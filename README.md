@@ -6,7 +6,7 @@ One-paragraph description of what your team is building goes here.
 
 | Name | GitHub username | Role |
 | --- | --- | --- |
-| Tran Tuan Anh | | |
+| Tran Tuan Anh | anotify-vie | |
 
 ## Setup
 
