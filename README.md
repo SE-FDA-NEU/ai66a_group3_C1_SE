@@ -6,7 +6,7 @@ One-paragraph description of what your team is building goes here.
 
 | Name | GitHub username | Role |
 | --- | --- | --- |
-| _add yourself here_ | | |
+|Nguyen Tuan Anh| NguyenTuanAnh0608 | |
 
 ## Setup
 
