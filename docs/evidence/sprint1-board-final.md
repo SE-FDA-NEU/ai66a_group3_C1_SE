@@ -1,0 +1,49 @@
+# Final Sprint 1 Board Snapshot
+
+Snapshot date: 2026-09-14
+
+Source: public GitHub issue state for `SE-FDA-NEU/ai66a_group3_C1_SE`, the
+available Sprint 1 board evidence in this folder, and the lack of linked merged
+PRs for committed Sprint 1 issues at wrap-up.
+
+## Board Columns
+
+| Column | Count | Cards |
+|--------|-------|-------|
+| Done | 1 | #10 - [Chore] Add Chore and Spike issue forms |
+| In Review | 0 | None |
+| In Progress | 5 | #11 - [Chore] C01 - Refine Sprint 1 backlog; #12 - [Chore] C02 - Sprint 1 wrap-up; #13 - [Chore] C03 - Collect and synthesize evidence for two personas; #14 - [Chore] C04 - Complete the M1 requirements dossier and traceability; #15 - [Chore] C05 - Review repository setup and team information |
+| Todo | 9 | #16 - [Spike] Investigate movie data and the initial recommendation approach; #17 - [Story] S01 - Select favorite genres to start choosing a movie; #18 - [Story] S02 - Get a movie list based on preferences; #19 - [Story] S03 - View movie details before deciding; #20 - [Story] S04 - Explore movies without preferences; #21 - [Story] S05a - Rate a movie and save feedback; #22 - [Story] S05b - Use movie ratings to improve recommendations; #23 - [Story] S06 - Filter recommendations by genre; #24 - [Story] S07 - Find similar movies from the details page |
+
+## Final Status of Committed Sprint 1 Issues
+
+Committed Sprint 1 issues are #11-#24. All were still open at wrap-up and are
+carried over.
+
+| Issue | Final GitHub issue state | Sprint result |
+|-------|--------------------------|---------------|
+| #11 | Open | Carried over |
+| #12 | Open | Carried over |
+| #13 | Open | Carried over |
+| #14 | Open | Carried over |
+| #15 | Open | Carried over |
+| #16 | Open | Carried over |
+| #17 | Open | Carried over |
+| #18 | Open | Carried over |
+| #19 | Open | Carried over |
+| #20 | Open | Carried over |
+| #21 | Open | Carried over |
+| #22 | Open | Carried over |
+| #23 | Open | Carried over |
+| #24 | Open | Carried over |
+
+## Blockers and Handover Notes
+
+- PR creation, teammate review request, and merge for #12 were blocked in this
+  agent environment because GitHub write tooling was unavailable.
+- Project board fields were not exposed through the public issue API, so this is
+  a text snapshot based on the available board evidence and current public issue
+  states.
+- The next Scrum Master should carry over #11-#24, verify board columns with
+  authenticated GitHub access, and check the single Sprint 2 retrospective action
+  assigned to @hoang3003.
