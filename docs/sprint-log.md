@@ -49,7 +49,7 @@ to `main`. The issue state check was taken from the public GitHub issue data for
 | Issue | Points | Final status | If not done, why |
 |-------|--------|--------------|------------------|
 | #11 | - | Carried over | Open on GitHub; backlog refinement evidence not merged into `main`. |
-| #12 | - | Carried over | Sprint wrap-up docs prepared locally, but PR review and merge were not completed. |
+| #12 | - | Carried over | Sprint wrap-up docs are in PR #25 with review requested from @kietxuan; approval and merge are not completed. |
 | #13 | - | Carried over | Open on GitHub; persona evidence and synthesis were not recorded in merged docs. |
 | #14 | - | Carried over | Open on GitHub; M1 dossier and traceability still need review and merge evidence. |
 | #15 | - | Carried over | Open on GitHub; repository setup review still needs recorded completion evidence. |
@@ -72,8 +72,8 @@ Snapshot file: [docs/evidence/sprint1-board-final.md](evidence/sprint1-board-fin
 | Board column | Cards at wrap-up |
 |--------------|------------------|
 | Done | #10 only; this was already closed and is not counted in the Sprint 1 commitment above. |
-| In Review | None recorded. |
-| In Progress | #11, #12, #13, #14, #15. |
+| In Review | #12. |
+| In Progress | #11, #13, #14, #15. |
 | Todo | #16, #17, #18, #19, #20, #21, #22, #23, #24. |
 
 ### Sprint Review
@@ -100,9 +100,9 @@ comment to every issue that has not moved since planning.
 
 ### Blockers
 
-- GitHub write automation was not available in the working environment: no `gh`
-  CLI and no `GITHUB_TOKEN` or `GH_TOKEN` were present, so PR creation, teammate
-  review request, merge, and issue closure could not be completed by the agent.
+- PR #25 was opened for #12 and review was requested from @kietxuan, but no
+  teammate approval was present at wrap-up, so merge and issue closure remain
+  blocked.
 - Project board field data was not available through the public issue API; the
   final board snapshot is recorded as a text snapshot from the available board
   evidence and public issue states.
@@ -113,12 +113,12 @@ comment to every issue that has not moved since planning.
 
 All committed Sprint 1 issues were unfinished at wrap-up and should be carried
 into Sprint 2: #11, #12, #13, #14, #15, #16, #17, #18, #19, #20, #21, #22, #23,
-and #24.
+and #24. Issue #12 has PR #25 open and waiting for teammate review.
 
 ### Scrum Master Handover
 
-Next Scrum Master should start from the final board snapshot above, unblock
-GitHub PR/review/merge access for #12, check the single retro action with
+Next Scrum Master should start from the final board snapshot above, follow up on
+the requested @kietxuan review for PR #25, check the single retro action with
 @hoang3003, and re-plan the carried-over issues before accepting new Sprint 2
 work.
 
