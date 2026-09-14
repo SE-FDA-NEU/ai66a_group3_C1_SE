@@ -106,8 +106,9 @@ comment to every issue that has not moved since planning.
 - Project board field data was not available through the public issue API; the
   final board snapshot is recorded as a text snapshot from the available board
   evidence and public issue states.
-- No Sprint 1 issue comments were present on #11-#24, so blockers and attendance
-  could not be verified from GitHub discussion history.
+- Before this wrap-up there were no Sprint 1 progress or blocker comments on
+  #11-#24, so attendance could not be verified from GitHub discussion history.
+  A handover comment was added to #12 after PR #25 was opened.
 
 ### Unfinished Work and Carry-over
 
@@ -117,10 +118,10 @@ and #24. Issue #12 has PR #25 open and waiting for teammate review.
 
 ### Scrum Master Handover
 
-Next Scrum Master should start from the final board snapshot above, follow up on
-the requested @kietxuan review for PR #25, check the single retro action with
-@hoang3003, and re-plan the carried-over issues before accepting new Sprint 2
-work.
+Next Scrum Master should start from the final board snapshot above and the
+handover comment on #12, follow up on the requested @kietxuan review for PR #25,
+check the single retro action with @hoang3003, and re-plan the carried-over
+issues before accepting new Sprint 2 work.
 
 ### Attendance
 

@@ -6,6 +6,8 @@ Source: public GitHub issue state for `SE-FDA-NEU/ai66a_group3_C1_SE`, the
 available Sprint 1 board evidence in this folder, and the lack of linked merged
 PRs for committed Sprint 1 issues at wrap-up.
 
+Handover comment: https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/12#issuecomment-5664483649
+
 ## Board Columns
 
 | Column | Count | Cards |
@@ -44,6 +46,7 @@ carried over.
 - Project board fields were not exposed through the public issue API, so this is
   a text snapshot based on the available board evidence and current public issue
   states.
-- The next Scrum Master should carry over #11-#24, follow up on PR #25, verify
-  board columns with authenticated GitHub access, and check the single Sprint 2
-  retrospective action assigned to @hoang3003.
+- The next Scrum Master should carry over #11-#24, use the handover comment on
+  #12, follow up on PR #25, verify board columns with authenticated GitHub
+  access, and check the single Sprint 2 retrospective action assigned to
+  @hoang3003.
