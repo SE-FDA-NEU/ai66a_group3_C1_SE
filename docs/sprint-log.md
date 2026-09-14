@@ -38,7 +38,8 @@ as story points in GitHub.
 | #23 | [Story] S06 - Filter recommendations by genre | 3 | @kietxuan |
 | #24 | [Story] S07 - Find similar movies from the details page | 3 | @vu-huzy |
 
-**Total committed: 30 story points plus 6 unestimated process items**
+**Total committed: 30 story points plus 5 unestimated chores and 1
+unestimated spike**
 
 ### Result
 
@@ -69,12 +70,17 @@ to `main`. The issue state check was taken from the public GitHub issue data for
 
 Snapshot file: [docs/evidence/sprint1-board-final.md](evidence/sprint1-board-final.md)
 
-| Board column | Cards at wrap-up |
-|--------------|------------------|
-| Done | #10 only; this was already closed and is not counted in the Sprint 1 commitment above. |
-| In Review | #12. |
-| In Progress | #11, #13, #14, #15. |
-| Todo | #16, #17, #18, #19, #20, #21, #22, #23, #24. |
+Project board fields were not exposed through the public issue API at wrap-up,
+so the column view below is the latest available board evidence plus the PR
+state that could be verified. The final GitHub issue state for every committed
+issue is recorded in the Result table above.
+
+| Board view | Cards |
+|------------|-------|
+| Verified Done issue | #10 only; this was already closed and is not counted in the Sprint 1 commitment above. |
+| Verified In Review update | #12 has PR #25 open with review requested from @kietxuan. |
+| Latest available board evidence: In Progress | #11, #13, #14, #15. Authenticated board verification still needed. |
+| Latest available board evidence: Todo | #16, #17, #18, #19, #20, #21, #22, #23, #24. Authenticated board verification still needed. |
 
 ### Sprint Review
 

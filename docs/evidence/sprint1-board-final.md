@@ -4,18 +4,20 @@ Snapshot date: 2026-09-14
 
 Source: public GitHub issue state for `SE-FDA-NEU/ai66a_group3_C1_SE`, the
 available Sprint 1 board evidence in this folder, and the lack of linked merged
-PRs for committed Sprint 1 issues at wrap-up.
+PRs for committed Sprint 1 issues at wrap-up. Public issue data did not expose
+authenticated GitHub Project board fields, so unverified column assignments are
+clearly marked.
 
 Handover comment: https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/12#issuecomment-5664483649
 
-## Board Columns
+## Board View
 
-| Column | Count | Cards |
-|--------|-------|-------|
-| Done | 1 | #10 - [Chore] Add Chore and Spike issue forms |
-| In Review | 1 | #12 - [Chore] C02 - Sprint 1 wrap-up; PR #25 opened and review requested from @kietxuan |
-| In Progress | 4 | #11 - [Chore] C01 - Refine Sprint 1 backlog; #13 - [Chore] C03 - Collect and synthesize evidence for two personas; #14 - [Chore] C04 - Complete the M1 requirements dossier and traceability; #15 - [Chore] C05 - Review repository setup and team information |
-| Todo | 9 | #16 - [Spike] Investigate movie data and the initial recommendation approach; #17 - [Story] S01 - Select favorite genres to start choosing a movie; #18 - [Story] S02 - Get a movie list based on preferences; #19 - [Story] S03 - View movie details before deciding; #20 - [Story] S04 - Explore movies without preferences; #21 - [Story] S05a - Rate a movie and save feedback; #22 - [Story] S05b - Use movie ratings to improve recommendations; #23 - [Story] S06 - Filter recommendations by genre; #24 - [Story] S07 - Find similar movies from the details page |
+| Board view | Count | Cards |
+|------------|-------|-------|
+| Verified Done issue | 1 | #10 - [Chore] Add Chore and Spike issue forms |
+| Verified In Review update | 1 | #12 - [Chore] C02 - Sprint 1 wrap-up; PR #25 opened and review requested from @kietxuan |
+| Latest available board evidence: In Progress | 4 | #11 - [Chore] C01 - Refine Sprint 1 backlog; #13 - [Chore] C03 - Collect and synthesize evidence for two personas; #14 - [Chore] C04 - Complete the M1 requirements dossier and traceability; #15 - [Chore] C05 - Review repository setup and team information |
+| Latest available board evidence: Todo | 9 | #16 - [Spike] Investigate movie data and the initial recommendation approach; #17 - [Story] S01 - Select favorite genres to start choosing a movie; #18 - [Story] S02 - Get a movie list based on preferences; #19 - [Story] S03 - View movie details before deciding; #20 - [Story] S04 - Explore movies without preferences; #21 - [Story] S05a - Rate a movie and save feedback; #22 - [Story] S05b - Use movie ratings to improve recommendations; #23 - [Story] S06 - Filter recommendations by genre; #24 - [Story] S07 - Find similar movies from the details page |
 
 ## Final Status of Committed Sprint 1 Issues
 
