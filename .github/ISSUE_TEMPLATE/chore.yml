@@ -1,0 +1,64 @@
+name: "Chore"
+description: "A setup, documentation, configuration, or process task with no user-visible feature"
+title: "[Chore] "
+labels: ["chore"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for setup, documentation, configuration, or process work.
+        Chores do not receive story points.
+
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective
+      description: What needs to be completed?
+      placeholder: "Example: Refine the Sprint 1 backlog and prepare it for Sprint Planning."
+    validations:
+      required: true
+
+  - type: textarea
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Break the work into small, verifiable steps.
+      value: |
+        - [ ] Task 1
+        - [ ] Task 2
+        - [ ] Task 3
+    validations:
+      required: true
+
+  - type: input
+    id: owner
+    attributes:
+      label: Owner
+      description: GitHub username of the person responsible for this chore.
+      placeholder: "@username"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: sprint
+    attributes:
+      label: Planned sprint
+      options:
+        - "Sprint 1"
+        - "Sprint 2"
+        - "Sprint 3"
+        - "Sprint 4"
+        - "Sprint 5"
+        - "Backlog"
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Completion evidence
+      description: Add the relevant PR, file, issue, or verification result after completion.
+      placeholder: "Link to the pull request or describe the evidence..."
+    validations:
+      required: false

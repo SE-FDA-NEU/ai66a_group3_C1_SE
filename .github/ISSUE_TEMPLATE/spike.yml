@@ -1,0 +1,56 @@
+name: "Spike"
+description: "A timeboxed investigation whose output is knowledge or a decision"
+title: "[Spike] "
+labels: ["spike"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A spike must have a clear timebox.
+        Spikes do not receive story points; their size is measured by time.
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Question to answer
+      description: What does the team need to investigate or decide?
+      placeholder: "Example: Which movie data source supports the fields required by BR2 and BR12?"
+    validations:
+      required: true
+
+  - type: input
+    id: timebox
+    attributes:
+      label: Timebox
+      description: Maximum time allowed for this investigation.
+      value: "4 hours"
+    validations:
+      required: true
+
+  - type: input
+    id: owner
+    attributes:
+      label: Owner
+      description: GitHub username of the person conducting the spike.
+      placeholder: "@username"
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-output
+    attributes:
+      label: Expected output
+      description: What document, recommendation, or decision should be delivered?
+      placeholder: "A short report listing the data source, available fields, constraints, and recommendation."
+    validations:
+      required: true
+
+  - type: textarea
+    id: result
+    attributes:
+      label: Result
+      description: Complete this section when the spike is finished.
+      placeholder: "Summarize the findings, decision, remaining unknowns, and impact on the backlog."
+    validations:
+      required: false
