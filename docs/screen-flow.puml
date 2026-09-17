@@ -1,0 +1,48 @@
+@startuml
+title AI Movie Recommendation System - Screen Flow
+
+start
+
+:Open the recommendation page;
+
+if (Saved genre preferences?) then (yes)
+  :Request personalised recommendations;
+else (no)
+  :Show popular movies;
+  :Show "Choose favourite genres" action;
+  :Select 1 to 5 favourite genres;
+
+  if (Valid genre selection?) then (yes)
+    :Save preferences for the current session;
+    :Request personalised recommendations;
+  else (no)
+    :Show validation message;
+    stop
+  endif
+endif
+
+if (Recommendation request succeeds?) then (yes)
+  if (Matching movies found?) then (yes)
+    :Show up to 10 matching movie cards;
+    :Optionally filter the list by genre;
+    :Select a movie;
+    :Show movie details;
+
+    if (User wants similar movies?) then (yes)
+      :Show up to 5 similar movies;
+    endif
+
+    if (User wants to rate the movie?) then (yes)
+      :Validate and save an optional rating from 1 to 5;
+    endif
+  else (no)
+    :Show no-match message;
+    :Show popular alternative movies;
+    :Offer actions to edit preferences or retry;
+  endif
+else (no)
+  :Show an error message and a retry action;
+endif
+
+stop
+@enduml
