@@ -2,9 +2,7 @@
 
 ## Product vision
 
-For university students who spend too much time choosing a movie, the AI Movie
-Recommendation System helps guests discover relevant movies through genre
-preferences, clear recommendation reasons, and useful fallback options.
+For university students facing choice overload, the AI Movie Recommendation System turns a small set of genre preferences and optional ratings into transparent movie recommendations, unlike a generic popularity list that gives every viewer the same choices.
 
 ## Target users
 
@@ -50,6 +48,13 @@ The first usable product flow is:
 - S05a - Rate a movie and save feedback.
 - S05b - Use ratings to improve recommendations.
 - S07 - View similar movies.
+- S08 - Search for a movie by title.
+- S09 - Browse popular movies.
+
+### P2 - Later capabilities
+
+- S10 - Learn how recommendations are personalised.
+- S11 - Reset my personalisation profile.
 
 ## Scope constraints
 
@@ -60,9 +65,13 @@ The first usable product flow is:
   for the movie-data spike.
 - User accounts, administrator features, payments, social features, and a
   complex machine-learning model are out of scope for the MVP.
+- P1 and P2 Stories remain in the product backlog and are not committed to the
+  Sprint 1 requirements sprint.
 
 ## Evidence basis
 
-The scope is based on the aggregated findings in `docs/user-research.md` and
-the behaviour patterns in `docs/personas.md`. The small, student-only sample
-guides the initial MVP; it does not represent all movie viewers.
+The scope is based on the aggregated questionnaire findings in
+`docs/user-research.md` and the behaviour patterns in `docs/personas.md`.
+The small, student-only sample guides the initial MVP; it does not represent
+all movie viewers. The Product Owner must validate or refine these decisions
+after C03 records the required anonymised user conversations.
