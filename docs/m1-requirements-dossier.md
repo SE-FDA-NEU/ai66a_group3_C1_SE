@@ -90,3 +90,107 @@ There are no user accounts in the MVP (see the scope constraints in
 | `/preferences` | Pick 1 to 5 favourite genres (BR1); come back later and change them. | G | P0 | F1 | #17 |
 | `/recommendations` | Up to 10 personalised or popular movies with a match reason (BR2, BR4, BR10, BR12); filter the list by genre (BR8). | G | P0 | F2, F4, F7 | #18, #20, #23 |
 | `/movies/:movieId` | Movie details (BR5), rating (BR6, BR7), and up to 5 similar movies (BR9). | G | P0 for details, P1 for rating and similar movies | F3, F5, F6, F8 | #19, #21, #22, #24 |
+
+## 5. Screen flow
+
+The original diagram is `docs/screen-flow.puml`. The Mermaid version below
+redraws the same flow so it renders directly on GitHub without a PlantUML
+viewer. It keeps the same success path and the same error, empty-state,
+retry and back-navigation branches; nothing is added or removed.
+
+```mermaid
+flowchart TD
+    A["Open the recommendations page"] --> B{"Saved genre\npreferences?"}
+    B -- yes --> C["Request personalised\nrecommendations"]
+    B -- no --> D["Show popular movies (BR3, BR12)\n+ 'Choose favourite genres' action"]
+    D --> E["/preferences: select 1-5 genres"]
+    E --> F{"Valid selection?\n(BR1)"}
+    F -- no --> G["Show validation message\n(stay on /preferences)"]
+    F -- yes --> H["Save preferences for the\ncurrent session (BR7)"]
+    H --> C
+    C --> I{"Request\nsucceeds?"}
+    I -- no --> J["Show error message\n+ retry action"]
+    J --> C
+    I -- yes --> K{"Matching movies\nfound? (BR2)"}
+    K -- no --> L["Show no-match message +\npopular alternatives (BR4)\n+ edit-preferences / retry actions"]
+    L --> E
+    K -- yes --> M["/recommendations: up to 10 cards\nwith match reason (BR10)"]
+    M --> N["Optionally filter by genre (BR8)"]
+    N --> O["Select a movie -> /movies/:movieId"]
+    O --> P["Show movie details (BR5)"]
+    P --> Q{"Similar movies\nexist? (BR9)"}
+    Q -- yes --> R["Show up to 5 similar movies"]
+    Q -- no --> S["Show 'no similar movies' message"]
+    P --> T{"Guest submits\na rating?"}
+    T -- yes --> U{"Valid integer\n1-5? (BR6)"}
+    U -- no --> V["Reject value,\nkeep previous rating"]
+    U -- yes --> W["Save/update rating for\nthis session (BR7, BR11)"]
+    P --> X["Back to /recommendations\n(preferences preserved)"]
+```
+
+The empty state shows up twice: once for a guest with no preferences at all
+(node D) and once for a guest whose genres do not match anything (node L).
+Both give the guest something to do next instead of a dead end. A failed
+recommendation request (I to J) does not discard the guest's selected
+genres; it offers retry, and retrying re-runs the same request (J to C),
+which is what #18's acceptance criteria ask for. Going from a movie's
+details page back to the recommendation list keeps the session's
+preferences and list state intact, per the last acceptance criterion on
+#19.
+
+## 6. Traceability
+
+[`docs/traceability.md`](traceability.md) is the one table that maps every
+route above to its feature(s) and real issue number(s). It is kept as a
+single file so there is only one place to update the mapping. Nothing in
+this dossier names a route, feature, or issue number that is not already
+in that table.
+
+## 7. Team and personas
+
+### Team
+
+| Name | GitHub username | Role |
+|---|---|---|
+| Nguyen Xuan Kiet | [kietxuan](https://github.com/kietxuan) | Product Owner, fixed for the whole term |
+| Minh Hoàng Trần | [hoang3003](https://github.com/hoang3003) | Scrum Master for Sprint 1 |
+| Tran Tuan Anh | [anotify-vie](https://github.com/anotify-vie) | Dev: led C03's persona and user-research work; assigned S05a (#21) |
+| Nguyen Tuan Anh | [NguyenTuanAnh0608](https://github.com/NguyenTuanAnh0608) | Dev: owns C05's repository review; assigned S03 (#19) |
+| Vũ Quốc Huy | [vu-huzy](https://github.com/vu-huzy) | Dev: owns C04, this dossier; assigned S04 (#20) and S07 (#24) |
+
+kietxuan is the Product Owner for the whole term, and hoang3003 is Sprint
+1's Scrum Master, a role that rotates each sprint per `docs/process.md`.
+That document also explains why: the team creates two mandatory chore
+issues each sprint, one for backlog refinement assigned to the PO and one
+for sprint wrap-up assigned to that sprint's Scrum Master. C01 (refine the
+backlog) went to kietxuan and C02 (Sprint 1 wrap-up) went to hoang3003,
+matching the roles above. README does not list these roles yet; updating
+it belongs to C05 (#15, still open), not to this dossier.
+
+README also spells Minh Hoàng Trần's GitHub username as `minhhoang3003`,
+but every issue assignment (#17, #20, #22, #12) points to `hoang3003`.
+That should be corrected as part of C05.
+
+### Personas
+
+The full write-up, with pain points and the survey evidence behind each
+one, is in [`docs/personas.md`](personas.md); the raw numbers are in
+[`docs/user-research.md`](user-research.md). In short:
+
+The Frequent Explorer persona watches movies at least twice a week (4 of 8
+respondents fit this pattern) and wants a short, explained list instead of
+scrolling through a popular-movies page again. This persona is behind F1,
+F2, F3, F7 and F8.
+
+The Occasional Undecided Viewer persona does not watch often and does not
+know where to start when the app opens. This persona needs popular movies
+to show up with no setup required, an obvious way into picking genres, and
+should never be forced to rate anything just to keep using the product.
+This persona is behind F1, F2, F4 and F5.
+
+Both are behaviour patterns pulled from the same anonymous 8-response
+survey, not descriptions of specific people. The sample is small and
+entirely university students aged 18 to 20, so these personas are good
+enough to steer the MVP, but they should not be read as representing every
+movie viewer. That limitation is spelled out in `docs/user-research.md` as
+well.
