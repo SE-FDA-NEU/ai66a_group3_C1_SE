@@ -21,6 +21,15 @@ If one box is unticked, the story stays in the sprint and carries over.
 - "My teammate approved it in five seconds." A review with no comments on a
   300-line PR is not a review. Ask a real question.
 
+## Documentation and requirements PRs
+
+Requirements work does not make a product Story Done. A documentation PR is ready to
+merge when it links its planned chore, contains checkable statements backed by the
+relevant Issue or research evidence, updates traceability when a route/rule changes,
+passes the applicable CI checks, and is approved by a teammate who did not author the
+change. It must not invent interview evidence, test results, implementation status, or
+future Sprint outcomes.
+
 ## Changing this document
 
 The team may add criteria at a retrospective. Removing one requires the
