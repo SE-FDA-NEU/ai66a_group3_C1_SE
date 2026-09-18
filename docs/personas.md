@@ -84,3 +84,46 @@ complete preference profile.
   cold-start.
 - 6 of 8 respondents preferred popular alternatives after no matching result.
 - No respondent rated movies frequently.
+
+## Persona 3 - Detail-Oriented Chooser
+
+### Context
+
+This user usually has a rough idea of what they want to watch but needs more
+information before deciding on a movie. A recommendation may look relevant, but
+the user still wants to check whether it matches their current interests.
+
+### Goal
+
+Confirm that a recommended movie is suitable before deciding to watch it.
+
+### Pain points
+
+- Being unsure whether a movie will match current interests or mood.
+- Recommendations may appear relevant without enough information to make a
+  confident decision.
+- Finding an interesting movie but not knowing how to discover similar options.
+
+### Needs from the product
+
+- See a clear reason why a movie was recommended.
+- Open detailed information about a movie before making a decision.
+- Filter recommendations by genre to narrow the available choices.
+- Continue exploring similar movies after finding an interesting title.
+
+### Relevant stories
+
+- S02 - View personalised recommendations.
+- S03 - View movie details.
+- S06 - Filter recommendations by genre.
+- S07 - View similar movies.
+
+### Evidence
+
+- 5 of 8 respondents were unsure whether a movie would suit their current mood.
+- Genre was selected by 6 of 8 respondents as important information before
+  choosing a movie.
+- Rating was selected by 4 of 8 respondents; overview, trailer or image, and a
+  recommendation reason were each selected by 3 of 8 respondents.
+- Viewing similar movies received an average importance score of 3.625 out of
+  5.
