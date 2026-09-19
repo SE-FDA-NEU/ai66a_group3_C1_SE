@@ -28,3 +28,16 @@ refer to screen names, route names, or button labels.
 6. They receive popular alternatives instead of reaching a dead end.
 7. They adjust their selected genres and try again.
 8. They receive matching recommendations and choose a movie to explore further.
+
+## Scenario 3 - A Detail-Oriented Chooser compares similar options
+
+**Persona:** Detail-Oriented Chooser
+
+1. The Detail-Oriented Chooser wants a film that fits their current interests but needs enough information to decide.
+2. They select a small set of favourite genres and receive a relevant list.
+3. They read the reason attached to one recommendation and choose it for closer inspection.
+4. They review its title, year, genres, and summary.
+5. They decide that its summary is not quite right for the evening.
+6. They look at other films that share at least one of its genres.
+7. They open one of those alternatives and read its information.
+8. They find a suitable option and decide whether to watch it.
