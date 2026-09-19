@@ -15,12 +15,18 @@ gives every viewer the same choices.
 
 ## 2. Personas
 
-Interview note: the personas are based on an anonymous questionnaire with 8 valid
-responses from university students aged 18 to 20, recorded in
-`docs/user-research.md` on 2026-09-17. No individual conversations are
-recorded in the repository. The quoted sentences are verbatim free-text
-answers from the questionnaire, translated from Vietnamese, and are not
-attributed to named people.
+Interview and research note: an anonymous, consented questionnaire collected
+8 valid responses from university students aged 18 to 20 between 00:47 and
+22:26 on 2026-09-16. Four respondents volunteered for a possible short
+follow-up conversation. The evidence in this document uses anonymous
+respondents only; quotations are faithful English translations of free-text
+answers, not verbatim English originals.
+
+At the time of this revision, the repository records the questionnaire but not
+two dated follow-up conversations. Before submitting M1, the team must add a
+brief note for at least two real conversations: anonymised participant code or
+role, date, and the key finding that informed a persona. It must not claim
+those conversations occurred until the notes exist.
 
 ### Persona 1: Frequent Explorer
 
@@ -78,8 +84,9 @@ similar movies scored 3.625 out of 5.
 
 ## 3. Scenarios
 
-Both scenarios are taken from `docs/scenarios.md`. They describe a complete
-use of the system in plain language and name no screens or buttons.
+The three scenarios below correspond to the three personas. They describe a
+complete use of the system in plain language and do not name screens, routes or
+buttons.
 
 ### Scenario 1: A Frequent Explorer finds a movie from existing preferences
 
@@ -109,10 +116,24 @@ use of the system in plain language and name no screens or buttons.
 8. They receive matching recommendations and choose a movie to explore
    further.
 
+### Scenario 3: A Detail-Oriented Chooser compares similar options
+
+1. The Detail-Oriented Chooser wants a film that fits their current interests
+   but needs enough information to decide.
+2. They select a small set of favourite genres and receive a relevant list.
+3. They read the reason attached to one recommendation and choose it for
+   closer inspection.
+4. They review its title, year, genres and summary.
+5. They decide that its summary is not quite right for the evening.
+6. They look at other films that share at least one of its genres.
+7. They open one of those alternatives and read its information.
+8. They find a suitable option and decide whether to watch it.
+
 ## 4. User stories
 
-Points are the estimates recorded on each GitHub issue. Five stories are P0,
-five are P1 and two are P2.
+The product backlog contains 12 Stories: five P0, five P1 and two P2. This
+meets the team-of-five minimum of 12 Stories and the required range of 4 to 6
+P0 Stories. Points are the estimates recorded on each GitHub issue.
 
 | ID | Story | Priority | Points | Issue | Route |
 |---|---|---|---|---|---|
@@ -129,14 +150,19 @@ five are P1 and two are P2.
 | S10 | Learn how recommendations are personalised | P2 | 3 | #32 | `/about-recommendations` |
 | S11 | Reset my personalisation profile | P2 | 3 | #33 | `/profile` |
 
-The full acceptance criteria stay on the GitHub issues. The criteria below
-are the ones each story is checked against.
+The acceptance criteria below match the live GitHub Story issues checked on
+2026-09-19. Each Story has at least two Given–When–Then criteria, including at
+least one concrete number or exact expected value. GitHub remains the working
+backlog; any later requirement change must be made in both the relevant issue
+and this document before the M1 PDF is exported.
 
 ### S01 Select favourite genres (P0, 3 points)
 
 As someone who wants to choose a movie quickly, I want to select my favourite
 genres so that I can receive relevant recommendations without viewing history.
 
+- Given I am on the home page, when I select Start, then the system opens
+  `/preferences` and displays the available genres.
 - Given I select 1 to 5 valid genres, when I confirm, then the choices are
   saved for the current session and I am taken to the recommendations.
 - Given I have not selected any genre, when I confirm, then I am asked to
@@ -164,6 +190,8 @@ watch.
 - Given the recommendation source fails, when recommendations are requested,
   then an error message and a retry action are shown and the selected
   preferences stay unchanged.
+- Given I retry after a recommendation-source failure, when the request
+  succeeds, then the recommendation results are displayed.
 
 ### S03 View movie details before deciding (P0, 3 points)
 
@@ -171,7 +199,8 @@ As someone considering a movie, I want to view detailed information so that I
 can decide whether to watch it.
 
 - Given a movie card has a valid ID, when I select View details, then the
-  title, year, genres and summary are displayed.
+  correct `/movies/:movieId` route opens and the title, year, genres and
+  summary are displayed.
 - Given the movie ID does not exist, when I open the details address, then
   "Movie not found" and a link back to the movie list are shown.
 - Given the movie has no summary or year, when I open its details, then
@@ -194,6 +223,9 @@ stuck on an empty screen before entering my preferences.
 - Given the popular movie data is empty, when I open the recommendations in a
   new session, then a no-data message and guidance to enter preferences are
   shown and no fake movies are displayed.
+- Given valid preferences have been saved, when I open the recommendations
+  again, then the system uses the personalised behaviour from S02 and follows
+  BR4 if the result is empty.
 
 ### S05a Rate a movie and save feedback (P1, 3 points)
 
@@ -211,6 +243,8 @@ that I can save my feedback.
   success message.
 - Given I have not rated any movie, when I request recommendations, then the
   recommendation flow still works.
+- Given one session has rated a movie, when an independent session opens the
+  same movie, then it does not display the first session's rating as its own.
 
 ### S05b Use movie ratings to improve recommendations (P1, 5 points)
 
@@ -226,7 +260,10 @@ feedback so that they become more relevant.
   when I rate an Action movie 3, then the Action candidate stays above the
   Comedy candidate because 3 is neutral.
 - Given ratings affect the ranking, when recommendations are generated, then
-  at most 10 different movies are returned.
+  at most 10 different movies are returned and BR2 is still satisfied.
+- Given a rating signal cannot be applied, when recommendations are generated,
+  then the system returns a valid preference-based result and does not show an
+  incorrect success message.
 
 ### S06 Filter recommendations by genre (P0, 3 points)
 
@@ -252,7 +289,7 @@ explore more options without starting the search again.
 - Given no suitable candidate exists, when I open the section, then a message
   says no similar movies are available and the original details stay visible.
 - Given similar movies are displayed, when I select one, then its details page
-  opens.
+  opens for the selected movie ID.
 
 ### S08 Search for a movie by title (P1, 3 points)
 
@@ -304,15 +341,16 @@ receiving recommendations without previous preference data.
 
 ## 5. Business rules
 
-Rule numbers follow the routes and stories mapped in `docs/traceability.md`.
-Each rule is a constraint the system enforces.
+The rules below are constraints the system enforces. They use the route and
+Story mapping in `docs/traceability.md`; their worked examples use concrete
+numbers or exact expected values.
 
 | ID | Rule | Worked example | Stories | Routes |
 |---|---|---|---|---|
 | BR1 | A viewer selects between 1 and 5 favourite genres. | Choosing Action, Comedy and Drama (3 genres) is accepted. A sixth genre after 5 is refused and the 5 stay selected. Confirming with 0 genres is refused. | S01 | `/`, `/preferences` |
 | BR2 | A recommended movie matches at least one selected genre. | Movie 7 is tagged Action and Comedy and movie 9 is tagged Drama. With Action selected, only movie 7 (1 of 2) can be recommended. | S02, S05b | `/recommendations` |
 | BR3 | A recommendation list has no duplicates and at most 10 movies. | If 12 movies match, 10 are shown. A movie that matches 2 selected genres appears once. | S02, S05b | `/recommendations` |
-| BR4 | When nothing matches, the viewer sees a no-match message, up to 10 popular alternatives, and actions to change preferences or retry. | The selected genres match 0 movies, so the page shows the message and 10 popular movies instead of an empty list. | S02, S04 | `/recommendations` |
+| BR4 | When nothing matches, the viewer sees a no-match message, up to 10 popular alternatives, and actions to change preferences or retry. | The selected genres match 0 movies. If 7 popular movies are available, the page shows those 7 with the message and actions instead of an empty list; if 12 are available, it shows only 10. | S02, S04 | `/recommendations` |
 | BR5 | Popular movies are ordered by popularity score from highest to lowest, equal scores by title from A to Z, and at most 10 are shown. | Movie A scores 90, Movie B 80 and Movie C 80. The order is A, B, C. | S04, S09 | `/`, `/recommendations`, `/popular` |
 | BR6 | Every movie has a unique ID that opens its details page. | The card with ID 42 opens the details of movie 42. An ID that does not exist shows "Movie not found". | S03 | `/movies/:movieId` |
 | BR7 | A rating is a whole number from 1 to 5. | 1 and 5 are accepted. 0, 6 and 3.5 are rejected and an earlier rating is kept. | S05a | `/movies/:movieId` |
