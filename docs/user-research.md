@@ -7,9 +7,15 @@ students aged 18-20. The survey asked about movie-watching habits,
 movie-selection behaviour, pain points, information needs, feature priorities,
 rating behaviour, cold-start preferences, and no-result preferences.
 
-The raw survey spreadsheet and the original response summary are kept outside
-the public repository. They contain timestamps and free-text responses, so this
-document records only aggregated and anonymized findings.
+The local repository currently tracks the raw survey spreadsheet. This does
+not establish consent to public redistribution. C03 must review publication
+consent and data minimisation before a further research-data push. This document
+reports aggregated findings only; the original summary is not included here.
+
+The evidence is a self-completed questionnaire, not eight conducted interviews.
+The M1 requirement for two real conversations remains unverified until dated
+conversation notes or an explicit instructor-approved alternative are recorded.
+Never fabricate conversations or consent.
 
 ## Findings
 

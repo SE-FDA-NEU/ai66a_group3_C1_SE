@@ -18,8 +18,8 @@ rather than giving every viewer the same generic popularity list.
 
 - Repository: [SE-FDA-NEU/ai66a_group3_C1_SE](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE)
 - Project board: [@group3_c1_se — Project 9](https://github.com/orgs/SE-FDA-NEU/projects/9)
-- Product backlog: 12 Story Issues, #17–#24 and #30–#33. The MVP P0 Stories are
-  S01, S02, S03, S04, and S06.
+- Product backlog: 14 Story Issues, #17–#24, #30–#33, #44 and #45 (54 points).
+  The six P0 Stories are S01–S04, S12 and S13; S06 is P1.
 
 ## Requirements references
 
