@@ -48,9 +48,12 @@ Story Points under the team's backlog-refinement rule.
 | #14 / C04 |      - | Done                    | Requirements, screen flow, and traceability work were merged through PRs #28, #38, and #39.                     |
 | #15 / C05 |      - | Done                    | Repository readiness, business rules, README, routes, and team information were merged through PRs #36 and #40. |
 
-**Completed work:** 5 of 5 committed Chores.
+**GitHub closed count:** 5 of 5 committed Chores. This is a status count, not
+verified completion of every checklist; C02 evidence remains unverified below.
 
-**Unfinished work:** None among the five committed Sprint 1 Chores.
+**Unverified completion evidence:** C02 is closed, but retrospective, improvement
+owner/action, attendance/review details and final snapshot are not fully supported
+by the files below. Closed status alone does not prove checklist completion.
 
 **Velocity:** 0 Story Points. The completed Sprint 1 work consists of Chores,
 which have no Story Point estimates. S04's 5-point estimate is not counted
@@ -71,6 +74,11 @@ because refining its requirements does not make the product Story Done.
 - S05 was separated into S05a (save optional feedback) and S05b (use ratings in
   recommendation ranking).
 - S08-S11 were added, bringing the product backlog to 12 Stories.
+- S12 Register an account and S13 Sign in and sign out securely were later
+  added as explicit course requirements, bringing the final M1 backlog to 14
+  Stories and 54 points.
+- The final account refinement assigns S01-S04, S12, and S13 to P0; S06 is P1
+  so the product stays within the required maximum of six P0 Stories.
 - S04 was refined to show at most 10 non-personalised popular movies, ordered by
   popularity descending and title A-Z for equal scores, with a visible action
   to choose genres.
@@ -80,10 +88,10 @@ because refining its requirements does not make the product Story Done.
 #### Carried-over and unresolved items
 
 - None of the five committed Sprint 1 Chores was carried over.
-- The board evidence shows the movie-data Spike #16 as In Progress, while the
-  backlog-refinement decision says to keep it in Backlog. The team must reconcile
-  its iteration and status before the final Sprint 1 snapshot.
-- Product Stories S01-S11 are backlog work rather than unfinished Sprint 1
+- The historical board image shows #16 In Progress; GitHub now shows it closed.
+  Result and independent-review evidence still need reconciliation. Preserve
+  historical images; any new snapshot must carry its actual capture date.
+- Product Stories S01-S13 are backlog work rather than unfinished Sprint 1
   commitments and therefore are not counted as carry-over from this sprint.
 
 ### Sprint Review
@@ -92,7 +100,7 @@ because refining its requirements does not make the product Story Done.
 
 **Repository outcomes available for demonstration:**
 
-- A research-backed product scope and 12-Story backlog.
+- A research-backed product scope and final 14-Story backlog.
 - Three personas and their scenarios.
 - The M1 requirements document, screen flow, business rules, and route-to-Story
   traceability.
@@ -102,9 +110,10 @@ because refining its requirements does not make the product Story Done.
 **Feedback received:** Not recorded in the repository.
 
 **Backlog changes resulting from the recorded refinement work:** S06 was
-promoted, S05 was split, S08-S11 were added, and S04's cold-start behaviour was
-made deterministic. The repository does not identify which changes, if any,
-were specifically agreed during a Sprint Review meeting.
+promoted, S05 was split, S08-S11 were added, S04's cold-start behaviour was
+made deterministic, and the final M1 refinement added S12/S13 with
+account-owned personalisation. The repository does not identify which changes,
+if any, were specifically agreed during a Sprint Review meeting.
 
 ### Retrospective
 
