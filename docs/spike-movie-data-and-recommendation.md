@@ -3,7 +3,7 @@
 - Related issue: [#16](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/16)
 - Owner: @kietxuan
 - Timebox: 4 hours
-- Status: authenticated smoke test completed; teammate review required before the issue is closed
+- Status: #16 is closed on GitHub; its Result and independent-review evidence require reconciliation
 - Scope: choose a catalogue source and a deterministic MVP recommendation
   approach. This Spike does not implement the application.
 
@@ -17,9 +17,9 @@ movies, and title search?
 ## Decision
 
 Use **TMDb API** as the external movie-catalogue provider for the MVP. Keep a
-small **synthetic local fixture** for automated tests. Store a viewer's 1--5
-movie rating in this application; do not treat TMDb's aggregate vote values as
-that viewer's rating.
+small **synthetic local fixture** for automated tests. Store a signed-in
+account's 1--5 movie rating in this application; do not treat TMDb's aggregate
+vote values as that account's rating.
 
 MovieLens is useful as a possible later research or offline-evaluation data
 set, but it is not the primary MVP catalogue. Its core files provide movie
@@ -88,22 +88,33 @@ catalogue is fetched or imported. It is not calculated from `vote_average` or
 
 ```text
 CatalogMovie
-  id: string                    // TMDb movie ID, stored as a string in the app
+  id: string                    // stable internal ID, opaque to clients
+  sourceId: string              // TMDb ID, unique with source
   title: string
   releaseYear: number | null    // derived from release date when available
   genreIds: number[]
   genreNames: string[]
   overview: string | null
-  popularityScore: number
+  popularityScore: number | null // never fabricate missing/non-finite values
   voteAverage: number | null    // external aggregate only; not the user's rating
   voteCount: number | null      // external aggregate only
   source: "tmdb"
   sourceFetchedAt: ISO-8601 timestamp
 
+UserAccount
+  id: string
+  emailNormalized: string       // unique, case-insensitive email key
+  passwordHash: string          // never returned by an API
+
 ViewerRating
-  sessionId: string
+  userId: string                // references UserAccount.id
   movieId: string
   value: 1 | 2 | 3 | 4 | 5
+
+AuthSession
+  id: string                    // opaque server-side session identifier
+  userId: string
+  invalidatedAt: ISO-8601 timestamp | null
 ```
 
 This separation means that changing data providers later does not require the
@@ -113,10 +124,10 @@ product rules or UI to depend directly on TMDb field names.
 
 ### 1. Personalised cold start
 
-1. The viewer chooses 1--5 genres.
+1. A signed-in account chooses 1--5 genres.
 2. Select catalogue movies sharing at least one selected genre.
 3. Remove duplicate IDs.
-4. Apply the rating adjustment only when the viewer has saved ratings.
+4. Apply the rating adjustment only when the current account has saved ratings.
 5. Sort by adjusted score descending, then `title` A--Z for ties.
 6. Return at most 10 movies and state the matched genre as the recommendation
    reason.
@@ -144,7 +155,11 @@ saved local ratings:
 For each candidate movie:
 
 ```text
-adjustedScore = popularityScore + sum(signals for genres shared with candidate)
+delta = sum(sign(rating.value) for each current-account rated movie
+            sharing at least one genre with the candidate)
+adjustedScore = popularityScore + delta  // finite popularity only
+// One contribution per rated movie, not per overlapping genre.
+// Missing popularity stays null and sorts after finite adjusted scores.
 ```
 
 The tie-breaker remains title A--Z. Thus, with Action and Comedy candidates
@@ -157,11 +172,13 @@ machine-learning personalisation.
 ### 4. Similar movies and title search
 
 - Similar movies: exclude the source movie, keep candidates sharing at least
-  one genre, order by `popularityScore` descending then title A--Z, and return
-  at most 5.
+  one genre, and return at most 5. The original TMDb decision used popularity
+  then title ordering; a separate NLP Spike must now validate any TF-IDF/cosine
+  text-ranking replacement and its missing-overview fallback.
 - Title search: reject a query shorter than 2 characters; otherwise use a
   case-insensitive match against the local catalogue title and return at most
-  10 results. TMDb search remains a future provider capability, not the
+  10 results. A separate NLP Spike must validate description-text search over
+  local overviews. TMDb search remains a provider capability, not the
   deterministic automated-test oracle.
 
 ## Deterministic test fixtures
@@ -219,23 +236,25 @@ renumber the new C05 rules.
 | S02 / #18 | Matches selected genres against `genreIds`; returns at most 10 unique movies. | Implement provider-neutral catalogue filtering and a match reason. |
 | S03 / #19 | Needs ID, title, year, genres, and overview. | Map a missing overview to an intentional unavailable state, never another movie. |
 | S04 / #20 | Uses TMDb-derived `popularityScore`; title resolves equal-score ties. | Use synthetic A=90/B=80/C=80 test data. |
-| S05a / #21 | Personal ratings are local whole integers from 1 to 5. | Do not send the rating to TMDb. |
-| S05b / #22 | Uses the documented +1/0/-1 local signal. | Implement the two required 80-point tie examples. |
+| S05a / #21 | Personal ratings are account-owned whole integers from 1 to 5. | Do not send the rating to TMDb; test Account A/B isolation. |
+| S05b / #22 | Uses the documented +1/0/-1 signal from the current account only. | Implement the two required 80-point tie examples. |
 | S06 / #23 | Filters the already displayed local list by genre. | Test exactly 2 Action and 3 Comedy movies. |
-| S07 / #24 | Finds candidates sharing a genre and omits the source movie. | Limit output to 5. |
-| S08 / #30 | Uses local, case-insensitive title search for deterministic MVP behaviour. | Reject queries below 2 characters. |
+| S07 / #24 | Keeps shared-genre eligibility and adds planned TF-IDF/cosine text ranking. | Limit output to 5; use fallback when overview text is unavailable. |
+| S08 / #30 | Keeps local, case-insensitive title search and adds planned description-text search. | Reject queries below 2 characters; do not return unrelated zero-score overview matches. |
 | S09 / #31 | Uses `popularityScore` as the source of rank. | Provide the exact no-data state if catalogue data is absent. |
 | S10 / #32 | Must disclose the simple genre/rating approach and TMDb attribution. | Add TMDb attribution to `/about-recommendations`. |
-| S11 / #33 | Clears local preferences and `ViewerRating` records for the session. | Ensure reset does not change external catalogue data. |
+| S11 / #33 | Clears preferences and ViewerRating records only for the current account. | Ensure reset does not change external catalogue data or another account. |
+| S12 / #44 | Creates a local account used to own preferences and ratings. | Normalize email, hash password server-side, and never expose credentials. |
+| S13 / #45 | Creates and invalidates the session used to identify the current account. | Protect personal routes/actions and keep Account A/B data isolated. |
 
 ## Risks and controls
 
 | Risk | Control |
 |---|---|
 | API token appears in Git history | Keep it only in a local environment variable or server-side secret; review every diff before commit. |
-| A browser-only client exposes a bearer token | Put TMDb calls behind a server-side provider or use a pre-imported catalogue for the frontend-only MVP. |
+| A browser-only client exposes a bearer token | Use a server-only importer and persistent server DB; this account-based MVP is not frontend-only. |
 | Live data changes make tests flaky | Use synthetic local fixtures for all automated tests. |
-| TMDb is unavailable | Show a catalogue-unavailable state or use a previously imported fixture; do not fabricate a recommendation. |
+| TMDb is unavailable | Keep the last valid imported catalogue snapshot; without one report unavailable. Never silently substitute synthetic test fixtures. |
 | TMDb attribution is missed | Add the prescribed attribution and approved logo/notice to `/about-recommendations` before the first TMDb-backed release. |
 | MovieLens terms are assumed rather than read | Do not download, redistribute, or include MovieLens data unless the assigned member has read and recorded the applicable terms. |
 
@@ -254,6 +273,6 @@ renumber the new C05 rules.
 - [ ] A teammate reviewed the report and confirmed the team accepts the
   decision.
 
-Only the teammate-review check remains. After that review, the owner should
-update the Result field of issue #16, open a PR with `Closes #16`, and move the
-card to Done after that PR is merged.
+Issue #16 is already closed. Locate the actual reviewed PR and record its link
+and observed result in the issue. If review did not happen, request it and
+reconcile status with the team; never invent approval or recreate history.
