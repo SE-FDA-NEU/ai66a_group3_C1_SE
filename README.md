@@ -26,6 +26,8 @@ rather than giving every viewer the same generic popularity list.
 - [Product scope](docs/product-scope.md)
 - [Business rules with worked examples](docs/business-rules.md)
 - [Route and Story traceability](docs/traceability.md)
+- [M2 architecture and ownership contract](docs/architecture.md)
+- [M2 auth and movie API contract](docs/api.md)
 - [Definition of Done](docs/definition-of-done.md)
 - [Sprint log](docs/sprint-log.md)
 
@@ -40,14 +42,17 @@ a route or screen changes. The full checklist is in
 
 ## Setup
 
-The application stack will be selected in Sprint 2. Until then, this repository
-contains the requirements and delivery-process scaffolding only. Do not treat the
-absence of runtime commands as proof that a product feature is complete.
+The C03 architecture contract selects the intended Sprint 2 stack and command
+interface in [docs/architecture.md](docs/architecture.md). At the current base
+commit, the repository still contains requirements and delivery-process
+scaffolding only: no application manifest, source directory, migration, or
+verified runtime command exists. S2-C04 (#70) must create and independently
+verify those runtime outputs before this section can present them as working.
 
 ```bash
 git clone https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE.git
 cd ai66a_group3_C1_SE
 ```
 
-When the stack is implemented, this section will contain the verified install,
-data-initialisation, run, and test commands required for a clean clone.
+When S2-C04 is implemented and reviewed, this section will contain the observed
+install, data-initialisation, run, and test commands required for a clean clone.
