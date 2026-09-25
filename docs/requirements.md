@@ -1,32 +1,26 @@
 # M1 requirements document - AI Movie Recommendation System
 
-This document covers the six sections required for Milestone 1. It draws on
-the research in `docs/user-research.md`, the personas in `docs/personas.md`,
-the scenarios in `docs/scenarios.md`, the scope in `docs/product-scope.md`,
-and the twelve Story issues on GitHub (#17 to #24 and #30 to #33). Route
-mapping is kept in `docs/traceability.md`.
+This document is the M1 requirements baseline. It draws on the research in
+docs/user-research.md, personas in docs/personas.md, scenarios in
+docs/scenarios.md, scope in docs/product-scope.md, and the fourteen GitHub
+Story issues #17 to #24, #30 to #33, #44, and #45. Route mapping is maintained
+in docs/traceability.md.
 
 ## 1. Product vision
 
 For university students facing choice overload, the AI Movie Recommendation
-System turns a small set of genre preferences and optional ratings into
-transparent movie recommendations, unlike a generic popularity list that
-gives every viewer the same choices.
+System lets each account save a small set of preferences and optional ratings
+to receive transparent movie recommendations, rather than showing every viewer
+the same generic popularity list.
 
 ## 2. Personas
 
 Interview and research note: an anonymous, consented questionnaire collected
 8 valid responses from university students aged 18 to 20 between 00:47 and
 22:26 on 2026-09-16. Four respondents volunteered for a possible short
-follow-up conversation. The evidence in this document uses anonymous
-respondents only; quotations are faithful English translations of free-text
-answers, not verbatim English originals.
-
-At the time of this revision, the repository records the questionnaire but not
-two dated follow-up conversations. Before submitting M1, the team must add a
-brief note for at least two real conversations: anonymised participant code or
-role, date, and the key finding that informed a persona. It must not claim
-those conversations occurred until the notes exist.
+follow-up conversation. The evidence below uses anonymous respondents only;
+quotations are faithful English translations of free-text answers, not
+verbatim English originals.
 
 ### Persona 1: Frequent Explorer
 
@@ -34,7 +28,7 @@ Role: a student who watches movies at least twice a week.
 
 Goal: find a relevant movie quickly when there are many possible choices.
 
-Blocked by: too many movies to decide between, and recommendations that feel
+Blocked by: too many movies to decide between and recommendations that feel
 unrelated to current interests. This persona may know a preferred genre and
 still struggle to find a suitable title.
 
@@ -42,13 +36,13 @@ In their words: "I want to watch a detective movie but I can't see any that
 fit my taste right then."
 
 Evidence: 4 of 8 respondents watch at least twice a week, 6 of 8 reported
-choice overload, and favourite genres, personalised recommendations and
-genre filtering each scored 4.125 out of 5.
+choice overload, and favourite genres, personalised recommendations, and genre
+filtering each scored 4.125 out of 5.
 
 ### Persona 2: Occasional Undecided Viewer
 
-Role: a student who watches movies rarely and does not know what to search
-for when opening a movie service.
+Role: a student who watches movies rarely and does not know what to search for
+when opening a movie service.
 
 Goal: start exploring immediately and find a reasonable movie without
 building a full preference profile first.
@@ -84,305 +78,358 @@ similar movies scored 3.625 out of 5.
 
 ## 3. Scenarios
 
-The three scenarios below correspond to the three personas. They describe a
-complete use of the system in plain language and do not name screens, routes or
-buttons.
+The scenarios describe complete use in plain language. They do not name
+screens, routes, or buttons.
 
-### Scenario 1: A Frequent Explorer finds a movie from existing preferences
+### Scenario 1: A Frequent Explorer returns to a personal list
 
-1. The Frequent Explorer wants to find a new movie without spending a long
-   time browsing.
-2. They return to the service after having saved several favourite genres
-   earlier.
-3. They receive a short list of movies related to those genres.
-4. They read why each suggested movie is relevant to their interests.
-5. They narrow the list to the genre they want to watch at that moment.
-6. They choose an interesting movie and read its year, genres and overview.
-7. They decide the movie is not quite suitable and look at similar
-   alternatives.
-8. They find a more suitable movie and decide to watch it.
+1. The Frequent Explorer wants to find a new movie without long browsing.
+2. They identify themselves using the account they used previously.
+3. The service restores their saved favourite genres for that account.
+4. They receive a short list of movies related to those genres.
+5. They read why each suggested movie is relevant to their interests.
+6. They narrow the current list to the genre they want that evening.
+7. They choose a movie and read its year, genres, and overview.
+8. They explore similar alternatives, then choose a more suitable movie.
 
-### Scenario 2: An Occasional Undecided Viewer explores without preferences
+### Scenario 2: An Occasional Undecided Viewer begins safely
 
 1. The Occasional Undecided Viewer wants to watch a movie but does not know
    what to search for.
-2. They begin by looking through a ranked selection of popular movies.
-3. They decide to provide several favourite genres to receive more relevant
-   suggestions.
-4. They receive a short list based on those selected genres.
-5. No suitable recommendation is available for the current preferences.
-6. They receive popular alternatives instead of reaching a dead end.
-7. They adjust their selected genres and try again.
-8. They receive matching recommendations and choose a movie to explore
-   further.
+2. They explore a ranked selection of popular movies without providing
+   personal data.
+3. They decide to receive suggestions that can be kept for a later visit.
+4. They create an account with an email and password, then identify
+   themselves to the service.
+5. They select several favourite genres.
+6. They request suggestions based on those selections.
+7. The catalogue contains no movie matching the current preferences.
+8. They receive popular alternatives instead of reaching a dead end.
+9. They adjust genres, receive matching recommendations, and choose a movie.
 
 ### Scenario 3: A Detail-Oriented Chooser compares similar options
 
-1. The Detail-Oriented Chooser wants a film that fits their current interests
-   but needs enough information to decide.
-2. They select a small set of favourite genres and receive a relevant list.
-3. They read the reason attached to one recommendation and choose it for
-   closer inspection.
-4. They review its title, year, genres and summary.
-5. They decide that its summary is not quite right for the evening.
-6. They look at other films that share at least one of its genres.
-7. They open one of those alternatives and read its information.
+1. The Detail-Oriented Chooser wants a film that fits their interests but
+   needs enough information to decide.
+2. They identify themselves and choose a small set of favourite genres.
+3. They receive a relevant list and read a recommendation reason.
+4. They choose one movie and review its title, year, genres, and summary.
+5. They decide that its summary is not right for the evening.
+6. They look at films sharing a genre with descriptions related to the
+   original film.
+7. They open one alternative and read its information.
 8. They find a suitable option and decide whether to watch it.
 
 ## 4. User stories
 
-The product backlog contains 12 Stories: five P0, five P1 and two P2. This
+The product backlog contains 14 Stories: six P0, six P1, and two P2. This
 meets the team-of-five minimum of 12 Stories and the required range of 4 to 6
-P0 Stories. Points are the estimates recorded on each GitHub issue.
+P0 Stories. The total estimate is 54 Story Points.
 
 | ID | Story | Priority | Points | Issue | Route |
-|---|---|---|---|---|---|
-| S01 | Select favourite genres to start choosing a movie | P0 | 3 | #17 | `/`, `/preferences` |
-| S02 | Get a movie list based on preferences | P0 | 5 | #18 | `/recommendations` |
-| S03 | View movie details before deciding | P0 | 3 | #19 | `/movies/:movieId` |
-| S04 | Explore movies without preferences | P0 | 5 | #20 | `/`, `/recommendations` |
-| S05a | Rate a movie and save feedback | P1 | 3 | #21 | `/movies/:movieId` |
-| S05b | Use movie ratings to improve recommendations | P1 | 5 | #22 | `/movies/:movieId`, `/recommendations` |
-| S06 | Filter recommendations by genre | P0 | 3 | #23 | `/recommendations` |
-| S07 | Find similar movies from the details page | P1 | 3 | #24 | `/movies/:movieId` |
-| S08 | Search for a movie by title | P1 | 3 | #30 | `/search` |
-| S09 | Browse popular movies | P1 | 3 | #31 | `/popular` |
-| S10 | Learn how recommendations are personalised | P2 | 3 | #32 | `/about-recommendations` |
-| S11 | Reset my personalisation profile | P2 | 3 | #33 | `/profile` |
+|---|---|---:|---:|---:|---|
+| S01 | Select favourite genres to start choosing a movie | P0 | 3 | #17 | /, /preferences |
+| S02 | Get a movie list based on preferences | P0 | 5 | #18 | /recommendations |
+| S03 | View movie details before deciding | P0 | 3 | #19 | /movies/:movieId |
+| S04 | Explore movies without preferences | P0 | 5 | #20 | /, /recommendations |
+| S05a | Rate a movie and save feedback | P1 | 3 | #21 | /movies/:movieId |
+| S05b | Use movie ratings to improve recommendations | P1 | 5 | #22 | /movies/:movieId, /recommendations |
+| S06 | Filter recommendations by genre | P1 | 3 | #23 | /recommendations |
+| S07 | Find content-similar movies from the details page | P1 | 5 | #24 | /movies/:movieId |
+| S08 | Search for a movie by title or description | P1 | 5 | #30 | /search |
+| S09 | Browse popular movies | P1 | 3 | #31 | /popular |
+| S10 | Learn how recommendations are personalised | P2 | 3 | #32 | /about-recommendations |
+| S11 | Reset my personalisation profile | P2 | 3 | #33 | /profile |
+| S12 | Register an account | P0 | 3 | #44 | /register |
+| S13 | Sign in and sign out securely | P0 | 5 | #45 | /login, authenticated navigation |
 
-The acceptance criteria below match the live GitHub Story issues checked on
-2026-09-19. Each Story has at least two Given–When–Then criteria, including at
-least one concrete number or exact expected value. GitHub remains the working
-backlog; any later requirement change must be made in both the relevant issue
-and this document before the M1 PDF is exported.
+GitHub is the working backlog. Each later requirement change must be made in
+the issue and this document before exporting the M1 PDF.
 
 ### S01 Select favourite genres (P0, 3 points)
 
-As someone who wants to choose a movie quickly, I want to select my favourite
-genres so that I can receive relevant recommendations without viewing history.
+As a signed-in viewer who wants to choose a movie quickly, I want to select my
+favourite genres so that I can receive relevant recommendations without viewing
+history.
 
-- Given I am on the home page, when I select Start, then the system opens
-  `/preferences` and displays the available genres.
-- Given I select 1 to 5 valid genres, when I confirm, then the choices are
-  saved for the current session and I am taken to the recommendations.
-- Given I have not selected any genre, when I confirm, then I am asked to
-  select at least one genre and stay on the same page.
-- Given I have selected 5 genres, when I try to select a sixth, then the limit
-  is shown and the previous 5 selections are kept.
-- Given the session already has preferences, when I return to edit them, then
-  my current selections are shown and an independent session cannot see them.
+- Given I am signed in and on the home page, when I select Start, then the
+  system opens /preferences and displays available genres.
+- Given I select 1 to 5 valid genres, when I confirm, then choices are saved
+  to my current account and I am taken to recommendations.
+- Given I select no genre, when I confirm, then I am asked to select at least
+  one and stay on the same page.
+- Given I selected 5 genres, when I select a sixth, then the limit is shown
+  and the previous 5 selections are kept.
+- Given my account has preferences, when I return to edit them, then my
+  selections are shown and another signed-in account cannot see them.
 
 ### S02 Get a movie list based on preferences (P0, 5 points)
 
-As a viewer with selected favourite genres, I want personalised
-recommendations with clear matching reasons so that I can narrow down what to
-watch.
+As a signed-in viewer with selected genres, I want personalised
+recommendations with clear reasons so that I can narrow down what to watch.
 
-- Given valid genres are selected and matching movies exist, when
+- Given my current account has valid genres and matching movies, when
   recommendations are requested, then up to 10 distinct movies are shown and
   each matches at least one selected genre.
-- Given results are displayed, when I view a movie card, then it shows the
-  title, the genres, and a reason that names at least one matching selected
-  genre.
-- Given no movie matches the selected genres, when recommendations are
-  requested, then a no-match message, up to 10 popular alternatives, and
-  actions to change preferences or retry are shown.
+- Given results are displayed, when I view a movie card, then it shows title,
+  genres, and a reason naming at least one matching selected genre.
+- Given no movie matches selected genres, when recommendations are requested,
+  then a no-match message, up to 10 popular alternatives, and actions to
+  change preferences or retry are shown.
 - Given the recommendation source fails, when recommendations are requested,
-  then an error message and a retry action are shown and the selected
-  preferences stay unchanged.
-- Given I retry after a recommendation-source failure, when the request
-  succeeds, then the recommendation results are displayed.
+  then an error and retry action are shown and current-account preferences stay
+  unchanged.
+- Given I retry after a source failure, when the request succeeds, then
+  recommendation results are displayed.
 
 ### S03 View movie details before deciding (P0, 3 points)
 
-As someone considering a movie, I want to view detailed information so that I
-can decide whether to watch it.
+As someone considering a movie, I want detailed information so that I can
+decide whether to watch it.
 
 - Given a movie card has a valid ID, when I select View details, then the
-  correct `/movies/:movieId` route opens and the title, year, genres and
-  summary are displayed.
-- Given the movie ID does not exist, when I open the details address, then
+  correct /movies/:movieId location opens and title, year, genres, and summary
+  are displayed.
+- Given a movie ID does not exist, when I open its details location, then
   "Movie not found" and a link back to the movie list are shown.
-- Given the movie has no summary or year, when I open its details, then
-  "Information unavailable" is shown for the missing field and the other
-  fields are still displayed.
-- Given I am viewing details, when I return to the list, then the session
-  preferences are preserved.
+- Given a movie has no summary or year, when I open details, then
+  "Information unavailable" is shown for each missing field and other fields
+  remain visible.
+- Given I am signed in and viewing details, when I return to the list, then my
+  account preferences are preserved.
 
 ### S04 Explore movies without preferences (P0, 5 points)
 
-As a new user, I want guidance and popular movies to explore so that I am not
-stuck on an empty screen before entering my preferences.
+As a newly signed-in viewer, I want guidance and popular movies to explore so
+that I am not stuck before entering preferences.
 
-- Given a new session has no preferences and the fallback data holds Movie A
-  with popularity 90, Movie B with 80 and Movie C with 80, when I open the
-  recommendations, then Movie A appears first, Movies B and C follow in title
-  order, at most 10 movies are shown, and they are marked as not personalised.
+- Given my newly signed-in account has no preferences and fallback data holds
+  Movie A with popularity 90, Movie B with 80, and Movie C with 80, when I
+  open recommendations, then A appears first, B and C follow in title order,
+  at most 10 movies are shown, and they are marked not personalised.
 - Given I am viewing the fallback list, when I select Enter preferences, then
-  I am taken to the genre selection.
-- Given the popular movie data is empty, when I open the recommendations in a
-  new session, then a no-data message and guidance to enter preferences are
-  shown and no fake movies are displayed.
-- Given valid preferences have been saved, when I open the recommendations
-  again, then the system uses the personalised behaviour from S02 and follows
-  BR4 if the result is empty.
+  I am taken to genre selection.
+- Given popular-movie data is empty, when I open recommendations with an
+  account having no preferences, then a no-data message and guidance to enter
+  preferences are shown and no fake movies are displayed.
+- Given valid preferences are saved to my account, when I open recommendations
+  again, then S02 behaviour is used and BR4 applies if results are empty.
 
 ### S05a Rate a movie and save feedback (P1, 3 points)
 
-As a viewer who has watched a movie, I want to give and update a rating so
-that I can save my feedback.
+As a signed-in viewer who has watched a movie, I want to give and update a
+rating so that I can save my feedback.
 
-- Given I open a valid movie, when I submit an integer rating from 1 to 5,
-  then the system confirms the rating was saved and shows my current rating.
-- Given I have already rated the movie in this session, when I change the
-  rating, then only one current rating is kept for that movie.
-- Given I submit 0, 6 or a non-integer rating, when it is processed, then the
-  value is rejected and any earlier rating is kept.
+- Given I am signed in and open a valid movie, when I submit an integer rating
+  from 1 to 5, then the system confirms it was saved and shows my current
+  account rating.
+- Given my account rated a movie, when I change the rating, then only one
+  current rating is kept for that movie.
+- Given I submit 0, 6, or a non-integer rating, when processed, then it is
+  rejected and an earlier account rating is kept.
 - Given saving fails, when I submit a valid rating, then the system says the
-  rating was not saved, keeps the selected value for retry, and shows no
-  success message.
-- Given I have not rated any movie, when I request recommendations, then the
+  rating was not saved, keeps the selection for retry, and shows no success.
+- Given my account has no ratings, when I request recommendations, then the
   recommendation flow still works.
-- Given one session has rated a movie, when an independent session opens the
-  same movie, then it does not display the first session's rating as its own.
+- Given Account A rated a movie, when Account B opens it, then Account B does
+  not display Account A's rating as its own.
 
 ### S05b Use movie ratings to improve recommendations (P1, 5 points)
 
-As a viewer who has provided ratings, I want future recommendations to use my
-feedback so that they become more relevant.
+As a signed-in viewer who has provided ratings, I want future recommendations
+to use my feedback so that they become more relevant.
 
-- Given an Action candidate and a Comedy candidate both have popularity 80,
-  when I have rated an Action movie 5 and request recommendations again, then
-  the Action candidate appears above the Comedy candidate.
-- Given the same two candidates, when I have rated an Action movie 1, then the
-  Comedy candidate appears above the Action candidate.
-- Given an Action candidate has popularity 90 and a Comedy candidate has 80,
-  when I rate an Action movie 3, then the Action candidate stays above the
-  Comedy candidate because 3 is neutral.
-- Given ratings affect the ranking, when recommendations are generated, then
-  at most 10 different movies are returned and BR2 is still satisfied.
+- Given Action and Comedy candidates both have popularity 80, when my account
+  rated an Action movie 5 and requests recommendations, then Action appears
+  above Comedy.
+- Given the same candidates, when my account rated an Action movie 1, then
+  Comedy appears above Action.
+- Given an Action candidate has popularity 90 and Comedy has 80, when my
+  account rates an Action movie 3, then Action stays above Comedy because 3 is
+  neutral.
+- Given ratings affect ranking, when recommendations are generated, then at
+  most 10 different movies are returned and BR2 is still satisfied.
 - Given a rating signal cannot be applied, when recommendations are generated,
-  then the system returns a valid preference-based result and does not show an
-  incorrect success message.
+  then the system returns a valid preference-based result and no false success.
 
-### S06 Filter recommendations by genre (P0, 3 points)
+### S06 Filter recommendations by genre (P1, 3 points)
 
-As someone choosing a movie, I want to filter recommendations by genre so that
-I can focus on what I want to watch now.
+As a signed-in viewer choosing a movie, I want to filter recommendations by
+genre so that I can focus on what I want to watch now.
 
-- Given the list holds exactly 2 Action movies and 3 Comedy movies, when I
-  select the Action filter, then exactly the 2 Action movies are shown and no
-  Comedy movie.
-- Given the selected genre has no movie in the list, when I apply the filter,
-  then no results are shown together with a clear way to remove the filter.
+- Given a list has exactly 2 Action and 3 Comedy movies, when I select Action,
+  then exactly the 2 Action movies and no Comedy movie are shown.
+- Given a selected genre has no movie in the list, when I apply the filter,
+  then no results are shown with a clear way to remove it.
 - Given a filter is active, when I remove it, then the original list returns
-  and the saved preferences are unchanged.
+  and account preferences are unchanged.
 
-### S07 Find similar movies from the details page (P1, 3 points)
+### S07 Find content-similar movies from the details page (P1, 5 points)
 
-As someone interested in a movie, I want to see similar movies so that I can
-explore more options without starting the search again.
+As someone interested in a movie, I want similar movies ranked using themes in
+their descriptions so that I can discover related content, not only the same
+genre.
 
-- Given the original movie has other movies that share a genre, when I view
-  the Similar movies section, then up to 5 different movies are shown, none is
-  the original, and each shares at least one genre with it.
-- Given no suitable candidate exists, when I open the section, then a message
-  says no similar movies are available and the original details stay visible.
-- Given similar movies are displayed, when I select one, then its details page
-  opens for the selected movie ID.
+- Given an original movie has other movies sharing a genre, when I view Similar
+  movies, then up to 5 different movies are shown, none is the original, and
+  each shares at least one genre with it.
+- Given no suitable candidate exists, when I open Similar movies, then a
+  message says no similar movies are available and original details stay
+  visible.
+- Given similar movies are displayed, when I select one, then its details
+  location opens for the selected movie ID.
+- Given two eligible movies share a genre with the original and Movie A has a
+  higher TF-IDF cosine similarity for its overview than Movie B, when similar
+  movies are displayed, then Movie A appears before Movie B.
+- Given the original movie or an eligible candidate has no overview, when
+  similar movies are requested, then the system does not fail and uses the
+  documented genre-and-popularity fallback ordering.
 
-### S08 Search for a movie by title (P1, 3 points)
+### S08 Search for a movie by title or description (P1, 5 points)
 
-As a viewer who already knows a movie title, I want to search the catalogue by
-title so that I can find it without browsing a long list.
+As a viewer who knows a movie title or a kind of story, I want to search the
+catalogue by title or description so that I can find relevant movies without
+browsing a long list.
 
-- Given the catalogue contains "Inception", when I search for "Inception",
-  then the results include "Inception".
-- Given a search returns more than 10 matches, when the results are displayed,
-  then only the first 10 are shown.
+- Given the catalogue contains "Inception", when I search for "Inception", then
+  results include "Inception".
+- Given a search has more than 10 matches, when results are displayed, then
+  only the first 10 are shown.
 - Given I enter fewer than 2 characters, when I submit, then the system shows
   "Enter at least 2 characters".
+- Given "Moon Rescue" has an astronaut rescue mission overview and "City
+  Robot" has a detective overview, when I search "astronaut rescue moon", then
+  "Moon Rescue" appears before "City Robot".
+- Given no overview has a positive TF-IDF cosine score for a valid description
+  query, when I search, then "No movies found" is shown and unrelated movies
+  are not displayed.
 
 ### S09 Browse popular movies (P1, 3 points)
 
-As an undecided viewer, I want to browse a ranked list of popular movies so
-that I can start choosing even when I have not set preferences.
+As an undecided viewer, I want to browse popular movies so that I can start
+choosing without signing in or setting preferences.
 
 - Given the catalogue has at least 10 movies with popularity values, when I
   open the list, then the 10 highest-ranked movies are displayed.
 - Given two movies have popularity 95 and 80, when the list is displayed, then
-  the movie with 95 appears before the movie with 80.
+  the movie with 95 appears first.
 - Given no popularity data is available, when I open the list, then the system
   shows "Popular movies are not available yet".
 
 ### S10 Learn how recommendations are personalised (P2, 3 points)
 
-As a viewer, I want a short explanation of how my genres and ratings affect
-recommendations so that I can decide whether to provide preference data.
+As a viewer, I want a short explanation of sign-in, genres, and ratings so
+that I can decide whether to provide preference data.
 
-- Given I open the explanation, when the page loads, then it explains the
-  process in exactly 3 steps: choose genres, receive recommendations, and
-  optionally rate movies.
-- Given I have not submitted any genres or ratings, when I read the
-  explanation, then it states "You can browse popular movies without
-  providing preferences".
+- Given I open the explanation, when it loads, then it has exactly 3 steps:
+  register or sign in, choose genres, and receive recommendations with
+  optional movie ratings.
+- Given I have not signed in or supplied preferences, when I read it, then it
+  states "You can browse popular movies without signing in or providing preferences".
 
 ### S11 Reset my personalisation profile (P2, 3 points)
 
-As a viewer, I want to reset my saved genres and ratings so that I can start
-receiving recommendations without previous preference data.
+As a signed-in viewer, I want to reset my saved genres and ratings so that I
+can start without previous preference data.
 
-- Given my profile holds 3 selected genres and 2 ratings, when I confirm the
-  reset, then it holds 0 genres and 0 ratings.
-- Given I select reset but do not confirm, when I return to my profile, then
-  my genres and ratings are unchanged.
-- Given the reset succeeds, when the operation finishes, then the system shows
-  "Your personalisation profile was reset".
+- Given my account has 3 selected genres and 2 ratings, when I confirm reset,
+  then it has 0 genres and 0 ratings.
+- Given I select reset but do not confirm, when I return to profile, then my
+  account genres and ratings are unchanged.
+- Given the reset succeeds, when the operation finishes, then the system
+  displays "Your personalisation profile was reset".
+- Given Account A has 3 selected genres and 2 ratings and Account B has 1
+  selected genre and 1 rating, when Account A confirms reset, then Account B
+  still has 1 selected genre and 1 rating.
+
+### S12 Register an account (P0, 3 points)
+
+As a new viewer, I want to register an account so that I can keep preferences
+and ratings for later visits.
+
+- Given a valid email and a password of at least 8 characters, when I submit
+  registration, then an account is created and I am directed to /login.
+- Given an account uses "viewer@example.com", when I register
+  "VIEWER@example.com", then registration is rejected with
+  "This email is already registered".
+- Given my email is invalid or password has fewer than 8 characters, when I
+  submit registration, then the invalid field is identified and no account is
+  created.
+- Given registration succeeds, when the account is stored, then the password
+  is stored only as a secure hash and is never returned by an API response.
+
+### S13 Sign in and sign out securely (P0, 5 points)
+
+As a registered viewer, I want to sign in and sign out so that only I can
+access saved preferences and ratings.
+
+- Given I enter a registered email and correct password, when I sign in, then
+  an authenticated session is created and /recommendations opens.
+- Given I enter an unregistered email or wrong password, when I sign in, then
+  "Email or password is incorrect" is shown without revealing which field
+  failed.
+- Given I am not signed in, when I open /preferences, /recommendations, or
+  /profile, or try to save a rating, then I am directed to /login and no
+  personal data is read or saved.
+- Given I am signed in, when I sign out, then the current session is
+  invalidated, / opens, and a later /preferences request is directed to /login.
+- Given Account A has saved preferences or ratings, when Account B signs in,
+  then Account B cannot view, update, reset, or receive recommendations from
+  Account A's personalisation data.
 
 ## 5. Business rules
 
-The rules below are constraints the system enforces. They use the route and
-Story mapping in `docs/traceability.md`; their worked examples use concrete
-numbers or exact expected values.
+The rules below are enforced constraints. Each worked example uses concrete
+numbers or an exact expected value.
 
 | ID | Rule | Worked example | Stories | Routes |
 |---|---|---|---|---|
-| BR1 | A viewer selects between 1 and 5 favourite genres. | Choosing Action, Comedy and Drama (3 genres) is accepted. A sixth genre after 5 is refused and the 5 stay selected. Confirming with 0 genres is refused. | S01 | `/`, `/preferences` |
-| BR2 | A recommended movie matches at least one selected genre. | Movie 7 is tagged Action and Comedy and movie 9 is tagged Drama. With Action selected, only movie 7 (1 of 2) can be recommended. | S02, S05b | `/recommendations` |
-| BR3 | A recommendation list has no duplicates and at most 10 movies. | If 12 movies match, 10 are shown. A movie that matches 2 selected genres appears once. | S02, S05b | `/recommendations` |
-| BR4 | When nothing matches, the viewer sees a no-match message, up to 10 popular alternatives, and actions to change preferences or retry. | The selected genres match 0 movies. If 7 popular movies are available, the page shows those 7 with the message and actions instead of an empty list; if 12 are available, it shows only 10. | S02, S04 | `/recommendations` |
-| BR5 | Popular movies are ordered by popularity score from highest to lowest, equal scores by title from A to Z, and at most 10 are shown. | Movie A scores 90, Movie B 80 and Movie C 80. The order is A, B, C. | S04, S09 | `/`, `/recommendations`, `/popular` |
-| BR6 | Every movie has a unique ID that opens its details page. | The card with ID 42 opens the details of movie 42. An ID that does not exist shows "Movie not found". | S03 | `/movies/:movieId` |
-| BR7 | A rating is a whole number from 1 to 5. | 1 and 5 are accepted. 0, 6 and 3.5 are rejected and an earlier rating is kept. | S05a | `/movies/:movieId` |
-| BR8 | Saved genres and ratings belong to the current session only. | Session X rates a movie 4. Session Y opens the same movie and sees no rating. | S01, S05a, S11 | `/preferences`, `/movies/:movieId`, `/profile` |
-| BR9 | A rating of 4 or 5 is a positive ranking signal, 1 or 2 is negative, and 3 is neutral. | Two candidates both score 80. After an Action movie is rated 5, Action ranks above Comedy. After a rating of 1, Comedy ranks above Action. With scores of 90 and 80, a rating of 3 leaves the order unchanged. | S05b | `/movies/:movieId`, `/recommendations` |
-| BR10 | The genre filter shows only the chosen genre from the current list and leaves saved preferences unchanged. | A list of 2 Action and 3 Comedy movies shows exactly 2 movies under the Action filter and 5 again once the filter is removed. | S06 | `/recommendations` |
-| BR11 | Similar movies share at least one genre with the original, exclude the original, and number at most 5. | A movie has 7 candidates that share a genre. 5 are shown and the original is not among them. | S07 | `/movies/:movieId` |
-| BR12 | A title search needs at least 2 characters and shows at most 10 matches. | Searching "I" shows "Enter at least 2 characters". Searching "In" with 14 matching titles shows 10. | S08 | `/search` |
-| BR13 | The recommendation explanation has exactly 3 steps. | The page lists 3 steps: choose genres, receive recommendations, optionally rate movies. | S10 | `/about-recommendations` |
-| BR14 | Resetting the profile needs confirmation and clears all saved genres and ratings. | A profile with 3 genres and 2 ratings holds 0 and 0 after confirming. Without confirming it still holds 3 and 2. | S11 | `/profile` |
+| BR1 | A signed-in viewer selects 1 to 5 favourite genres for their account. | Action, Comedy, Drama (3) is accepted. A sixth is refused; 0 is refused. | S01 | /preferences |
+| BR2 | A personal recommendation matches at least one genre selected by the current account. | With Action selected, an Action/Thriller movie may appear; a Documentary-only movie may not. | S02, S05b | /recommendations |
+| BR3 | A recommendation list has no duplicates and at most 10 movies. | 12 matching records, including duplicate ID 44, produce no duplicate and no more than 10 items. | S02, S05b | /recommendations |
+| BR4 | No match shows a message, up to 10 popular alternatives, and edit/retry actions. | 0 Documentary matches and 7 popular movies show those 7, not an empty list. | S02, S04 | /recommendations |
+| BR5 | Popular movies sort by popularity descending, then title A-Z for ties, with at most 10 items. | A=90, B=80, C=80 returns A, B, C when B precedes C alphabetically. | S04, S09 | /, /recommendations, /popular |
+| BR6 | A movie ID opens only its own details; an unknown ID opens no other movie. | ID 42 opens movie 42; ID 999 shows "Movie not found". | S03 | /movies/:movieId |
+| BR7 | A rating is a whole integer from 1 to 5; invalid input does not replace a saved rating. | 4 is accepted; 4.5, 0, and 6 are rejected. | S05a | /movies/:movieId |
+| BR8 | Preferences and ratings belong only to their authenticated account and persist after a later sign-in. | Account A saves 3 genres and 2 ratings, signs out, then sees 3 and 2 after sign-in; B sees 0 and 0. | S01, S05a, S05b, S11, S13 | protected routes |
+| BR9 | Ratings 4-5 are positive, 1-2 negative, and 3 neutral ranking signals. | With Action and Comedy at 80, an Action 5 puts Action first; 1 puts it below Comedy. | S05b | /recommendations |
+| BR10 | A genre filter changes only the current list, not saved preferences. | A 2-Action/3-Comedy list shows exactly 2 under Action; removing filter restores 5. | S06 | /recommendations |
+| BR11 | Similar movies exclude the source, share a genre, and number at most 5. | Source M10 is excluded; up to 5 other eligible movies may appear. | S07 | /movies/:movieId |
+| BR12 | Title search needs at least 2 characters, is case-insensitive, and returns at most 10 matches. | "a" is rejected; "in" and "IN" match alike; 14 matches return at most 10. | S08 | /search |
+| BR13 | The explanation has exactly 3 steps and says popular movies need no preferences. | It lists sign in, choose genres, then receive recommendations with optional ratings. | S10 | /about-recommendations |
+| BR14 | Reset needs confirmation and clears only that account's genres and ratings. | 3 genres and 2 ratings become 0 and 0 after confirmation; cancellation changes neither. | S11 | /profile |
+| BR15 | S07: usable candidates rank by cosine descending, popularity descending, title ascending, then ID; missing-text candidates follow by popularity/title/ID. With no usable source vector, all eligible candidates use popularity/title/ID. S08: trimmed query length >=2; literal case-insensitive title matches take precedence and sort by title/ID. Only if no title matches exist, use overview cosine >0 sorted by cosine descending, title ascending, then ID. No popularity fallback for search. | S07: A=0.68, B=0.21, C=no overview returns A,B,C. S08: no title matches and scores A=0.4, B=0 returns only A; all zero returns "No movies found". | S07, S08 | /movies/:movieId, /search |
+| BR16 | Account email is unique after case-insensitive normalization. | viewer@example.com blocks registration with VIEWER@example.com and shows "This email is already registered". | S12 | /register |
+| BR17 | A password has at least 8 characters and is stored only as a cryptographic hash. | "movie123" is accepted; "movie7" is rejected; no API response returns password or hash. | S12 | /register |
+| BR18 | A personal-data action needs a valid authenticated session and accesses only that account's data. | An unsigned /preferences request goes to /login; B cannot read or write A's ratings. | S13 | /login, protected routes |
+| BR19 | Sign-out invalidates the current session without deleting account data. | After sign-out, /profile goes to /login; signing into the same account restores its data. | S13 | authenticated navigation |
 
 ## 6. Screens and flow
 
-There are no user accounts in the MVP, so every screen is open to guests (G).
+Access codes: G = guest, U = authenticated user, A = administrator. Public
+movie discovery is available to G. Account-specific preferences,
+recommendations, ratings, and profile controls require U.
 
 | Route | Purpose | Access | Priority |
 |---|---|---|---|
-| `/` | Start choosing genres, or see non-personalised popular movies when there are no preferences. | G | P0 |
-| `/preferences` | Select, save and revisit 1 to 5 favourite genres. | G | P0 |
-| `/recommendations` | Show personalised movies, the no-match fallback, cold-start results and the genre filter. | G | P0 |
-| `/movies/:movieId` | View movie details, rate the movie and see similar movies. | G | P0 for details, P1 for rating and similar movies |
-| `/search` | Search the catalogue by title. | G | P1 |
-| `/popular` | Browse the ranked popular-movie list. | G | P1 |
-| `/about-recommendations` | Explain in 3 steps how genres and ratings affect recommendations. | G | P2 |
-| `/profile` | Confirm and reset saved genres and ratings. | G | P2 |
+| / | Start public discovery; reach account access, popular movies, search, and explanation. | G | P0 |
+| /register | Create an account with a unique email and secure password. | G | P0 |
+| /login | Sign in to an existing account; signed-in navigation offers sign-out. | G | P0 |
+| /preferences | Select, save, and revisit 1 to 5 favourite genres for the current account. | U | P0 |
+| /recommendations | Show personal recommendations, no-match alternatives, fallback, and filtering. | U | P0 and P1 |
+| /movies/:movieId | View public details; a signed-in viewer can save a rating. | G; rating U | P0 details; P1 additions |
+| /search | Search catalogue titles or descriptions. | G | P1 |
+| /popular | Browse ranked popular movies. | G | P1 |
+| /about-recommendations | Explain the 3-step account, genre, and optional-rating model. | G | P2 |
+| /profile | Confirm and reset current-account genres and ratings. | U | P2 |
 
-![Screen flow: all eight routes and how a viewer moves between them](images/screen-flow.png)
+![Screen flow: all ten routes and account-access decisions](images/screen-flow.png)
 
-Every route is reachable from `/`. A viewer with no preferences sees popular
-movies on `/recommendations` with an action to open `/preferences`. A viewer
-whose genres match nothing sees popular alternatives with actions to edit
-preferences or retry. A failed recommendation request shows an error and a
-retry action. Going back from `/movies/:movieId` returns to
-`/recommendations` with the preferences kept, and an unknown movie ID shows
-"Movie not found" with a link back to the list.
+Every route is reachable from /. A guest can browse popular movies, search,
+movie details, and the explanation, then register or sign in before entering
+the protected preference and recommendation journey. A signed-in viewer with
+no saved preferences sees popular fallback movies and an action to choose
+genres. A viewer whose genres match nothing sees popular alternatives with
+actions to edit preferences or retry. Rating, profile reset, and saved
+recommendations always act on the current authenticated account; signing out
+returns the viewer to public discovery.

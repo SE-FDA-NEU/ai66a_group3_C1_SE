@@ -1,7 +1,10 @@
 # Definition of Done
 
 A story is Done when **all** of the following are true. Not "mostly true".
-If one box is unticked, the story stays in the sprint and carries over.
+An unfinished Story never earns completed Story points. If completion was
+committed this sprint, record unfinished/carry-over. If only named technical
+milestones were planned, record those Tasks separately, not a completed parent
+Story. Record the planned closure sprint and review one-sprint readiness at Planning.
 
 | # | Criterion | Who checks |
 |---|-----------|------------|
@@ -17,7 +20,8 @@ If one box is unticked, the story stays in the sprint and carries over.
 ## What Done is not
 
 - "It works on my machine" - criterion 2 exists for this reason.
-- "I will write the test later." Later is Sprint 4, and Sprint 4 is the demo.
+- "I will write the test later." Tests accompany implementation. Sprint 4 is the testing milestone;
+  the final demo is Sprint 5 / session 15.
 - "My teammate approved it in five seconds." A review with no comments on a
   300-line PR is not a review. Ask a real question.
 

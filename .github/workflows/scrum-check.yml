@@ -7,6 +7,8 @@ name: Scrum hygiene
 on:
   pull_request:
     types: [opened, edited, synchronize, ready_for_review]
+  pull_request_review:
+    types: [submitted, dismissed]
 
 permissions:
   contents: read
@@ -28,7 +30,7 @@ jobs:
             const closes = body.match(/\b(close[sd]?|fix(e[sd])?|resolve[sd]?)\s+#(\d+)/gi) || [];
             const titleRef = title.match(/^\[#(\d+)\]/);
 
-            if (closes.length === 0 && !titleRef) {
+            if (closes.length === 0) {
               core.setFailed(
                 "This pull request is not linked to an issue.\n\n" +
                 "Add a line to the description: Closes #<number>\n" +
@@ -39,9 +41,8 @@ jobs:
             }
             core.info(`Linked. Closing keywords found: ${closes.length}, title ref: ${!!titleRef}`);
 
-      - name: Check the linked issue is in a sprint
+      - name: Check linked issue exists and has a type and owner
         uses: actions/github-script@v7
-        continue-on-error: true
         with:
           script: |
             const body = context.payload.pull_request.body || "";
@@ -54,9 +55,9 @@ jobs:
                 owner: context.repo.owner, repo: context.repo.repo, issue_number: num
               });
               const labels = issue.labels.map(l => (typeof l === "string" ? l : l.name));
-              if (!labels.some(l => ["story", "task", "bug"].includes(l))) {
+              if (!labels.some(l => ["story", "task", "bug", "chore", "spike"].includes(l))) {
                 core.warning(
-                  `Issue #${num} has none of the labels story / task / bug. ` +
+                  `Issue #${num} has none of the labels story / task / bug / chore / spike. ` +
                   `Untyped issues do not appear in the sprint report.`
                 );
               }
@@ -75,21 +76,24 @@ jobs:
             const pr = context.payload.pull_request;
             const author = pr.user.login;
 
-            const { data: reviews } = await github.rest.pulls.listReviews({
-              owner: context.repo.owner, repo: context.repo.repo, pull_number: pr.number
-            });
-            const { data: requested } = await github.rest.pulls.listRequestedReviewers({
-              owner: context.repo.owner, repo: context.repo.repo, pull_number: pr.number
+            const reviews = await github.paginate(github.rest.pulls.listReviews, {
+              owner: context.repo.owner, repo: context.repo.repo, pull_number: pr.number, per_page: 100
             });
 
-            const others = new Set([
-              ...reviews.map(r => r.user && r.user.login).filter(l => l && l !== author),
-              ...requested.users.map(u => u.login).filter(l => l !== author),
-            ]);
+            // A request or ordinary comment is not an approval. Branch protection
+            // must also require approvals and dismiss stale reviews on new commits.
+            const latest = new Map();
+            for (const review of reviews) {
+              if (review.user && review.user.login !== author &&
+                  ["APPROVED", "CHANGES_REQUESTED", "DISMISSED"].includes(review.state)) {
+                latest.set(review.user.login, review.state);
+              }
+            }
+            const others = new Set([...latest].filter(([, state]) => state === "APPROVED").map(([login]) => login));
 
             if (others.size === 0) {
-              core.warning(
-                "No teammate has been asked to review this yet. " +
+              core.setFailed(
+                "No teammate approval is recorded yet. " +
                 "Open the Reviewers menu on the right and pick someone who did not write this code. " +
                 "Cross-review counts towards your individual mark."
               );

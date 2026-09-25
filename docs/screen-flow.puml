@@ -1,47 +1,61 @@
 @startuml
-title AI Movie Recommendation System - Screen Flow
+title AI Movie Recommendation System - Account-aware activity flow
 
 start
 
-:Open the recommendation page;
+:Open / public home;
 
-if (Saved genre preferences?) then (yes)
-  :Request personalised recommendations;
-else (no)
-  :Show popular movies;
-  :Show "Choose favourite genres" action;
-  :Select 1 to 5 favourite genres;
-
-  if (Valid genre selection?) then (yes)
-    :Save preferences for the current session;
-    :Request personalised recommendations;
-  else (no)
-    :Show validation message;
-    stop
+if (Use public discovery?) then (yes)
+  if (Browse popular movies?) then (yes)
+    :Open /popular;
+  else (search)
+    :Open /search or /about-recommendations;
   endif
-endif
+  :Open /movies/:movieId when a movie is selected;
+  if (Save a rating while signed out?) then (yes)
+    :Open /login;
+  else (no)
+    :Return to the public list;
+  endif
+else (personalise)
+  if (Already registered?) then (yes)
+    :Open /login;
+  else (no)
+    :Open /register;
+    :Create account with a unique email;
+    :Open /login;
+  endif
 
-if (Recommendation request succeeds?) then (yes)
+  :Authenticate the account;
+  :Open /recommendations;
+
+  if (Saved favourite genres?) then (yes)
+    :Request personal recommendations;
+  else (no)
+    :Show non-personalised popular fallback;
+    :Open /preferences from Enter preferences;
+    :Select 1 to 5 genres and save them for the current account;
+    :Open /recommendations;
+  endif
+
   if (Matching movies found?) then (yes)
-    :Show up to 10 matching movie cards;
-    :Optionally filter the list by genre;
-    :Select a movie;
-    :Show movie details;
-
-    if (User wants similar movies?) then (yes)
-      :Show up to 5 similar movies;
-    endif
-
-    if (User wants to rate the movie?) then (yes)
-      :Validate and save an optional rating from 1 to 5;
+    :Show at most 10 distinct recommended movies and reasons;
+    :Optionally filter the current displayed list;
+    :Open /movies/:movieId;
+    :View public similar movies;
+    if (Rate this movie?) then (yes)
+      :Save/update the current account rating from 1 to 5;
     endif
   else (no)
-    :Show no-match message;
-    :Show popular alternative movies;
-    :Offer actions to edit preferences or retry;
+    :Show no-match message and popular alternatives;
+    :Retry or open /preferences to edit genres;
   endif
-else (no)
-  :Show an error message and a retry action;
+
+  if (Manage account data?) then (yes)
+    :Open /profile;
+    :Confirm reset of only this account's genres and ratings;
+  endif
+  :Sign out and return to /;
 endif
 
 stop
