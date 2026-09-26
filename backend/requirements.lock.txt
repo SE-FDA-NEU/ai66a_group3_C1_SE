@@ -1,4 +1,3 @@
--e git+https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE.git@cfe731a452bfc0a54b9548b0d016b6b57a0f3bc9#egg=ai_movie_recommendation_backend&subdirectory=backend
 alembic==1.20.0
 annotated-doc==0.0.5
 annotated-types==0.8.0

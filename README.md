@@ -54,7 +54,7 @@ git clone https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE.git
 cd ai66a_group3_C1_SE
 ```
 
-# AI Movie Recommendation System (Spint 2)
+# AI Movie Recommendation System (Sprint 2)
 
 ## Overview
 
@@ -64,27 +64,27 @@ The selected stack is:
 
 ### Backend
 
-* Python 3.12
-* FastAPI
-* Pydantic
-* Uvicorn
-* SQLAlchemy
-* Alembic
-* SQLite
+- Python 3.12
+- FastAPI
+- Pydantic
+- Uvicorn
+- SQLAlchemy
+- Alembic
+- SQLite
 
 ### Frontend
 
-* Node.js 24
-* React
-* TypeScript
-* Vite
-* React Router
+- Node.js 24
+- React
+- TypeScript
+- Vite
+- React Router
 
 ### Testing
 
-* pytest
-* Vitest
-* React Testing Library
+- pytest
+- Vitest
+- React Testing Library
 
 During local development, Vite proxies `/api` requests to the FastAPI server.
 
@@ -93,11 +93,13 @@ During local development, Vite proxies `/api` requests to the FastAPI server.
 
 Install the following before running the project:
 
-* Python 3.12
-* Node.js 24
-* npm
+- Python 3.12
+- Node.js 24
+- npm
 
-Check installed versions:
+Check the installed versions.
+
+### macOS/Linux
 
 ```bash
 python3.12 --version
@@ -105,16 +107,38 @@ node --version
 npm --version
 ```
 
+### Windows PowerShell
+
+```powershell
+py -3.12 --version
+node --version
+npm --version
+```
+
 
 ## Environment Setup
 
-From the repository root, create the local environment file:
+The project uses a local `.env` file for runtime configuration.
+
+### macOS/Linux
+
+From the repository root:
 
 ```bash
 cp .env.example .env
+mkdir -p data
 ```
 
-The local configuration uses:
+### Windows PowerShell
+
+From the repository root:
+
+```powershell
+Copy-Item .env.example .env
+New-Item -ItemType Directory -Force data
+```
+
+The default local configuration is:
 
 ```env
 DATABASE_URL=sqlite:///./data/app.db
@@ -125,30 +149,34 @@ TMDB_READ_ACCESS_TOKEN=
 
 Do not commit:
 
-* `.env`
-* TMDb access tokens
-* API keys
-* SQLite database files
-* database dumps
+- `.env`
+- TMDb access tokens
+- API keys
+- SQLite database files
+- database dumps
 
 
 ## Backend Setup
 
 ### 1. Create a virtual environment
 
-From the repository root:
+#### macOS/Linux
 
 ```bash
 python3.12 -m venv .venv
-```
-
-Activate it on macOS/Linux:
-
-```bash
 source .venv/bin/activate
 ```
 
+#### Windows PowerShell
+
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+```
+
 ### 2. Install locked backend dependencies
+
+After activating the virtual environment:
 
 ```bash
 python -m pip install --upgrade pip
@@ -156,7 +184,9 @@ python -m pip install -r backend/requirements.lock.txt
 python -m pip install -e "./backend[dev]" --no-deps
 ```
 
-`backend/requirements.lock.txt` contains the resolved Python dependency versions used for reproducible installation.
+`backend/requirements.lock.txt` contains pinned third-party Python dependencies used for reproducible installation.
+
+The lockfile must not contain an editable Git reference to the project itself. The final command installs the local backend package in editable mode without resolving dependencies again.
 
 
 ## Frontend Setup
@@ -172,16 +202,24 @@ The frontend uses `frontend/package-lock.json` to keep dependency versions repro
 
 ## Database Setup
 
-The local database is stored at:
+The local SQLite database is stored at:
 
 ```text
 data/app.db
 ```
 
-Create the local data directory if it does not already exist:
+If the `data` directory was not created during environment setup, create it first.
+
+### macOS/Linux
 
 ```bash
 mkdir -p data
+```
+
+### Windows PowerShell
+
+```powershell
+New-Item -ItemType Directory -Force data
 ```
 
 Apply all database migrations:
@@ -190,14 +228,12 @@ Apply all database migrations:
 python -m alembic -c backend/alembic.ini upgrade head
 ```
 
-C04 only bootstraps the migration system.
-
-Feature-specific schemas such as account and catalogue tables are owned by their corresponding Sprint tasks.
+C04 only bootstraps the shared migration system. Feature-specific schemas, such as account and catalogue tables, are owned by their corresponding Sprint tasks.
 
 
 ## Run the Backend
 
-From the repository root:
+From the repository root with the Python virtual environment activated:
 
 ```bash
 python -m uvicorn app.main:app --app-dir backend --reload
@@ -215,10 +251,14 @@ FastAPI documentation is available at:
 http://127.0.0.1:8000/docs
 ```
 
+Keep this terminal running while developing or testing the frontend against the backend.
+
 
 ## Health Check
 
-After migrations have been applied and the backend is running, open:
+Apply the database migrations before starting the backend.
+
+After the backend is running, open:
 
 ```text
 http://127.0.0.1:8000/health
@@ -236,10 +276,12 @@ Example response:
 }
 ```
 
-The migration revision value depends on the current Alembic migration.
+`migrationVersion` should contain the currently applied Alembic revision and should not be `null` after migrations have been applied.
 
 
 ## Run the Frontend
+
+Open a second terminal from the repository root while keeping the backend running.
 
 Start the Vite development server:
 
@@ -276,6 +318,8 @@ instead of hardcoding the backend host.
 
 ## Run Backend Tests
 
+Make sure the virtual environment is activated and database migrations have been applied.
+
 ```bash
 python -m pytest backend/tests -v
 ```
@@ -294,6 +338,12 @@ npm --prefix frontend test
 
 ```bash
 python -m ruff check backend
+```
+
+Expected result:
+
+```text
+All checks passed!
 ```
 
 
@@ -316,27 +366,30 @@ The production frontend output is generated under:
 frontend/dist/
 ```
 
-The generated build directory should not be committed.
+The generated `frontend/dist/` directory should not be committed.
 
 
 ## Full Local Verification
 
-From a clean clone, the following sequence should reproduce the development setup.
+The following sequence reproduces the development environment from a clean clone.
 
-### 1. Create environment configuration
+### macOS/Linux
+
+#### 1. Create the environment configuration and local data directory
 
 ```bash
 cp .env.example .env
+mkdir -p data
 ```
 
-### 2. Create the Python virtual environment
+#### 2. Create and activate the Python virtual environment
 
 ```bash
 python3.12 -m venv .venv
 source .venv/bin/activate
 ```
 
-### 3. Install backend dependencies
+#### 3. Install locked backend dependencies
 
 ```bash
 python -m pip install --upgrade pip
@@ -344,83 +397,157 @@ python -m pip install -r backend/requirements.lock.txt
 python -m pip install -e "./backend[dev]" --no-deps
 ```
 
-### 4. Install frontend dependencies
+#### 4. Install frontend dependencies
 
 ```bash
 npm --prefix frontend ci
 ```
 
-### 5. Create the local database directory
-
-```bash
-mkdir -p data
-```
-
-### 6. Apply database migrations
+#### 5. Apply database migrations
 
 ```bash
 python -m alembic -c backend/alembic.ini upgrade head
 ```
 
-### 7. Run backend lint
+#### 6. Run backend lint
 
 ```bash
 python -m ruff check backend
 ```
 
-### 8. Run backend tests
+#### 7. Run backend tests
 
 ```bash
 python -m pytest backend/tests -v
 ```
 
-### 9. Run frontend lint
+#### 8. Run frontend lint
 
 ```bash
 npm --prefix frontend run lint
 ```
 
-### 10. Run frontend tests
+#### 9. Run frontend tests
 
 ```bash
 npm --prefix frontend test
 ```
 
-### 11. Build the frontend
+#### 10. Build the frontend
 
 ```bash
 npm --prefix frontend run build
 ```
 
+### Windows PowerShell
+
+#### 1. Create the environment configuration and local data directory
+
+```powershell
+Copy-Item .env.example .env
+New-Item -ItemType Directory -Force data
+```
+
+#### 2. Create and activate the Python virtual environment
+
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+```
+
+#### 3. Install locked backend dependencies
+
+```powershell
+python -m pip install --upgrade pip
+python -m pip install -r backend/requirements.lock.txt
+python -m pip install -e "./backend[dev]" --no-deps
+```
+
+#### 4. Install frontend dependencies
+
+```powershell
+npm --prefix frontend ci
+```
+
+#### 5. Apply database migrations
+
+```powershell
+python -m alembic -c backend/alembic.ini upgrade head
+```
+
+#### 6. Run backend lint
+
+```powershell
+python -m ruff check backend
+```
+
+#### 7. Run backend tests
+
+```powershell
+python -m pytest backend/tests -v
+```
+
+#### 8. Run frontend lint
+
+```powershell
+npm --prefix frontend run lint
+```
+
+#### 9. Run frontend tests
+
+```powershell
+npm --prefix frontend test
+```
+
+#### 10. Build the frontend
+
+```powershell
+npm --prefix frontend run build
+```
+
 If all commands pass, the local runtime matches the checks used by CI.
+
+To run the application after verification, use two terminals:
+
+**Terminal 1 — Backend**
+
+```bash
+python -m uvicorn app.main:app --app-dir backend --reload
+```
+
+**Terminal 2 — Frontend**
+
+```bash
+npm --prefix frontend run dev
+```
 
 
 ## CI
 
 GitHub Actions runs automatically on pushed branches and pull requests.
 
-The CI workflow verifies:
+The CI workflow verifies the following.
 
 ### Stack Detection
 
-* `backend/pyproject.toml`
-* `frontend/package.json`
+- `backend/pyproject.toml`
+- `frontend/package.json`
 
 ### Backend
 
-* Python 3.12 setup
-* locked dependency installation
-* database migration
-* Ruff lint
-* pytest
+- Python 3.12 setup
+- locked dependency installation
+- database migration
+- Ruff lint
+- pytest
 
 ### Frontend
 
-* Node.js 24 setup
-* `npm ci`
-* frontend lint
-* Vitest tests
-* frontend production build
+- Node.js 24 setup
+- `npm ci`
+- frontend lint
+- Vitest tests
+- frontend production build
 
 ### Repository Safety
 
@@ -439,17 +566,21 @@ The repository must not contain tracked:
 
 ## Verify No Local Database or Environment Files Are Tracked
 
-Run:
+### macOS/Linux
 
 ```bash
 git ls-files | grep -E '(^|/)\.env$|\.db$|\.sqlite$|\.sqlite3$|\.dump$'
 ```
 
-Expected result:
+Expected result: no output.
 
-```text
-no output
+### Windows PowerShell
+
+```powershell
+git ls-files | Select-String -Pattern '(^|/)\.env$|\.db$|\.sqlite$|\.sqlite3$|\.dump$'
 ```
+
+Expected result: no output.
 
 
 ## Verify TMDb Credentials Are Not Committed
@@ -462,10 +593,10 @@ git grep "TMDB_READ_ACCESS_TOKEN"
 
 It is valid for the environment-variable name to appear in:
 
-* `.env.example`
-* runtime configuration
-* CI configuration
-* project documentation
+- `.env.example`
+- runtime configuration
+- CI configuration
+- project documentation
 
 A real TMDb token must never appear in the repository.
 
@@ -506,5 +637,4 @@ The C04 runtime bootstrap provides the following shared structure:
 └── README.md
 ```
 
-Feature-specific modules and UI are implemented by their corresponding Sprint tasks and should not be added to C04 simply to extend the bootstrap scope.
-
+Feature-specific backend modules and user-facing UI are implemented by their corresponding Sprint tasks and should not be added to C04 simply to extend the bootstrap scope.
