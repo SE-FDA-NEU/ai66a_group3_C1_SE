@@ -56,3 +56,17 @@ cd ai66a_group3_C1_SE
 
 When S2-C04 is implemented and reviewed, this section will contain the observed
 install, data-initialisation, run, and test commands required for a clean clone.
+
+## Requirements
+
+- Python 3.12
+- Node.js 24
+- npm
+- SQLite
+
+## Environment setup
+
+Copy the example environment file:
+
+```bash
+cp .env.example .env
