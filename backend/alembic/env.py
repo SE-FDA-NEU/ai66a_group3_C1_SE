@@ -8,16 +8,22 @@ from sqlalchemy import engine_from_config, pool
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
-ROOT_DIR = Path(__file__).resolve().parents[2]
-load_dotenv(ROOT_DIR / ".env")
 
 config = context.config
 
-database_url = os.getenv("DATABASE_URL")
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
-if database_url:
-    config.set_main_option("sqlalchemy.url", database_url)
+load_dotenv(PROJECT_ROOT / ".env")
 
+database_url = os.getenv(
+    "DATABASE_URL",
+    "sqlite:///./data/app.db",
+)
+
+config.set_main_option(
+    "sqlalchemy.url",
+    database_url,
+)
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 if config.config_file_name is not None:

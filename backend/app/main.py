@@ -11,9 +11,12 @@ app = FastAPI(
 @app.get("/health")
 def health():
     with engine.connect() as connection:
-        connection.execute(text("SELECT 1"))
+        migration_version = connection.execute(
+            text("SELECT version_num FROM alembic_version")
+        ).scalar_one_or_none()
 
     return {
         "status": "ok",
         "database": "connected",
+        "migrationVersion": migration_version,
     }
