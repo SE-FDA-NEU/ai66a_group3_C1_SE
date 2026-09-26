@@ -1,12 +1,30 @@
-# Python
-__pycache__/
-*.pyc
-venv/
+# Environment
 .env
-# Data & models (too large for Git)
+.env.*
+!.env.example
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+
+# Data & models
 data/raw/*.csv
 *.pkl
 checkpoints/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
 # Editor / OS junk
 .vscode/
 .DS_Store
