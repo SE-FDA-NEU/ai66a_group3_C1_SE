@@ -27,7 +27,7 @@ rather than giving every viewer the same generic popularity list.
 - [Business rules with worked examples](docs/business-rules.md)
 - [Route and Story traceability](docs/traceability.md)
 - [M2 architecture and ownership contract](docs/architecture.md)
-- [M2 auth and movie API contract](docs/api.md)
+- [M2 auth, catalogue, and recommendation API contract](docs/api.md)
 - [Definition of Done](docs/definition-of-done.md)
 - [Sprint log](docs/sprint-log.md)
 

@@ -7,10 +7,10 @@ rules, and TMDb import flow. The HTTP DTO contract is in [api.md](api.md).
 
 Contract revision: `C03-DRAFT-1`.
 
-`C03-DRAFT-1` is not an approved or merged revision. It becomes the frozen
-contract only after an independent substantive review and merge. This document
-does not claim that runtime code, tests, a review, a meeting, or a submission
-already exists.
+`C03-DRAFT-1` remains a draft until it is merged. Live review, CI, and merge
+status are tracked on the contract pull request rather than copied into this
+document. Merge freezes this baseline for consumers; runtime verification and
+the reviewed NLP addendum remain separate gates before #69 can close.
 
 ## 1. Verified repository state
 
@@ -24,10 +24,10 @@ The repository was inspected from base commit
 | Node manifest | No `package.json` or lockfile exists. |
 | Database/migrations | No application database schema or migration directory exists. |
 | Runtime commands | None can be truthfully reported as working yet. |
-| CI runtime baselines | `.github/workflows/ci.yml` specifies Python 3.12 when a Python manifest exists and Node.js 20 when `package.json` exists. |
+| CI runtime baselines | `.github/workflows/ci.yml` detects `backend/pyproject.toml` and `frontend/package.json`, then uses Python 3.12 and Node.js 24 respectively. Runtime jobs remain skipped until C04 adds those manifests. |
 | Runtime bootstrap dependency | [#70 / S2-C04](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/70) is open and owns lockfiles, migrations, run/test commands, and a real database-backed route. |
 | NLP decision dependency | [#43](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/43) is open with `Result: Pending`; its requested output file is not present. |
-| Review evidence for #69 | Issue #69 currently has no completion evidence or review comment. |
+| Review and merge evidence | [PR #72](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/72) is the source of truth for the live review, CI, and merge status of this baseline. |
 
 The selected stack and paths below are therefore the C03 implementation
 contract for C04, not a claim that those modules already exist. C04 must create
@@ -38,7 +38,7 @@ PR/SHA and observed commands before #69 closes.
 
 | Layer | C03 decision | Evidence boundary |
 |---|---|---|
-| Frontend runtime | Node.js 20 | The version is already configured in CI. |
+| Frontend runtime | Node.js 24 LTS | Supported LTS line selected for C03/C04 and configured consistently in CI; Node.js 20 is EOL. See the [official release schedule](https://github.com/nodejs/Release#release-schedule). |
 | Frontend application | React, TypeScript, Vite, React Router | Selected here; packages and exact versions do not yet exist and must be locked by C04. |
 | Backend runtime | Python 3.12 | The version is already configured in CI. |
 | HTTP/API | FastAPI, Pydantic, Uvicorn | Selected here; packages and exact versions do not yet exist and must be locked by C04. |
@@ -62,8 +62,10 @@ deliberately explicit so a planned path is not misreported as an actual file.
 | FastAPI application entry point | `backend/app/main.py` | `@anotify-vie` (#70) | No |
 | Auth HTTP router | `backend/app/api/auth.py` | `@hoang3003` (#52, #54) | No |
 | Movie HTTP router | `backend/app/api/movies.py` | `@kietxuan` (#60) | No |
+| Recommendation HTTP router | `backend/app/api/recommendations.py` | `@NguyenTuanAnh0608` (#58) | No |
 | Auth service | `backend/app/services/auth.py` | `@NguyenTuanAnh0608` (#49, #53) | No |
 | Catalogue service/repository | `backend/app/services/catalogue.py`, `backend/app/repositories/movies.py` | `@kietxuan` (#47) | No |
+| Recommendation service | `backend/app/services/recommendations.py` | `@NguyenTuanAnh0608` (#58) | No |
 | TMDb adapter/import command | `backend/app/integrations/tmdb.py`, `backend/app/commands/import_tmdb.py` | `@kietxuan` (#48) | No |
 | Database models and migrations | `backend/app/db/models.py`, `backend/alembic/` | Account/catalogue owners; bootstrap by `@anotify-vie` (#70) | No |
 | Backend contract tests | `backend/tests/` | `@vu-huzy` (#51, #57, #62) | No |
@@ -90,7 +92,22 @@ manifest/module is absent. A later PR must run each command and replace
 | Test backend | `python -m pytest backend/tests -v` | Not verified; tests absent |
 | Test frontend | `npm --prefix frontend test` | Not verified; tests absent |
 | Build frontend | `npm --prefix frontend run build` | Not verified; manifest absent |
-| Check current documentation diff | `git diff --check` | Runnable now; the observed result for this branch is recorded only in the author handoff, not treated as runtime evidence |
+| Check current documentation diff | `git diff --check` | Runnable now; run it and record the observed result in the current PR handoff before merge |
+
+### CI handoff requirement
+
+The runtime manifests are intentionally nested, so C04 and CI must keep the
+same paths and commands:
+
+- Python detection uses `backend/pyproject.toml`; installation uses
+  `python -m pip install -e "./backend[dev]"`; lint and pytest target `backend/`.
+- Node detection uses `frontend/package.json`; CI uses Node.js 24 and the
+  `npm --prefix frontend` install, lint, test, and build commands.
+- A root-only manifest check is not an acceptable gate because it would report
+  success while silently skipping both selected runtimes.
+
+C04 must commit the lockfiles/manifests and demonstrate that a deliberately
+failing backend and frontend test makes the corresponding CI job fail.
 
 ## 3. Module ownership
 
@@ -107,8 +124,8 @@ reviewer has accepted the work.
 | Registration/auth/detail/explanation verification and M2 evidence | `@vu-huzy` | #51, #57, #62, #65, #71 |
 
 Changes across boundaries require the affected owners to agree on this contract
-before implementation. The independent reviewer for #69 is not currently
-recorded and must not be inferred from ownership.
+before implementation. Ownership never counts as independent review; the live
+review record is maintained on PR #72.
 
 ## 4. Target architecture
 
@@ -117,7 +134,7 @@ flowchart LR
     Browser[React browser application]
 
     subgraph FastAPI[FastAPI server]
-        Routers[Auth and movie routers]
+        Routers[Auth, movie, and recommendation routers]
         Auth[Auth/session service]
         Catalogue[Catalogue service]
         Reco[Recommendation service]
@@ -142,8 +159,9 @@ flowchart LR
 
 Routers translate HTTP only. Services enforce business rules. Repositories own
 parameterized database access and transaction boundaries. The provider adapter
-owns TMDb field names; application DTOs stay provider-neutral. Runtime movie
-requests read the local database and never call TMDb.
+owns TMDb field names; application DTO field names stay provider-neutral.
+Runtime movie and recommendation requests read the local database and never
+call TMDb.
 
 ## 5. Data and authentication policy
 
@@ -153,10 +171,13 @@ requests read the local database and never call TMDb.
 |---|---|
 | `UserAccount` | Server-generated opaque string `id`; normalized email with a database unique constraint; password hash; no plaintext password. |
 | `AuthSession` | Opaque random session identifier/digest, `user_id`, expiry, and invalidation timestamp. |
-| `CatalogMovie` | Stable opaque internal `id`; `source`; `source_id`; title; nullable year/overview/popularity/vote fields; fetch timestamp; unique (`source`, `source_id`). |
+| `CatalogueRevision` | Server-generated opaque string `id`, provider, creation timestamp, and successful-import metadata. A revision is not runtime-visible unless `CatalogueState` points to it. |
+| `CatalogueState` | Singleton row containing non-null `active_revision_id` after the first successful import and an update timestamp. The foreign key targets `CatalogueRevision.id`. |
+| `CatalogMovie` | Stable opaque internal `id`; non-null `catalogue_revision_id`; `source`; `source_id`; title; nullable year/overview/popularity/vote fields; fetch timestamp; unique (`source`, `source_id`). |
 | `Genre` and `MovieGenre` | Provider genre ID/name and a de-duplicated movie/genre relation. |
-| `ViewerRating` | Composite identity (`user_id`, `movie_id`) and integer value 1-5. |
-| `ImportRun` | Provider, status, timestamps, catalogue revision, and inserted/updated/rejected counts without credentials. |
+| `ViewerGenrePreference` | `user_id`, provider numeric `genre_id`, and a unique (`user_id`, `genre_id`) constraint. Both columns are foreign keys; a service transaction enforces 1-5 distinct genres when saving a preference set. |
+| `ViewerRating` | Composite identity (`user_id`, `movie_id`), foreign keys to the account and movie, and an integer value constrained to 1-5. |
+| `ImportRun` | Provider, status, timestamps, nullable `catalogue_revision_id`, and inserted/updated/rejected counts without credentials. Only a successful run can activate its revision. |
 
 ### Email and password
 
@@ -190,7 +211,42 @@ requests read the local database and never call TMDb.
   the session-derived `user_id`, which prevents Account B from accessing
   Account A's data.
 
-The exact request/response/error shapes are frozen in [api.md](api.md).
+The exact request/response/error shapes for the Sprint 2 endpoint scope are
+frozen in [api.md](api.md). Later mutation endpoints require reviewed addenda.
+
+### Preference, rating, and reset persistence
+
+- Saving preferences validates 1-5 distinct existing provider genre IDs, then
+  replaces only the current session-derived user's preference rows in one
+  transaction. The client cannot select a different `user_id`.
+- The unique (`user_id`, `genre_id`) constraint prevents duplicate preference
+  rows. The 1-5 set-size rule is enforced by the service transaction because it
+  spans multiple rows.
+- A rating upsert uses (`user_id`, `movie_id`) as its identity, so one account
+  has at most one current rating for a movie and another account's value is
+  never returned as its own.
+- A confirmed profile reset deletes `ViewerGenrePreference` and
+  `ViewerRating` rows where `user_id` equals the current authenticated account,
+  in one transaction. Cancellation performs no write; failure rolls back both
+  deletes. The reset never deletes another account's data.
+- These entities freeze the persistence and account-isolation boundary. Their
+  HTTP mutation endpoints remain outside this Sprint 2 API table and must be
+  added by the reviewed S01, S05a, and S11 sprint contracts.
+
+### Active catalogue revision and runtime reads
+
+- Every `CatalogMovie` row belongs to exactly one `CatalogueRevision` through
+  `catalogue_revision_id`.
+- Every runtime catalogue, detail, and recommendation query first resolves
+  `CatalogueState.active_revision_id` and filters movie rows to that exact
+  revision. Reads never infer the active revision from a timestamp or the most
+  recent `ImportRun` row.
+- The API `catalogueRevision` metadata is the same active revision ID used by
+  the query. No active revision produces `503 CATALOGUE_UNAVAILABLE`; an active
+  revision with zero matching rows produces a successful empty list.
+- Rows left on an older revision are inactive and cannot appear in runtime
+  results. They may be cleaned up after activation, but cleanup is not part of
+  the activation transaction and cannot change the active result set.
 
 ## 6. TMDb importer flow
 
@@ -205,13 +261,14 @@ flowchart TD
     Stage[Stage import and counts]
     Commit{All required fetches and transaction valid?}
     Upsert[Atomic upsert by source and source_id]
+    Activate[Set active catalogue revision]
     Success[Record successful import revision and counts]
     Fail[Record sanitized failure]
     Keep[Keep last valid catalogue snapshot]
-    Runtime[Runtime movie API reads database]
+    Runtime[Runtime catalogue and recommendation APIs read active revision]
 
     Start --> Secret --> Genres --> Popular --> Detail --> Map --> Stage --> Commit
-    Commit -->|yes| Upsert --> Success --> Runtime
+    Commit -->|yes| Upsert --> Activate --> Success --> Runtime
     Commit -->|no| Fail --> Keep --> Runtime
 ```
 
@@ -227,12 +284,18 @@ flowchart TD
 - HTTP 401/403 fails without credential output. HTTP 429 respects
   `Retry-After`. Timeout, 429, and transient 5xx responses have bounded retry;
   automated tests use fake responses and never call live TMDb.
-- Rows are validated before one atomic database transaction. A failed required
-  fetch or transaction leaves the last valid catalogue unchanged. Test fixtures
-  are never substituted into runtime data.
+- Rows are validated before one atomic database transaction. The transaction
+  creates a candidate `CatalogueRevision`, upserts every accepted movie with
+  that `catalogue_revision_id`, replaces its genre relations, and updates
+  `CatalogueState.active_revision_id` only after all required writes succeed.
+- A failed required fetch or transaction never activates the candidate
+  revision, so the previous active revision and its runtime result set remain
+  unchanged. Test fixtures are never substituted into runtime data.
 - Upsert key (`source`, `source_id`) preserves the stable internal movie ID on
-  re-import. The run records inserted, updated, rejected, and timestamps; it
-  does not record secrets.
+  re-import. Movies not present in the new bounded import retain an older
+  revision marker and are excluded by active-revision queries. The run records
+  its revision ID, inserted, updated, rejected, and timestamps; it does not
+  record secrets.
 
 ### TMDb mapping
 
@@ -272,19 +335,18 @@ runtime-independent fallback.
 
 ## 8. Review and merge gate
 
-At this revision:
+Live PR facts such as approval count, CI result, and merge state change over
+time. PR #72 is the source of truth for those facts; this contract records only
+the durable gates:
 
-| Required evidence | Current truthful value |
+| Gate | Durable rule |
 |---|---|
-| Actual output files | `docs/architecture.md` and `docs/api.md` exist only in the local working branch until committed/pushed. |
-| Dependency PR/SHA | No C04 PR/SHA is recorded; only open dependency issue #70 is known. |
-| DTO revision | `C03-DRAFT-1` |
-| Independent reviewer | Not recorded or confirmed. |
-| Substantive review | Not performed/linked. |
-| Contract PR | Not opened. |
-| Merge | Not performed. |
+| Baseline contract | `docs/architecture.md`, `docs/api.md`, and affected CI configuration receive substantive review and are merged before consumers call `C03-DRAFT-1` frozen. |
+| Runtime verification | #70 links the actual dependency PR/SHA and observed install, migration, run, test, and clean-clone results for the selected nested paths. |
+| Catalogue safety | Tests prove that a failed import leaves `CatalogueState.active_revision_id` unchanged and that every runtime movie query filters by it. |
+| Account isolation | Tests prove session-derived identity for protected reads/writes and current-account-only preference/rating reset behaviour. |
+| NLP addendum | #43 supplies observed fixtures, language/library/version, preprocessing, fallback, deterministic ordering, and independent review before Sprint 4 text-ranking work begins. |
 
-Do not close #69 until the runtime paths/commands are verified against the C04
-PR/SHA, the NLP contract has its reviewed Spike evidence before Sprint 4, the
-contract PR receives an independent substantive review, and the reviewed
-documentation/configuration is merged.
+#69 remains open until the reviewed NLP addendum is merged. Closing #69 also
+requires the baseline and runtime-verification gates above; approval or merge
+of the baseline PR alone is not completion evidence for the broader chore.
