@@ -3,7 +3,6 @@ from sqlalchemy import text
 
 from app.db.database import engine
 
-
 app = FastAPI(
     title="AI Movie Recommendation System",
 )
