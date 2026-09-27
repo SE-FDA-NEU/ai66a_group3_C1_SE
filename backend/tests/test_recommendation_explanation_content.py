@@ -1,7 +1,6 @@
 import re
 from pathlib import Path
 
-
 CONTENT_PATH = (
     Path(__file__).resolve().parents[2] / "docs" / "recommendation-explanation.md"
 )
