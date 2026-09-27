@@ -20,6 +20,8 @@ checkpoints/
 *.db
 *.sqlite
 *.sqlite3
+*.sql
+*.dump
 
 # Frontend
 frontend/node_modules/
