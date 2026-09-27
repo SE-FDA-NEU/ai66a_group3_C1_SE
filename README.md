@@ -569,7 +569,7 @@ The repository must not contain tracked:
 ### macOS/Linux
 
 ```bash
-git ls-files | grep -E '(^|/)\.env$|\.db$|\.sqlite$|\.sqlite3$|\.dump$'
+git ls-files | grep -E '(^|/)\.env$|\.db$|\.sqlite$|\.sqlite3$|\.sql$|\.dump$'
 ```
 
 Expected result: no output.
@@ -577,7 +577,7 @@ Expected result: no output.
 ### Windows PowerShell
 
 ```powershell
-git ls-files | Select-String -Pattern '(^|/)\.env$|\.db$|\.sqlite$|\.sqlite3$|\.dump$'
+git ls-files | Select-String -Pattern '(^|/)\.env$|\.db$|\.sqlite$|\.sqlite3$|\.sql$|\.dump$'
 ```
 
 Expected result: no output.
