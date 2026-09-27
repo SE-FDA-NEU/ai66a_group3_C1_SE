@@ -1,0 +1,29 @@
+@startuml
+!include <C4/C4_Container>
+
+title AI Movie Recommendation System - C4 container diagram
+
+LAYOUT_LEFT_RIGHT()
+
+Person(viewer, "Viewer", "Browses movies and manages account-owned preferences")
+
+System_Boundary(ams, "AI Movie Recommendation System") {
+    Container(web, "Browser frontend", "React, TypeScript, Vite", "Renders public and authenticated movie experiences")
+    Container(api, "Backend API", "FastAPI, Python 3.12", "Owns HTTP contracts, authentication, and business rules")
+    ContainerDb(db, "SQLite database", "SQLite, SQLAlchemy, Alembic", "Stores accounts, sessions, catalogue data, preferences, ratings, and import state")
+    Container(importer, "Optional server-side TMDb importer", "Python, httpx", "Imports provider data outside browser request handling")
+}
+
+System_Ext(tmdb, "TMDb API", "External movie and genre data provider")
+
+Rel(viewer, web, "Sends navigation, form, and selection input; receives rendered screens", "Browser UI")
+Rel(web, api, "Sends HTTPS JSON requests and the opaque session cookie", "HTTPS/JSON")
+Rel(api, web, "Returns account, genre, movie, preference, recommendation DTOs, and error envelopes", "HTTPS/JSON")
+Rel(api, db, "Sends parameterized SQL queries and transaction commands", "SQL")
+Rel(db, api, "Returns result rows and transaction outcomes", "SQLite protocol")
+Rel(importer, tmdb, "Sends genre, popular-movie, and movie-detail requests", "HTTPS")
+Rel(tmdb, importer, "Returns provider movie and genre JSON records", "HTTPS/JSON")
+Rel(importer, db, "Writes validated imported provider records and catalogue revision state", "SQL transactions")
+
+SHOW_LEGEND()
+@enduml
