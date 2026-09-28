@@ -73,15 +73,15 @@ read the local SQLite catalogue; they do not call TMDb.
 PlantUML source: [erd.puml](images/erd.puml).
 
 The ERD records the C03 catalogue/account migration contract, including PKs,
-FKs, unique/check constraints, and relationship multiplicities. It is not
-evidence that these tables currently exist: the executable bootstrap migration
-is empty. Before catalogue/account implementation is labelled complete, the
-ERD must be compared to the actual Alembic revisions and updated in the same
-change if any table, column, key, constraint, or multiplicity differs.
+FKs, unique/check constraints, and relationship multiplicities. The catalogue
+tables and `users` are implemented by Alembic revisions; the remaining account
+relations stay planned until their owning tasks are merged. Compare the ERD to
+each new revision and update it in the same change if any table, column, key,
+constraint, or multiplicity differs.
 
 ### Required persistence rules
 
-- `user_accounts.email_normalized` is unique. Password plaintext is never
+- `users.email_normalized` is unique. Password plaintext is never
   stored; only an Argon2id hash is persisted.
 - `auth_sessions.user_id` identifies the authenticated account. Protected
   operations never accept a client-selected account identity.

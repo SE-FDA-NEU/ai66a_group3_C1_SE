@@ -11,7 +11,7 @@ skinparam entity {
   HeaderBackgroundColor #D9E8FB
 }
 
-entity "user_accounts" as user_accounts {
+entity "users" as users {
   * id : TEXT <<PK>>
   --
   * email_normalized : TEXT <<UQ>>
@@ -95,9 +95,9 @@ entity "import_runs" as imports {
   * rejected_count : INTEGER
 }
 
-user_accounts "1" -- "0..*" auth_sessions
-user_accounts "1" -- "0..*" viewer_genre_preferences
-user_accounts "1" -- "0..*" viewer_ratings
+users "1" -- "0..*" auth_sessions
+users "1" -- "0..*" viewer_genre_preferences
+users "1" -- "0..*" viewer_ratings
 genres "1" -- "0..*" viewer_genre_preferences
 rev "1" -- "0..*" movie_rows
 rev "0..1" -- "0..1" active_state
@@ -117,8 +117,7 @@ legend bottom
   | 0..* | Zero or many |
 
   This is the C03 catalogue/account migration contract.
-  The current bootstrap migration creates no domain tables.
-  Reconcile names, columns, constraints, and multiplicities with the
-  actual catalogue/account Alembic migrations before marking it implemented.
+  Catalogue tables and users have executable Alembic migrations.
+  Other account tables remain planned until their owning tasks are merged.
 endlegend
 @enduml

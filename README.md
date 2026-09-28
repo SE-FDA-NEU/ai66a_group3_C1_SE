@@ -230,6 +230,32 @@ python -m alembic -c backend/alembic.ini upgrade head
 
 C04 only bootstraps the shared migration system. Feature-specific schemas, such as account and catalogue tables, are owned by their corresponding Sprint tasks.
 
+### Verify the account storage boundary
+
+From the repository root, run the focused account checks:
+
+```powershell
+Set-Location backend
+..\.venv\Scripts\python.exe -m pytest tests/test_account_migration.py tests/test_user_repository.py tests/test_passwords.py -q
+```
+
+These checks verify that the migration follows the catalogue revision, email
+case variants hit the same database uniqueness constraint, plaintext passwords
+are replaced by Argon2id hashes, and the public account DTO contains only `id`
+and `email`.
+
+Confirm that Alembic has exactly one migration head:
+
+```powershell
+..\.venv\Scripts\python.exe -m alembic -c alembic.ini heads
+```
+
+Expected head:
+
+```text
+7f5b1d2a6e90 (head)
+```
+
 
 ## Run the Backend
 
