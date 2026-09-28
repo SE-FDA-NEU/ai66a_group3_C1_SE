@@ -3,13 +3,12 @@ from __future__ import annotations
 from collections.abc import Iterator
 
 import pytest
-from sqlalchemy import create_engine, select
-from sqlalchemy.orm import Session, sessionmaker
-
 from app.db.database import Base
 from app.db.models import User
 from app.repositories.users import create_user, get_user_by_email
 from app.security.passwords import verify_password
+from sqlalchemy import create_engine, select
+from sqlalchemy.orm import Session, sessionmaker
 
 
 @pytest.fixture
