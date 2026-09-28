@@ -1,9 +1,10 @@
-"""Application-owned persistence models for the movie catalogue.
+"""Application-owned persistence models for accounts and the movie catalogue.
 
-The catalogue models deliberately distinguish a stable internal movie ID from
-the ID supplied by an external provider.  Runtime queries reach only the
-revision selected by ``CatalogueState``; importing a newer revision never
-requires the browser to know about a provider ID.
+Account models keep credential fields internal.  Catalogue models deliberately
+distinguish a stable internal movie ID from the ID supplied by an external
+provider. Runtime queries reach only the revision selected by
+``CatalogueState``; importing a newer revision never requires the browser to
+know about a provider ID.
 """
 
 from __future__ import annotations
@@ -62,6 +63,29 @@ class CatalogueRevision(Base):
 
     movies: Mapped[list[CatalogMovie]] = relationship(
         back_populates="catalogue_revision"
+    )
+
+
+class User(Base):
+    """An account used to own authentication and personalisation data.
+
+    The application never stores a plaintext password.  ``password_hash`` is
+    intentionally named as such to keep the persistence boundary explicit.
+    Authentication code should use :mod:`app.security.passwords` rather than
+    handling Argon2 directly.
+    """
+
+    __tablename__ = "users"
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=new_opaque_id
+    )
+    email_normalized: Mapped[str] = mapped_column(
+        String(320, collation="NOCASE"), nullable=False, unique=True
+    )
+    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, default=utc_now
     )
 
 
