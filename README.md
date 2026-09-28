@@ -257,6 +257,35 @@ Expected head:
 ```
 
 
+## Deterministic M2 Catalogue Bootstrap
+
+For the M2 walking skeleton, run this single command from the repository root:
+
+```bash
+python -m app.cli.bootstrap_m2_catalogue
+```
+
+The command creates the parent directory for the configured SQLite database,
+applies every Alembic migration, and activates the fixed local M2 catalogue. It
+does not read `TMDB_READ_ACCESS_TOKEN` or make a network request. The command
+is therefore safe to run with an empty TMDb token and without internet access.
+
+Successful output has this shape:
+
+```text
+M2 catalogue bootstrap complete
+active_revision=<opaque UUID>
+movies=12
+genres=8
+movie_genres=22
+```
+
+Run the command a second time to verify idempotence: it reports the same active
+revision and row counts, without duplicate movies or movie/genre relations.
+This is the offline demo catalogue only; a future server-side TMDb importer is
+a separate operation and is never called by browser movie requests.
+
+
 ## Run the Backend
 
 From the repository root with the Python virtual environment activated:
