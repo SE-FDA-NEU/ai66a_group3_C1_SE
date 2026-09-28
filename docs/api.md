@@ -6,9 +6,9 @@ This document inventories the HTTP boundary needed by the six P0 Stories:
 S01, S02, S03, S04, S12, and S13. It separates runtime evidence from planned
 contracts so a future endpoint is never presented as already running.
 
-At this repository revision, only `GET /health` exists in backend source. All
-P0 routes below are target contracts and remain unavailable until their route,
-service, persistence, and tests are merged.
+The account storage and S2-T07 authentication routes are implemented in the
+backend. Other P0 routes remain target contracts until their route, service,
+persistence, and tests are merged.
 
 Architecture and persistence rules are in
 [architecture.md](architecture.md).
@@ -55,9 +55,9 @@ not an availability claim.
 |---|---|---|---|---|---|---|---|
 | Infrastructure | `GET` | `/health` | Public | None | `200` health and database/migration state | Unhandled database failure currently produces framework `500` | `Implemented in M2` |
 | S12 | `POST` | `/api/auth/register` | Public | `RegisterRequest` | `201 RegisterResponse` | `400 VALIDATION_ERROR`, `409 EMAIL_ALREADY_REGISTERED` | `Planned for later sprint` |
-| S13 | `POST` | `/api/auth/login` | Public | `LoginRequest` | `200 AuthResponse` and opaque cookie | `400 VALIDATION_ERROR`, `401 INVALID_CREDENTIALS` | `Planned for later sprint` |
-| S13 | `POST` | `/api/auth/logout` | Cookie optional; idempotent | None | `204`, session invalidated and cookie cleared | `500 INTERNAL_ERROR`, `503 SERVICE_UNAVAILABLE` | `Planned for later sprint` |
-| S13 | `GET` | `/api/auth/me` | Authenticated | None | `200 AuthResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Planned for later sprint` |
+| S13 | `POST` | `/api/auth/login` | Public | `LoginRequest` | `200 AuthResponse` and opaque cookie | `400 VALIDATION_ERROR`, `401 INVALID_CREDENTIALS` | `Implemented in M2` |
+| S13 | `POST` | `/api/auth/logout` | Cookie optional; idempotent | None | `204`, session invalidated and cookie cleared | `500 INTERNAL_ERROR`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
+| S13 | `GET` | `/api/auth/me` | Authenticated | None | `200 AuthResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 | S01 | `GET` | `/api/genres` | Authenticated | None | `200 GenreListResponse` | `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE` | `Planned for later sprint` |
 | S01 | `GET` | `/api/me/preferences` | Authenticated | None | `200 PreferenceResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Planned for later sprint` |
 | S01 | `PUT` | `/api/me/preferences` | Authenticated | `SavePreferencesRequest` | `200 PreferenceResponse` | `400 INVALID_GENRE_SELECTION`, `401 AUTHENTICATION_REQUIRED`, `404 GENRE_NOT_FOUND` | `Planned for later sprint` |

@@ -9,7 +9,7 @@ know about a provider ID.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import uuid4
 
 from sqlalchemy import (
@@ -30,7 +30,7 @@ from app.db.database import Base
 def utc_now() -> datetime:
     """Return a timezone-aware UTC timestamp for application-created rows."""
 
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def new_opaque_id() -> str:
@@ -87,6 +87,32 @@ class User(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, default=utc_now
     )
+
+    sessions: Mapped[list[AuthSession]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
+
+
+class AuthSession(Base):
+    """A server-side login session identified by a digest of its cookie token."""
+
+    __tablename__ = "auth_sessions"
+
+    token_digest: Mapped[str] = mapped_column(String(64), primary_key=True)
+    user_id: Mapped[str] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, default=utc_now
+    )
+    expires_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
+    revoked_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+
+    user: Mapped[User] = relationship(back_populates="sessions")
 
 
 class CatalogueState(Base):
