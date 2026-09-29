@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 from app.db.database import Base
@@ -123,7 +123,7 @@ def test_replace_movie_genres_de_duplicates_the_relation(session: Session) -> No
         source="seed",
         source_id="genre-test",
         title="Genre test",
-        source_fetched_at=datetime(2026, 9, 27, tzinfo=timezone.utc),
+        source_fetched_at=datetime(2026, 9, 27, tzinfo=UTC),
     )
     upsert_genre(session, genre_id=28, name="Action")
     upsert_genre(session, genre_id=35, name="Comedy")
