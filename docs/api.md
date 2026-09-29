@@ -67,12 +67,13 @@ not an availability claim.
 | S01 | `GET` | `/api/me/preferences` | Authenticated | None | `200 PreferenceResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Planned for later sprint` |
 | S01 | `PUT` | `/api/me/preferences` | Authenticated | `SavePreferencesRequest` | `200 PreferenceResponse` | `400 INVALID_GENRE_SELECTION`, `401 AUTHENTICATION_REQUIRED`, `404 GENRE_NOT_FOUND` | `Planned for later sprint` |
 | S02, S04 | `GET` | `/api/me/recommendations?limit=10` | Authenticated | Optional integer `limit`, 1-10 | `200 RecommendationResponse` | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE` | `Planned for later sprint` |
-| S03 | `GET` | `/api/movies/{movieId}` | Public | Opaque `movieId` | `200 MovieDetailResponse` | `404 MOVIE_NOT_FOUND`, `503 CATALOGUE_UNAVAILABLE` | `Planned for later sprint` |
+| S04 | `GET` | `/api/movies?limit=10` | Public | Optional integer `limit`, 1-10, default 10 | `200 MovieListResponse` | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE` | `Implemented in M2` |
+| S03 | `GET` | `/api/movies/{movieId}` | Public | Opaque `movieId` | `200 MovieDetailResponse` | `404 MOVIE_NOT_FOUND`, `503 CATALOGUE_UNAVAILABLE` | `Implemented in M2` |
 
-Public popular browsing (`GET /api/movies`), rating mutation, rating-informed
-ranking, genre filtering, similar movies, search, and profile reset are not P0
-endpoint requirements in this revision. They must be added with their owning
-Story and marked planned until code is merged.
+Rating mutation, rating-informed ranking, genre filtering, similar movies,
+search, and profile reset are not P0 endpoint requirements in this revision.
+They must be added with their owning Story and marked planned until code is
+merged.
 
 ## 3. Shared DTOs
 
@@ -308,7 +309,49 @@ Behaviour by account state:
 Popular alternatives sort by finite popularity descending, null popularity
 last, title A-Z for ties, and internal movie ID as the final deterministic tie.
 
-## 8. S03 movie details
+## 8. S03/S04 movie catalogue
+
+### `GET /api/movies?limit=10`
+
+`limit` defaults to 10 and accepts an integer from 1 through 10. Results are
+public and read only the active local catalogue; the endpoint never contacts
+TMDb.
+
+Success (`200`):
+
+```json
+{
+  "data": {
+    "movies": [
+      {
+        "id": "3ef5aa47-3ec6-41c8-9337-f5059d257988",
+        "title": "Example Movie",
+        "releaseYear": 2025,
+        "genres": [
+          { "id": 28, "name": "Action" }
+        ],
+        "popularityScore": 90.0
+      }
+    ]
+  },
+  "meta": {
+    "count": 1,
+    "limit": 10,
+    "catalogueRevision": "revision-example"
+  }
+}
+```
+
+Sort order is finite popularity descending, null popularity last, title A-Z
+for ties, and internal movie ID as the final deterministic tie-breaker.
+
+| Condition | Status/code | Public message |
+|---|---|---|
+| `limit` outside 1-10 or not an integer | `400 VALIDATION_ERROR` | `Please correct the highlighted fields` |
+| No active catalogue or database unavailable | `503 CATALOGUE_UNAVAILABLE` | `Movie catalogue is unavailable` |
+
+An empty active catalogue returns `200` with `movies: []`; the UI shows
+guidance and never invents movies.
 
 ### `GET /api/movies/{movieId}`
 
