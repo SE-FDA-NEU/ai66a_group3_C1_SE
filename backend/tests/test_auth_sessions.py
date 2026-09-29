@@ -1,16 +1,19 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
+from datetime import UTC, datetime, timedelta
+from secrets import token_urlsafe
 
 import pytest
-from app.db.database import Base
-from app.db.models import AuthSession
-from app.main import app, get_db
-from app.repositories.users import create_user
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
+
+from app.db.database import Base
+from app.db.models import AuthSession
+from app.main import app, get_db
+from app.repositories.users import create_user
 
 
 @pytest.fixture
@@ -80,7 +83,9 @@ def test_unknown_email_and_wrong_password_have_same_public_error(
     )
 
     assert unknown.status_code == wrong.status_code == 401
-    assert unknown.json() == wrong.json()
+    assert unknown.json()["error"]["code"] == wrong.json()["error"]["code"]
+    assert unknown.json()["error"]["message"] == wrong.json()["error"]["message"]
+    assert unknown.json()["error"]["requestId"] != wrong.json()["error"]["requestId"]
 
 
 def test_logout_revokes_session_and_expired_or_invalid_cookie_is_unauthorized(
@@ -102,3 +107,36 @@ def test_logout_revokes_session_and_expired_or_invalid_cookie_is_unauthorized(
         "AUTHENTICATION_REQUIRED"
     )
     assert database_session.scalar(select(AuthSession)).revoked_at is not None
+
+
+def test_expired_session_is_unauthorized(
+    client: tuple[TestClient, Session],
+) -> None:
+    http, database_session = client
+    http.post(
+        "/api/auth/login",
+        json={"email": "viewer@example.com", "password": "movie123"},
+    )
+    stored = database_session.scalar(select(AuthSession))
+    assert stored is not None
+    stored.expires_at = datetime.now(UTC) - timedelta(seconds=1)
+    database_session.commit()
+
+    response = http.get("/api/auth/me")
+
+    assert response.status_code == 401
+    assert response.json()["error"]["code"] == "AUTHENTICATION_REQUIRED"
+    assert response.json()["error"]["requestId"].startswith("req_")
+
+
+def test_unknown_cookie_is_unauthorized(
+    client: tuple[TestClient, Session],
+) -> None:
+    http, _ = client
+    http.cookies.set("ams_session", token_urlsafe(32))
+
+    response = http.get("/api/auth/me")
+
+    assert response.status_code == 401
+    assert response.json()["error"]["code"] == "AUTHENTICATION_REQUIRED"
+    assert response.json()["error"]["requestId"].startswith("req_")

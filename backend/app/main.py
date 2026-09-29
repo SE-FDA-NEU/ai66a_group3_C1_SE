@@ -1,10 +1,12 @@
 import os
 from collections.abc import Generator
+from uuid import uuid4
 
 from fastapi import Depends, FastAPI, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.db.database import SessionLocal, engine
@@ -29,6 +31,17 @@ async def validation_error_handler(_request: Request, _exc: RequestValidationErr
     return _error("VALIDATION_ERROR", "Please correct the highlighted fields", 400)
 
 
+@app.exception_handler(SQLAlchemyError)
+async def database_error_handler(_request: Request, _exc: SQLAlchemyError):
+    """Keep persistence failures inside the public API contract."""
+
+    return _error(
+        "SERVICE_UNAVAILABLE",
+        "Service is temporarily unavailable",
+        503,
+    )
+
+
 def get_db() -> Generator[Session, None, None]:
     database_session = SessionLocal()
     try:
@@ -40,7 +53,13 @@ def get_db() -> Generator[Session, None, None]:
 def _error(code: str, message: str, status_code: int) -> JSONResponse:
     return JSONResponse(
         status_code=status_code,
-        content={"error": {"code": code, "message": message}},
+        content={
+            "error": {
+                "code": code,
+                "message": message,
+                "requestId": f"req_{uuid4().hex}",
+            }
+        },
     )
 
 

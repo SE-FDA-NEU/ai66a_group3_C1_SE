@@ -45,6 +45,11 @@ Architecture and persistence rules are in
 Validation errors may add a safe `fields` object. It must not echo a password,
 cookie, credential, SQL text, or stack trace.
 
+Every error response includes a generated `requestId` so a client can correlate
+the failure with server-side logs. Persistence failures on implemented
+authentication routes are returned as `503 SERVICE_UNAVAILABLE` with the same
+safe envelope.
+
 ## 2. Endpoint inventory and delivery status
 
 `Implemented in M2` means a callable route and its supporting behaviour exist
