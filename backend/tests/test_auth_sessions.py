@@ -5,15 +5,14 @@ from datetime import UTC, datetime, timedelta
 from secrets import token_urlsafe
 
 import pytest
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine, select
-from sqlalchemy.orm import Session, sessionmaker
-from sqlalchemy.pool import StaticPool
-
 from app.db.database import Base
 from app.db.models import AuthSession
 from app.main import app, get_db
 from app.repositories.users import create_user
+from fastapi.testclient import TestClient
+from sqlalchemy import create_engine, select
+from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.pool import StaticPool
 
 
 @pytest.fixture
