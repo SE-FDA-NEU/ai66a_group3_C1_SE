@@ -2,7 +2,7 @@ import os
 from collections.abc import Generator
 from uuid import uuid4
 
-from fastapi import Depends, FastAPI, Request, Response
+from fastapi import Depends, FastAPI, Query, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
@@ -10,6 +10,13 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.db.database import SessionLocal, engine
+from app.repositories.movies import (
+    get_active_catalogue_revision,
+    get_active_movie_by_id,
+    list_active_movies,
+    to_movie_detail_dto,
+    to_movie_summary_dto,
+)
 from app.repositories.users import get_user_by_email, to_user_dto
 from app.schemas.auth import LoginRequest
 from app.security.passwords import normalize_email, verify_password
@@ -171,6 +178,51 @@ def logout(
     revoke_session(database_session, request.cookies.get(SESSION_COOKIE))
     database_session.commit()
     _clear_session_cookie(response, request)
+
+
+@app.get("/api/movies", response_model=dict, status_code=200)
+def list_movies(
+    limit: int = Query(default=10, ge=1, le=10),
+    database_session: Session = Depends(get_db),  # noqa: B008
+):
+    revision = get_active_catalogue_revision(database_session)
+    if revision is None:
+        return _error(
+            "CATALOGUE_UNAVAILABLE", "Movie catalogue is unavailable", 503
+        )
+
+    movies = list_active_movies(database_session, limit=limit)
+    return {
+        "data": {
+            "movies": [to_movie_summary_dto(movie).model_dump() for movie in movies]
+        },
+        "meta": {
+            "count": len(movies),
+            "limit": limit,
+            "catalogueRevision": revision.id,
+        },
+    }
+
+
+@app.get("/api/movies/{movie_id}", response_model=dict, status_code=200)
+def get_movie(
+    movie_id: str,
+    database_session: Session = Depends(get_db),  # noqa: B008
+):
+    revision = get_active_catalogue_revision(database_session)
+    if revision is None:
+        return _error(
+            "CATALOGUE_UNAVAILABLE", "Movie catalogue is unavailable", 503
+        )
+
+    movie = get_active_movie_by_id(database_session, movie_id=movie_id)
+    if movie is None:
+        return _error("MOVIE_NOT_FOUND", "Movie not found", 404)
+
+    return {
+        "data": {"movie": to_movie_detail_dto(movie).model_dump()},
+        "meta": {"catalogueRevision": revision.id},
+    }
 
 
 # Used only to keep unknown-email verification on the same Argon2 path as a
