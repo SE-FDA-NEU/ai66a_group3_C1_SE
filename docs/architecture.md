@@ -103,6 +103,10 @@ constraint, or multiplicity differs.
 - Login creates a cryptographically random opaque session. The cookie uses
   `HttpOnly`, `SameSite=Lax`, `Path=/`, and `Secure` outside documented
   localhost development.
+- Login and logout combine that cookie policy with the same-origin deployment,
+  no permissive CORS configuration, and a Fetch Metadata/`Origin` guard.
+  Cross-origin or same-site browser writes are rejected before session state
+  changes. Vite-proxied development requests remain browser same-origin.
 - Every protected request resolves `user_id` from the cookie and server-side
   session. Body, query, path, or custom-header account IDs are not
   authoritative.

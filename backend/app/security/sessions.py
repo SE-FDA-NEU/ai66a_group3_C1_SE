@@ -16,7 +16,10 @@ SESSION_TTL = timedelta(days=7)
 
 
 def _digest(token: str) -> str:
-    return hashlib.sha256(token.encode("ascii")).hexdigest()
+    # Valid tokens are URL-safe ASCII, but an attacker controls the cookie
+    # header. UTF-8 keeps malformed/non-ASCII cookie values on the normal
+    # unauthorized path instead of turning them into an encoding exception.
+    return hashlib.sha256(token.encode("utf-8")).hexdigest()
 
 
 def _as_utc(value: datetime) -> datetime:
