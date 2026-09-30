@@ -19,6 +19,7 @@ from app.repositories.movies import (
 )
 from app.repositories.users import get_user_by_email, to_user_dto
 from app.schemas.auth import LoginRequest
+from app.schemas.movies import MovieDetailResponse, MovieListResponse
 from app.security.passwords import normalize_email, verify_password
 from app.security.sessions import (
     SESSION_COOKIE,
@@ -180,7 +181,7 @@ def logout(
     _clear_session_cookie(response, request)
 
 
-@app.get("/api/movies", response_model=dict, status_code=200)
+@app.get("/api/movies", response_model=MovieListResponse, status_code=200)
 def list_movies(
     limit: int = Query(default=10, ge=1, le=10),
     database_session: Session = Depends(get_db),  # noqa: B008
@@ -204,7 +205,7 @@ def list_movies(
     }
 
 
-@app.get("/api/movies/{movie_id}", response_model=dict, status_code=200)
+@app.get("/api/movies/{movie_id}", response_model=MovieDetailResponse, status_code=200)
 def get_movie(
     movie_id: str,
     database_session: Session = Depends(get_db),  # noqa: B008
