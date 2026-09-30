@@ -25,6 +25,9 @@ Architecture and persistence rules are in
   `Information unavailable` when a movie year or overview is missing.
 - Authentication uses the same-origin `ams_session` cookie. Browser bearer
   tokens and local-storage tokens are not part of this contract.
+- Browser `POST /api/auth/login` and `POST /api/auth/logout` requests must pass
+  the same-origin Fetch Metadata/`Origin` check. Cross-origin and same-site
+  browser writes return `403 ORIGIN_NOT_ALLOWED` before session state changes.
 - Protected endpoints derive the account only from the authenticated session.
   A client-supplied `user_id` cannot select an account.
 - Passwords, hashes, session digests, cookie values, and TMDb credentials never
@@ -60,19 +63,20 @@ not an availability claim.
 |---|---|---|---|---|---|---|---|
 | Infrastructure | `GET` | `/health` | Public | None | `200` health and database/migration state | Unhandled database failure currently produces framework `500` | `Implemented in M2` |
 | S12 | `POST` | `/api/auth/register` | Public | `RegisterRequest` | `201 RegisterResponse` | `400 VALIDATION_ERROR`, `409 EMAIL_ALREADY_REGISTERED` | `Implemented in M2` |
-| S13 | `POST` | `/api/auth/login` | Public | `LoginRequest` | `200 AuthResponse` and opaque cookie | `400 VALIDATION_ERROR`, `401 INVALID_CREDENTIALS` | `Implemented in M2` |
-| S13 | `POST` | `/api/auth/logout` | Cookie optional; idempotent | None | `204`, session invalidated and cookie cleared | `500 INTERNAL_ERROR`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
+| S13 | `POST` | `/api/auth/login` | Public, same-origin write | `LoginRequest` | `200 AuthResponse` and opaque cookie | `400 VALIDATION_ERROR`, `401 INVALID_CREDENTIALS`, `403 ORIGIN_NOT_ALLOWED` | `Implemented in M2` |
+| S13 | `POST` | `/api/auth/logout` | Cookie optional; idempotent same-origin write | None | `204`, session invalidated and cookie cleared | `403 ORIGIN_NOT_ALLOWED`, `500 INTERNAL_ERROR`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 | S13 | `GET` | `/api/auth/me` | Authenticated | None | `200 AuthResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 | S01 | `GET` | `/api/genres` | Authenticated | None | `200 GenreListResponse` | `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE` | `Planned for later sprint` |
 | S01 | `GET` | `/api/me/preferences` | Authenticated | None | `200 PreferenceResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Planned for later sprint` |
 | S01 | `PUT` | `/api/me/preferences` | Authenticated | `SavePreferencesRequest` | `200 PreferenceResponse` | `400 INVALID_GENRE_SELECTION`, `401 AUTHENTICATION_REQUIRED`, `404 GENRE_NOT_FOUND` | `Planned for later sprint` |
 | S02, S04 | `GET` | `/api/me/recommendations?limit=10` | Authenticated | Optional integer `limit`, 1-10 | `200 RecommendationResponse` | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE` | `Planned for later sprint` |
-| S03 | `GET` | `/api/movies/{movieId}` | Public | Opaque `movieId` | `200 MovieDetailResponse` | `404 MOVIE_NOT_FOUND`, `503 CATALOGUE_UNAVAILABLE` | `Planned for later sprint` |
+| S04 | `GET` | `/api/movies?limit=10` | Public | Optional integer `limit`, 1-10, default 10 | `200 MovieListResponse` | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
+| S03 | `GET` | `/api/movies/{movieId}` | Public | Opaque `movieId` | `200 MovieDetailResponse` | `404 MOVIE_NOT_FOUND`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 
-Public popular browsing (`GET /api/movies`), rating mutation, rating-informed
-ranking, genre filtering, similar movies, search, and profile reset are not P0
-endpoint requirements in this revision. They must be added with their owning
-Story and marked planned until code is merged.
+Rating mutation, rating-informed ranking, genre filtering, similar movies,
+search, and profile reset are not P0 endpoint requirements in this revision.
+They must be added with their owning Story and marked planned until code is
+merged.
 
 ## 3. Shared DTOs
 
@@ -180,6 +184,7 @@ email and incorrect password return the same response:
 |---|---|---|
 | Required input missing | `400 VALIDATION_ERROR` | `Email and password are required` |
 | Unknown email or wrong password | `401 INVALID_CREDENTIALS` | `Email or password is incorrect` |
+| Cross-origin or same-site browser write | `403 ORIGIN_NOT_ALLOWED` | `Request origin is not allowed` |
 | Persistence unavailable | `503 SERVICE_UNAVAILABLE` | `Service is temporarily unavailable` |
 
 The UI opens `/recommendations` only after successful login.
@@ -196,6 +201,8 @@ session returns `401 AUTHENTICATION_REQUIRED` with message
 The operation is idempotent and has no request DTO. It invalidates a valid
 session, clears the cookie, and returns `204 No Content`. The UI then opens
 `/`. Reusing the revoked cookie cannot authenticate a protected endpoint.
+The same-origin check runs before revocation, so a rejected browser request
+cannot terminate the current session.
 
 ## 6. S01 genres and account preferences
 
@@ -308,7 +315,50 @@ Behaviour by account state:
 Popular alternatives sort by finite popularity descending, null popularity
 last, title A-Z for ties, and internal movie ID as the final deterministic tie.
 
-## 8. S03 movie details
+## 8. S03/S04 movie catalogue
+
+### `GET /api/movies?limit=10`
+
+`limit` defaults to 10 and accepts an integer from 1 through 10. Results are
+public and read only the active local catalogue; the endpoint never contacts
+TMDb.
+
+Success (`200`):
+
+```json
+{
+  "data": {
+    "movies": [
+      {
+        "id": "3ef5aa47-3ec6-41c8-9337-f5059d257988",
+        "title": "Example Movie",
+        "releaseYear": 2025,
+        "genres": [
+          { "id": 28, "name": "Action" }
+        ],
+        "popularityScore": 90.0
+      }
+    ]
+  },
+  "meta": {
+    "count": 1,
+    "limit": 10,
+    "catalogueRevision": "revision-example"
+  }
+}
+```
+
+Sort order is finite popularity descending, null popularity last, title A-Z
+for ties, and internal movie ID as the final deterministic tie-breaker.
+
+| Condition | Status/code | Public message |
+|---|---|---|
+| `limit` outside 1-10 or not an integer | `400 VALIDATION_ERROR` | `Please correct the highlighted fields` |
+| No active catalogue | `503 CATALOGUE_UNAVAILABLE` | `Movie catalogue is unavailable` |
+| Database read failure | `503 SERVICE_UNAVAILABLE` | `Service is temporarily unavailable` |
+
+An empty active catalogue returns `200` with `movies: []`; the UI shows
+guidance and never invents movies.
 
 ### `GET /api/movies/{movieId}`
 
@@ -342,7 +392,8 @@ Success (`200`):
 | Condition | Status/code | Public message |
 |---|---|---|
 | Internal movie ID not found | `404 MOVIE_NOT_FOUND` | `Movie not found` |
-| No active catalogue or database unavailable | `503 CATALOGUE_UNAVAILABLE` | `Movie catalogue is unavailable` |
+| No active catalogue | `503 CATALOGUE_UNAVAILABLE` | `Movie catalogue is unavailable` |
+| Database read failure | `503 SERVICE_UNAVAILABLE` | `Service is temporarily unavailable` |
 | Unexpected server failure | `500 INTERNAL_ERROR` | `Something went wrong` |
 
 A missing year or overview remains JSON `null`; the UI displays
@@ -357,11 +408,12 @@ to a false 404.
 | `INVALID_GENRE_SELECTION` | 400 | The preference set is not 1-5 distinct genres. |
 | `AUTHENTICATION_REQUIRED` | 401 | A protected route has no valid session. |
 | `INVALID_CREDENTIALS` | 401 | Login credentials are invalid without revealing which field failed. |
+| `ORIGIN_NOT_ALLOWED` | 403 | A browser session write failed the same-origin check. |
 | `MOVIE_NOT_FOUND` | 404 | The internal movie ID does not exist in the active catalogue. |
 | `GENRE_NOT_FOUND` | 404 | A requested genre ID does not exist. |
 | `EMAIL_ALREADY_REGISTERED` | 409 | The normalized email is already stored. |
 | `INTERNAL_ERROR` | 500 | An unexpected failure occurred. |
-| `SERVICE_UNAVAILABLE` | 503 | Required account persistence is unavailable. |
+| `SERVICE_UNAVAILABLE` | 503 | Required persistence (account or catalogue) is unavailable. |
 | `CATALOGUE_UNAVAILABLE` | 503 | No active catalogue is readable. |
 
 ## 10. Scope boundary

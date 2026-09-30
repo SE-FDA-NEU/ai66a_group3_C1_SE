@@ -2,7 +2,7 @@ import os
 from collections.abc import Generator
 from uuid import uuid4
 
-from fastapi import Depends, FastAPI, Request, Response
+from fastapi import Depends, FastAPI, Query, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
@@ -10,8 +10,23 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.db.database import SessionLocal, engine
+from app.repositories.movies import (
+    get_active_catalogue_revision,
+    get_active_movie_by_id,
+    list_active_movies,
+    to_movie_detail_dto,
+    to_movie_summary_dto,
+)
 from app.repositories.users import create_user, get_user_by_email, to_user_dto
-from app.schemas.auth import LoginRequest, RegisterRequest
+from app.schemas.auth import (
+    AuthData,
+    AuthResponse,
+    LoginRequest,
+    RegisterRequest,
+    RegisterResponse,
+)
+from app.schemas.movies import MovieDetailResponse, MovieListResponse
+from app.security.origin import same_origin_write_allowed
 from app.security.passwords import normalize_email, verify_password
 from app.security.sessions import (
     SESSION_COOKIE,
@@ -24,6 +39,25 @@ from app.security.sessions import (
 app = FastAPI(
     title="AI Movie Recommendation System",
 )
+
+_SESSION_WRITE_PATHS = frozenset({"/api/auth/login", "/api/auth/logout"})
+
+
+@app.middleware("http")
+async def same_origin_session_writes(request: Request, call_next):
+    """Reject cross-origin browser requests before they can change a session."""
+
+    if (
+        request.method == "POST"
+        and request.url.path in _SESSION_WRITE_PATHS
+        and not same_origin_write_allowed(request)
+    ):
+        return _error(
+            "ORIGIN_NOT_ALLOWED",
+            "Request origin is not allowed",
+            403,
+        )
+    return await call_next(request)
 
 
 @app.exception_handler(RequestValidationError)
@@ -107,7 +141,7 @@ def health():
     }
 
 
-@app.post("/api/auth/register", response_model=dict, status_code=201)
+@app.post("/api/auth/register", response_model=RegisterResponse, status_code=201)
 def register(
     payload: RegisterRequest,
     database_session: Session = Depends(get_db),  # noqa: B008
@@ -124,10 +158,10 @@ def register(
             "This email is already registered",
             409,
         )
-    return {"data": {"user": user_dto.model_dump()}}
+    return RegisterResponse(data=AuthData(user=user_dto))
 
 
-@app.post("/api/auth/login", response_model=dict, status_code=200)
+@app.post("/api/auth/login", response_model=AuthResponse, status_code=200)
 def login(
     payload: LoginRequest,
     request: Request,
@@ -164,10 +198,10 @@ def login(
     token = create_session(database_session, user=user)
     database_session.commit()
     _set_session_cookie(response, request, token)
-    return {"data": {"user": to_user_dto(user).model_dump()}}
+    return AuthResponse(data=AuthData(user=to_user_dto(user)))
 
 
-@app.get("/api/auth/me", response_model=dict, status_code=200)
+@app.get("/api/auth/me", response_model=AuthResponse, status_code=200)
 def current_user(
     request: Request,
     database_session: Session = Depends(get_db),  # noqa: B008
@@ -179,7 +213,7 @@ def current_user(
         return _error(
             "AUTHENTICATION_REQUIRED", "Authentication required", 401
         )
-    return {"data": {"user": to_user_dto(user).model_dump()}}
+    return AuthResponse(data=AuthData(user=to_user_dto(user)))
 
 
 @app.post("/api/auth/logout", status_code=204)
@@ -191,6 +225,51 @@ def logout(
     revoke_session(database_session, request.cookies.get(SESSION_COOKIE))
     database_session.commit()
     _clear_session_cookie(response, request)
+
+
+@app.get("/api/movies", response_model=MovieListResponse, status_code=200)
+def list_movies(
+    limit: int = Query(default=10, ge=1, le=10),
+    database_session: Session = Depends(get_db),  # noqa: B008
+):
+    revision = get_active_catalogue_revision(database_session)
+    if revision is None:
+        return _error(
+            "CATALOGUE_UNAVAILABLE", "Movie catalogue is unavailable", 503
+        )
+
+    movies = list_active_movies(database_session, limit=limit)
+    return {
+        "data": {
+            "movies": [to_movie_summary_dto(movie).model_dump() for movie in movies]
+        },
+        "meta": {
+            "count": len(movies),
+            "limit": limit,
+            "catalogueRevision": revision.id,
+        },
+    }
+
+
+@app.get("/api/movies/{movie_id}", response_model=MovieDetailResponse, status_code=200)
+def get_movie(
+    movie_id: str,
+    database_session: Session = Depends(get_db),  # noqa: B008
+):
+    revision = get_active_catalogue_revision(database_session)
+    if revision is None:
+        return _error(
+            "CATALOGUE_UNAVAILABLE", "Movie catalogue is unavailable", 503
+        )
+
+    movie = get_active_movie_by_id(database_session, movie_id=movie_id)
+    if movie is None:
+        return _error("MOVIE_NOT_FOUND", "Movie not found", 404)
+
+    return {
+        "data": {"movie": to_movie_detail_dto(movie).model_dump()},
+        "meta": {"catalogueRevision": revision.id},
+    }
 
 
 # Used only to keep unknown-email verification on the same Argon2 path as a

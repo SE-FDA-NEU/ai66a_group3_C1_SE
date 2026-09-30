@@ -33,7 +33,19 @@ class LoginRequest(BaseModel):
     password: str | None = None
 
 
-class AuthResponse(BaseModel):
+class AuthData(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     user: UserDto
+
+
+class AuthResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    data: AuthData
+
+
+class RegisterResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    data: AuthData

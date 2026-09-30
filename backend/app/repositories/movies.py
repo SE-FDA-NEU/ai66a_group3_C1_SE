@@ -18,6 +18,7 @@ from app.db.models import (
     new_opaque_id,
     utc_now,
 )
+from app.schemas.movies import GenreDto, MovieDetailDto, MovieSummaryDto
 
 ACTIVE_CATALOGUE_STATE_ID = 1
 
@@ -249,6 +250,33 @@ def get_active_movie_by_id(session: Session, *, movie_id: str) -> CatalogMovie |
         .options(selectinload(CatalogMovie.genres))
     )
     return session.scalar(statement)
+
+
+def to_movie_summary_dto(movie: CatalogMovie) -> MovieSummaryDto:
+    """Project a catalogue movie to the safe public list-item shape."""
+
+    return MovieSummaryDto(
+        id=movie.id,
+        title=movie.title,
+        releaseYear=movie.release_year,
+        genres=[GenreDto(id=genre.id, name=genre.name) for genre in movie.genres],
+        popularityScore=movie.popularity_score,
+    )
+
+
+def to_movie_detail_dto(movie: CatalogMovie) -> MovieDetailDto:
+    """Project a catalogue movie to the safe public detail shape."""
+
+    return MovieDetailDto(
+        id=movie.id,
+        title=movie.title,
+        releaseYear=movie.release_year,
+        genres=[GenreDto(id=genre.id, name=genre.name) for genre in movie.genres],
+        overview=movie.overview,
+        popularityScore=movie.popularity_score,
+        voteAverage=movie.vote_average,
+        voteCount=movie.vote_count,
+    )
 
 
 def _normalise_optional_text(value: str | None) -> str | None:

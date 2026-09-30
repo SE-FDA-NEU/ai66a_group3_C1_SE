@@ -381,6 +381,12 @@ python -m pytest backend/tests -v
 
 The backend test suite includes runtime and database-backed health verification.
 
+To rerun only the S2-T08 login/logout/current-account contract tests:
+
+```bash
+python -m pytest backend/tests/test_auth_sessions.py -v
+```
+
 
 ## Run Frontend Tests
 
