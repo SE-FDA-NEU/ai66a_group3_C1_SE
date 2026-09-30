@@ -6,7 +6,7 @@ from fastapi import Depends, FastAPI, Query, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.db.database import SessionLocal, engine
@@ -17,8 +17,14 @@ from app.repositories.movies import (
     to_movie_detail_dto,
     to_movie_summary_dto,
 )
-from app.repositories.users import get_user_by_email, to_user_dto
-from app.schemas.auth import AuthData, AuthResponse, LoginRequest
+from app.repositories.users import create_user, get_user_by_email, to_user_dto
+from app.schemas.auth import (
+    AuthData,
+    AuthResponse,
+    LoginRequest,
+    RegisterRequest,
+    RegisterResponse,
+)
 from app.schemas.movies import MovieDetailResponse, MovieListResponse
 from app.security.origin import same_origin_write_allowed
 from app.security.passwords import normalize_email, verify_password
@@ -133,6 +139,26 @@ def health():
         "database": "connected",
         "migrationVersion": migration_version,
     }
+
+
+@app.post("/api/auth/register", response_model=RegisterResponse, status_code=201)
+def register(
+    payload: RegisterRequest,
+    database_session: Session = Depends(get_db),  # noqa: B008
+):
+    try:
+        user_dto = create_user(
+            database_session, email=payload.email, password=payload.password
+        )
+        database_session.commit()
+    except IntegrityError:
+        database_session.rollback()
+        return _error(
+            "EMAIL_ALREADY_REGISTERED",
+            "This email is already registered",
+            409,
+        )
+    return RegisterResponse(data=AuthData(user=user_dto))
 
 
 @app.post("/api/auth/login", response_model=AuthResponse, status_code=200)

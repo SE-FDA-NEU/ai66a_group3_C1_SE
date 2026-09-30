@@ -62,7 +62,7 @@ not an availability claim.
 | Story | Method | Endpoint | Access | Input | Success | Representative errors | Delivery status |
 |---|---|---|---|---|---|---|---|
 | Infrastructure | `GET` | `/health` | Public | None | `200` health and database/migration state | Unhandled database failure currently produces framework `500` | `Implemented in M2` |
-| S12 | `POST` | `/api/auth/register` | Public | `RegisterRequest` | `201 RegisterResponse` | `400 VALIDATION_ERROR`, `409 EMAIL_ALREADY_REGISTERED` | `Planned for later sprint` |
+| S12 | `POST` | `/api/auth/register` | Public | `RegisterRequest` | `201 RegisterResponse` | `400 VALIDATION_ERROR`, `409 EMAIL_ALREADY_REGISTERED` | `Implemented in M2` |
 | S13 | `POST` | `/api/auth/login` | Public, same-origin write | `LoginRequest` | `200 AuthResponse` and opaque cookie | `400 VALIDATION_ERROR`, `401 INVALID_CREDENTIALS`, `403 ORIGIN_NOT_ALLOWED` | `Implemented in M2` |
 | S13 | `POST` | `/api/auth/logout` | Cookie optional; idempotent same-origin write | None | `204`, session invalidated and cookie cleared | `403 ORIGIN_NOT_ALLOWED`, `500 INTERNAL_ERROR`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 | S13 | `GET` | `/api/auth/me` | Authenticated | None | `200 AuthResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
