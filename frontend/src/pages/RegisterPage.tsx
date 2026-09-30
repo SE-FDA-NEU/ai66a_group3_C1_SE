@@ -40,8 +40,6 @@ function RegisterPage() {
     } catch (error) {
       if (error instanceof ApiError && error.code === "EMAIL_ALREADY_REGISTERED") {
         setRequestError("This email is already registered");
-      } else if (error instanceof Error) {
-        setRequestError(error.message);
       } else {
         setRequestError("Service is temporarily unavailable");
       }

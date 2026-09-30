@@ -185,6 +185,6 @@ describe("S12 registration UI", () => {
 
     expect(globalThis.fetch).toHaveBeenCalledTimes(1);
     resolveRequest(new Response(JSON.stringify({ error: { message: "Try again" } }), { status: 503 }));
-    await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("Try again"));
+    await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("Service is temporarily unavailable"));
   });
 });
