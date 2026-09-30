@@ -16,13 +16,9 @@ function jsonResponse(body: unknown, status = 200) {
 }
 
 afterEach(() => {
-  vi.restoreAllMocks();
-  window.history.replaceState({}, "", "/");
-});
-
-afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
+  window.history.replaceState({}, "", "/");
 });
 
 describe("S13 authentication UI", () => {
@@ -120,7 +116,13 @@ describe("S13 authentication UI", () => {
           },
         }),
       )
-      .mockImplementationOnce(() => Promise.resolve(new Response(null, { status: 204 })));
+      .mockImplementationOnce(() => Promise.resolve(new Response(null, { status: 204 })))
+      .mockImplementationOnce(() =>
+        jsonResponse({
+          data: { movies: [] },
+          meta: { count: 0, limit: 10, catalogueRevision: "revision-test" },
+        }),
+      );
 
     render(<App />);
 
