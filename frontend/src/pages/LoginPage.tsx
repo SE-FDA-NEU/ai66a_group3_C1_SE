@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { login } from "../api/auth.ts";
 
@@ -76,6 +76,9 @@ function LoginPage() {
             {isSubmitting ? "Signing in..." : "Sign in"}
           </button>
         </form>
+        <p className="auth-footer">
+          Need an account? <Link to="/register">Create an account</Link>
+        </p>
       </section>
     </main>
   );
