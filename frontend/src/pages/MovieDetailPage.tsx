@@ -17,19 +17,51 @@ function MovieDetailPage() {
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
-  let cancelled = false;
+    let cancelled = false;
 
-  getMovie(movieId)
-    .then((result) => {
-      if (!cancelled) {
-        setMovie(result);
-      }
-    })
-    .catch((error) => {
-      if (cancelled) {
-        return;
-      }
+    getMovie(movieId)
+      .then((result) => {
+        if (!cancelled) {
+          setMovie(result);
+        }
+      })
+      .catch((error) => {
+        if (cancelled) {
+          return;
+        }
 
+        setMovie(null);
+
+        if (
+          error instanceof MovieApiError &&
+          (error.status === 404 || error.code === "MOVIE_NOT_FOUND")
+        ) {
+          setNotFound(true);
+        } else {
+          setError(
+            error instanceof Error ? error.message : "Something went wrong",
+          );
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [movieId]);
+
+  async function handleRetry() {
+    setIsLoading(true);
+    setError("");
+    setNotFound(false);
+
+    try {
+      setMovie(await getMovie(movieId));
+    } catch (error) {
       setMovie(null);
 
       if (
@@ -42,42 +74,11 @@ function MovieDetailPage() {
           error instanceof Error ? error.message : "Something went wrong",
         );
       }
-    })
-    .finally(() => {
-      if (!cancelled) {
-        setIsLoading(false);
-      }
-    });
-
-  return () => {
-    cancelled = true;
-  };
-}, [movieId]);
-
-async function handleRetry() {
-  setIsLoading(true);
-  setError("");
-  setNotFound(false);
-
-  try {
-    setMovie(await getMovie(movieId));
-  } catch (error) {
-    setMovie(null);
-
-    if (
-      error instanceof MovieApiError &&
-      (error.status === 404 || error.code === "MOVIE_NOT_FOUND")
-    ) {
-      setNotFound(true);
-    } else {
-      setError(
-        error instanceof Error ? error.message : "Something went wrong",
-      );
+    } finally {
+      setIsLoading(false);
     }
-  } finally {
-    setIsLoading(false);
   }
-}
+
   if (isLoading) {
     return (
       <main className="page page--centered">
