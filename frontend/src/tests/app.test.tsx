@@ -16,19 +16,14 @@ function jsonResponse(body: unknown, status = 200) {
 }
 
 afterEach(() => {
-  vi.restoreAllMocks();
-  window.history.replaceState({}, "", "/");
-});
-
-afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
+  window.history.replaceState({}, "", "/");
 });
 
 describe("S13 authentication UI", () => {
   it("renders the login route", () => {
     window.history.pushState({}, "", "/login");
-
     render(<App />);
 
     expect(screen.getByRole("heading", { name: "Sign in" })).toBeInTheDocument();
@@ -38,37 +33,21 @@ describe("S13 authentication UI", () => {
 
   it("opens recommendations after a successful login", async () => {
     window.history.pushState({}, "", "/login");
-
     const fetchMock = vi
       .spyOn(globalThis, "fetch")
       .mockImplementationOnce(() =>
-        jsonResponse({
-          data: {
-            user: { id: "user-1", email: "viewer@example.com" },
-          },
-        }),
+        jsonResponse({ data: { user: { id: "user-1", email: "viewer@example.com" } } }),
       )
       .mockImplementationOnce(() =>
-        jsonResponse({
-          data: {
-            user: { id: "user-1", email: "viewer@example.com" },
-          },
-        }),
+        jsonResponse({ data: { user: { id: "user-1", email: "viewer@example.com" } } }),
       );
 
     render(<App />);
-
-    fireEvent.change(screen.getByLabelText("Email"), {
-      target: { value: "viewer@example.com" },
-    });
-    fireEvent.change(screen.getByLabelText("Password"), {
-      target: { value: "movie123" },
-    });
+    fireEvent.change(screen.getByLabelText("Email"), { target: { value: "viewer@example.com" } });
+    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "movie123" } });
     fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
 
-    expect(
-      await screen.findByRole("heading", { name: "Recommendations" }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Recommendations" })).toBeInTheDocument();
     expect(window.location.pathname).toBe("/recommendations");
     expect(fetchMock).toHaveBeenNthCalledWith(
       1,
@@ -79,56 +58,56 @@ describe("S13 authentication UI", () => {
 
   it("shows the exact invalid-credentials message", async () => {
     window.history.pushState({}, "", "/login");
-
     vi.spyOn(globalThis, "fetch").mockImplementationOnce(() =>
-      jsonResponse(
-        {
-          error: {
-            code: "INVALID_CREDENTIALS",
-            message: "Email or password is incorrect",
-            requestId: "req_test",
-          },
-        },
-        401,
-      ),
+      jsonResponse({ error: { code: "INVALID_CREDENTIALS", message: "Email or password is incorrect" } }, 401),
+    );
+
+    render(<App />);
+    fireEvent.change(screen.getByLabelText("Email"), { target: { value: "viewer@example.com" } });
+    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "wrong-pass" } });
+    fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Email or password is incorrect");
+  });
+
+  it("restores the authenticated session on the recommendations route", async () => {
+    window.history.pushState({}, "", "/recommendations");
+    vi.spyOn(globalThis, "fetch").mockImplementationOnce(() =>
+      jsonResponse({ data: { user: { id: "user-1", email: "viewer@example.com" } } }),
     );
 
     render(<App />);
 
-    fireEvent.change(screen.getByLabelText("Email"), {
-      target: { value: "viewer@example.com" },
-    });
-    fireEvent.change(screen.getByLabelText("Password"), {
-      target: { value: "wrong-pass" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
+    expect(await screen.findByRole("heading", { name: "Recommendations" })).toBeInTheDocument();
+    expect(screen.getByText("viewer@example.com")).toBeInTheDocument();
+    expect(window.location.pathname).toBe("/recommendations");
+  });
 
-    expect(
-      await screen.findByRole("alert"),
-    ).toHaveTextContent("Email or password is incorrect");
+  it("redirects unauthenticated users from recommendations to login", async () => {
+    window.history.pushState({}, "", "/recommendations");
+    vi.spyOn(globalThis, "fetch").mockImplementationOnce(() =>
+      jsonResponse({ error: { code: "AUTHENTICATION_REQUIRED", message: "Authentication required" } }, 401),
+    );
+
+    render(<App />);
+
+    await waitFor(() => expect(window.location.pathname).toBe("/login"));
+    expect(screen.getByRole("heading", { name: "Sign in" })).toBeInTheDocument();
   });
 
   it("signs out and opens the home route", async () => {
     window.history.pushState({}, "", "/recommendations");
-
     const fetchMock = vi
       .spyOn(globalThis, "fetch")
       .mockImplementationOnce(() =>
-        jsonResponse({
-          data: {
-            user: { id: "user-1", email: "viewer@example.com" },
-          },
-        }),
+        jsonResponse({ data: { user: { id: "user-1", email: "viewer@example.com" } } }),
       )
       .mockImplementationOnce(() => Promise.resolve(new Response(null, { status: 204 })));
 
     render(<App />);
-
     fireEvent.click(await screen.findByRole("button", { name: "Sign out" }));
 
-    await waitFor(() => {
-      expect(window.location.pathname).toBe("/");
-    });
+    await waitFor(() => expect(window.location.pathname).toBe("/"));
     expect(screen.getByRole("heading", { name: "Find your next movie" })).toBeInTheDocument();
     expect(fetchMock).toHaveBeenNthCalledWith(
       2,
@@ -136,56 +115,76 @@ describe("S13 authentication UI", () => {
       expect.objectContaining({ method: "POST", credentials: "include" }),
     );
   });
+});
 
-  it("restores the authenticated session on the recommendations route", async () => {
-  window.history.pushState({}, "", "/recommendations");
+describe("S12 registration UI", () => {
+  function renderRegistration() {
+    window.history.pushState({}, "", "/register");
+    render(<App />);
+  }
 
-  vi.spyOn(globalThis, "fetch").mockImplementationOnce(() =>
-    jsonResponse({
-      data: {
-        user: {
-          id: "user-1",
-          email: "viewer@example.com",
-        },
-      },
-    }),
-  );
+  it("shows invalid email validation without calling the API", () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch");
+    renderRegistration();
 
-  render(<App />);
+    fireEvent.change(screen.getByLabelText("Email"), { target: { value: "invalid-email" } });
+    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "movie123" } });
+    fireEvent.click(screen.getByRole("button", { name: "Create account" }));
 
-  expect(
-    await screen.findByRole("heading", { name: "Recommendations" }),
-  ).toBeInTheDocument();
-
-  expect(screen.getByText("viewer@example.com")).toBeInTheDocument();
-
-  expect(window.location.pathname).toBe("/recommendations");
+    expect(screen.getByText("Enter a valid email address")).toBeInTheDocument();
+    expect(fetchSpy).not.toHaveBeenCalled();
   });
 
-  it("redirects unauthenticated users from recommendations to login", async () => {
-  window.history.pushState({}, "", "/recommendations");
+  it("shows the seven-character password validation without calling the API", () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch");
+    renderRegistration();
 
-  vi.spyOn(globalThis, "fetch").mockImplementationOnce(() =>
-    jsonResponse(
-      {
-        error: {
-          code: "AUTHENTICATION_REQUIRED",
-          message: "Authentication required",
-          requestId: "req_test",
-        },
-      },
-      401,
-    ),
-  );
+    fireEvent.change(screen.getByLabelText("Email"), { target: { value: "user@example.com" } });
+    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "movie12" } });
+    fireEvent.click(screen.getByRole("button", { name: "Create account" }));
 
-  render(<App />);
-
-  await waitFor(() => {
-    expect(window.location.pathname).toBe("/login");
+    expect(screen.getByText("Password must be at least 8 characters")).toBeInTheDocument();
+    expect(fetchSpy).not.toHaveBeenCalled();
   });
 
-  expect(
-    screen.getByRole("heading", { name: "Sign in" }),
-  ).toBeInTheDocument();
+  it("shows the duplicate message and retains the email", async () => {
+    vi.spyOn(globalThis, "fetch").mockImplementationOnce(() =>
+      jsonResponse({ error: { code: "EMAIL_ALREADY_REGISTERED" } }, 409),
+    );
+    renderRegistration();
+    fireEvent.change(screen.getByLabelText("Email"), { target: { value: "USER@example.com" } });
+    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "movie123" } });
+    fireEvent.click(screen.getByRole("button", { name: "Create account" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("This email is already registered");
+    expect(screen.getByLabelText("Email")).toHaveValue("USER@example.com");
+  });
+
+  it("navigates to login only after a 201 response", async () => {
+    vi.spyOn(globalThis, "fetch").mockImplementationOnce(() =>
+      jsonResponse({ data: { user: { id: "user-1", email: "user@example.com" } } }, 201),
+    );
+    renderRegistration();
+    fireEvent.change(screen.getByLabelText("Email"), { target: { value: "user@example.com" } });
+    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "movie123" } });
+    fireEvent.click(screen.getByRole("button", { name: "Create account" }));
+
+    await waitFor(() => expect(window.location.pathname).toBe("/login"));
+    expect(screen.getByRole("heading", { name: "Sign in" })).toBeInTheDocument();
+  });
+
+  it("prevents duplicate submissions while the request is pending", async () => {
+    let resolveRequest: (response: Response) => void = () => undefined;
+    vi.spyOn(globalThis, "fetch").mockReturnValue(new Promise((resolve) => { resolveRequest = resolve; }));
+    renderRegistration();
+    fireEvent.change(screen.getByLabelText("Email"), { target: { value: "user@example.com" } });
+    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "movie123" } });
+    const button = screen.getByRole("button", { name: "Create account" });
+    fireEvent.click(button);
+    fireEvent.click(button);
+
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1);
+    resolveRequest(new Response(JSON.stringify({ error: { message: "Try again" } }), { status: 503 }));
+    await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("Try again"));
   });
 });
