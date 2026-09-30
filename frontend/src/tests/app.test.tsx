@@ -136,4 +136,56 @@ describe("S13 authentication UI", () => {
       expect.objectContaining({ method: "POST", credentials: "include" }),
     );
   });
+
+  it("restores the authenticated session on the recommendations route", async () => {
+  window.history.pushState({}, "", "/recommendations");
+
+  vi.spyOn(globalThis, "fetch").mockImplementationOnce(() =>
+    jsonResponse({
+      data: {
+        user: {
+          id: "user-1",
+          email: "viewer@example.com",
+        },
+      },
+    }),
+  );
+
+  render(<App />);
+
+  expect(
+    await screen.findByRole("heading", { name: "Recommendations" }),
+  ).toBeInTheDocument();
+
+  expect(screen.getByText("viewer@example.com")).toBeInTheDocument();
+
+  expect(window.location.pathname).toBe("/recommendations");
+  });
+
+  it("redirects unauthenticated users from recommendations to login", async () => {
+  window.history.pushState({}, "", "/recommendations");
+
+  vi.spyOn(globalThis, "fetch").mockImplementationOnce(() =>
+    jsonResponse(
+      {
+        error: {
+          code: "AUTHENTICATION_REQUIRED",
+          message: "Authentication required",
+          requestId: "req_test",
+        },
+      },
+      401,
+    ),
+  );
+
+  render(<App />);
+
+  await waitFor(() => {
+    expect(window.location.pathname).toBe("/login");
+  });
+
+  expect(
+    screen.getByRole("heading", { name: "Sign in" }),
+  ).toBeInTheDocument();
+  });
 });
