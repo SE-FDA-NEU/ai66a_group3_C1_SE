@@ -18,8 +18,9 @@ from app.repositories.movies import (
     to_movie_summary_dto,
 )
 from app.repositories.users import get_user_by_email, to_user_dto
-from app.schemas.auth import LoginRequest
+from app.schemas.auth import AuthData, AuthResponse, LoginRequest
 from app.schemas.movies import MovieDetailResponse, MovieListResponse
+from app.security.origin import same_origin_write_allowed
 from app.security.passwords import normalize_email, verify_password
 from app.security.sessions import (
     SESSION_COOKIE,
@@ -32,6 +33,25 @@ from app.security.sessions import (
 app = FastAPI(
     title="AI Movie Recommendation System",
 )
+
+_SESSION_WRITE_PATHS = frozenset({"/api/auth/login", "/api/auth/logout"})
+
+
+@app.middleware("http")
+async def same_origin_session_writes(request: Request, call_next):
+    """Reject cross-origin browser requests before they can change a session."""
+
+    if (
+        request.method == "POST"
+        and request.url.path in _SESSION_WRITE_PATHS
+        and not same_origin_write_allowed(request)
+    ):
+        return _error(
+            "ORIGIN_NOT_ALLOWED",
+            "Request origin is not allowed",
+            403,
+        )
+    return await call_next(request)
 
 
 @app.exception_handler(RequestValidationError)
@@ -115,7 +135,7 @@ def health():
     }
 
 
-@app.post("/api/auth/login", response_model=dict, status_code=200)
+@app.post("/api/auth/login", response_model=AuthResponse, status_code=200)
 def login(
     payload: LoginRequest,
     request: Request,
@@ -152,10 +172,10 @@ def login(
     token = create_session(database_session, user=user)
     database_session.commit()
     _set_session_cookie(response, request, token)
-    return {"data": {"user": to_user_dto(user).model_dump()}}
+    return AuthResponse(data=AuthData(user=to_user_dto(user)))
 
 
-@app.get("/api/auth/me", response_model=dict, status_code=200)
+@app.get("/api/auth/me", response_model=AuthResponse, status_code=200)
 def current_user(
     request: Request,
     database_session: Session = Depends(get_db),  # noqa: B008
@@ -167,7 +187,7 @@ def current_user(
         return _error(
             "AUTHENTICATION_REQUIRED", "Authentication required", 401
         )
-    return {"data": {"user": to_user_dto(user).model_dump()}}
+    return AuthResponse(data=AuthData(user=to_user_dto(user)))
 
 
 @app.post("/api/auth/logout", status_code=204)

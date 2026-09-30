@@ -25,6 +25,9 @@ Architecture and persistence rules are in
   `Information unavailable` when a movie year or overview is missing.
 - Authentication uses the same-origin `ams_session` cookie. Browser bearer
   tokens and local-storage tokens are not part of this contract.
+- Browser `POST /api/auth/login` and `POST /api/auth/logout` requests must pass
+  the same-origin Fetch Metadata/`Origin` check. Cross-origin and same-site
+  browser writes return `403 ORIGIN_NOT_ALLOWED` before session state changes.
 - Protected endpoints derive the account only from the authenticated session.
   A client-supplied `user_id` cannot select an account.
 - Passwords, hashes, session digests, cookie values, and TMDb credentials never
@@ -60,8 +63,8 @@ not an availability claim.
 |---|---|---|---|---|---|---|---|
 | Infrastructure | `GET` | `/health` | Public | None | `200` health and database/migration state | Unhandled database failure currently produces framework `500` | `Implemented in M2` |
 | S12 | `POST` | `/api/auth/register` | Public | `RegisterRequest` | `201 RegisterResponse` | `400 VALIDATION_ERROR`, `409 EMAIL_ALREADY_REGISTERED` | `Planned for later sprint` |
-| S13 | `POST` | `/api/auth/login` | Public | `LoginRequest` | `200 AuthResponse` and opaque cookie | `400 VALIDATION_ERROR`, `401 INVALID_CREDENTIALS` | `Implemented in M2` |
-| S13 | `POST` | `/api/auth/logout` | Cookie optional; idempotent | None | `204`, session invalidated and cookie cleared | `500 INTERNAL_ERROR`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
+| S13 | `POST` | `/api/auth/login` | Public, same-origin write | `LoginRequest` | `200 AuthResponse` and opaque cookie | `400 VALIDATION_ERROR`, `401 INVALID_CREDENTIALS`, `403 ORIGIN_NOT_ALLOWED` | `Implemented in M2` |
+| S13 | `POST` | `/api/auth/logout` | Cookie optional; idempotent same-origin write | None | `204`, session invalidated and cookie cleared | `403 ORIGIN_NOT_ALLOWED`, `500 INTERNAL_ERROR`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 | S13 | `GET` | `/api/auth/me` | Authenticated | None | `200 AuthResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 | S01 | `GET` | `/api/genres` | Authenticated | None | `200 GenreListResponse` | `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE` | `Planned for later sprint` |
 | S01 | `GET` | `/api/me/preferences` | Authenticated | None | `200 PreferenceResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Planned for later sprint` |
@@ -181,6 +184,7 @@ email and incorrect password return the same response:
 |---|---|---|
 | Required input missing | `400 VALIDATION_ERROR` | `Email and password are required` |
 | Unknown email or wrong password | `401 INVALID_CREDENTIALS` | `Email or password is incorrect` |
+| Cross-origin or same-site browser write | `403 ORIGIN_NOT_ALLOWED` | `Request origin is not allowed` |
 | Persistence unavailable | `503 SERVICE_UNAVAILABLE` | `Service is temporarily unavailable` |
 
 The UI opens `/recommendations` only after successful login.
@@ -197,6 +201,8 @@ session returns `401 AUTHENTICATION_REQUIRED` with message
 The operation is idempotent and has no request DTO. It invalidates a valid
 session, clears the cookie, and returns `204 No Content`. The UI then opens
 `/`. Reusing the revoked cookie cannot authenticate a protected endpoint.
+The same-origin check runs before revocation, so a rejected browser request
+cannot terminate the current session.
 
 ## 6. S01 genres and account preferences
 
@@ -402,6 +408,7 @@ to a false 404.
 | `INVALID_GENRE_SELECTION` | 400 | The preference set is not 1-5 distinct genres. |
 | `AUTHENTICATION_REQUIRED` | 401 | A protected route has no valid session. |
 | `INVALID_CREDENTIALS` | 401 | Login credentials are invalid without revealing which field failed. |
+| `ORIGIN_NOT_ALLOWED` | 403 | A browser session write failed the same-origin check. |
 | `MOVIE_NOT_FOUND` | 404 | The internal movie ID does not exist in the active catalogue. |
 | `GENRE_NOT_FOUND` | 404 | A requested genre ID does not exist. |
 | `EMAIL_ALREADY_REGISTERED` | 409 | The normalized email is already stored. |
