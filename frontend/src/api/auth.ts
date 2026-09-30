@@ -14,6 +14,7 @@ type ApiErrorResponse = {
     code?: string;
     message?: string;
     requestId?: string;
+    fields?: Record<string, string>;
   };
 };
 
@@ -56,6 +57,21 @@ export async function login(email: string, password: string): Promise<User> {
   });
 
   if (!response.ok) {
+    throw await readError(response);
+  }
+
+  const body = (await response.json()) as AuthResponse;
+  return body.data.user;
+}
+
+export async function register(email: string, password: string): Promise<User> {
+  const response = await fetch("/api/auth/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+
+  if (response.status !== 201) {
     throw await readError(response);
   }
 
