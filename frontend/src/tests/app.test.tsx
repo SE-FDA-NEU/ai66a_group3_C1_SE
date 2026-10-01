@@ -91,8 +91,10 @@ describe("S13 authentication UI", () => {
 
     render(<App />);
 
-    await waitFor(() => expect(window.location.pathname).toBe("/login"));
-    expect(screen.getByRole("heading", { name: "Sign in" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: "Sign in" }),
+    ).toBeInTheDocument();
+    expect(window.location.pathname).toBe("/login");
   });
 
   it("signs out and opens the home route", async () => {
@@ -102,7 +104,13 @@ describe("S13 authentication UI", () => {
       .mockImplementationOnce(() =>
         jsonResponse({ data: { user: { id: "user-1", email: "viewer@example.com" } } }),
       )
-      .mockImplementationOnce(() => Promise.resolve(new Response(null, { status: 204 })));
+      .mockImplementationOnce(() => Promise.resolve(new Response(null, { status: 204 })))
+      .mockImplementationOnce(() =>
+        jsonResponse({
+          data: { movies: [] },
+          meta: { count: 0, limit: 10, catalogueRevision: "revision-test" },
+        }),
+      );
 
     render(<App />);
     fireEvent.click(await screen.findByRole("button", { name: "Sign out" }));
@@ -169,8 +177,10 @@ describe("S12 registration UI", () => {
     fireEvent.change(screen.getByLabelText("Password"), { target: { value: "movie123" } });
     fireEvent.click(screen.getByRole("button", { name: "Create account" }));
 
-    await waitFor(() => expect(window.location.pathname).toBe("/login"));
-    expect(screen.getByRole("heading", { name: "Sign in" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: "Sign in" }),
+    ).toBeInTheDocument();
+    expect(window.location.pathname).toBe("/login");
   });
 
   it("prevents duplicate submissions while the request is pending", async () => {
