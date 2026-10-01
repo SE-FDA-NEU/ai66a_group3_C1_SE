@@ -2,9 +2,14 @@
 
 import "@testing-library/jest-dom/vitest";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { useState } from "react";
+import { Link, MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import App from "../App";
+import { AuthProvider } from "../auth/AuthContext";
+import RequireAuth from "../auth/RequireAuth";
+import { useAuth } from "../auth/authState";
 
 function jsonResponse(body: unknown, status = 200) {
   return Promise.resolve(
@@ -92,7 +97,7 @@ describe("S13 authentication UI", () => {
     render(<App />);
 
     await waitFor(() => expect(window.location.pathname).toBe("/login"));
-    expect(screen.getByRole("heading", { name: "Sign in" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Sign in" })).toBeInTheDocument();
   });
 
   it("signs out and opens the home route", async () => {
@@ -108,7 +113,7 @@ describe("S13 authentication UI", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Sign out" }));
 
     await waitFor(() => expect(window.location.pathname).toBe("/"));
-    expect(screen.getByRole("heading", { name: "Find your next movie" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Find your next movie" })).toBeInTheDocument();
     expect(fetchMock).toHaveBeenNthCalledWith(
       2,
       "/api/auth/logout",
@@ -186,5 +191,150 @@ describe("S12 registration UI", () => {
     expect(globalThis.fetch).toHaveBeenCalledTimes(1);
     resolveRequest(new Response(JSON.stringify({ error: { message: "Try again" } }), { status: 503 }));
     await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("Service is temporarily unavailable"));
+  });
+});
+
+describe("T10 route guards and stale account state", () => {
+  const userA = { data: { user: { id: "user-a", email: "a@example.com" } } };
+  const unauthenticated = {
+    error: { code: "AUTHENTICATION_REQUIRED", message: "Authentication required" },
+  };
+
+  it.each(["/recommendations", "/preferences", "/profile"])(
+    "redirects an unsigned visitor from %s to login",
+    async (path) => {
+      window.history.pushState({}, "", path);
+      vi.spyOn(globalThis, "fetch").mockImplementation(() => jsonResponse(unauthenticated, 401));
+
+      render(<App />);
+
+      await waitFor(() => expect(window.location.pathname).toBe("/login"));
+      expect(await screen.findByRole("heading", { name: "Sign in" })).toBeInTheDocument();
+    },
+  );
+
+  it.each(["/", "/login", "/register"])("does not check the session on public route %s", (path) => {
+    window.history.pushState({}, "", path);
+    const fetchSpy = vi.spyOn(globalThis, "fetch");
+
+    render(<App />);
+
+    expect(window.location.pathname).toBe(path);
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it("renders a guarded route for a signed-in account", async () => {
+    window.history.pushState({}, "", "/profile");
+    vi.spyOn(globalThis, "fetch").mockImplementation(() => jsonResponse(userA));
+
+    render(<App />);
+
+    expect(await screen.findByRole("heading", { name: "Profile" })).toBeInTheDocument();
+    expect(window.location.pathname).toBe("/profile");
+  });
+
+  it("shows an error, not the page, when the session check fails with a server error", async () => {
+    window.history.pushState({}, "", "/recommendations");
+    vi.spyOn(globalThis, "fetch").mockImplementation(() =>
+      jsonResponse({ error: { message: "Service is temporarily unavailable" } }, 503),
+    );
+
+    render(<App />);
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Service is temporarily unavailable");
+    expect(screen.queryByRole("heading", { name: "Recommendations" })).not.toBeInTheDocument();
+    expect(window.location.pathname).toBe("/recommendations");
+  });
+
+  it("does not reuse the old account after sign-out when returning to a guarded route", async () => {
+    function Probe() {
+      const auth = useAuth();
+      return <button onClick={() => void auth.signOut()}>sign out</button>;
+    }
+
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockImplementationOnce(() => jsonResponse(userA))
+      .mockImplementationOnce(() => Promise.resolve(new Response(null, { status: 204 })));
+
+    render(
+      <MemoryRouter initialEntries={["/secret"]}>
+        <AuthProvider>
+          <Routes>
+            <Route path="/secret" element={<RequireAuth><Probe /></RequireAuth>} />
+            <Route path="/" element={<Link to="/secret">back to secret</Link>} />
+            <Route path="/login" element={<h1>Login page</h1>} />
+          </Routes>
+        </AuthProvider>
+      </MemoryRouter>,
+    );
+
+    fireEvent.click(await screen.findByText("sign out"));
+    fireEvent.click(await screen.findByText("back to secret"));
+
+    expect(await screen.findByRole("heading", { name: "Login page" })).toBeInTheDocument();
+    expect(screen.queryByText("sign out")).not.toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("clears account-keyed component state when the account changes", async () => {
+    const accounts = [
+      { id: "user-a", email: "a@example.com" },
+      { id: "user-b", email: "b@example.com" },
+    ];
+
+    function Probe() {
+      const auth = useAuth();
+      const [note, setNote] = useState("");
+      return (
+        <div>
+          <input aria-label="note" value={note} onChange={(e) => setNote(e.target.value)} />
+          <button onClick={() => void auth.signIn("b@example.com", "movie123")}>switch</button>
+        </div>
+      );
+    }
+
+    vi.spyOn(globalThis, "fetch")
+      .mockImplementationOnce(() => jsonResponse({ data: { user: accounts[0] } }))
+      .mockImplementationOnce(() => jsonResponse({ data: { user: accounts[1] } }));
+
+    render(
+      <MemoryRouter>
+        <AuthProvider>
+          <RequireAuth>
+            <Probe />
+          </RequireAuth>
+        </AuthProvider>
+      </MemoryRouter>,
+    );
+
+    fireEvent.change(await screen.findByLabelText("note"), { target: { value: "account A draft" } });
+    fireEvent.click(screen.getByText("switch"));
+
+    await waitFor(() => expect(screen.getByLabelText("note")).toHaveValue(""));
+  });
+
+  it("redirects to login when a protected API call reports 401", async () => {
+    function Probe() {
+      const auth = useAuth();
+      return <button onClick={auth.handleUnauthorized}>expire</button>;
+    }
+
+    vi.spyOn(globalThis, "fetch").mockImplementation(() => jsonResponse(userA));
+
+    render(
+      <MemoryRouter initialEntries={["/secret"]}>
+        <AuthProvider>
+          <Routes>
+            <Route path="/secret" element={<RequireAuth><Probe /></RequireAuth>} />
+            <Route path="/login" element={<h1>Login page</h1>} />
+          </Routes>
+        </AuthProvider>
+      </MemoryRouter>,
+    );
+
+    fireEvent.click(await screen.findByText("expire"));
+
+    expect(await screen.findByRole("heading", { name: "Login page" })).toBeInTheDocument();
   });
 });

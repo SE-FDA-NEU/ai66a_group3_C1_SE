@@ -1,8 +1,10 @@
 import { BrowserRouter, Link, Navigate, Route, Routes } from "react-router-dom";
 
+import { AuthProvider } from "./auth/AuthContext.tsx";
+import RequireAuth from "./auth/RequireAuth.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
-import RecommendationsPage from "./pages/RecommendationsPage.tsx";
 import RegisterPage from "./pages/RegisterPage.tsx";
+import { PROTECTED_ROUTES } from "./protectedRoutes.tsx";
 
 function HomePage() {
   return (
@@ -27,13 +29,17 @@ function HomePage() {
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/recommendations" element={<RecommendationsPage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          {PROTECTED_ROUTES.map(({ path, element }) => (
+            <Route key={path} path={path} element={<RequireAuth>{element}</RequireAuth>} />
+          ))}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

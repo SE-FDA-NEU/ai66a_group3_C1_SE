@@ -1,64 +1,23 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
-import { ApiError, getCurrentUser, logout, type User } from "../api/auth.ts";
+import { useAuth } from "../auth/authState.ts";
 
 function RecommendationsPage() {
-  const navigate = useNavigate();
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const auth = useAuth();
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    let active = true;
-
-    async function loadSession() {
-      try {
-        const currentUser = await getCurrentUser();
-        if (active) {
-          setUser(currentUser);
-        }
-      } catch (error) {
-        if (!active) {
-          return;
-        }
-
-        if (error instanceof ApiError && error.status === 401) {
-          navigate("/login", { replace: true });
-          return;
-        }
-
-        setError(error instanceof Error ? error.message : "Something went wrong");
-      } finally {
-        if (active) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    void loadSession();
-
-    return () => {
-      active = false;
-    };
-  }, [navigate]);
+  const user = auth.status === "authenticated" ? auth.user : null;
 
   async function handleSignOut() {
     setError("");
     setIsSigningOut(true);
 
     try {
-      await logout();
-      navigate("/", { replace: true });
+      await auth.signOut();
     } catch (error) {
       setError(error instanceof Error ? error.message : "Something went wrong");
       setIsSigningOut(false);
     }
-  }
-
-  if (isLoading) {
-    return <main className="page page--centered">Checking session...</main>;
   }
 
   return (
