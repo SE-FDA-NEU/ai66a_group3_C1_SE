@@ -107,7 +107,13 @@ describe("S13 authentication UI", () => {
       .mockImplementationOnce(() =>
         jsonResponse({ data: { user: { id: "user-1", email: "viewer@example.com" } } }),
       )
-      .mockImplementationOnce(() => Promise.resolve(new Response(null, { status: 204 })));
+      .mockImplementationOnce(() => Promise.resolve(new Response(null, { status: 204 })))
+      .mockImplementationOnce(() =>
+        jsonResponse({
+          data: { movies: [] },
+          meta: { count: 0, limit: 10, catalogueRevision: "revision-test" },
+        }),
+      );
 
     render(<App />);
     fireEvent.click(await screen.findByRole("button", { name: "Sign out" }));
@@ -174,8 +180,10 @@ describe("S12 registration UI", () => {
     fireEvent.change(screen.getByLabelText("Password"), { target: { value: "movie123" } });
     fireEvent.click(screen.getByRole("button", { name: "Create account" }));
 
-    await waitFor(() => expect(window.location.pathname).toBe("/login"));
-    expect(screen.getByRole("heading", { name: "Sign in" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: "Sign in" }),
+    ).toBeInTheDocument();
+    expect(window.location.pathname).toBe("/login");
   });
 
   it("prevents duplicate submissions while the request is pending", async () => {
@@ -213,15 +221,20 @@ describe("T10 route guards and stale account state", () => {
     },
   );
 
-  it.each(["/", "/login", "/register"])("does not check the session on public route %s", (path) => {
-    window.history.pushState({}, "", path);
-    const fetchSpy = vi.spyOn(globalThis, "fetch");
+  it.each(["/", "/movies/1", "/login", "/register"])(
+    "does not check the session on public route %s",
+    async (path) => {
+      window.history.pushState({}, "", path);
+      const fetchSpy = vi
+        .spyOn(globalThis, "fetch")
+        .mockImplementation(() => jsonResponse({ error: { message: "Movie not found" } }, 404));
 
-    render(<App />);
+      render(<App />);
 
-    expect(window.location.pathname).toBe(path);
-    expect(fetchSpy).not.toHaveBeenCalled();
-  });
+      await waitFor(() => expect(window.location.pathname).toBe(path));
+      expect(fetchSpy).not.toHaveBeenCalledWith("/api/auth/me", expect.anything());
+    },
+  );
 
   it("renders a guarded route for a signed-in account", async () => {
     window.history.pushState({}, "", "/profile");
