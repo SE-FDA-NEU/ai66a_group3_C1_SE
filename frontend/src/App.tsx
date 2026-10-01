@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
+import RecommendationExplanationPage from "./RecommendationExplanationPage.tsx";
 import { AuthProvider } from "./auth/AuthContext.tsx";
 import RequireAuth from "./auth/RequireAuth.tsx";
 import HomePage from "./pages/HomePage.tsx";
@@ -14,6 +15,10 @@ function App() {
       <AuthProvider>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route
+            path="/about-recommendations"
+            element={<RecommendationExplanationPage />}
+          />
           <Route path="/movies/:movieId" element={<MovieDetailPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
