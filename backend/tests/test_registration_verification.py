@@ -191,15 +191,20 @@ def test_duplicate_email_is_rejected_case_and_whitespace_insensitively(
 
 
 def test_concurrent_duplicate_registrations_create_exactly_one_account(
-    http: TestClient, database: sessionmaker[Session]
+    database: sessionmaker[Session],
 ) -> None:
     attempts = 8
     start_together = Barrier(attempts)
 
     def register(index: int) -> int:
-        start_together.wait()
         email = ["race@example.com", "RACE@example.com", " Race@Example.com "][index % 3]
-        return http.post(REGISTER, json={"email": email, "password": f"password-{index}"}).status_code
+        # Each worker owns its client; it is built before the barrier so setup
+        # time does not spread out the simultaneous POSTs.
+        with TestClient(app) as client:
+            start_together.wait()
+            return client.post(
+                REGISTER, json={"email": email, "password": f"password-{index}"}
+            ).status_code
 
     with ThreadPoolExecutor(max_workers=attempts) as pool:
         statuses = sorted(pool.map(register, range(attempts)))
