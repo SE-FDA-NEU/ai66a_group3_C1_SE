@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import { login } from "../api/auth.ts";
+import { useAuth } from "../auth/authState.ts";
 
 const INVALID_CREDENTIALS_MESSAGE = "Email or password is incorrect";
 
 function LoginPage() {
   const navigate = useNavigate();
+  const { signIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -25,7 +26,7 @@ function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      await login(email, password);
+      await signIn(email, password);
       navigate("/recommendations", { replace: true });
     } catch (error) {
       if (error instanceof Error && error.message) {
