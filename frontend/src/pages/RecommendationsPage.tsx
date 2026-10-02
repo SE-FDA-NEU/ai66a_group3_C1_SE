@@ -1,6 +1,27 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 import { useAuth } from "../auth/authState.ts";
+
+type RecommendationStateProps = {
+  status: "loading" | "empty";
+};
+
+export function RecommendationState({ status }: RecommendationStateProps) {
+  if (status === "loading") {
+    return <p role="status">Loading recommendations...</p>;
+  }
+
+  return (
+    <div className="recommendation-empty-state" role="status">
+      <h3>No recommendations available yet.</h3>
+      <p>Enter your preferences to get personalised recommendations.</p>
+      <Link className="text-link" to="/preferences">
+        Enter preferences &rarr;
+      </Link>
+    </div>
+  );
+}
 
 function RecommendationsPage() {
   const auth = useAuth();
@@ -47,11 +68,12 @@ function RecommendationsPage() {
         </p>
       ) : null}
 
-      <section className="content-card">
-        <h2>Your recommendations</h2>
-        <p className="muted">
-          Recommendation content will be connected when its API is available.
-        </p>
+      <section className="content-card recommendations-card" aria-labelledby="popular-title">
+        <div className="section-heading">
+          <p className="eyebrow">Your next watch</p>
+          <h2 id="popular-title">Popular</h2>
+        </div>
+        <RecommendationState status="empty" />
       </section>
     </main>
   );
