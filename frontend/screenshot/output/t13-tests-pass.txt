@@ -1,0 +1,16 @@
+T13 focused test command
+=========================
+
+Command: npm test -- recommendations
+
+Test Files  1 passed (1)
+Tests       4 passed (4)
+
+The focused T13 tests cover:
+- recommendation landing page
+- Popular label
+- empty state
+- no fake movie cards
+- Enter preferences link and /preferences href
+- loading state
+- real /preferences page
