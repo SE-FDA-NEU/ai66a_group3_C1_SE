@@ -285,6 +285,37 @@ revision and row counts, without duplicate movies or movie/genre relations.
 This is the offline demo catalogue only; a future server-side TMDb importer is
 a separate operation and is never called by browser movie requests.
 
+## Optional server-side TMDb catalogue import
+
+The M2 bootstrap above is the reproducible demonstration path. It remains
+offline even when no TMDb credential is configured. An operator may separately
+replace the active catalogue with one bounded TMDb import only after the local
+database has been migrated and bootstrapped:
+
+```bash
+python -m app.cli.bootstrap_m2_catalogue
+python -m app.cli.import_tmdb_catalogue
+```
+
+Set `TMDB_READ_ACCESS_TOKEN` only in the server environment or in the local,
+gitignored `.env` file. The importer reads one page of TMDb popular movies and
+the official movie genre list; it requests a movie-detail record only when a
+popular result omits `genre_ids`. It never runs as part of browser requests,
+automated tests, or the M2 bootstrap command.
+
+On success, the command prints an opaque active revision ID and only the
+inserted, updated, and rejected record counts. A missing/invalid credential,
+rate limit, timeout, invalid snapshot, or database failure leaves the prior
+active catalogue unchanged. Never commit, print, screenshot, or paste the
+actual access token.
+
+Verify this boundary without a credential or internet connection:
+
+```bash
+python -m pytest backend/tests/test_tmdb_import.py backend/tests/test_m2_catalogue_bootstrap.py backend/tests/test_movies_api.py -v
+python -m ruff check backend
+```
+
 
 ## Run the Backend
 
