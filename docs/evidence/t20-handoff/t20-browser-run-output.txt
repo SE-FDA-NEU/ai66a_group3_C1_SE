@@ -1,0 +1,29 @@
+# Step 0: protected route without an account
+GET /recommendations (unsigned) -> browser path /login
+GET /api/me/recommendations (no cookie) -> 401 {"error":{"code":"AUTHENTICATION_REQUIRED","message":"Authentication required","requestId"
+screenshot t20-01-unsigned-redirect-to-login.png (path /login)
+# Step 1: register a new account
+Registered t20-handoff-1790938312596@example.com -> browser path /login
+# Step 2: sign in and reach the recommendation landing
+Signed in -> browser path /recommendations
+Landing text: "Recommendations | Popular"
+Session cookie present: true (httpOnly=true, sameSite=Lax)
+screenshot t20-02-recommendation-landing-new-account.png (path /recommendations)
+GET /api/auth/me (cookie) -> 200 {"data":{"user":{"id":"335649d5-33e8-4f33-9d4c-5c9fa942f2d8","email":"t20-handoff-1790938312596@example.com"}}}
+GET /api/me/recommendations (cookie) -> 200 mode=popular personalised=false noMatch=false count=10
+Top 3: Northstar Protocol (98); Quiet Harbour (92); Paper Planets (90)
+# Step 3: public movie detail from the catalogue
+Catalogue cards visible: 10
+Detail path: /movies/2dc40ea3-518c-4fe5-add9-61b15a567308 title: Northstar Protocol
+screenshot t20-03-movie-detail.png (path /movies/2dc40ea3-518c-4fe5-add9-61b15a567308)
+GET /api/movies/2dc40ea3-518c-4fe5-add9-61b15a567308 (no cookie) -> 200
+# Step 4: sign out
+Signed out -> browser path /
+Session cookie after sign-out in browser: removed
+# Step 5: reuse the OLD session token on authenticated APIs
+GET /api/auth/me (old cookie) -> 401 {"error":{"code":"AUTHENTICATION_REQUIRED","message":"Authentication required","requestId":"req_f226
+GET /api/me/recommendations (old cookie) -> 401 {"error":{"code":"AUTHENTICATION_REQUIRED","message":"Authentication required","requestId":"req_bee9
+GET /api/movies?limit=10 (old cookie, public) -> 200
+# Step 6: protected route after sign-out
+GET /recommendations (after sign-out) -> browser path /login
+screenshot t20-04-after-sign-out-guard-redirects-to-login.png (path /login)

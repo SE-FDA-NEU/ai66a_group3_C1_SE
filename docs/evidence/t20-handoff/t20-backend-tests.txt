@@ -1,0 +1,19 @@
+$ python -m pytest backend/tests/test_auth_catalogue_handoff.py -v -rs
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.1.1, pluggy-1.6.0 -- F:\\1 t\xe0i li\u1ec7u h\u1ecdc t\u1eadp\\SE\\ai66a_group3_C1_SE\\.venv\\Scripts\\python.exe
+rootdir: F:\\1 t\xe0i li\u1ec7u h\u1ecdc t\u1eadp\\SE\\ai66a_group3_C1_SE\\backend
+configfile: pyproject.toml
+plugins: anyio-4.15.1, cov-7.1.0
+collecting ... collected 6 items
+backend\tests\test_auth_catalogue_handoff.py::test_new_account_reaches_the_recommendation_landing_data PASSED [ 16%]
+backend\tests\test_auth_catalogue_handoff.py::test_a_recommended_movie_opens_its_public_detail PASSED [ 33%]
+backend\tests\test_auth_catalogue_handoff.py::test_logout_forbids_reusing_the_old_session_on_authenticated_api PASSED [ 50%]
+backend\tests\test_auth_catalogue_handoff.py::test_signing_in_again_after_logout_creates_a_fresh_session PASSED [ 66%]
+backend\tests\test_auth_catalogue_handoff.py::test_rating_write_requires_the_signed_in_account SKIPPED [ 83%]
+backend\tests\test_auth_catalogue_handoff.py::test_two_accounts_receive_their_own_personalised_recommendations SKIPPED [100%]
+============================== warnings summary ===============================
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+SKIPPED [1] backend\tests\test_auth_catalogue_handoff.py:218: Pending S05a: rating write API is not implemented yet.
+SKIPPED [1] backend\tests\test_auth_catalogue_handoff.py:223: Pending S02/S03: personalised recommendations and cross-account isolation of ratings need preferences and ratings first.
+=================== 4 passed, 2 skipped, 1 warning in 6.78s ===================
