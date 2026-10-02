@@ -60,9 +60,17 @@ function HomePage() {
           <h1>Find your next movie</h1>
           <p className="muted">Browse the public local movie catalogue.</p>
         </div>
-        <Link className="button-link button-secondary" to="/login">
-          Sign in
-        </Link>
+        <nav className="catalogue-actions" aria-label="Public navigation">
+          <Link
+            className="button-link button-secondary"
+            to="/about-recommendations"
+          >
+            How recommendations work
+          </Link>
+          <Link className="button-link" to="/login">
+            Sign in
+          </Link>
+        </nav>
       </header>
 
       {isLoading ? (
