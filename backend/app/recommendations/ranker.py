@@ -1,7 +1,8 @@
 """Shared deterministic ordering for popularity-based movie ranking."""
 
-from app.db.models import CatalogMovie
 from sqlalchemy import case
+
+from app.db.models import CatalogMovie
 
 
 def popularity_title_id_ordering():
