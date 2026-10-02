@@ -155,3 +155,145 @@ The attendance fields therefore remain explicitly unconfirmed.
 Include the selected start and final snapshots in the Sprint 1 wrap-up commit.
 The saved board image predates the final C02 status update, so the Project board
 must show C02 as Done before the final snapshot is used as evidence.
+
+---
+
+## Sprint 2 - repository activity recorded 2026-09-24 to 2026-10-02
+
+**Official Sprint dates:** Not recorded in the repository or the public Issue
+evidence reviewed on 2026-10-03.
+
+**Sprint Planning date:** Not recorded.
+
+### Sprint goal
+
+Produce the Milestone 2 walking skeleton from a public browser page, through a
+backend endpoint, to a real local database with visible deterministic movie
+data. This wording is a concise restatement of the recorded objective in
+[#67 / S2-C01](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/67).
+
+### Commitment and Story-point boundary
+
+The recorded Sprint plan commits 21 named Tasks and five Chores to the Sprint 2
+iteration. It links those Tasks to five parent Stories, but it also explicitly
+requires the partially implemented parent Stories to remain open. The parent
+Stories and their complete estimates are:
+
+| Parent Story | Story points | Sprint 2 task coverage |
+| ------------ | -----------: | ---------------------- |
+| [#19 / S03](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/19) | 3 | #47, #48, #60, #61, #62, #74 |
+| [#20 / S04](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/20) | 5 | #58, #59 |
+| [#32 / S10](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/32) | 3 | #63, #64, #65 |
+| [#44 / S12](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/44) | 3 | #49, #50, #51, #52 |
+| [#45 / S13](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/45) | 5 | #53, #54, #55, #56, #57, #66 |
+
+The five parent estimates total 19 points, but the evidence does not commit
+completion of those five whole Stories. Counting those full estimates would
+claim scope that #67 explicitly identifies as partial. Task hours are not
+Story Points and are not substituted for velocity.
+
+**Verified committed Story Points:** 0.
+
+**Verified completed Story Points:** 0. All five parent Stories remain open,
+their acceptance-criterion checklists remain incomplete, and none meets the
+repository's whole-Story Definition of Done.
+
+**Velocity:** 0 Story Points.
+
+If a dated Planning artifact or start-of-Sprint board snapshot proves that one
+or more whole parent Stories were committed for completion, the committed
+figure must be corrected from that artifact before this wrap-up is merged. The
+completed figure remains zero unless the corresponding whole Story reaches
+Done.
+
+### Completed Sprint 2 items
+
+As of 2026-10-03, GitHub records all 21 named Sprint 2 Tasks as closed. The
+table groups them by parent Story without awarding the parent Story's points.
+Closed Task status records delivery of the named technical slice; it does not
+close or earn points for the parent Story.
+
+| Parent | Closed Tasks | Merged implementation or verification PRs |
+| ------ | ------------ | ------------------------------------------ |
+| S03 / #19 | [#47](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/47), [#48](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/48), [#60](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/60), [#61](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/61), [#62](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/62), [#74](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/74) | [#77](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/77), [#90](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/90), [#83](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/83), [#86](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/86), [#91](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/91), [#79](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/79) |
+| S04 / #20 | [#58](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/58), [#59](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/59) | [#93](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/93), [#95](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/95) |
+| S10 / #32 | [#63](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/63), [#64](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/64), [#65](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/65) | [#75](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/75), [#88](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/88), [#94](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/94) |
+| S12 / #44 | [#49](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/49), [#50](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/50), [#51](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/51), [#52](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/52) | [#78](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/78), [#85](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/85), [#89](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/89), [#82](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/82) |
+| S13 / #45 | [#53](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/53), [#54](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/54), [#55](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/55), [#56](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/56), [#57](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/57), [#66](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/66) | [#80](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/80), [#81](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/81), [#84](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/84), [#87](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/87), [#92](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/92), [#96](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/96) |
+
+Of the five Sprint 2 Chores, [#69 / S2-C03](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/69)
+is closed and its baseline contract was merged in
+[PR #72](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/72).
+
+### Individual contribution and independent-review evidence
+
+Each member has a merged Sprint 2 PR authored by that member, a closed assigned
+Sprint 2 Task, and an approval submitted on another member's PR. The review
+links below point to the specific GitHub review records rather than only to the
+PR conversation.
+
+| Member | Authored merged and reviewed PR | Closed assigned issue | Independent review contribution |
+| ------ | ------------------------------- | --------------------- | ------------------------------- |
+| Nguyen Xuan Kiet (`@kietxuan`) | [PR #90](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/90), approved by four other members | [#48](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/48) | [Approved PR #94](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/94#pullrequestreview-5388277229) |
+| Tran Minh Hoang (`@hoang3003`) | [PR #95](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/95), approved by four other members | [#59](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/59) | [Approved PR #94](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/94#pullrequestreview-5388945973) |
+| Tran Tuan Anh (`@anotify-vie`) | [PR #93](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/93), approved by four other members | [#58](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/58) | [Approved PR #94](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/94#pullrequestreview-5388919871) |
+| Vu Quoc Huy (`@vu-huzy`) | [PR #96](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/96), approved by three other members | [#66](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/66) | [Approved PR #94](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/94#pullrequestreview-5388283763) |
+| Nguyen Tuan Anh (`@NguyenTuanAnh0608`) | [PR #94](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/94), approved by four other members | [#65](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/65) | [Approved PR #93](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/93#pullrequestreview-5388046814) |
+
+### Unfinished work and carry-over
+
+The following Sprint 2 Chores remain open. Their public Issue records do not
+name a next iteration, so assigning one here would invent a planning decision.
+
+| Issue | Recorded unfinished scope | Next iteration |
+| ----- | ------------------------- | -------------- |
+| [#67 / S2-C01](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/67) | Planning-state board evidence and final completion links remain unrecorded. | Not recorded; team decision required |
+| [#68 / S2-C02](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/68) | Final board evidence, retrospective action, handoff, documentation PR and final closure remain pending. | Sprint 2 wrap-up; close only after all evidence exists |
+| [#70 / S2-C04](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/70) | The Issue remains open; its checklist still requires recorded clean-clone, CI, reviewed-PR and review links. | Not recorded; team decision required |
+| [#71 / S2-C05](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/71) | Final design dossier, setup document, clean-clone evidence, documentation PR, board screenshots and submission evidence remain incomplete. | Not recorded; team decision required |
+
+The five parent Stories #19, #20, #32, #44 and #45 also remain open. This is
+consistent with #67's recorded instruction to keep partially implemented
+Stories open; they are product-backlog work, not completed Sprint 2 Stories.
+
+### Sprint Review
+
+**Review date:** Not recorded.
+
+**Repository outcomes available for demonstration:** the deterministic local
+catalogue bootstrap, database-backed catalogue and detail endpoints, account
+registration and server sessions, login/navigation guards, popular cold-start
+recommendations, public recommendation explanation, and the integrated
+auth-to-catalogue handoff.
+
+**Review feedback:** Not recorded. Repository evidence demonstrates delivered
+technical outputs but does not prove that a Sprint Review meeting occurred or
+what feedback participants gave.
+
+### Retrospective
+
+No Sprint 2 retrospective outcome is recorded in the repository or linked
+Issues. The required single improvement action and its owner must be supplied
+from the actual retrospective before #68 is closed.
+
+**Exactly one improvement action:** Not recorded.
+
+**Owner:** Not recorded.
+
+### Sprint Master handoff
+
+The repository identifies `@NguyenTuanAnh0608` as the Sprint 2 wrap-up owner.
+The next Sprint Master, handoff date, and handoff evidence are not recorded.
+These fields must be completed from the team's actual decision.
+
+### Board and documentation evidence
+
+- **Final Sprint 2 board screenshot:** Not available. The Project board requires
+  authenticated access; no Sprint 2 board image is committed under
+  `docs/evidence/` as of 2026-10-03.
+- **Documentation PR:** Not available yet. This section was prepared on local
+  branch `docs/sprint-2-wrap-up` and must link its reviewed PR before merge.
+- **Closure rule:** Do not close #68 until the Sprint has ended, the final board
+  screenshot is committed, the retrospective action and owner are recorded,
+  the next Sprint Master handoff is recorded, every open item has an agreed
+  next iteration, and the documentation PR is reviewed and merged.
