@@ -1,17 +1,18 @@
 # S2-T16 M2 database-backed walking-skeleton evidence
 
-Test date: 2026-10-01 (Asia/Saigon)
+Test date: 2026-10-02 (Asia/Saigon)
 
 - Related task: [#62](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/62)
 - Parent story: [#19](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/19) (reference only; do not close the Story)
-- Tested commit: [`5f215d9887361d9c5d15e0599a7fc5a6ad479f58`](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/5f215d9887361d9c5d15e0599a7fc5a6ad479f58)
+- Tested commit: [`e581b2cd3f37e8060c33840084b8b2c5e9dc9441`](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/e581b2cd3f37e8060c33840084b8b2c5e9dc9441)
+- Integration state: this commit contains the merged T02 TMDb import work and the latest `main` available for the rerun.
 
 ## Clean bootstrap and database count
 
 A new application-data directory was created specifically for this run. It contained zero files before bootstrap.
 
 ```powershell
-$env:DATABASE_URL = "sqlite:///./data/t16-evidence-5f215d9/app.db"
+$env:DATABASE_URL = "sqlite:///./data/t16-evidence-e581b2c/app.db"
 $env:TMDB_READ_ACCESS_TOKEN = ""
 .\.venv\Scripts\python.exe -m app.cli.bootstrap_m2_catalogue
 ```
@@ -21,14 +22,14 @@ Actual output:
 ```text
 Pre-bootstrap file count: 0
 M2 catalogue bootstrap complete
-active_revision=ee6a4424-5d86-416f-8d2e-efae4065a937
+active_revision=d14bb994-29ff-4ce0-ac4e-bb9ead958ab0
 movies=12
 genres=8
 movie_genres=22
 Bootstrap exit code: 0
 ```
 
-The command created `data/t16-evidence-5f215d9/app.db` (81,920 bytes). A direct query against this database returned:
+The command created `data/t16-evidence-e581b2c/app.db` (81,920 bytes). A direct query against this database returned:
 
 ```text
 Movie count: 12
@@ -42,7 +43,7 @@ The database and browser profile were disposable test artifacts and were removed
 The backend was run against that same newly bootstrapped database:
 
 ```powershell
-$env:DATABASE_URL = "sqlite:///./data/t16-evidence-5f215d9/app.db"
+$env:DATABASE_URL = "sqlite:///./data/t16-evidence-e581b2c/app.db"
 $env:TMDB_READ_ACCESS_TOKEN = ""
 .\.venv\Scripts\python.exe -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
 ```
@@ -55,7 +56,7 @@ GET http://127.0.0.1:8000/api/movies?limit=10
 Catalogue records returned: 10
 meta.count: 10
 meta.limit: 10
-catalogueRevision: ee6a4424-5d86-416f-8d2e-efae4065a937
+catalogueRevision: d14bb994-29ff-4ce0-ac4e-bb9ead958ab0
 ```
 
 The ten records were `Northstar Protocol`, `Quiet Harbour`, `Paper Planets`, `The Last Detour`, `Glass Signal`, `After the Rain`, `Red Horizon`, `Borrowed Summer`, `Echo Room`, and `Orbit of Us`.
@@ -108,7 +109,29 @@ error.message: Movie not found
 
 ### Incomplete movie record
 
-The deterministic dataset contains `Archive 17`, whose `releaseYear` is `null`, and `Unfinished Map`, whose `overview` is `null`. Both detail API calls returned `200 OK`. The frontend displayed `Information unavailable` for the missing year without crashing:
+The deterministic dataset contains `Archive 17`, whose `releaseYear` is `null`. It is outside the ten records returned by the catalogue endpoint, and its internal ID changes on every clean bootstrap. The following command finds the ID in the active SQLite catalogue and opens the detail route while the backend and frontend are running:
+
+```powershell
+$dbPath = "data/t16-evidence-e581b2c/app.db"
+$archive17Id = (& .\.venv\Scripts\python.exe -c "import sqlite3, sys; con=sqlite3.connect(sys.argv[1]); row=con.execute('SELECT m.id FROM catalog_movies AS m JOIN catalogue_state AS s ON s.active_revision_id=m.catalogue_revision_id WHERE s.id=1 AND m.title=?', ('Archive 17',)).fetchone(); con.close(); print(row[0])" $dbPath).Trim()
+
+"Archive 17 internal ID: $archive17Id"
+Invoke-RestMethod "http://127.0.0.1:8000/api/movies/$archive17Id" | ConvertTo-Json -Depth 10
+Start-Process "http://localhost:5173/movies/$archive17Id"
+```
+
+Actual ID and API result for this clean bootstrap:
+
+```text
+Archive 17 internal ID: c91315d1-2ace-4c2e-bccb-6d782bc42870
+GET /api/movies/c91315d1-2ace-4c2e-bccb-6d782bc42870
+200 OK
+title: Archive 17
+releaseYear: null
+overview: A records clerk discovers that one sealed file is still being updated.
+```
+
+Opening the generated frontend URL displayed `Information unavailable` for the missing year without crashing:
 
 ![Incomplete movie detail safely displays unavailable information](incomplete-movie-detail-5f215d9.png)
 
@@ -117,13 +140,13 @@ The deterministic dataset contains `Archive 17`, whose `releaseYear` is `null`, 
 Focused backend command:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest backend/tests/test_m2_catalogue_bootstrap.py backend/tests/test_movies_api.py -v --basetemp data/t16-evidence-5f215d9/pytest-focused -p no:cacheprovider
+.\.venv\Scripts\python.exe -m pytest backend/tests/test_m2_catalogue_bootstrap.py backend/tests/test_movies_api.py -v --basetemp data/t16-evidence-e581b2c/pytest-focused -p no:cacheprovider
 ```
 
 Result:
 
 ```text
-13 passed, 1 warning in 6.93s
+13 passed, 1 warning in 11.03s
 ```
 
 Focused frontend command:
@@ -137,7 +160,7 @@ Result:
 ```text
 Test Files  1 passed (1)
 Tests       6 passed (6)
-Duration    1.74s
+Duration    4.57s
 ```
 
 Coverage of the required cases:
@@ -152,11 +175,11 @@ Full verification results:
 
 | Command                                                                                                                     | Actual result                                   |
 | --------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| `.\.venv\Scripts\python.exe -m pytest backend/tests -v --basetemp data/t16-evidence-5f215d9/pytest-all -p no:cacheprovider` | `77 passed, 1 warning in 15.39s`                |
-| `npm.cmd --prefix frontend test -- --reporter=verbose`                                                                      | `3 test files passed; 35 tests passed in 2.42s` |
+| `.\.venv\Scripts\python.exe -m pytest backend/tests -v --basetemp data/t16-evidence-e581b2c/pytest-all -p no:cacheprovider` | `89 passed, 1 warning in 29.60s`                |
+| `npm.cmd --prefix frontend test -- --reporter=verbose`                                                                      | `3 test files passed; 35 tests passed in 4.92s` |
 | `.\.venv\Scripts\python.exe -m ruff check backend`                                                                          | `All checks passed!`                            |
 | `npm.cmd --prefix frontend run lint`                                                                                        | Exit code 0                                     |
-| `npm.cmd --prefix frontend run build`                                                                                       | Exit code 0; Vite build completed successfully  |
+| `npm.cmd --prefix frontend run build`                                                                                       | Exit code 0; Vite build completed successfully |
 
 The warning is the existing Starlette `TestClient` deprecation warning and did not affect the results.
 
@@ -166,7 +189,7 @@ The warning is the existing Starlette `TestClient` deprecation warning and did n
 - The deterministic M2 seed does not read the token and does not import a network client.
 - `test_seed_service_never_needs_a_network_connection` replaces network connection creation with a failing function; the test passed.
 - CI sets `TMDB_READ_ACCESS_TOKEN: ""`, runs the same backend suite, and contains no TMDb importer step.
-- All checks on the tested commit succeeded: `Detect stack`, `Python tests`, `Node build and tests`, and `No secrets committed` ([CI run](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/36893078580)).
+- The local rerun on the tested commit passed the complete backend suite, frontend suite, Ruff, ESLint, and the production build. The PR CI run remains the final merge gate; the earlier CI URL for `5f215d9` is not reused as evidence for this commit.
 
 Normal dependency installation still uses package registries and GitHub Actions infrastructure. The M2 bootstrap and tests require no TMDb token, live TMDb call, or application-level internet access.
 
