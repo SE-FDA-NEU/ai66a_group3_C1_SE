@@ -183,6 +183,13 @@ button:disabled {
   margin: 0;
 }
 
+.catalogue-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
 .status-panel {
   padding: 2rem;
   border: 1px solid #dedede;
@@ -305,8 +312,13 @@ button:disabled {
 
 @media (max-width: 640px) {
   .catalogue-header,
+  .catalogue-actions,
   .movie-detail__facts {
     display: flex;
     flex-direction: column;
+  }
+
+  .catalogue-actions {
+    align-items: stretch;
   }
 }
