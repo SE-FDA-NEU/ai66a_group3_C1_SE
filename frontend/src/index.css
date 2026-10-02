@@ -153,6 +153,30 @@ button:disabled {
   margin: 0 auto;
 }
 
+.recommendations-card {
+  width: min(100%, 760px);
+}
+
+.section-heading h2 {
+  margin-bottom: 0;
+}
+
+.recommendation-empty-state {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border: 1px dashed #bdbdbd;
+  border-radius: 12px;
+  background: #fafafa;
+}
+
+.recommendation-empty-state h3 {
+  margin: 0;
+}
+
+.recommendation-empty-state p {
+  margin: 0.75rem 0 1rem;
+}
+
 @media (max-width: 640px) {
   .page {
     padding: 1rem;
