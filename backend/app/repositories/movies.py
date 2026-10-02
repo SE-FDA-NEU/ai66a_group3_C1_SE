@@ -6,7 +6,7 @@ from collections.abc import Iterable
 from datetime import datetime
 from math import isfinite
 
-from sqlalchemy import case, delete, select
+from sqlalchemy import delete, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.db.models import (
@@ -18,6 +18,7 @@ from app.db.models import (
     new_opaque_id,
     utc_now,
 )
+from app.recommendations.ranker import popularity_title_id_ordering
 from app.schemas.movies import GenreDto, MovieDetailDto, MovieSummaryDto
 
 ACTIVE_CATALOGUE_STATE_ID = 1
@@ -223,12 +224,7 @@ def list_active_movies(session: Session, *, limit: int) -> list[CatalogMovie]:
         )
         .where(CatalogueState.id == ACTIVE_CATALOGUE_STATE_ID)
         .options(selectinload(CatalogMovie.genres))
-        .order_by(
-            case((CatalogMovie.popularity_score.is_(None), 1), else_=0),
-            CatalogMovie.popularity_score.desc(),
-            CatalogMovie.title.asc(),
-            CatalogMovie.id.asc(),
-        )
+        .order_by(*popularity_title_id_ordering())
         .limit(limit)
     )
     return list(session.scalars(statement).unique())

@@ -17,6 +17,7 @@ from app.repositories.movies import (
     to_movie_detail_dto,
     to_movie_summary_dto,
 )
+from app.repositories.recommendations import list_popular_recommendation_movies
 from app.repositories.users import create_user, get_user_by_email, to_user_dto
 from app.schemas.auth import (
     AuthData,
@@ -26,6 +27,7 @@ from app.schemas.auth import (
     RegisterResponse,
 )
 from app.schemas.movies import MovieDetailResponse, MovieListResponse
+from app.schemas.recommendations import RecommendationResponse
 from app.security.origin import same_origin_write_allowed
 from app.security.passwords import normalize_email, verify_password
 from app.security.sessions import (
@@ -226,6 +228,58 @@ def logout(
     database_session.commit()
     _clear_session_cookie(response, request)
 
+@app.get(
+    "/api/me/recommendations",
+    response_model=RecommendationResponse,
+    status_code=200,
+)
+def recommendations(
+    request: Request,
+    limit: int = Query(default=10, ge=1, le=10),
+    database_session: Session = Depends(get_db),  # noqa: B008
+):
+    user = resolve_session(
+        database_session,
+        request.cookies.get(SESSION_COOKIE),
+    )
+
+    if user is None:
+        return _error(
+            "AUTHENTICATION_REQUIRED",
+            "Authentication required",
+            401,
+        )
+
+    revision = get_active_catalogue_revision(database_session)
+
+    if revision is None:
+        return _error(
+            "CATALOGUE_UNAVAILABLE",
+            "Movie catalogue is unavailable",
+            503,
+        )
+
+    movies = list_popular_recommendation_movies(
+        database_session,
+        limit=limit,
+    )
+
+    return {
+        "data": {
+            "movies": [
+                to_movie_summary_dto(movie).model_dump()
+                for movie in movies
+            ],
+            "mode": "popular",
+            "personalised": False,
+            "noMatch": False,
+        },
+        "meta": {
+            "count": len(movies),
+            "limit": limit,
+            "catalogueRevision": revision.id,
+        },
+    }
 
 @app.get("/api/movies", response_model=MovieListResponse, status_code=200)
 def list_movies(
