@@ -199,6 +199,57 @@ def test_client_user_id_cannot_override_the_session_account(
     assert login_with_user_id.status_code == 400
     assert login_with_user_id.json()["error"]["code"] == "VALIDATION_ERROR"
 
+def test_separate_clients_keep_account_identity_isolated(
+    client: tuple[TestClient, Session],
+) -> None:
+    http_a, _ = client
+    http_b = TestClient(app)
+    try:
+        login_a = http_a.post(
+            "/api/auth/login",
+            json={
+                "email": "viewer@example.com",
+                "password": "movie123",
+            },
+        )
+        login_b = http_b.post(
+            "/api/auth/login",
+            json={
+                "email": "other@example.com",
+                "password": "other-pass",
+            },
+        )
+        assert login_a.status_code == 200
+        assert login_b.status_code == 200
+        user_a = login_a.json()["data"]["user"]
+        user_b = login_b.json()["data"]["user"]
+        assert user_a["email"] == "viewer@example.com"
+        assert user_b["email"] == "other@example.com"
+        assert user_a["id"] != user_b["id"]
+        cookie_a = http_a.cookies.get("ams_session")
+        cookie_b = http_b.cookies.get("ams_session")
+        assert cookie_a
+        assert cookie_b
+        assert cookie_a != cookie_b
+        me_a = http_a.get("/api/auth/me")
+        me_b = http_b.get("/api/auth/me")
+        assert me_a.status_code == 200
+        assert me_b.status_code == 200
+        assert me_a.json()["data"]["user"]["id"] == user_a["id"]
+        assert me_a.json()["data"]["user"]["email"] == "viewer@example.com"
+        assert me_b.json()["data"]["user"]["id"] == user_b["id"]
+        assert me_b.json()["data"]["user"]["email"] == "other@example.com"
+        logout_a = http_a.post("/api/auth/logout")
+        assert logout_a.status_code == 204
+        assert http_a.get("/api/auth/me").status_code == 401
+        me_b_after_a_logout = http_b.get("/api/auth/me")
+        assert me_b_after_a_logout.status_code == 200
+        assert (
+            me_b_after_a_logout.json()["data"]["user"]["id"]
+            == user_b["id"]
+        )
+    finally:
+        http_b.close()
 
 def test_cross_origin_login_is_rejected_before_session_creation(
     client: tuple[TestClient, Session],
