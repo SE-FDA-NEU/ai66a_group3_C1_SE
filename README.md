@@ -4,6 +4,8 @@ For university students facing choice overload, this system turns a small set of
 genre preferences and optional ratings into transparent movie recommendations,
 rather than giving every viewer the same generic popularity list.
 
+Setup: [docs/SETUP.md](docs/SETUP.md) takes a fresh clone to a running application.
+
 ## Team and Sprint 1 roles
 
 | Member           | GitHub                                                       | Sprint 1 responsibility                                   |
@@ -13,6 +15,16 @@ rather than giving every viewer the same generic popularity list.
 | Tran Tuan Anh    | [`@anotify-vie`](https://github.com/anotify-vie)             | C03 user research, personas, and scenarios                |
 | Vu Quoc Huy      | [`@vu-huzy`](https://github.com/vu-huzy)                     | C04 M1 requirements-document integration                  |
 | Nguyen Tuan Anh  | [`@NguyenTuanAnh0608`](https://github.com/NguyenTuanAnh0608) | C05 repository readiness, rules, routes, and traceability |
+
+## Sprint 2 roles
+
+| Member           | GitHub                                                       | Sprint 2 responsibility                                       |
+| ---------------- | ------------------------------------------------------------ | ------------------------------------------------------------- |
+| Nguyen Xuan Kiet | [`@kietxuan`](https://github.com/kietxuan)                   | Product Owner; C01 backlog refinement (#67)                   |
+| Tran Minh Hoang  | [`@hoang3003`](https://github.com/hoang3003)                 | C03 architecture, data, and API contracts (#69)               |
+| Tran Tuan Anh    | [`@anotify-vie`](https://github.com/anotify-vie)             | C04 runtime, CI, and database setup (#70)                     |
+| Vu Quoc Huy      | [`@vu-huzy`](https://github.com/vu-huzy)                     | C05 Milestone 2 design dossier (#71)                          |
+| Nguyen Tuan Anh  | [`@NguyenTuanAnh0608`](https://github.com/NguyenTuanAnh0608) | Scrum Master; C02 Sprint 2 wrap-up (#68)                      |
 
 ## Project management
 
@@ -26,6 +38,7 @@ rather than giving every viewer the same generic popularity list.
 - [Product scope](docs/product-scope.md)
 - [Business rules with worked examples](docs/business-rules.md)
 - [Route and Story traceability](docs/traceability.md)
+- [M2 design document](docs/design.md)
 - [M2 architecture and ownership contract](docs/architecture.md)
 - [M2 auth, catalogue, and recommendation API contract](docs/api.md)
 - [Definition of Done](docs/definition-of-done.md)
