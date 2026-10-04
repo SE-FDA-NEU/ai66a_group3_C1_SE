@@ -142,15 +142,3 @@ The command ran outside the virtual environment, or the backend package is not i
 python -m pip install -e "./backend[dev]" --no-deps
 ```
 
-## Independent clean-clone verification
-
-This section is filled in by a team member who did not write these steps. They follow the steps above in a new folder, then record the result.
-
-| Field | Value |
-|---|---|
-| Tester | Not recorded yet |
-| Date | Not recorded yet |
-| Time | Not recorded yet |
-| Operating system | Not recorded yet |
-| Commit | Not recorded yet |
-| Result | Not recorded yet |
