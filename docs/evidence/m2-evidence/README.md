@@ -7,6 +7,16 @@ Test date: 2026-10-02 (Asia/Saigon)
 - Tested commit: [`e581b2cd3f37e8060c33840084b8b2c5e9dc9441`](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/e581b2cd3f37e8060c33840084b8b2c5e9dc9441)
 - Integration state: this commit contains the merged T02 TMDb import work and the latest `main` available for the rerun.
 
+## Sprint 2 planning board
+
+The Product Owner retained the following Project Board snapshot as the accepted
+Sprint 2 Planning evidence for [#67](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/67).
+All four board columns are visible. It records the planned Sprint 2 work in the
+same project board used throughout delivery; it is evidence of planning and
+traceability, not a claim that every Story is complete.
+
+![Sprint 2 Planning board with all columns visible](sprint2-planning-board.png)
+
 ## Clean bootstrap and database count
 
 A new application-data directory was created specifically for this run. It contained zero files before bootstrap.
