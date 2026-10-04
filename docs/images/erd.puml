@@ -1,5 +1,5 @@
 @startuml
-title Catalogue and account ERD - C03 migration contract
+title Catalogue and account ERD - current migrations
 
 hide circle
 hide methods
@@ -20,12 +20,12 @@ entity "users" as users {
 }
 
 entity "auth_sessions" as auth_sessions {
-  * session_digest : TEXT <<PK>>
+  * token_digest : TEXT <<PK>>
   --
   * user_id : TEXT <<FK>>
   * created_at : DATETIME
   * expires_at : DATETIME
-  invalidated_at : DATETIME <<NULL>>
+  revoked_at : DATETIME <<NULL>>
 }
 
 entity "catalogue_revisions" as rev {
@@ -33,13 +33,15 @@ entity "catalogue_revisions" as rev {
   --
   * provider : TEXT
   * created_at : DATETIME
-  completed_at : DATETIME <<NULL>>
+  * inserted_movie_count : INTEGER
+  * updated_movie_count : INTEGER
+  * rejected_movie_count : INTEGER
 }
 
 entity "catalogue_state" as active_state {
-  * id : INTEGER <<PK>>
+  * id : INTEGER <<PK, CHECK id = 1>>
   --
-  active_revision_id : TEXT <<FK, NULL, UQ>>
+  * active_revision_id : TEXT <<FK, UQ>>
   * updated_at : DATETIME
 }
 
@@ -60,7 +62,6 @@ entity "catalog_movies" as movie_rows {
 
 entity "genres" as genres {
   * id : INTEGER <<PK>>
-  --
   * name : TEXT
 }
 
@@ -69,42 +70,11 @@ entity "movie_genres" as movie_genre_links {
   * genre_id : INTEGER <<PK, FK>>
 }
 
-entity "viewer_genre_preferences" as viewer_genre_preferences {
-  * user_id : TEXT <<PK, FK>>
-  * genre_id : INTEGER <<PK, FK>>
-}
-
-entity "viewer_ratings" as viewer_ratings {
-  * user_id : TEXT <<PK, FK>>
-  * movie_id : TEXT <<PK, FK>>
-  --
-  * value : INTEGER <<CHECK 1..5>>
-  * updated_at : DATETIME
-}
-
-entity "import_runs" as imports {
-  * id : TEXT <<PK>>
-  --
-  * provider : TEXT
-  * status : TEXT
-  * started_at : DATETIME
-  completed_at : DATETIME <<NULL>>
-  catalogue_revision_id : TEXT <<FK, NULL>>
-  * inserted_count : INTEGER
-  * updated_count : INTEGER
-  * rejected_count : INTEGER
-}
-
 users "1" -- "0..*" auth_sessions
-users "1" -- "0..*" viewer_genre_preferences
-users "1" -- "0..*" viewer_ratings
-genres "1" -- "0..*" viewer_genre_preferences
 rev "1" -- "0..*" movie_rows
 rev "0..1" -- "0..1" active_state
-rev "0..1" -- "0..*" imports
 movie_rows "1" -- "0..*" movie_genre_links
 genres "1" -- "0..*" movie_genre_links
-movie_rows "1" -- "0..*" viewer_ratings
 
 legend bottom
   | Notation | Meaning |
@@ -116,8 +86,6 @@ legend bottom
   | 0..1 | Zero or one |
   | 0..* | Zero or many |
 
-  This is the C03 catalogue/account migration contract.
-  Catalogue tables and users have executable Alembic migrations.
-  Other account tables remain planned until their owning tasks are merged.
+  Only tables created by the current Alembic migrations are shown.
 endlegend
 @enduml

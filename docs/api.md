@@ -1,14 +1,10 @@
-# P0 HTTP API contract
+# M2 HTTP API contract
 
-Contract revision: `C03-DRAFT-2`.
+Contract revision: `M2-CURRENT`.
 
-This document inventories the HTTP boundary needed by the six P0 Stories:
-S01, S02, S03, S04, S12, and S13. It separates runtime evidence from planned
-contracts so a future endpoint is never presented as already running.
-
-The account storage and S2-T07 authentication routes are implemented in the
-backend. Other P0 routes remain target contracts until their route, service,
-persistence, and tests are merged.
+This document inventories the implemented M2 HTTP boundary and clearly
+separates Sprint 3 targets from runtime evidence. A planned endpoint is not an
+availability claim.
 
 Architecture and persistence rules are in
 [architecture.md](architecture.md).
@@ -61,22 +57,18 @@ not an availability claim.
 
 | Story | Method | Endpoint | Access | Input | Success | Representative errors | Delivery status |
 |---|---|---|---|---|---|---|---|
-| Infrastructure | `GET` | `/health` | Public | None | `200` health and database/migration state | Unhandled database failure currently produces framework `500` | `Implemented in M2` |
+| Infrastructure | `GET` | `/health` | Public | None | `200` health and database/migration state | `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 | S12 | `POST` | `/api/auth/register` | Public | `RegisterRequest` | `201 RegisterResponse` | `400 VALIDATION_ERROR`, `409 EMAIL_ALREADY_REGISTERED` | `Implemented in M2` |
 | S13 | `POST` | `/api/auth/login` | Public, same-origin write | `LoginRequest` | `200 AuthResponse` and opaque cookie | `400 VALIDATION_ERROR`, `401 INVALID_CREDENTIALS`, `403 ORIGIN_NOT_ALLOWED` | `Implemented in M2` |
-| S13 | `POST` | `/api/auth/logout` | Cookie optional; idempotent same-origin write | None | `204`, session invalidated and cookie cleared | `403 ORIGIN_NOT_ALLOWED`, `500 INTERNAL_ERROR`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
+| S13 | `POST` | `/api/auth/logout` | Cookie optional; idempotent same-origin write | None | `204`, session invalidated and cookie cleared | `403 ORIGIN_NOT_ALLOWED`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 | S13 | `GET` | `/api/auth/me` | Authenticated | None | `200 AuthResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
-| S01 | `GET` | `/api/genres` | Authenticated | None | `200 GenreListResponse` | `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE` | `Planned for later sprint` |
-| S01 | `GET` | `/api/me/preferences` | Authenticated | None | `200 PreferenceResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Planned for later sprint` |
-| S01 | `PUT` | `/api/me/preferences` | Authenticated | `SavePreferencesRequest` | `200 PreferenceResponse` | `400 INVALID_GENRE_SELECTION`, `401 AUTHENTICATION_REQUIRED`, `404 GENRE_NOT_FOUND` | `Planned for later sprint` |
-| S02, S04 | `GET` | `/api/me/recommendations?limit=10` | Authenticated | Optional integer `limit`, 1-10 | `200 RecommendationResponse` | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE` | `Planned for later sprint` |
+| S02, S04 | `GET` | `/api/me/recommendations?limit=10` | Authenticated | Optional integer `limit`, 1-10 | `200 RecommendationResponse` with popular/cold-start results | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE` | `Implemented in M2` |
 | S04 | `GET` | `/api/movies?limit=10` | Public | Optional integer `limit`, 1-10, default 10 | `200 MovieListResponse` | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 | S03 | `GET` | `/api/movies/{movieId}` | Public | Opaque `movieId` | `200 MovieDetailResponse` | `404 MOVIE_NOT_FOUND`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 
-Rating mutation, rating-informed ranking, genre filtering, similar movies,
-search, and profile reset are not P0 endpoint requirements in this revision.
-They must be added with their owning Story and marked planned until code is
-merged.
+Preferences, ratings, personalized ranking, genre filtering, similar movies,
+search, and profile reset are Sprint 3 targets. They are not implemented in
+the current router or migrations.
 
 ## 3. Shared DTOs
 
@@ -204,7 +196,10 @@ session, clears the cookie, and returns `204 No Content`. The UI then opens
 The same-origin check runs before revocation, so a rejected browser request
 cannot terminate the current session.
 
-## 6. S01 genres and account preferences
+## 6. Planned Sprint 3: genres and account preferences
+
+The following endpoints are planned only. No current backend route or
+migration provides them, so they are not M2 completion evidence.
 
 ### `GET /api/genres`
 
@@ -259,12 +254,16 @@ returns the `PreferenceResponse` above.
 
 No request or response accepts a `userId` field.
 
-## 7. S02 and S04 recommendations
+## 7. M2 popular/cold-start recommendations
 
 ### `GET /api/me/recommendations?limit=10`
 
 `limit` defaults to 10 and accepts an integer from 1 through 10. The account is
 resolved only from the authenticated session.
+
+The route is implemented, but it currently returns the shared popular
+catalogue ordering for every authenticated account. It does not read saved
+preferences or ratings and is not personalized.
 
 Response shape:
 
@@ -279,17 +278,11 @@ Response shape:
         "genres": [
           { "id": 28, "name": "Action" }
         ],
-        "popularityScore": 90.0,
-        "reason": {
-          "code": "GENRE_MATCH",
-          "matchedGenres": [
-            { "id": 28, "name": "Action" }
-          ]
-        }
+        "popularityScore": 90.0
       }
     ],
-    "mode": "personalised",
-    "personalised": true,
+    "mode": "popular",
+    "personalised": false,
     "noMatch": false
   },
   "meta": {
@@ -300,17 +293,10 @@ Response shape:
 }
 ```
 
-The values are schema examples, not evidence of an import or live endpoint.
-
-Behaviour by account state:
-
-| State | Result |
-|---|---|
-| 1-5 saved genres and matches exist | Up to 10 distinct movies sharing at least one selected genre; `mode=personalised`, `personalised=true`, `noMatch=false`; every item names at least one matching genre. |
-| Saved genres but no match exists | No-match state plus up to 10 popular alternatives; `mode=popular`, `personalised=false`, `noMatch=true`. |
-| No saved genres | Up to 10 popular movies; `mode=popular`, `personalised=false`, `noMatch=false`, with guidance to enter preferences. |
-| Valid active catalogue has no usable movies | `200` with `movies: []`; the UI shows guidance and never invents movies. |
-| No active catalogue or database unavailable | `503 CATALOGUE_UNAVAILABLE`; saved preferences remain unchanged. |
+The response always uses `mode=popular`, `personalised=false`, and
+`noMatch=false`. A valid active catalogue with no usable movies returns
+`200` with `movies: []`. No active catalogue returns
+`503 CATALOGUE_UNAVAILABLE`.
 
 Popular alternatives sort by finite popularity descending, null popularity
 last, title A-Z for ties, and internal movie ID as the final deterministic tie.
@@ -394,7 +380,6 @@ Success (`200`):
 | Internal movie ID not found | `404 MOVIE_NOT_FOUND` | `Movie not found` |
 | No active catalogue | `503 CATALOGUE_UNAVAILABLE` | `Movie catalogue is unavailable` |
 | Database read failure | `503 SERVICE_UNAVAILABLE` | `Service is temporarily unavailable` |
-| Unexpected server failure | `500 INTERNAL_ERROR` | `Something went wrong` |
 
 A missing year or overview remains JSON `null`; the UI displays
 `Information unavailable` for that field. Storage failure is never translated
@@ -412,11 +397,11 @@ to a false 404.
 | `MOVIE_NOT_FOUND` | 404 | The internal movie ID does not exist in the active catalogue. |
 | `GENRE_NOT_FOUND` | 404 | A requested genre ID does not exist. |
 | `EMAIL_ALREADY_REGISTERED` | 409 | The normalized email is already stored. |
-| `INTERNAL_ERROR` | 500 | An unexpected failure occurred. |
 | `SERVICE_UNAVAILABLE` | 503 | Required persistence (account or catalogue) is unavailable. |
 | `CATALOGUE_UNAVAILABLE` | 503 | No active catalogue is readable. |
 
 ## 10. Scope boundary
 
-This contract contains no NLP endpoint, DTO, preprocessing rule, or text
-similarity contract. The NLP Spike is independent and is not a gate for C03.
+This contract contains no implemented preferences, ratings, personalized
+recommendation, or NLP endpoint. Those are Planned Sprint 3 work and are not
+M2 completion criteria.
