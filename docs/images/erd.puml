@@ -39,7 +39,7 @@ entity "catalogue_revisions" as rev {
 }
 
 entity "catalogue_state" as active_state {
-  * id : INTEGER <<PK>>
+  * id : INTEGER <<PK, CHECK id = 1>>
   --
   * active_revision_id : TEXT <<FK, UQ>>
   * updated_at : DATETIME
