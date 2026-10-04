@@ -181,9 +181,9 @@ The API returns the same ten titles in the same order: `GET /api/movies?limit=10
 
 ### Screenshot
 
-![The running catalogue page with ten movie cards](evidence/m2-evidence/catalogue-10-cards-5f215d9.png)
+![The catalogue page open at localhost:5173](evidence/m2-evidence/m2-catalogue-localhost-5173.png)
 
-Captured on 2026-10-02 during task #62. The steps and the other screenshots (valid detail, unknown movie, incomplete record) are in [evidence/m2-evidence/README.md](evidence/m2-evidence/README.md).
+The catalogue page at `http://localhost:5173/` in a browser. Eight of the ten cards are visible; the other two are below the fold. The steps and the other screenshots (valid detail, unknown movie, incomplete record) are in [evidence/m2-evidence/README.md](evidence/m2-evidence/README.md).
 
 ### Checks
 
