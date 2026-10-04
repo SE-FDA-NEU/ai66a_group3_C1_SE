@@ -1,44 +1,45 @@
 # M2 architecture and persistence contract
 
-Contract revision: `C03-DRAFT-2`.
+Contract revision: `M2-CURRENT`.
 
-This follow-up contract extends the baseline merged in PR #72. It does not
-change that merged pull request or its history. The HTTP contract is in
-[api.md](api.md).
+The HTTP contract is in [api.md](api.md). This document describes the
+backend that is present in the repository, not planned Sprint 3 features.
 
-## 1. Evidence boundary
+## 1. Runtime evidence
 
-The current repository contains the C04 runtime bootstrap:
+The repository contains a FastAPI backend with these implemented areas:
 
-- a React, TypeScript, and Vite frontend manifest;
-- a Python 3.12 FastAPI backend manifest;
-- a database-backed `GET /health` route; and
-- Alembic configuration with one bootstrap revision.
+- `GET /health`, which reports application, database, and Alembic migration
+  state.
+- Authentication through registration, login, current-session lookup, and
+  logout under `/api/auth`.
+- Public catalogue reads through `GET /api/movies` and
+  `GET /api/movies/{movieId}`.
+- Authenticated `GET /api/me/recommendations`, which currently serves the
+  shared popular/cold-start recommendation list.
 
-The bootstrap revision
-`backend/alembic/versions/2d8a3f83d517_bootstrap_database.py` has empty
-`upgrade()` and `downgrade()` functions. It does not create catalogue or
-account tables. No auth, catalogue, preference, or recommendation HTTP route
-is present at this revision. Target components, entities, and endpoints below
-are contracts for later implementation unless linked to runtime evidence.
+The backend uses the local SQLite catalogue selected by
+`catalogue_state.active_revision_id`. Movie and recommendation reads do not
+call TMDb. The optional server-side TMDb importer writes catalogue revisions
+outside browser requests.
 
-This distinction prevents a planned endpoint or table from being described as
-already running.
+Preferences, ratings, personalized recommendation ranking, and NLP are Sprint
+3 work. They are not implemented migrations or M2 runtime capabilities.
 
 ## 2. Selected stack
 
 | Layer | Technology | Boundary |
 |---|---|---|
-| Browser frontend | React, TypeScript, Vite | Renders screens and calls only the backend API. |
-| Backend API | FastAPI, Pydantic, Python 3.12 | Owns HTTP validation, authentication, and business rules. |
-| Persistence | SQLAlchemy, Alembic, SQLite | Owns parameterized queries and local/demo persistence. |
+| Browser frontend | React, TypeScript, Vite | Renders screens and calls the backend API. |
+| Backend API | FastAPI, Pydantic, Python 3.12 | Owns HTTP validation, authentication, catalogue reads, and popular recommendations. |
+| Persistence | SQLAlchemy, Alembic, SQLite | Owns the migrated account/session and catalogue tables. |
 | Password storage | Argon2id | Stores only encoded password hashes. |
 | Provider integration | Server-side `httpx` adapter | Keeps the TMDb credential out of the browser. |
 | Tests | pytest; Vitest and React Testing Library | Verifies backend and frontend behaviour. |
 
-The intended integrated deployment is same-origin: FastAPI serves `/api` and
-the built frontend, while Vite proxies `/api` during development. The browser
-uses an opaque `HttpOnly` session cookie and never stores a bearer token.
+The intended deployment is same-origin: FastAPI serves `/api` and the built
+frontend, while Vite proxies `/api` during development. The browser uses an
+opaque `HttpOnly` session cookie and never stores a bearer token.
 
 ## 3. C4 container diagram
 
@@ -46,110 +47,72 @@ uses an opaque `HttpOnly` session cookie and never stores a bearer token.
 
 PlantUML source: [architecture.puml](images/architecture.puml).
 
-The diagram contains these required runtime boundaries:
+The runtime boundaries are:
 
 1. Browser frontend.
 2. Backend API.
 3. SQLite database.
 4. Optional server-side TMDb importer.
 
-TMDb is shown as an external system. Every relationship is labelled with the
-data carried across the boundary. Runtime movie and recommendation requests
-read the local SQLite catalogue; they do not call TMDb.
-
-### Component responsibilities
-
 | Component | Responsibility | Must not do |
 |---|---|---|
-| Browser frontend | Render account, preference, catalogue, and recommendation experiences; send JSON requests. | Receive TMDb credentials or issue provider calls. |
-| Backend API | Validate HTTP input, resolve the session account, apply business rules, and return stable DTOs/errors. | Trust a client-supplied `user_id`. |
-| SQLite database | Persist accounts, sessions, catalogue revisions, movies, genres, preferences, ratings, and import state. | Select an account independently of the authenticated session. |
+| Browser frontend | Render auth, catalogue, and popular recommendation experiences; send JSON requests. | Receive TMDb credentials or issue provider calls. |
+| Backend API | Validate input, resolve the session account, read the active catalogue, and return stable DTOs/errors. | Trust a client-supplied `user_id`. |
+| SQLite database | Persist users, sessions, catalogue revisions, the active revision, movies, genres, and movie/genre links. | Select an account independently of the authenticated session. |
 | Optional TMDb importer | Fetch bounded provider data, validate it, and write one atomic catalogue revision. | Run in the browser or expose provider credentials. |
 
-## 4. ERD and migration status
+## 4. ERD and current migrations
 
 ![Catalogue and account ERD](images/erd.png)
 
 PlantUML source: [erd.puml](images/erd.puml).
 
-The ERD records the C03 catalogue/account migration contract, including PKs,
-FKs, unique/check constraints, and relationship multiplicities. The catalogue
-tables and `users` are implemented by Alembic revisions; the remaining account
-relations stay planned until their owning tasks are merged. Compare the ERD to
-each new revision and update it in the same change if any table, column, key,
-constraint, or multiplicity differs.
+The ERD shows exactly the seven tables created by the current Alembic
+migrations:
 
-### Required persistence rules
+- `users`
+- `auth_sessions`
+- `catalogue_revisions`
+- `catalogue_state`
+- `catalog_movies`
+- `genres`
+- `movie_genres`
 
-- `users.email_normalized` is unique. Password plaintext is never
-  stored; only an Argon2id hash is persisted.
-- `auth_sessions.user_id` identifies the authenticated account. Protected
-  operations never accept a client-selected account identity.
-- `viewer_genre_preferences` has a composite key `(user_id, genre_id)`.
-  Saving preferences replaces only the current account's 1-5 distinct genres
-  in one transaction.
-- `viewer_ratings` has a composite key `(user_id, movie_id)` and a rating
-  constraint from 1 through 5.
-- Each `catalog_movies` row belongs to one catalogue revision. Runtime reads
-  filter by `catalogue_state.active_revision_id`.
+`auth_sessions` stores `token_digest`, `created_at`, `expires_at`, and nullable
+`revoked_at`. `catalogue_revisions` stores the inserted, updated, and rejected
+movie counters. `catalogue_state.active_revision_id` is required and points to
+the active revision. No preferences, ratings, or import-run table has been
+migrated.
+
+## 5. Persistence and ownership rules
+
+- `users.email_normalized` is unique. Plaintext passwords are never stored.
+- `auth_sessions.user_id` identifies the authenticated account; protected
+  operations derive it from the opaque cookie session.
+- Each `catalog_movies` row belongs to one catalogue revision.
+- Runtime catalogue reads filter through
+  `catalogue_state.active_revision_id`.
 - `movie_genres` de-duplicates each movie/genre relationship through its
   composite primary key.
-- A failed import cannot update the active revision. Import records never
-  contain the TMDb credential.
+- A failed import cannot replace the active revision.
+- Preferences, ratings, personalized recommendation ranking, and NLP require
+  future Sprint 3 migrations and routes; they are not part of this database
+  contract.
 
-## 5. Authentication and data ownership
+## 6. Authentication and provider flow
 
-- Registration trims and lowercases the email before validation and insertion.
-- Login creates a cryptographically random opaque session. The cookie uses
-  `HttpOnly`, `SameSite=Lax`, `Path=/`, and `Secure` outside documented
-  localhost development.
-- Login and logout combine that cookie policy with the same-origin deployment,
-  no permissive CORS configuration, and a Fetch Metadata/`Origin` guard.
-  Cross-origin or same-site browser writes are rejected before session state
-  changes. Vite-proxied development requests remain browser same-origin.
-- Every protected request resolves `user_id` from the cookie and server-side
-  session. Body, query, path, or custom-header account IDs are not
-  authoritative.
-- Logout invalidates the current server session and clears the cookie without
-  deleting account-owned preferences or ratings.
-- Preference, rating, reset, and personal recommendation operations can read
-  or modify only the authenticated account's rows.
-- Passwords, password hashes, session digests, cookie values, and provider
-  credentials never appear in response DTOs or logs.
+Registration normalizes the email and stores an Argon2id hash. Login creates a
+cryptographically random opaque session cookie. Logout revokes the current
+session and clears the cookie. Passwords, hashes, session digests, cookie
+values, and provider credentials never appear in response DTOs or logs.
 
-## 6. Optional TMDb import flow
+The importer reads `TMDB_READ_ACCESS_TOKEN` on the server, fetches bounded
+provider data, validates it, records revision counters, and activates the
+revision only after all required writes succeed. Provider failures retain the
+previous active revision.
 
-The importer is an explicit server-side operation, not part of a browser movie
-request:
+## 7. Delivery boundary
 
-1. Read `TMDB_READ_ACCESS_TOKEN` from the server environment.
-2. Request provider genres and a bounded set of popular-movie pages.
-3. Request details only for required missing fields.
-4. Map provider field names to provider-neutral records and reject invalid
-   records.
-5. In one database transaction, create a candidate catalogue revision, upsert
-   movies and genres, replace movie/genre links, record counts, and activate
-   the revision only after all required writes succeed.
-6. On provider or transaction failure, retain the previous active revision and
-   record only a sanitized failure.
-
-The importer transmits movie and genre provider JSON; it never transmits a
-password, account session, preference, or rating to TMDb.
-
-## 7. C03 completion gate
-
-C03 is complete when the new documentation PR demonstrates all of the
-following:
-
-- the C4 diagram has at least the four required components;
-- every architecture arrow names the transmitted data;
-- the PNGs are rendered from the committed PlantUML sources;
-- the ERD identifies PKs, FKs, and multiplicities and is reconciled with the
-  actual catalogue/account migrations once those migrations exist;
-- the API inventory covers every P0 Story and exposes stable error codes;
-- every endpoint is classified as `Implemented in M2` or
-  `Planned for later sprint` using repository evidence; and
-- no planned endpoint is described as currently available.
-
-The NLP Spike and an NLP API contract are outside C03. C03 does not wait for
-the Spike, and NLP is not a C03 completion criterion.
+M2 includes health, authentication, catalogue reads, and popular/cold-start
+recommendations. Sprint 3 will add preferences, ratings, personalized
+recommendations, and NLP after their migrations, routes, and tests exist.
