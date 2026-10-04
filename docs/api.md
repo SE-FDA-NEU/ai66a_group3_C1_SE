@@ -380,7 +380,6 @@ Success (`200`):
 | Internal movie ID not found | `404 MOVIE_NOT_FOUND` | `Movie not found` |
 | No active catalogue | `503 CATALOGUE_UNAVAILABLE` | `Movie catalogue is unavailable` |
 | Database read failure | `503 SERVICE_UNAVAILABLE` | `Service is temporarily unavailable` |
-| Database read failure | `503 SERVICE_UNAVAILABLE` | `Service is temporarily unavailable` |
 
 A missing year or overview remains JSON `null`; the UI displays
 `Information unavailable` for that field. Storage failure is never translated
