@@ -4,7 +4,7 @@ For university students facing choice overload, this system turns a small set of
 genre preferences and optional ratings into transparent movie recommendations,
 rather than giving every viewer the same generic popularity list.
 
-Setup: [docs/SETUP.md](docs/SETUP.md) takes a fresh clone to a running application.
+- [M2 setup and clean-clone guide](docs/SETUP.md)
 
 ## Team and Sprint 1 roles
 
@@ -55,12 +55,7 @@ a route or screen changes. The full checklist is in
 
 ## Setup
 
-The C03 architecture contract selects the intended Sprint 2 stack and command
-interface in [docs/architecture.md](docs/architecture.md). At the current base
-commit, the repository still contains requirements and delivery-process
-scaffolding only: no application manifest, source directory, migration, or
-verified runtime command exists. S2-C04 (#70) must create and independently
-verify those runtime outputs before this section can present them as working.
+For platform-specific setup, expected output, troubleshooting, and clean-clone verification, see [docs/SETUP.md](docs/SETUP.md).
 
 ```bash
 git clone https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE.git
@@ -266,7 +261,7 @@ Confirm that Alembic has exactly one migration head:
 Expected head:
 
 ```text
-7f5b1d2a6e90 (head)
+8c1e2f4a7b90 (head)
 ```
 
 

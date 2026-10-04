@@ -48,7 +48,9 @@ PlantUML source: [images/erd.puml](images/erd.puml).
 
 The database has seven application tables, created by three Alembic revisions on top of the empty bootstrap revision: `4bde7d96c1c2` (catalogue), `7f5b1d2a6e90` (users) and `8c1e2f4a7b90` (auth sessions). The single migration head is `8c1e2f4a7b90`.
 
-The ERD image is the earlier contract diagram and differs from the migrations in four ways. It also draws `viewer_genre_preferences`, `viewer_ratings` and `import_runs`, which have no migration yet. It names two session columns `session_digest` and `invalidated_at`, where the database has `token_digest` and `revoked_at`. It gives `catalogue_revisions` a `completed_at` column, where the database has three count columns. It marks `catalogue_state.active_revision_id` as nullable, where the migration makes it NOT NULL. The table below follows the migrations.
+The ERD in `docs/images/erd.png` matches the current M2 Alembic migrations. It shows only the seven migrated tables: `users`, `auth_sessions`, `catalogue_revisions`, `catalogue_state`, `catalog_movies`, `genres`, and `movie_genres`.
+
+Preferences, ratings, personalised recommendation, and NLP remain planned Sprint 3 work and are not represented as implemented M2 tables.
 
 A trailing `?` marks a column that allows NULL. Every other column is NOT NULL.
 
@@ -258,4 +260,4 @@ After. `auth_sessions` is keyed by `token_digest`, the SHA-256 digest of the coo
 
 Reason. Task #53 requires that expired or invalid sessions return `401` and that login renews the session identity. Storing only the digest means the database never holds a value that a browser could send as a cookie.
 
-Impact. The ERD image still shows the earlier names `session_digest` and `invalidated_at`. The migration and the code use `token_digest` and `revoked_at`, and section 2 follows the migration.
+Impact. A copy of the database holds no cookie value that a browser could send, and a cookie that was signed out or has expired returns `401`. The ERD in `docs/images/erd.png` shows `token_digest` and `revoked_at`.
