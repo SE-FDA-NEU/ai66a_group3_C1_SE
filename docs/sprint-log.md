@@ -174,10 +174,11 @@ data. This wording is a concise restatement of the recorded objective in
 
 ### Commitment and Story-point boundary
 
-The recorded Sprint plan commits 21 named Tasks and five Chores to the Sprint 2
-iteration. It links those Tasks to five parent Stories, but it also explicitly
-requires the partially implemented parent Stories to remain open. The parent
-Stories and their complete estimates are:
+The [Sprint 2 planning record](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/67#issuecomment-5829313492)
+commits S10 / #32 and S12 / #44 for whole-Story closure, for a total of 6 Story
+Points. It keeps S03 / #19, S04 / #20, and S13 / #45 open as partial Stories.
+The Sprint plan also places 21 named Tasks and five Chores in the Sprint 2
+iteration. The five parent Stories and their complete estimates are:
 
 | Parent Story | Story points | Sprint 2 task coverage |
 | ------------ | -----------: | ---------------------- |
@@ -187,24 +188,21 @@ Stories and their complete estimates are:
 | [#44 / S12](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/44) | 3 | #49, #50, #51, #52 |
 | [#45 / S13](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/45) | 5 | #53, #54, #55, #56, #57, #66 |
 
-The five parent estimates total 19 points, but the evidence does not commit
-completion of those five whole Stories. Counting those full estimates would
-claim scope that #67 explicitly identifies as partial. Task hours are not
-Story Points and are not substituted for velocity.
+The five parent estimates total 19 points, but only S10 / #32 and S12 / #44
+were committed for whole-Story closure. Counting the complete estimates of the
+other three parents would claim scope that the planning record explicitly
+identifies as partial. Task hours are not Story Points and are not substituted
+for velocity.
 
-**Verified committed Story Points:** 0.
+**Verified committed Story Points:** 6 (S10 / #32: 3 points; S12 / #44: 3
+points), supported by the linked Sprint 2 planning record.
 
-**Verified completed Story Points:** 0. All five parent Stories remain open,
-their acceptance-criterion checklists remain incomplete, and none meets the
-repository's whole-Story Definition of Done.
+**Verified completed Story Points:** 0. Both committed Stories remain open, their
+acceptance-criterion checklists remain incomplete, and neither meets the
+repository's whole-Story Definition of Done. The three partial parent Stories
+also remain open.
 
 **Velocity:** 0 Story Points.
-
-If a dated Planning artifact or start-of-Sprint board snapshot proves that one
-or more whole parent Stories were committed for completion, the committed
-figure must be corrected from that artifact before this wrap-up is merged. The
-completed figure remains zero unless the corresponding whole Story reaches
-Done.
 
 ### Completed Sprint 2 items
 
@@ -288,11 +286,21 @@ These fields must be completed from the team's actual decision.
 
 ### Board and documentation evidence
 
+- **Sprint 2 Planning record:** [Issue #67 planning comment](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/67#issuecomment-5829313492)
+  records S10 / #32 and S12 / #44 as the two planned Story closures, totalling
+  6 committed Story Points.
+- **Planning-state board screenshot:** Not available. Issue #67 requires a
+  screenshot with all columns visible, but no screenshot is linked from its
+  body or planning comment and none is committed under `docs/evidence/` as of
+  2026-10-04. Add the actual Planning screenshot and link it here; do not use a
+  later board state as Planning evidence.
 - **Final Sprint 2 board screenshot:** Not available. The Project board requires
   authenticated access; no Sprint 2 board image is committed under
-  `docs/evidence/` as of 2026-10-03.
-- **Documentation PR:** Not available yet. This section was prepared on local
-  branch `docs/sprint-2-wrap-up` and must link its reviewed PR before merge.
+  `docs/evidence/` as of 2026-10-04. Add a final screenshot with all board
+  columns visible and link it here before merge.
+- **Documentation PR:** [PR #97](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/97)
+  contains this Sprint 2 wrap-up and is awaiting completion evidence before
+  merge.
 - **Closure rule:** Do not close #68 until the Sprint has ended, the final board
   screenshot is committed, the retrospective action and owner are recorded,
   the next Sprint Master handoff is recorded, every open item has an agreed
