@@ -3,9 +3,10 @@
 Contract revision: `S3-DRAFT`, reconciled with the current frontend on
 2026-10-08.
 
-This document separates current UI evidence from planned Sprint 3 state
-contracts. A planned state is not an implementation or test-evidence claim.
-HTTP payloads and errors are defined in [api.md](api.md).
+This document separates current UI evidence from committed Sprint 3 state
+contracts whose implementation is pending. These states are required Sprint
+scope, not optional future work, but are not implementation or test-evidence
+claims. HTTP payloads and errors are defined in [api.md](api.md).
 
 ## 1. Current P0 screen: public catalogue `/`
 
@@ -34,7 +35,7 @@ Current evidence: `frontend/src/pages/HomePage.tsx` and
 
 ## 2. Mapping current API errors to UI behaviour
 
-Every code below exists in the current backend/tests. Planned-only codes are
+Every code below exists in the current backend/tests. Contract-only codes are
 not included merely to reach a row count.
 
 | HTTP | Code | Business rule / condition | Exact rendered message | Recovery action |
@@ -52,14 +53,14 @@ Messages must not include stack traces, SQL/database internals, passwords,
 session values, or TMDb credentials. The two Story messages remain exact:
 `Email or password is incorrect` and `This email is already registered`.
 
-## 3. Planned rating UI on public movie detail
+## 3. Committed Sprint 3 rating UI contract (implementation pending)
 
 Movie detail remains public. A guest load calls only
 `GET /api/movies/{movieId}` and must not automatically call either private
 rating endpoint. If a guest chooses a rating action, open `/login` before any
 private rating GET/PUT.
 
-For an authenticated account and current movie, the planned rating control has
+For an authenticated account and current movie, the committed rating control has
 these states:
 
 | State | UI contract |
@@ -82,9 +83,9 @@ movie A must not update movie B. On account change/logout, clear rating state
 and ignore every response captured for the previous account.
 
 The rating UI and its tests do not exist in the current repository. This
-section is a Sprint 3 implementation target.
+section is committed Sprint 3 scope with implementation pending.
 
-## 4. Planned preference, recommendation, and reset UI states
+## 4. Committed preference, recommendation, and reset UI states
 
 - Preferences: initialise from the current account only. On successful save,
   accept the committed response, invalidate that account's recommendation
@@ -107,6 +108,20 @@ The current recommendation page is also a placeholder: it renders an empty
 state and does not call `/api/me/recommendations`. That implementation mismatch
 must be resolved by a separate feature task before claiming the Sprint 3 data
 state is delivered.
+
+Implementation handoff is explicit:
+
+- Shared cards, API client, and recommendation container integration belong to
+  [S3-T10 #112](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/112).
+- No-match errors, retry, and request-race states belong to
+  [S3-T11 #113](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/113).
+- Cold-start transitions after saving preferences belong to
+  [S3-T13 #115](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/115).
+- This UI-state explanation and the matching `docs/design.md` change must be
+  coordinated in the same reviewed change for
+  [S3-C05 #136](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/136).
+
+These assignments do not claim that any issue is complete or reviewed.
 
 ## 5. Account/cache/request invalidation
 
@@ -131,8 +146,9 @@ response completion can race.
 
 Current account isolation evidence is the `AuthProvider` ownership model and
 the `RequireAuth` subtree keyed by `user.id`. Movie-detail request cleanup is
-implemented today. Preference/rating/reset request invalidation remains a
-planned extension because those API clients do not yet exist.
+implemented today. Preference/rating/reset request invalidation is committed
+Sprint 3 behaviour with implementation pending because those API clients do
+not yet exist.
 
 ## 6. UI-driven architecture evidence
 
