@@ -4,7 +4,8 @@ For university students facing choice overload, this system turns a small set of
 genre preferences and optional ratings into transparent movie recommendations,
 rather than giving every viewer the same generic popularity list.
 
-- [M2 setup and clean-clone guide](docs/SETUP.md)
+- [Local setup and clean-clone guide](docs/SETUP.md)
+- [Required TMDb catalogue setup from Sprint 3](docs/tmdb-sprint3-runbook.md)
 
 ## Team and Sprint 1 roles
 
@@ -52,6 +53,11 @@ is green, a teammate who did not author the change approves the PR, the PR is me
 to `main`, no secret or database dump is committed, and traceability is updated when
 a route or screen changes. The full checklist is in
 [docs/definition-of-done.md](docs/definition-of-done.md).
+
+From Sprint 3, catalogue-dependent Story acceptance also requires a successful
+TMDb import into SQLite and verified manual provenance smoke for the demo/staging
+environment. M2 seed-only data is not accepted; automated tests remain synthetic
+and token-free. See the [runbook](docs/tmdb-sprint3-runbook.md).
 
 ## Setup
 
@@ -153,7 +159,12 @@ DATABASE_URL=sqlite:///./data/app.db
 TMDB_READ_ACCESS_TOKEN=
 ```
 
-`TMDB_READ_ACCESS_TOKEN` is only required for server-side TMDb import functionality.
+From Sprint 3, a valid `TMDB_READ_ACCESS_TOKEN` is required by anyone running
+the server-side import to prepare a development, staging or demo catalogue.
+Configure it privately in the root `.env` or server environment. Teammates
+using an already-imported backend and automated tests do not need a real token.
+The token must never enter a frontend/Vite variable. See the
+[required TMDb Sprint 3 runbook](docs/tmdb-sprint3-runbook.md).
 
 Do not commit:
 
@@ -265,9 +276,10 @@ Expected head:
 ```
 
 
-## Deterministic M2 Catalogue Bootstrap
+## Historical M2 Catalogue Bootstrap / Offline Test Support
 
-For the M2 walking skeleton, run this single command from the repository root:
+For historical M2 reproduction or explicitly labelled offline work in a
+separate database, run this command from the repository root:
 
 ```bash
 python -m app.cli.bootstrap_m2_catalogue
@@ -290,18 +302,19 @@ movie_genres=22
 
 Run the command a second time to verify idempotence: it reports the same active
 revision and row counts, without duplicate movies or movie/genre relations.
-This is the offline demo catalogue only; a future server-side TMDb importer is
-a separate operation and is never called by browser movie requests.
+This seed is not accepted as the Sprint 3 development/staging/demo catalogue.
+The command activates the seed revision; do not run it on the accepted Sprint 3
+database after a TMDb import. It remains useful for controlled tests/offline work.
 
-## Optional server-side TMDb catalogue import
+## Required server-side TMDb catalogue import — Sprint 3 onward
 
-The M2 bootstrap above is the reproducible demonstration path. It remains
-offline even when no TMDb credential is configured. An operator may separately
-replace the active catalogue with one bounded TMDb import only after the local
-database has been migrated and bootstrapped:
+TMDb is the required movie-catalogue source for development, staging and
+milestone demos from Sprint 3. After dependency/environment setup, create the
+configured SQLite parent directory and apply migrations, then import directly.
+Running the M2 bootstrap is not a prerequisite:
 
 ```bash
-python -m app.cli.bootstrap_m2_catalogue
+python -m alembic -c backend/alembic.ini upgrade head
 python -m app.cli.import_tmdb_catalogue
 ```
 
@@ -317,7 +330,26 @@ rate limit, timeout, invalid snapshot, or database failure leaves the prior
 active catalogue unchanged. Never commit, print, screenshot, or paste the
 actual access token.
 
-Verify this boundary without a credential or internet connection:
+The required Sprint 3 contract is tracked under [#128](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/128):
+missing-token errors must give safe setup guidance, and the setup must never
+silently substitute the M2 seed. A fresh environment is not ready for catalogue
+acceptance until import and provenance smoke succeed. Existing valid TMDb data
+remains usable if a later import fails; record the failed attempt honestly.
+
+Run the separate mandatory manual smoke in the
+[runbook](docs/tmdb-sprint3-runbook.md): record active revision/provider `tmdb`,
+movie source/source IDs, fetch/import timestamps, counts, candidate SHA and
+actual API results. The demo catalogue must support the committed flows,
+including at least ten distinct finite-popularity movies for the public popular
+list. This live smoke is outside CI; it is not evidence that planned Sprint 3
+routes or media features are already implemented.
+
+The browser reads movie data through the local backend/SQLite API. Backdrop,
+trailer and VN provider enrichment remain separate feature tasks; requiring
+TMDb catalogue import does not make those enhancements Sprint 3 commitments.
+
+Verify the automated boundary with synthetic provider responses, isolated test
+databases and no real credential or provider network request:
 
 ```bash
 python -m pytest backend/tests/test_tmdb_import.py backend/tests/test_m2_catalogue_bootstrap.py backend/tests/test_movies_api.py -v
@@ -471,7 +503,15 @@ The generated `frontend/dist/` directory should not be committed.
 
 ## Full Local Verification
 
-The following sequence reproduces the development environment from a clean clone.
+The following sequence reproduces the dependencies and offline checks from a
+clean clone. CI/unit/integration tests use synthetic fixtures and mock TMDb;
+do not configure a real token for those checks. Keep test databases separate
+from the accepted application database.
+
+For a Sprint 3 development/staging/demo environment, additionally configure
+your private token, run the required import after migrations and record the
+manual live smoke in the [runbook](docs/tmdb-sprint3-runbook.md). Passing the
+offline checks alone does not establish TMDb catalogue readiness.
 
 ### macOS/Linux
 
@@ -608,6 +648,10 @@ npm --prefix frontend run build
 If all commands pass, the local runtime matches the checks used by CI.
 
 To run the application after verification, use two terminals:
+
+From Sprint 3, first complete the required TMDb import and provenance smoke
+above. M2 seed-only operation is explicitly offline support and cannot be used
+as M3 acceptance evidence.
 
 **Terminal 1 — Backend**
 

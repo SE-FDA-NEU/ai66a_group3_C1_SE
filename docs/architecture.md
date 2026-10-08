@@ -20,8 +20,11 @@ The repository contains a FastAPI backend with these implemented areas:
 
 The backend uses the local SQLite catalogue selected by
 `catalogue_state.active_revision_id`. Movie and recommendation reads do not
-call TMDb. The optional server-side TMDb importer writes catalogue revisions
-outside browser requests.
+call TMDb. The server-side TMDb importer writes catalogue revisions outside
+browser requests. From Sprint 3 this import is required for development,
+staging and demo catalogue acceptance; it is verified under T29/C04 in the
+[runbook](tmdb-sprint3-runbook.md). M2 seed evidence remains historical/test
+support, while CI uses synthetic provider fixtures without a real token/network.
 
 Preferences, ratings, personalized recommendation ranking, and NLP are Sprint
 3 work. They are not implemented migrations or M2 runtime capabilities.
@@ -47,19 +50,22 @@ opaque `HttpOnly` session cookie and never stores a bearer token.
 
 PlantUML source: [architecture.puml](images/architecture.puml).
 
+This diagram preserves the historical M2 optional-import label; from Sprint 3
+the same importer is required catalogue preparation under the updated decision.
+
 The runtime boundaries are:
 
 1. Browser frontend.
 2. Backend API.
 3. SQLite database.
-4. Optional server-side TMDb importer.
+4. Server-side TMDb importer; required catalogue preparation from Sprint 3.
 
 | Component | Responsibility | Must not do |
 |---|---|---|
 | Browser frontend | Render auth, catalogue, and popular recommendation experiences; send JSON requests. | Receive TMDb credentials or issue provider calls. |
 | Backend API | Validate input, resolve the session account, read the active catalogue, and return stable DTOs/errors. | Trust a client-supplied `user_id`. |
 | SQLite database | Persist users, sessions, catalogue revisions, the active revision, movies, genres, and movie/genre links. | Select an account independently of the authenticated session. |
-| Optional TMDb importer | Fetch bounded provider data, validate it, and write one atomic catalogue revision. | Run in the browser or expose provider credentials. |
+| TMDb importer | Required Sprint 3 dev/staging/demo catalogue preparation: fetch bounded provider data, validate it and write one atomic revision. | Run in the browser, expose credentials or silently fall back to seed on failure. |
 
 ## 4. ERD and current migrations
 
