@@ -2,11 +2,24 @@
 
 This document describes the system as it exists on `main` at commit `4bfae7c` (checked on 2026-10-03). Every table and endpoint is marked as implemented or planned. Request and response shapes are in [api.md](api.md); the ownership and persistence contract is in [architecture.md](architecture.md).
 
+Sprint 3 decision update, 2026-10-06: TMDb is the required catalogue source for
+development, staging and demos. The existing importer is reused; operational
+readiness and verification are planned under
+[#128](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/128) and
+[#135](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/135).
+Historical M2 seed screenshots/test results below remain M2 evidence, not a
+claim that the Sprint 3 live import or acceptance has passed. See the tracked
+[TMDb Sprint 3 runbook](tmdb-sprint3-runbook.md).
+
 ## 1. Architecture
 
 ![C4 container diagram](images/architecture.png)
 
 PlantUML source: [images/architecture.puml](images/architecture.puml).
+
+The diagram is historical M2 evidence and its importer label reflects the old
+optional setup. The updated Sprint 3 source requirement is recorded in the
+component table and ADR-1 below; topology and runtime read boundaries are unchanged.
 
 The browser talks only to the backend API. The backend is the only component that reads or writes accounts and sessions. The TMDb importer is a separate command that never runs during a browser request, so movie pages read the local database and never call TMDb.
 
@@ -15,7 +28,7 @@ The browser talks only to the backend API. The backend is the only component tha
 | Browser frontend | React, TypeScript, Vite, React Router | Renders the public catalogue, movie detail, explanation, registration and sign-in pages, and the signed-in pages. Calls the backend through relative `/api` paths. |
 | Backend API | Python 3.12, FastAPI, Pydantic | Validates input, resolves the session cookie to an account, applies the business rules, and returns DTOs and error envelopes. |
 | SQLite database | SQLite, SQLAlchemy, Alembic | Stores accounts, sessions, and the movie catalogue. The backend turns on `PRAGMA foreign_keys` for every connection, so foreign keys are enforced. |
-| TMDb importer | Python command, httpx | Optional. Fetches genres and one page of popular movies, writes a new catalogue revision, and makes it active only after every write succeeds. |
+| TMDb importer | Python command, httpx | Required catalogue preparation for Sprint 3 dev/staging/demo. Fetches genres and one page of popular movies, writes a new revision, and activates it only after every write succeeds. |
 | TMDb API | External service | Source of movie and genre data for the importer only. |
 
 In development, Vite listens on port 5173 and proxies `/api` to the backend on `http://127.0.0.1:8000`, so the browser sees one origin. The backend does not serve the built frontend in M2, so the application runs as two processes. The session cookie is named `ams_session`; it is opaque, `HttpOnly` and `SameSite=Lax`.
@@ -28,7 +41,7 @@ Owners are the GitHub assignees of the Sprint 2 tasks.
 |---|---|---|
 | Catalogue storage and repository: `backend/app/db/models.py`, `backend/app/repositories/movies.py` | Stable internal movie IDs, the active-revision pointer, and the list and detail queries. | Nguyen Xuan Kiet, `@kietxuan` (#47) |
 | M2 seed and bootstrap: `backend/app/catalogue/m2_seed.py`, `backend/app/cli/bootstrap_m2_catalogue.py` | One idempotent command that migrates the database and loads the 12-movie dataset. | `@kietxuan` (#74) |
-| TMDb importer: `backend/app/integrations/tmdb.py`, `backend/app/catalogue/tmdb_import.py`, `backend/app/cli/import_tmdb_catalogue.py` | Optional server-side import into a new catalogue revision. | `@kietxuan` (#48) |
+| TMDb importer: `backend/app/integrations/tmdb.py`, `backend/app/catalogue/tmdb_import.py`, `backend/app/cli/import_tmdb_catalogue.py` | Server-side atomic catalogue import; required from Sprint 3. | `@kietxuan` (#48); S3 T29 setup, `@hoang3003` independent review |
 | Account storage and password hashing: `backend/app/repositories/users.py`, `backend/app/security/passwords.py` | Users table access, email normalisation, Argon2id hashing. | Nguyen Tuan Anh, `@NguyenTuanAnh0608` (#49) |
 | Server sessions: `backend/app/security/sessions.py` | Creates, resolves and revokes sessions. | `@NguyenTuanAnh0608` (#53) |
 | Registration endpoint: `backend/app/schemas/auth.py`, `POST /api/auth/register` | Validates the email and password and creates the account. | Vu Quoc Huy, `@vu-huzy` (#52) |
@@ -131,9 +144,13 @@ Error codes returned by the running backend:
 
 The route is the browser page `/`. It calls `GET /api/movies?limit=10`, which reads `catalog_movies` (with `genres` and `movie_genres`) for the revision named in `catalogue_state`. The page shows the ten movies the database returns, and nothing is hard-coded in the frontend.
 
-### Bootstrap
+### Historical M2 bootstrap
 
 From the repository root, with the virtual environment active and `.env` copied from `.env.example`:
+
+This historical seed path is retained for M2 reproduction/test/offline support
+in a separate database. Sprint 3 requires migration followed by TMDb import and
+manual provenance smoke; do not activate the seed on its accepted database.
 
 ```bash
 python -m app.cli.bootstrap_m2_catalogue
@@ -203,9 +220,9 @@ The two skipped backend tests are placeholders for criteria that are not built y
 
 ### ADR-1: Where the running application reads movie data from
 
-Status: accepted. Sources: the movie-data Spike (#16), tasks #48 and #74.
+Status: accepted runtime boundary; catalogue-source decision updated for Sprint 3 on 2026-10-06. Sources: the movie-data Spike (#16), tasks #48/#74, and planned S3 T29/C04 readiness checks.
 
-Context. TMDb needs a private access token. The M2 setup has to run from a clean clone with no credential and no network access, and its tests have to give the same result on every run.
+Context. M2 required a token-free deterministic walking skeleton. From Sprint 3 the team requires real TMDb catalogue data in development, staging and demos, while automated tests remain deterministic and credential-free.
 
 Options considered:
 
@@ -213,13 +230,13 @@ Options considered:
 2. The backend calls TMDb on each catalogue request. Page content and test results would depend on a live service whose popularity values change between runs.
 3. The backend reads only the local database, and a separate command fills it, either from a fixed local dataset or from TMDb.
 
-Decision. Option 3. The M2 catalogue comes from the fixed dataset `local-m2-seed-v1` (12 movies). The TMDb importer is optional and server-side. It writes a new revision and switches `catalogue_state` to it only after every write succeeds, so a failed import leaves the previous catalogue active (`test_provider_failure_keeps_previous_active_catalogue`).
+Decision. Option 3 remains the runtime boundary. From Sprint 3, the server-side importer is mandatory catalogue preparation: configure a private Read Access Token, migrate a fresh database and import TMDb before dev/staging/demo acceptance. Active revision provider and movie source must be `tmdb`, with source IDs, counts and fetch/import timestamps verified by a separate manual smoke. The importer activates a revision only after every write succeeds; failed imports preserve the previous valid catalogue and do not fall back to seed. Required setup/failure checks are completed under T29/C04.
 
-Rationale. A reviewer can reproduce the same 12 movies and the same order without a token. The token stays on the server. The seed is idempotent: a second run reports the same revision and counts.
+Rationale. TMDb supplies the application catalogue, while local reads keep user requests independent of provider availability. Synthetic provider fixtures, boundary mocks and isolated test databases keep automated AC tests deterministic without live tokens/network. Credentials remain server-side.
 
-Consequence. The M2 catalogue holds fixed local titles, not TMDb data.
+Consequence. The M2 fixed dataset is only historical/test/labelled offline support, not Sprint 3 acceptance data. A missing token or failed import leaves a new demo environment unready. On an existing environment the valid previous snapshot remains readable; the failed attempt cannot be reported as successful readiness evidence. `/api/genres`, recommendations, public popular and details continue to read SQLite; source provenance stays in operator evidence, not new public secret/source-ID DTO fields. Media T26–T28 remain stretch and do not block unchanged S03 criteria.
 
-What would change the decision. A requirement for data fresher than a manual import provides. Even then the importer would run before the demo, and the runtime read path would stay the same.
+Verification. T29 and C04 must link successful fresh-database import, credential/error guidance, rollback/idempotence checks and final-candidate live smoke outside CI. Existing M2 tests/evidence do not imply these checks have passed. The [runbook](tmdb-sprint3-runbook.md) contains the required commands and provenance checklist.
 
 ### ADR-2: How the server recognises a signed-in account
 
@@ -244,13 +261,24 @@ What would change the decision. A client that is not a browser, or a frontend se
 
 ### Change 1: The M2 catalogue comes from a local dataset, not from TMDb
 
+Historical M2 decision; superseded for Sprint 3 dev/staging/demo by ADR-1 above.
+
 Before. The M1 Spike (#16) chose TMDb as the catalogue provider and kept only a small local fixture for tests.
 
 After. The M2 backend reads a fixed 12-movie dataset loaded by `python -m app.cli.bootstrap_m2_catalogue`. The TMDb importer was merged separately (task #48, PR #90) as an optional command.
 
 Reason. The M2 requirement is a clean clone that runs without external credentials. Task #74 forbids a TMDb token or network request in the seed.
 
-Impact. The ten cards on `/` show fixed local titles. The importer is tested with mocked provider responses, and this repository records no importer run against the live TMDb service.
+Impact in M2. The ten cards on `/` used fixed local titles and the importer was tested with mocked provider responses. These historical results do not establish Sprint 3 live-import readiness.
+
+### Change 1b: TMDb catalogue is mandatory from Sprint 3
+
+Decision date: 2026-10-06. Development/staging/demo catalogue preparation now
+requires a configured server token, successful bounded import and verified TMDb
+provenance. CI remains synthetic, isolated and token-free. T29 owns the required
+setup foundation; C04 independently verifies clean clone and final-candidate
+smoke. Account data and runtime SQLite reads retain their existing boundaries;
+original Story criteria/points and separate media commitments are unchanged.
 
 ### Change 2: Sessions are stored as a digest with an expiry
 

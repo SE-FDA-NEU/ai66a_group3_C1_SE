@@ -16,6 +16,16 @@ Story. Record the planned closure sprint and review one-sprint readiness at Plan
 | 6 | Merged into `main` | GitHub |
 | 7 | No secrets, `.env`, or database dumps in the diff | CI |
 | 8 | `docs/traceability.md` updated if a screen or route changed | Reviewer |
+| 9 | From Sprint 3, catalogue-dependent dev/staging/demo acceptance has successful TMDb import and active provider/source/IDs/counts/timestamps verified by manual smoke; automated AC tests remain synthetic/token-free | T29 owner, C04 and independent reviewer |
+
+Criterion 9 records the 2026-10-06 Sprint 3 source decision. Implementation and
+verification are assigned to planned T29/C04. Follow the [runbook](tmdb-sprint3-runbook.md).
+M2 seed is historical/test/labelled offline support; missing-token/import failure
+must not silently activate it. A failed attempted import is not Pass; an existing
+valid snapshot may keep serving runtime reads and must be identified in new
+acceptance evidence. Media enhancements keep their separate admission gates and
+do not change original Story AC/points. This document does not claim those checks
+have already passed.
 
 ## What Done is not
 

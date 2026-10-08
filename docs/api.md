@@ -201,6 +201,17 @@ cannot terminate the current session.
 The following endpoints are planned only. No current backend route or
 migration provides them, so they are not M2 completion evidence.
 
+Sprint 3 data-source decision (2026-10-06): development/staging/demo catalogue
+must be imported from TMDb into SQLite and verified under T29/C04 in the
+[runbook](tmdb-sprint3-runbook.md). This applies to genres, recommendations,
+popular and details. Runtime endpoints read the local active catalogue and
+never call TMDb API; account preferences are stored by this application.
+Public IDs/DTOs remain unchanged. Operator provenance uses database source IDs
+and timestamps, not tokens or new public source-ID fields. Synthetic fixtures
+and provider-boundary mocks remain the automated-test path; mandatory live
+import/provenance smoke runs separately outside CI. This policy does not claim
+that the planned preference/personalised/popular routes are implemented.
+
 ### `GET /api/genres`
 
 Returns the active catalogue's available genres:

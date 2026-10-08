@@ -1,6 +1,10 @@
 # Setup
 
-These steps take a fresh clone to a running application with ten movie cards on the home page. They need no TMDb token and no network access beyond downloading packages. The design behind them is in [design.md](design.md).
+From Sprint 3 these steps prepare the application with a required TMDb-imported
+catalogue. Running the importer needs a valid private Read Access Token and
+network access to TMDb. Automated checks use synthetic fixtures/mocks and no
+live token/provider network. The decision is in [design.md](design.md); manual
+smoke/provenance and verification ownership are in the [runbook](tmdb-sprint3-runbook.md).
 
 ## Prerequisites
 
@@ -22,11 +26,20 @@ DATABASE_URL=sqlite:///./data/app.db
 TMDB_READ_ACCESS_TOKEN=
 ```
 
-Copy it to `.env` and leave the token empty. `TMDB_READ_ACCESS_TOKEN` is read only by the optional TMDb importer. `.env` is ignored by Git and must not be committed.
+On a fresh clone copy it to the root `.env` and privately enter your valid
+`TMDB_READ_ACCESS_TOKEN` before running the importer. Do not overwrite an existing
+configured `.env`. Only the server importer reads the token; never put it in
+frontend variables, logs, screenshots, Git or group messages. Tests use a blank
+token and isolated test configuration. A teammate consuming an already-imported
+backend does not need a token. `.env` is ignored by Git.
 
 ## Steps
 
 Run every command from the repository root.
+
+After the copy step in either platform sequence below, edit the local `.env`
+to configure the token before the final import command. The commands create
+and migrate the database directly; the M2 seed is not a prerequisite.
 
 ### macOS and Linux
 
@@ -45,7 +58,8 @@ python -m pip install -e "./backend[dev]" --no-deps
 
 npm --prefix frontend ci
 
-python -m app.cli.bootstrap_m2_catalogue
+python -m alembic -c backend/alembic.ini upgrade head
+python -m app.cli.import_tmdb_catalogue
 ```
 
 ### Windows PowerShell
@@ -65,10 +79,41 @@ python -m pip install -e "./backend[dev]" --no-deps
 
 npm --prefix frontend ci
 
+python -m alembic -c backend/alembic.ini upgrade head
+python -m app.cli.import_tmdb_catalogue
+```
+
+## Required import result and smoke
+
+A successful import prints this shape, with actual counts depending on the
+bounded TMDb snapshot:
+
+```text
+TMDb catalogue import complete
+active_revision=<opaque UUID>
+inserted=<count>
+updated=<count>
+rejected=<count>
+```
+
+Before accepting the environment, verify provider/source=tmdb, source IDs,
+fetch/import timestamps and movie/genre/finite-popularity counts using the
+[manual smoke](tmdb-sprint3-runbook.md#3-mandatory-manual-live-smoke-and-provenance).
+The catalogue must support the committed flows, including ten distinct
+finite-popularity movies for #31. Live smoke is outside CI. Missing-token or
+failed import exits nonzero and preserves any previous valid snapshot; it
+must not fall back to seed. T29 owns any missing guidance/checks.
+
+## Historical M2 seed / offline support
+
+Only for M2 reproduction or labelled offline/test work, in a separate database:
+
+```text
 python -m app.cli.bootstrap_m2_catalogue
 ```
 
-## Expected seed count
+Do not run this seed command on the accepted Sprint 3 database: it activates
+the seed revision. It cannot supply Sprint 3 catalogue acceptance evidence.
 
 The bootstrap command applies the migrations and loads the fixed local catalogue. It prints:
 
@@ -106,7 +151,12 @@ Open `http://127.0.0.1:8000/health`. The response is:
 {"status":"ok","database":"connected","migrationVersion":"8c1e2f4a7b90"}
 ```
 
-Open `http://localhost:5173/`. The page shows the heading "Find your next movie" and ten movie cards, starting with Northstar Protocol (2024) and ending with Orbit of Us (2020). Each card has a "View details" link. The list matches the screenshot in [design.md](design.md#4-walking-skeleton).
+Open `http://localhost:5173/`. The existing home page reads its cards from the
+imported SQLite catalogue, and each valid card has a "View details" link. Live
+titles/popularity can change. The Northstar Protocol/Orbit of Us screenshot in
+[design.md](design.md#4-walking-skeleton) is historical M2 seed evidence, not
+the expected Sprint 3 TMDb catalogue. New Sprint 3 routes still require their
+own implementation and acceptance evidence.
 
 ## Verify
 
@@ -120,19 +170,36 @@ npm --prefix frontend run lint
 npm --prefix frontend run build
 ```
 
-Expected on commit `4bfae7c`: 100 backend tests passed and 2 skipped, Ruff reports "All checks passed!", and 41 frontend tests passed across 5 files. Lint and build exit with code 0. Run the bootstrap command first, because `test_health` reads the migration table of the configured database.
+Historical results on commit `4bfae7c`: 100 backend tests passed and 2 skipped,
+and 41 frontend tests passed across 5 files. These are not current-candidate
+results. For automated verification use a separate test database with migrations
+applied (`test_health` reads its migration table), a blank token and synthetic
+provider fixtures/mocks. No live import is part of CI; manual live smoke remains
+required separately for dev/staging/demo acceptance.
 
 ## Troubleshooting
 
 ### `/health` returns 503, or `test_health` fails with 503
 
-The database has no migration table, so the migrations have not been applied. The response is `503` with the code `SERVICE_UNAVAILABLE`. Run the bootstrap command from the steps above, or apply the migrations alone:
+The database has no migration table, so the migrations have not been applied.
+The response is `503` with the code `SERVICE_UNAVAILABLE`. Apply migrations:
 
 ```bash
 python -m alembic -c backend/alembic.ini upgrade head
 ```
 
 Then open `/health` again. `migrationVersion` should be `8c1e2f4a7b90`.
+
+This is the current M2 head; Sprint 3 migrations may advance it. Verify the
+actual current head. A healthy database alone does not prove catalogue readiness;
+dev/staging/demo still needs the successful TMDb import and provenance smoke.
+
+### Missing token or failed TMDb import
+
+Configure `TMDB_READ_ACCESS_TOKEN` privately in the root `.env` or server
+environment and retry the bounded import. Record authentication/network/provider
+failures as failures, keep existing valid data, and follow the runbook. Do not
+run the seed as a workaround for Sprint 3 acceptance.
 
 ### `No module named 'app'` when running the bootstrap command
 
