@@ -1,10 +1,12 @@
-# M2 HTTP API contract
+# Sprint 3 HTTP API contract
 
-Contract revision: `M2-CURRENT`.
+Contract revision: `S3-DRAFT`, reconciled with the current M2 runtime on
+2026-10-08.
 
-This document inventories the implemented M2 HTTP boundary and clearly
-separates Sprint 3 targets from runtime evidence. A planned endpoint is not an
-availability claim.
+This document inventories the implemented M2 HTTP boundary and defines the
+Sprint 3 target contracts needed by the next implementation tasks. Every route
+is labelled `Implemented in M2` or `Planned for Sprint 3`; a planned contract
+is not an availability or test-evidence claim.
 
 Architecture and persistence rules are in
 [architecture.md](architecture.md).
@@ -24,8 +26,14 @@ Architecture and persistence rules are in
 - Browser `POST /api/auth/login` and `POST /api/auth/logout` requests must pass
   the same-origin Fetch Metadata/`Origin` check. Cross-origin and same-site
   browser writes return `403 ORIGIN_NOT_ALLOWED` before session state changes.
+- Planned Sprint 3 browser writes (`PUT /api/me/preferences`,
+  `PUT /api/me/ratings/{movieId}`, and `POST /api/me/profile/reset`) must reuse
+  that protection. The current middleware covers login/logout only, so this is
+  an implementation requirement, not current runtime behaviour.
 - Protected endpoints derive the account only from the authenticated session.
-  A client-supplied `user_id` cannot select an account.
+  A client-supplied `user_id`, account ID, email, username, or owner field
+  cannot select or change the target account. Such fields are not part of a
+  valid DTO and must never redirect a read or mutation to another account.
 - Passwords, hashes, session digests, cookie values, and TMDb credentials never
   appear in a response.
 
@@ -63,12 +71,19 @@ not an availability claim.
 | S13 | `POST` | `/api/auth/logout` | Cookie optional; idempotent same-origin write | None | `204`, session invalidated and cookie cleared | `403 ORIGIN_NOT_ALLOWED`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 | S13 | `GET` | `/api/auth/me` | Authenticated | None | `200 AuthResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 | S02, S04 | `GET` | `/api/me/recommendations?limit=10` | Authenticated | Optional integer `limit`, 1-10 | `200 RecommendationResponse` with popular/cold-start results | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE` | `Implemented in M2` |
-| S04 | `GET` | `/api/movies?limit=10` | Public | Optional integer `limit`, 1-10, default 10 | `200 MovieListResponse` | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
+| S04 | `GET` | `/api/movies?limit=10` | Public | Optional integer `limit`, 1-10, default 10 | `200 MovieListResponse`, popularity ordered | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2`; this is the current public popular-movie route |
 | S03 | `GET` | `/api/movies/{movieId}` | Public | Opaque `movieId` | `200 MovieDetailResponse` | `404 MOVIE_NOT_FOUND`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
+| S01 | `GET` | `/api/genres` | Authenticated | None | `200 GenreListResponse` | `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Planned for Sprint 3` |
+| S01 | `GET` | `/api/me/preferences` | Authenticated | None | `200 PreferenceResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Planned for Sprint 3` |
+| S01 | `PUT` | `/api/me/preferences` | Authenticated, same-origin write | `PreferenceRequest` | `200 PreferenceResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 GENRE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Planned for Sprint 3` |
+| S05a | `GET` | `/api/me/ratings/{movieId}` | Authenticated | Opaque `movieId` | `200 RatingResponse` | `401 AUTHENTICATION_REQUIRED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Planned for Sprint 3` |
+| S05a | `PUT` | `/api/me/ratings/{movieId}` | Authenticated, same-origin write | `RatingRequest` | `200 RatingResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Planned for Sprint 3` |
+| S11 | `POST` | `/api/me/profile/reset` | Authenticated, same-origin write | `ProfileResetRequest` | `200 ProfileResetResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `503 SERVICE_UNAVAILABLE` | `Planned Sprint 3 backend contract only` |
 
-Preferences, ratings, personalized ranking, genre filtering, similar movies,
-search, and profile reset are Sprint 3 targets. They are not implemented in
-the current router or migrations.
+The current repository has no preferences, ratings, or reset route, model,
+migration, repository, or executable test. Personalised recommendations are
+also not implemented. Genre filtering, similar movies, and search remain
+outside this contract update.
 
 ## 3. Shared DTOs
 
@@ -111,6 +126,28 @@ voteCount: number | null
 
 The public movie `id` is the stable internal ID. A TMDb source ID is not part
 of a public DTO.
+
+### Sprint 3 recommendation and account DTOs
+
+`RecommendationMovieDto` keeps every `MovieSummaryDto` field and adds:
+
+```text
+reason:
+  matchedGenres: GenreDto[]
+```
+
+For `mode="personalised"`, `matchedGenres` is the non-empty intersection of
+that movie's canonical genres and the current account's saved genres. For a
+popular result or popular no-match alternative it is an empty list. Provider
+IDs and TMDb credentials are never included.
+
+`RatingResponse` uses an opaque movie ID and represents unrated with JSON
+`null`, never `0`:
+
+```text
+movieId: string
+rating: 1 | 2 | 3 | 4 | 5 | null
+```
 
 ## 4. S12 registration
 
@@ -210,11 +247,16 @@ Public IDs/DTOs remain unchanged. Operator provenance uses database source IDs
 and timestamps, not tokens or new public source-ID fields. Synthetic fixtures
 and provider-boundary mocks remain the automated-test path; mandatory live
 import/provenance smoke runs separately outside CI. This policy does not claim
-that the planned preference/personalised/popular routes are implemented.
+that the planned preference or personalised-recommendation behaviour is
+implemented; the public popularity-ordered `/api/movies` route already exists.
+
+All three routes require a valid, unexpired, unrevoked session. The account is
+resolved from `ams_session`; no request contains an account identity. Genres,
+preferences, and later recommendation requests read local SQLite only.
 
 ### `GET /api/genres`
 
-Returns the active catalogue's available genres:
+Returns the active catalogue's available canonical genres:
 
 ```json
 {
@@ -226,6 +268,10 @@ Returns the active catalogue's available genres:
   }
 }
 ```
+
+A missing session returns `401 AUTHENTICATION_REQUIRED`; no active catalogue
+returns `503 CATALOGUE_UNAVAILABLE`; a database failure returns
+`503 SERVICE_UNAVAILABLE`.
 
 ### `GET /api/me/preferences`
 
@@ -252,20 +298,24 @@ Request:
 }
 ```
 
-The list must contain 1-5 distinct, existing genre IDs. The server replaces
-only the authenticated account's preference rows in one transaction and
-returns the `PreferenceResponse` above.
+The list must contain 1-5 distinct, existing canonical genre IDs. The server
+replaces only the authenticated account's preference rows in one transaction
+and returns the `PreferenceResponse` above only after commit. An invalid or
+failed replacement leaves the previously committed selection unchanged.
 
 | Condition | Status/code | Public message |
 |---|---|---|
-| Empty, duplicate, or more than five IDs | `400 INVALID_GENRE_SELECTION` | `Select 1 to 5 distinct genres` |
+| Empty, duplicate, non-integer, or more than five IDs; missing/malformed body | `400 VALIDATION_ERROR` | `Please correct the highlighted fields` |
 | Any genre does not exist | `404 GENRE_NOT_FOUND` | `Genre not found` |
 | Missing or invalid session | `401 AUTHENTICATION_REQUIRED` | `Authentication required` |
+| Browser write fails the existing same-origin policy | `403 ORIGIN_NOT_ALLOWED` | `Request origin is not allowed` |
 | Transaction unavailable | `503 SERVICE_UNAVAILABLE` | `Service is temporarily unavailable` |
 
-No request or response accepts a `userId` field.
+No request or response accepts a `userId` field. After a successful save the
+client invalidates the current account's preference and recommendation state;
+it must not reuse another account's cached response.
 
-## 7. M2 popular/cold-start recommendations
+## 7. Recommendation contract: current M2 and Sprint 3 target
 
 ### `GET /api/me/recommendations?limit=10`
 
@@ -274,7 +324,7 @@ resolved only from the authenticated session.
 
 The route is implemented, but it currently returns the shared popular
 catalogue ordering for every authenticated account. It does not read saved
-preferences or ratings and is not personalized.
+preferences or ratings and is not personalised.
 
 Response shape:
 
@@ -311,6 +361,60 @@ The response always uses `mode=popular`, `personalised=false`, and
 
 Popular alternatives sort by finite popularity descending, null popularity
 last, title A-Z for ties, and internal movie ID as the final deterministic tie.
+
+### Planned Sprint 3 personalised response
+
+Sprint 3 keeps `data.movies`, `mode`, `personalised`, and `noMatch` and adds the
+recommendation explanation field `reason.matchedGenres` to each result. It
+does not rename or move those fields.
+
+```json
+{
+  "data": {
+    "movies": [
+      {
+        "id": "3ef5aa47-3ec6-41c8-9337-f5059d257988",
+        "title": "Example Movie",
+        "releaseYear": 2025,
+        "genres": [{ "id": 28, "name": "Action" }],
+        "popularityScore": 90.0,
+        "reason": {
+          "matchedGenres": [{ "id": 28, "name": "Action" }]
+        }
+      }
+    ],
+    "mode": "personalised",
+    "personalised": true,
+    "noMatch": false
+  },
+  "meta": {
+    "count": 1,
+    "limit": 10,
+    "catalogueRevision": "revision-example"
+  }
+}
+```
+
+The three valid state combinations are:
+
+| Account/catalogue state | `mode` | `personalised` | `noMatch` | `reason.matchedGenres` |
+|---|---|---:|---:|---|
+| No saved preferences | `popular` | `false` | `false` | Empty for every popular movie |
+| Preferences and at least one match | `personalised` | `true` | `false` | Non-empty intersection for every movie |
+| Preferences but zero matches | `popular` | `false` | `true` | Empty for every popular alternative |
+
+Sprint 3 ranking uses only the current account's saved genres and local
+`popularityScore`: candidates must share at least one selected genre, then use
+the existing popularity-descending, title-ascending, ID-ascending order. The
+response contains at most ten distinct opaque movie IDs. Rating-adjusted
+ranking is explicitly outside Sprint 3; it belongs to Story #22, S05b, and is
+planned Sprint 4 behaviour. Saving a rating in Sprint 3 must not change this
+ordering.
+
+Missing, expired, or revoked sessions return `401 AUTHENTICATION_REQUIRED`
+before a private result is returned. Catalogue/database failures use the same
+`503 CATALOGUE_UNAVAILABLE`/`503 SERVICE_UNAVAILABLE` distinction as the M2
+route. The route never contacts TMDb during a request.
 
 ## 8. S03/S04 movie catalogue
 
@@ -394,14 +498,133 @@ Success (`200`):
 
 A missing year or overview remains JSON `null`; the UI displays
 `Information unavailable` for that field. Storage failure is never translated
-to a false 404.
+to a false 404. Movie detail remains public; a guest opening it must not cause
+the frontend to call a private rating endpoint.
 
-## 9. Error code registry
+## 9. Planned Sprint 3 rating contract
+
+These two S05a routes are frozen target contracts, not implemented routes.
+Both use the current authenticated session as the only account identity and
+address a movie by its opaque active-catalogue ID.
+
+### `GET /api/me/ratings/{movieId}`
+
+The request has no body and returns only the committed rating owned by the
+current session account. Unrated is represented by `null`, not `0`.
+
+Success (`200`, rated):
+
+```json
+{
+  "data": {
+    "movieId": "3ef5aa47-3ec6-41c8-9337-f5059d257988",
+    "rating": 4
+  }
+}
+```
+
+Success (`200`, unrated):
+
+```json
+{
+  "data": {
+    "movieId": "3ef5aa47-3ec6-41c8-9337-f5059d257988",
+    "rating": null
+  }
+}
+```
+
+### `PUT /api/me/ratings/{movieId}`
+
+Exact request:
+
+```json
+{
+  "rating": 4
+}
+```
+
+Exact success (`200`, only after commit):
+
+```json
+{
+  "data": {
+    "movieId": "3ef5aa47-3ec6-41c8-9337-f5059d257988",
+    "rating": 4
+  }
+}
+```
+
+`rating` is a strict JSON integer and only `1`, `2`, `3`, `4`, or `5` is
+valid. The server must reject `0`, `6`, negatives, fractions such as `3.5`,
+strings including `"5"`, booleans, `null`, a missing field, extra identity
+fields, malformed JSON, and any malformed payload with
+`400 VALIDATION_ERROR` / `Please correct the highlighted fields`. Rejection
+does not replace a previously committed rating.
+
+| Condition | Status/code | Public message and persistence rule |
+|---|---|---|
+| Missing, expired, revoked, or invalid session | `401 AUTHENTICATION_REQUIRED` | `Authentication required`; no private read/write |
+| Browser write fails the existing same-origin policy | `403 ORIGIN_NOT_ALLOWED` | `Request origin is not allowed`; no mutation |
+| Opaque movie ID is not in the active catalogue | `404 MOVIE_NOT_FOUND` | `Movie not found`; do not create a movie or orphan rating |
+| Invalid JSON/body/rating value | `400 VALIDATION_ERROR` | `Please correct the highlighted fields`; preserve the prior committed rating |
+| Read or commit fails | `503 SERVICE_UNAVAILABLE` | `Service is temporarily unavailable`; rollback and preserve the prior committed rating |
+
+Neither route accepts `userId`, account ID, email, username, or owner ID. A
+forged identity field cannot read, update, or retarget another account. The
+database target is one row per `(user_id, movie_id)` with a `1..5` check; the
+storage contract is in [architecture.md](architecture.md).
+
+## 10. Planned Sprint 3 profile-reset backend contract
+
+### `POST /api/me/profile/reset`
+
+This route freezes only the authenticated reset backend contract for Sprint 3;
+it does not claim completion of all Story #33 / S11 profile UI behaviour.
+
+Exact confirmation request:
+
+```json
+{
+  "confirm": true
+}
+```
+
+Exact success (`200`, only after the transaction commits):
+
+```json
+{
+  "data": {
+    "reset": true
+  }
+}
+```
+
+The server deletes the current account's preference rows and rating rows in
+one transaction. It does not delete the user, session, catalogue, movies,
+genres, another account's rows, or any provider data. The current session is
+preserved. If either delete or the commit fails, the whole transaction rolls
+back and returns `503 SERVICE_UNAVAILABLE`; partial reset and false success are
+forbidden.
+
+Missing `confirm`, `false`, non-boolean values, extra identity fields,
+malformed JSON, and malformed payloads return `400 VALIDATION_ERROR` /
+`Please correct the highlighted fields` with no mutation. Missing, expired,
+or revoked sessions return `401 AUTHENTICATION_REQUIRED`; a rejected browser
+origin returns `403 ORIGIN_NOT_ALLOWED`. The account always comes from
+`ams_session`, never from request data.
+
+After success, the next recommendation request observes no saved preferences
+and therefore returns the popular cold-start state (`mode="popular"`,
+`personalised=false`, `noMatch=false`). The client invalidates current-account
+preferences, ratings, recommendation results, in-flight private requests, and
+profile state only after the reset success response.
+
+## 11. Error code registry
 
 | Code | HTTP status | Meaning |
 |---|---:|---|
 | `VALIDATION_ERROR` | 400 | Request fields or query values are invalid. |
-| `INVALID_GENRE_SELECTION` | 400 | The preference set is not 1-5 distinct genres. |
 | `AUTHENTICATION_REQUIRED` | 401 | A protected route has no valid session. |
 | `INVALID_CREDENTIALS` | 401 | Login credentials are invalid without revealing which field failed. |
 | `ORIGIN_NOT_ALLOWED` | 403 | A browser session write failed the same-origin check. |
@@ -411,8 +634,18 @@ to a false 404.
 | `SERVICE_UNAVAILABLE` | 503 | Required persistence (account or catalogue) is unavailable. |
 | `CATALOGUE_UNAVAILABLE` | 503 | No active catalogue is readable. |
 
-## 10. Scope boundary
+`GENRE_NOT_FOUND` is a planned preference-contract code and is not returned by
+the current router. All other codes in this table are present in the M2 backend
+or existing API contract. Sprint 3 rating and reset validation deliberately
+reuse `VALIDATION_ERROR`; this document does not invent rating/reset-specific
+codes.
 
-This contract contains no implemented preferences, ratings, personalized
-recommendation, or NLP endpoint. Those are Planned Sprint 3 work and are not
-M2 completion criteria.
+## 12. Scope boundary
+
+The repository still contains no implemented preferences, ratings, profile
+reset, personalised recommendation, or NLP endpoint. Sections 6, 7 (planned
+response), 9, and 10 define implementation targets only. Automated tests must
+use synthetic SQLite fixtures or provider mocks and run offline without a
+TMDb token. Live TMDb catalogue import is a separate server-side
+development/staging/M3 acceptance step; the token must never appear in DTOs,
+frontend assets, logs, fixtures, or documentation evidence.
