@@ -236,3 +236,211 @@ def test_movie_detail_database_failure_is_service_unavailable_not_not_found(
 
     assert response.status_code == 503
     assert response.json()["error"]["code"] == "SERVICE_UNAVAILABLE"
+
+def test_popular_movies_returns_top_ten_using_shared_popularity_order(
+    client: tuple[TestClient, Session],
+) -> None:
+    http, database_session = client
+
+    revision = create_catalogue_revision(
+        database_session,
+        provider="seed",
+    )
+
+    upsert_catalogue_movie(
+        database_session,
+        catalogue_revision_id=revision.id,
+        source="seed",
+        source_id="high",
+        title="Alpha",
+        popularity_score=95.0,
+    )
+
+    upsert_catalogue_movie(
+        database_session,
+        catalogue_revision_id=revision.id,
+        source="seed",
+        source_id="tie-b",
+        title="Beta",
+        popularity_score=80.0,
+    )
+
+    upsert_catalogue_movie(
+        database_session,
+        catalogue_revision_id=revision.id,
+        source="seed",
+        source_id="tie-c",
+        title="Charlie",
+        popularity_score=80.0,
+    )
+
+    for index in range(9):
+        upsert_catalogue_movie(
+            database_session,
+            catalogue_revision_id=revision.id,
+            source="seed",
+            source_id=f"extra-{index}",
+            title=f"Extra {index:02d}",
+            popularity_score=float(70 - index),
+        )
+
+    activate_catalogue_revision(
+        database_session,
+        revision_id=revision.id,
+    )
+    database_session.commit()
+
+    response = http.get("/api/movies/popular")
+
+    assert response.status_code == 200
+
+    body = response.json()
+    movies = body["data"]["movies"]
+
+    assert len(movies) == 10
+    assert movies[0]["title"] == "Alpha"
+    assert movies[0]["popularityScore"] == 95.0
+    assert movies[1]["title"] == "Beta"
+    assert movies[1]["popularityScore"] == 80.0
+    assert movies[2]["title"] == "Charlie"
+    assert movies[2]["popularityScore"] == 80.0
+
+    assert body["meta"]["count"] == 10
+    assert body["meta"]["limit"] == 10
+
+def test_popular_movies_excludes_missing_popularity(
+    client: tuple[TestClient, Session],
+) -> None:
+    http, database_session = client
+
+    revision = create_catalogue_revision(
+        database_session,
+        provider="seed",
+    )
+
+    upsert_catalogue_movie(
+        database_session,
+        catalogue_revision_id=revision.id,
+        source="seed",
+        source_id="usable",
+        title="Usable Movie",
+        popularity_score=80.0,
+    )
+
+    upsert_catalogue_movie(
+        database_session,
+        catalogue_revision_id=revision.id,
+        source="seed",
+        source_id="missing",
+        title="Missing Popularity",
+        popularity_score=None,
+    )
+
+    activate_catalogue_revision(
+        database_session,
+        revision_id=revision.id,
+    )
+    database_session.commit()
+
+    response = http.get("/api/movies/popular")
+
+    assert response.status_code == 200
+
+    movies = response.json()["data"]["movies"]
+
+    assert len(movies) == 1
+    assert movies[0]["title"] == "Usable Movie"
+    assert movies[0]["popularityScore"] == 80.0
+
+def test_popular_movies_with_no_usable_popularity_returns_empty_data(
+    client: tuple[TestClient, Session],
+) -> None:
+    http, database_session = client
+
+    revision = create_catalogue_revision(
+        database_session,
+        provider="seed",
+    )
+
+    for index in range(3):
+        upsert_catalogue_movie(
+            database_session,
+            catalogue_revision_id=revision.id,
+            source="seed",
+            source_id=f"missing-{index}",
+            title=f"Movie {index}",
+            popularity_score=None,
+        )
+
+    activate_catalogue_revision(
+        database_session,
+        revision_id=revision.id,
+    )
+    database_session.commit()
+
+    response = http.get("/api/movies/popular")
+
+    assert response.status_code == 200
+
+    body = response.json()
+
+    assert body["data"]["movies"] == []
+    assert body["meta"]["count"] == 0
+    assert body["meta"]["limit"] == 10
+
+def test_popular_movies_database_failure_returns_service_unavailable(
+    client: tuple[TestClient, Session],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    http, database_session = client
+
+    revision = create_catalogue_revision(
+        database_session,
+        provider="seed",
+    )
+
+    upsert_catalogue_movie(
+        database_session,
+        catalogue_revision_id=revision.id,
+        source="seed",
+        source_id="movie",
+        title="Movie",
+        popularity_score=95.0,
+    )
+
+    activate_catalogue_revision(
+        database_session,
+        revision_id=revision.id,
+    )
+    database_session.commit()
+
+    def _raise_database_error(
+        *_args: object,
+        **_kwargs: object,
+    ) -> None:
+        raise SQLAlchemyError("simulated database failure")
+
+    monkeypatch.setattr(
+        "app.main.list_popular_recommendation_movies",
+        _raise_database_error,
+    )
+
+    response = http.get("/api/movies/popular")
+
+    assert response.status_code == 503
+    assert response.json()["error"]["code"] == (
+        "SERVICE_UNAVAILABLE"
+    )
+
+def test_popular_movies_without_active_catalogue_is_unavailable(
+    client: tuple[TestClient, Session],
+) -> None:
+    http, _ = client
+
+    response = http.get("/api/movies/popular")
+
+    assert response.status_code == 503
+    assert response.json()["error"]["code"] == (
+        "CATALOGUE_UNAVAILABLE"
+    )
+

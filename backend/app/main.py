@@ -304,6 +304,41 @@ def list_movies(
         },
     }
 
+@app.get(
+    "/api/movies/popular",
+    response_model=MovieListResponse,
+    status_code=200,
+)
+def list_popular_movies(
+    database_session: Session = Depends(get_db),  # noqa: B008
+):
+    revision = get_active_catalogue_revision(database_session)
+
+    if revision is None:
+        return _error(
+            "CATALOGUE_UNAVAILABLE",
+            "Movie catalogue is unavailable",
+            503,
+        )
+
+    movies = list_popular_recommendation_movies(
+        database_session,
+        limit=10,
+    )
+
+    return {
+        "data": {
+            "movies": [
+                to_movie_summary_dto(movie).model_dump()
+                for movie in movies
+            ]
+        },
+        "meta": {
+            "count": len(movies),
+            "limit": 10,
+            "catalogueRevision": revision.id,
+        },
+    }
 
 @app.get("/api/movies/{movie_id}", response_model=MovieDetailResponse, status_code=200)
 def get_movie(
