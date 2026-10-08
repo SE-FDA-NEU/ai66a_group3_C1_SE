@@ -4,9 +4,11 @@ Contract revision: `S3-DRAFT`, reconciled with the current M2 runtime on
 2026-10-08.
 
 This document inventories the implemented M2 HTTP boundary and defines the
-Sprint 3 target contracts needed by the next implementation tasks. Every route
-is labelled `Implemented in M2` or `Planned for Sprint 3`; a planned contract
-is not an availability or test-evidence claim.
+committed Sprint 3 contracts needed by implementation consumers. Every route
+is labelled `Implemented in M2` or `Committed Sprint 3 contract;
+implementation pending`. A committed contract is required Sprint scope, but
+is not an availability or test-evidence claim until its implementation and
+verification evidence exist.
 
 Architecture and persistence rules are in
 [architecture.md](architecture.md).
@@ -26,7 +28,7 @@ Architecture and persistence rules are in
 - Browser `POST /api/auth/login` and `POST /api/auth/logout` requests must pass
   the same-origin Fetch Metadata/`Origin` check. Cross-origin and same-site
   browser writes return `403 ORIGIN_NOT_ALLOWED` before session state changes.
-- Planned Sprint 3 browser writes (`PUT /api/me/preferences`,
+- Committed Sprint 3 browser writes (`PUT /api/me/preferences`,
   `PUT /api/me/ratings/{movieId}`, and `POST /api/me/profile/reset`) must reuse
   that protection. The current middleware covers login/logout only, so this is
   an implementation requirement, not current runtime behaviour.
@@ -60,8 +62,9 @@ safe envelope.
 ## 2. Endpoint inventory and delivery status
 
 `Implemented in M2` means a callable route and its supporting behaviour exist
-in the repository. `Planned for later sprint` is a reviewed target only and is
-not an availability claim.
+in the repository. `Committed Sprint 3 contract; implementation pending`
+means consumers may build against the frozen contract, but the route is not
+yet available in the current repository.
 
 | Story | Method | Endpoint | Access | Input | Success | Representative errors | Delivery status |
 |---|---|---|---|---|---|---|---|
@@ -73,12 +76,12 @@ not an availability claim.
 | S02, S04 | `GET` | `/api/me/recommendations?limit=10` | Authenticated | Optional integer `limit`, 1-10 | `200 RecommendationResponse` with popular/cold-start results | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE` | `Implemented in M2` |
 | S04 | `GET` | `/api/movies?limit=10` | Public | Optional integer `limit`, 1-10, default 10 | `200 MovieListResponse`, popularity ordered | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2`; this is the current public popular-movie route |
 | S03 | `GET` | `/api/movies/{movieId}` | Public | Opaque `movieId` | `200 MovieDetailResponse` | `404 MOVIE_NOT_FOUND`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
-| S01 | `GET` | `/api/genres` | Authenticated | None | `200 GenreListResponse` | `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Planned for Sprint 3` |
-| S01 | `GET` | `/api/me/preferences` | Authenticated | None | `200 PreferenceResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Planned for Sprint 3` |
-| S01 | `PUT` | `/api/me/preferences` | Authenticated, same-origin write | `PreferenceRequest` | `200 PreferenceResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 GENRE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Planned for Sprint 3` |
-| S05a | `GET` | `/api/me/ratings/{movieId}` | Authenticated | Opaque `movieId` | `200 RatingResponse` | `401 AUTHENTICATION_REQUIRED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Planned for Sprint 3` |
-| S05a | `PUT` | `/api/me/ratings/{movieId}` | Authenticated, same-origin write | `RatingRequest` | `200 RatingResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Planned for Sprint 3` |
-| S11 | `POST` | `/api/me/profile/reset` | Authenticated, same-origin write | `ProfileResetRequest` | `200 ProfileResetResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `503 SERVICE_UNAVAILABLE` | `Planned Sprint 3 backend contract only` |
+| S01 | `GET` | `/api/genres` | Authenticated | None | `200 GenreListResponse` | `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 contract; implementation pending` |
+| S01 | `GET` | `/api/me/preferences` | Authenticated | None | `200 PreferenceResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 contract; implementation pending` |
+| S01 | `PUT` | `/api/me/preferences` | Authenticated, same-origin write | `PreferenceRequest` | `200 PreferenceResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 GENRE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 contract; implementation pending` |
+| S05a | `GET` | `/api/me/ratings/{movieId}` | Authenticated | Opaque `movieId` | `200 RatingResponse` | `401 AUTHENTICATION_REQUIRED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 contract; implementation pending` |
+| S05a | `PUT` | `/api/me/ratings/{movieId}` | Authenticated, same-origin write | `RatingRequest` | `200 RatingResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 contract; implementation pending` |
+| S11 | `POST` | `/api/me/profile/reset` | Authenticated, same-origin write | `ProfileResetRequest` | `200 ProfileResetResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 backend contract; implementation pending` |
 
 The current repository has no preferences, ratings, or reset route, model,
 migration, repository, or executable test. Personalised recommendations are
@@ -233,10 +236,11 @@ session, clears the cookie, and returns `204 No Content`. The UI then opens
 The same-origin check runs before revocation, so a rejected browser request
 cannot terminate the current session.
 
-## 6. Planned Sprint 3: genres and account preferences
+## 6. Committed Sprint 3: genres and account preferences
 
-The following endpoints are planned only. No current backend route or
-migration provides them, so they are not M2 completion evidence.
+The following contracts are committed Sprint 3 scope, not optional future
+work. No current backend route or migration provides them yet, so they are not
+runtime or completion evidence.
 
 Sprint 3 data-source decision (2026-10-06): development/staging/demo catalogue
 must be imported from TMDb into SQLite and verified under T29/C04 in the
@@ -247,8 +251,8 @@ Public IDs/DTOs remain unchanged. Operator provenance uses database source IDs
 and timestamps, not tokens or new public source-ID fields. Synthetic fixtures
 and provider-boundary mocks remain the automated-test path; mandatory live
 import/provenance smoke runs separately outside CI. This policy does not claim
-that the planned preference or personalised-recommendation behaviour is
-implemented; the public popularity-ordered `/api/movies` route already exists.
+that the committed preference or personalised-recommendation behaviour is
+implemented yet; the public popularity-ordered `/api/movies` route already exists.
 
 All three routes require a valid, unexpired, unrevoked session. The account is
 resolved from `ams_session`; no request contains an account identity. Genres,
@@ -362,7 +366,7 @@ The response always uses `mode=popular`, `personalised=false`, and
 Popular alternatives sort by finite popularity descending, null popularity
 last, title A-Z for ties, and internal movie ID as the final deterministic tie.
 
-### Planned Sprint 3 personalised response
+### Committed Sprint 3 personalised response (implementation pending)
 
 Sprint 3 keeps `data.movies`, `mode`, `personalised`, and `noMatch` and adds the
 recommendation explanation field `reason.matchedGenres` to each result. It
@@ -501,9 +505,11 @@ A missing year or overview remains JSON `null`; the UI displays
 to a false 404. Movie detail remains public; a guest opening it must not cause
 the frontend to call a private rating endpoint.
 
-## 9. Planned Sprint 3 rating contract
+## 9. Committed Sprint 3 rating contract (implementation pending)
 
-These two S05a routes are frozen target contracts, not implemented routes.
+These two S05a routes are committed Sprint 3 scope and frozen for consumers;
+they are not implemented routes in the current working tree. Their session
+ownership and isolation rules support Story #45 / S13.
 Both use the current authenticated session as the only account identity and
 address a movie by its opaque active-catalogue ID.
 
@@ -575,12 +581,13 @@ forged identity field cannot read, update, or retarget another account. The
 database target is one row per `(user_id, movie_id)` with a `1..5` check; the
 storage contract is in [architecture.md](architecture.md).
 
-## 10. Planned Sprint 3 profile-reset backend contract
+## 10. Committed Sprint 3 profile-reset backend contract (implementation pending)
 
 ### `POST /api/me/profile/reset`
 
 This route freezes only the authenticated reset backend contract for Sprint 3;
-it does not claim completion of all Story #33 / S11 profile UI behaviour.
+it supports Story #45 / S13 account isolation and does not claim completion of
+all Story #33 / S11 profile UI behaviour.
 
 Exact confirmation request:
 
@@ -634,7 +641,7 @@ profile state only after the reset success response.
 | `SERVICE_UNAVAILABLE` | 503 | Required persistence (account or catalogue) is unavailable. |
 | `CATALOGUE_UNAVAILABLE` | 503 | No active catalogue is readable. |
 
-`GENRE_NOT_FOUND` is a planned preference-contract code and is not returned by
+`GENRE_NOT_FOUND` is a committed preference-contract code and is not returned by
 the current router. All other codes in this table are present in the M2 backend
 or existing API contract. Sprint 3 rating and reset validation deliberately
 reuse `VALIDATION_ERROR`; this document does not invent rating/reset-specific
@@ -643,8 +650,9 @@ codes.
 ## 12. Scope boundary
 
 The repository still contains no implemented preferences, ratings, profile
-reset, personalised recommendation, or NLP endpoint. Sections 6, 7 (planned
-response), 9, and 10 define implementation targets only. Automated tests must
+reset, personalised recommendation, or NLP endpoint. Sections 6, 7 (committed
+response), 9, and 10 are committed Sprint 3 delivery contracts, not optional
+future work, while their implementation status remains pending. Automated tests must
 use synthetic SQLite fixtures or provider mocks and run offline without a
 TMDb token. Live TMDb catalogue import is a separate server-side
 development/staging/M3 acceptance step; the token must never appear in DTOs,
