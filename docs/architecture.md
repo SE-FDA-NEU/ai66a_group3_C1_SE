@@ -3,10 +3,10 @@
 Contract revision: `S3-DRAFT`, reconciled with current migrations on
 2026-10-08.
 
-The HTTP contract is in [api.md](api.md). This document describes the
-backend that is present in the repository and separately labels planned
-Sprint 3 persistence contracts. Planned tables/routes are not runtime or test
-evidence.
+The HTTP contract is in [api.md](api.md). This document describes the backend
+that is present in the repository and separately labels committed Sprint 3
+persistence contracts whose implementation is pending. Committed target
+tables/routes are required Sprint scope, but are not runtime or test evidence.
 
 ## 1. Runtime evidence
 
@@ -29,10 +29,11 @@ staging and demo catalogue acceptance; it is verified under T29/C04 in the
 [runbook](tmdb-sprint3-runbook.md). M2 seed evidence remains historical/test
 support, while CI uses synthetic provider fixtures without a real token/network.
 
-Preferences, ratings, personalised recommendation ranking, and profile reset
-are not implemented migrations or current runtime capabilities. Sprint 3
-freezes their API/storage boundaries; rating-adjusted ranking remains Story
-#22 / S05b planned for Sprint 4.
+Preferences, rating storage/API/UI protection, genre/popularity-only
+personalised recommendations, and the authenticated reset backend are
+committed Sprint 3 scope. They are not implemented migrations or current
+runtime capabilities. Rating/reset session isolation supports Story #45 / S13.
+Rating-adjusted ranking remains Story #22 / S05b planned for Sprint 4.
 
 ## 2. Selected stack
 
@@ -107,11 +108,11 @@ movie counters. `catalogue_state.active_revision_id` is required and points to
 the active revision. No preferences, ratings, or import-run table has been
 migrated.
 
-### Planned Sprint 3 personalisation storage
+### Committed Sprint 3 personalisation storage (implementation pending)
 
-The implementation target adds two application-owned tables. Names below are
-the frozen storage contract for the planned migration; they do not exist in
-the current Alembic head.
+The committed contract requires two application-owned tables. Names below are
+frozen for the future implementation migration; they do not exist in the
+current Alembic head.
 
 | Table | Columns | Keys and constraints | Ownership/delete rule |
 |---|---|---|---|
@@ -134,13 +135,13 @@ provider movie across importer updates that preserve that ID.
 - `movie_genres` de-duplicates each movie/genre relationship through its
   composite primary key.
 - A failed import cannot replace the active revision.
-- Planned private rows are always keyed by the session-resolved `users.id`;
+- Sprint 3 private rows are always keyed by the session-resolved `users.id`;
   no client-supplied identity participates in a lookup or mutation.
-- Planned preference replacement is one transaction and preserves the prior
+- Sprint 3 preference replacement is one transaction and preserves the prior
   committed set on failure.
-- Planned rating upsert is one transaction and returns success only after
+- Sprint 3 rating upsert is one transaction and returns success only after
   commit. Invalid input or a failed commit preserves the prior value.
-- Planned profile reset deletes only the current user's preference and rating
+- Sprint 3 profile reset deletes only the current user's preference and rating
   rows in one transaction. Failure of either delete or commit rolls back both;
   the user, current session, catalogue, movies, genres, and other accounts are
   preserved.
@@ -163,7 +164,7 @@ provider responses and run offline; CI needs no TMDb token. The token must not
 appear in DTOs, frontend/Vite assets, logs, screenshots, fixtures, database
 dumps used as evidence, or documentation evidence.
 
-Planned private writes must extend the existing same-origin Fetch
+Committed Sprint 3 private writes must extend the existing same-origin Fetch
 Metadata/`Origin` protection before mutation. Missing, expired, or revoked
 sessions return `401 AUTHENTICATION_REQUIRED`; permitted-origin requests still
 derive their account solely from the server-side session.
