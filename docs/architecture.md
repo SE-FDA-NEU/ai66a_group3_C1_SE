@@ -1,9 +1,12 @@
-# M2 architecture and persistence contract
+# Sprint 3 architecture and persistence contract
 
-Contract revision: `M2-CURRENT`.
+Contract revision: `S3-DRAFT`, reconciled with current migrations on
+2026-10-08.
 
 The HTTP contract is in [api.md](api.md). This document describes the
-backend that is present in the repository, not planned Sprint 3 features.
+backend that is present in the repository and separately labels planned
+Sprint 3 persistence contracts. Planned tables/routes are not runtime or test
+evidence.
 
 ## 1. Runtime evidence
 
@@ -26,8 +29,10 @@ staging and demo catalogue acceptance; it is verified under T29/C04 in the
 [runbook](tmdb-sprint3-runbook.md). M2 seed evidence remains historical/test
 support, while CI uses synthetic provider fixtures without a real token/network.
 
-Preferences, ratings, personalized recommendation ranking, and NLP are Sprint
-3 work. They are not implemented migrations or M2 runtime capabilities.
+Preferences, ratings, personalised recommendation ranking, and profile reset
+are not implemented migrations or current runtime capabilities. Sprint 3
+freezes their API/storage boundaries; rating-adjusted ranking remains Story
+#22 / S05b planned for Sprint 4.
 
 ## 2. Selected stack
 
@@ -53,6 +58,12 @@ PlantUML source: [architecture.puml](images/architecture.puml).
 This diagram preserves the historical M2 optional-import label; from Sprint 3
 the same importer is required catalogue preparation under the updated decision.
 
+The catalogue flow is:
+
+```text
+TMDb -> server-side import -> backend -> local SQLite -> API -> frontend
+```
+
 The runtime boundaries are:
 
 1. Browser frontend.
@@ -66,6 +77,12 @@ The runtime boundaries are:
 | Backend API | Validate input, resolve the session account, read the active catalogue, and return stable DTOs/errors. | Trust a client-supplied `user_id`. |
 | SQLite database | Persist users, sessions, catalogue revisions, the active revision, movies, genres, and movie/genre links. | Select an account independently of the authenticated session. |
 | TMDb importer | Required Sprint 3 dev/staging/demo catalogue preparation: fetch bounded provider data, validate it and write one atomic revision. | Run in the browser, expose credentials or silently fall back to seed on failure. |
+
+The API never proxies a browser request to TMDb. Genres, recommendations,
+public popular movies (`GET /api/movies`), and movie details all read the
+active local SQLite revision. `catalog_movies.id` is the public opaque
+identity; `(source, source_id)` remains provider provenance and is not exposed
+as the public ID.
 
 ## 4. ERD and current migrations
 
@@ -90,6 +107,22 @@ movie counters. `catalogue_state.active_revision_id` is required and points to
 the active revision. No preferences, ratings, or import-run table has been
 migrated.
 
+### Planned Sprint 3 personalisation storage
+
+The implementation target adds two application-owned tables. Names below are
+the frozen storage contract for the planned migration; they do not exist in
+the current Alembic head.
+
+| Table | Columns | Keys and constraints | Ownership/delete rule |
+|---|---|---|---|
+| `user_genre_preferences` | `user_id` VARCHAR(36), `genre_id` INTEGER | Composite primary key/unique `(user_id, genre_id)`; FK `user_id -> users.id` ON DELETE CASCADE; FK `genre_id -> genres.id` ON DELETE RESTRICT | Rows belong to one user; deleting/resetting one account's preference rows cannot affect another account or the genre catalogue. |
+| `viewer_ratings` | `user_id` VARCHAR(36), `movie_id` VARCHAR(36), `rating` INTEGER | Composite primary key/unique `(user_id, movie_id)`; FK `user_id -> users.id` ON DELETE CASCADE; FK `movie_id -> catalog_movies.id` ON DELETE RESTRICT; CHECK `rating BETWEEN 1 AND 5` | One committed rating per user/movie; deleting a catalogue movie cannot leave an orphan rating. |
+
+Application validation must also enforce a strict integer: SQLite's check is
+defence in depth and does not make JSON strings, booleans, or fractions valid.
+The stable internal movie ID lets a rating continue to identify the same
+provider movie across importer updates that preserve that ID.
+
 ## 5. Persistence and ownership rules
 
 - `users.email_normalized` is unique. Plaintext passwords are never stored.
@@ -101,9 +134,16 @@ migrated.
 - `movie_genres` de-duplicates each movie/genre relationship through its
   composite primary key.
 - A failed import cannot replace the active revision.
-- Preferences, ratings, personalized recommendation ranking, and NLP require
-  future Sprint 3 migrations and routes; they are not part of this database
-  contract.
+- Planned private rows are always keyed by the session-resolved `users.id`;
+  no client-supplied identity participates in a lookup or mutation.
+- Planned preference replacement is one transaction and preserves the prior
+  committed set on failure.
+- Planned rating upsert is one transaction and returns success only after
+  commit. Invalid input or a failed commit preserves the prior value.
+- Planned profile reset deletes only the current user's preference and rating
+  rows in one transaction. Failure of either delete or commit rolls back both;
+  the user, current session, catalogue, movies, genres, and other accounts are
+  preserved.
 
 ## 6. Authentication and provider flow
 
@@ -117,8 +157,33 @@ provider data, validates it, records revision counters, and activates the
 revision only after all required writes succeed. Provider failures retain the
 previous active revision.
 
+TMDb import is required preparation for development, staging, and M3
+acceptance. Automated tests use synthetic catalogue fixtures or mocked
+provider responses and run offline; CI needs no TMDb token. The token must not
+appear in DTOs, frontend/Vite assets, logs, screenshots, fixtures, database
+dumps used as evidence, or documentation evidence.
+
+Planned private writes must extend the existing same-origin Fetch
+Metadata/`Origin` protection before mutation. Missing, expired, or revoked
+sessions return `401 AUTHENTICATION_REQUIRED`; permitted-origin requests still
+derive their account solely from the server-side session.
+
 ## 7. Delivery boundary
 
 M2 includes health, authentication, catalogue reads, and popular/cold-start
-recommendations. Sprint 3 will add preferences, ratings, personalized
-recommendations, and NLP after their migrations, routes, and tests exist.
+recommendations. Sprint 3 contracts in this document cover preferences,
+genre/popularity-only personalised recommendations, rating persistence, and
+the authenticated profile-reset backend. None is implemented until its
+migration, route, transaction handling, origin protection, and tests exist.
+
+Rating-adjusted recommendation ranking is not part of Sprint 3. It belongs to
+Story #22 / S05b and is planned Sprint 4 behaviour.
+
+## 8. Backdrop reconciliation
+
+The current model, catalogue migration, TMDb mapper, movie DTOs, detail route,
+and frontend contain no `backdrop` field. There is no nullable-backdrop
+migration or importer/detail compatibility implementation in this repository.
+The repository also contains no evidence linking tasks/issues #129-#131 to
+completed backdrop work. Backdrop remains pending/stretch work; this contract
+must not be read as completion evidence.
