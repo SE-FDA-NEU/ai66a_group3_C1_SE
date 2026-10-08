@@ -115,9 +115,10 @@ Do not invent records or reset the database if the bounded import is inadequate;
 report the shortfall to the PO for a reviewed budget/scope decision.
 
 Link `GET /api/movies` and a valid details response to the active revision.
-After Sprint 3 routes are implemented, also smoke `/api/genres`,
-`/api/movies/popular` and authenticated `/api/me/recommendations`. These routes
-read SQLite only; preferences/accounts remain application-owned data. Keep
+After Sprint 3 routes are implemented, also smoke `/api/genres`, the existing
+public popularity-ordered `/api/movies`, and authenticated
+`/api/me/recommendations`. These routes read SQLite only;
+preferences/accounts remain application-owned data. Keep
 source IDs in the operator evidence; public movie IDs remain opaque internal IDs.
 Start/restart the app and verify local reads still work without new provider
 requests and without losing account data.
