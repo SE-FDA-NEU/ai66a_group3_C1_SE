@@ -75,7 +75,7 @@ yet available in the current repository.
 | S13 | `GET` | `/api/auth/me` | Authenticated | None | `200 AuthResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 | S02, S04 | `GET` | `/api/me/recommendations?limit=10` | Authenticated | Optional integer `limit`, 1-10 | `200 RecommendationResponse` with popular/cold-start results | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE` | `Implemented in M2` |
 | S04 | `GET` | `/api/movies?limit=10` | Public | Optional integer `limit`, 1-10, default 10 | `200 MovieListResponse`; catalogue entries without popularity may be included and sort last when popularity ordering is used | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2`; public catalogue route |
-| S09 / T19 | `GET` | `/api/movies/popular?limit=10` | Public | Optional integer `limit`, 1-10, default 10 | `200 MovieListResponse`; only movies with valid popularity | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 contract; implementation pending`; dedicated popular-movie route |
+| S09 / T19 | `GET` | `/api/movies/popular?limit=10` | Public | Optional integer `limit`, 1-10, default 10 | `200 MovieListResponse`; only movies with valid popularity | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in M3`; dedicated popular-movie route |
 | S03 | `GET` | `/api/movies/{movieId}` | Public | Opaque `movieId` | `200 MovieDetailResponse` | `404 MOVIE_NOT_FOUND`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 | S01 | `GET` | `/api/genres` | Authenticated | None | `200 GenreListResponse` | `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 contract; implementation pending` |
 | S01 | `GET` | `/api/me/preferences` | Authenticated | None | `200 PreferenceResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 contract; implementation pending` |
@@ -85,9 +85,11 @@ yet available in the current repository.
 | S11 | `POST` | `/api/me/profile/reset` | Authenticated, same-origin write | `ProfileResetRequest` | `200 ProfileResetResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 backend contract; implementation pending` |
 
 The current repository has no preferences, ratings, or reset route, model,
-migration, repository, or executable test. Personalised recommendations and
-the dedicated `GET /api/movies/popular` route are also not implemented. Genre
-filtering, similar movies, and search remain outside this contract update.
+migration, repository, or executable test. Personalised recommendations
+are not yet implemented. The dedicated GET /api/movies/popular route is
+implemented in M3. Genre filtering, similar movies, and search remain outside
+this contract update.
+
 
 ## 3. Shared DTOs
 
@@ -253,8 +255,8 @@ Public IDs/DTOs remain unchanged. Operator provenance uses database source IDs
 and timestamps, not tokens or new public source-ID fields. Synthetic fixtures
 and provider-boundary mocks remain the automated-test path; mandatory live
 import/provenance smoke runs separately outside CI. This policy does not claim
-that the committed preference, personalised-recommendation behaviour, or
-dedicated `/api/movies/popular` route is implemented. The existing
+that committed preference or personalised recommendation behaviour is implemented.
+The dedicated public popular movie route is implemented in M3 under T19. The existing
 `/api/movies` route is the public catalogue route and is a separate contract.
 
 All three routes require a valid, unexpired, unrevoked session. The account is
@@ -480,7 +482,7 @@ endpoint.
 An empty active catalogue returns `200` with `movies: []`; the UI shows
 guidance and never invents movies.
 
-### `GET /api/movies/popular?limit=10` (implementation pending)
+### `GET /api/movies/popular?limit=10` (implementation in M3)
 
 This is the dedicated public popular-movie endpoint introduced for S09/T19.
 `limit` defaults to 10 and accepts an integer from 1 through 10. It returns only
@@ -712,12 +714,19 @@ codes.
 
 ## 12. Scope boundary
 
-The repository still contains no implemented preferences, ratings, profile
-reset, dedicated public popular, personalised recommendation, or NLP endpoint.
-Sections 6, 7 (committed response), 8 (dedicated popular route), 9, and 10 are
-committed Sprint 3 delivery contracts, not optional future work, while their
-implementation status remains pending. Automated tests must use synthetic
-SQLite fixtures or provider mocks and run offline without a TMDb token. Live
-TMDb catalogue import is a separate server-side development/staging/M3
-acceptance step; the token must never appear in DTOs, frontend assets, logs,
-fixtures, or documentation evidence.
+The dedicated public popular movie endpoint (`GET /api/movies/popular`)
+is implemented in M3 under T19, reusing the shared deterministic
+popularity/title/ID ranker.
+
+Preferences, ratings, profile reset, personalised recommendations, and NLP
+endpoints remain unimplemented. Sections 6, 7 (committed personalised response),
+9, and 10 remain committed Sprint 3 delivery contracts, not optional future
+work, while their implementation status remains pending.
+
+Section 8 documents both the existing public catalogue endpoint and the
+implemented dedicated popular movie endpoint.
+
+Automated tests must use synthetic SQLite fixtures or provider mocks and run
+offline without a TMDb token. Live TMDb catalogue import is a separate
+server-side development/staging/M3 acceptance step; the token must never
+appear in DTOs, frontend assets, logs, fixtures, or documentation evidence.
