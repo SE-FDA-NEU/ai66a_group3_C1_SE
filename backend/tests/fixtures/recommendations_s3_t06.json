@@ -6,6 +6,7 @@
     "networkRequired": false,
     "description": "Fictional genres, movies, scores, IDs, and revision created only for automated recommendation tests."
   },
+  "oracleEncoding": "Each expected movie references one candidate by id and adds its exact reason. Expand genreIds through genres, then copy title, releaseYear, and popularityScore to obtain the complete public response card.",
   "catalogueRevision": "fixture-revision-s3-t06",
   "genres": [
     { "id": 7101, "name": "Ember" },
