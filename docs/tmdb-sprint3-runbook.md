@@ -114,12 +114,32 @@ flows, including at least ten distinct movies with finite popularity for #31.
 Do not invent records or reset the database if the bounded import is inadequate;
 report the shortfall to the PO for a reviewed budget/scope decision.
 
-Link `GET /api/movies` and a valid details response to the active revision.
-After Sprint 3 routes are implemented, also smoke `/api/genres`, the existing
-public popularity-ordered `/api/movies`, and authenticated
-`/api/me/recommendations`. These routes read SQLite only;
-preferences/accounts remain application-owned data. Keep
-source IDs in the operator evidence; public movie IDs remain opaque internal IDs.
+Smoke the two public list contracts separately:
+
+```text
+curl "http://localhost:8000/api/movies?limit=10"
+```
+
+Expected: `200` with public catalogue entries linked to the active revision.
+Entries without a valid popularity value may be present and, when popularity
+ordering is used, appear after entries with finite popularity. Also verify a
+valid `GET /api/movies/{movieId}` response against that revision.
+
+After the S09/T19 route is implemented, run:
+
+```text
+curl "http://localhost:8000/api/movies/popular?limit=10"
+```
+
+Expected: `200` with only movies whose popularity value is valid and finite,
+in the committed popularity/title/ID order. Do not use the `/api/movies` smoke
+result as evidence for the dedicated popular-movie contract. Until the route is
+implemented, record this check as `Pending/Not run`, not as passed.
+
+After the other Sprint 3 routes are implemented, also smoke `/api/genres` and
+authenticated `/api/me/recommendations`. All these application routes read
+SQLite only; preferences/accounts remain application-owned data. Keep source
+IDs in the operator evidence; public movie IDs remain opaque internal IDs.
 Start/restart the app and verify local reads still work without new provider
 requests and without losing account data.
 

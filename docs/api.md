@@ -1,7 +1,7 @@
 # Sprint 3 HTTP API contract
 
 Contract revision: `S3-DRAFT`, reconciled with the current M2 runtime on
-2026-10-08.
+2026-10-09.
 
 This document inventories the implemented M2 HTTP boundary and defines the
 committed Sprint 3 contracts needed by implementation consumers. Every route
@@ -74,7 +74,8 @@ yet available in the current repository.
 | S13 | `POST` | `/api/auth/logout` | Cookie optional; idempotent same-origin write | None | `204`, session invalidated and cookie cleared | `403 ORIGIN_NOT_ALLOWED`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 | S13 | `GET` | `/api/auth/me` | Authenticated | None | `200 AuthResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 | S02, S04 | `GET` | `/api/me/recommendations?limit=10` | Authenticated | Optional integer `limit`, 1-10 | `200 RecommendationResponse` with popular/cold-start results | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE` | `Implemented in M2` |
-| S04 | `GET` | `/api/movies?limit=10` | Public | Optional integer `limit`, 1-10, default 10 | `200 MovieListResponse`, popularity ordered | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2`; this is the current public popular-movie route |
+| S04 | `GET` | `/api/movies?limit=10` | Public | Optional integer `limit`, 1-10, default 10 | `200 MovieListResponse`; catalogue entries without popularity may be included and sort last when popularity ordering is used | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2`; public catalogue route |
+| S09 / T19 | `GET` | `/api/movies/popular?limit=10` | Public | Optional integer `limit`, 1-10, default 10 | `200 MovieListResponse`; only movies with valid popularity | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 contract; implementation pending`; dedicated popular-movie route |
 | S03 | `GET` | `/api/movies/{movieId}` | Public | Opaque `movieId` | `200 MovieDetailResponse` | `404 MOVIE_NOT_FOUND`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 | S01 | `GET` | `/api/genres` | Authenticated | None | `200 GenreListResponse` | `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 contract; implementation pending` |
 | S01 | `GET` | `/api/me/preferences` | Authenticated | None | `200 PreferenceResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 contract; implementation pending` |
@@ -84,9 +85,9 @@ yet available in the current repository.
 | S11 | `POST` | `/api/me/profile/reset` | Authenticated, same-origin write | `ProfileResetRequest` | `200 ProfileResetResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 backend contract; implementation pending` |
 
 The current repository has no preferences, ratings, or reset route, model,
-migration, repository, or executable test. Personalised recommendations are
-also not implemented. Genre filtering, similar movies, and search remain
-outside this contract update.
+migration, repository, or executable test. Personalised recommendations and
+the dedicated `GET /api/movies/popular` route are also not implemented. Genre
+filtering, similar movies, and search remain outside this contract update.
 
 ## 3. Shared DTOs
 
@@ -245,14 +246,16 @@ runtime or completion evidence.
 Sprint 3 data-source decision (2026-10-06): development/staging/demo catalogue
 must be imported from TMDb into SQLite and verified under T29/C04 in the
 [runbook](tmdb-sprint3-runbook.md). This applies to genres, recommendations,
-popular and details. Runtime endpoints read the local active catalogue and
-never call TMDb API; account preferences are stored by this application.
+the public catalogue, the dedicated popular list, and details. Runtime
+endpoints read the local active catalogue and never call TMDb API; account
+preferences are stored by this application.
 Public IDs/DTOs remain unchanged. Operator provenance uses database source IDs
 and timestamps, not tokens or new public source-ID fields. Synthetic fixtures
 and provider-boundary mocks remain the automated-test path; mandatory live
 import/provenance smoke runs separately outside CI. This policy does not claim
-that the committed preference or personalised-recommendation behaviour is
-implemented yet; the public popularity-ordered `/api/movies` route already exists.
+that the committed preference, personalised-recommendation behaviour, or
+dedicated `/api/movies/popular` route is implemented. The existing
+`/api/movies` route is the public catalogue route and is a separate contract.
 
 All three routes require a valid, unexpired, unrevoked session. The account is
 resolved from `ams_session`; no request contains an account identity. Genres,
@@ -363,8 +366,9 @@ The response always uses `mode=popular`, `personalised=false`, and
 `200` with `movies: []`. No active catalogue returns
 `503 CATALOGUE_UNAVAILABLE`.
 
-Popular alternatives sort by finite popularity descending, null popularity
-last, title A-Z for ties, and internal movie ID as the final deterministic tie.
+Popular alternatives contain only movies with finite popularity, sorted by
+popularity descending, title A-Z for ties, and internal movie ID as the final
+deterministic tie.
 
 ### Committed Sprint 3 personalised response (implementation pending)
 
@@ -420,13 +424,74 @@ before a private result is returned. Catalogue/database failures use the same
 `503 CATALOGUE_UNAVAILABLE`/`503 SERVICE_UNAVAILABLE` distinction as the M2
 route. The route never contacts TMDb during a request.
 
-## 8. S03/S04 movie catalogue
+## 8. S03/S04 catalogue and S09/T19 popular movie reads
 
 ### `GET /api/movies?limit=10`
 
-`limit` defaults to 10 and accepts an integer from 1 through 10. Results are
-public and read only the active local catalogue; the endpoint never contacts
-TMDb.
+This is the implemented public catalogue endpoint for S04. `limit` defaults to
+10 and accepts an integer from 1 through 10. Results read only the active local
+catalogue; the endpoint never contacts TMDb. Movies without a valid popularity
+value may still be returned. When popularity ordering is used, those entries
+appear after movies with finite popularity.
+
+Success (`200`):
+
+```json
+{
+  "data": {
+    "movies": [
+      {
+        "id": "3ef5aa47-3ec6-41c8-9337-f5059d257988",
+        "title": "Example Movie",
+        "releaseYear": 2025,
+        "genres": [
+          { "id": 28, "name": "Action" }
+        ],
+        "popularityScore": 90.0
+      },
+      {
+        "id": "33da16a6-c912-4e46-9b8a-a5063a0d87b2",
+        "title": "Catalogue Movie Without Popularity",
+        "releaseYear": null,
+        "genres": [],
+        "popularityScore": null
+      }
+    ]
+  },
+  "meta": {
+    "count": 2,
+    "limit": 10,
+    "catalogueRevision": "revision-example"
+  }
+}
+```
+
+Sort order is finite popularity descending, missing/null popularity last,
+title A-Z for ties, and internal movie ID as the final deterministic
+tie-breaker. This endpoint must not be treated as the dedicated popular-movie
+endpoint.
+
+| Condition | Status/code | Public message |
+|---|---|---|
+| `limit` outside 1-10 or not an integer | `400 VALIDATION_ERROR` | `Please correct the highlighted fields` |
+| No active catalogue | `503 CATALOGUE_UNAVAILABLE` | `Movie catalogue is unavailable` |
+| Database read failure | `503 SERVICE_UNAVAILABLE` | `Service is temporarily unavailable` |
+
+An empty active catalogue returns `200` with `movies: []`; the UI shows
+guidance and never invents movies.
+
+### `GET /api/movies/popular?limit=10` (implementation pending)
+
+This is the dedicated public popular-movie endpoint introduced for S09/T19.
+`limit` defaults to 10 and accepts an integer from 1 through 10. It returns only
+movies whose `popularityScore` is a valid finite number. Null, missing, NaN, and
+infinite popularity values are not eligible. Results sort by popularity
+descending, title A-Z for ties, and internal movie ID as the final deterministic
+tie-breaker.
+
+Consumers rendering the Sprint 3 public popular list must call this endpoint,
+not `GET /api/movies`. The two routes intentionally share the response envelope
+but have different filtering semantics.
 
 Success (`200`):
 
@@ -453,17 +518,15 @@ Success (`200`):
 }
 ```
 
-Sort order is finite popularity descending, null popularity last, title A-Z
-for ties, and internal movie ID as the final deterministic tie-breaker.
-
 | Condition | Status/code | Public message |
 |---|---|---|
 | `limit` outside 1-10 or not an integer | `400 VALIDATION_ERROR` | `Please correct the highlighted fields` |
 | No active catalogue | `503 CATALOGUE_UNAVAILABLE` | `Movie catalogue is unavailable` |
 | Database read failure | `503 SERVICE_UNAVAILABLE` | `Service is temporarily unavailable` |
 
-An empty active catalogue returns `200` with `movies: []`; the UI shows
-guidance and never invents movies.
+An active catalogue with no valid finite popularity values returns `200` with
+`movies: []`. That empty result is valid popular-list data; the UI shows its
+no-data state and never substitutes unranked catalogue entries.
 
 ### `GET /api/movies/{movieId}`
 
@@ -650,10 +713,11 @@ codes.
 ## 12. Scope boundary
 
 The repository still contains no implemented preferences, ratings, profile
-reset, personalised recommendation, or NLP endpoint. Sections 6, 7 (committed
-response), 9, and 10 are committed Sprint 3 delivery contracts, not optional
-future work, while their implementation status remains pending. Automated tests must
-use synthetic SQLite fixtures or provider mocks and run offline without a
-TMDb token. Live TMDb catalogue import is a separate server-side
-development/staging/M3 acceptance step; the token must never appear in DTOs,
-frontend assets, logs, fixtures, or documentation evidence.
+reset, dedicated public popular, personalised recommendation, or NLP endpoint.
+Sections 6, 7 (committed response), 8 (dedicated popular route), 9, and 10 are
+committed Sprint 3 delivery contracts, not optional future work, while their
+implementation status remains pending. Automated tests must use synthetic
+SQLite fixtures or provider mocks and run offline without a TMDb token. Live
+TMDb catalogue import is a separate server-side development/staging/M3
+acceptance step; the token must never appear in DTOs, frontend assets, logs,
+fixtures, or documentation evidence.

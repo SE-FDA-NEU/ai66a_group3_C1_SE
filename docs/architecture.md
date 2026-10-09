@@ -1,7 +1,7 @@
 # Sprint 3 architecture and persistence contract
 
 Contract revision: `S3-DRAFT`, reconciled with current migrations on
-2026-10-08.
+2026-10-09.
 
 The HTTP contract is in [api.md](api.md). This document describes the backend
 that is present in the repository and separately labels committed Sprint 3
@@ -20,6 +20,10 @@ The repository contains a FastAPI backend with these implemented areas:
   `GET /api/movies/{movieId}`.
 - Authenticated `GET /api/me/recommendations`, which currently serves the
   shared popular/cold-start recommendation list.
+
+The dedicated public popular-movie route `GET /api/movies/popular` is a
+committed S09/T19 Sprint 3 contract and is not implemented in the current
+runtime. It must not be inferred from the existing catalogue route.
 
 The backend uses the local SQLite catalogue selected by
 `catalogue_state.active_revision_id`. Movie and recommendation reads do not
@@ -74,16 +78,34 @@ The runtime boundaries are:
 
 | Component | Responsibility | Must not do |
 |---|---|---|
-| Browser frontend | Render auth, catalogue, and popular recommendation experiences; send JSON requests. | Receive TMDb credentials or issue provider calls. |
+| Browser frontend | Render auth, catalogue, dedicated popular-list, and recommendation experiences; call the matching API contract. | Receive TMDb credentials, issue provider calls, or use `/api/movies` as evidence for `/api/movies/popular`. |
 | Backend API | Validate input, resolve the session account, read the active catalogue, and return stable DTOs/errors. | Trust a client-supplied `user_id`. |
 | SQLite database | Persist users, sessions, catalogue revisions, the active revision, movies, genres, and movie/genre links. | Select an account independently of the authenticated session. |
 | TMDb importer | Required Sprint 3 dev/staging/demo catalogue preparation: fetch bounded provider data, validate it and write one atomic revision. | Run in the browser, expose credentials or silently fall back to seed on failure. |
 
 The API never proxies a browser request to TMDb. Genres, recommendations,
-public popular movies (`GET /api/movies`), and movie details all read the
-active local SQLite revision. `catalog_movies.id` is the public opaque
+public catalogue movies, dedicated popular movies, and movie details all read
+the active local SQLite revision. `catalog_movies.id` is the public opaque
 identity; `(source, source_id)` remains provider provenance and is not exposed
 as the public ID.
+
+The two public list flows are intentionally distinct:
+
+```text
+Public catalogue frontend
+  -> GET /api/movies
+  -> Backend API
+  -> SQLite active catalogue (entries without popularity may be included)
+
+Popular frontend
+  -> GET /api/movies/popular
+  -> Backend API
+  -> SQLite active-catalogue movies with valid finite popularity only
+```
+
+`GET /api/movies` is the implemented S04 public catalogue route. The committed
+S09/T19 `GET /api/movies/popular` route is the dedicated popular subset. The
+frontend must use the latter when rendering the Sprint 3 public popular list.
 
 ## 4. ERD and current migrations
 
@@ -172,10 +194,11 @@ derive their account solely from the server-side session.
 ## 7. Delivery boundary
 
 M2 includes health, authentication, catalogue reads, and popular/cold-start
-recommendations. Sprint 3 contracts in this document cover preferences,
-genre/popularity-only personalised recommendations, rating persistence, and
-the authenticated profile-reset backend. None is implemented until its
-migration, route, transaction handling, origin protection, and tests exist.
+recommendations. Sprint 3 contracts in this document cover the dedicated
+S09/T19 public popular route, preferences, genre/popularity-only personalised
+recommendations, rating persistence, and the authenticated profile-reset
+backend. Each pending capability remains unimplemented until its route and
+applicable query, migration, transaction handling, protection, and tests exist.
 
 Rating-adjusted recommendation ranking is not part of Sprint 3. It belongs to
 Story #22 / S05b and is planned Sprint 4 behaviour.
