@@ -1,6 +1,11 @@
-# Milestone 2 design
+# Sprint 3 design and contract reconciliation
 
-This document describes the system as it exists on `main` at commit `4bfae7c` (checked on 2026-10-03). Every table and endpoint is marked as implemented or planned. Request and response shapes are in [api.md](api.md); the ownership and persistence contract is in [architecture.md](architecture.md).
+This document was reconciled with the local working tree on 2026-10-09. Every
+table and endpoint is marked as implemented or as committed Sprint 3 scope
+with implementation pending; no tested SHA or review approval is implied.
+Request and response shapes are in
+[api.md](api.md), UI state is in [ui.md](ui.md), and ownership/persistence is
+in [architecture.md](architecture.md).
 
 Sprint 3 decision update, 2026-10-06: TMDb is the required catalogue source for
 development, staging and demos. The existing importer is reused; operational
@@ -35,7 +40,9 @@ In development, Vite listens on port 5173 and proxies `/api` to the backend on `
 
 ### Modules and owners
 
-Owners are the GitHub assignees of the Sprint 2 tasks.
+Implemented-module owners are the GitHub assignees of the Sprint 2 tasks. The
+pending dedicated popular contract is owned here only as the #134 contract
+handoff; its implementation ownership remains with the S09/T19 consumer work.
 
 | Module | What it does | Owner (task) |
 |---|---|---|
@@ -47,6 +54,7 @@ Owners are the GitHub assignees of the Sprint 2 tasks.
 | Registration endpoint: `backend/app/schemas/auth.py`, `POST /api/auth/register` | Validates the email and password and creates the account. | Vu Quoc Huy, `@vu-huzy` (#52) |
 | Login, logout, current account: `backend/app/main.py`, `backend/app/security/origin.py` | Sign-in and sign-out endpoints and the same-origin check. | Tran Minh Hoang, `@hoang3003` (#54) |
 | Catalogue and detail endpoints: `GET /api/movies`, `GET /api/movies/{movieId}` | Public list and detail reads from the active catalogue. | `@vu-huzy` (#60) |
+| Dedicated popular endpoint: `GET /api/movies/popular` | S09/T19 public popular subset; only finite-popularity movies are eligible. Contract committed, implementation pending. | `@hoang3003` (#134 contract handoff); S09/T19 implementation consumer |
 | Popular ranking: `backend/app/recommendations/ranker.py`, `GET /api/me/recommendations` | Shared popularity ordering and the signed-in cold-start list. | Tran Tuan Anh, `@anotify-vie` (#58) |
 | Catalogue and detail pages: `frontend/src/pages/HomePage.tsx`, `MovieDetailPage.tsx` | Ten movie cards at `/` and the detail page at `/movies/:movieId`. | `@anotify-vie` (#61) |
 | Registration and sign-in forms: `RegisterPage.tsx`, `LoginPage.tsx` | Forms that call the auth endpoints. | `@NguyenTuanAnh0608` (#50), `@anotify-vie` (#55) |
@@ -63,7 +71,9 @@ The database has seven application tables, created by three Alembic revisions on
 
 The ERD in `docs/images/erd.png` matches the current M2 Alembic migrations. It shows only the seven migrated tables: `users`, `auth_sessions`, `catalogue_revisions`, `catalogue_state`, `catalog_movies`, `genres`, and `movie_genres`.
 
-Preferences, ratings, personalised recommendation, and NLP remain planned Sprint 3 work and are not represented as implemented M2 tables.
+Preferences, ratings, personalised recommendation, and profile reset are not
+represented as implemented tables. Sprint 3 freezes their contracts; rating-
+adjusted ranking (Story #22 / S05b) is planned Sprint 4 rather than Sprint 3.
 
 A trailing `?` marks a column that allows NULL. Every other column is NOT NULL.
 
@@ -84,11 +94,20 @@ Multiplicities:
 - `catalogue_state` holds exactly one row, and that row points at exactly one revision.
 - Movies and genres are many-to-many through `movie_genres`; the composite primary key prevents a duplicate pair.
 
+Committed Sprint 3 storage adds `user_genre_preferences` with composite key
+`(user_id, genre_id)` and `viewer_ratings` with composite key
+`(user_id, movie_id)`. Both columns in each key have foreign keys to the
+application-owned user/catalogue records. `viewer_ratings.rating` has a
+database check from 1 through 5. These tables and constraints do not exist in
+the current migration head; [architecture.md](architecture.md) is the target
+storage contract for their future migration.
+
 ### Business rules enforced in M2
 
 | Rule | Database | Service or query | Tests |
 |---|---|---|---|
-| BR5: popular movies sort by popularity descending, then title A-Z, at most 10 | None | `popularity_title_id_ordering()` sorts by popularity (null last), then title, then ID. `limit` accepts 1 to 10. | `test_movies_api.py`, `test_popular_recommendations.py` |
+| S04 public catalogue ordering | None | `GET /api/movies` may include null/missing popularity; when popularity ordering is used, those entries sort after finite values, then by title and ID. | `test_movies_api.py` |
+| BR5: dedicated popular and recommendation fallback lists sort by popularity descending, then title A-Z, at most 10 | None | `GET /api/movies/popular` filters to finite popularity before deterministic popularity/title/ID ordering. The dedicated route is pending; the recommendation repository already excludes null popularity. | `test_popular_recommendations.py`; dedicated route tests pending |
 | BR6: an unknown movie ID never shows another movie | `catalog_movies.id` is the primary key | Lookup by ID inside the active revision; a miss returns `404 MOVIE_NOT_FOUND` | `test_unknown_movie_id_returns_404` |
 | BR13: the explanation lists exactly 3 steps | None | Page content in `RecommendationExplanationPage.tsx` | `test_recommendation_explanation_content.py`, `recommendation-explanation.test.tsx` |
 | BR16: an email is unique after case-insensitive normalisation | UNIQUE `email_normalized` with NOCASE collation | The email is trimmed and lowercased; a duplicate returns `409 EMAIL_ALREADY_REGISTERED` | `test_registration.py`, `test_registration_verification.py`, `test_account_migration.py` |
@@ -97,6 +116,11 @@ Multiplicities:
 | BR19: sign-out invalidates the session and keeps the account | `revoked_at` on the session row | `revoke_session` sets `revoked_at`; the user row is untouched | `test_logout_forbids_reusing_the_old_session_on_authenticated_api` |
 
 BR1 to BR4, BR7 to BR12, BR14 and BR15 depend on preference, rating, search, similarity or reset features that are not built yet. BR8 needs the preference and rating tables, which do not exist.
+
+Committed Sprint 3 delivery is narrower than that historical rule list:
+BR1-BR4 use saved genres and local popularity, BR7 stores an optional 1-5
+rating without using it for ranking, and BR14 freezes the authenticated reset
+backend transaction. BR9 rating-adjusted ranking remains Sprint 4.
 
 ## 3. API design
 
@@ -107,6 +131,9 @@ Conventions:
 - A success body is `{ "data": ..., "meta": ... }`. An error body is `{ "error": { "code", "message", "requestId" } }`.
 - The signed-in account comes only from the `ams_session` cookie. No endpoint accepts a user ID from the client.
 - `POST /api/auth/login` and `POST /api/auth/logout` reject cross-origin browser requests with `403 ORIGIN_NOT_ALLOWED`.
+- Committed preference, rating, and reset writes must extend the same-origin
+  mechanism. The current middleware does not yet protect those nonexistent
+  routes; this is a recorded implementation gap.
 - Any database failure returns `503 SERVICE_UNAVAILABLE`.
 
 | Story | Method and endpoint | Access | Input | Success | Errors | Status |
@@ -116,14 +143,31 @@ Conventions:
 | S13 | `POST /api/auth/login` | Public, same-origin | `email`, `password` | `200` with `data.user`; sets the session cookie | `400 VALIDATION_ERROR`, `401 INVALID_CREDENTIALS`, `403 ORIGIN_NOT_ALLOWED` | Implemented in M2 |
 | S13 | `POST /api/auth/logout` | Cookie optional, same-origin | None | `204`; session revoked, cookie cleared | `403 ORIGIN_NOT_ALLOWED` | Implemented in M2 |
 | S13 | `GET /api/auth/me` | Signed in | None | `200` with `data.user` | `401 AUTHENTICATION_REQUIRED` | Implemented in M2 |
-| S03, S04 | `GET /api/movies?limit=10` | Public | `limit` 1 to 10, default 10 | `200` with `data.movies` and `meta` (`count`, `limit`, `catalogueRevision`) | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE` | Implemented in M2 |
+| S04 | `GET /api/movies?limit=10` | Public | `limit` 1 to 10, default 10 | `200` with `data.movies` and `meta`; catalogue entries without popularity may be included and sort last when popularity ordering is used | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE` | Implemented in M2; public catalogue route |
+| S09 / T19 | `GET /api/movies/popular?limit=10` | Public | `limit` 1 to 10, default 10 | `200` with `data.movies` and `meta`; only finite-popularity movies are eligible | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | Committed Sprint 3 contract; implementation pending; dedicated popular route |
 | S03 | `GET /api/movies/{movieId}` | Public | Internal movie ID | `200` with `data.movie` | `404 MOVIE_NOT_FOUND`, `503 CATALOGUE_UNAVAILABLE` | Implemented in M2 |
 | S02, S04 | `GET /api/me/recommendations?limit=10` | Signed in | `limit` 1 to 10, default 10 | `200` with the popular list, `mode` `popular`, `personalised` `false` | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE` | Implemented in M2 (popular list only) |
-| S01 | `GET /api/genres` | Signed in | None | `200` with the genre list | `401 AUTHENTICATION_REQUIRED` | Planned for later sprint |
-| S01 | `GET /api/me/preferences` | Signed in | None | `200` with the saved genres | `401 AUTHENTICATION_REQUIRED` | Planned for later sprint |
-| S01 | `PUT /api/me/preferences` | Signed in | `genreIds`: 1 to 5 distinct genre IDs | `200` with the saved genres | `400 INVALID_GENRE_SELECTION`, `401 AUTHENTICATION_REQUIRED`, `404 GENRE_NOT_FOUND` | Planned for later sprint |
+| S01 | `GET /api/genres` | Signed in | None | `200` with the local canonical genre list | `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | Committed Sprint 3 contract; implementation pending |
+| S01 | `GET /api/me/preferences` | Signed in | None | `200` with the saved genres | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | Committed Sprint 3 contract; implementation pending |
+| S01 | `PUT /api/me/preferences` | Signed in, same-origin | `genreIds`: 1 to 5 distinct genre IDs | `200` with the saved genres after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 GENRE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | Committed Sprint 3 contract; implementation pending |
+| S05a | `GET /api/me/ratings/{movieId}` | Signed in | Opaque movie ID | `200` with committed `rating` or `null` | `401 AUTHENTICATION_REQUIRED`, `404 MOVIE_NOT_FOUND` | Committed Sprint 3 contract; implementation pending |
+| S05a | `PUT /api/me/ratings/{movieId}` | Signed in, same-origin | Strict `{ "rating": 1..5 }` | `200` only after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | Committed Sprint 3 contract; implementation pending |
+| S11 | `POST /api/me/profile/reset` | Signed in, same-origin | Exact `{ "confirm": true }` | `200` only after preferences/ratings delete transaction commits | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `503 SERVICE_UNAVAILABLE` | Committed Sprint 3 backend contract; implementation pending |
 
-All six P0 Stories appear in the table: S01 (genres and preferences), S02 and S04 (recommendations and the movie list), S03 (movie detail), S12 (register) and S13 (sign-in, sign-out, current account). The S01 endpoints are planned. The recommendation endpoint returns the popular list for every signed-in account; genre-based ranking depends on the planned preference endpoints. The `/recommendations` page does not display this response yet; the T20 evidence records that gap.
+All six P0 Stories appear in the table: S01 (genres and preferences), S02 and
+S04 (recommendations and the public catalogue), S03 (movie detail), S12
+(register) and S13 (sign-in, sign-out, current account). The S01 contracts are
+committed Sprint 3 scope with implementation pending. S09/T19 is listed
+separately as the committed dedicated public popular route. The recommendation
+endpoint returns the popular list for every signed-in account; genre-based
+ranking depends on the committed preference contracts. The `/recommendations`
+page does not display this response yet; the T20 evidence records that gap.
+
+The existing `GET /api/movies` route remains the public catalogue endpoint.
+Sprint 3 public popular-list consumers use `GET /api/movies/popular`. These are
+separate contracts: the catalogue route may include entries with null or
+missing popularity, while the dedicated popular route returns only entries
+with valid finite popularity.
 
 Error codes returned by the running backend:
 
@@ -138,7 +182,10 @@ Error codes returned by the running backend:
 | `SERVICE_UNAVAILABLE` | 503 | The database could not be read or written |
 | `CATALOGUE_UNAVAILABLE` | 503 | No active catalogue revision exists |
 
-`INVALID_GENRE_SELECTION` (400) and `GENRE_NOT_FOUND` (404) belong to the planned preference endpoints and are not returned yet.
+`GENRE_NOT_FOUND` (404) belongs to the committed preference contract and is not
+returned yet. Sprint 3 invalid preference/rating/reset bodies reuse the
+implemented `VALIDATION_ERROR` convention; no rating/reset-specific error code
+is invented.
 
 ## 4. Walking skeleton
 
@@ -230,11 +277,11 @@ Options considered:
 2. The backend calls TMDb on each catalogue request. Page content and test results would depend on a live service whose popularity values change between runs.
 3. The backend reads only the local database, and a separate command fills it, either from a fixed local dataset or from TMDb.
 
-Decision. Option 3 remains the runtime boundary. From Sprint 3, the server-side importer is mandatory catalogue preparation: configure a private Read Access Token, migrate a fresh database and import TMDb before dev/staging/demo acceptance. Active revision provider and movie source must be `tmdb`, with source IDs, counts and fetch/import timestamps verified by a separate manual smoke. The importer activates a revision only after every write succeeds; failed imports preserve the previous valid catalogue and do not fall back to seed. Required setup/failure checks are completed under T29/C04.
+Decision. Option 3 remains the runtime boundary. From Sprint 3, the server-side importer is mandatory catalogue preparation: configure a private Read Access Token, migrate a fresh database and import TMDb before dev/staging/demo acceptance. Active revision provider and movie source must be `tmdb`, with source IDs, counts and fetch/import timestamps verified by a separate manual smoke. The importer activates a revision only after every write succeeds; failed imports preserve the previous valid catalogue and do not fall back to seed. Required setup/failure checks must be completed under T29/C04; this document does not claim that acceptance has passed.
 
 Rationale. TMDb supplies the application catalogue, while local reads keep user requests independent of provider availability. Synthetic provider fixtures, boundary mocks and isolated test databases keep automated AC tests deterministic without live tokens/network. Credentials remain server-side.
 
-Consequence. The M2 fixed dataset is only historical/test/labelled offline support, not Sprint 3 acceptance data. A missing token or failed import leaves a new demo environment unready. On an existing environment the valid previous snapshot remains readable; the failed attempt cannot be reported as successful readiness evidence. `/api/genres`, recommendations, public popular and details continue to read SQLite; source provenance stays in operator evidence, not new public secret/source-ID DTO fields. Media T26–T28 remain stretch and do not block unchanged S03 criteria.
+Consequence. The M2 fixed dataset is only historical/test/labelled offline support, not Sprint 3 acceptance data. A missing token or failed import leaves a new demo environment unready. On an existing environment the valid previous snapshot remains readable; the failed attempt cannot be reported as successful readiness evidence. `/api/genres`, recommendations, the `/api/movies` public catalogue, the `/api/movies/popular` dedicated finite-popularity subset, and details read SQLite; source provenance stays in operator evidence, not new public secret/source-ID DTO fields. Media T26–T28 remain stretch and do not block unchanged S03 criteria.
 
 Verification. T29 and C04 must link successful fresh-database import, credential/error guidance, rollback/idempotence checks and final-candidate live smoke outside CI. Existing M2 tests/evidence do not imply these checks have passed. The [runbook](tmdb-sprint3-runbook.md) contains the required commands and provenance checklist.
 
@@ -253,7 +300,7 @@ Decision. Option 2. The cookie value is 32 random bytes from `secrets.token_urls
 
 Rationale. The contract rules out tokens in browser storage. The server can revoke a session itself: the T20 test replays the old cookie after sign-out from a new client and gets `401` on `/api/auth/me` and `/api/me/recommendations`.
 
-Consequences. Every protected request reads a session row. Browsers attach cookies automatically, so the cookie uses `SameSite=Lax` and the backend checks `Sec-Fetch-Site` or `Origin` on login and logout. That check covers only those two endpoints; the planned `PUT /api/me/preferences` is not covered because it does not exist yet.
+Consequences. Every protected request reads a session row. Browsers attach cookies automatically, so the cookie uses `SameSite=Lax` and the backend checks `Sec-Fetch-Site` or `Origin` on login and logout. That check covers only those two endpoints; the committed preference, rating, and reset writes are not covered because they do not exist yet.
 
 What would change the decision. A client that is not a browser, or a frontend served from a different origin than the API.
 
@@ -289,3 +336,133 @@ After. `auth_sessions` is keyed by `token_digest`, the SHA-256 digest of the coo
 Reason. Task #53 requires that expired or invalid sessions return `401` and that login renews the session identity. Storing only the digest means the database never holds a value that a browser could send as a cookie.
 
 Impact. A copy of the database holds no cookie value that a browser could send, and a cookie that was signed out or has expired returns `401`. The ERD in `docs/images/erd.png` shows `token_digest` and `revoked_at`.
+
+## 7. Sprint 3 personalisation decisions
+
+### ADR-3: Account identity and transaction boundary
+
+Status: committed Sprint 3 contract; implementation pending.
+
+Preferences, ratings, and reset are account-owned operations. Their target
+user is resolved only from the valid `ams_session` row. Request bodies do not
+accept `user_id`, account ID, email, username, or owner ID. Missing, expired,
+or revoked sessions return `401` before private data is returned or changed,
+and state-changing browser requests must pass the existing same-origin policy.
+
+Preference replacement, rating upsert, and profile reset each return success
+only after commit. Reset deletes the current user's preference and rating rows
+in the same transaction; either failure rolls back both. The user, current
+session, catalogue, movies, genres, and other accounts remain untouched.
+
+### ADR-4: Sprint 3 recommendation inputs
+
+Status: committed Sprint 3 contract; implementation pending.
+
+Sprint 3 personalised ranking uses only saved genres and local catalogue
+popularity. It preserves `data.movies`, `mode` (`personalised` or `popular`),
+`personalised`, `noMatch`, and per-movie `reason.matchedGenres`. Ratings may be
+stored by S05a but do not alter recommendation order in Sprint 3.
+Rating-adjusted ranking belongs to Story #22 / S05b and is planned Sprint 4.
+
+## 8. UI-driven design changes with repository evidence
+
+### Stale response isolation
+
+1. UI problem: a catalogue/detail request may finish after navigation, and an
+   authenticated request may finish after logout or an account switch.
+2. An unkeyed component/request result could display the previous movie or
+   previous account's private state.
+3. Current UI code cancels catalogue/detail state writes on effect cleanup,
+   keys the protected subtree by `auth.user.id`, and centralises a protected
+   API `401` transition through `handleUnauthorized`. Sprint 3 extends this
+   rule to preference/rating/recommendation/reset requests by keying them with
+   account ID and, for ratings, movie ID.
+4. A delayed response is accepted only when its captured account/movie key and
+   request generation still match current state; otherwise it is ignored.
+5. This does not change M2 API payloads. It constrains client state ownership
+   and preserves public catalogue/detail behaviour.
+
+Evidence: `frontend/src/pages/HomePage.tsx` and `MovieDetailPage.tsx` use effect
+cleanup cancellation; `frontend/src/auth/AuthContext.tsx` owns account
+identity; `RequireAuth.tsx` keys protected content by `user.id`.
+
+### Nullable catalogue fields for renderable detail states
+
+The detail UI must remain usable when provider data lacks a release year or
+overview. The current migration/model allow those fields to be null, DTOs
+return JSON `null`, and the detail UI renders `Information unavailable` while
+keeping the other fields visible. This is an evidence-backed data/UI
+reconciliation, not a proposed backdrop change. Clients that assumed non-null
+values must accept the already-documented nullable contract.
+
+Evidence: migration `4bde7d96c1c2`, `MovieDetailDto`,
+`MovieDetailPage.tsx`, and `test_movie_detail_returns_genres_and_treats_missing_fields_as_null`.
+
+## 9. Backdrop reconciliation
+
+No `backdrop` column, nullable-backdrop migration, TMDb backdrop mapping, DTO
+field, detail compatibility code, or related test exists in the current
+repository. No repository evidence maps issues #129-#131 to completed work.
+Backdrop work therefore remains pending/stretch and is not described as
+implemented.
+
+## 10. D1 contract publication and consumer handoff
+
+The initial contract milestone is prepared in this local working tree. D1 is
+not considered published or reviewed until the documentation change has a real
+review record. Once reviewed, implementation consumers may use it without
+waiting for the final reconciliation gate.
+
+Initial consumers/dependencies:
+
+- [#103](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/103)
+- [#106](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/106)
+- [#108](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/108)
+- [#112](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/112)
+- [#128](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/128)
+- [T30 #137](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/137)
+- [T31 #138](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/138)
+- [T32 #140](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/140)
+- [T33 #139](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/139)
+- [T34 #141](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/141)
+- [T35 #142](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/142)
+
+Consumer ownership/handoff:
+
+- Shared recommendation cards/client/container integration:
+  [S3-T10 #112](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/112).
+- No-match error, retry, and request-race handling:
+  [S3-T11 #113](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/113).
+- Cold-start transitions after preference save:
+  [S3-T13 #115](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/115).
+- TMDb import/setup:
+  [#128](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/128).
+- Public popular-list consumers: use the dedicated S09/T19
+  `GET /api/movies/popular` contract, not the existing S04 catalogue route.
+- API/data contract:
+  [#134](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/134).
+- Clean-clone/offline CI:
+  [#135](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/135).
+- M3 UI dossier coordination: the UI-driven explanation in `docs/ui.md` and
+  this design update must appear together in the same reviewed change for
+  [S3-C05 #136](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/136).
+
+These links assign handoff only. They do not imply completion, review approval,
+test evidence, or a tested SHA.
+
+## 11. Final reconciliation gate
+
+| Gate | Current status | Evidence needed before completion |
+|---|---|---|
+| Initial API/database/UI contract | Prepared locally; review/publication pending | Reviewed D1 contract link |
+| Preferences and personalised recommendation implementation | Pending; not present in current source/migrations | Merged code, migrations, executable tests, and consumer verification |
+| Rating storage/API/UI protection | Committed Sprint 3 scope; implementation pending | [T30 #137](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/137), [T31 #138](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/138), [T32 #140](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/140), [T33 #139](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/139), and [T34 #141](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/141); merged implementation plus isolation/validation/transaction/UI tests |
+| Authenticated reset backend | Committed Sprint 3 scope; implementation pending | [T35 #142](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/142); merged transaction/rollback/security tests |
+| UI-driven design reconciliation | Documented locally; #136 coordination/review pending | Same reviewed change containing `docs/ui.md` and `docs/design.md` |
+| Backdrop #129-#131 | Conditional and pending; no shipped repository evidence | Reconcile only if nullable storage, migration/import, detail compatibility, and independent verification ship |
+| Final implementation reconciliation | Pending | Compare these contracts with merged implementation and verification evidence |
+| Final evidence | Pending | Reviewed contract links, actual implementation evidence, final test results, and real tested SHA |
+
+Do not replace a `Pending` status with completion until the named repository
+evidence exists. This local contract update is not a reviewed publication and
+does not manufacture implementation results or a SHA.
