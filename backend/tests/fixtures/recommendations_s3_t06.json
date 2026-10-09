@@ -1,0 +1,266 @@
+{
+  "fixtureVersion": 1,
+  "fixtureId": "s3-t06-deterministic-recommendations",
+  "provenance": {
+    "kind": "hand-authored-synthetic",
+    "networkRequired": false,
+    "description": "Fictional genres, movies, scores, IDs, and revision created only for automated recommendation tests."
+  },
+  "catalogueRevision": "fixture-revision-s3-t06",
+  "genres": [
+    { "id": 7101, "name": "Ember" },
+    { "id": 7102, "name": "Tidal" },
+    { "id": 7103, "name": "Meadow" },
+    { "id": 7104, "name": "Archive" }
+  ],
+  "candidateRows": [
+    {
+      "id": "10000000-0000-0000-0000-000000000001",
+      "title": "Amber Velocity",
+      "releaseYear": 2041,
+      "genreIds": [7101, 7103],
+      "popularityScore": 110.0
+    },
+    {
+      "id": "10000000-0000-0000-0000-000000000002",
+      "title": "Binary Picnic",
+      "releaseYear": 2042,
+      "genreIds": [7102],
+      "popularityScore": 105.0
+    },
+    {
+      "id": "10000000-0000-0000-0000-000000000003",
+      "title": "Cobalt Relay",
+      "releaseYear": 2043,
+      "genreIds": [7101, 7102],
+      "popularityScore": 100.0
+    },
+    {
+      "id": "10000000-0000-0000-0000-000000000003",
+      "title": "Cobalt Relay",
+      "releaseYear": 2043,
+      "genreIds": [7101, 7102],
+      "popularityScore": 100.0
+    },
+    {
+      "id": "10000000-0000-0000-0000-000000000004",
+      "title": "Delta Lantern",
+      "releaseYear": 2044,
+      "genreIds": [7101],
+      "popularityScore": 100.0
+    },
+    {
+      "id": "10000000-0000-0000-0000-000000000005",
+      "title": "Echo Arc",
+      "releaseYear": 2045,
+      "genreIds": [7102, 7103],
+      "popularityScore": 95.0
+    },
+    {
+      "id": "10000000-0000-0000-0000-000000000006",
+      "title": "Echo Arc",
+      "releaseYear": 2046,
+      "genreIds": [7101],
+      "popularityScore": 95.0
+    },
+    {
+      "id": "10000000-0000-0000-0000-000000000007",
+      "title": "Fjord Signal",
+      "releaseYear": 2047,
+      "genreIds": [7102],
+      "popularityScore": 90.0
+    },
+    {
+      "id": "10000000-0000-0000-0000-000000000008",
+      "title": "Glass Orchard",
+      "releaseYear": 2048,
+      "genreIds": [7101, 7103],
+      "popularityScore": 85.0
+    },
+    {
+      "id": "10000000-0000-0000-0000-000000000009",
+      "title": "Harbor Circuit",
+      "releaseYear": 2049,
+      "genreIds": [7102],
+      "popularityScore": 80.0
+    },
+    {
+      "id": "10000000-0000-0000-0000-000000000010",
+      "title": "Indigo Parade",
+      "releaseYear": 2050,
+      "genreIds": [7101, 7102],
+      "popularityScore": 75.0
+    },
+    {
+      "id": "10000000-0000-0000-0000-000000000011",
+      "title": "Juniper Flight",
+      "releaseYear": 2051,
+      "genreIds": [7101],
+      "popularityScore": 70.0
+    }
+  ],
+  "cases": {
+    "personalisedTwoGenreIntersection": {
+      "savedGenreIds": [7101, 7102],
+      "request": { "limit": 10 },
+      "expectedResponse": {
+        "data": {
+          "movies": [
+            {
+              "id": "10000000-0000-0000-0000-000000000001",
+              "reason": { "matchedGenres": [{ "id": 7101, "name": "Ember" }] }
+            },
+            {
+              "id": "10000000-0000-0000-0000-000000000002",
+              "reason": { "matchedGenres": [{ "id": 7102, "name": "Tidal" }] }
+            },
+            {
+              "id": "10000000-0000-0000-0000-000000000003",
+              "reason": {
+                "matchedGenres": [
+                  { "id": 7101, "name": "Ember" },
+                  { "id": 7102, "name": "Tidal" }
+                ]
+              }
+            },
+            {
+              "id": "10000000-0000-0000-0000-000000000004",
+              "reason": { "matchedGenres": [{ "id": 7101, "name": "Ember" }] }
+            },
+            {
+              "id": "10000000-0000-0000-0000-000000000005",
+              "reason": { "matchedGenres": [{ "id": 7102, "name": "Tidal" }] }
+            },
+            {
+              "id": "10000000-0000-0000-0000-000000000006",
+              "reason": { "matchedGenres": [{ "id": 7101, "name": "Ember" }] }
+            },
+            {
+              "id": "10000000-0000-0000-0000-000000000007",
+              "reason": { "matchedGenres": [{ "id": 7102, "name": "Tidal" }] }
+            },
+            {
+              "id": "10000000-0000-0000-0000-000000000008",
+              "reason": { "matchedGenres": [{ "id": 7101, "name": "Ember" }] }
+            },
+            {
+              "id": "10000000-0000-0000-0000-000000000009",
+              "reason": { "matchedGenres": [{ "id": 7102, "name": "Tidal" }] }
+            },
+            {
+              "id": "10000000-0000-0000-0000-000000000010",
+              "reason": {
+                "matchedGenres": [
+                  { "id": 7101, "name": "Ember" },
+                  { "id": 7102, "name": "Tidal" }
+                ]
+              }
+            }
+          ],
+          "mode": "personalised",
+          "personalised": true,
+          "noMatch": false
+        },
+        "meta": {
+          "count": 10,
+          "limit": 10,
+          "catalogueRevision": "fixture-revision-s3-t06"
+        }
+      }
+    },
+    "popularColdStart": {
+      "savedGenreIds": [],
+      "request": { "limit": 10 },
+      "expectedResponse": {
+        "data": {
+          "movies": [
+            { "id": "10000000-0000-0000-0000-000000000001", "reason": { "matchedGenres": [] } },
+            { "id": "10000000-0000-0000-0000-000000000002", "reason": { "matchedGenres": [] } },
+            { "id": "10000000-0000-0000-0000-000000000003", "reason": { "matchedGenres": [] } },
+            { "id": "10000000-0000-0000-0000-000000000004", "reason": { "matchedGenres": [] } },
+            { "id": "10000000-0000-0000-0000-000000000005", "reason": { "matchedGenres": [] } },
+            { "id": "10000000-0000-0000-0000-000000000006", "reason": { "matchedGenres": [] } },
+            { "id": "10000000-0000-0000-0000-000000000007", "reason": { "matchedGenres": [] } },
+            { "id": "10000000-0000-0000-0000-000000000008", "reason": { "matchedGenres": [] } },
+            { "id": "10000000-0000-0000-0000-000000000009", "reason": { "matchedGenres": [] } },
+            { "id": "10000000-0000-0000-0000-000000000010", "reason": { "matchedGenres": [] } }
+          ],
+          "mode": "popular",
+          "personalised": false,
+          "noMatch": false
+        },
+        "meta": {
+          "count": 10,
+          "limit": 10,
+          "catalogueRevision": "fixture-revision-s3-t06"
+        }
+      }
+    },
+    "popularNoMatch": {
+      "savedGenreIds": [7104],
+      "request": { "limit": 10 },
+      "expectedResponse": {
+        "data": {
+          "movies": [
+            { "id": "10000000-0000-0000-0000-000000000001", "reason": { "matchedGenres": [] } },
+            { "id": "10000000-0000-0000-0000-000000000002", "reason": { "matchedGenres": [] } },
+            { "id": "10000000-0000-0000-0000-000000000003", "reason": { "matchedGenres": [] } },
+            { "id": "10000000-0000-0000-0000-000000000004", "reason": { "matchedGenres": [] } },
+            { "id": "10000000-0000-0000-0000-000000000005", "reason": { "matchedGenres": [] } },
+            { "id": "10000000-0000-0000-0000-000000000006", "reason": { "matchedGenres": [] } },
+            { "id": "10000000-0000-0000-0000-000000000007", "reason": { "matchedGenres": [] } },
+            { "id": "10000000-0000-0000-0000-000000000008", "reason": { "matchedGenres": [] } },
+            { "id": "10000000-0000-0000-0000-000000000009", "reason": { "matchedGenres": [] } },
+            { "id": "10000000-0000-0000-0000-000000000010", "reason": { "matchedGenres": [] } }
+          ],
+          "mode": "popular",
+          "personalised": false,
+          "noMatch": true
+        },
+        "meta": {
+          "count": 10,
+          "limit": 10,
+          "catalogueRevision": "fixture-revision-s3-t06"
+        }
+      }
+    }
+  },
+  "faultCases": [
+    {
+      "id": "authentication-required",
+      "when": "The session is missing, expired, invalid, or revoked.",
+      "expectedStatus": 401,
+      "expectedBody": {
+        "error": {
+          "code": "AUTHENTICATION_REQUIRED",
+          "message": "Authentication required",
+          "requestIdPattern": "^req_[0-9a-f]{32}$"
+        }
+      }
+    },
+    {
+      "id": "catalogue-unavailable",
+      "when": "No active catalogue revision is readable.",
+      "expectedStatus": 503,
+      "expectedBody": {
+        "error": {
+          "code": "CATALOGUE_UNAVAILABLE",
+          "message": "Movie catalogue is unavailable",
+          "requestIdPattern": "^req_[0-9a-f]{32}$"
+        }
+      }
+    },
+    {
+      "id": "service-unavailable",
+      "when": "The catalogue database read fails.",
+      "expectedStatus": 503,
+      "expectedBody": {
+        "error": {
+          "code": "SERVICE_UNAVAILABLE",
+          "message": "Service is temporarily unavailable",
+          "requestIdPattern": "^req_[0-9a-f]{32}$"
+        }
+      }
+    }
+  ]
+}
