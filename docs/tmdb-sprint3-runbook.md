@@ -52,7 +52,11 @@ python -m app.cli.import_tmdb_catalogue
 The current importer fetches one page of popular movies and the official genre
 list, with detail lookups only when needed for missing genre IDs. Keep the import
 finite. Any change to its page/request budget must be explicit and reviewed.
-Success prints `active_revision`, `inserted`, `updated` and `rejected` counts.
+Success prints a safe provenance summary: `provider`, `active_revision`,
+`inserted`, `updated`, `rejected`, `movies`, `associated_genres`,
+`finite_popularity_movies`, `source_fetched_at`, and up to three provider
+`sample_source_ids`, plus `imported_at` for the active revision. It never
+prints the token or provider payload.
 
 Missing/blank credentials must produce a nonzero exit and safe guidance naming
 `TMDB_READ_ACCESS_TOKEN` and where to configure it. Rejected credentials,
@@ -151,8 +155,10 @@ faults in the accepted shared environment.
 
 Evidence must include candidate SHA, environment, tester/date, command and exit
 status, actual counts, active revision/provider, sample source IDs, timestamps,
-expected/actual results and any blocker. Do not attach `.env`, credentials,
-database dumps or live provider payloads as automated test fixtures.
+expected/actual results and any blocker. Record it with the tracked
+[T29 evidence record](evidence/t29-tmdb-live-smoke.md). Do not attach `.env`,
+credentials, database dumps or live provider payloads as automated test
+fixtures.
 
 If no successful TMDb import/provenance smoke exists, catalogue-dependent flows
 cannot be accepted for Sprint 3. A failed attempted import cannot be recorded as
