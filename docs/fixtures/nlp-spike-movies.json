@@ -1,0 +1,51 @@
+[
+  {
+    "id": "source-railway",
+    "title": "Railway Murder",
+    "genres": ["Mystery", "Crime"],
+    "popularity": 90,
+    "overview": "A detective investigates a murder aboard a passenger train."
+  },
+  {
+    "id": "night-train",
+    "title": "Night Train Case",
+    "genres": ["Mystery", "Crime"],
+    "popularity": 80,
+    "overview": "A detective investigates a murder on an overnight train."
+  },
+  {
+    "id": "zebra-case",
+    "title": "Zebra Case",
+    "genres": ["Mystery", "Crime"],
+    "popularity": 70,
+    "overview": "A detective investigates a murder on an overnight train."
+  },
+  {
+    "id": "silent-platform",
+    "title": "Silent Platform",
+    "genres": ["Mystery"],
+    "popularity": 99,
+    "overview": null
+  },
+  {
+    "id": "family-drama",
+    "title": "Family Drama",
+    "genres": ["Mystery", "Drama"],
+    "popularity": 60,
+    "overview": "A family rebuilds their home after a storm."
+  },
+  {
+    "id": "city-escape",
+    "title": "City Escape",
+    "genres": ["Drama"],
+    "popularity": 100,
+    "overview": "A detective investigates a murder in a crowded city."
+  },
+  {
+    "id": "night-train",
+    "title": "Night Train Case",
+    "genres": ["Mystery", "Crime"],
+    "popularity": 80,
+    "overview": "A detective investigates a murder on an overnight train."
+  }
+]
