@@ -76,6 +76,17 @@ export async function listMovies(limit = 10): Promise<MovieSummary[]> {
   return body.data.movies;
 }
 
+export async function listPopularMovies(limit = 10): Promise<MovieSummary[]> {
+  const response = await fetch(`/api/movies/popular?limit=${limit}`);
+
+  if (!response.ok) {
+    throw await readError(response);
+  }
+
+  const body = (await response.json()) as MovieListResponse;
+  return body.data.movies;
+}
+
 export async function getMovie(movieId: string): Promise<MovieDetail> {
   const response = await fetch(`/api/movies/${encodeURIComponent(movieId)}`);
 
