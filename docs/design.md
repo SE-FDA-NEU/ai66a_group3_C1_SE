@@ -71,8 +71,9 @@ The database has eight application tables, created by four Alembic revisions on 
 
 The ERD in `docs/images/erd.png` is the M2 baseline. It shows the seven M2 tables: `users`, `auth_sessions`, `catalogue_revisions`, `catalogue_state`, `catalog_movies`, `genres`, and `movie_genres`. It does not yet show `user_genre_preferences`, added in S3-T01 and described below.
 
-Preferences, ratings, personalised recommendation, and profile reset are not
-represented as implemented tables. Sprint 3 freezes their contracts; rating-
+Genre preferences are stored in `user_genre_preferences` (S3-T01). Ratings,
+personalised recommendation, and profile reset are not represented as
+implemented tables. Sprint 3 freezes their contracts; rating-
 adjusted ranking (Story #22 / S05b) is planned Sprint 4 rather than Sprint 3.
 
 A trailing `?` marks a column that allows NULL. Every other column is NOT NULL.
@@ -457,7 +458,7 @@ test evidence, or a tested SHA.
 | Gate | Current status | Evidence needed before completion |
 |---|---|---|
 | Initial API/database/UI contract | Prepared locally; review/publication pending | Reviewed D1 contract link |
-| Preferences and personalised recommendation implementation | Pending; not present in current source/migrations | Merged code, migrations, executable tests, and consumer verification |
+| Preferences and personalised recommendation implementation | Partly done: preference table and reads exist (S3-T01); preference write and personalised recommendation pending | Merged code, migrations, executable tests, and consumer verification |
 | Rating storage/API/UI protection | Committed Sprint 3 scope; implementation pending | [T30 #137](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/137), [T31 #138](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/138), [T32 #140](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/140), [T33 #139](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/139), and [T34 #141](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/141); merged implementation plus isolation/validation/transaction/UI tests |
 | Authenticated reset backend | Committed Sprint 3 scope; implementation pending | [T35 #142](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/142); merged transaction/rollback/security tests |
 | UI-driven design reconciliation | Documented locally; #136 coordination/review pending | Same reviewed change containing `docs/ui.md` and `docs/design.md` |
