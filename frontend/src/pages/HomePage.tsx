@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { listMovies, type MovieSummary } from "../api/movies.ts";
-
-const INFORMATION_UNAVAILABLE = "Information unavailable";
+import MovieGrid from "../components/MovieGrid.tsx";
 
 function HomePage() {
   const [movies, setMovies] = useState<MovieSummary[]>([]);
@@ -61,6 +60,9 @@ function HomePage() {
           <p className="muted">Browse the public local movie catalogue.</p>
         </div>
         <nav className="catalogue-actions" aria-label="Public navigation">
+          <Link className="button-link button-secondary" to="/popular">
+            Popular movies
+          </Link>
           <Link
             className="button-link button-secondary"
             to="/about-recommendations"
@@ -91,30 +93,7 @@ function HomePage() {
           <p className="muted">The active catalogue does not contain any movies yet.</p>
         </section>
       ) : (
-        <section aria-label="Movie catalogue" className="movie-grid">
-          {movies.map((movie) => (
-            <article className="movie-card" key={movie.id}>
-              <div>
-                <p className="movie-year">
-                  {movie.releaseYear ?? INFORMATION_UNAVAILABLE}
-                </p>
-                <h2>{movie.title}</h2>
-                <p className="muted">
-                  {movie.genres.length > 0
-                    ? movie.genres.map((genre) => genre.name).join(" · ")
-                    : INFORMATION_UNAVAILABLE}
-                </p>
-              </div>
-              <Link
-                className="movie-card__link"
-                to={`/movies/${encodeURIComponent(movie.id)}`}
-                aria-label={`View details for ${movie.title}`}
-              >
-                View details
-              </Link>
-            </article>
-          ))}
-        </section>
+        <MovieGrid ariaLabel="Movie catalogue" movies={movies} />
       )}
     </main>
   );
