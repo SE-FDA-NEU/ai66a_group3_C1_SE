@@ -90,10 +90,17 @@ bounded TMDb snapshot:
 
 ```text
 TMDb catalogue import complete
+provider=tmdb
 active_revision=<opaque UUID>
 inserted=<count>
 updated=<count>
 rejected=<count>
+movies=<count>
+associated_genres=<count>
+finite_popularity_movies=<count>
+source_fetched_at=<UTC timestamp>
+imported_at=<UTC timestamp>
+sample_source_ids=<up to three TMDb source IDs>
 ```
 
 Before accepting the environment, verify provider/source=tmdb, source IDs,
