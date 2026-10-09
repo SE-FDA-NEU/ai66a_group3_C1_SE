@@ -77,15 +77,17 @@ yet available in the current repository.
 | S04 | `GET` | `/api/movies?limit=10` | Public | Optional integer `limit`, 1-10, default 10 | `200 MovieListResponse`; catalogue entries without popularity may be included and sort last when popularity ordering is used | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2`; public catalogue route |
 | S09 / T19 | `GET` | `/api/movies/popular?limit=10` | Public | Optional integer `limit`, 1-10, default 10 | `200 MovieListResponse`; only movies with valid popularity | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 contract; implementation pending`; dedicated popular-movie route |
 | S03 | `GET` | `/api/movies/{movieId}` | Public | Opaque `movieId` | `200 MovieDetailResponse` | `404 MOVIE_NOT_FOUND`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
-| S01 | `GET` | `/api/genres` | Authenticated | None | `200 GenreListResponse` | `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 contract; implementation pending` |
-| S01 | `GET` | `/api/me/preferences` | Authenticated | None | `200 PreferenceResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 contract; implementation pending` |
+| S01 | `GET` | `/api/genres` | Authenticated | None | `200 GenreListResponse` | `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T01)` |
+| S01 | `GET` | `/api/me/preferences` | Authenticated | None | `200 PreferenceResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T01)` |
 | S01 | `PUT` | `/api/me/preferences` | Authenticated, same-origin write | `PreferenceRequest` | `200 PreferenceResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 GENRE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 contract; implementation pending` |
 | S05a | `GET` | `/api/me/ratings/{movieId}` | Authenticated | Opaque `movieId` | `200 RatingResponse` | `401 AUTHENTICATION_REQUIRED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 contract; implementation pending` |
 | S05a | `PUT` | `/api/me/ratings/{movieId}` | Authenticated, same-origin write | `RatingRequest` | `200 RatingResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 contract; implementation pending` |
 | S11 | `POST` | `/api/me/profile/reset` | Authenticated, same-origin write | `ProfileResetRequest` | `200 ProfileResetResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 backend contract; implementation pending` |
 
-The current repository has no preferences, ratings, or reset route, model,
-migration, repository, or executable test. Personalised recommendations and
+S3-T01 added the `user_genre_preferences` table and the two read routes
+`GET /api/genres` and `GET /api/me/preferences`. The current repository has no
+`PUT /api/me/preferences`, ratings, or reset route, model, migration,
+repository, or executable test. Personalised recommendations and
 the dedicated `GET /api/movies/popular` route are also not implemented. Genre
 filtering, similar movies, and search remain outside this contract update.
 
@@ -263,7 +265,9 @@ preferences, and later recommendation requests read local SQLite only.
 
 ### `GET /api/genres`
 
-Returns the active catalogue's available canonical genres:
+Returns the canonical genres carried by at least one movie of the active
+catalogue revision, sorted by name then ID. A genre that no active movie uses
+could never match a recommendation, so it is not offered:
 
 ```json
 {
@@ -712,8 +716,9 @@ codes.
 
 ## 12. Scope boundary
 
-The repository still contains no implemented preferences, ratings, profile
+The repository still contains no implemented preference write, ratings, profile
 reset, dedicated public popular, personalised recommendation, or NLP endpoint.
+Only the preference reads (`GET /api/genres`, `GET /api/me/preferences`) exist.
 Sections 6, 7 (committed response), 8 (dedicated popular route), 9, and 10 are
 committed Sprint 3 delivery contracts, not optional future work, while their
 implementation status remains pending. Automated tests must use synthetic

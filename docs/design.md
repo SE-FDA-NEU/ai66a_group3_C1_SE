@@ -67,9 +67,9 @@ handoff; its implementation ownership remains with the S09/T19 consumer work.
 
 PlantUML source: [images/erd.puml](images/erd.puml).
 
-The database has seven application tables, created by three Alembic revisions on top of the empty bootstrap revision: `4bde7d96c1c2` (catalogue), `7f5b1d2a6e90` (users) and `8c1e2f4a7b90` (auth sessions). The single migration head is `8c1e2f4a7b90`.
+The database has eight application tables, created by four Alembic revisions on top of the empty bootstrap revision: `4bde7d96c1c2` (catalogue), `7f5b1d2a6e90` (users), `8c1e2f4a7b90` (auth sessions) and `9d2f5a1c3b84` (genre preferences, S3-T01). The single migration head is `9d2f5a1c3b84`.
 
-The ERD in `docs/images/erd.png` matches the current M2 Alembic migrations. It shows only the seven migrated tables: `users`, `auth_sessions`, `catalogue_revisions`, `catalogue_state`, `catalog_movies`, `genres`, and `movie_genres`.
+The ERD in `docs/images/erd.png` is the M2 baseline. It shows the seven M2 tables: `users`, `auth_sessions`, `catalogue_revisions`, `catalogue_state`, `catalog_movies`, `genres`, and `movie_genres`. It does not yet show `user_genre_preferences`, added in S3-T01 and described below.
 
 Preferences, ratings, personalised recommendation, and profile reset are not
 represented as implemented tables. Sprint 3 freezes their contracts; rating-
@@ -94,13 +94,15 @@ Multiplicities:
 - `catalogue_state` holds exactly one row, and that row points at exactly one revision.
 - Movies and genres are many-to-many through `movie_genres`; the composite primary key prevents a duplicate pair.
 
-Committed Sprint 3 storage adds `user_genre_preferences` with composite key
+Sprint 3 storage adds `user_genre_preferences` with composite key
 `(user_id, genre_id)` and `viewer_ratings` with composite key
 `(user_id, movie_id)`. Both columns in each key have foreign keys to the
 application-owned user/catalogue records. `viewer_ratings.rating` has a
-database check from 1 through 5. These tables and constraints do not exist in
-the current migration head; [architecture.md](architecture.md) is the target
-storage contract for their future migration.
+database check from 1 through 5. `user_genre_preferences` exists in migration
+`9d2f5a1c3b84` (S3-T01): `user_id` references `users.id` ON DELETE CASCADE and
+`genre_id` references `genres.id` ON DELETE RESTRICT. `viewer_ratings` does not
+exist in the current migration head; [architecture.md](architecture.md) is the
+target storage contract for its future migration.
 
 ### Business rules enforced in M2
 
@@ -147,8 +149,8 @@ Conventions:
 | S09 / T19 | `GET /api/movies/popular?limit=10` | Public | `limit` 1 to 10, default 10 | `200` with `data.movies` and `meta`; only finite-popularity movies are eligible | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | Committed Sprint 3 contract; implementation pending; dedicated popular route |
 | S03 | `GET /api/movies/{movieId}` | Public | Internal movie ID | `200` with `data.movie` | `404 MOVIE_NOT_FOUND`, `503 CATALOGUE_UNAVAILABLE` | Implemented in M2 |
 | S02, S04 | `GET /api/me/recommendations?limit=10` | Signed in | `limit` 1 to 10, default 10 | `200` with the popular list, `mode` `popular`, `personalised` `false` | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE` | Implemented in M2 (popular list only) |
-| S01 | `GET /api/genres` | Signed in | None | `200` with the local canonical genre list | `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | Committed Sprint 3 contract; implementation pending |
-| S01 | `GET /api/me/preferences` | Signed in | None | `200` with the saved genres | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | Committed Sprint 3 contract; implementation pending |
+| S01 | `GET /api/genres` | Signed in | None | `200` with the local canonical genre list | `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | Implemented in Sprint 3 (S3-T01) |
+| S01 | `GET /api/me/preferences` | Signed in | None | `200` with the saved genres | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | Implemented in Sprint 3 (S3-T01) |
 | S01 | `PUT /api/me/preferences` | Signed in, same-origin | `genreIds`: 1 to 5 distinct genre IDs | `200` with the saved genres after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 GENRE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | Committed Sprint 3 contract; implementation pending |
 | S05a | `GET /api/me/ratings/{movieId}` | Signed in | Opaque movie ID | `200` with committed `rating` or `null` | `401 AUTHENTICATION_REQUIRED`, `404 MOVIE_NOT_FOUND` | Committed Sprint 3 contract; implementation pending |
 | S05a | `PUT /api/me/ratings/{movieId}` | Signed in, same-origin | Strict `{ "rating": 1..5 }` | `200` only after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | Committed Sprint 3 contract; implementation pending |
