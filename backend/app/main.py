@@ -310,6 +310,7 @@ def list_movies(
     status_code=200,
 )
 def list_popular_movies(
+    limit: int = Query(default=10, ge=1, le=10),
     database_session: Session = Depends(get_db),  # noqa: B008
 ):
     revision = get_active_catalogue_revision(database_session)
@@ -323,7 +324,7 @@ def list_popular_movies(
 
     movies = list_popular_recommendation_movies(
         database_session,
-        limit=10,
+        limit=limit,
     )
 
     return {
@@ -335,7 +336,7 @@ def list_popular_movies(
         },
         "meta": {
             "count": len(movies),
-            "limit": 10,
+            "limit": limit,
             "catalogueRevision": revision.id,
         },
     }

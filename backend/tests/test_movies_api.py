@@ -444,3 +444,49 @@ def test_popular_movies_without_active_catalogue_is_unavailable(
         "CATALOGUE_UNAVAILABLE"
     )
 
+def test_popular_movies_respects_custom_limit(
+    client: tuple[TestClient, Session],
+) -> None:
+    http, database_session = client
+
+    revision = create_catalogue_revision(
+        database_session,
+        provider="seed",
+    )
+
+    for index in range(8):
+        upsert_catalogue_movie(
+            database_session,
+            catalogue_revision_id=revision.id,
+            source="seed",
+            source_id=f"movie-{index}",
+            title=f"Movie {index}",
+            popularity_score=float(100 - index),
+        )
+
+    activate_catalogue_revision(
+        database_session,
+        revision_id=revision.id,
+    )
+    database_session.commit()
+
+    response = http.get("/api/movies/popular?limit=5")
+
+    assert response.status_code == 200
+    assert len(response.json()["data"]["movies"]) == 5
+    assert response.json()["meta"]["count"] == 5
+    assert response.json()["meta"]["limit"] == 5
+
+
+def test_popular_movies_rejects_limit_above_ten(
+    client: tuple[TestClient, Session],
+) -> None:
+    http, _ = client
+
+    response = http.get("/api/movies/popular?limit=11")
+
+    assert response.status_code == 400
+    assert response.json()["error"]["code"] == "VALIDATION_ERROR"
+    assert response.json()["error"]["message"] == (
+        "Please correct the highlighted fields"
+    )
