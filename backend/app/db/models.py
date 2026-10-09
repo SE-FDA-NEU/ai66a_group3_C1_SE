@@ -93,6 +93,23 @@ class User(Base):
     )
 
 
+class UserGenrePreference(Base):
+    """One favourite genre saved by one account.
+
+    Rows are always keyed by the session-resolved ``users.id``.  Deleting an
+    account removes its rows; a genre that is still preferred cannot be deleted.
+    """
+
+    __tablename__ = "user_genre_preferences"
+
+    user_id: Mapped[str] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
+    )
+    genre_id: Mapped[int] = mapped_column(
+        ForeignKey("genres.id", ondelete="RESTRICT"), primary_key=True
+    )
+
+
 class AuthSession(Base):
     """A server-side login session identified by a digest of its cookie token."""
 
