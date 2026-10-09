@@ -85,10 +85,11 @@ yet available in the current repository.
 | S11 | `POST` | `/api/me/profile/reset` | Authenticated, same-origin write | `ProfileResetRequest` | `200 ProfileResetResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 backend contract; implementation pending` |
 
 The current repository has no preferences, ratings, or reset route, model,
-migration, repository, or executable test. Personalised recommendations 
-are not yet implemented. The dedicated GET /api/movies/popular route is 
-implemented in M3. Genre filtering, similar movies, and search remain outside 
+migration, repository, or executable test. Personalised recommendations
+are not yet implemented. The dedicated GET /api/movies/popular route is
+implemented in M3. Genre filtering, similar movies, and search remain outside
 this contract update.
+
 
 ## 3. Shared DTOs
 
@@ -253,8 +254,8 @@ preferences are stored by this application.
 Public IDs/DTOs remain unchanged. Operator provenance uses database source IDs
 and timestamps, not tokens or new public source-ID fields. Synthetic fixtures
 and provider-boundary mocks remain the automated-test path; mandatory live
-import/provenance smoke runs separately outside CI. This policy does not claim 
-that committed preference or personalised recommendation behaviour is implemented. 
+import/provenance smoke runs separately outside CI. This policy does not claim
+that committed preference or personalised recommendation behaviour is implemented.
 The dedicated public popular movie route is implemented in M3 under T19. The existing
 `/api/movies` route is the public catalogue route and is a separate contract.
 
@@ -481,7 +482,7 @@ endpoint.
 An empty active catalogue returns `200` with `movies: []`; the UI shows
 guidance and never invents movies.
 
-### `GET /api/movies/popular?limit=10` (implementation pending)
+### `GET /api/movies/popular?limit=10` (implementation in M3)
 
 This is the dedicated public popular-movie endpoint introduced for S09/T19.
 `limit` defaults to 10 and accepts an integer from 1 through 10. It returns only
