@@ -272,7 +272,7 @@ Confirm that Alembic has exactly one migration head:
 Expected head:
 
 ```text
-8c1e2f4a7b90 (head)
+9d2f5a1c3b84 (head)
 ```
 
 
@@ -324,11 +324,13 @@ the official movie genre list; it requests a movie-detail record only when a
 popular result omits `genre_ids`. It never runs as part of browser requests,
 automated tests, or the M2 bootstrap command.
 
-On success, the command prints an opaque active revision ID and only the
-inserted, updated, and rejected record counts. A missing/invalid credential,
-rate limit, timeout, invalid snapshot, or database failure leaves the prior
-active catalogue unchanged. Never commit, print, screenshot, or paste the
-actual access token.
+On success, the command prints a safe provenance summary: provider, opaque
+active revision ID, inserted/updated/rejected counts, movie/associated-genre/
+finite-popularity counts, source fetch timestamp and up to three provider
+source IDs, plus the active revision import timestamp. A missing/invalid
+credential, rate limit, timeout, invalid snapshot, or database failure leaves
+the prior active catalogue unchanged. Never commit, print, screenshot, or paste
+the actual access token.
 
 The required Sprint 3 contract is tracked under [#128](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/128):
 missing-token errors must give safe setup guidance, and the setup must never

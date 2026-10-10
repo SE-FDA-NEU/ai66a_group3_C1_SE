@@ -113,8 +113,8 @@ frontend must use the latter when rendering the Sprint 3 public popular list.
 
 PlantUML source: [erd.puml](images/erd.puml).
 
-The ERD shows exactly the seven tables created by the current Alembic
-migrations:
+The ERD image is the M2 baseline and shows exactly the seven tables created by
+the M2 Alembic migrations:
 
 - `users`
 - `auth_sessions`
@@ -127,14 +127,15 @@ migrations:
 `auth_sessions` stores `token_digest`, `created_at`, `expires_at`, and nullable
 `revoked_at`. `catalogue_revisions` stores the inserted, updated, and rejected
 movie counters. `catalogue_state.active_revision_id` is required and points to
-the active revision. No preferences, ratings, or import-run table has been
-migrated.
+the active revision. S3-T01 migration `9d2f5a1c3b84` added
+`user_genre_preferences`, which the ERD image does not show yet. No ratings or
+import-run table has been migrated.
 
 ### Committed Sprint 3 personalisation storage (implementation pending)
 
 The committed contract requires two application-owned tables. Names below are
-frozen for the future implementation migration; they do not exist in the
-current Alembic head.
+frozen. `user_genre_preferences` exists in migration `9d2f5a1c3b84` (S3-T01);
+`viewer_ratings` does not exist in the current Alembic head.
 
 | Table | Columns | Keys and constraints | Ownership/delete rule |
 |---|---|---|---|

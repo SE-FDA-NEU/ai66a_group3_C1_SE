@@ -20,7 +20,7 @@ MAX_POPULAR_PAGES = 1
 
 
 class TmdbImportError(RuntimeError):
-    """A sanitized failure while reading the optional provider catalogue."""
+    """A sanitized failure while reading the required provider catalogue."""
 
 
 class TmdbConfigurationError(TmdbImportError):
@@ -40,7 +40,7 @@ class TmdbPayloadError(TmdbImportError):
 
 
 class TmdbClient:
-    """Read only the bounded TMDb data needed by the optional importer."""
+    """Read only the bounded TMDb data needed by the server-side importer."""
 
     def __init__(
         self,
@@ -51,7 +51,8 @@ class TmdbClient:
         normalized_token = token.strip()
         if not normalized_token:
             raise TmdbConfigurationError(
-                "TMDb import requires TMDB_READ_ACCESS_TOKEN"
+                "TMDb import requires TMDB_READ_ACCESS_TOKEN in the root .env "
+                "or server environment"
             )
 
         self._headers = {
@@ -125,6 +126,11 @@ class TmdbClient:
             )
         except httpx.TimeoutException as exc:
             raise TmdbImportError("TMDb request timed out") from exc
+        except httpx.ConnectError as exc:
+            raise TmdbImportError(
+                "TMDb request failed; check network/DNS access to "
+                "api.themoviedb.org"
+            ) from exc
         except httpx.HTTPError as exc:
             raise TmdbImportError("TMDb request failed") from exc
 
