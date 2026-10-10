@@ -195,6 +195,26 @@ describe("S3-T20 public popular-movie page", () => {
       ) {
         return jsonResponse(movieListResponse(popularMovies.slice(0, 1)));
       }
+      if (request.method === "GET" && request.url === "/api/genres") {
+        return jsonResponse({
+          data: {
+            genres: [
+              { id: 18, name: "Drama" },
+              { id: 28, name: "Action" },
+            ],
+          },
+        });
+      }
+      if (request.method === "GET" && request.url === "/api/me/preferences") {
+        return jsonResponse({
+          data: {
+            genres: [
+              { id: 18, name: "Drama" },
+              { id: 28, name: "Action" },
+            ],
+          },
+        });
+      }
       if (request.method === "PUT" && request.url === "/api/me/preferences") {
         savedGenreIds.splice(0);
       }
@@ -216,6 +236,8 @@ describe("S3-T20 public popular-movie page", () => {
     expect(savedGenreIds).toEqual([18, 28]);
     expect(requests).toEqual([
       { method: "GET", url: "/api/auth/me" },
+      { method: "GET", url: "/api/genres" },
+      { method: "GET", url: "/api/me/preferences" },
       { method: "GET", url: "/api/movies/popular?limit=10" },
     ]);
     await waitFor(() => expect(window.location.pathname).toBe("/popular"));

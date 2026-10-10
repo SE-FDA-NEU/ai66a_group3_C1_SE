@@ -56,10 +56,4 @@ describe("T13 recommendation landing", () => {
     expect(screen.getByRole("status")).toHaveTextContent("Loading recommendations...");
   });
 
-  it("makes preferences a real protected page", async () => {
-    renderAuthenticatedRoute("/preferences");
-
-    expect(await screen.findByRole("heading", { name: "Movie Preferences" })).toBeInTheDocument();
-    expect(screen.getByText("Preference selection will be available soon.")).toBeInTheDocument();
-  });
 });

@@ -177,6 +177,70 @@ button:disabled {
   margin: 0.75rem 0 1rem;
 }
 
+.preferences-card {
+  width: min(100%, 680px);
+}
+
+.preference-status {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  border: 1px dashed #bdbdbd;
+  border-radius: 12px;
+  background: #fafafa;
+}
+
+.preference-status h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.15rem;
+}
+
+.genre-picker {
+  margin: 1.5rem 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.genre-picker legend {
+  font-weight: 700;
+}
+
+.selection-count {
+  margin: 0.35rem 0 1rem;
+  color: #666666;
+}
+
+.genre-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.75rem;
+}
+
+.genre-option {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 48px;
+  padding: 0.75rem;
+  border: 1px solid #dedede;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.genre-option:has(input:checked) {
+  border-color: #171717;
+  background: #f0f0f0;
+}
+
+.genre-option input {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin: 0;
+}
+
+.preference-limit {
+  margin-top: 1rem;
+}
+
 @media (max-width: 640px) {
   .page {
     padding: 1rem;
