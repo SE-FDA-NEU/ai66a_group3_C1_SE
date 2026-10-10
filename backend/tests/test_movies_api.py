@@ -274,7 +274,7 @@ def test_popular_movies_returns_top_ten_using_shared_popularity_order(
         popularity_score=80.0,
     )
 
-    for index in range(9):
+    for index in range(8):
         upsert_catalogue_movie(
             database_session,
             catalogue_revision_id=revision.id,
@@ -298,6 +298,19 @@ def test_popular_movies_returns_top_ten_using_shared_popularity_order(
     movies = body["data"]["movies"]
 
     assert len(movies) == 10
+    assert [movie["title"] for movie in movies] == [
+        "Alpha",
+        "Beta",
+        "Charlie",
+        "Extra 00",
+        "Extra 01",
+        "Extra 02",
+        "Extra 03",
+        "Extra 04",
+        "Extra 05",
+        "Extra 06",
+    ]
+    assert "Extra 07" not in [movie["title"] for movie in movies]
     assert movies[0]["title"] == "Alpha"
     assert movies[0]["popularityScore"] == 95.0
     assert movies[1]["title"] == "Beta"
