@@ -18,8 +18,10 @@ from app.repositories.movies import (
     to_movie_summary_dto,
 )
 from app.repositories.preferences import (
+    GenreNotFoundError,
     list_available_genres,
     list_user_preference_genres,
+    replace_user_preference_genres,
 )
 from app.repositories.recommendations import list_popular_recommendation_movies
 from app.repositories.users import create_user, get_user_by_email, to_user_dto
@@ -31,7 +33,12 @@ from app.schemas.auth import (
     RegisterResponse,
 )
 from app.schemas.movies import MovieDetailResponse, MovieListResponse
-from app.schemas.preferences import GenreListResponse, PreferenceResponse
+from app.schemas.preferences import (
+    GenreListData,
+    GenreListResponse,
+    PreferenceRequest,
+    PreferenceResponse,
+)
 from app.schemas.recommendations import RecommendationResponse
 from app.security.origin import same_origin_write_allowed
 from app.security.passwords import normalize_email, verify_password
@@ -47,16 +54,21 @@ app = FastAPI(
     title="AI Movie Recommendation System",
 )
 
-_SESSION_WRITE_PATHS = frozenset({"/api/auth/login", "/api/auth/logout"})
+_SAME_ORIGIN_WRITES = frozenset(
+    {
+        ("POST", "/api/auth/login"),
+        ("POST", "/api/auth/logout"),
+        ("PUT", "/api/me/preferences"),
+    }
+)
 
 
 @app.middleware("http")
-async def same_origin_session_writes(request: Request, call_next):
-    """Reject cross-origin browser requests before they can change a session."""
+async def same_origin_account_writes(request: Request, call_next):
+    """Reject cross-origin browser writes to sessions or account preferences."""
 
     if (
-        request.method == "POST"
-        and request.url.path in _SESSION_WRITE_PATHS
+        (request.method, request.url.path) in _SAME_ORIGIN_WRITES
         and not same_origin_write_allowed(request)
     ):
         return _error(
@@ -333,6 +345,32 @@ def get_preferences(
             )
         }
     }
+
+
+@app.put("/api/me/preferences", response_model=PreferenceResponse, status_code=200)
+def put_preferences(
+    payload: PreferenceRequest,
+    request: Request,
+    database_session: Session = Depends(get_db),  # noqa: B008
+):
+    try:
+        user = resolve_session(database_session, request.cookies.get(SESSION_COOKIE))
+        if user is None:
+            return _error("AUTHENTICATION_REQUIRED", "Authentication required", 401)
+
+        genres = replace_user_preference_genres(
+            database_session, user_id=user.id, genre_ids=payload.genreIds
+        )
+        response = PreferenceResponse(data=GenreListData(genres=genres))
+        database_session.commit()
+    except GenreNotFoundError:
+        database_session.rollback()
+        return _error("GENRE_NOT_FOUND", "Genre not found", 404)
+    except SQLAlchemyError:
+        database_session.rollback()
+        return _error("SERVICE_UNAVAILABLE", "Service is temporarily unavailable", 503)
+
+    return response
 
 
 @app.get("/api/movies", response_model=MovieListResponse, status_code=200)
