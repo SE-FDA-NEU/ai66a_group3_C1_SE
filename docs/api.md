@@ -1,11 +1,11 @@
 # Sprint 3 HTTP API contract
 
-Contract revision: `S3-DRAFT`, reconciled with the current M2 runtime on
-2026-10-09.
+Contract revision: `S3-DRAFT`, reconciled with the current M2/Sprint 3 runtime on
+2026-10-10 (S3-T02 preference replacement).
 
 This document inventories the implemented M2 HTTP boundary and defines the
 committed Sprint 3 contracts needed by implementation consumers. Every route
-is labelled `Implemented in M2` or `Committed Sprint 3 contract;
+is labelled with its implemented milestone/task or `Committed Sprint 3 contract;
 implementation pending`. A committed contract is required Sprint scope, but
 is not an availability or test-evidence claim until its implementation and
 verification evidence exist.
@@ -28,10 +28,10 @@ Architecture and persistence rules are in
 - Browser `POST /api/auth/login` and `POST /api/auth/logout` requests must pass
   the same-origin Fetch Metadata/`Origin` check. Cross-origin and same-site
   browser writes return `403 ORIGIN_NOT_ALLOWED` before session state changes.
-- Committed Sprint 3 browser writes (`PUT /api/me/preferences`,
-  `PUT /api/me/ratings/{movieId}`, and `POST /api/me/profile/reset`) must reuse
-  that protection. The current middleware covers login/logout only, so this is
-  an implementation requirement, not current runtime behaviour.
+- `PUT /api/me/preferences` now reuses that protection (S3-T02). The same-origin
+  registry matches method and path; login/logout protection is preserved.
+  Committed rating and profile-reset writes must extend the registry when
+  their routes are implemented.
 - Protected endpoints derive the account only from the authenticated session.
   A client-supplied `user_id`, account ID, email, username, or owner field
   cannot select or change the target account. Such fields are not part of a
@@ -79,16 +79,16 @@ yet available in the current repository.
 | S03 | `GET` | `/api/movies/{movieId}` | Public | Opaque `movieId` | `200 MovieDetailResponse` | `404 MOVIE_NOT_FOUND`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 | S01 | `GET` | `/api/genres` | Authenticated | None | `200 GenreListResponse` | `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T01)` |
 | S01 | `GET` | `/api/me/preferences` | Authenticated | None | `200 PreferenceResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T01)` |
-| S01 | `PUT` | `/api/me/preferences` | Authenticated, same-origin write | `PreferenceRequest` | `200 PreferenceResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 GENRE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 contract; implementation pending` |
+| S01 | `PUT` | `/api/me/preferences` | Authenticated, same-origin write | `PreferenceRequest` | `200 PreferenceResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 GENRE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T02)` |
 | S05a | `GET` | `/api/me/ratings/{movieId}` | Authenticated | Opaque `movieId` | `200 RatingResponse` | `401 AUTHENTICATION_REQUIRED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 contract; implementation pending` |
 | S05a | `PUT` | `/api/me/ratings/{movieId}` | Authenticated, same-origin write | `RatingRequest` | `200 RatingResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 contract; implementation pending` |
 | S11 | `POST` | `/api/me/profile/reset` | Authenticated, same-origin write | `ProfileResetRequest` | `200 ProfileResetResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 backend contract; implementation pending` |
 
 S3-T01 added the `user_genre_preferences` table and the two read routes
-`GET /api/genres` and `GET /api/me/preferences`. The dedicated
-`GET /api/movies/popular` route is implemented in M3 under T19. The current
-repository has no `PUT /api/me/preferences`, ratings, or reset route, model,
-migration, repository, or executable test. Personalised recommendations are
+`GET /api/genres` and `GET /api/me/preferences`. S3-T02 implements validated,
+atomic preference replacement through `PUT /api/me/preferences`. The dedicated
+`GET /api/movies/popular` route is implemented in M3 under T19. Ratings and
+reset storage/routes remain pending. Personalised recommendations are
 not yet implemented. Genre filtering, similar movies, and search remain outside
 this contract update.
 
@@ -245,9 +245,9 @@ cannot terminate the current session.
 
 The following contracts are committed Sprint 3 scope, not optional future
 work. S3-T01 implements the account-owned preference migration and the read
-routes `GET /api/genres` and `GET /api/me/preferences`. Preference replacement
-through `PUT /api/me/preferences` and personalised recommendations remain
-pending, so those parts are not runtime or completion evidence.
+routes `GET /api/genres` and `GET /api/me/preferences`. S3-T02 implements
+preference replacement through `PUT /api/me/preferences`. Personalised
+recommendations remain pending.
 
 Sprint 3 data-source decision (2026-10-06): development/staging/demo catalogue
 must be imported from TMDb into SQLite and verified under T29/C04 in the
@@ -258,9 +258,9 @@ preferences are stored by this application.
 Public IDs/DTOs remain unchanged. Operator provenance uses database source IDs
 and timestamps, not tokens or new public source-ID fields. Synthetic fixtures
 and provider-boundary mocks remain the automated-test path; mandatory live
-import/provenance smoke runs separately outside CI. S3-T01 implements preference storage
-and the preference reads, but this policy does not claim that preference
-replacement or personalised recommendation behaviour is implemented.
+import/provenance smoke runs separately outside CI. Preference storage/reads
+are implemented under T01 and replacement under T02; personalised
+recommendation behaviour remains pending.
 The dedicated public popular movie route is implemented in M3 under T19. The existing
 `/api/movies` route is the public catalogue route and is a separate contract.
 
@@ -318,6 +318,16 @@ The list must contain 1-5 distinct, existing canonical genre IDs. The server
 replaces only the authenticated account's preference rows in one transaction
 and returns the `PreferenceResponse` above only after commit. An invalid or
 failed replacement leaves the previously committed selection unchanged.
+
+S3-T02 enforces strict integer items: strings, floats, booleans, and null are
+not coerced into IDs. Extra body fields (including `userId`) are rejected.
+Existence is checked against local canonical `genres`, not just the active
+catalogue's selectable subset. Unknown IDs are rejected before deletion. The
+server flushes all replacement rows and prepares the sorted response before
+commit; a failed insert or commit rolls back deletion and insertion together.
+It returns the prepared response only after commit succeeds, avoiding a new
+database read after an already-successful write. Tests and reviewer steps are
+in [T02 evidence](evidence/s3-t02-atomic-preferences.md).
 
 | Condition | Status/code | Public message |
 |---|---|---|
@@ -706,16 +716,15 @@ profile state only after the reset success response.
 | `VALIDATION_ERROR` | 400 | Request fields or query values are invalid. |
 | `AUTHENTICATION_REQUIRED` | 401 | A protected route has no valid session. |
 | `INVALID_CREDENTIALS` | 401 | Login credentials are invalid without revealing which field failed. |
-| `ORIGIN_NOT_ALLOWED` | 403 | A browser session write failed the same-origin check. |
+| `ORIGIN_NOT_ALLOWED` | 403 | A browser session or preference write failed the same-origin check. |
 | `MOVIE_NOT_FOUND` | 404 | The internal movie ID does not exist in the active catalogue. |
 | `GENRE_NOT_FOUND` | 404 | A requested genre ID does not exist. |
 | `EMAIL_ALREADY_REGISTERED` | 409 | The normalized email is already stored. |
 | `SERVICE_UNAVAILABLE` | 503 | Required persistence (account or catalogue) is unavailable. |
 | `CATALOGUE_UNAVAILABLE` | 503 | No active catalogue is readable. |
 
-`GENRE_NOT_FOUND` is a committed preference-contract code and is not returned by
-the current router. All other codes in this table are present in the M2 backend
-or existing API contract. Sprint 3 rating and reset validation deliberately
+`GENRE_NOT_FOUND` is returned by S3-T02 when any requested canonical genre does
+not exist. Sprint 3 rating and reset validation deliberately
 reuse `VALIDATION_ERROR`; this document does not invent rating/reset-specific
 codes.
 
@@ -727,9 +736,9 @@ popularity/title/ID ranker.
 
 The preference storage and the preference reads (`GET /api/genres`,
 `GET /api/me/preferences`) are implemented in Sprint 3 under S3-T01.
-Preference replacement (`PUT /api/me/preferences`), ratings, profile reset,
-personalised recommendations, and NLP endpoints remain unimplemented. Sections
-6 (preference write), 7 (committed personalised response), 9, and 10 remain
+Preference replacement (`PUT /api/me/preferences`) is implemented under S3-T02.
+Ratings, profile reset, personalised recommendations, and NLP endpoints remain
+unimplemented. Sections 7 (committed personalised response), 9, and 10 remain
 committed Sprint 3 delivery contracts, not optional future work, while their
 implementation status remains pending.
 

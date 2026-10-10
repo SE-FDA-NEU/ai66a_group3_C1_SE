@@ -1,6 +1,6 @@
 # Sprint 3 design and contract reconciliation
 
-This document was reconciled with the local working tree on 2026-10-09. Every
+This document was reconciled with the local working tree on 2026-10-10. Every
 table and endpoint is marked as implemented or as committed Sprint 3 scope
 with implementation pending; no tested SHA or review approval is implied.
 Request and response shapes are in
@@ -40,9 +40,9 @@ In development, Vite listens on port 5173 and proxies `/api` to the backend on `
 
 ### Modules and owners
 
-Implemented-module owners are the GitHub assignees of the Sprint 2 tasks. The
-pending dedicated popular contract is owned here only as the #134 contract
-handoff; its implementation ownership remains with the S09/T19 consumer work.
+The table records the existing Sprint 2 module owners and the dedicated
+popular contract's #134 handoff. The dedicated popular route is now
+implemented under Sprint 3 T19 (#121).
 
 | Module | What it does | Owner (task) |
 |---|---|---|
@@ -54,7 +54,7 @@ handoff; its implementation ownership remains with the S09/T19 consumer work.
 | Registration endpoint: `backend/app/schemas/auth.py`, `POST /api/auth/register` | Validates the email and password and creates the account. | Vu Quoc Huy, `@vu-huzy` (#52) |
 | Login, logout, current account: `backend/app/main.py`, `backend/app/security/origin.py` | Sign-in and sign-out endpoints and the same-origin check. | Tran Minh Hoang, `@hoang3003` (#54) |
 | Catalogue and detail endpoints: `GET /api/movies`, `GET /api/movies/{movieId}` | Public list and detail reads from the active catalogue. | `@vu-huzy` (#60) |
-| Dedicated popular endpoint: `GET /api/movies/popular` | S09/T19 public popular subset; only finite-popularity movies are eligible. Contract committed, implementation pending. | `@hoang3003` (#134 contract handoff); S09/T19 implementation consumer |
+| Dedicated popular endpoint: `GET /api/movies/popular` | Implemented S09/T19 public popular subset; only finite-popularity movies are eligible. | `@hoang3003` (#134 contract handoff); S09/T19 implementation task #121 |
 | Popular ranking: `backend/app/recommendations/ranker.py`, `GET /api/me/recommendations` | Shared popularity ordering and the signed-in cold-start list. | Tran Tuan Anh, `@anotify-vie` (#58) |
 | Catalogue and detail pages: `frontend/src/pages/HomePage.tsx`, `MovieDetailPage.tsx` | Ten movie cards at `/` and the detail page at `/movies/:movieId`. | `@anotify-vie` (#61) |
 | Registration and sign-in forms: `RegisterPage.tsx`, `LoginPage.tsx` | Forms that call the auth endpoints. | `@NguyenTuanAnh0608` (#50), `@anotify-vie` (#55) |
@@ -110,7 +110,7 @@ target storage contract for its future migration.
 | Rule | Database | Service or query | Tests |
 |---|---|---|---|
 | S04 public catalogue ordering | None | `GET /api/movies` may include null/missing popularity; when popularity ordering is used, those entries sort after finite values, then by title and ID. | `test_movies_api.py` |
-| BR5: dedicated popular and recommendation fallback lists sort by popularity descending, then title A-Z, at most 10 | None | `GET /api/movies/popular` filters to finite popularity before deterministic popularity/title/ID ordering. The dedicated route is pending; the recommendation repository already excludes null popularity. | `test_popular_recommendations.py`; dedicated route tests pending |
+| BR5: dedicated popular and recommendation fallback lists sort by popularity descending, then title A-Z, at most 10 | None | `GET /api/movies/popular` filters to finite popularity before deterministic popularity/title/ID ordering. The recommendation repository also excludes null popularity. | `test_popular_recommendations.py`, `test_movies_api.py` |
 | BR6: an unknown movie ID never shows another movie | `catalog_movies.id` is the primary key | Lookup by ID inside the active revision; a miss returns `404 MOVIE_NOT_FOUND` | `test_unknown_movie_id_returns_404` |
 | BR13: the explanation lists exactly 3 steps | None | Page content in `RecommendationExplanationPage.tsx` | `test_recommendation_explanation_content.py`, `recommendation-explanation.test.tsx` |
 | BR16: an email is unique after case-insensitive normalisation | UNIQUE `email_normalized` with NOCASE collation | The email is trimmed and lowercased; a duplicate returns `409 EMAIL_ALREADY_REGISTERED` | `test_registration.py`, `test_registration_verification.py`, `test_account_migration.py` |
@@ -118,7 +118,10 @@ target storage contract for its future migration.
 | BR18: personal data needs a valid session and belongs to that account | `auth_sessions.user_id` references `users.id` | `/api/auth/me` and `/api/me/recommendations` take the account from the cookie only and return `401` without a valid session | `test_auth_sessions.py`, `test_auth_catalogue_handoff.py` |
 | BR19: sign-out invalidates the session and keeps the account | `revoked_at` on the session row | `revoke_session` sets `revoked_at`; the user row is untouched | `test_logout_forbids_reusing_the_old_session_on_authenticated_api` |
 
-BR1 to BR4, BR7 to BR12, BR14 and BR15 depend on preference, rating, search, similarity or reset features that are not built yet. BR8 needs the preference and rating tables, which do not exist.
+Preference validation and account-scoped replacement are implemented under
+T02. Recommendation, rating, search, similarity, and reset rules remain
+incomplete until their respective tasks pass. The preference table exists;
+rating storage and full preference/rating persistence acceptance remain pending.
 
 Committed Sprint 3 delivery is narrower than that historical rule list:
 BR1-BR4 use saved genres and local popularity, BR7 stores an optional 1-5
@@ -134,9 +137,8 @@ Conventions:
 - A success body is `{ "data": ..., "meta": ... }`. An error body is `{ "error": { "code", "message", "requestId" } }`.
 - The signed-in account comes only from the `ams_session` cookie. No endpoint accepts a user ID from the client.
 - `POST /api/auth/login` and `POST /api/auth/logout` reject cross-origin browser requests with `403 ORIGIN_NOT_ALLOWED`.
-- Committed preference, rating, and reset writes must extend the same-origin
-  mechanism. The current middleware does not yet protect those nonexistent
-  routes; this is a recorded implementation gap.
+- `PUT /api/me/preferences` reuses the same-origin mechanism under T02. Future
+  rating and reset writes must extend the method/path registry before mutation.
 - Any database failure returns `503 SERVICE_UNAVAILABLE`.
 
 | Story | Method and endpoint | Access | Input | Success | Errors | Status |
@@ -147,21 +149,22 @@ Conventions:
 | S13 | `POST /api/auth/logout` | Cookie optional, same-origin | None | `204`; session revoked, cookie cleared | `403 ORIGIN_NOT_ALLOWED` | Implemented in M2 |
 | S13 | `GET /api/auth/me` | Signed in | None | `200` with `data.user` | `401 AUTHENTICATION_REQUIRED` | Implemented in M2 |
 | S04 | `GET /api/movies?limit=10` | Public | `limit` 1 to 10, default 10 | `200` with `data.movies` and `meta`; catalogue entries without popularity may be included and sort last when popularity ordering is used | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE` | Implemented in M2; public catalogue route |
-| S09 / T19 | `GET /api/movies/popular?limit=10` | Public | `limit` 1 to 10, default 10 | `200` with `data.movies` and `meta`; only finite-popularity movies are eligible | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | Committed Sprint 3 contract; implementation pending; dedicated popular route |
+| S09 / T19 | `GET /api/movies/popular?limit=10` | Public | `limit` 1 to 10, default 10 | `200` with `data.movies` and `meta`; only finite-popularity movies are eligible | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | Implemented in Sprint 3 (S3-T19); dedicated popular route |
 | S03 | `GET /api/movies/{movieId}` | Public | Internal movie ID | `200` with `data.movie` | `404 MOVIE_NOT_FOUND`, `503 CATALOGUE_UNAVAILABLE` | Implemented in M2 |
 | S02, S04 | `GET /api/me/recommendations?limit=10` | Signed in | `limit` 1 to 10, default 10 | `200` with the popular list, `mode` `popular`, `personalised` `false` | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE` | Implemented in M2 (popular list only) |
 | S01 | `GET /api/genres` | Signed in | None | `200` with the local canonical genre list | `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | Implemented in Sprint 3 (S3-T01) |
 | S01 | `GET /api/me/preferences` | Signed in | None | `200` with the saved genres | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | Implemented in Sprint 3 (S3-T01) |
-| S01 | `PUT /api/me/preferences` | Signed in, same-origin | `genreIds`: 1 to 5 distinct genre IDs | `200` with the saved genres after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 GENRE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | Committed Sprint 3 contract; implementation pending |
+| S01 | `PUT /api/me/preferences` | Signed in, same-origin | `genreIds`: 1 to 5 distinct genre IDs | `200` with the saved genres after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 GENRE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | Implemented in Sprint 3 (S3-T02) |
 | S05a | `GET /api/me/ratings/{movieId}` | Signed in | Opaque movie ID | `200` with committed `rating` or `null` | `401 AUTHENTICATION_REQUIRED`, `404 MOVIE_NOT_FOUND` | Committed Sprint 3 contract; implementation pending |
 | S05a | `PUT /api/me/ratings/{movieId}` | Signed in, same-origin | Strict `{ "rating": 1..5 }` | `200` only after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | Committed Sprint 3 contract; implementation pending |
 | S11 | `POST /api/me/profile/reset` | Signed in, same-origin | Exact `{ "confirm": true }` | `200` only after preferences/ratings delete transaction commits | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `503 SERVICE_UNAVAILABLE` | Committed Sprint 3 backend contract; implementation pending |
 
 All six P0 Stories appear in the table: S01 (genres and preferences), S02 and
 S04 (recommendations and the public catalogue), S03 (movie detail), S12
-(register) and S13 (sign-in, sign-out, current account). The S01 contracts are
-committed Sprint 3 scope with implementation pending. S09/T19 is listed
-separately as the committed dedicated public popular route. The recommendation
+(register) and S13 (sign-in, sign-out, current account). S01 backend storage,
+reads, and atomic preference replacement are implemented under T01/T02; its
+frontend and complete Story acceptance remain pending. S09/T19 is listed
+separately as the implemented dedicated public popular route. The recommendation
 endpoint returns the popular list for every signed-in account; genre-based
 ranking depends on the committed preference contracts. The `/recommendations`
 page does not display this response yet; the T20 evidence records that gap.
@@ -179,14 +182,15 @@ Error codes returned by the running backend:
 | `VALIDATION_ERROR` | 400 | A body field or the `limit` query value is invalid |
 | `AUTHENTICATION_REQUIRED` | 401 | A signed-in endpoint has no valid, unexpired, unrevoked session |
 | `INVALID_CREDENTIALS` | 401 | The email is unknown or the password is wrong; the message is the same for both |
-| `ORIGIN_NOT_ALLOWED` | 403 | A login or logout request fails the same-origin check |
+| `ORIGIN_NOT_ALLOWED` | 403 | A login, logout, or preference PUT request fails the same-origin check |
 | `MOVIE_NOT_FOUND` | 404 | The movie ID does not exist in the active catalogue |
+| `GENRE_NOT_FOUND` | 404 | A requested canonical genre ID does not exist |
 | `EMAIL_ALREADY_REGISTERED` | 409 | The normalised email is already stored |
 | `SERVICE_UNAVAILABLE` | 503 | The database could not be read or written |
 | `CATALOGUE_UNAVAILABLE` | 503 | No active catalogue revision exists |
 
-`GENRE_NOT_FOUND` (404) belongs to the committed preference contract and is not
-returned yet. Sprint 3 invalid preference/rating/reset bodies reuse the
+`GENRE_NOT_FOUND` (404) is returned by the implemented T02 preference route.
+Sprint 3 invalid preference/rating/reset bodies reuse the
 implemented `VALIDATION_ERROR` convention; no rating/reset-specific error code
 is invented.
 
@@ -303,7 +307,7 @@ Decision. Option 2. The cookie value is 32 random bytes from `secrets.token_urls
 
 Rationale. The contract rules out tokens in browser storage. The server can revoke a session itself: the T20 test replays the old cookie after sign-out from a new client and gets `401` on `/api/auth/me` and `/api/me/recommendations`.
 
-Consequences. Every protected request reads a session row. Browsers attach cookies automatically, so the cookie uses `SameSite=Lax` and the backend checks `Sec-Fetch-Site` or `Origin` on login and logout. That check covers only those two endpoints; the committed preference, rating, and reset writes are not covered because they do not exist yet.
+Consequences. Every protected request reads a session row. Browsers attach cookies automatically, so the cookie uses `SameSite=Lax` and the backend checks `Sec-Fetch-Site` or `Origin` on login, logout, and preference replacement. Future rating/reset writes must extend the same method/path registry.
 
 What would change the decision. A client that is not a browser, or a frontend served from a different origin than the API.
 
@@ -344,7 +348,8 @@ Impact. A copy of the database holds no cookie value that a browser could send, 
 
 ### ADR-3: Account identity and transaction boundary
 
-Status: committed Sprint 3 contract; implementation pending.
+Status: preference storage/reads/replacement implemented under T01/T02;
+rating/reset implementation pending.
 
 Preferences, ratings, and reset are account-owned operations. Their target
 user is resolved only from the valid `ams_session` row. Request bodies do not
@@ -356,6 +361,14 @@ Preference replacement, rating upsert, and profile reset each return success
 only after commit. Reset deletes the current user's preference and rating rows
 in the same transaction; either failure rolls back both. The user, current
 session, catalogue, movies, genres, and other accounts remain untouched.
+
+T02 validates 1-5 distinct strict integer IDs and checks local canonical
+existence before deleting the current account's old rows. It flushes and
+prepares the sorted DTO before committing once. Insert/commit failures roll
+back both deletion and insertion; no post-commit database query is required to
+build a success response. [T02 evidence](evidence/s3-t02-atomic-preferences.md)
+records focused validation/security/rollback tests. T03 and the later UI
+acceptance tasks still own broader persistence and complete S01 verification.
 
 ### ADR-4: Sprint 3 recommendation inputs
 
@@ -458,7 +471,7 @@ test evidence, or a tested SHA.
 | Gate | Current status | Evidence needed before completion |
 |---|---|---|
 | Initial API/database/UI contract | Prepared locally; review/publication pending | Reviewed D1 contract link |
-| Preferences and personalised recommendation implementation | Partly done: preference table and reads exist (S3-T01); preference write and personalised recommendation pending | Merged code, migrations, executable tests, and consumer verification |
+| Preferences and personalised recommendation implementation | Backend storage/reads/replacement implemented under T01/T02; UI, broader persistence acceptance, and personalised recommendations pending | Reviewed/merged code, executable tests, and consumer verification; see T02 evidence |
 | Rating storage/API/UI protection | Committed Sprint 3 scope; implementation pending | [T30 #137](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/137), [T31 #138](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/138), [T32 #140](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/140), [T33 #139](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/139), and [T34 #141](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/141); merged implementation plus isolation/validation/transaction/UI tests |
 | Authenticated reset backend | Committed Sprint 3 scope; implementation pending | [T35 #142](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/142); merged transaction/rollback/security tests |
 | UI-driven design reconciliation | Documented locally; #136 coordination/review pending | Same reviewed change containing `docs/ui.md` and `docs/design.md` |

@@ -1,7 +1,7 @@
 # Sprint 3 architecture and persistence contract
 
 Contract revision: `S3-DRAFT`, reconciled with current migrations on
-2026-10-09.
+2026-10-10 (S3-T02 preference replacement).
 
 The HTTP contract is in [api.md](api.md). This document describes the backend
 that is present in the repository and separately labels committed Sprint 3
@@ -20,10 +20,12 @@ The repository contains a FastAPI backend with these implemented areas:
   `GET /api/movies/{movieId}`.
 - Authenticated `GET /api/me/recommendations`, which currently serves the
   shared popular/cold-start recommendation list.
+- Authenticated genre/preference reads (S3-T01) and validated, atomic
+  `PUT /api/me/preferences` (S3-T02), scoped only by the server-side session.
 
-The dedicated public popular-movie route `GET /api/movies/popular` is a
-committed S09/T19 Sprint 3 contract and is not implemented in the current
-runtime. It must not be inferred from the existing catalogue route.
+The dedicated public popular-movie route `GET /api/movies/popular` is an
+implemented S09/T19 Sprint 3 route. It returns the finite-popularity subset
+and is distinct from the existing general catalogue route.
 
 The backend uses the local SQLite catalogue selected by
 `catalogue_state.active_revision_id`. Movie and recommendation reads do not
@@ -33,10 +35,10 @@ staging and demo catalogue acceptance; it is verified under T29/C04 in the
 [runbook](tmdb-sprint3-runbook.md). M2 seed evidence remains historical/test
 support, while CI uses synthetic provider fixtures without a real token/network.
 
-Preferences, rating storage/API/UI protection, genre/popularity-only
-personalised recommendations, and the authenticated reset backend are
-committed Sprint 3 scope. They are not implemented migrations or current
-runtime capabilities. Rating/reset session isolation supports Story #45 / S13.
+Preference storage, reads, and atomic replacement are implemented under
+T01/T02. Preference UI, rating storage/API/UI protection, genre/popularity-only
+personalised recommendations, and the authenticated reset backend remain
+committed Sprint 3 work. Rating/reset session isolation supports Story #45 / S13.
 Rating-adjusted ranking remains Story #22 / S05b planned for Sprint 4.
 
 ## 2. Selected stack
@@ -161,7 +163,10 @@ provider movie across importer updates that preserve that ID.
 - Sprint 3 private rows are always keyed by the session-resolved `users.id`;
   no client-supplied identity participates in a lookup or mutation.
 - Sprint 3 preference replacement is one transaction and preserves the prior
-  committed set on failure.
+  committed set on failure (implemented under T02). Canonical existence is
+  checked before deletion; scoped deletion, insertion, and flush run in the
+  request's transaction. The route commits once or rolls back on database
+  failure. Response DTOs are prepared before commit and returned after it.
 - Sprint 3 rating upsert is one transaction and returns success only after
   commit. Invalid input or a failed commit preserves the prior value.
 - Sprint 3 profile reset deletes only the current user's preference and rating
@@ -187,8 +192,9 @@ provider responses and run offline; CI needs no TMDb token. The token must not
 appear in DTOs, frontend/Vite assets, logs, screenshots, fixtures, database
 dumps used as evidence, or documentation evidence.
 
-Committed Sprint 3 private writes must extend the existing same-origin Fetch
-Metadata/`Origin` protection before mutation. Missing, expired, or revoked
+T02 extends the existing same-origin Fetch Metadata/`Origin` protection to
+preference PUT requests using a method/path registry. Future rating/reset
+writes must extend it before mutation. Missing, expired, or revoked
 sessions return `401 AUTHENTICATION_REQUIRED`; permitted-origin requests still
 derive their account solely from the server-side session.
 
