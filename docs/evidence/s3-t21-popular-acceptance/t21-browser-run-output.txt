@@ -1,6 +1,6 @@
 S09 / T21 real-DB UI acceptance
-run_at=2026-10-10T21:31:25+07:00
-base_commit=6321e702347a877850ca3215ca334bb288f2cfd2
+run_at=2026-10-10T21:51:06+07:00
+base_commit=eaa41371b78e7bbba4b6328693bd6fe3af505fd2
 working_tree=local changes present
 python=3.12.3
 node=v24.20.0

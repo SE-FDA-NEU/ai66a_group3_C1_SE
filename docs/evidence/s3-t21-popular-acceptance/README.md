@@ -5,9 +5,8 @@ Test date: 2026-10-10 (Asia/Saigon)
 - Parent Story: [#31](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/31) (reference only; do not close the Story from this task)
 - Backend dependency: [PR #145](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/145)
 - UI dependency: [PR #148](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/148)
-- Tested base commit: `6321e702347a877850ca3215ca334bb288f2cfd2`
-- Tested candidate: the base commit above plus the local T21 working-tree changes listed below
-- Candidate commit permalink: pending until the T21 changes are committed
+- Tested candidate after merging `main`: [`eaa41371b78e7bbba4b6328693bd6fe3af505fd2`](https://github.com/kietxuan/ai66a_group3_C1_SE/commit/eaa41371b78e7bbba4b6328693bd6fe3af505fd2)
+- Pre-run working tree: clean; the acceptance runner then refreshed the tracked evidence files
 - Independent review: pending until a T21 pull request is opened
 - Scope: testing and evidence only; no production application code changed
 
@@ -59,7 +58,7 @@ Full machine-readable output is in `t21-browser-run-output.txt`. The backend out
 | `python backend/scripts/verify_s09_popular_ui.py --evidence-dir docs/evidence/s3-t21-popular-acceptance` | PASS; migrated real DB, real API, Vite UI and headless Chromium |
 | `python -m pytest backend/tests/test_movies_api.py -k popular -v -p no:cacheprovider` | 7 passed, 10 deselected, 1 existing deprecation warning |
 | `npm --prefix frontend test -- src/tests/popular-movies.test.tsx --reporter=verbose` | 1 file passed; 6 tests passed |
-| `python -m pytest backend/tests -v -p no:cacheprovider` | 109 passed, 2 skipped, 1 existing deprecation warning |
+| `python -m pytest backend/tests -v -p no:cacheprovider` | 135 passed, 2 skipped, 1 existing deprecation warning |
 | `npm --prefix frontend test -- --reporter=verbose` | 6 files passed; 47 tests passed |
 | `python -m ruff check backend` | All checks passed |
 | `npm --prefix frontend run lint` | Exit code 0 |
@@ -81,6 +80,6 @@ The two backend skips are existing placeholders for rating-write and cross-accou
 ## Explicitly pending or unimplemented
 
 - Unimplemented S09 criteria in T21 scope: **none**. All three criteria listed above pass through the real database and UI.
-- Candidate commit permalink: pending because these changes have not yet been committed.
+- Tested candidate commit: linked above; the post-merge acceptance and focused suites pass against it.
 - Independent review link: pending because no T21 PR has been opened.
 - Story-wide closure: intentionally not claimed. Keep #31 open until its complete AC-to-task matrix and Definition of Done pass.
