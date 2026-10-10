@@ -103,11 +103,13 @@ describe("S3-T20 public popular-movie page", () => {
 
     render(<App />);
 
-    expect(
-      await screen.findByRole("heading", {
+    const emptyStateHeading = await screen.findByRole("heading", {
         name: "Popular movies are not available yet",
-      }),
-    ).toBeInTheDocument();
+      });
+
+    expect(emptyStateHeading).toHaveTextContent(
+      /^Popular movies are not available yet$/,
+    );
     expect(screen.queryAllByRole("article")).toHaveLength(0);
   });
 
