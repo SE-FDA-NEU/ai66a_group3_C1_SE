@@ -16,6 +16,7 @@ const LIMIT_MESSAGE =
 function PreferencesPage() {
   const { handleUnauthorized } = useAuth();
   const [genres, setGenres] = useState<Genre[]>([]);
+  const [unavailableSavedGenres, setUnavailableSavedGenres] = useState<Genre[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -30,16 +31,17 @@ function PreferencesPage() {
       getPreferences(controller.signal),
     ])
       .then(([availableGenres, savedGenres]) => {
+        if (controller.signal.aborted) {
+          return;
+        }
+
         const availableIds = new Set(availableGenres.map((genre) => genre.id));
 
         setGenres(availableGenres);
-        setSelectedIds(
-          new Set(
-            savedGenres
-              .map((genre) => genre.id)
-              .filter((genreId) => availableIds.has(genreId)),
-          ),
+        setUnavailableSavedGenres(
+          savedGenres.filter((genre) => !availableIds.has(genre.id)),
         );
+        setSelectedIds(new Set(savedGenres.map((genre) => genre.id)));
         setLimitError("");
       })
       .catch((error: unknown) => {
@@ -114,7 +116,7 @@ function PreferencesPage() {
               Retry
             </button>
           </div>
-        ) : genres.length === 0 ? (
+        ) : genres.length === 0 && unavailableSavedGenres.length === 0 ? (
           <div className="preference-status">
             <h2>No genres available</h2>
             <p className="muted">
@@ -133,20 +135,61 @@ function PreferencesPage() {
             <p id="genre-selection-count" className="selection-count" aria-live="polite">
               {selectedIds.size} of {MAX_GENRES} selected
             </p>
-            <div className="genre-options">
-              {genres.map((genre) => (
-                <label className="genre-option" key={genre.id}>
-                  <input
-                    type="checkbox"
-                    checked={selectedIds.has(genre.id)}
-                    onChange={(event) =>
-                      handleGenreChange(genre.id, event.currentTarget.checked)
-                    }
-                  />
-                  <span>{genre.name}</span>
-                </label>
-              ))}
-            </div>
+            {genres.length > 0 ? (
+              <div className="genre-options">
+                {genres.map((genre) => (
+                  <label className="genre-option" key={genre.id}>
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(genre.id)}
+                      onChange={(event) =>
+                        handleGenreChange(genre.id, event.currentTarget.checked)
+                      }
+                    />
+                    <span>{genre.name}</span>
+                  </label>
+                ))}
+              </div>
+            ) : (
+              <div className="preference-status preference-status--compact">
+                <h2>No active genres available</h2>
+                <p className="muted">
+                  You can still review saved genres that are no longer in the
+                  active catalogue.
+                </p>
+              </div>
+            )}
+
+            {unavailableSavedGenres.length > 0 ? (
+              <section
+                className="unavailable-genres"
+                aria-labelledby="unavailable-genres-title"
+              >
+                <h2 id="unavailable-genres-title">Saved but unavailable</h2>
+                <p className="muted">
+                  These saved genres are not in the active catalogue. They remain
+                  selected and count toward the 5-genre limit; clear one only if
+                  you want to remove it from this draft.
+                </p>
+                <div className="genre-options">
+                  {unavailableSavedGenres.map((genre) => (
+                    <label
+                      className="genre-option genre-option--unavailable"
+                      key={genre.id}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.has(genre.id)}
+                        onChange={(event) =>
+                          handleGenreChange(genre.id, event.currentTarget.checked)
+                        }
+                      />
+                      <span>{genre.name} (saved, unavailable)</span>
+                    </label>
+                  ))}
+                </div>
+              </section>
+            ) : null}
           </fieldset>
         )}
 

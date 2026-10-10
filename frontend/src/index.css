@@ -194,6 +194,10 @@ button:disabled {
   font-size: 1.15rem;
 }
 
+.preference-status--compact {
+  margin-top: 0;
+}
+
 .genre-picker {
   margin: 1.5rem 0 0;
   padding: 0;
@@ -231,6 +235,10 @@ button:disabled {
   background: #f0f0f0;
 }
 
+.genre-option--unavailable {
+  border-style: dashed;
+}
+
 .genre-option input {
   width: 1.1rem;
   height: 1.1rem;
@@ -239,6 +247,17 @@ button:disabled {
 
 .preference-limit {
   margin-top: 1rem;
+}
+
+.unavailable-genres {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #dedede;
+}
+
+.unavailable-genres h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
 }
 
 @media (max-width: 640px) {
