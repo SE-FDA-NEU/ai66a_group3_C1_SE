@@ -155,7 +155,7 @@ npm --prefix frontend run dev
 Open `http://127.0.0.1:8000/health`. The response is:
 
 ```json
-{"status":"ok","database":"connected","migrationVersion":"8c1e2f4a7b90"}
+{"status":"ok","database":"connected","migrationVersion":"9d2f5a1c3b84"}
 ```
 
 Open `http://localhost:5173/`. The existing home page reads its cards from the
@@ -195,7 +195,7 @@ The response is `503` with the code `SERVICE_UNAVAILABLE`. Apply migrations:
 python -m alembic -c backend/alembic.ini upgrade head
 ```
 
-Then open `/health` again. `migrationVersion` should be `8c1e2f4a7b90`.
+Then open `/health` again. `migrationVersion` should be `9d2f5a1c3b84`.
 
 This is the current M2 head; Sprint 3 migrations may advance it. Verify the
 actual current head. A healthy database alone does not prove catalogue readiness;

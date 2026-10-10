@@ -17,6 +17,10 @@ from app.repositories.movies import (
     to_movie_detail_dto,
     to_movie_summary_dto,
 )
+from app.repositories.preferences import (
+    list_available_genres,
+    list_user_preference_genres,
+)
 from app.repositories.recommendations import list_popular_recommendation_movies
 from app.repositories.users import create_user, get_user_by_email, to_user_dto
 from app.schemas.auth import (
@@ -27,6 +31,7 @@ from app.schemas.auth import (
     RegisterResponse,
 )
 from app.schemas.movies import MovieDetailResponse, MovieListResponse
+from app.schemas.preferences import GenreListResponse, PreferenceResponse
 from app.schemas.recommendations import RecommendationResponse
 from app.security.origin import same_origin_write_allowed
 from app.security.passwords import normalize_email, verify_password
@@ -280,6 +285,55 @@ def recommendations(
             "catalogueRevision": revision.id,
         },
     }
+
+@app.get("/api/genres", response_model=GenreListResponse, status_code=200)
+def list_genres(
+    request: Request,
+    database_session: Session = Depends(get_db),  # noqa: B008
+):
+    user = resolve_session(
+        database_session,
+        request.cookies.get(SESSION_COOKIE),
+    )
+    if user is None:
+        return _error(
+            "AUTHENTICATION_REQUIRED", "Authentication required", 401
+        )
+
+    if get_active_catalogue_revision(database_session) is None:
+        return _error(
+            "CATALOGUE_UNAVAILABLE", "Movie catalogue is unavailable", 503
+        )
+
+    return {"data": {"genres": list_available_genres(database_session)}}
+
+
+@app.get(
+    "/api/me/preferences",
+    response_model=PreferenceResponse,
+    status_code=200,
+)
+def get_preferences(
+    request: Request,
+    database_session: Session = Depends(get_db),  # noqa: B008
+):
+    user = resolve_session(
+        database_session,
+        request.cookies.get(SESSION_COOKIE),
+    )
+    if user is None:
+        return _error(
+            "AUTHENTICATION_REQUIRED", "Authentication required", 401
+        )
+
+    return {
+        "data": {
+            "genres": list_user_preference_genres(
+                database_session, user_id=user.id
+            )
+        }
+    }
+
 
 @app.get("/api/movies", response_model=MovieListResponse, status_code=200)
 def list_movies(

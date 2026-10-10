@@ -70,7 +70,14 @@ entity "movie_genres" as movie_genre_links {
   * genre_id : INTEGER <<PK, FK>>
 }
 
+entity "user_genre_preferences" as user_genre_prefs {
+  * user_id : TEXT <<PK, FK>>
+  * genre_id : INTEGER <<PK, FK>>
+}
+
 users "1" -- "0..*" auth_sessions
+users "1" -- "0..*" user_genre_prefs
+genres "1" -- "0..*" user_genre_prefs
 rev "1" -- "0..*" movie_rows
 rev "0..1" -- "0..1" active_state
 movie_rows "1" -- "0..*" movie_genre_links
