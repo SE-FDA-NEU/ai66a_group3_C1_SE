@@ -1,4 +1,4 @@
-"""Validate and atomically activate an optional TMDb catalogue import."""
+"""Validate and atomically activate the required TMDb catalogue import."""
 
 from __future__ import annotations
 
@@ -34,12 +34,18 @@ class TmdbCatalogueGateway(Protocol):
 
 @dataclass(frozen=True)
 class TmdbImportResult:
-    """Safe summary printed by the optional command after a successful commit."""
+    """Safe provenance summary printed after a successful import commit."""
 
     active_revision_id: str
     inserted_movie_count: int
     updated_movie_count: int
     rejected_movie_count: int
+    movie_count: int
+    associated_genre_count: int
+    finite_popularity_movie_count: int
+    source_fetched_at: datetime
+    imported_at: datetime
+    sample_source_ids: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -82,6 +88,13 @@ def import_tmdb_catalogue(
     if not prepared_movies:
         raise TmdbPayloadError("TMDb did not return any usable movies")
 
+    associated_genre_count = len(
+        {genre_id for movie in prepared_movies for genre_id in movie.genre_ids}
+    )
+    finite_popularity_movie_count = sum(
+        movie.popularity_score is not None for movie in prepared_movies
+    )
+
     revision = create_catalogue_revision(session, provider=TMDB_SOURCE)
     for genre_id, name in genres_by_id.items():
         upsert_genre(session, genre_id=genre_id, name=name)
@@ -123,6 +136,12 @@ def import_tmdb_catalogue(
         inserted_movie_count=inserted_movie_count,
         updated_movie_count=updated_movie_count,
         rejected_movie_count=rejected_movie_count,
+        movie_count=len(prepared_movies),
+        associated_genre_count=associated_genre_count,
+        finite_popularity_movie_count=finite_popularity_movie_count,
+        source_fetched_at=source_fetched_at,
+        imported_at=revision.created_at,
+        sample_source_ids=tuple(movie.source_id for movie in prepared_movies[:3]),
     )
 
 
