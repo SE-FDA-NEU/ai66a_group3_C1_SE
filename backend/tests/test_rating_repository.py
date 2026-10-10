@@ -14,7 +14,8 @@ from app.repositories.ratings import (
     get_user_movie_rating,
     set_user_movie_rating,
 )
-from sqlalchemy import create_engine, func, select
+from sqlalchemy import create_engine, func, select, text
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
@@ -235,3 +236,35 @@ def test_repository_rejects_invalid_rating_values(
             movie_id="movie-a",
             rating=rating,  # type: ignore[arg-type]
         )
+
+def test_orm_created_schema_rejects_fractional_rating(
+    database_session: Session,
+) -> None:
+    with pytest.raises(IntegrityError):
+        database_session.execute(
+            text(
+                """
+                INSERT INTO user_movie_ratings
+                    (
+                        id,
+                        user_id,
+                        movie_id,
+                        rating,
+                        created_at,
+                        updated_at
+                    )
+                VALUES
+                    (
+                        'fractional-rating',
+                        'user-a',
+                        'movie-a',
+                        3.5,
+                        '2026-10-10 00:00:00',
+                        '2026-10-10 00:00:00'
+                    )
+                """
+            )
+        )
+        database_session.flush()
+
+    database_session.rollback()

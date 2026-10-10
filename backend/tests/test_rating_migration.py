@@ -272,6 +272,12 @@ def test_database_enforces_rating_range_and_foreign_keys(
             "movie_id": "unknown-movie",
             "rating": 4,
         },
+        {
+            "id": "bad-fraction",
+            "user_id": "user-a",
+            "movie_id": "movie-a",
+            "rating": 3.5,
+        },
     )
 
     for row in invalid_rows:

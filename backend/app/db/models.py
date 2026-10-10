@@ -252,7 +252,7 @@ class UserMovieRating(Base):
             name="uq_user_movie_ratings_user_movie",
         ),
         CheckConstraint(
-            "rating >= 1 AND rating <= 5",
+            "typeof(rating) = 'integer' AND rating BETWEEN 1 AND 5",
             name="ck_user_movie_ratings_rating_range",
         ),
     )
