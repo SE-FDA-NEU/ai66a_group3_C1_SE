@@ -1,0 +1,18 @@
+S09 / T21 real-DB UI acceptance
+run_at=2026-10-10T21:31:25+07:00
+base_commit=6321e702347a877850ca3215ca334bb288f2cfd2
+working_tree=local changes present
+python=3.12.3
+node=v24.20.0
+browser_executable=C:\Program Files\Google\Chrome\Application\chrome.exe
+database=migrated temporary file-backed SQLite
+guest_route=/popular
+request=/api/movies/popular?limit=10
+seeded_popular_movies=11
+ui_titles=["Alpha 95", "Beta 80", "Candidate 03", "Candidate 04", "Candidate 05", "Candidate 06", "Candidate 07", "Candidate 08", "Candidate 09", "Candidate 10"]
+visible_cards=10
+excluded_title=Excluded 11
+ordering=Alpha 95 before Beta 80
+empty_message=Popular movies are not available yet
+empty_visible_cards=0
+result=PASS
