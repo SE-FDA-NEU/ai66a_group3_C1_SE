@@ -220,9 +220,5 @@ def test_rating_write_requires_the_signed_in_account() -> None:
     raise AssertionError("pending")
 
 
-@pytest.mark.skip(
-    reason="Pending S02/S03: personalised recommendations and cross-account "
-    "isolation of ratings need preferences and ratings first."
-)
-def test_two_accounts_receive_their_own_personalised_recommendations() -> None:
-    raise AssertionError("pending")
+# Personalised cross-account recommendation isolation is exercised against
+# synthetic API/database state in test_personalised_recommendations_api.py.

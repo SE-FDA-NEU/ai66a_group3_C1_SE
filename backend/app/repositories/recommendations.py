@@ -34,6 +34,8 @@ def list_popular_recommendation_movies(
         .where(
             CatalogueState.id == ACTIVE_CATALOGUE_STATE_ID,
             CatalogMovie.popularity_score.is_not(None),
+            CatalogMovie.popularity_score < float("inf"),
+            CatalogMovie.popularity_score > float("-inf"),
         )
         .options(selectinload(CatalogMovie.genres))
         .order_by(*popularity_title_id_ordering())
