@@ -30,8 +30,9 @@ Architecture and persistence rules are in
   browser writes return `403 ORIGIN_NOT_ALLOWED` before session state changes.
 - `PUT /api/me/preferences` now reuses that protection (S3-T02). The same-origin
   registry matches method and path; login/logout protection is preserved.
-  Committed rating and profile-reset writes must extend the registry when
-  their routes are implemented.
+  `PUT /api/me/ratings/{movieId}` is covered the same way (S3-T31, path
+  prefix match). The committed profile-reset write must extend the registry
+  when its route is implemented.
 - Protected endpoints derive the account only from the authenticated session.
   A client-supplied `user_id`, account ID, email, username, or owner field
   cannot select or change the target account. Such fields are not part of a
@@ -80,15 +81,15 @@ yet available in the current repository.
 | S01 | `GET` | `/api/genres` | Authenticated | None | `200 GenreListResponse` | `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T01)` |
 | S01 | `GET` | `/api/me/preferences` | Authenticated | None | `200 PreferenceResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T01)` |
 | S01 | `PUT` | `/api/me/preferences` | Authenticated, same-origin write | `PreferenceRequest` | `200 PreferenceResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 GENRE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T02)` |
-| S05a | `GET` | `/api/me/ratings/{movieId}` | Authenticated | Opaque `movieId` | `200 RatingResponse` | `401 AUTHENTICATION_REQUIRED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 contract; implementation pending` |
-| S05a | `PUT` | `/api/me/ratings/{movieId}` | Authenticated, same-origin write | `RatingRequest` | `200 RatingResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 contract; implementation pending` |
+| S05a | `GET` | `/api/me/ratings/{movieId}` | Authenticated | Opaque `movieId` | `200 RatingResponse` | `401 AUTHENTICATION_REQUIRED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T31)` |
+| S05a | `PUT` | `/api/me/ratings/{movieId}` | Authenticated, same-origin write | `RatingRequest` | `200 RatingResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T31)` |
 | S11 | `POST` | `/api/me/profile/reset` | Authenticated, same-origin write | `ProfileResetRequest` | `200 ProfileResetResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 backend contract; implementation pending` |
 
 S3-T01 added the `user_genre_preferences` table and the two read routes
 `GET /api/genres` and `GET /api/me/preferences`. S3-T02 implements validated,
 atomic preference replacement through `PUT /api/me/preferences`. The dedicated
-`GET /api/movies/popular` route is implemented in M3 under T19. Ratings and
-reset storage/routes remain pending. Personalised recommendations are
+`GET /api/movies/popular` route is implemented in M3 under T19. The rating
+routes are implemented under S3-T31; the reset route remains pending. Personalised recommendations are
 not yet implemented. Genre filtering, similar movies, and search remain outside
 this contract update.
 
@@ -587,11 +588,11 @@ A missing year or overview remains JSON `null`; the UI displays
 to a false 404. Movie detail remains public; a guest opening it must not cause
 the frontend to call a private rating endpoint.
 
-## 9. Committed Sprint 3 rating contract (implementation pending)
+## 9. Sprint 3 rating contract (implemented under S3-T31)
 
-These two S05a routes are committed Sprint 3 scope and frozen for consumers;
-they are not implemented routes in the current working tree. Their session
-ownership and isolation rules support Story #45 / S13.
+These two S05a routes are committed Sprint 3 scope and are implemented under
+S3-T31. A missing session returns `401` before the body is validated or any
+private row is read. Their session ownership and isolation rules support Story #45 / S13.
 Both use the current authenticated session as the only account identity and
 address a movie by its opaque active-catalogue ID.
 
