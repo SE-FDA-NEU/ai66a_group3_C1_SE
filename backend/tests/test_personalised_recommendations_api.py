@@ -10,11 +10,6 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine, select
-from sqlalchemy.orm import Session, sessionmaker
-from sqlalchemy.pool import StaticPool
-
 from app.db.database import Base
 from app.db.models import (
     AuthSession,
@@ -32,6 +27,10 @@ from app.repositories.movies import (
     upsert_catalogue_movie,
     upsert_genre,
 )
+from fastapi.testclient import TestClient
+from sqlalchemy import create_engine, select
+from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.pool import StaticPool
 
 FIXTURE_PATH = Path(__file__).parent / "fixtures" / "recommendations_s3_t06.json"
 PASSWORD = "movie123"

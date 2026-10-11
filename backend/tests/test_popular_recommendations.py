@@ -3,12 +3,6 @@ from __future__ import annotations
 from collections.abc import Iterator
 
 import pytest
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session, sessionmaker
-from sqlalchemy.pool import StaticPool
-
 from app.db.database import Base
 from app.db.models import CatalogMovie
 from app.main import app, get_db
@@ -18,6 +12,11 @@ from app.repositories.movies import (
     upsert_catalogue_movie,
 )
 from app.repositories.users import create_user
+from fastapi.testclient import TestClient
+from sqlalchemy import create_engine
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.pool import StaticPool
 
 
 @pytest.fixture
