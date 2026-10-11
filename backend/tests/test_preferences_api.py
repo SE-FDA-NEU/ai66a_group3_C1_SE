@@ -504,3 +504,87 @@ def test_put_and_get_use_only_local_canonical_genres_without_provider_access(
     response = http.put("/api/me/preferences", json={"genreIds": [18]}, headers=HEADERS)
     assert response.status_code == 200
     assert http.get("/api/me/preferences").json() == {"data": {"genres": [DRAMA]}}
+
+
+def test_two_accounts_remain_isolated_and_a_restores_genres_after_later_login(
+    database_session: Session,
+) -> None:
+    """S3-T03 acceptance journey through only public auth/preference APIs."""
+
+    _activate_catalogue(database_session)
+    account_a, account_a_id = _sign_in("account-a@example.com")
+    account_b, account_b_id = _sign_in("account-b@example.com")
+    account_a_cookie = account_a.cookies.get("ams_session")
+    account_b_cookie = account_b.cookies.get("ams_session")
+
+    assert account_a_id != account_b_id
+    assert account_a_cookie
+    assert account_b_cookie
+    assert account_a_cookie != account_b_cookie
+
+    saved_a = account_a.put(
+        "/api/me/preferences",
+        json={"genreIds": [COMEDY["id"], ACTION["id"]]},
+        headers=HEADERS,
+    )
+    assert saved_a.status_code == 200
+    assert saved_a.json() == {"data": {"genres": [ACTION, COMEDY]}}
+
+    # B cannot select A for reads through client-controlled identity values.
+    forged_read = account_b.get(
+        "/api/me/preferences",
+        params={"userId": account_a_id, "user_id": account_a_id},
+        headers={"X-User-Id": account_a_id},
+    )
+    assert forged_read.status_code == 200
+    assert forged_read.json() == {"data": {"genres": []}}
+
+    # Identity is forbidden in the write payload, and rejecting the whole body
+    # leaves both accounts unchanged rather than partially replacing either.
+    forged_write = account_b.put(
+        "/api/me/preferences",
+        json={"genreIds": [DRAMA["id"]], "userId": account_a_id},
+        headers=HEADERS | {"X-User-Id": account_a_id},
+    )
+    _assert_error(
+        forged_write,
+        400,
+        "VALIDATION_ERROR",
+        "Please correct the highlighted fields",
+    )
+    assert _fresh_preference_ids(database_session, account_a_id) == [28, 35]
+    assert _fresh_preference_ids(database_session, account_b_id) == []
+
+    # Even accepted genre data plus forged query/header identity can change
+    # only B, because the authenticated cookie is the sole account selector.
+    saved_b = account_b.put(
+        "/api/me/preferences",
+        params={"userId": account_a_id, "user_id": account_a_id},
+        json={"genreIds": [DRAMA["id"]]},
+        headers=HEADERS | {"X-User-Id": account_a_id},
+    )
+    assert saved_b.status_code == 200
+    assert saved_b.json() == {"data": {"genres": [DRAMA]}}
+    assert _fresh_preference_ids(database_session, account_a_id) == [28, 35]
+    assert _fresh_preference_ids(database_session, account_b_id) == [18]
+
+    assert account_a.post("/api/auth/logout", headers=HEADERS).status_code == 204
+    assert account_a.get("/api/me/preferences").status_code == 401
+
+    # A returns with a new cookie store and a newly issued server-side session.
+    with TestClient(app) as returning_a:
+        login = returning_a.post(
+            "/api/auth/login",
+            json={"email": "account-a@example.com", "password": PASSWORD},
+            headers=HEADERS,
+        )
+        assert login.status_code == 200
+        assert login.json()["data"]["user"]["id"] == account_a_id
+        assert returning_a.cookies.get("ams_session") != account_a_cookie
+        assert returning_a.get("/api/me/preferences").json() == {
+            "data": {"genres": [ACTION, COMEDY]}
+        }
+
+    assert account_b.get("/api/me/preferences").json() == {
+        "data": {"genres": [DRAMA]}
+    }
