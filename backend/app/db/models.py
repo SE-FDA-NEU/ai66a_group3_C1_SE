@@ -66,6 +66,7 @@ class CatalogueRevision(Base):
     )
 
 
+
 class User(Base):
     """An account used to own authentication and personalisation data.
 
@@ -92,6 +93,10 @@ class User(Base):
         back_populates="user", cascade="all, delete-orphan"
     )
 
+    ratings: Mapped[list[UserMovieRating]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
 
 class UserGenrePreference(Base):
     """One favourite genre saved by one account.
@@ -199,6 +204,10 @@ class CatalogMovie(Base):
     genres: Mapped[list[Genre]] = relationship(
         secondary="movie_genres", back_populates="movies", viewonly=True
     )
+    ratings: Mapped[list[UserMovieRating]] = relationship(
+        back_populates="movie",
+        cascade="all, delete-orphan",
+    )
 
 
 class Genre(Base):
@@ -231,3 +240,57 @@ class MovieGenre(Base):
 
     movie: Mapped[CatalogMovie] = relationship(back_populates="movie_genres")
     genre: Mapped[Genre] = relationship(back_populates="movie_genres")
+
+class UserMovieRating(Base):
+    """One current rating owned by one account for one catalogue movie."""
+
+    __tablename__ = "user_movie_ratings"
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id",
+            "movie_id",
+            name="uq_user_movie_ratings_user_movie",
+        ),
+        CheckConstraint(
+            "typeof(rating) = 'integer' AND rating BETWEEN 1 AND 5",
+            name="ck_user_movie_ratings_rating_range",
+        ),
+    )
+
+    id: Mapped[str] = mapped_column(
+        String(36),
+        primary_key=True,
+        default=new_opaque_id,
+    )
+    user_id: Mapped[str] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    movie_id: Mapped[str] = mapped_column(
+        ForeignKey("catalog_movies.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    rating: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+        onupdate=utc_now,
+    )
+
+    user: Mapped[User] = relationship(
+        back_populates="ratings",
+    )
+    movie: Mapped[CatalogMovie] = relationship(
+        back_populates="ratings",
+    )
