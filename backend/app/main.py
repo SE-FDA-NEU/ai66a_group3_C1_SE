@@ -10,6 +10,7 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.db.database import SessionLocal, engine
+from app.recommendations.service import build_account_recommendations
 from app.repositories.movies import (
     get_active_catalogue_revision,
     get_active_movie_by_id,
@@ -276,23 +277,21 @@ def recommendations(
             503,
         )
 
-    movies = list_popular_recommendation_movies(
+    result = build_account_recommendations(
         database_session,
+        user_id=user.id,
         limit=limit,
     )
 
     return {
         "data": {
-            "movies": [
-                to_movie_summary_dto(movie).model_dump()
-                for movie in movies
-            ],
-            "mode": "popular",
-            "personalised": False,
-            "noMatch": False,
+            "movies": [movie.model_dump() for movie in result.movies],
+            "mode": result.mode,
+            "personalised": result.personalised,
+            "noMatch": result.no_match,
         },
         "meta": {
-            "count": len(movies),
+            "count": len(result.movies),
             "limit": limit,
             "catalogueRevision": revision.id,
         },
