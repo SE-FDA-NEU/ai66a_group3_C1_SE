@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import type { Genre } from "../api/movies.ts";
 import {
   getPreferences,
   listGenres,
   PreferenceApiError,
+  savePreferences,
 } from "../api/preferences.ts";
 import { useAuth } from "../auth/authState.ts";
 
@@ -15,6 +16,10 @@ const LIMIT_MESSAGE =
 
 function PreferencesPage() {
   const { handleUnauthorized } = useAuth();
+  const navigate = useNavigate();
+
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
   const [genres, setGenres] = useState<Genre[]>([]);
   const [unavailableSavedGenres, setUnavailableSavedGenres] = useState<Genre[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
@@ -92,6 +97,39 @@ function PreferencesPage() {
     });
   }
 
+  async function handleSave() {
+    if (selectedIds.size < 1) {
+      setSaveError("Select at least 1 genre");
+      return;
+    }
+
+    setSaveError("");
+    setIsSaving(true);
+
+    try {
+      await savePreferences(
+        Array.from(selectedIds).sort((a, b) => a - b),
+      );
+
+      navigate("/recommendations");
+    } catch (error: unknown) {
+      if (
+        error instanceof PreferenceApiError &&
+        error.status === 401
+      ) {
+        handleUnauthorized();
+        return;
+      }
+
+      setSaveError(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong",
+      );
+    } finally {
+      setIsSaving(false);
+    }
+  }
   return (
     <main className="page page--centered">
       <section
@@ -197,6 +235,26 @@ function PreferencesPage() {
           <p className="form-error preference-limit" role="alert">
             {limitError}
           </p>
+        ) : null}
+        {saveError ? (
+          <p className="form-error preference-save-error" role="alert">
+            {saveError}
+          </p>
+        ) : null}
+        {!isLoading && !error ? (
+          <div className="preference-actions">
+            <button
+              type="button"
+              onClick={() => void handleSave()}
+              disabled={
+                isSaving ||
+                selectedIds.size < 1 ||
+                selectedIds.size > MAX_GENRES
+              }
+            >
+              {isSaving ? "Saving..." : "Save preferences"}
+            </button>
+          </div>
         ) : null}
       </section>
     </main>
