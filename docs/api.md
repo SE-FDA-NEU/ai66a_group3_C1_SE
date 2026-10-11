@@ -595,8 +595,11 @@ the frontend to call a private rating endpoint.
 ## 9. Sprint 3 rating contract (implemented under S3-T31)
 
 These two S05a routes are committed Sprint 3 scope and are implemented under
-S3-T31. A missing session returns `401` before the body is validated or any
-private row is read. Their session ownership and isolation rules support Story #45 / S13.
+S3-T31. A missing, expired, or revoked session returns `401` before any private
+row is read or written, and before the rating value is validated. The one
+exception is a non-empty `application/json` body that is not syntactically
+valid JSON: it is rejected with `400` while the body is parsed, before the
+session is resolved, and still reads and writes nothing. Their session ownership and isolation rules support Story #45 / S13.
 Both use the current authenticated session as the only account identity and
 address a movie by its opaque active-catalogue ID.
 
@@ -660,7 +663,7 @@ does not replace a previously committed rating.
 | Missing, expired, revoked, or invalid session | `401 AUTHENTICATION_REQUIRED` | `Authentication required`; no private read/write |
 | Browser write fails the existing same-origin policy | `403 ORIGIN_NOT_ALLOWED` | `Request origin is not allowed`; no mutation |
 | Opaque movie ID is not in the active catalogue | `404 MOVIE_NOT_FOUND` | `Movie not found`; do not create a movie or orphan rating |
-| Invalid JSON/body/rating value | `400 VALIDATION_ERROR` | `Please correct the highlighted fields`; preserve the prior committed rating |
+| Invalid JSON/body/rating value | `400 VALIDATION_ERROR` | `Please correct the highlighted fields`; preserve the prior committed rating. A wrong value with no valid session is `401`; a non-empty `application/json` body that is not valid JSON is `400` regardless of session |
 | Read or commit fails | `503 SERVICE_UNAVAILABLE` | `Service is temporarily unavailable`; rollback and preserve the prior committed rating |
 
 Neither route accepts `userId`, account ID, email, username, or owner ID. A
@@ -721,7 +724,7 @@ profile state only after the reset success response.
 | `VALIDATION_ERROR` | 400 | Request fields or query values are invalid. |
 | `AUTHENTICATION_REQUIRED` | 401 | A protected route has no valid session. |
 | `INVALID_CREDENTIALS` | 401 | Login credentials are invalid without revealing which field failed. |
-| `ORIGIN_NOT_ALLOWED` | 403 | A browser session or preference write failed the same-origin check. |
+| `ORIGIN_NOT_ALLOWED` | 403 | A browser session, preference, or rating write failed the same-origin check. |
 | `MOVIE_NOT_FOUND` | 404 | The internal movie ID does not exist in the active catalogue. |
 | `GENRE_NOT_FOUND` | 404 | A requested genre ID does not exist. |
 | `EMAIL_ALREADY_REGISTERED` | 409 | The normalized email is already stored. |
@@ -742,10 +745,11 @@ popularity/title/ID ranker.
 The preference storage and the preference reads (`GET /api/genres`,
 `GET /api/me/preferences`) are implemented in Sprint 3 under S3-T01.
 Preference replacement (`PUT /api/me/preferences`) is implemented under S3-T02.
-Rating API/UI, profile reset, and NLP endpoints remain outside this endpoint's
-implementation. Sections 9 and 10 remain
-committed Sprint 3 delivery contracts, not optional future work, while their
-implementation status remains pending.
+The rating routes (`GET` and `PUT /api/me/ratings/{movieId}`) are implemented
+under S3-T31. The rating UI, profile reset, and NLP endpoints remain outside
+this endpoint's implementation. Section 10 remains a committed Sprint 3
+delivery contract, not optional future work, while its implementation status
+remains pending.
 
 Section 8 documents both the existing public catalogue endpoint and the
 implemented dedicated popular movie endpoint.

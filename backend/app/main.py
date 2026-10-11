@@ -127,8 +127,11 @@ def current_session_user(
     request: Request,
     database_session: Session = Depends(get_db),  # noqa: B008
 ) -> User:
-    """Resolve the account from the cookie only; a dependency, so a missing
-    session is rejected before the request body is validated."""
+    """Resolve the account from the cookie only.
+
+    As a dependency this runs before FastAPI validates the body fields, so a
+    missing session wins over a wrong rating value. JSON that is not
+    syntactically valid is rejected earlier, while the body is parsed."""
 
     user = resolve_session(database_session, request.cookies.get(SESSION_COOKIE))
     if user is None:
