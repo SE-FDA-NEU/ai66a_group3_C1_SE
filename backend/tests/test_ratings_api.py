@@ -146,6 +146,19 @@ def _expire_or_revoke(session: Session, user_id: str, state: str) -> None:
     session.commit()
 
 
+def _lose_session(
+    http: TestClient, session: Session, user_id: str, state: str
+) -> None:
+    """Leave `http` without a valid session: no cookie, a bogus one, or a dead one."""
+
+    if state in {"missing", "invalid"}:
+        http.cookies.clear()
+        if state == "invalid":
+            http.cookies.set("ams_session", "invalid-session")
+    else:
+        _expire_or_revoke(session, user_id, state)
+
+
 # --- GET ------------------------------------------------------------------
 
 
@@ -194,12 +207,7 @@ def test_missing_expired_or_revoked_session_gets_401_and_nothing_changes(
     http, user_id = viewer
     path = f"/api/me/ratings/{movie_ids['first']}"
     assert http.put(path, json={"rating": 3}, headers=HEADERS).status_code == 200
-    if state in {"missing", "invalid"}:
-        http.cookies.clear()
-        if state == "invalid":
-            http.cookies.set("ams_session", "invalid-session")
-    else:
-        _expire_or_revoke(database_session, user_id, state)
+    _lose_session(http, database_session, user_id, state)
 
     response = (
         http.get(path)
@@ -211,16 +219,22 @@ def test_missing_expired_or_revoked_session_gets_401_and_nothing_changes(
     assert _stored(database_session, user_id, movie_ids["first"]) == [3]
 
 
+@pytest.mark.parametrize("state", ["missing", "invalid", "expired", "revoked"])
 def test_unauthenticated_invalid_payload_is_401_not_400(
+    database_session: Session,
+    viewer: tuple[TestClient, str],
     movie_ids: dict[str, str],
+    state: str,
 ) -> None:
-    response = TestClient(app).put(
-        f"/api/me/ratings/{movie_ids['first']}",
-        json={"rating": 99},
-        headers=HEADERS,
-    )
+    http, user_id = viewer
+    path = f"/api/me/ratings/{movie_ids['first']}"
+    assert http.put(path, json={"rating": 3}, headers=HEADERS).status_code == 200
+    _lose_session(http, database_session, user_id, state)
+
+    response = http.put(path, json={"rating": 99}, headers=HEADERS)
 
     _assert_error(response, 401, "AUTHENTICATION_REQUIRED", "Authentication required")
+    assert _stored(database_session, user_id, movie_ids["first"]) == [3]
 
 
 @pytest.mark.parametrize("method", ["get", "put"])
@@ -347,6 +361,35 @@ def test_malformed_json_is_rejected_and_preserves_the_previous_rating(
         response, 400, "VALIDATION_ERROR", "Please correct the highlighted fields"
     )
     assert _stored(database_session, user_id, movie_ids["first"]) == [2]
+
+
+@pytest.mark.parametrize("state", ["missing", "invalid", "expired", "revoked"])
+@pytest.mark.parametrize("content", [b"{", b"not json", b'{"rating": 5'])
+def test_unparsable_json_is_400_even_without_a_valid_session(
+    database_session: Session,
+    viewer: tuple[TestClient, str],
+    movie_ids: dict[str, str],
+    state: str,
+    content: bytes,
+) -> None:
+    """The documented exception to 401-first: FastAPI parses the JSON body before
+    the session dependency runs. Nothing is read or written either way."""
+
+    http, user_id = viewer
+    path = f"/api/me/ratings/{movie_ids['first']}"
+    assert http.put(path, json={"rating": 3}, headers=HEADERS).status_code == 200
+    _lose_session(http, database_session, user_id, state)
+
+    response = http.put(
+        path,
+        content=content,
+        headers={**HEADERS, "Content-Type": "application/json"},
+    )
+
+    _assert_error(
+        response, 400, "VALIDATION_ERROR", "Please correct the highlighted fields"
+    )
+    assert _stored(database_session, user_id, movie_ids["first"]) == [3]
 
 
 def test_forged_identity_never_retargets_another_account(
