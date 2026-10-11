@@ -1,6 +1,6 @@
 # Sprint 3 design and contract reconciliation
 
-This document was reconciled with the local working tree on 2026-10-10. Every
+This document was reconciled with the local working tree on 2026-10-11. Every
 table and endpoint is marked as implemented or as committed Sprint 3 scope
 with implementation pending; no tested SHA or review approval is implied.
 Request and response shapes are in
@@ -471,7 +471,7 @@ test evidence, or a tested SHA.
 | Gate | Current status | Evidence needed before completion |
 |---|---|---|
 | Initial API/database/UI contract | Prepared locally; review/publication pending | Reviewed D1 contract link |
-| Preferences and personalised recommendation implementation | Backend storage/reads/replacement implemented under T01/T02; UI, broader persistence acceptance, and personalised recommendations pending | Reviewed/merged code, executable tests, and consumer verification; see T02 evidence |
+| Preferences and personalised recommendation implementation | Backend storage/reads/replacement implemented under T01/T02; genre/popularity endpoint implemented locally under T08; UI and broader acceptance remain separate | Reviewed/merged T08 PR, executable tests, and consumer verification; see T02/T08 evidence |
 | Rating storage/API/UI protection | Committed Sprint 3 scope; implementation pending | [T30 #137](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/137), [T31 #138](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/138), [T32 #140](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/140), [T33 #139](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/139), and [T34 #141](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/141); merged implementation plus isolation/validation/transaction/UI tests |
 | Authenticated reset backend | Committed Sprint 3 scope; implementation pending | [T35 #142](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/142); merged transaction/rollback/security tests |
 | UI-driven design reconciliation | Documented locally; #136 coordination/review pending | Same reviewed change containing `docs/ui.md` and `docs/design.md` |
