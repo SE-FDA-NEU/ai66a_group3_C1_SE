@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import type { Genre } from "../api/movies.ts";
@@ -28,6 +28,21 @@ function PreferencesPage() {
   const [limitError, setLimitError] = useState("");
   const [reloadVersion, setReloadVersion] = useState(0);
 
+  const saveControllerRef = useRef<AbortController | null>(null);
+  const saveRequestIdRef = useRef(0);
+  const isMountedRef = useRef(false);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+
+    return () => {
+      isMountedRef.current = false;
+      saveRequestIdRef.current += 1;
+      saveControllerRef.current?.abort();
+      saveControllerRef.current = null;
+    };
+  }, []);
+  
   useEffect(() => {
     const controller = new AbortController();
 
@@ -98,10 +113,24 @@ function PreferencesPage() {
   }
 
   async function handleSave() {
-    if (selectedIds.size < 1) {
-      setSaveError("Select at least 1 genre");
+    if (isSaving) return;
+
+    if (selectedIds.size < 1 || selectedIds.size > MAX_GENRES) {
+      setSaveError("Select 1 to 5 genres");
       return;
     }
+
+    saveControllerRef.current?.abort();
+
+    const controller = new AbortController();
+    const requestId = ++saveRequestIdRef.current;
+
+    saveControllerRef.current = controller;
+
+    const isCurrentRequest = () =>
+      isMountedRef.current &&
+      !controller.signal.aborted &&
+      saveRequestIdRef.current === requestId;
 
     setSaveError("");
     setIsSaving(true);
@@ -109,10 +138,15 @@ function PreferencesPage() {
     try {
       await savePreferences(
         Array.from(selectedIds).sort((a, b) => a - b),
+        controller.signal,
       );
+
+      if (!isCurrentRequest()) return;
 
       navigate("/recommendations");
     } catch (error: unknown) {
+      if (!isCurrentRequest()) return;
+
       if (
         error instanceof PreferenceApiError &&
         error.status === 401
@@ -127,7 +161,10 @@ function PreferencesPage() {
           : "Something went wrong",
       );
     } finally {
-      setIsSaving(false);
+      if (isCurrentRequest()) {
+        setIsSaving(false);
+        saveControllerRef.current = null;
+      }
     }
   }
   return (
