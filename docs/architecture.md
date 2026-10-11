@@ -1,7 +1,7 @@
 # Sprint 3 architecture and persistence contract
 
-Contract revision: `S3-DRAFT`, reconciled with current migrations on
-2026-10-10 (S3-T02 preference replacement).
+Contract revision: `S3-DRAFT`, reconciled with the current runtime on
+2026-10-11 (through S3-T08 recommendation integration).
 
 The HTTP contract is in [api.md](api.md). This document describes the backend
 that is present in the repository and separately labels committed Sprint 3
@@ -18,8 +18,9 @@ The repository contains a FastAPI backend with these implemented areas:
   logout under `/api/auth`.
 - Public catalogue reads through `GET /api/movies` and
   `GET /api/movies/{movieId}`.
-- Authenticated `GET /api/me/recommendations`, which currently serves the
-  shared popular/cold-start recommendation list.
+- Authenticated `GET /api/me/recommendations`, which uses the session account's
+  saved genres when matches exist and otherwise serves the reviewed popular
+  cold-start/no-match states.
 - Authenticated genre/preference reads (S3-T01) and validated, atomic
   `PUT /api/me/preferences` (S3-T02), scoped only by the server-side session.
 
@@ -36,9 +37,10 @@ staging and demo catalogue acceptance; it is verified under T29/C04 in the
 support, while CI uses synthetic provider fixtures without a real token/network.
 
 Preference storage, reads, and atomic replacement are implemented under
-T01/T02. Preference UI, rating storage/API/UI protection, genre/popularity-only
-personalised recommendations, and the authenticated reset backend remain
-committed Sprint 3 work. Rating/reset session isolation supports Story #45 / S13.
+T01/T02. The genre/popularity-only personalised recommendation backend is
+implemented under T08. Preference UI, rating API/UI protection, and the
+authenticated reset backend remain separate Sprint 3 work. Rating/reset
+session isolation supports Story #45 / S13.
 Rating-adjusted ranking remains Story #22 / S05b planned for Sprint 4.
 
 ## 2. Selected stack
@@ -46,7 +48,7 @@ Rating-adjusted ranking remains Story #22 / S05b planned for Sprint 4.
 | Layer | Technology | Boundary |
 |---|---|---|
 | Browser frontend | React, TypeScript, Vite | Renders screens and calls the backend API. |
-| Backend API | FastAPI, Pydantic, Python 3.12 | Owns HTTP validation, authentication, catalogue reads, and popular recommendations. |
+| Backend API | FastAPI, Pydantic, Python 3.12 | Owns HTTP validation, authentication, catalogue reads, and genre/popularity recommendations. |
 | Persistence | SQLAlchemy, Alembic, SQLite | Owns the migrated account/session and catalogue tables. |
 | Password storage | Argon2id | Stores only encoded password hashes. |
 | Provider integration | Server-side `httpx` adapter | Keeps the TMDb credential out of the browser. |
@@ -201,11 +203,11 @@ derive their account solely from the server-side session.
 ## 7. Delivery boundary
 
 M2 includes health, authentication, catalogue reads, and popular/cold-start
-recommendations. Sprint 3 contracts in this document cover the dedicated
-S09/T19 public popular route, preferences, genre/popularity-only personalised
-recommendations, rating persistence, and the authenticated profile-reset
-backend. Each pending capability remains unimplemented until its route and
-applicable query, migration, transaction handling, protection, and tests exist.
+recommendations. Sprint 3 adds the dedicated S09/T19 public popular route,
+preferences, and the implemented T08 genre/popularity-only personalised
+recommendations. Rating API/UI and the authenticated profile-reset backend
+remain separate capabilities until their applicable routes, transactions,
+protection, and tests exist.
 
 Rating-adjusted recommendation ranking is not part of Sprint 3. It belongs to
 Story #22 / S05b and is planned Sprint 4 behaviour.
