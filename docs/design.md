@@ -137,8 +137,9 @@ Conventions:
 - A success body is `{ "data": ..., "meta": ... }`. An error body is `{ "error": { "code", "message", "requestId" } }`.
 - The signed-in account comes only from the `ams_session` cookie. No endpoint accepts a user ID from the client.
 - `POST /api/auth/login` and `POST /api/auth/logout` reject cross-origin browser requests with `403 ORIGIN_NOT_ALLOWED`.
-- `PUT /api/me/preferences` reuses the same-origin mechanism under T02. Future
-  rating and reset writes must extend the method/path registry before mutation.
+- `PUT /api/me/preferences` and `PUT /api/me/ratings/{movieId}` reuse the
+  same-origin mechanism (T02, T31). A future reset write must extend the
+  registry before mutation.
 - Any database failure returns `503 SERVICE_UNAVAILABLE`.
 
 | Story | Method and endpoint | Access | Input | Success | Errors | Status |
@@ -155,8 +156,8 @@ Conventions:
 | S01 | `GET /api/genres` | Signed in | None | `200` with the local canonical genre list | `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | Implemented in Sprint 3 (S3-T01) |
 | S01 | `GET /api/me/preferences` | Signed in | None | `200` with the saved genres | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | Implemented in Sprint 3 (S3-T01) |
 | S01 | `PUT /api/me/preferences` | Signed in, same-origin | `genreIds`: 1 to 5 distinct genre IDs | `200` with the saved genres after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 GENRE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | Implemented in Sprint 3 (S3-T02) |
-| S05a | `GET /api/me/ratings/{movieId}` | Signed in | Opaque movie ID | `200` with committed `rating` or `null` | `401 AUTHENTICATION_REQUIRED`, `404 MOVIE_NOT_FOUND` | Committed Sprint 3 contract; implementation pending |
-| S05a | `PUT /api/me/ratings/{movieId}` | Signed in, same-origin | Strict `{ "rating": 1..5 }` | `200` only after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | Committed Sprint 3 contract; implementation pending |
+| S05a | `GET /api/me/ratings/{movieId}` | Signed in | Opaque movie ID | `200` with committed `rating` or `null` | `401 AUTHENTICATION_REQUIRED`, `404 MOVIE_NOT_FOUND` | Implemented in Sprint 3 (S3-T31) |
+| S05a | `PUT /api/me/ratings/{movieId}` | Signed in, same-origin | Strict `{ "rating": 1..5 }` | `200` only after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | Implemented in Sprint 3 (S3-T31) |
 | S11 | `POST /api/me/profile/reset` | Signed in, same-origin | Exact `{ "confirm": true }` | `200` only after preferences/ratings delete transaction commits | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `503 SERVICE_UNAVAILABLE` | Committed Sprint 3 backend contract; implementation pending |
 
 All six P0 Stories appear in the table: S01 (genres and preferences), S02 and
@@ -349,7 +350,7 @@ Impact. A copy of the database holds no cookie value that a browser could send, 
 ### ADR-3: Account identity and transaction boundary
 
 Status: preference storage/reads/replacement implemented under T01/T02;
-rating/reset implementation pending.
+rating routes implemented under T31; reset implementation pending.
 
 Preferences, ratings, and reset are account-owned operations. Their target
 user is resolved only from the valid `ams_session` row. Request bodies do not
