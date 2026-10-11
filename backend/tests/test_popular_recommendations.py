@@ -3,7 +3,14 @@ from __future__ import annotations
 from collections.abc import Iterator
 
 import pytest
+from fastapi.testclient import TestClient
+from sqlalchemy import create_engine
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.pool import StaticPool
+
 from app.db.database import Base
+from app.db.models import CatalogMovie
 from app.main import app, get_db
 from app.repositories.movies import (
     activate_catalogue_revision,
@@ -11,11 +18,6 @@ from app.repositories.movies import (
     upsert_catalogue_movie,
 )
 from app.repositories.users import create_user
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session, sessionmaker
-from sqlalchemy.pool import StaticPool
 
 
 @pytest.fixture
@@ -133,6 +135,10 @@ def test_popular_recommendations_rank_by_popularity_then_title_then_id(
     assert body["data"]["mode"] == "popular"
     assert body["data"]["personalised"] is False
     assert body["data"]["noMatch"] is False
+    assert all(
+        movie["reason"] == {"matchedGenres": []}
+        for movie in body["data"]["movies"]
+    )
 
 
 def test_popular_recommendations_use_id_as_final_tie_breaker(
@@ -267,6 +273,48 @@ def test_no_usable_popularity_returns_empty_recommendations(
     assert body["meta"]["count"] == 0
 
 
+def test_popular_recommendations_exclude_non_finite_database_values(
+    client: tuple[TestClient, Session],
+) -> None:
+    http, database_session = client
+    _login(http)
+    revision = create_catalogue_revision(database_session, provider="seed")
+    upsert_catalogue_movie(
+        database_session,
+        catalogue_revision_id=revision.id,
+        source="seed",
+        source_id="finite",
+        title="Finite",
+        popularity_score=1.0,
+    )
+    database_session.add_all(
+        CatalogMovie(
+            catalogue_revision_id=revision.id,
+            source="seed",
+            source_id=source_id,
+            title=title,
+            popularity_score=popularity,
+        )
+        for source_id, title, popularity in (
+            ("positive-infinity", "Positive infinity", float("inf")),
+            ("negative-infinity", "Negative infinity", float("-inf")),
+        )
+    )
+    activate_catalogue_revision(database_session, revision_id=revision.id)
+    database_session.commit()
+
+    response = http.get("/api/me/recommendations")
+
+    assert response.status_code == 200
+    assert [
+        movie["title"] for movie in response.json()["data"]["movies"]
+    ] == ["Finite"]
+    assert all(
+        movie["popularityScore"] == 1.0
+        for movie in response.json()["data"]["movies"]
+    )
+
+
 def test_recommendations_require_authentication(
     client: tuple[TestClient, Session],
 ) -> None:
@@ -328,7 +376,7 @@ def test_recommendation_database_failure_returns_service_unavailable(
         raise SQLAlchemyError("simulated database failure")
 
     monkeypatch.setattr(
-        "app.main.list_popular_recommendation_movies",
+        "app.main.build_account_recommendations",
         _raise_database_error,
     )
 
