@@ -1,8 +1,8 @@
 # Sprint 3 architecture and persistence contract
 
 Contract revision: `S3-DRAFT`, reconciled with the current runtime on
-2026-10-11 (through S3-T08 recommendation integration and S3-T30 rating
-storage).
+2026-10-11 (through S3-T08 recommendation integration, S3-T30 rating
+storage, and S3-T31 rating API).
 
 The HTTP contract is in [api.md](api.md). This document describes the backend
 that is present in the repository and separately labels committed Sprint 3
@@ -40,8 +40,9 @@ support, while CI uses synthetic provider fixtures without a real token/network.
 Preference storage, reads, and atomic replacement are implemented under
 T01/T02. The genre/popularity-only personalised recommendation backend is
 implemented under T08. Account-owned rating storage and its repository are
-implemented under T30. Preference UI, rating API/UI protection, and the
-authenticated reset backend remain separate Sprint 3 work. Rating/reset
+implemented under T30, and the protected rating read/write API under T31.
+Preference UI, rating UI, and the authenticated reset backend remain separate
+Sprint 3 work. Rating/reset
 session isolation supports Story #45 / S13.
 Rating-adjusted ranking remains Story #22 / S05b planned for Sprint 4.
 
@@ -174,8 +175,8 @@ provider movie across importer updates that preserve that ID.
   request's transaction. The route commits once or rolls back on database
   failure. Response DTOs are prepared before commit and returned after it.
 - The T30 rating repository reads and upserts by `(user_id, movie_id)` inside
-  the caller's transaction. The pending rating API must return success only
-  after commit; invalid input or a failed commit must preserve the prior value.
+  the caller's transaction. The T31 rating API returns success only after
+  commit; invalid input or a failed commit preserves the prior value.
 - Sprint 3 profile reset deletes only the current user's preference and rating
   rows in one transaction. Failure of either delete or commit rolls back both;
   the user, current session, catalogue, movies, genres, and other accounts are
@@ -200,8 +201,9 @@ appear in DTOs, frontend/Vite assets, logs, screenshots, fixtures, database
 dumps used as evidence, or documentation evidence.
 
 T02 extends the existing same-origin Fetch Metadata/`Origin` protection to
-preference PUT requests using a method/path registry. Future rating/reset
-writes must extend it before mutation. Missing, expired, or revoked
+preference PUT requests using a method/path registry, and T31 extends it to
+rating PUT requests. A future reset write must extend it before mutation.
+Missing, expired, or revoked
 sessions return `401 AUTHENTICATION_REQUIRED`; permitted-origin requests still
 derive their account solely from the server-side session.
 
@@ -210,10 +212,10 @@ derive their account solely from the server-side session.
 M2 includes health, authentication, catalogue reads, and popular/cold-start
 recommendations. Sprint 3 adds the dedicated S09/T19 public popular route,
 preferences, and the implemented T08 genre/popularity-only personalised
-recommendations. T30 adds account-owned rating storage and repository support.
-Rating API/UI and the authenticated profile-reset backend remain separate
-capabilities until their applicable routes, transactions, protection, and
-tests exist.
+recommendations. T30 adds account-owned rating storage and repository support,
+and T31 adds the protected rating read/write API. The rating UI and the
+authenticated profile-reset backend remain separate capabilities until their
+applicable routes, transactions, protection, and tests exist.
 
 Rating-adjusted recommendation ranking is not part of Sprint 3. It belongs to
 Story #22 / S05b and is planned Sprint 4 behaviour.
