@@ -1,7 +1,7 @@
 # Sprint 3 HTTP API contract
 
 Contract revision: `S3-DRAFT`, reconciled with the current M2/Sprint 3 runtime on
-2026-10-10 (S3-T02 preference replacement).
+2026-10-11 (through S3-T08 recommendation integration).
 
 This document inventories the implemented M2 HTTP boundary and defines the
 committed Sprint 3 contracts needed by implementation consumers. Every route
@@ -73,7 +73,7 @@ yet available in the current repository.
 | S13 | `POST` | `/api/auth/login` | Public, same-origin write | `LoginRequest` | `200 AuthResponse` and opaque cookie | `400 VALIDATION_ERROR`, `401 INVALID_CREDENTIALS`, `403 ORIGIN_NOT_ALLOWED` | `Implemented in M2` |
 | S13 | `POST` | `/api/auth/logout` | Cookie optional; idempotent same-origin write | None | `204`, session invalidated and cookie cleared | `403 ORIGIN_NOT_ALLOWED`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 | S13 | `GET` | `/api/auth/me` | Authenticated | None | `200 AuthResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
-| S02, S04 | `GET` | `/api/me/recommendations?limit=10` | Authenticated | Optional integer `limit`, 1-10 | `200 RecommendationResponse` with popular/cold-start results | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE` | `Implemented in M2` |
+| S02, S04 | `GET` | `/api/me/recommendations?limit=10` | Authenticated | Optional integer `limit`, 1-10 | `200 RecommendationResponse` in personalised, no-match, or cold-start state | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T08)` |
 | S04 | `GET` | `/api/movies?limit=10` | Public | Optional integer `limit`, 1-10, default 10 | `200 MovieListResponse`; catalogue entries without popularity may be included and sort last when popularity ordering is used | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2`; public catalogue route |
 | S09 / T19 | `GET` | `/api/movies/popular?limit=10` | Public | Optional integer `limit`, 1-10, default 10 | `200 MovieListResponse`; only movies with valid popularity | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in M3`; dedicated popular-movie route |
 | S03 | `GET` | `/api/movies/{movieId}` | Public | Opaque `movieId` | `200 MovieDetailResponse` | `404 MOVIE_NOT_FOUND`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
@@ -88,9 +88,9 @@ S3-T01 added the `user_genre_preferences` table and the two read routes
 `GET /api/genres` and `GET /api/me/preferences`. S3-T02 implements validated,
 atomic preference replacement through `PUT /api/me/preferences`. The dedicated
 `GET /api/movies/popular` route is implemented in M3 under T19. Ratings and
-reset storage/routes remain pending. Personalised recommendations are
-not yet implemented. Genre filtering, similar movies, and search remain outside
-this contract update.
+reset storage/routes remain pending. S3-T08 implements the genre/popularity
+personalised recommendation baseline. Genre filtering, similar movies, and
+search remain outside this contract update.
 
 
 ## 3. Shared DTOs
@@ -341,16 +341,16 @@ No request or response accepts a `userId` field. After a successful save the
 client invalidates the current account's preference and recommendation state;
 it must not reuse another account's cached response.
 
-## 7. Recommendation contract: current M2 and Sprint 3 target
+## 7. Recommendation contract: Sprint 3 genre/popularity baseline
 
 ### `GET /api/me/recommendations?limit=10`
 
 `limit` defaults to 10 and accepts an integer from 1 through 10. The account is
 resolved only from the authenticated session.
 
-The route is implemented, but it currently returns the shared popular
-catalogue ordering for every authenticated account. It does not read saved
-preferences or ratings and is not personalised.
+The route reads only the authenticated account's saved genres and the active
+local SQLite catalogue. It does not accept an account identifier, call TMDb,
+or use rating signals.
 
 Response shape:
 
@@ -365,7 +365,10 @@ Response shape:
         "genres": [
           { "id": 28, "name": "Action" }
         ],
-        "popularityScore": 90.0
+        "popularityScore": 90.0,
+        "reason": {
+          "matchedGenres": []
+        }
       }
     ],
     "mode": "popular",
@@ -380,8 +383,8 @@ Response shape:
 }
 ```
 
-The response always uses `mode=popular`, `personalised=false`, and
-`noMatch=false`. A valid active catalogue with no usable movies returns
+An account without saved genres uses `mode=popular`, `personalised=false`, and
+`noMatch=false`. A valid active catalogue with no usable popular movies returns
 `200` with `movies: []`. No active catalogue returns
 `503 CATALOGUE_UNAVAILABLE`.
 
@@ -389,7 +392,7 @@ Popular alternatives contain only movies with finite popularity, sorted by
 popularity descending, title A-Z for ties, and internal movie ID as the final
 deterministic tie.
 
-### Committed Sprint 3 personalised response (implementation pending)
+### Personalised response
 
 Sprint 3 keeps `data.movies`, `mode`, `personalised`, and `noMatch` and adds the
 recommendation explanation field `reason.matchedGenres` to each result. It
@@ -737,8 +740,8 @@ popularity/title/ID ranker.
 The preference storage and the preference reads (`GET /api/genres`,
 `GET /api/me/preferences`) are implemented in Sprint 3 under S3-T01.
 Preference replacement (`PUT /api/me/preferences`) is implemented under S3-T02.
-Ratings, profile reset, personalised recommendations, and NLP endpoints remain
-unimplemented. Sections 7 (committed personalised response), 9, and 10 remain
+Rating API/UI, profile reset, and NLP endpoints remain outside this endpoint's
+implementation. Sections 9 and 10 remain
 committed Sprint 3 delivery contracts, not optional future work, while their
 implementation status remains pending.
 
