@@ -42,7 +42,6 @@ function PreferencesPage() {
       saveControllerRef.current = null;
     };
   }, []);
-  
   useEffect(() => {
     const controller = new AbortController();
 
