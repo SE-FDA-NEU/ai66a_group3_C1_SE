@@ -420,6 +420,30 @@ def _committed_preference_rows(session: Session) -> list[tuple[str, int]]:
         ]
 
 
+def test_t17_recommendation_detail_round_trip_preserves_database_preferences(
+    database_session: Session,
+) -> None:
+    _seed_small_catalogue(database_session)
+    http, user_id = _sign_in("t17-detail-return@example.com")
+    _save_preferences(http, [1])
+    rows_before = _committed_preference_rows(database_session)
+
+    recommendations = http.get("/api/me/recommendations?limit=2")
+    assert recommendations.status_code == 200
+    movie_id = recommendations.json()["data"]["movies"][0]["id"]
+
+    detail = http.get(f"/api/movies/{movie_id}")
+    assert detail.status_code == 200
+    assert detail.json()["data"]["movie"]["id"] == movie_id
+
+    assert http.get("/api/me/preferences").json()["data"]["genres"] == [
+        {"id": 1, "name": "Action"}
+    ]
+    assert _committed_preference_rows(database_session) == rows_before == [
+        (user_id, 1)
+    ]
+
+
 def _is_failure_query(stage: str, statement: str) -> bool:
     """Select the actual SQLite query boundary to interrupt, not its result."""
 

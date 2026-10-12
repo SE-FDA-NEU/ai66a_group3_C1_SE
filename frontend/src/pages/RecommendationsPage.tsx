@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import {
   getRecommendations,
@@ -8,6 +8,7 @@ import {
 } from "../api/recommendations.ts";
 import { useAuth } from "../auth/authState.ts";
 import MovieGrid from "../components/MovieGrid.tsx";
+import { currentReturnPath } from "../navigation/movieDetailReturn.ts";
 
 type RecommendationStateProps = {
   status: "loading" | "empty";
@@ -35,6 +36,7 @@ type RecommendationLoad =
   | { status: "ready"; result: RecommendationResult };
 
 function RecommendationsPage() {
+  const location = useLocation();
   const auth = useAuth();
   const { handleUnauthorized } = auth;
   const [isSigningOut, setIsSigningOut] = useState(false);
@@ -143,6 +145,7 @@ function RecommendationsPage() {
             ariaLabel={sectionTitle}
             movies={load.result.movies}
             showReasons={load.result.personalised}
+            returnTo={currentReturnPath(location)}
           />
         )}
       </section>

@@ -1,7 +1,7 @@
 # Sprint 3 UI-state contract
 
 Contract revision: `S3-DRAFT`, reconciled with the current frontend on
-2026-10-08.
+2026-10-13.
 
 This document separates current UI evidence from committed Sprint 3 state
 contracts whose implementation is pending. These states are required Sprint
@@ -44,7 +44,7 @@ not included merely to reach a row count.
 | 401 | `INVALID_CREDENTIALS` | Email is unknown or password is wrong; do not reveal which | `Email or password is incorrect` | Edit credentials and submit again. |
 | 401 | `AUTHENTICATION_REQUIRED` | Protected route has a missing, expired, invalid, or revoked session | No private content is rendered; the central auth state opens `/login` | Sign in; clear previous account-scoped state. |
 | 403 | `ORIGIN_NOT_ALLOWED` | Browser session write fails same-origin protection | `Request origin is not allowed` | Retry only from the application origin; do not claim the write succeeded. |
-| 404 | `MOVIE_NOT_FOUND` | Opaque ID is not present in the active catalogue | Heading `Movie not found`; text `That movie is not available in the active catalogue.` | `Return to catalogue` opens `/`. |
+| 404 | `MOVIE_NOT_FOUND` | Opaque ID is not present in the active catalogue | Heading `Movie not found`; text `That movie is not available in the active catalogue.` | Return to the validated originating movie list; a direct or unsafe return context uses `Return to catalogue` and `/`. |
 | 409 | `EMAIL_ALREADY_REGISTERED` | Normalized email already exists | `This email is already registered` | Sign in or use a different email. |
 | 503 | `CATALOGUE_UNAVAILABLE` | No active local catalogue revision | Heading `Movies are unavailable`; text `Movie catalogue is unavailable` | `Retry`; operator fixes/imports the catalogue if it persists. |
 | 503 | `SERVICE_UNAVAILABLE` | Database read/write is unavailable | Heading `Movies are unavailable` (catalogue screen); text `Service is temporarily unavailable` | `Retry`; preserve previously committed/private state. |
@@ -52,6 +52,26 @@ not included merely to reach a row count.
 Messages must not include stack traces, SQL/database internals, passwords,
 session values, or TMDb credentials. The two Story messages remain exact:
 `Email or password is incorrect` and `This email is already registered`.
+
+### Movie-detail return context (S3-T17)
+
+Every shared movie card records only the current list location in React Router
+state before opening `/movies/:movieId`. The detail page accepts return paths
+whose parsed pathname is exactly `/`, `/popular`, or `/recommendations` and
+preserves that path's query string and fragment. Success, not-found, and error
+detail states all use the same validated destination.
+
+The state is navigation context, not trusted input or account data. Absolute
+URLs, scheme-relative values such as `//example.com`, backslashes, malformed
+values, non-string values, and internal paths outside the list allow-list are
+discarded. A direct detail URL has no return state and therefore renders
+`Return to catalogue` linking to `/`.
+
+Returning from a recommendation detail opens `/recommendations`, where the
+existing protected route and current session select the account and fetch its
+recommendations again. The round trip never serialises genre choices and never
+calls `PUT /api/me/preferences`, so the database remains the sole owner of the
+account's committed preferences.
 
 ## 3. Committed Sprint 3 rating UI contract (implementation pending)
 

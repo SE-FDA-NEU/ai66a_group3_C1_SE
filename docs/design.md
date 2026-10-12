@@ -1,6 +1,6 @@
 # Sprint 3 design and contract reconciliation
 
-This document was reconciled with the local working tree on 2026-10-11. Every
+This document was reconciled with the local working tree on 2026-10-13. Every
 table and endpoint is marked as implemented or as committed Sprint 3 scope
 with implementation pending; no tested SHA or review approval is implied.
 Request and response shapes are in
@@ -415,6 +415,26 @@ Rating-adjusted ranking belongs to Story #22 / S05b and is planned Sprint 4.
 Evidence: `frontend/src/pages/HomePage.tsx` and `MovieDetailPage.tsx` use effect
 cleanup cancellation; `frontend/src/auth/AuthContext.tsx` owns account
 identity; `RequireAuth.tsx` keys protected content by `user.id`.
+
+### Safe movie-detail return context
+
+Shared movie cards pass a minimal `{ returnTo }` React Router state to the
+public detail route. The value is derived from the current list location; no
+account ID, genre preference, recommendation payload, or external URL is
+stored in it. `MovieDetailPage` resolves the value through a fixed movie-list
+allow-list (`/`, `/popular`, and `/recommendations`) before rendering any Back
+or Return link. Direct loads and rejected values fall back to `/`.
+
+This design uses an explicit destination rather than `navigate(-1)`: a direct
+URL, stale browser history entry, or externally supplied state therefore
+cannot send the viewer to an unvalidated origin. Returning to
+`/recommendations` runs the existing protected-route check and issues the
+normal recommendation GET for the still-current account. Detail navigation
+has no preference write path, leaving `user_genre_preferences` unchanged.
+
+Evidence: `frontend/src/navigation/movieDetailReturn.ts`, the shared
+`MovieCard`/`MovieGrid`, `MovieDetailPage.tsx`, and
+`movie-detail-return.test.tsx`.
 
 ### Nullable catalogue fields for renderable detail states
 

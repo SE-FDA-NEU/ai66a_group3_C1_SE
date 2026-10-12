@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import { listMovies, type MovieSummary } from "../api/movies.ts";
 import MovieGrid from "../components/MovieGrid.tsx";
+import { currentReturnPath } from "../navigation/movieDetailReturn.ts";
 
 function HomePage() {
+  const location = useLocation();
   const [movies, setMovies] = useState<MovieSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -96,7 +98,11 @@ function HomePage() {
           <p className="muted">The active catalogue does not contain any movies yet.</p>
         </section>
       ) : (
-        <MovieGrid ariaLabel="Movie catalogue" movies={movies} />
+        <MovieGrid
+          ariaLabel="Movie catalogue"
+          movies={movies}
+          returnTo={currentReturnPath(location)}
+        />
       )}
     </main>
   );
