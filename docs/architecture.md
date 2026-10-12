@@ -1,12 +1,13 @@
 # Sprint 3 architecture and persistence contract
 
-Contract revision: `S3-DRAFT`, reconciled with current migrations on
-2026-10-10 (S3-T02 preference replacement).
+Contract revision: `S3-DRAFT`, reconciled with the current runtime on
+2026-10-11 (through S3-T08 recommendation integration, S3-T30 rating
+storage, and S3-T31 rating API).
 
 The HTTP contract is in [api.md](api.md). This document describes the backend
 that is present in the repository and separately labels committed Sprint 3
-persistence contracts whose implementation is pending. Committed target
-tables/routes are required Sprint scope, but are not runtime or test evidence.
+contracts whose API or UI implementation is pending. Committed target routes
+are required Sprint scope, but are not runtime or test evidence.
 
 ## 1. Runtime evidence
 
@@ -18,8 +19,9 @@ The repository contains a FastAPI backend with these implemented areas:
   logout under `/api/auth`.
 - Public catalogue reads through `GET /api/movies` and
   `GET /api/movies/{movieId}`.
-- Authenticated `GET /api/me/recommendations`, which currently serves the
-  shared popular/cold-start recommendation list.
+- Authenticated `GET /api/me/recommendations`, which uses the session account's
+  saved genres when matches exist and otherwise serves the reviewed popular
+  cold-start/no-match states.
 - Authenticated genre/preference reads (S3-T01) and validated, atomic
   `PUT /api/me/preferences` (S3-T02), scoped only by the server-side session.
 
@@ -36,9 +38,12 @@ staging and demo catalogue acceptance; it is verified under T29/C04 in the
 support, while CI uses synthetic provider fixtures without a real token/network.
 
 Preference storage, reads, and atomic replacement are implemented under
-T01/T02. Preference UI, rating storage/API/UI protection, genre/popularity-only
-personalised recommendations, and the authenticated reset backend remain
-committed Sprint 3 work. Rating/reset session isolation supports Story #45 / S13.
+T01/T02. The genre/popularity-only personalised recommendation backend is
+implemented under T08. Account-owned rating storage and its repository are
+implemented under T30, and the protected rating read/write API under T31.
+Preference UI, rating UI, and the authenticated reset backend remain separate
+Sprint 3 work. Rating/reset
+session isolation supports Story #45 / S13.
 Rating-adjusted ranking remains Story #22 / S05b planned for Sprint 4.
 
 ## 2. Selected stack
@@ -46,8 +51,8 @@ Rating-adjusted ranking remains Story #22 / S05b planned for Sprint 4.
 | Layer | Technology | Boundary |
 |---|---|---|
 | Browser frontend | React, TypeScript, Vite | Renders screens and calls the backend API. |
-| Backend API | FastAPI, Pydantic, Python 3.12 | Owns HTTP validation, authentication, catalogue reads, and popular recommendations. |
-| Persistence | SQLAlchemy, Alembic, SQLite | Owns the migrated account/session and catalogue tables. |
+| Backend API | FastAPI, Pydantic, Python 3.12 | Owns HTTP validation, authentication, catalogue reads, and genre/popularity recommendations. |
+| Persistence | SQLAlchemy, Alembic, SQLite | Owns the migrated account/session, preference, rating, and catalogue tables. |
 | Password storage | Argon2id | Stores only encoded password hashes. |
 | Provider integration | Server-side `httpx` adapter | Keeps the TMDb credential out of the browser. |
 | Tests | pytest; Vitest and React Testing Library | Verifies backend and frontend behaviour. |
@@ -130,22 +135,24 @@ the M2 Alembic migrations:
 `revoked_at`. `catalogue_revisions` stores the inserted, updated, and rejected
 movie counters. `catalogue_state.active_revision_id` is required and points to
 the active revision. S3-T01 migration `9d2f5a1c3b84` added
-`user_genre_preferences`, which the ERD image does not show yet. No ratings or
-import-run table has been migrated.
+`user_genre_preferences`; S3-T30 migration `b7e4c2d91f30` added
+`user_movie_ratings` and is the single current Alembic head. The ERD image does
+not show those two Sprint 3 tables yet. No import-run table has been migrated.
 
-### Committed Sprint 3 personalisation storage (implementation pending)
+### Sprint 3 personalisation storage
 
-The committed contract requires two application-owned tables. Names below are
-frozen. `user_genre_preferences` exists in migration `9d2f5a1c3b84` (S3-T01);
-`viewer_ratings` does not exist in the current Alembic head.
+Both application-owned tables are implemented:
+`user_genre_preferences` in migration `9d2f5a1c3b84` (S3-T01) and
+`user_movie_ratings` in migration `b7e4c2d91f30` (S3-T30).
 
 | Table | Columns | Keys and constraints | Ownership/delete rule |
 |---|---|---|---|
 | `user_genre_preferences` | `user_id` VARCHAR(36), `genre_id` INTEGER | Composite primary key/unique `(user_id, genre_id)`; FK `user_id -> users.id` ON DELETE CASCADE; FK `genre_id -> genres.id` ON DELETE RESTRICT | Rows belong to one user; deleting/resetting one account's preference rows cannot affect another account or the genre catalogue. |
-| `viewer_ratings` | `user_id` VARCHAR(36), `movie_id` VARCHAR(36), `rating` INTEGER | Composite primary key/unique `(user_id, movie_id)`; FK `user_id -> users.id` ON DELETE CASCADE; FK `movie_id -> catalog_movies.id` ON DELETE RESTRICT; CHECK `rating BETWEEN 1 AND 5` | One committed rating per user/movie; deleting a catalogue movie cannot leave an orphan rating. |
+| `user_movie_ratings` | `id` VARCHAR(36), `user_id` VARCHAR(36), `movie_id` VARCHAR(36), `rating` INTEGER, `created_at` DATETIME, `updated_at` DATETIME | Primary key `id`; unique `(user_id, movie_id)`; FK `user_id -> users.id` ON DELETE CASCADE; FK `movie_id -> catalog_movies.id` ON DELETE CASCADE; CHECK `typeof(rating) = 'integer' AND rating BETWEEN 1 AND 5` | One current rating per user/movie; deleting its account or catalogue movie removes the owned rating. |
 
-Application validation must also enforce a strict integer: SQLite's check is
-defence in depth and does not make JSON strings, booleans, or fractions valid.
+The T30 repository also enforces a strict integer before persistence. The
+pending API must retain request validation because the SQLite check is defence
+in depth and does not define the public JSON contract.
 The stable internal movie ID lets a rating continue to identify the same
 provider movie across importer updates that preserve that ID.
 
@@ -167,8 +174,9 @@ provider movie across importer updates that preserve that ID.
   checked before deletion; scoped deletion, insertion, and flush run in the
   request's transaction. The route commits once or rolls back on database
   failure. Response DTOs are prepared before commit and returned after it.
-- Sprint 3 rating upsert is one transaction and returns success only after
-  commit. Invalid input or a failed commit preserves the prior value.
+- The T30 rating repository reads and upserts by `(user_id, movie_id)` inside
+  the caller's transaction. The T31 rating API returns success only after
+  commit; invalid input or a failed commit preserves the prior value.
 - Sprint 3 profile reset deletes only the current user's preference and rating
   rows in one transaction. Failure of either delete or commit rolls back both;
   the user, current session, catalogue, movies, genres, and other accounts are
@@ -193,19 +201,21 @@ appear in DTOs, frontend/Vite assets, logs, screenshots, fixtures, database
 dumps used as evidence, or documentation evidence.
 
 T02 extends the existing same-origin Fetch Metadata/`Origin` protection to
-preference PUT requests using a method/path registry. Future rating/reset
-writes must extend it before mutation. Missing, expired, or revoked
+preference PUT requests using a method/path registry, and T31 extends it to
+rating PUT requests. A future reset write must extend it before mutation.
+Missing, expired, or revoked
 sessions return `401 AUTHENTICATION_REQUIRED`; permitted-origin requests still
 derive their account solely from the server-side session.
 
 ## 7. Delivery boundary
 
 M2 includes health, authentication, catalogue reads, and popular/cold-start
-recommendations. Sprint 3 contracts in this document cover the dedicated
-S09/T19 public popular route, preferences, genre/popularity-only personalised
-recommendations, rating persistence, and the authenticated profile-reset
-backend. Each pending capability remains unimplemented until its route and
-applicable query, migration, transaction handling, protection, and tests exist.
+recommendations. Sprint 3 adds the dedicated S09/T19 public popular route,
+preferences, and the implemented T08 genre/popularity-only personalised
+recommendations. T30 adds account-owned rating storage and repository support,
+and T31 adds the protected rating read/write API. The rating UI and the
+authenticated profile-reset backend remain separate capabilities until their
+applicable routes, transactions, protection, and tests exist.
 
 Rating-adjusted recommendation ranking is not part of Sprint 3. It belongs to
 Story #22 / S05b and is planned Sprint 4 behaviour.

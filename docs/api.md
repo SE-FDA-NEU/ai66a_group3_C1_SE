@@ -1,7 +1,7 @@
 # Sprint 3 HTTP API contract
 
 Contract revision: `S3-DRAFT`, reconciled with the current M2/Sprint 3 runtime on
-2026-10-10 (S3-T02 preference replacement).
+2026-10-11 (through S3-T08 recommendation integration).
 
 This document inventories the implemented M2 HTTP boundary and defines the
 committed Sprint 3 contracts needed by implementation consumers. Every route
@@ -30,8 +30,9 @@ Architecture and persistence rules are in
   browser writes return `403 ORIGIN_NOT_ALLOWED` before session state changes.
 - `PUT /api/me/preferences` now reuses that protection (S3-T02). The same-origin
   registry matches method and path; login/logout protection is preserved.
-  Committed rating and profile-reset writes must extend the registry when
-  their routes are implemented.
+  `PUT /api/me/ratings/{movieId}` is covered the same way (S3-T31, path
+  prefix match). The committed profile-reset write must extend the registry
+  when its route is implemented.
 - Protected endpoints derive the account only from the authenticated session.
   A client-supplied `user_id`, account ID, email, username, or owner field
   cannot select or change the target account. Such fields are not part of a
@@ -73,24 +74,25 @@ yet available in the current repository.
 | S13 | `POST` | `/api/auth/login` | Public, same-origin write | `LoginRequest` | `200 AuthResponse` and opaque cookie | `400 VALIDATION_ERROR`, `401 INVALID_CREDENTIALS`, `403 ORIGIN_NOT_ALLOWED` | `Implemented in M2` |
 | S13 | `POST` | `/api/auth/logout` | Cookie optional; idempotent same-origin write | None | `204`, session invalidated and cookie cleared | `403 ORIGIN_NOT_ALLOWED`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 | S13 | `GET` | `/api/auth/me` | Authenticated | None | `200 AuthResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
-| S02, S04 | `GET` | `/api/me/recommendations?limit=10` | Authenticated | Optional integer `limit`, 1-10 | `200 RecommendationResponse` with popular/cold-start results | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE` | `Implemented in M2` |
+| S02, S04 | `GET` | `/api/me/recommendations?limit=10` | Authenticated | Optional integer `limit`, 1-10 | `200 RecommendationResponse` in personalised, no-match, or cold-start state | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T08)` |
 | S04 | `GET` | `/api/movies?limit=10` | Public | Optional integer `limit`, 1-10, default 10 | `200 MovieListResponse`; catalogue entries without popularity may be included and sort last when popularity ordering is used | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2`; public catalogue route |
 | S09 / T19 | `GET` | `/api/movies/popular?limit=10` | Public | Optional integer `limit`, 1-10, default 10 | `200 MovieListResponse`; only movies with valid popularity | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in M3`; dedicated popular-movie route |
 | S03 | `GET` | `/api/movies/{movieId}` | Public | Opaque `movieId` | `200 MovieDetailResponse` | `404 MOVIE_NOT_FOUND`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 | S01 | `GET` | `/api/genres` | Authenticated | None | `200 GenreListResponse` | `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T01)` |
 | S01 | `GET` | `/api/me/preferences` | Authenticated | None | `200 PreferenceResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T01)` |
 | S01 | `PUT` | `/api/me/preferences` | Authenticated, same-origin write | `PreferenceRequest` | `200 PreferenceResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 GENRE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T02)` |
-| S05a | `GET` | `/api/me/ratings/{movieId}` | Authenticated | Opaque `movieId` | `200 RatingResponse` | `401 AUTHENTICATION_REQUIRED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 contract; implementation pending` |
-| S05a | `PUT` | `/api/me/ratings/{movieId}` | Authenticated, same-origin write | `RatingRequest` | `200 RatingResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 contract; implementation pending` |
+| S05a | `GET` | `/api/me/ratings/{movieId}` | Authenticated | Opaque `movieId` | `200 RatingResponse` | `401 AUTHENTICATION_REQUIRED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T31)` |
+| S05a | `PUT` | `/api/me/ratings/{movieId}` | Authenticated, same-origin write | `RatingRequest` | `200 RatingResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T31)` |
 | S11 | `POST` | `/api/me/profile/reset` | Authenticated, same-origin write | `ProfileResetRequest` | `200 ProfileResetResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 backend contract; implementation pending` |
 
 S3-T01 added the `user_genre_preferences` table and the two read routes
 `GET /api/genres` and `GET /api/me/preferences`. S3-T02 implements validated,
 atomic preference replacement through `PUT /api/me/preferences`. The dedicated
-`GET /api/movies/popular` route is implemented in M3 under T19. Ratings and
-reset storage/routes remain pending. Personalised recommendations are
-not yet implemented. Genre filtering, similar movies, and search remain outside
-this contract update.
+`GET /api/movies/popular` route is implemented in M3 under T19. S3-T08
+implements the genre/popularity personalised recommendation baseline, and the
+rating routes are implemented under S3-T31; the reset route remains pending.
+Genre filtering, similar movies, and search remain outside this contract
+update.
 
 
 ## 3. Shared DTOs
@@ -341,16 +343,16 @@ No request or response accepts a `userId` field. After a successful save the
 client invalidates the current account's preference and recommendation state;
 it must not reuse another account's cached response.
 
-## 7. Recommendation contract: current M2 and Sprint 3 target
+## 7. Recommendation contract: Sprint 3 genre/popularity baseline
 
 ### `GET /api/me/recommendations?limit=10`
 
 `limit` defaults to 10 and accepts an integer from 1 through 10. The account is
 resolved only from the authenticated session.
 
-The route is implemented, but it currently returns the shared popular
-catalogue ordering for every authenticated account. It does not read saved
-preferences or ratings and is not personalised.
+The route reads only the authenticated account's saved genres and the active
+local SQLite catalogue. It does not accept an account identifier, call TMDb,
+or use rating signals.
 
 Response shape:
 
@@ -365,7 +367,10 @@ Response shape:
         "genres": [
           { "id": 28, "name": "Action" }
         ],
-        "popularityScore": 90.0
+        "popularityScore": 90.0,
+        "reason": {
+          "matchedGenres": []
+        }
       }
     ],
     "mode": "popular",
@@ -380,8 +385,8 @@ Response shape:
 }
 ```
 
-The response always uses `mode=popular`, `personalised=false`, and
-`noMatch=false`. A valid active catalogue with no usable movies returns
+An account without saved genres uses `mode=popular`, `personalised=false`, and
+`noMatch=false`. A valid active catalogue with no usable popular movies returns
 `200` with `movies: []`. No active catalogue returns
 `503 CATALOGUE_UNAVAILABLE`.
 
@@ -389,7 +394,7 @@ Popular alternatives contain only movies with finite popularity, sorted by
 popularity descending, title A-Z for ties, and internal movie ID as the final
 deterministic tie.
 
-### Committed Sprint 3 personalised response (implementation pending)
+### Personalised response
 
 Sprint 3 keeps `data.movies`, `mode`, `personalised`, and `noMatch` and adds the
 recommendation explanation field `reason.matchedGenres` to each result. It
@@ -587,11 +592,14 @@ A missing year or overview remains JSON `null`; the UI displays
 to a false 404. Movie detail remains public; a guest opening it must not cause
 the frontend to call a private rating endpoint.
 
-## 9. Committed Sprint 3 rating contract (implementation pending)
+## 9. Sprint 3 rating contract (implemented under S3-T31)
 
-These two S05a routes are committed Sprint 3 scope and frozen for consumers;
-they are not implemented routes in the current working tree. Their session
-ownership and isolation rules support Story #45 / S13.
+These two S05a routes are committed Sprint 3 scope and are implemented under
+S3-T31. A missing, expired, or revoked session returns `401` before any private
+row is read or written, and before the rating value is validated. The one
+exception is a non-empty `application/json` body that is not syntactically
+valid JSON: it is rejected with `400` while the body is parsed, before the
+session is resolved, and still reads and writes nothing. Their session ownership and isolation rules support Story #45 / S13.
 Both use the current authenticated session as the only account identity and
 address a movie by its opaque active-catalogue ID.
 
@@ -655,7 +663,7 @@ does not replace a previously committed rating.
 | Missing, expired, revoked, or invalid session | `401 AUTHENTICATION_REQUIRED` | `Authentication required`; no private read/write |
 | Browser write fails the existing same-origin policy | `403 ORIGIN_NOT_ALLOWED` | `Request origin is not allowed`; no mutation |
 | Opaque movie ID is not in the active catalogue | `404 MOVIE_NOT_FOUND` | `Movie not found`; do not create a movie or orphan rating |
-| Invalid JSON/body/rating value | `400 VALIDATION_ERROR` | `Please correct the highlighted fields`; preserve the prior committed rating |
+| Invalid JSON/body/rating value | `400 VALIDATION_ERROR` | `Please correct the highlighted fields`; preserve the prior committed rating. A wrong value with no valid session is `401`; a non-empty `application/json` body that is not valid JSON is `400` regardless of session |
 | Read or commit fails | `503 SERVICE_UNAVAILABLE` | `Service is temporarily unavailable`; rollback and preserve the prior committed rating |
 
 Neither route accepts `userId`, account ID, email, username, or owner ID. A
@@ -716,7 +724,7 @@ profile state only after the reset success response.
 | `VALIDATION_ERROR` | 400 | Request fields or query values are invalid. |
 | `AUTHENTICATION_REQUIRED` | 401 | A protected route has no valid session. |
 | `INVALID_CREDENTIALS` | 401 | Login credentials are invalid without revealing which field failed. |
-| `ORIGIN_NOT_ALLOWED` | 403 | A browser session or preference write failed the same-origin check. |
+| `ORIGIN_NOT_ALLOWED` | 403 | A browser session, preference, or rating write failed the same-origin check. |
 | `MOVIE_NOT_FOUND` | 404 | The internal movie ID does not exist in the active catalogue. |
 | `GENRE_NOT_FOUND` | 404 | A requested genre ID does not exist. |
 | `EMAIL_ALREADY_REGISTERED` | 409 | The normalized email is already stored. |
@@ -737,10 +745,11 @@ popularity/title/ID ranker.
 The preference storage and the preference reads (`GET /api/genres`,
 `GET /api/me/preferences`) are implemented in Sprint 3 under S3-T01.
 Preference replacement (`PUT /api/me/preferences`) is implemented under S3-T02.
-Ratings, profile reset, personalised recommendations, and NLP endpoints remain
-unimplemented. Sections 7 (committed personalised response), 9, and 10 remain
-committed Sprint 3 delivery contracts, not optional future work, while their
-implementation status remains pending.
+The rating routes (`GET` and `PUT /api/me/ratings/{movieId}`) are implemented
+under S3-T31. The rating UI, profile reset, and NLP endpoints remain outside
+this endpoint's implementation. Section 10 remains a committed Sprint 3
+delivery contract, not optional future work, while its implementation status
+remains pending.
 
 Section 8 documents both the existing public catalogue endpoint and the
 implemented dedicated popular movie endpoint.

@@ -10,6 +10,8 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.db.database import SessionLocal, engine
+from app.db.models import User
+from app.recommendations.service import build_account_recommendations
 from app.repositories.movies import (
     get_active_catalogue_revision,
     get_active_movie_by_id,
@@ -23,6 +25,7 @@ from app.repositories.preferences import (
     list_user_preference_genres,
     replace_user_preference_genres,
 )
+from app.repositories.ratings import get_user_movie_rating, set_user_movie_rating
 from app.repositories.recommendations import list_popular_recommendation_movies
 from app.repositories.users import create_user, get_user_by_email, to_user_dto
 from app.schemas.auth import (
@@ -39,6 +42,7 @@ from app.schemas.preferences import (
     PreferenceRequest,
     PreferenceResponse,
 )
+from app.schemas.ratings import RatingData, RatingRequest, RatingResponse
 from app.schemas.recommendations import RecommendationResponse
 from app.security.origin import same_origin_write_allowed
 from app.security.passwords import normalize_email, verify_password
@@ -61,22 +65,38 @@ _SAME_ORIGIN_WRITES = frozenset(
         ("PUT", "/api/me/preferences"),
     }
 )
+_RATING_WRITE_PREFIX = "/api/me/ratings/"
+
+
+def _requires_same_origin(request: Request) -> bool:
+    path = request.url.path
+    return (request.method, path) in _SAME_ORIGIN_WRITES or (
+        request.method == "PUT" and path.startswith(_RATING_WRITE_PREFIX)
+    )
 
 
 @app.middleware("http")
 async def same_origin_account_writes(request: Request, call_next):
-    """Reject cross-origin browser writes to sessions or account preferences."""
+    """Reject cross-origin browser writes to sessions or account data."""
 
-    if (
-        (request.method, request.url.path) in _SAME_ORIGIN_WRITES
-        and not same_origin_write_allowed(request)
-    ):
+    if _requires_same_origin(request) and not same_origin_write_allowed(request):
         return _error(
             "ORIGIN_NOT_ALLOWED",
             "Request origin is not allowed",
             403,
         )
     return await call_next(request)
+
+
+class AuthenticationRequiredError(Exception):
+    """Raised when a protected route has no valid session."""
+
+
+@app.exception_handler(AuthenticationRequiredError)
+async def authentication_required_handler(
+    _request: Request, _exc: AuthenticationRequiredError
+):
+    return _error("AUTHENTICATION_REQUIRED", "Authentication required", 401)
 
 
 @app.exception_handler(RequestValidationError)
@@ -101,6 +121,22 @@ def get_db() -> Generator[Session, None, None]:
         yield database_session
     finally:
         database_session.close()
+
+
+def current_session_user(
+    request: Request,
+    database_session: Session = Depends(get_db),  # noqa: B008
+) -> User:
+    """Resolve the account from the cookie only.
+
+    As a dependency this runs before FastAPI validates the body fields, so a
+    missing session wins over a wrong rating value. JSON that is not
+    syntactically valid is rejected earlier, while the body is parsed."""
+
+    user = resolve_session(database_session, request.cookies.get(SESSION_COOKIE))
+    if user is None:
+        raise AuthenticationRequiredError
+    return user
 
 
 def _error(code: str, message: str, status_code: int) -> JSONResponse:
@@ -276,23 +312,21 @@ def recommendations(
             503,
         )
 
-    movies = list_popular_recommendation_movies(
+    result = build_account_recommendations(
         database_session,
+        user_id=user.id,
         limit=limit,
     )
 
     return {
         "data": {
-            "movies": [
-                to_movie_summary_dto(movie).model_dump()
-                for movie in movies
-            ],
-            "mode": "popular",
-            "personalised": False,
-            "noMatch": False,
+            "movies": [movie.model_dump() for movie in result.movies],
+            "mode": result.mode,
+            "personalised": result.personalised,
+            "noMatch": result.no_match,
         },
         "meta": {
-            "count": len(movies),
+            "count": len(result.movies),
             "limit": limit,
             "catalogueRevision": revision.id,
         },
@@ -366,6 +400,64 @@ def put_preferences(
     except GenreNotFoundError:
         database_session.rollback()
         return _error("GENRE_NOT_FOUND", "Genre not found", 404)
+    except SQLAlchemyError:
+        database_session.rollback()
+        return _error("SERVICE_UNAVAILABLE", "Service is temporarily unavailable", 503)
+
+    return response
+
+
+@app.get(
+    "/api/me/ratings/{movie_id}",
+    response_model=RatingResponse,
+    status_code=200,
+)
+def get_rating(
+    movie_id: str,
+    user: User = Depends(current_session_user),  # noqa: B008
+    database_session: Session = Depends(get_db),  # noqa: B008
+):
+    movie = get_active_movie_by_id(database_session, movie_id=movie_id)
+    if movie is None:
+        return _error("MOVIE_NOT_FOUND", "Movie not found", 404)
+
+    stored = get_user_movie_rating(
+        database_session, user_id=user.id, movie_id=movie.id
+    )
+    return RatingResponse(
+        data=RatingData(
+            movieId=movie.id,
+            rating=stored.rating if stored is not None else None,
+        )
+    )
+
+
+@app.put(
+    "/api/me/ratings/{movie_id}",
+    response_model=RatingResponse,
+    status_code=200,
+)
+def put_rating(
+    movie_id: str,
+    payload: RatingRequest,
+    user: User = Depends(current_session_user),  # noqa: B008
+    database_session: Session = Depends(get_db),  # noqa: B008
+):
+    movie = get_active_movie_by_id(database_session, movie_id=movie_id)
+    if movie is None:
+        return _error("MOVIE_NOT_FOUND", "Movie not found", 404)
+
+    try:
+        stored = set_user_movie_rating(
+            database_session,
+            user_id=user.id,
+            movie_id=movie.id,
+            rating=payload.rating,
+        )
+        response = RatingResponse(
+            data=RatingData(movieId=movie.id, rating=stored.rating)
+        )
+        database_session.commit()
     except SQLAlchemyError:
         database_session.rollback()
         return _error("SERVICE_UNAVAILABLE", "Service is temporarily unavailable", 503)

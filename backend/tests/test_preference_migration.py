@@ -142,16 +142,34 @@ def test_a_preferred_genre_cannot_be_deleted(engine: Engine) -> None:
 
 
 def test_downgrade_drops_only_the_preference_table(
-    migrated_database_url: str,
+    tmp_path: Path,
 ) -> None:
-    completed = _alembic(migrated_database_url, "downgrade", "-1")
-    assert completed.returncode == 0, completed.stderr
+    database_url = (
+        f"sqlite:///{(tmp_path / 'preferences_downgrade.db').as_posix()}"
+    )
 
-    downgraded = create_engine(migrated_database_url)
+    upgraded = _alembic(
+        database_url,
+        "upgrade",
+        "9d2f5a1c3b84",
+    )
+    assert upgraded.returncode == 0, upgraded.stderr
+
+    downgraded = _alembic(
+        database_url,
+        "downgrade",
+        "8c1e2f4a7b90",
+    )
+    assert downgraded.returncode == 0, downgraded.stderr
+
+    engine = create_engine(database_url)
+
     try:
-        tables = set(inspect(downgraded).get_table_names())
+        tables = set(inspect(engine).get_table_names())
     finally:
-        downgraded.dispose()
+        engine.dispose()
 
     assert "user_genre_preferences" not in tables
-    assert {"users", "auth_sessions", "genres"} <= tables
+    assert "users" in tables
+    assert "catalog_movies" in tables
+    assert "auth_sessions" in tables

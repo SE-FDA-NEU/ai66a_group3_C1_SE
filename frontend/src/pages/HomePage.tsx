@@ -60,6 +60,9 @@ function HomePage() {
           <p className="muted">Browse the public local movie catalogue.</p>
         </div>
         <nav className="catalogue-actions" aria-label="Public navigation">
+          <Link className="button-link" to="/preferences">
+            Start
+          </Link>
           <Link className="button-link button-secondary" to="/popular">
             Popular movies
           </Link>
