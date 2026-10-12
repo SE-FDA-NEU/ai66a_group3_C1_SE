@@ -766,7 +766,7 @@ profile state only after the reset success response.
 | `VALIDATION_ERROR` | 400 | Request fields or query values are invalid. |
 | `AUTHENTICATION_REQUIRED` | 401 | A protected route has no valid session. |
 | `INVALID_CREDENTIALS` | 401 | Login credentials are invalid without revealing which field failed. |
-| `ORIGIN_NOT_ALLOWED` | 403 | A browser session, preference, or rating write failed the same-origin check. |
+| `ORIGIN_NOT_ALLOWED` | 403 | A browser session, preference, rating, or profile-reset write failed the same-origin check. |
 | `MOVIE_NOT_FOUND` | 404 | The internal movie ID does not exist in the active catalogue. |
 | `GENRE_NOT_FOUND` | 404 | A requested genre ID does not exist. |
 | `EMAIL_ALREADY_REGISTERED` | 409 | The normalized email is already stored. |

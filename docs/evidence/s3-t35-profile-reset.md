@@ -5,9 +5,9 @@
 - Account-isolation support: [S13 #45](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/45) AC5
 - Dependencies: preference replacement [#104](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/104), rating API [S3-T31 #138](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/138), and approved contract [#134](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/134)
 - Verification date: 2026-10-12
-- Tested state: uncommitted working tree based on `d345c8725f6788ae68db739454e056bca552b8ec`
-- Tested candidate SHA: pending by request; this implementation must not be committed by the implementer in this session
-- Independent review: pending
+- Tested implementation SHA after merging `main`: [`05ee98232a96a10321d0e925c7e059d90c45d7c0`](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/05ee98232a96a10321d0e925c7e059d90c45d7c0)
+- Hosted CI and independent review: not verified in this evidence; attach the final PR check run and a teammate's approval before marking T35 complete
+- Evidence status: this documentation correction is uncommitted; verify the final PR SHA after it is committed
 
 ## Implemented boundary
 
@@ -36,19 +36,27 @@ Story #33.
 | Shared and unrelated state is preserved | The confirmed-reset test compares user, session, catalogue, movie, genre, and relation counts and retains Account B's rows. |
 | Recommendations observe the reset state | `test_recommendations_use_cold_start_state_after_reset` moves from personalised mode to popular cold-start mode. |
 
-## Local results
+## Local results on tested implementation SHA
+
+From the repository root, with the project virtual environment installed:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest backend/tests/test_profile_reset_api.py -q
+.\.venv\Scripts\python.exe -m pytest backend/tests -q --cov=backend/app --cov-report=term
+.\.venv\Scripts\python.exe -m ruff check backend --output-format=concise
+```
 
 Focused reset suite:
 
 ```text
-28 passed, 1 warning in 9.46s
+28 passed, 1 warning in 9.67s
 ```
 
-Full backend regression with coverage:
+Full backend regression after the T31/main merge, with coverage:
 
 ```text
-244 passed, 1 skipped, 1 warning in 88.46s
-TOTAL 1117 statements, 122 missed, 89% coverage
+328 passed, 1 skipped, 1 warning in 86.19s
+TOTAL 1164 statements, 122 missed, 90% coverage
 ```
 
 Ruff:
@@ -58,6 +66,7 @@ All checks passed!
 ```
 
 The warning is the existing Starlette TestClient deprecation warning. The
-single skipped test is pre-existing. A commit SHA and independent approval must
-be appended after the owner commits and opens the review; neither is fabricated
-from this uncommitted working tree.
+single skipped test is pre-existing. The merged tree also passed 68 frontend
+tests, frontend lint, and frontend build. These are local results, not hosted
+CI or an independent review. The PR's final commit SHA and review evidence
+still need to be linked after this evidence update is committed.
