@@ -7,7 +7,7 @@ import {
   type RecommendationResult,
 } from "../api/recommendations.ts";
 import { useAuth } from "../auth/authState.ts";
-import MovieGrid from "../components/MovieGrid.tsx";
+import RecommendationFilter from "../components/RecommendationFilter.tsx";
 
 type RecommendationStateProps = {
   status: "loading" | "empty";
@@ -139,10 +139,9 @@ function RecommendationsPage() {
         ) : load.result.movies.length === 0 ? (
           <RecommendationState status="empty" />
         ) : (
-          <MovieGrid
+          <RecommendationFilter
             ariaLabel={sectionTitle}
-            movies={load.result.movies}
-            showReasons={load.result.personalised}
+            snapshot={load.result}
           />
         )}
       </section>
