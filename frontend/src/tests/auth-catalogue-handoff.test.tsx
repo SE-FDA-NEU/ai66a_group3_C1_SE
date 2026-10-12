@@ -63,6 +63,21 @@ function installFakeServer() {
       activeSessionOwner = null;
       return Promise.resolve(new Response(null, { status: 204 }));
     }
+    if (method === "GET" && url === "/api/me/recommendations?limit=10") {
+      return Promise.resolve(
+        activeSessionOwner
+          ? json({
+              data: {
+                movies: movies.map((movie) => ({ ...movie, reason: { matchedGenres: [] } })),
+                mode: "popular",
+                personalised: false,
+                noMatch: false,
+              },
+              meta: { count: 10, limit: 10, catalogueRevision: "revision-test" },
+            })
+          : json({ error: { code: "AUTHENTICATION_REQUIRED", message: "Authentication required" } }, 401),
+      );
+    }
     if (method === "GET" && url === "/api/movies?limit=10") {
       return Promise.resolve(
         json({ data: { movies }, meta: { count: 10, limit: 10, catalogueRevision: "revision-test" } }),
@@ -114,12 +129,13 @@ describe("T20 integrated auth-to-catalogue handoff", () => {
     expect(await screen.findByRole("heading", { name: "Recommendations" })).toBeInTheDocument();
     expect(window.location.pathname).toBe("/recommendations");
     expect(screen.getByText("handoff@example.com")).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Popular" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Popular" })).toBeInTheDocument();
+    expect(requests).toContain("GET /api/me/recommendations?limit=10");
 
     // Sign out returns to the public catalogue; a movie detail opens without a session.
     fireEvent.click(screen.getByRole("button", { name: "Sign out" }));
+    await waitFor(() => expect(window.location.pathname).toBe("/"));
     expect(await screen.findByText("Movie 1")).toBeInTheDocument();
-    expect(window.location.pathname).toBe("/");
     fireEvent.click(screen.getByRole("link", { name: "View details for Movie 1" }));
     expect(await screen.findByText("A real overview.")).toBeInTheDocument();
     expect(window.location.pathname).toBe("/movies/movie-1");
