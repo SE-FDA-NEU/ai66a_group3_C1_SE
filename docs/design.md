@@ -171,9 +171,11 @@ S04 (recommendations and the public catalogue), S03 (movie detail), S12
 reads, and atomic preference replacement are implemented under T01/T02; its
 frontend and complete Story acceptance remain pending. S09/T19 is listed
 separately as the implemented dedicated public popular route. The recommendation
-endpoint returns the popular list for every signed-in account; genre-based
-ranking depends on the committed preference contracts. The `/recommendations`
-page does not display this response yet; the T20 evidence records that gap.
+endpoint supports popular cold-start results and genre-based personalised
+results implemented under S3-T08. The `/recommendations` page consumes this
+response through the shared typed client and renders server-ordered movie cards
+under S3-T10. No-match guidance, retry and request-race handling remain with
+S3-T11; cold-start guidance and saved-preference transitions remain with S3-T13.
 
 The existing `GET /api/movies` route remains the public catalogue endpoint.
 Sprint 3 public popular-list consumers use `GET /api/movies/popular`. These are
