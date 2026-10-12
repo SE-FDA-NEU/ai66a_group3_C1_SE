@@ -1,4 +1,4 @@
-"""S3-T08: account-scoped recommendation endpoint integration checks."""
+"""S3-T08/T09: account-scoped recommendations and failure/recovery checks."""
 
 from __future__ import annotations
 
@@ -15,8 +15,10 @@ from app.db.models import (
     AuthSession,
     CatalogMovie,
     CatalogueRevision,
+    CatalogueState,
     Genre,
     MovieGenre,
+    UserGenrePreference,
 )
 from app.integrations.tmdb import TmdbClient
 from app.main import app, get_db
@@ -28,7 +30,8 @@ from app.repositories.movies import (
     upsert_genre,
 )
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine, select
+from sqlalchemy import create_engine, delete, event, select
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
@@ -402,3 +405,229 @@ def test_recommendations_read_only_local_sqlite_and_never_call_tmdb(
     assert response.status_code == 200
     assert response.json()["meta"]["count"] == 2
     assert response.json()["meta"]["limit"] == 2
+
+
+def _committed_preference_rows(session: Session) -> list[tuple[str, int]]:
+    """Read every account's committed rows without the request identity map."""
+
+    with Session(session.get_bind()) as fresh:
+        return [
+            (user_id, genre_id)
+            for user_id, genre_id in fresh.execute(
+                select(UserGenrePreference.user_id, UserGenrePreference.genre_id)
+                .order_by(UserGenrePreference.user_id, UserGenrePreference.genre_id)
+            )
+        ]
+
+
+def _is_failure_query(stage: str, statement: str) -> bool:
+    """Select the actual SQLite query boundary to interrupt, not its result."""
+
+    if stage == "catalogue":
+        return "FROM catalogue_revisions JOIN catalogue_state" in statement
+    if stage == "preferences":
+        return "JOIN user_genre_preferences" in statement
+    if stage == "matching":
+        return "FROM catalog_movies JOIN catalogue_state" in statement and (
+            "EXISTS" in statement
+        )
+    if stage == "popular":
+        return "FROM catalog_movies JOIN catalogue_state" in statement and (
+            "EXISTS" not in statement
+        )
+    if stage == "movie_genres":
+        return "FROM movie_genres JOIN genres" in statement
+    raise AssertionError(f"Unknown failure stage: {stage}")
+
+
+@pytest.mark.parametrize(
+    ("stage", "account_mode"),
+    [
+        (stage, account_mode)
+        for stage in ("catalogue", "preferences", "matching", "popular", "movie_genres")
+        for account_mode in ("personalised", "no_match", "cold_start")
+        if not (stage == "matching" and account_mode == "cold_start")
+        and not (stage == "popular" and account_mode == "personalised")
+    ],
+)
+def test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts(
+    database_session: Session,
+    monkeypatch: pytest.MonkeyPatch,
+    stage: str,
+    account_mode: str,
+) -> None:
+    """Fail real query execution, then retry with the same account and query."""
+
+    _seed_small_catalogue(database_session)
+
+    def fresh_request_db() -> Iterator[Session]:
+        with Session(database_session.get_bind(), autoflush=False) as request_session:
+            yield request_session
+
+    # Model production cleanup: each request closes its own Session, including
+    # failures. The fixture Session is used only for committed-row observation.
+    monkeypatch.setitem(app.dependency_overrides, get_db, fresh_request_db)
+    account_a, account_a_id = _sign_in("t09-a@example.com")
+    account_b, account_b_id = _sign_in("t09-b@example.com")
+    if account_mode != "cold_start":
+        _save_preferences(account_a, [1] if account_mode == "personalised" else [3])
+    _save_preferences(account_b, [2])
+    assert account_a_id != account_b_id
+    assert account_a.cookies.get("ams_session") != account_b.cookies.get("ams_session")
+
+    def forbid_provider(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("Failure or retry must not call TMDb")
+
+    monkeypatch.setattr(TmdbClient, "_get_json", forbid_provider)
+
+    path = "/api/me/recommendations?limit=2"
+    baseline_a = account_a.get(path)
+    baseline_b = account_b.get(path)
+    preferences_a = account_a.get("/api/me/preferences")
+    preferences_b = account_b.get("/api/me/preferences")
+    assert baseline_a.status_code == baseline_b.status_code == 200
+    assert preferences_a.status_code == preferences_b.status_code == 200
+    assert baseline_a.json()["data"]["mode"] == (
+        "personalised" if account_mode == "personalised" else "popular"
+    )
+    assert baseline_a.json()["data"]["noMatch"] is (account_mode == "no_match")
+    assert baseline_a.json()["meta"]["limit"] == 2
+    rows_before = _committed_preference_rows(database_session)
+    assert any(user_id == account_b_id for user_id, _genre_id in rows_before)
+
+    failed_queries: list[str] = []
+    writes: list[str] = []
+
+    def interrupt_query(_connection, _cursor, statement, parameters, _context, _many):
+        if statement.lstrip().upper().startswith(("INSERT", "UPDATE", "DELETE")):
+            writes.append(statement)
+        if _is_failure_query(stage, statement):
+            failed_queries.append(statement)
+            raise OperationalError(
+                statement, parameters, Exception("private-t09-db-detail")
+            )
+
+    engine = database_session.get_bind()
+    event.listen(engine, "before_cursor_execute", interrupt_query)
+    try:
+        failed = account_a.get(path)
+        failed_again = account_a.get(path)
+    finally:
+        event.remove(engine, "before_cursor_execute", interrupt_query)
+
+    assert len(failed_queries) == 2, "Both failed requests must reach the injected query"
+    assert not writes, "Recommendation failures must never write personalisation data"
+    for response in (failed, failed_again):
+        _assert_error(
+            response,
+            503,
+            "SERVICE_UNAVAILABLE",
+            "Service is temporarily unavailable",
+        )
+        assert set(response.json()["error"]) == {"code", "message", "requestId"}
+        assert "private-t09-db-detail" not in response.text
+        assert "SELECT" not in response.text
+        assert "t09-a@example.com" not in response.text
+        assert "t09-b@example.com" not in response.text
+    assert failed.json()["error"]["requestId"] != failed_again.json()["error"]["requestId"]
+    assert _committed_preference_rows(database_session) == rows_before
+
+    # No sign-in, preference rewrite, or client replacement is needed to recover.
+    recovered_a = account_a.get(path)
+    recovered_b = account_b.get(path)
+    assert recovered_a.status_code == recovered_b.status_code == 200
+    assert recovered_a.json() == baseline_a.json()
+    assert recovered_b.json() == baseline_b.json()
+    assert account_a.get("/api/me/preferences").json() == preferences_a.json()
+    assert account_b.get("/api/me/preferences").json() == preferences_b.json()
+    assert _committed_preference_rows(database_session) == rows_before
+
+
+def test_t09_missing_catalogue_preserves_preferences_and_recovers_after_activation(
+    database_session: Session,
+) -> None:
+    revision_id = _seed_small_catalogue(database_session)
+    account_a, _ = _sign_in("t09-missing-a@example.com")
+    account_b, _ = _sign_in("t09-missing-b@example.com")
+    _save_preferences(account_a, [1])
+    _save_preferences(account_b, [2])
+    path = "/api/me/recommendations?limit=2"
+    baseline_a = account_a.get(path)
+    baseline_b = account_b.get(path)
+    assert baseline_a.status_code == baseline_b.status_code == 200
+    rows_before = _committed_preference_rows(database_session)
+
+    # Remove only the pointer in this isolated test database, not movies or users.
+    database_session.execute(delete(CatalogueState))
+    database_session.commit()
+    for account in (account_a, account_b):
+        unavailable = account.get(path)
+        _assert_error(
+            unavailable,
+            503,
+            "CATALOGUE_UNAVAILABLE",
+            "Movie catalogue is unavailable",
+        )
+    assert _committed_preference_rows(database_session) == rows_before
+
+    activate_catalogue_revision(database_session, revision_id=revision_id)
+    database_session.commit()
+    recovered_a = account_a.get(path)
+    recovered_b = account_b.get(path)
+    assert recovered_a.status_code == recovered_b.status_code == 200
+    assert recovered_a.json() == baseline_a.json()
+    assert recovered_b.json() == baseline_b.json()
+    assert _committed_preference_rows(database_session) == rows_before
+
+
+def test_t09_active_empty_catalogue_is_cold_start_success_not_a_source_error(
+    database_session: Session,
+) -> None:
+    revision = create_catalogue_revision(database_session, provider="synthetic-test")
+    activate_catalogue_revision(database_session, revision_id=revision.id)
+    database_session.commit()
+    http, _ = _sign_in("t09-empty@example.com")
+
+    response = http.get("/api/me/recommendations?limit=2")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "data": {
+            "movies": [],
+            "mode": "popular",
+            "personalised": False,
+            "noMatch": False,
+        },
+        "meta": {"count": 0, "limit": 2, "catalogueRevision": revision.id},
+    }
+    assert _committed_preference_rows(database_session) == []
+
+
+@pytest.mark.parametrize("rating", [1, 5])
+def test_t09_saved_ratings_do_not_change_sprint3_ranking_or_preferences(
+    database_session: Session,
+    rating: int,
+) -> None:
+    _seed_small_catalogue(database_session)
+    account_a, _ = _sign_in("t09-rating-a@example.com")
+    account_b, _ = _sign_in("t09-rating-b@example.com")
+    _save_preferences(account_a, [1])
+    _save_preferences(account_b, [2])
+    baseline_a = account_a.get("/api/me/recommendations")
+    baseline_b = account_b.get("/api/me/recommendations")
+    assert baseline_a.status_code == baseline_b.status_code == 200
+    rows_before = _committed_preference_rows(database_session)
+    movie_id = baseline_a.json()["data"]["movies"][0]["id"]
+    rating_path = f"/api/me/ratings/{movie_id}"
+
+    saved_b = account_b.put(rating_path, json={"rating": 3}, headers=HEADERS)
+    saved_a = account_a.put(rating_path, json={"rating": rating}, headers=HEADERS)
+    assert saved_a.status_code == saved_b.status_code == 200
+    assert account_a.get(rating_path).json()["data"]["rating"] == rating
+    assert account_b.get(rating_path).json()["data"]["rating"] == 3
+    after_a = account_a.get("/api/me/recommendations")
+    after_b = account_b.get("/api/me/recommendations")
+    assert after_a.status_code == after_b.status_code == 200
+    assert after_a.json() == baseline_a.json()
+    assert after_b.json() == baseline_b.json()
+    assert _committed_preference_rows(database_session) == rows_before
