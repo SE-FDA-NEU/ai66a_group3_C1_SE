@@ -111,14 +111,20 @@ server order with the shared movie cards and these states:
 | State | Rendered content |
 |---|---|
 | Loading | `Loading recommendations...` |
-| Popular (`mode=popular`) | Heading `Popular`, label `Not personalised`, cards without a genre-match reason |
+| Popular cold start (`mode=popular`, `noMatch=false`) | Heading `Popular`, label `Not personalised`, cards without a genre-match reason; it is not presented as a failed personalisation request |
 | Personalised (`mode=personalised`) | Heading `Recommended for you`, cards with `Matches your genres: <names>` from `reason.matchedGenres` |
-| Empty (`movies: []`) | `No recommendations available yet.` with a link to `/preferences`; zero cards |
-| Error | Alert `Recommendations are unavailable` with the API message; never shown as an empty result |
+| No match (`mode=popular`, `noMatch=true`) | `No movies matched your favourite genres.` with `Edit preferences` and `Retry`; render any returned `data.movies` once as `Popular alternatives` |
+| Valid empty (`movies: []`, `noMatch=false`) | `No recommendations available yet.` with a link to `/preferences`; zero cards and no error/no-match claim |
+| Error | Alert `Recommendations are unavailable` with the API/network message and `Retry`; never shown as empty or no-match data |
 | Protected API `401` | `handleUnauthorized` discards the account and opens `/login` |
 
-Retry, no-match guidance, and request-race handling are still owned by T11
-(#113); cold-start transitions by T13 (#115).
+T11 (#113) implements retry, no-match guidance, and request-race handling.
+Every attempt uses the single T10 client path with the same `limit=10` query.
+The component captures the authenticated `user.id` and a request generation;
+it aborts obsolete work and also rejects delayed completions whose generation
+is no longer current. An old success or `401` therefore cannot replace or sign
+out a newer account after retry, navigation, logout, or account switch.
+Cold-start transitions after a preference save remain owned by T13 (#115).
 
 Implementation handoff is explicit:
 
@@ -157,9 +163,9 @@ response completion can race.
 
 Current account isolation evidence is the `AuthProvider` ownership model and
 the `RequireAuth` subtree keyed by `user.id`. Movie-detail request cleanup is
-implemented today. Preference/rating/reset request invalidation is committed
-Sprint 3 behaviour with implementation pending because those API clients do
-not yet exist.
+implemented today. T11 adds recommendation request generation checks in
+`RecommendationsPage`; preference request invalidation is also implemented.
+Rating/reset UI invalidation remains owned by their dedicated tasks.
 
 ## 6. UI-driven architecture evidence
 

@@ -1,11 +1,25 @@
 // @vitest-environment jsdom
 
 import "@testing-library/jest-dom/vitest";
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { Link, MemoryRouter, Route, Routes } from "react-router-dom";
 
 import App from "../App";
-import { RecommendationState } from "../pages/RecommendationsPage";
+import {
+  AuthContext,
+  type AuthContextValue,
+} from "../auth/authState.ts";
+import RecommendationsPage, {
+  RecommendationState,
+} from "../pages/RecommendationsPage";
 
 const action = { id: 28, name: "Action" };
 const drama = { id: 18, name: "Drama" };
@@ -35,6 +49,44 @@ function jsonResponse(body: unknown, status = 200) {
       status,
       headers: { "Content-Type": "application/json" },
     }),
+  );
+}
+
+function deferredResponse() {
+  let resolve!: (response: Response | PromiseLike<Response>) => void;
+
+  const promise = new Promise<Response>((done) => {
+    resolve = done;
+  });
+
+  return { promise, resolve };
+}
+
+const accounts = {
+  A: { id: "user-a", email: "a@example.com" },
+  B: { id: "user-b", email: "b@example.com" },
+};
+
+function RecommendationAccountHarness({
+  account,
+  onUnauthorized,
+}: {
+  account: "A" | "B";
+  onUnauthorized: () => void;
+}) {
+  const auth: AuthContextValue = {
+    status: "authenticated",
+    user: accounts[account],
+    refresh: async () => {},
+    signIn: async () => {},
+    signOut: async () => {},
+    handleUnauthorized: onUnauthorized,
+  };
+
+  return (
+    <AuthContext.Provider value={auth}>
+      <RecommendationsPage />
+    </AuthContext.Provider>
   );
 }
 
@@ -76,6 +128,11 @@ describe("T10 recommendation cards", () => {
 
     expect(await screen.findByRole("heading", { name: "Popular" })).toBeInTheDocument();
     expect(screen.getByText("Not personalised")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", {
+        name: "No movies matched your favourite genres.",
+      }),
+    ).not.toBeInTheDocument();
     expect(
       screen.getAllByRole("heading", { level: 2 }).map((heading) => heading.textContent),
     ).toEqual(["Popular", "Movie A", "Movie B", "Movie C"]);
@@ -168,7 +225,7 @@ describe("T10 recommendation cards", () => {
   });
 
   it("shows the API message, not an empty result, when the request fails", async () => {
-    renderRecommendations(() =>
+    const fetchMock = renderRecommendations(() =>
       jsonResponse(
         { error: { code: "SERVICE_UNAVAILABLE", message: "Service is temporarily unavailable" } },
         503,
@@ -176,13 +233,272 @@ describe("T10 recommendation cards", () => {
     );
 
     expect(await screen.findByRole("alert")).toHaveTextContent("Service is temporarily unavailable");
+    expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "No recommendations available yet." })).not.toBeInTheDocument();
     expect(document.querySelectorAll(".movie-card")).toHaveLength(0);
+    expect(
+      fetchMock.mock.calls.some(([input]) =>
+        String(input).startsWith("/api/me/preferences"),
+      ),
+    ).toBe(false);
   });
 
   it("renders the loading state component", () => {
     render(<RecommendationState status="loading" />);
 
     expect(screen.getByRole("status")).toHaveTextContent("Loading recommendations...");
+  });
+});
+
+describe("T11 no-match, retry, and request-race states", () => {
+  it("shows no-match guidance, edit/retry actions, and popular alternatives", async () => {
+    renderRecommendations(() =>
+      jsonResponse(
+        popularBody(
+          [
+            movie("movie-a", "Movie A", 90, []),
+            movie("movie-b", "Movie B", 80, []),
+          ],
+          true,
+        ),
+      ),
+    );
+
+    expect(
+      await screen.findByRole("heading", {
+        name: "No movies matched your favourite genres.",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Popular alternatives" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Not personalised")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Edit preferences" })).toHaveAttribute(
+      "href",
+      "/preferences",
+    );
+    expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
+    expect(screen.getByText("Movie A")).toBeInTheDocument();
+    expect(screen.getByText("Movie B")).toBeInTheDocument();
+    expect(screen.queryByText(/Matches your genres/)).not.toBeInTheDocument();
+  });
+
+  it("keeps no-match guidance and actions when no popular alternative exists", async () => {
+    renderRecommendations(() => jsonResponse(popularBody([], true)));
+
+    expect(
+      await screen.findByRole("heading", {
+        name: "No movies matched your favourite genres.",
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Edit preferences" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "No recommendations available yet." }),
+    ).not.toBeInTheDocument();
+    expect(document.querySelectorAll(".movie-card")).toHaveLength(0);
+  });
+
+  it("retries the same recommendation query and replaces an error with recovered data", async () => {
+    let attempt = 0;
+    const fetchMock = renderRecommendations(() => {
+      attempt += 1;
+      return attempt === 1
+        ? jsonResponse(
+            {
+              error: {
+                code: "SERVICE_UNAVAILABLE",
+                message: "Service is temporarily unavailable",
+              },
+            },
+            503,
+          )
+        : jsonResponse(personalisedBody([movie("movie-a", "Movie A", 90)]));
+    });
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Service is temporarily unavailable",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Retry" }));
+
+    expect(await screen.findByText("Movie A")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Recommended for you" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+
+    const recommendationCalls = fetchMock.mock.calls.filter(([input]) =>
+      String(input).startsWith("/api/me/recommendations"),
+    );
+    expect(recommendationCalls).toHaveLength(2);
+    expect(recommendationCalls.map(([input]) => String(input))).toEqual([
+      "/api/me/recommendations?limit=10",
+      "/api/me/recommendations?limit=10",
+    ]);
+    expect(
+      fetchMock.mock.calls.some(([input]) =>
+        String(input).startsWith("/api/me/preferences"),
+      ),
+    ).toBe(false);
+  });
+
+  it("shows retry for a network failure instead of treating it as empty data", async () => {
+    renderRecommendations(() => Promise.reject(new TypeError("Network unavailable")));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Network unavailable",
+    );
+    expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "No recommendations available yet." }),
+    ).not.toBeInTheDocument();
+  });
+
+  it.each([200, 401])(
+    "ignores an old account response with status %i after switching to B",
+    async (status) => {
+      const oldAccountRequest = deferredResponse();
+      let currentAccount: "A" | "B" = "A";
+      const onUnauthorized = vi.fn();
+
+      vi.spyOn(globalThis, "fetch").mockImplementation(() =>
+        currentAccount === "A"
+          ? oldAccountRequest.promise
+          : jsonResponse(
+              personalisedBody([
+                movie("movie-b", "Account B movie", 80, [drama]),
+              ]),
+            ),
+      );
+
+      const view = render(
+        <MemoryRouter initialEntries={["/recommendations"]}>
+          <RecommendationAccountHarness
+            account="A"
+            onUnauthorized={onUnauthorized}
+          />
+        </MemoryRouter>,
+      );
+
+      expect(await screen.findByRole("status")).toHaveTextContent(
+        "Loading recommendations...",
+      );
+
+      currentAccount = "B";
+      view.rerender(
+        <MemoryRouter initialEntries={["/recommendations"]}>
+          <RecommendationAccountHarness
+            account="B"
+            onUnauthorized={onUnauthorized}
+          />
+        </MemoryRouter>,
+      );
+
+      expect(await screen.findByText("Account B movie")).toBeInTheDocument();
+
+      await act(async () => {
+        oldAccountRequest.resolve(
+          status === 200
+            ? jsonResponse(
+                personalisedBody([
+                  movie("movie-a", "Account A movie", 90),
+                ]),
+              )
+            : new Response(
+                JSON.stringify({
+                  error: {
+                    code: "AUTHENTICATION_REQUIRED",
+                    message: "Authentication required",
+                  },
+                }),
+                {
+                  status: 401,
+                  headers: { "Content-Type": "application/json" },
+                },
+              ),
+        );
+      });
+
+      expect(screen.getByText("Account B movie")).toBeInTheDocument();
+      expect(screen.queryByText("Account A movie")).not.toBeInTheDocument();
+      expect(onUnauthorized).not.toHaveBeenCalled();
+    },
+  );
+
+  it("ignores a pending response after navigating away", async () => {
+    const pendingRequest = deferredResponse();
+    const auth: AuthContextValue = {
+      status: "authenticated",
+      user: accounts.A,
+      refresh: async () => {},
+      signIn: async () => {},
+      signOut: async () => {},
+      handleUnauthorized: vi.fn(),
+    };
+
+    vi.spyOn(globalThis, "fetch").mockReturnValue(pendingRequest.promise);
+
+    render(
+      <MemoryRouter initialEntries={["/recommendations"]}>
+        <AuthContext.Provider value={auth}>
+          <Link to="/away">Leave recommendations</Link>
+          <Routes>
+            <Route path="/recommendations" element={<RecommendationsPage />} />
+            <Route path="/away" element={<h1>Another page</h1>} />
+          </Routes>
+        </AuthContext.Provider>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "Loading recommendations...",
+    );
+    fireEvent.click(screen.getByRole("link", { name: "Leave recommendations" }));
+    expect(
+      await screen.findByRole("heading", { name: "Another page" }),
+    ).toBeInTheDocument();
+
+    await act(async () => {
+      pendingRequest.resolve(
+        jsonResponse(personalisedBody([movie("movie-a", "Old movie", 90)])),
+      );
+    });
+
+    expect(screen.getByRole("heading", { name: "Another page" })).toBeInTheDocument();
+    expect(screen.queryByText("Old movie")).not.toBeInTheDocument();
+  });
+
+  it("ignores a pending recommendation response after logout", async () => {
+    const pendingRequest = deferredResponse();
+
+    vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+      const path = String(input);
+
+      if (path === "/api/auth/me") {
+        return jsonResponse({ data: { user: accounts.A } });
+      }
+      if (path.startsWith("/api/me/recommendations")) {
+        return pendingRequest.promise;
+      }
+      if (path === "/api/auth/logout") {
+        return Promise.resolve(new Response(null, { status: 204 }));
+      }
+      return Promise.reject(new Error(`Unexpected request: ${path}`));
+    });
+
+    window.history.pushState({}, "", "/recommendations");
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole("button", { name: "Sign out" }));
+    await waitFor(() => expect(window.location.pathname).toBe("/"));
+
+    await act(async () => {
+      pendingRequest.resolve(
+        jsonResponse(personalisedBody([movie("movie-a", "Old movie", 90)])),
+      );
+    });
+
+    expect(window.location.pathname).toBe("/");
+    expect(screen.queryByText("Old movie")).not.toBeInTheDocument();
   });
 });

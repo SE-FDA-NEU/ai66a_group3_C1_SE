@@ -174,8 +174,9 @@ separately as the implemented dedicated public popular route. The recommendation
 endpoint supports popular cold-start results and genre-based personalised
 results implemented under S3-T08. The `/recommendations` page consumes this
 response through the shared typed client and renders server-ordered movie cards
-under S3-T10. No-match guidance, retry and request-race handling remain with
-S3-T11; cold-start guidance and saved-preference transitions remain with S3-T13.
+under S3-T10. S3-T11 adds no-match guidance, error recovery, and account-keyed
+request-generation checks so obsolete results and 401 responses are ignored.
+Cold-start guidance and saved-preference transitions remain with S3-T13.
 
 The existing `GET /api/movies` route remains the public catalogue endpoint.
 Sprint 3 public popular-list consumers use `GET /api/movies/popular`. These are
@@ -414,7 +415,9 @@ Rating-adjusted ranking belongs to Story #22 / S05b and is planned Sprint 4.
 
 Evidence: `frontend/src/pages/HomePage.tsx` and `MovieDetailPage.tsx` use effect
 cleanup cancellation; `frontend/src/auth/AuthContext.tsx` owns account
-identity; `RequireAuth.tsx` keys protected content by `user.id`.
+identity; `RequireAuth.tsx` keys protected content by `user.id`; and
+`RecommendationsPage.tsx` combines abort cleanup with an account-keyed request
+generation before accepting success, error, or 401 results.
 
 ### Nullable catalogue fields for renderable detail states
 
@@ -485,7 +488,7 @@ test evidence, or a tested SHA.
 | Gate | Current status | Evidence needed before completion |
 |---|---|---|
 | Initial API/database/UI contract | Prepared locally; review/publication pending | Reviewed D1 contract link |
-| Preferences and personalised recommendation implementation | Backend storage/reads/replacement implemented under T01/T02; genre/popularity endpoint implemented locally under T08; UI and broader acceptance remain separate | Reviewed/merged T08 PR, executable tests, and consumer verification; see T02/T08 evidence |
+| Preferences and personalised recommendation implementation | Backend storage/reads/replacement implemented under T01/T02; genre/popularity endpoint under T08; card/client integration under T10; no-match/retry/race UI implemented locally under T11; broader acceptance remains separate | Reviewed/merged implementation, executable tests, and consumer verification; see T02/T08/T11 evidence |
 | Rating storage and repository | Implemented under T30 | T30 [#137](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/137) is merged with migration/repository tests |
 | Rating API | Implemented under T31; independent verification pending | T31 [#138](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/138) ships `backend/tests/test_ratings_api.py` (auth, validation, same-origin, isolation, rollback). T32 [#140](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/140) still owns the dedicated persistence/rollback/isolation verification |
 | Rating UI and acceptance | Pending | T33 [#139](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/139) widget and saved state, and T34 [#141](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/141) auth/account-switch verification |
