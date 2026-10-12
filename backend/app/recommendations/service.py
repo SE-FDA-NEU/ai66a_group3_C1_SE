@@ -35,7 +35,14 @@ def build_account_recommendations(
     user_id: str,
     limit: int,
 ) -> AccountRecommendationResult:
-    """Build recommendations from one session-resolved account and local data."""
+    """Build recommendations from one session-resolved account and local data.
+
+    This is read-only: a recommendation failure must not clear saved genres.
+    Persistence exceptions intentionally propagate to the API's existing 503
+    handler; only a successful query with zero matches triggers popular fallback.
+    Ratings remain a separate Sprint 4 ranking extension, not an error fallback
+    or an input to this Sprint 3 genre/popularity baseline.
+    """
 
     selected_genres = list_user_preference_genres(session, user_id=user_id)
     if not selected_genres:

@@ -448,6 +448,35 @@ before a private result is returned. Catalogue/database failures use the same
 `503 CATALOGUE_UNAVAILABLE`/`503 SERVICE_UNAVAILABLE` distinction as the M2
 route. The route never contacts TMDb during a request.
 
+### Failure, valid empty results, and retry (S3-T09)
+
+| Outcome | HTTP / code | Meaning |
+|---|---|---|
+| Active catalogue, successful reads, no usable movies | `200`, `data.movies=[]` | Valid empty success; preserve the state flags above. |
+| No active catalogue revision | `503 CATALOGUE_UNAVAILABLE` | Catalogue setup/availability failure, not a no-match result. |
+| Database query fails | `503 SERVICE_UNAVAILABLE` | Source failure, not cold-start, no-match, or empty success. |
+| No valid session | `401 AUTHENTICATION_REQUIRED` | Authentication failure; do not treat it as a retryable empty catalogue. |
+
+Errors use only the existing `error.code`, `error.message`, and `error.requestId`
+envelope. Do not include a success `data` or `meta` object, raw SQL, account
+details, provider credentials, or the underlying exception in the public error.
+A zero-match fallback is allowed only after the matching query succeeds.
+
+Recommendation reads do not clear, replace, or otherwise write either account's
+saved preferences. Retrying while the source still fails returns another error.
+After the source recovers, retrying the same endpoint, authenticated account,
+and `limit` reads the current catalogue normally; no login or preference rewrite
+is required while the session remains valid. If the catalogue and preferences
+are unchanged, the successful body matches the pre-failure body. Recovery does
+not promise an identical list if the catalogue or preferences have changed.
+
+T09 verifies this API boundary. T10 (#112) owns the typed client/cards, T11
+(#113) owns Error/Retry UI and stale-request protection, and T12 (#114) owns the
+integrated Story #18 acceptance. Clients must replace their error state only
+after a successful current-account response; T09 does not claim that this UI
+is already implemented. Rating-adjusted ranking remains a Sprint 4 extension
+under Story #22 and does not change the error envelope.
+
 ## 8. S03/S04 catalogue and S09/T19 popular movie reads
 
 ### `GET /api/movies?limit=10`
