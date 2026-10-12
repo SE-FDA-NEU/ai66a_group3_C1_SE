@@ -91,6 +91,20 @@ No test uses a live TMDb token or provider response. Recommendation response
 bodies are controlled fixtures, while T09 owns real SQL failure/recovery and
 preference-preservation verification behind the API.
 
+## Visual evidence
+
+These screenshots render the real T11 page from this branch against controlled
+frontend response fixtures. They demonstrate the visible states only and are
+not presented as live TMDb or end-to-end backend evidence.
+
+### No match with popular alternatives
+
+![No-match guidance with edit, retry, and popular alternatives](./s3-t11-no-match.png)
+
+### Recommendation service failure
+
+![Service-unavailable error with retry action](./s3-t11-error-retry.png)
+
 ## Reproducible reviewer journey
 
 1. Sign into an account with saved genres and open `/recommendations`. Confirm
