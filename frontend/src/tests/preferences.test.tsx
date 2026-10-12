@@ -580,6 +580,12 @@ describe("S3-T04 home Start and genre picker", () => {
           });
         }
 
+        if (path.startsWith("/api/me/recommendations")) {
+          return jsonResponse({
+            data: { movies: [], mode: "popular", personalised: false, noMatch: false },
+          });
+        }
+
         if (
           path === "/api/me/preferences" &&
           method === "GET"
@@ -638,7 +644,7 @@ describe("S3-T04 home Start and genre picker", () => {
     );
 
     fireEvent.click(
-      screen.getByRole("link", {
+      await screen.findByRole("link", {
         name: /Enter preferences/i,
       }),
     );
