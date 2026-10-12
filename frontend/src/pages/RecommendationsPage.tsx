@@ -1,7 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
+import {
+  getRecommendations,
+  RecommendationApiError,
+  type RecommendationResult,
+} from "../api/recommendations.ts";
 import { useAuth } from "../auth/authState.ts";
+import MovieGrid from "../components/MovieGrid.tsx";
 
 type RecommendationStateProps = {
   status: "loading" | "empty";
@@ -23,11 +29,55 @@ export function RecommendationState({ status }: RecommendationStateProps) {
   );
 }
 
+type RecommendationLoad =
+  | { status: "loading" }
+  | { status: "error"; message: string }
+  | { status: "ready"; result: RecommendationResult };
+
 function RecommendationsPage() {
   const auth = useAuth();
+  const { handleUnauthorized } = auth;
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [error, setError] = useState("");
+  const [load, setLoad] = useState<RecommendationLoad>({ status: "loading" });
   const user = auth.status === "authenticated" ? auth.user : null;
+
+  // The route is keyed by user.id (RequireAuth), so a new account remounts this
+  // page and aborts the previous account's request through the cleanup below.
+  useEffect(() => {
+    const controller = new AbortController();
+
+    getRecommendations(10, controller.signal)
+      .then((result) => {
+        if (!controller.signal.aborted) {
+          setLoad({ status: "ready", result });
+        }
+      })
+      .catch((error: unknown) => {
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        if (error instanceof RecommendationApiError && error.status === 401) {
+          handleUnauthorized();
+          return;
+        }
+
+        setLoad({
+          status: "error",
+          message: error instanceof Error ? error.message : "Something went wrong",
+        });
+      });
+
+    return () => controller.abort();
+  }, [handleUnauthorized]);
+
+  const result = load.status === "ready" ? load.result : null;
+  const sectionTitle = result
+    ? result.personalised
+      ? "Recommended for you"
+      : "Popular"
+    : "Your recommendations";
 
   async function handleSignOut() {
     setError("");
@@ -68,12 +118,33 @@ function RecommendationsPage() {
         </p>
       ) : null}
 
-      <section className="content-card recommendations-card" aria-labelledby="popular-title">
+      <section
+        className="content-card recommendations-card"
+        aria-labelledby="recommendations-title"
+      >
         <div className="section-heading">
           <p className="eyebrow">Your next watch</p>
-          <h2 id="popular-title">Popular</h2>
+          <h2 id="recommendations-title">{sectionTitle}</h2>
+          {result && result.mode === "popular" ? (
+            <p className="muted recommendation-mode">Not personalised</p>
+          ) : null}
         </div>
-        <RecommendationState status="empty" />
+        {load.status === "loading" ? (
+          <RecommendationState status="loading" />
+        ) : load.status === "error" ? (
+          <div className="recommendation-empty-state" role="alert">
+            <h3>Recommendations are unavailable</h3>
+            <p>{load.message}</p>
+          </div>
+        ) : load.result.movies.length === 0 ? (
+          <RecommendationState status="empty" />
+        ) : (
+          <MovieGrid
+            ariaLabel={sectionTitle}
+            movies={load.result.movies}
+            showReasons={load.result.personalised}
+          />
+        )}
       </section>
     </main>
   );
