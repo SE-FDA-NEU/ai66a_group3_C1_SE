@@ -34,7 +34,7 @@ Architecture and persistence rules are in
   and S3-T35
   ([#142](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/142)).
   The same-origin registry matches method and path; login/logout protection is
-  preserved.
+  preserved. Rating writes are matched by path prefix.
 - Protected endpoints derive the account only from the authenticated session.
   A client-supplied `user_id`, account ID, email, username, or owner field
   cannot select or change the target account. Such fields are not part of a
@@ -452,6 +452,35 @@ before a private result is returned. Catalogue/database failures use the same
 `503 CATALOGUE_UNAVAILABLE`/`503 SERVICE_UNAVAILABLE` distinction as the M2
 route. The route never contacts TMDb during a request.
 
+### Failure, valid empty results, and retry (S3-T09)
+
+| Outcome | HTTP / code | Meaning |
+|---|---|---|
+| Active catalogue, successful reads, no usable movies | `200`, `data.movies=[]` | Valid empty success; preserve the state flags above. |
+| No active catalogue revision | `503 CATALOGUE_UNAVAILABLE` | Catalogue setup/availability failure, not a no-match result. |
+| Database query fails | `503 SERVICE_UNAVAILABLE` | Source failure, not cold-start, no-match, or empty success. |
+| No valid session | `401 AUTHENTICATION_REQUIRED` | Authentication failure; do not treat it as a retryable empty catalogue. |
+
+Errors use only the existing `error.code`, `error.message`, and `error.requestId`
+envelope. Do not include a success `data` or `meta` object, raw SQL, account
+details, provider credentials, or the underlying exception in the public error.
+A zero-match fallback is allowed only after the matching query succeeds.
+
+Recommendation reads do not clear, replace, or otherwise write either account's
+saved preferences. Retrying while the source still fails returns another error.
+After the source recovers, retrying the same endpoint, authenticated account,
+and `limit` reads the current catalogue normally; no login or preference rewrite
+is required while the session remains valid. If the catalogue and preferences
+are unchanged, the successful body matches the pre-failure body. Recovery does
+not promise an identical list if the catalogue or preferences have changed.
+
+T09 verifies this API boundary. T10 (#112) owns the typed client/cards, T11
+(#113) owns Error/Retry UI and stale-request protection, and T12 (#114) owns the
+integrated Story #18 acceptance. Clients must replace their error state only
+after a successful current-account response; T09 does not claim that this UI
+is already implemented. Rating-adjusted ranking remains a Sprint 4 extension
+under Story #22 and does not change the error envelope.
+
 ## 8. S03/S04 catalogue and S09/T19 popular movie reads
 
 ### `GET /api/movies?limit=10`
@@ -600,7 +629,12 @@ the frontend to call a private rating endpoint.
 
 These two S05a routes are implemented under S3-T31
 [#138](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/138).
-Their session ownership and isolation rules support Story #45 / S13.
+Their session ownership and isolation rules support Story #45 / S13. A missing,
+expired, or revoked session returns `401` before any private row is read or
+written, and before the rating value is validated. The one exception is a
+non-empty `application/json` body that is not syntactically valid JSON: it is
+rejected with `400` during parsing, before the session is resolved, and still
+reads and writes nothing.
 Both use the current authenticated session as the only account identity and
 address a movie by its opaque active-catalogue ID.
 
@@ -664,7 +698,7 @@ does not replace a previously committed rating.
 | Missing, expired, revoked, or invalid session | `401 AUTHENTICATION_REQUIRED` | `Authentication required`; no private read/write |
 | Browser write fails the existing same-origin policy | `403 ORIGIN_NOT_ALLOWED` | `Request origin is not allowed`; no mutation |
 | Opaque movie ID is not in the active catalogue | `404 MOVIE_NOT_FOUND` | `Movie not found`; do not create a movie or orphan rating |
-| Invalid JSON/body/rating value | `400 VALIDATION_ERROR` | `Please correct the highlighted fields`; preserve the prior committed rating |
+| Invalid JSON/body/rating value | `400 VALIDATION_ERROR` | `Please correct the highlighted fields`; preserve the prior committed rating. A wrong value with no valid session is `401`; a non-empty `application/json` body that is not valid JSON is `400` regardless of session |
 | Read or commit fails | `503 SERVICE_UNAVAILABLE` | `Service is temporarily unavailable`; rollback and preserve the prior committed rating |
 
 Neither route accepts `userId`, account ID, email, username, or owner ID. A
@@ -732,7 +766,7 @@ profile state only after the reset success response.
 | `VALIDATION_ERROR` | 400 | Request fields or query values are invalid. |
 | `AUTHENTICATION_REQUIRED` | 401 | A protected route has no valid session. |
 | `INVALID_CREDENTIALS` | 401 | Login credentials are invalid without revealing which field failed. |
-| `ORIGIN_NOT_ALLOWED` | 403 | A browser session or preference write failed the same-origin check. |
+| `ORIGIN_NOT_ALLOWED` | 403 | A browser session, preference, or rating write failed the same-origin check. |
 | `MOVIE_NOT_FOUND` | 404 | The internal movie ID does not exist in the active catalogue. |
 | `GENRE_NOT_FOUND` | 404 | A requested genre ID does not exist. |
 | `EMAIL_ALREADY_REGISTERED` | 409 | The normalized email is already stored. |

@@ -50,7 +50,7 @@ implemented under Sprint 3 T19 (#121).
 | M2 seed and bootstrap: `backend/app/catalogue/m2_seed.py`, `backend/app/cli/bootstrap_m2_catalogue.py` | One idempotent command that migrates the database and loads the 12-movie dataset. | `@kietxuan` (#74) |
 | TMDb importer: `backend/app/integrations/tmdb.py`, `backend/app/catalogue/tmdb_import.py`, `backend/app/cli/import_tmdb_catalogue.py` | Server-side atomic catalogue import; required from Sprint 3. | `@kietxuan` (#48); S3 T29 setup, `@hoang3003` independent review |
 | Account storage and password hashing: `backend/app/repositories/users.py`, `backend/app/security/passwords.py` | Users table access, email normalisation, Argon2id hashing. | Nguyen Tuan Anh, `@NguyenTuanAnh0608` (#49) |
-| Rating storage: `backend/app/db/models.py`, `backend/app/repositories/ratings.py`, migration `b7e4c2d91f30` | Account-scoped current rating storage and repository reads/upserts; HTTP API and UI remain separate work. | S3-T30 ([#137](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/137)) |
+| Rating storage: `backend/app/db/models.py`, `backend/app/repositories/ratings.py`, migration `b7e4c2d91f30` | Account-scoped current rating storage and repository reads/upserts. | S3-T30 ([#137](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/137)) |
 | Rating API: `backend/app/schemas/ratings.py`, `GET` and `PUT /api/me/ratings/{movieId}` | Session-owned, same-origin-protected, atomic rating reads and writes; UI remains separate. | S3-T31 ([#138](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/138)) |
 | Profile-reset backend: `backend/app/repositories/profile.py`, `backend/app/schemas/profile.py`, `POST /api/me/profile/reset` | Explicitly confirmed, session-owned atomic deletion of the current account's preferences and ratings. | S3-T35 ([#142](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/142)) |
 | Server sessions: `backend/app/security/sessions.py` | Creates, resolves and revokes sessions. | `@NguyenTuanAnh0608` (#53) |
@@ -172,9 +172,11 @@ S04 (recommendations and the public catalogue), S03 (movie detail), S12
 reads, and atomic preference replacement are implemented under T01/T02; its
 frontend and complete Story acceptance remain pending. S09/T19 is listed
 separately as the implemented dedicated public popular route. The recommendation
-endpoint returns the popular list for every signed-in account; genre-based
-ranking depends on the committed preference contracts. The `/recommendations`
-page does not display this response yet; the T20 evidence records that gap.
+endpoint supports popular cold-start results and genre-based personalised
+results implemented under S3-T08. The `/recommendations` page consumes this
+response through the shared typed client and renders server-ordered movie cards
+under S3-T10. No-match guidance, retry and request-race handling remain with
+S3-T11; cold-start guidance and saved-preference transitions remain with S3-T13.
 
 The existing `GET /api/movies` route remains the public catalogue endpoint.
 Sprint 3 public popular-list consumers use `GET /api/movies/popular`. These are
@@ -485,7 +487,10 @@ test evidence, or a tested SHA.
 | Initial API/database/UI contract | Prepared locally; review/publication pending | Reviewed D1 contract link |
 | Preferences and personalised recommendation implementation | Backend storage/reads/replacement implemented under T01/T02; genre/popularity endpoint implemented locally under T08; UI and broader acceptance remain separate | Reviewed/merged T08 PR, executable tests, and consumer verification; see T02/T08 evidence |
 | Rating storage/API/UI protection | Storage/repository implemented under T30 and API under T31; UI pending | T30 [#137](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/137) and T31 [#138](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/138) are merged. T32 [#140](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/140), T33 [#139](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/139), and T34 [#141](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/141) retain independent verification/UI scope. |
-| Authenticated reset backend | Implemented under T35; UI pending | [T35 #142](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/142); `backend/tests/test_profile_reset_api.py` covers confirmation, authentication, origin, isolation, rollback, preservation, and cold-start behaviour. Tested SHA and independent review remain pending until the uncommitted change is committed and reviewed. |
+| Rating storage and repository | Implemented under T30 | T30 [#137](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/137) is merged with migration/repository tests. |
+| Rating API | Implemented under T31; independent verification pending | T31 [#138](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/138) ships `backend/tests/test_ratings_api.py`; T32 [#140](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/140) owns dedicated persistence/rollback/isolation verification. |
+| Rating UI and acceptance | Pending | T33 [#139](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/139) widget/saved state and T34 [#141](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/141) auth/account-switch verification. |
+| Authenticated reset backend | Implemented under T35; UI pending | [T35 #142](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/142); `backend/tests/test_profile_reset_api.py` covers confirmation, authentication, origin, isolation, rollback, preservation, and cold-start behaviour. Local T35 SHA `d8eb66d2eb52801046a1bdce4d77a5aa893f3701`; post-merge verification and independent review remain pending. |
 | UI-driven design reconciliation | Documented locally; #136 coordination/review pending | Same reviewed change containing `docs/ui.md` and `docs/design.md` |
 | Backdrop #129-#131 | Conditional and pending; no shipped repository evidence | Reconcile only if nullable storage, migration/import, detail compatibility, and independent verification ship |
 | Final implementation reconciliation | Pending | Compare these contracts with merged implementation and verification evidence |

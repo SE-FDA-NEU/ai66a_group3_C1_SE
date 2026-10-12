@@ -33,23 +33,65 @@ function installApiMock(options?: {
   const availableGenres = options?.availableGenres ?? genres;
   const savedGenres = options?.savedGenres ?? [];
 
-  return vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
-    const path = String(input);
+  return vi
+    .spyOn(globalThis, "fetch")
+    .mockImplementation((input, init) => {
+      const path = String(input);
+      const method = init?.method ?? "GET";
 
-    if (path === "/api/auth/me") {
-      return jsonResponse({ data: { user } });
+      if (path === "/api/auth/me") {
+        return jsonResponse({ data: { user } });
+      }
+
+      if (path === "/api/genres") {
+        return jsonResponse({
+          data: {
+            genres: availableGenres,
+          },
+        });
+      }
+
+      if (
+        path === "/api/me/preferences" &&
+        method === "GET"
+      ) {
+        return jsonResponse({
+          data: {
+            genres: savedGenres,
+          },
+        });
+      }
+
+      if (
+        path === "/api/me/preferences" &&
+        method === "PUT"
+      ) {
+        const body = JSON.parse(
+          String(init?.body ?? "{}"),
+        ) as {
+          genreIds: number[];
+        };
+
+        return jsonResponse({
+          data: {
+            genres: availableGenres.filter((genre) =>
+              body.genreIds.includes(genre.id),
+            ),
+          },
+        });
     }
-    if (path === "/api/genres") {
-      return jsonResponse({ data: { genres: availableGenres } });
-    }
-    if (path === "/api/me/preferences") {
-      return jsonResponse({ data: { genres: savedGenres } });
-    }
+
     if (path === "/api/movies?limit=10") {
-      return jsonResponse({ data: { movies: [] } });
+      return jsonResponse({
+        data: {
+          movies: [],
+        },
+      });
     }
 
-    throw new Error(`Unexpected request: ${path}`);
+    throw new Error(
+      `Unexpected request: ${method} ${path}`,
+    );
   });
 }
 
@@ -320,5 +362,304 @@ describe("S3-T04 home Start and genre picker", () => {
 
     await waitFor(() => expect(window.location.pathname).toBe("/login"));
     expect(await screen.findByRole("heading", { name: "Sign in" })).toBeInTheDocument();
+  });
+  it("navigates to recommendations only after preferences save succeeds", async () => {
+    let resolveSave!: (response: Response) => void;
+
+    const pendingSave = new Promise<Response>((resolve) => {
+      resolveSave = resolve;
+    });
+
+    vi.spyOn(globalThis, "fetch").mockImplementation(
+      (input, init) => {
+        const path = String(input);
+        const method = init?.method ?? "GET";
+
+        if (path === "/api/auth/me") {
+          return jsonResponse({ data: { user } });
+        }
+
+        if (path === "/api/genres") {
+          return jsonResponse({
+            data: {
+              genres,
+            },
+          });
+        }
+
+        if (
+          path === "/api/me/preferences" &&
+          method === "GET"
+        ) {
+          return jsonResponse({
+            data: {
+              genres: [],
+            },
+          });
+        }
+
+        if (
+          path === "/api/me/preferences" &&
+          method === "PUT"
+        ) {
+          return pendingSave;
+        }
+
+        throw new Error(
+          `Unexpected request: ${method} ${path}`,
+        );
+      },
+    );
+
+    renderPreferences();
+
+    const action = await screen.findByRole(
+      "checkbox",
+      { name: "Action" },
+    );
+
+    fireEvent.click(action);
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Save preferences",
+      }),
+    );
+
+    expect(window.location.pathname).toBe(
+      "/preferences",
+    );
+
+    expect(
+      screen.getByRole("button", {
+        name: "Saving...",
+      }),
+    ).toBeDisabled();
+
+    resolveSave(
+      new Response(
+        JSON.stringify({
+          data: {
+            genres: [genres[0]],
+          },
+        }),
+        {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      ),
+    );
+
+    await waitFor(() =>
+      expect(window.location.pathname).toBe(
+        "/recommendations",
+      ),
+    );
+  });
+
+  it("preserves the draft when preference save fails", async () => {
+    vi.spyOn(globalThis, "fetch").mockImplementation(
+      (input, init) => {
+        const path = String(input);
+        const method = init?.method ?? "GET";
+
+        if (path === "/api/auth/me") {
+          return jsonResponse({ data: { user } });
+        }
+
+        if (path === "/api/genres") {
+          return jsonResponse({
+            data: {
+              genres,
+            },
+          });
+        }
+
+        if (
+          path === "/api/me/preferences" &&
+          method === "GET"
+        ) {
+          return jsonResponse({
+            data: {
+              genres: [genres[0]],
+            },
+          });
+        }
+
+        if (
+          path === "/api/me/preferences" &&
+          method === "PUT"
+        ) {
+          return jsonResponse(
+            {
+              error: {
+                code: "SERVICE_UNAVAILABLE",
+                message:
+                  "Service is temporarily unavailable",
+              },
+            },
+            503,
+          );
+        }
+
+        throw new Error(
+          `Unexpected request: ${method} ${path}`,
+        );
+      },
+    );
+
+    renderPreferences();
+
+    expect(
+      await screen.findByRole(
+        "checkbox",
+        { name: "Action" },
+      ),
+    ).toBeChecked();
+
+    fireEvent.click(
+      screen.getByRole("checkbox", {
+        name: "Drama",
+      }),
+    );
+
+    expect(
+      screen.getByRole("checkbox", {
+        name: "Drama",
+      }),
+    ).toBeChecked();
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Save preferences",
+      }),
+    );
+
+    expect(
+      await screen.findByRole("alert"),
+    ).toHaveTextContent(
+      "Service is temporarily unavailable",
+    );
+
+    expect(window.location.pathname).toBe(
+      "/preferences",
+    );
+
+    expect(
+      screen.getByRole("checkbox", {
+        name: "Action",
+      }),
+    ).toBeChecked();
+
+    expect(
+      screen.getByRole("checkbox", {
+        name: "Drama",
+      }),
+    ).toBeChecked();
+  });
+
+  it("reloads the current account's committed choices when returning to preferences", async () => {
+    let saved = [genres[0]];
+
+    vi.spyOn(globalThis, "fetch").mockImplementation(
+      (input, init) => {
+        const path = String(input);
+        const method = init?.method ?? "GET";
+
+        if (path === "/api/auth/me") {
+          return jsonResponse({ data: { user } });
+        }
+
+        if (path === "/api/genres") {
+          return jsonResponse({
+            data: {
+              genres,
+            },
+          });
+        }
+
+        if (path.startsWith("/api/me/recommendations")) {
+          return jsonResponse({
+            data: { movies: [], mode: "popular", personalised: false, noMatch: false },
+          });
+        }
+
+        if (
+          path === "/api/me/preferences" &&
+          method === "GET"
+        ) {
+          return jsonResponse({
+            data: {
+              genres: saved,
+            },
+          });
+        }
+
+        if (
+          path === "/api/me/preferences" &&
+          method === "PUT"
+        ) {
+          saved = [genres[0], genres[2]];
+
+          return jsonResponse({
+            data: {
+              genres: saved,
+            },
+          });
+        }
+
+        throw new Error(
+          `Unexpected request: ${method} ${path}`,
+        );
+      },
+    );
+
+    renderPreferences();
+
+    expect(
+      await screen.findByRole(
+        "checkbox",
+        { name: "Action" },
+      ),
+    ).toBeChecked();
+
+    fireEvent.click(
+      screen.getByRole("checkbox", {
+        name: "Drama",
+      }),
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Save preferences",
+      }),
+    );
+
+    await waitFor(() =>
+      expect(window.location.pathname).toBe(
+        "/recommendations",
+      ),
+    );
+
+    fireEvent.click(
+      await screen.findByRole("link", {
+        name: /Enter preferences/i,
+      }),
+    );
+
+    expect(
+      await screen.findByRole(
+        "checkbox",
+        { name: "Action" },
+      ),
+    ).toBeChecked();
+
+    expect(
+      screen.getByRole("checkbox", {
+        name: "Drama",
+      }),
+    ).toBeChecked();
   });
 });

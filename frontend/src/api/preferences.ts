@@ -62,3 +62,25 @@ export function listGenres(signal?: AbortSignal): Promise<Genre[]> {
 export function getPreferences(signal?: AbortSignal): Promise<Genre[]> {
   return getGenreList("/api/me/preferences", signal);
 }
+
+export async function savePreferences(
+  genreIds: number[],
+  signal?: AbortSignal,
+): Promise<Genre[]> {
+  const response = await fetch("/api/me/preferences", {
+    method: "PUT",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ genreIds }),
+    signal,
+  });
+
+  if (!response.ok) {
+    throw await readError(response);
+  }
+
+  const body = (await response.json()) as GenreListResponse;
+  return body.data.genres;
+}

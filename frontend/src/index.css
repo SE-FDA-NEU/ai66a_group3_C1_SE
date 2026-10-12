@@ -161,6 +161,21 @@ button:disabled {
   margin-bottom: 0;
 }
 
+.recommendation-mode {
+  margin: 0.25rem 0 0;
+  font-size: 0.875rem;
+}
+
+.recommendations-card .movie-grid {
+  margin-top: 1.5rem;
+}
+
+.movie-reason {
+  margin: 0.75rem 0 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
 .recommendation-empty-state {
   margin-top: 2rem;
   padding: 1.5rem;
@@ -428,4 +443,14 @@ button:disabled {
   .catalogue-actions {
     align-items: stretch;
   }
+}
+
+.preference-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+
+.preference-save-error {
+  margin-top: 1rem;
 }
