@@ -6,13 +6,15 @@ Parent Story: [#17 / S01](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issue
 
 Branch: `105-verify-preference-api-persistence`
 
-Dependency: S3-T02 implementation/evidence at
-[`7f866b5`](https://github.com/kietxuan/ai66a_group3_C1_SE/commit/7f866b5).
-T02 is the accepted working base for this test branch but is not present in
-`upstream/main` at `5251a88`; its PR/independent review must be linked before
-T03 closes.
+Dependency: S3-T02 was merged into `main` through
+[PR #152](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/152), merge
+commit
+[`ad3452572edad79faf6ef4e59628402dc5f7a9c9`](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/ad3452572edad79faf6ef4e59628402dc5f7a9c9).
+This branch has since been synchronized with `upstream/main` at
+[`f421f50d7933cc5a6ad1207d78c45d3ece19d17d`](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/f421f50d7933cc5a6ad1207d78c45d3ece19d17d).
 
-Verification date: 2026-10-12; Windows, Python 3.12
+Verification date: 2026-10-12; Windows local verification and GitHub CI on
+Python 3.12
 
 ## Acceptance coverage
 
@@ -40,27 +42,37 @@ not call TMDb, use a live token, or put credentials/session values in evidence.
 Run from the repository root in PowerShell:
 
 ```powershell
-$env:PYTHONPATH = (Resolve-Path backend).Path
+$taskT03Database = Join-Path $env:TEMP `
+  ("s3-t03-" + [guid]::NewGuid().ToString("N") + ".db")
 
+$env:PYTHONPATH = (Resolve-Path backend).Path
+$env:DATABASE_URL = "sqlite:///" + $taskT03Database.Replace('\', '/')
+
+.\.venv\Scripts\python.exe -m alembic -c backend/alembic.ini upgrade head
 .\.venv\Scripts\python.exe -m pytest backend/tests/test_preferences_api.py -q
 .\.venv\Scripts\python.exe -m pytest backend/tests -q
 .\.venv\Scripts\python.exe -m ruff check backend
 git diff --check
+
+Remove-Item Env:DATABASE_URL -ErrorAction SilentlyContinue
+Remove-Item -LiteralPath $taskT03Database -ErrorAction SilentlyContinue
 ```
 
-Recorded local results for the current uncommitted T03 worktree:
+Recorded after synchronizing the branch with `upstream/main@f421f50` at local
+merge commit `485a18a84bd0be6334271752131b63d8f9a9fdb6`:
 
 - Focused preference API suite: **51 passed**, 1 pre-existing deprecation
-  warning, 17.78 seconds.
+  warning, 30.63 seconds.
 - Full backend regression on a separately migrated temporary SQLite database:
-  **177 passed, 2 skipped**, 1 pre-existing warning, 52.86 seconds.
+  **283 passed, 1 skipped**, 1 pre-existing warning, 131.21 seconds.
 - Whole-backend Ruff: **All checks passed!**
 - `git diff --check`: passed with no whitespace errors.
 
-The two skips are existing future rating/personalised-recommendation handoff
-placeholders. The warning comes from the installed FastAPI `TestClient`
-compatibility layer. None is a T03 failure. Update the recorded results if code
-changes before commit.
+The one skip is an existing future handoff placeholder. The warning comes from
+the installed FastAPI `TestClient` compatibility layer. Neither is a T03
+failure. The earlier **177 passed, 2 skipped** count was recorded before later
+Sprint 3 work reached `main` and is retained only in Git history as a historical
+baseline, not as the current result.
 
 For only the new T03 journey:
 
@@ -111,27 +123,28 @@ Story #17. The current status of every S01 acceptance criterion is explicit:
 
 | Story #17 criterion | Status after T03 |
 |---|---|
-| Home `Start` opens `/preferences` and displays available genres | Not implemented or verified by T03; owned by the genre-control UI task. |
-| Confirming 1-5 valid genres saves them and navigates to recommendations | Backend save is covered; browser confirm, client state handling, and navigation remain outside T03. |
-| Confirming zero genres shows guidance and stays on the page | Backend rejects an empty list; the required UI feedback/stay behaviour remains outside T03. |
-| Selecting a sixth genre shows the limit and keeps the previous five | UI-only acceptance remains outside T03. |
-| Returning shows the current account's selections and hides them from another account | Backend GET persistence/isolation is covered; complete browser rendering remains outside T03. |
+| Home `Start` opens `/preferences` and displays available genres | Implemented by the separate genre-control UI work; not claimed or re-verified by T03. |
+| Confirming 1-5 valid genres saves them and navigates to recommendations | Backend persistence is covered by T03; browser save/navigation belongs to the separate preference UI work and still needs integrated Story acceptance. |
+| Confirming zero genres shows guidance and stays on the page | Backend rejection is covered; browser feedback/stay behaviour remains outside T03's verification scope. |
+| Selecting a sixth genre shows the limit and keeps the previous five | UI acceptance remains outside T03's verification scope. |
+| Returning shows the current account's selections and hides them from another account | Backend persistence/isolation is covered; complete browser rendering remains part of integrated Story acceptance. |
 
 Personalised recommendation results are S02 scope and are not claimed here.
-Story Definition of Done also remains open until clean-clone/manual acceptance,
-green remote CI, independent approval, merge to `main`, and the applicable
-catalogue smoke evidence are complete.
+PR #159 has green remote CI and independent approval. Story Definition of Done
+still remains open until clean-clone/manual acceptance, merge to `main`, and
+the applicable catalogue smoke evidence are complete.
 
 ## Publication and review gates
 
 | Evidence field | Current state |
 |---|---|
-| Tested T03 commit SHA | Pending: intentionally no commit yet at the request of the branch owner. |
-| Implementation/test PR | Pending commit and publication. |
-| Independent review URL | Pending review by someone other than the author. |
-| Remote CI result | Pending publication. |
-| T02 dependency PR/review | Pending link; the dependency is currently consumed from the branch commit above. |
+| Reviewed T03 implementation SHA | [`121bd2c9dfd10d67364d6f95d01bc43149e80034`](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/121bd2c9dfd10d67364d6f95d01bc43149e80034) |
+| Implementation/test PR | [PR #159](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/159) |
+| Independent review | Approved by [vu-huzy](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/159#pullrequestreview-5486097342) and [hoang3003](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/159#pullrequestreview-5486171590) on the reviewed SHA. |
+| Remote CI | [Python tests](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/38163176710/job/114540201940), [Node build and tests](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/38163176710/job/114540201980), and [review policy gate](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/38204838789/job/114665917144) passed. |
+| T02 dependency | Merged through [PR #152](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/152) at [`ad3452572edad79faf6ef4e59628402dc5f7a9c9`](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/ad3452572edad79faf6ef4e59628402dc5f7a9c9). |
 
-Before closing #105, commit the tested work, replace the pending SHA with its
-link, open the PR, rerun CI against that exact SHA, and add the independent
-review URL. Do not report this uncommitted local verification as reviewed.
+PR #159 is published and has independent approval. The main-sync merge and
+this evidence correction occurred after reviewed SHA `121bd2c`; remote CI must
+be allowed to rerun after the follow-up is pushed so the final PR head retains
+the same green status before merge.
