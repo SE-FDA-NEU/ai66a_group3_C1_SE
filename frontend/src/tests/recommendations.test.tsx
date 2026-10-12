@@ -46,6 +46,9 @@ function renderRecommendations(recommendations: () => Promise<Response>) {
     if (url === "/api/auth/me") {
       return jsonResponse({ data: { user: { id: "user-1", email: "viewer@example.com" } } });
     }
+    if (url === "/api/genres") {
+      return jsonResponse({ data: { genres: [action, drama] } });
+    }
     if (url.startsWith("/api/me/recommendations")) {
       return recommendations();
     }
