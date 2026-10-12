@@ -28,10 +28,13 @@ Architecture and persistence rules are in
 - Browser `POST /api/auth/login` and `POST /api/auth/logout` requests must pass
   the same-origin Fetch Metadata/`Origin` check. Cross-origin and same-site
   browser writes return `403 ORIGIN_NOT_ALLOWED` before session state changes.
-- `PUT /api/me/preferences` now reuses that protection (S3-T02). The same-origin
-  registry matches method and path; login/logout protection is preserved.
-  Committed rating and profile-reset writes must extend the registry when
-  their routes are implemented.
+- `PUT /api/me/preferences`, `PUT /api/me/ratings/{movieId}`, and
+  `POST /api/me/profile/reset` reuse that protection under S3-T02, S3-T31
+  ([#138](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/138)),
+  and S3-T35
+  ([#142](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/142)).
+  The same-origin registry matches method and path; login/logout protection is
+  preserved.
 - Protected endpoints derive the account only from the authenticated session.
   A client-supplied `user_id`, account ID, email, username, or owner field
   cannot select or change the target account. Such fields are not part of a
@@ -80,17 +83,20 @@ yet available in the current repository.
 | S01 | `GET` | `/api/genres` | Authenticated | None | `200 GenreListResponse` | `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T01)` |
 | S01 | `GET` | `/api/me/preferences` | Authenticated | None | `200 PreferenceResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T01)` |
 | S01 | `PUT` | `/api/me/preferences` | Authenticated, same-origin write | `PreferenceRequest` | `200 PreferenceResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 GENRE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T02)` |
-| S05a | `GET` | `/api/me/ratings/{movieId}` | Authenticated | Opaque `movieId` | `200 RatingResponse` | `401 AUTHENTICATION_REQUIRED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 contract; implementation pending` |
-| S05a | `PUT` | `/api/me/ratings/{movieId}` | Authenticated, same-origin write | `RatingRequest` | `200 RatingResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 contract; implementation pending` |
-| S11 | `POST` | `/api/me/profile/reset` | Authenticated, same-origin write | `ProfileResetRequest` | `200 ProfileResetResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `503 SERVICE_UNAVAILABLE` | `Committed Sprint 3 backend contract; implementation pending` |
+| S05a | `GET` | `/api/me/ratings/{movieId}` | Authenticated | Opaque `movieId` | `200 RatingResponse` | `401 AUTHENTICATION_REQUIRED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T31)` |
+| S05a | `PUT` | `/api/me/ratings/{movieId}` | Authenticated, same-origin write | `RatingRequest` | `200 RatingResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T31)` |
+| S11 | `POST` | `/api/me/profile/reset` | Authenticated, same-origin write | `ProfileResetRequest` | `200 ProfileResetResponse` after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `503 SERVICE_UNAVAILABLE` | `Implemented backend in Sprint 3 (S3-T35); UI pending` |
 
 S3-T01 added the `user_genre_preferences` table and the two read routes
 `GET /api/genres` and `GET /api/me/preferences`. S3-T02 implements validated,
 atomic preference replacement through `PUT /api/me/preferences`. The dedicated
-`GET /api/movies/popular` route is implemented in M3 under T19. Ratings and
-reset storage/routes remain pending. S3-T08 implements the genre/popularity
-personalised recommendation baseline. Genre filtering, similar movies, and
-search remain outside this contract update.
+`GET /api/movies/popular` route is implemented in M3 under T19. T30 implements
+rating storage, T31 [#138](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/138)
+implements rating reads/writes, and T35
+[#142](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/142)
+implements the backend reset boundary. S3-T08 implements the genre/popularity
+personalised recommendation baseline. The reset UI, genre filtering, similar
+movies, and search remain outside this contract update.
 
 
 ## 3. Shared DTOs
@@ -590,11 +596,11 @@ A missing year or overview remains JSON `null`; the UI displays
 to a false 404. Movie detail remains public; a guest opening it must not cause
 the frontend to call a private rating endpoint.
 
-## 9. Committed Sprint 3 rating contract (implementation pending)
+## 9. Sprint 3 rating contract (implemented under S3-T31)
 
-These two S05a routes are committed Sprint 3 scope and frozen for consumers;
-they are not implemented routes in the current working tree. Their session
-ownership and isolation rules support Story #45 / S13.
+These two S05a routes are implemented under S3-T31
+[#138](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/138).
+Their session ownership and isolation rules support Story #45 / S13.
 Both use the current authenticated session as the only account identity and
 address a movie by its opaque active-catalogue ID.
 
@@ -666,13 +672,14 @@ forged identity field cannot read, update, or retarget another account. The
 database target is one row per `(user_id, movie_id)` with a `1..5` check; the
 storage contract is in [architecture.md](architecture.md).
 
-## 10. Committed Sprint 3 profile-reset backend contract (implementation pending)
+## 10. Sprint 3 profile-reset backend contract (implemented under S3-T35)
 
 ### `POST /api/me/profile/reset`
 
-This route freezes only the authenticated reset backend contract for Sprint 3;
-it supports Story #45 / S13 account isolation and does not claim completion of
-all Story #33 / S11 profile UI behaviour.
+This route implements the authenticated reset backend contract under S3-T35
+[#142](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/142). It supports
+Story #45 / S13 account isolation and does not claim completion of all Story
+#33 / S11 profile UI behaviour.
 
 Exact confirmation request:
 
@@ -706,6 +713,12 @@ or revoked sessions return `401 AUTHENTICATION_REQUIRED`; a rejected browser
 origin returns `403 ORIGIN_NOT_ALLOWED`. The account always comes from
 `ams_session`, never from request data.
 
+FastAPI parses and validates the JSON body before the route resolves the
+session. Therefore an invalid or unparsable confirmation body returns `400`
+even if the request also lacks a valid session; it still performs no private
+read or mutation. A syntactically valid `{ "confirm": true }` request without
+a valid session returns `401`.
+
 After success, the next recommendation request observes no saved preferences
 and therefore returns the popular cold-start state (`mode="popular"`,
 `personalised=false`, `noMatch=false`). The client invalidates current-account
@@ -737,13 +750,11 @@ The dedicated public popular movie endpoint (`GET /api/movies/popular`)
 is implemented in M3 under T19, reusing the shared deterministic
 popularity/title/ID ranker.
 
-The preference storage and the preference reads (`GET /api/genres`,
-`GET /api/me/preferences`) are implemented in Sprint 3 under S3-T01.
-Preference replacement (`PUT /api/me/preferences`) is implemented under S3-T02.
-Rating API/UI, profile reset, and NLP endpoints remain outside this endpoint's
-implementation. Sections 9 and 10 remain
-committed Sprint 3 delivery contracts, not optional future work, while their
-implementation status remains pending.
+The preference storage and reads are implemented under S3-T01, preference
+replacement under S3-T02, rating storage under S3-T30, rating reads/writes
+under S3-T31, and the profile-reset backend under S3-T35. Rating/reset UI and
+NLP endpoints remain separate work. The backend reset evidence must not be
+used to close Story #33 / S11 UI acceptance.
 
 Section 8 documents both the existing public catalogue endpoint and the
 implemented dedicated popular movie endpoint.
