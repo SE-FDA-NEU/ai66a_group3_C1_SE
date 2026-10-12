@@ -104,10 +104,21 @@ section is committed Sprint 3 scope with implementation pending.
   backend contract is committed by this document; the current `/profile` page
   remains a protected placeholder.
 
-The current recommendation page is also a placeholder: it renders an empty
-state and does not call `/api/me/recommendations`. That implementation mismatch
-must be resolved by a separate feature task before claiming the Sprint 3 data
-state is delivered.
+The recommendation page (S3-T10) now calls `GET /api/me/recommendations?limit=10`
+through `frontend/src/api/recommendations.ts`. It renders `data.movies` in
+server order with the shared movie cards and these states:
+
+| State | Rendered content |
+|---|---|
+| Loading | `Loading recommendations...` |
+| Popular (`mode=popular`) | Heading `Popular`, label `Not personalised`, cards without a genre-match reason |
+| Personalised (`mode=personalised`) | Heading `Recommended for you`, cards with `Matches your genres: <names>` from `reason.matchedGenres` |
+| Empty (`movies: []`) | `No recommendations available yet.` with a link to `/preferences`; zero cards |
+| Error | Alert `Recommendations are unavailable` with the API message; never shown as an empty result |
+| Protected API `401` | `handleUnauthorized` discards the account and opens `/login` |
+
+Retry, no-match guidance, and request-race handling are still owned by T11
+(#113); cold-start transitions by T13 (#115).
 
 Implementation handoff is explicit:
 
