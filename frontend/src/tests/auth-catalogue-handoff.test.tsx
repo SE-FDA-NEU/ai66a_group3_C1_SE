@@ -63,6 +63,11 @@ function installFakeServer() {
       activeSessionOwner = null;
       return Promise.resolve(new Response(null, { status: 204 }));
     }
+    if (method === "GET" && url === "/api/genres") {
+      return Promise.resolve(activeSessionOwner
+        ? json({ data: { genres: [{ id: 28, name: "Action" }] } })
+        : json({ error: { code: "AUTHENTICATION_REQUIRED", message: "Authentication required" } }, 401));
+    }
     if (method === "GET" && url === "/api/me/recommendations?limit=10") {
       return Promise.resolve(
         activeSessionOwner
