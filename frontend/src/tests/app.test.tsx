@@ -20,6 +20,14 @@ function jsonResponse(body: unknown, status = 200) {
   );
 }
 
+// The recommendations page requests the protected API as soon as it mounts.
+function emptyRecommendations() {
+  return jsonResponse({
+    data: { movies: [], mode: "popular", personalised: false, noMatch: false },
+    meta: { count: 0, limit: 10, catalogueRevision: "revision-test" },
+  });
+}
+
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
@@ -43,9 +51,7 @@ describe("S13 authentication UI", () => {
       .mockImplementationOnce(() =>
         jsonResponse({ data: { user: { id: "user-1", email: "viewer@example.com" } } }),
       )
-      .mockImplementationOnce(() =>
-        jsonResponse({ data: { user: { id: "user-1", email: "viewer@example.com" } } }),
-      );
+      .mockImplementationOnce(() => emptyRecommendations());
 
     render(<App />);
     fireEvent.change(screen.getByLabelText("Email"), { target: { value: "viewer@example.com" } });
@@ -77,9 +83,11 @@ describe("S13 authentication UI", () => {
 
   it("restores the authenticated session on the recommendations route", async () => {
     window.history.pushState({}, "", "/recommendations");
-    vi.spyOn(globalThis, "fetch").mockImplementationOnce(() =>
-      jsonResponse({ data: { user: { id: "user-1", email: "viewer@example.com" } } }),
-    );
+    vi.spyOn(globalThis, "fetch")
+      .mockImplementationOnce(() =>
+        jsonResponse({ data: { user: { id: "user-1", email: "viewer@example.com" } } }),
+      )
+      .mockImplementationOnce(() => emptyRecommendations());
 
     render(<App />);
 
@@ -107,6 +115,7 @@ describe("S13 authentication UI", () => {
       .mockImplementationOnce(() =>
         jsonResponse({ data: { user: { id: "user-1", email: "viewer@example.com" } } }),
       )
+      .mockImplementationOnce(() => emptyRecommendations())
       .mockImplementationOnce(() => Promise.resolve(new Response(null, { status: 204 })))
       .mockImplementationOnce(() =>
         jsonResponse({
@@ -121,7 +130,7 @@ describe("S13 authentication UI", () => {
     await waitFor(() => expect(window.location.pathname).toBe("/"));
     expect(await screen.findByRole("heading", { name: "Find your next movie" })).toBeInTheDocument();
     expect(fetchMock).toHaveBeenNthCalledWith(
-      2,
+      3,
       "/api/auth/logout",
       expect.objectContaining({ method: "POST", credentials: "include" }),
     );
