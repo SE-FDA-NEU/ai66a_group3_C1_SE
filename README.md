@@ -319,10 +319,24 @@ python -m app.cli.import_tmdb_catalogue
 ```
 
 Set `TMDB_READ_ACCESS_TOKEN` only in the server environment or in the local,
-gitignored `.env` file. The importer reads one page of TMDb popular movies and
+gitignored `.env` file. By default, the importer reads one page of TMDb popular movies and
 the official movie genre list; it requests a movie-detail record only when a
 popular result omits `genre_ids`. It never runs as part of browser requests,
 automated tests, or the M2 bootstrap command.
+
+For a larger local catalogue (roughly 260 movies), explicitly opt into 13 pages:
+
+```bash
+python -m app.cli.import_tmdb_catalogue --pages 13
+```
+
+The allowed budget is 1–15 pages (roughly 20–300 results before validation and
+deduplication). Live counts can vary. Each import activates a new snapshot; it
+does not append blindly. Retained TMDb movies keep their internal IDs, and
+accounts, preferences and ratings are not deleted. A later import without
+`--pages 13` returns to the one-page default. Back up an existing database before
+refreshing it. Public and recommendation list limits remain at most ten cards;
+the larger catalogue expands the candidate pool, not the number shown at once.
 
 On success, the command prints a safe provenance summary: provider, opaque
 active revision ID, inserted/updated/rejected counts, movie/associated-genre/
