@@ -176,6 +176,48 @@ button:disabled {
   font-weight: 600;
 }
 
+.recommendation-filter {
+  margin-top: 1.5rem;
+}
+
+.recommendation-filter__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.75rem;
+}
+
+.recommendation-filter__field {
+  display: grid;
+  gap: 0.5rem;
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.recommendation-filter__field label {
+  font-weight: 600;
+}
+
+.recommendation-filter__field select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.75rem;
+  border: 1px solid #bdbdbd;
+  border-radius: 8px;
+  font: inherit;
+  background: #fff;
+  color: #171717;
+}
+
+.recommendation-filter__field select:focus-visible {
+  outline: 3px solid #171717;
+  outline-offset: 2px;
+}
+
+.recommendation-filter__error {
+  margin-top: 1rem;
+}
+
 .recommendation-empty-state {
   margin-top: 2rem;
   padding: 1.5rem;
