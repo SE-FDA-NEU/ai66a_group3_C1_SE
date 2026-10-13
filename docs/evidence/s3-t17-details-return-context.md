@@ -183,7 +183,7 @@ storage are outside T17.
 | Original published T17 SHA | [`371e2d45a6acba85d8413b7b026e04ddbb794d84`](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/371e2d45a6acba85d8413b7b026e04ddbb794d84) |
 | Tested post-merge implementation SHA | `c3896c8431e6e2f896ecc970f67eb0b6f10e3256`; the following evidence-only commit does not change implementation |
 | Implementation/test PR | Published as [PR #165](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/165). |
-| Remote CI on published SHA | [Python tests and Node build/tests passed](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/38291931173); the post-merge candidate requires a new run after push. |
+| Remote CI | Original published checks passed in [run 38291931173](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/38291931173). Post-merge Python tests, Node build/tests, and secret scan passed on evidence head `68de458` in [run 38347037667](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/38347037667); the following documentation-only commit does not change the tested implementation. |
 | Independent review on published SHA | Approved by [hoang3003](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/165#pullrequestreview-5495083353), [vu-huzy](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/165#pullrequestreview-5498204235), and [anotify-vie](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/165#pullrequestreview-5498701692); the updated candidate still requires the normal post-push review/CI gates. |
 
 Before closing #119, confirm the PR checks and approval apply to the current
