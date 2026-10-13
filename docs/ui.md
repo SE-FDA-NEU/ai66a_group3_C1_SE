@@ -61,6 +61,11 @@ whose parsed pathname is exactly `/`, `/popular`, or `/recommendations` and
 preserves that path's query string and fragment. Success, not-found, and error
 detail states all use the same validated destination.
 
+On `/recommendations`, `RecommendationsPage` passes that location through the
+T15 `RecommendationFilter` to `MovieGrid` and `MovieCard`; filtering therefore
+does not discard the return context. The same path is used for a non-empty T11
+popular-alternatives snapshot as for an ordinary recommendation snapshot.
+
 The state is navigation context, not trusted input or account data. Absolute
 URLs, scheme-relative values such as `//example.com`, backslashes, malformed
 values, non-string values, and internal paths outside the list allow-list are

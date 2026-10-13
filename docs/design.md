@@ -435,9 +435,11 @@ cannot send the viewer to an unvalidated origin. Returning to
 normal recommendation GET for the still-current account. Detail navigation
 has no preference write path, leaving `user_genre_preferences` unchanged.
 
-Evidence: `frontend/src/navigation/movieDetailReturn.ts`, the shared
-`MovieCard`/`MovieGrid`, `MovieDetailPage.tsx`, and
-`movie-detail-return.test.tsx`.
+Evidence: `frontend/src/navigation/movieDetailReturn.ts`,
+`RecommendationsPage.tsx`, the T15 `RecommendationFilter`, the shared
+`MovieGrid`/`MovieCard`, `MovieDetailPage.tsx`, and
+`movie-detail-return.test.tsx`. The recommendation path applies to ordinary
+results and T11 popular alternatives without bypassing the snapshot filter.
 
 ### Nullable catalogue fields for renderable detail states
 

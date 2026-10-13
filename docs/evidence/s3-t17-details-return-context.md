@@ -6,8 +6,12 @@ Parent Story: [#19 / S03](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issue
 
 Branch: `119-preserve-details-return-context`
 
-Base: team `main` at
+Original published base: team `main` at
 [`0a11da2737ef6445fb9bf9b54d82ef5dd9636034`](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/0a11da2737ef6445fb9bf9b54d82ef5dd9636034).
+The post-publication integration candidate merges the tested T11 branch, which
+contains team `main` through
+[`3dcb51f`](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/3dcb51f)
+and the merged T15 filter.
 
 Dependencies are present in that base:
 
@@ -23,6 +27,10 @@ Dependencies are present in that base:
   [PR #86](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/86),
   merge commit
   [`c3a121b86feb12b52c8be018c57c6231496e0592`](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/c3a121b86feb12b52c8be018c57c6231496e0592).
+- S3-T15 current-list recommendation filter: merged
+  [PR #162](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/162),
+  merge commit
+  [`17ef831`](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/17ef831).
 
 Verification date: 2026-10-13. Environment: Windows, Node.js 24.15.0,
 npm 11.12.1.
@@ -31,7 +39,11 @@ npm 11.12.1.
 
 The existing shared `MovieCard` and `MovieGrid` carry a minimal React Router
 state object when a viewer opens a detail. List pages derive `returnTo` from
-their current pathname, query string, and fragment. No recommendation data,
+their current pathname, query string, and fragment. On recommendations the
+prop flows through `RecommendationsPage` -> `RecommendationFilter` ->
+`MovieGrid` -> `MovieCard` -> `MovieDetailPage`, preserving the T15 filter
+instead of replacing it with a direct grid. This applies both to ordinary
+results and non-empty T11 popular alternatives. No recommendation data,
 account ID, or genre preference is copied into that state.
 
 `MovieDetailPage` resolves the state through the shared
@@ -64,6 +76,8 @@ compares the committed preference rows before and after.
 `frontend/src/tests/movie-detail-return.test.tsx` covers:
 
 - recommendation card to the correct `/movies/:movieId` route;
+- no-match popular-alternative card through the T15 filter to the same return
+  policy, including query and fragment context;
 - route state containing only `/recommendations`;
 - detail `Back to recommendations` and a fresh current-account recommendation
   read after returning;
@@ -106,14 +120,28 @@ Recorded local results for this implementation:
 
 | Check | Result |
 |---|---|
-| Focused T17 suite | **9 passed** in 1 file |
-| Detail/list/recommendation regression | **30 passed** across 4 files |
-| Full frontend regression | **77 passed** across 9 files |
+| Focused T17 suite | **10 passed** in 1 file |
+| Detail/list/recommendation regression | **41 passed** across 4 files |
+| Full frontend regression | **108 passed** across 10 files |
 | Frontend ESLint | Passed |
-| Frontend production build | Passed; 44 modules transformed |
+| Frontend production build | Passed; 45 modules transformed |
 | Recommendation/detail DB persistence regression | **29 passed**, 1 pre-existing TestClient compatibility warning |
-| Full backend regression | **301 passed, 1 skipped**, 1 pre-existing TestClient compatibility warning |
+| Full backend regression | **370 passed, 1 skipped**, 1 pre-existing TestClient compatibility warning |
 | Backend Ruff | Passed |
+
+## Visual evidence
+
+Both images use the real Vite UI and FastAPI movie-detail endpoint against the
+controlled local catalogue fixture; neither image contains a live provider
+token or private account data.
+
+### Recommendation-origin detail
+
+![Movie detail with Back to recommendations](./s3-t17-back-to-recommendations.png)
+
+### Direct detail URL
+
+![Direct movie detail with Return to catalogue](./s3-t17-direct-detail-return-catalogue.png)
 
 ## Reproducible reviewer journey
 
@@ -152,11 +180,11 @@ storage are outside T17.
 
 | Evidence field | Current state |
 |---|---|
-| Tested T17 commit SHA | Pending commit; do not substitute the base SHA. |
-| Implementation/test PR | Pending publication. |
-| Remote CI | Pending publication. |
-| Independent review | Pending review by a teammate who did not author the change. |
+| Original published T17 SHA | [`371e2d45a6acba85d8413b7b026e04ddbb794d84`](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/371e2d45a6acba85d8413b7b026e04ddbb794d84) |
+| Tested post-merge implementation SHA | `c3896c8431e6e2f896ecc970f67eb0b6f10e3256`; the following evidence-only commit does not change implementation |
+| Implementation/test PR | Published as [PR #165](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/165). |
+| Remote CI on published SHA | [Python tests and Node build/tests passed](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/38291931173); the post-merge candidate requires a new run after push. |
+| Independent review on published SHA | Approved by [hoang3003](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/165#pullrequestreview-5495083353), [vu-huzy](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/165#pullrequestreview-5498204235), and [anotify-vie](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/165#pullrequestreview-5498701692); the updated candidate still requires the normal post-push review/CI gates. |
 
-Before closing #119, link the exact tested commit, PR, green CI run, and an
-approval from a teammate who did not author the change. Rerun all commands
-above if implementation changes.
+Before closing #119, confirm the PR checks and approval apply to the current
+post-merge candidate. Rerun all commands above if implementation changes.
