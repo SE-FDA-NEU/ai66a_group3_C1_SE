@@ -126,6 +126,43 @@ is no longer current. An old success or `401` therefore cannot replace or sign
 out a newer account after retry, navigation, logout, or account switch.
 Cold-start transitions after a preference save remain owned by T13 (#115).
 
+### Current-list genre filtering (S3-T15, #117)
+
+The ready, non-empty recommendation list is passed to
+`frontend/src/components/RecommendationFilter.tsx` as one accepted response
+snapshot. `Filter by genre` defaults to `All genres`. Options use canonical IDs
+from the authenticated `GET /api/genres` active-catalogue list, not only genres
+present in these up-to-ten cards. A genre available elsewhere in the catalogue
+can therefore legitimately have no matches in the current snapshot.
+
+- Selection filters `snapshot.movies` locally and preserves server order,
+  card links, popular labels, and personalised matching reasons.
+- `Showing N of M movies` reports the visible count and original snapshot size.
+- Zero filtered matches show `No movies match this filter.` and
+  `Clear filter to see the full recommendation list.`, with `Show all movies`.
+  This is not an API failure, an empty source catalogue, or `noMatch=true`.
+- `Clear filter` or `All genres` restores the original snapshot. No preference
+  write, recommendations refetch, browser-storage write, or TMDb call occurs.
+- Each newly accepted response object resets selection to `All genres` and
+  becomes the only reset target, even if the catalogue revision is unchanged.
+  An ordinary rerender with the same response keeps the current filter.
+- Genre-option loading/failure does not hide valid cards. The disabled select
+  explains loading/unavailable options; `Retry filter options` retries only
+  `GET /api/genres`. A genre `401` uses central auth recovery. Cleanup aborts
+  old option requests and ignores their late success/error responses.
+- Account changes remount the guarded subtree, discarding the temporary filter.
+- A non-empty T11 no-match alternatives snapshot uses the same filter without
+  hiding its guidance, `Edit preferences`, or `Retry`. An accepted retry
+  response is a new snapshot and resets the temporary selection.
+
+T16 (#118) still owns independent S06 acceptance and committed-database
+preference comparisons. See [T15 evidence](evidence/s3-t15-recommendation-filter.md)
+for author tests and the isolated real-TMDb-catalogue browser smoke. This does
+not claim Story #23 is closed or that T13 is implemented.
+
+T11 remains responsible for retry, no-match guidance, and request-race
+handling; cold-start transitions remain owned by T13 (#115).
+
 Implementation handoff is explicit:
 
 - Shared cards, API client, and recommendation container integration belong to

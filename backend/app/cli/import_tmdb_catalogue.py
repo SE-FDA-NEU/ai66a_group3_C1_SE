@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import sys
 from datetime import UTC, datetime
 
@@ -9,11 +10,26 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from app.catalogue.tmdb_import import import_tmdb_catalogue
 from app.db.database import SessionLocal
-from app.integrations.tmdb import TmdbClient, TmdbImportError
+from app.integrations.tmdb import (
+    DEFAULT_POPULAR_PAGES,
+    MAX_POPULAR_PAGES,
+    TmdbClient,
+    TmdbImportError,
+)
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     """Import a bounded TMDb snapshot without exposing credentials."""
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--pages",
+        type=int,
+        choices=range(1, MAX_POPULAR_PAGES + 1),
+        default=DEFAULT_POPULAR_PAGES,
+        help="Popular pages to import (default: 1; 13 usually yields about 260 movies).",
+    )
+    args = parser.parse_args(argv)
 
     try:
         client = TmdbClient.from_environment()
@@ -23,7 +39,7 @@ def main() -> int:
 
     try:
         with client, SessionLocal() as session, session.begin():
-            result = import_tmdb_catalogue(session, client=client)
+            result = import_tmdb_catalogue(session, client=client, pages=args.pages)
     except TmdbImportError as exc:
         sys.stderr.write(f"TMDb catalogue import failed: {exc}\n")
         return 1

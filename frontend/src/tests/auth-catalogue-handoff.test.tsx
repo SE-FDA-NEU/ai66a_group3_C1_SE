@@ -63,6 +63,11 @@ function installFakeServer() {
       activeSessionOwner = null;
       return Promise.resolve(new Response(null, { status: 204 }));
     }
+    if (method === "GET" && url === "/api/genres") {
+      return Promise.resolve(activeSessionOwner
+        ? json({ data: { genres: [{ id: 28, name: "Action" }] } })
+        : json({ error: { code: "AUTHENTICATION_REQUIRED", message: "Authentication required" } }, 401));
+    }
     if (method === "GET" && url === "/api/me/recommendations?limit=10") {
       return Promise.resolve(
         activeSessionOwner
@@ -131,6 +136,10 @@ describe("T20 integrated auth-to-catalogue handoff", () => {
     expect(screen.getByText("handoff@example.com")).toBeInTheDocument();
     expect(await screen.findByRole("heading", { name: "Popular" })).toBeInTheDocument();
     expect(requests).toContain("GET /api/me/recommendations?limit=10");
+    await waitFor(
+      () => expect(screen.getByRole("combobox", { name: "Filter by genre" })).toBeEnabled(),
+      { timeout: 5_000 },
+    );
 
     // Sign out returns to the public catalogue; a movie detail opens without a session.
     fireEvent.click(screen.getByRole("button", { name: "Sign out" }));

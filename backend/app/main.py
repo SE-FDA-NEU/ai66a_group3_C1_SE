@@ -25,6 +25,7 @@ from app.repositories.preferences import (
     list_user_preference_genres,
     replace_user_preference_genres,
 )
+from app.repositories.profile import reset_user_personalisation
 from app.repositories.ratings import get_user_movie_rating, set_user_movie_rating
 from app.repositories.recommendations import list_popular_recommendation_movies
 from app.repositories.users import create_user, get_user_by_email, to_user_dto
@@ -41,6 +42,11 @@ from app.schemas.preferences import (
     GenreListResponse,
     PreferenceRequest,
     PreferenceResponse,
+)
+from app.schemas.profile import (
+    ProfileResetData,
+    ProfileResetRequest,
+    ProfileResetResponse,
 )
 from app.schemas.ratings import RatingData, RatingRequest, RatingResponse
 from app.schemas.recommendations import RecommendationResponse
@@ -62,6 +68,7 @@ _SAME_ORIGIN_WRITES = frozenset(
     {
         ("POST", "/api/auth/login"),
         ("POST", "/api/auth/logout"),
+        ("POST", "/api/me/profile/reset"),
         ("PUT", "/api/me/preferences"),
     }
 )
@@ -403,6 +410,47 @@ def put_preferences(
     except SQLAlchemyError:
         database_session.rollback()
         return _error("SERVICE_UNAVAILABLE", "Service is temporarily unavailable", 503)
+
+    return response
+
+
+@app.post(
+    "/api/me/profile/reset",
+    response_model=ProfileResetResponse,
+    status_code=200,
+)
+def reset_profile(
+    payload: ProfileResetRequest,
+    request: Request,
+    database_session: Session = Depends(get_db),  # noqa: B008
+):
+    try:
+        user = resolve_session(
+            database_session,
+            request.cookies.get(SESSION_COOKIE),
+        )
+        if user is None:
+            return _error(
+                "AUTHENTICATION_REQUIRED",
+                "Authentication required",
+                401,
+            )
+
+        reset_user_personalisation(
+            database_session,
+            user_id=user.id,
+        )
+        response = ProfileResetResponse(
+            data=ProfileResetData(reset=True),
+        )
+        database_session.commit()
+    except SQLAlchemyError:
+        database_session.rollback()
+        return _error(
+            "SERVICE_UNAVAILABLE",
+            "Service is temporarily unavailable",
+            503,
+        )
 
     return response
 

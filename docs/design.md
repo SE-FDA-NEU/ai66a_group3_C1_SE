@@ -51,7 +51,8 @@ implemented under Sprint 3 T19 (#121).
 | TMDb importer: `backend/app/integrations/tmdb.py`, `backend/app/catalogue/tmdb_import.py`, `backend/app/cli/import_tmdb_catalogue.py` | Server-side atomic catalogue import; required from Sprint 3. | `@kietxuan` (#48); S3 T29 setup, `@hoang3003` independent review |
 | Account storage and password hashing: `backend/app/repositories/users.py`, `backend/app/security/passwords.py` | Users table access, email normalisation, Argon2id hashing. | Nguyen Tuan Anh, `@NguyenTuanAnh0608` (#49) |
 | Rating storage: `backend/app/db/models.py`, `backend/app/repositories/ratings.py`, migration `b7e4c2d91f30` | Account-scoped current rating storage and repository reads/upserts. | S3-T30 ([#137](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/137)) |
-| Rating API: `backend/app/schemas/ratings.py`, `GET` and `PUT /api/me/ratings/{movieId}` | Session-owned, same-origin-protected, atomic rating read and write; the rating UI remains separate work. | S3-T31 ([#138](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/138)) |
+| Rating API: `backend/app/schemas/ratings.py`, `GET` and `PUT /api/me/ratings/{movieId}` | Session-owned, same-origin-protected, atomic rating reads and writes; UI remains separate. | S3-T31 ([#138](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/138)) |
+| Profile-reset backend: `backend/app/repositories/profile.py`, `backend/app/schemas/profile.py`, `POST /api/me/profile/reset` | Explicitly confirmed, session-owned atomic deletion of the current account's preferences and ratings. | S3-T35 ([#142](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/142)) |
 | Server sessions: `backend/app/security/sessions.py` | Creates, resolves and revokes sessions. | `@NguyenTuanAnh0608` (#53) |
 | Registration endpoint: `backend/app/schemas/auth.py`, `POST /api/auth/register` | Validates the email and password and creates the account. | Vu Quoc Huy, `@vu-huzy` (#52) |
 | Login, logout, current account: `backend/app/main.py`, `backend/app/security/origin.py` | Sign-in and sign-out endpoints and the same-origin check. | Tran Minh Hoang, `@hoang3003` (#54) |
@@ -75,9 +76,9 @@ The ERD in `docs/images/erd.png` is the M2 baseline. It shows the seven M2 table
 
 Genre preferences are stored in `user_genre_preferences` (S3-T01), and current
 account/movie ratings are stored in `user_movie_ratings` (S3-T30). The rating
-HTTP API is implemented under S3-T31; the rating UI and profile reset remain
-pending. Rating-adjusted ranking (Story #22 / S05b) is planned Sprint 4 rather
-than Sprint 3.
+HTTP API is implemented under T31 and the reset backend under T35; their UI
+work remains pending. Rating-adjusted ranking (Story #22 / S05b) is planned
+Sprint 4 rather than Sprint 3.
 
 A trailing `?` marks a column that allows NULL. Every other column is NOT NULL.
 
@@ -123,10 +124,10 @@ cascading deletes, and a strict integer database check from 1 through 5.
 | BR19: sign-out invalidates the session and keeps the account | `revoked_at` on the session row | `revoke_session` sets `revoked_at`; the user row is untouched | `test_logout_forbids_reusing_the_old_session_on_authenticated_api` |
 
 Preference validation and account-scoped replacement are implemented under
-T02. T30 implements account-scoped rating storage and repository reads/upserts,
-and T31 implements the protected rating API. The rating UI, search,
-similarity, and reset rules remain incomplete until their respective tasks
-pass.
+T02. T30 implements account-scoped rating storage/repository operations, T31
+implements the protected rating API, and T35 implements the reset backend.
+Rating/reset UI, search, and similarity remain incomplete until their
+respective tasks pass.
 
 Committed Sprint 3 delivery is narrower than that historical rule list:
 BR1-BR4 use saved genres and local popularity, BR7 stores an optional 1-5
@@ -142,9 +143,9 @@ Conventions:
 - A success body is `{ "data": ..., "meta": ... }`. An error body is `{ "error": { "code", "message", "requestId" } }`.
 - The signed-in account comes only from the `ams_session` cookie. No endpoint accepts a user ID from the client.
 - `POST /api/auth/login` and `POST /api/auth/logout` reject cross-origin browser requests with `403 ORIGIN_NOT_ALLOWED`.
-- `PUT /api/me/preferences` and `PUT /api/me/ratings/{movieId}` reuse the
-  same-origin mechanism (T02, T31). A future reset write must extend the
-  registry before mutation.
+- `PUT /api/me/preferences`, `PUT /api/me/ratings/{movieId}`, and
+  `POST /api/me/profile/reset` reuse the same-origin mechanism under T02, T31,
+  and T35.
 - Any database failure returns `503 SERVICE_UNAVAILABLE`.
 
 | Story | Method and endpoint | Access | Input | Success | Errors | Status |
@@ -163,7 +164,7 @@ Conventions:
 | S01 | `PUT /api/me/preferences` | Signed in, same-origin | `genreIds`: 1 to 5 distinct genre IDs | `200` with the saved genres after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 GENRE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | Implemented in Sprint 3 (S3-T02) |
 | S05a | `GET /api/me/ratings/{movieId}` | Signed in | Opaque movie ID | `200` with committed `rating` or `null` | `401 AUTHENTICATION_REQUIRED`, `404 MOVIE_NOT_FOUND` | Implemented in Sprint 3 (S3-T31) |
 | S05a | `PUT /api/me/ratings/{movieId}` | Signed in, same-origin | Strict `{ "rating": 1..5 }` | `200` only after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | Implemented in Sprint 3 (S3-T31) |
-| S11 | `POST /api/me/profile/reset` | Signed in, same-origin | Exact `{ "confirm": true }` | `200` only after preferences/ratings delete transaction commits | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `503 SERVICE_UNAVAILABLE` | Committed Sprint 3 backend contract; implementation pending |
+| S11 | `POST /api/me/profile/reset` | Signed in, same-origin | Exact `{ "confirm": true }` | `200` only after preferences/ratings delete transaction commits | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `503 SERVICE_UNAVAILABLE` | Backend implemented in Sprint 3 (S3-T35); UI pending |
 
 All six P0 Stories appear in the table: S01 (genres and preferences), S02 and
 S04 (recommendations and the public catalogue), S03 (movie detail), S12
@@ -191,7 +192,7 @@ Error codes returned by the running backend:
 | `VALIDATION_ERROR` | 400 | A body field or the `limit` query value is invalid |
 | `AUTHENTICATION_REQUIRED` | 401 | A signed-in endpoint has no valid, unexpired, unrevoked session |
 | `INVALID_CREDENTIALS` | 401 | The email is unknown or the password is wrong; the message is the same for both |
-| `ORIGIN_NOT_ALLOWED` | 403 | A login, logout, or preference PUT request fails the same-origin check |
+| `ORIGIN_NOT_ALLOWED` | 403 | A login, logout, preference/rating write, or profile reset fails the same-origin check |
 | `MOVIE_NOT_FOUND` | 404 | The movie ID does not exist in the active catalogue |
 | `GENRE_NOT_FOUND` | 404 | A requested canonical genre ID does not exist |
 | `EMAIL_ALREADY_REGISTERED` | 409 | The normalised email is already stored |
@@ -316,7 +317,7 @@ Decision. Option 2. The cookie value is 32 random bytes from `secrets.token_urls
 
 Rationale. The contract rules out tokens in browser storage. The server can revoke a session itself: the T20 test replays the old cookie after sign-out from a new client and gets `401` on `/api/auth/me` and `/api/me/recommendations`.
 
-Consequences. Every protected request reads a session row. Browsers attach cookies automatically, so the cookie uses `SameSite=Lax` and the backend checks `Sec-Fetch-Site` or `Origin` on login, logout, preference replacement, and rating writes (T31). A future reset write must extend the same method/path registry.
+Consequences. Every protected request reads a session row. Browsers attach cookies automatically, so the cookie uses `SameSite=Lax` and the backend checks `Sec-Fetch-Site` or `Origin` on login, logout, preference replacement, rating writes, and profile reset.
 
 What would change the decision. A client that is not a browser, or a frontend served from a different origin than the API.
 
@@ -358,8 +359,8 @@ Impact. A copy of the database holds no cookie value that a browser could send, 
 ### ADR-3: Account identity and transaction boundary
 
 Status: preference storage/reads/replacement implemented under T01/T02,
-rating storage/repository under T30, and the rating API under T31; rating UI
-and reset implementation remain pending.
+rating storage/repository under T30, rating API under T31, and reset backend
+under T35; rating/reset UI remains pending.
 
 Preferences, ratings, and reset are account-owned operations. Their target
 user is resolved only from the valid `ams_session` row. Request bodies do not
@@ -369,12 +370,11 @@ and state-changing browser requests must pass the existing same-origin policy.
 
 Preference replacement returns success only after commit. The T30 rating
 repository reads and upserts only the supplied account/movie pair inside the
-caller's transaction, and the T31 rating API returns success only after
-commit. The pending profile reset must also return success only after
-commit. Reset deletes the
-current user's preference and rating rows in the same transaction; either
-failure rolls back both. The user, current session, catalogue, movies, genres,
-and other accounts remain untouched.
+caller's transaction, and the T31 rating API returns success only after commit.
+The T35 reset backend deletes the session account's preference and rating rows
+in one transaction and returns success only after commit; either failure rolls
+back both. The user, current session, catalogue, movies, genres, and other
+accounts remain untouched.
 
 T02 validates 1-5 distinct strict integer IDs and checks local canonical
 existence before deleting the current account's old rows. It flushes and
@@ -488,11 +488,12 @@ test evidence, or a tested SHA.
 | Gate | Current status | Evidence needed before completion |
 |---|---|---|
 | Initial API/database/UI contract | Prepared locally; review/publication pending | Reviewed D1 contract link |
-| Preferences and personalised recommendation implementation | Backend storage/reads/replacement implemented under T01/T02; genre/popularity endpoint under T08; card/client integration under T10; no-match/retry/race UI implemented locally under T11; broader acceptance remains separate | Reviewed/merged implementation, executable tests, and consumer verification; see T02/T08/T11 evidence |
-| Rating storage and repository | Implemented under T30 | T30 [#137](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/137) is merged with migration/repository tests |
-| Rating API | Implemented under T31; independent verification pending | T31 [#138](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/138) ships `backend/tests/test_ratings_api.py` (auth, validation, same-origin, isolation, rollback). T32 [#140](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/140) still owns the dedicated persistence/rollback/isolation verification |
-| Rating UI and acceptance | Pending | T33 [#139](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/139) widget and saved state, and T34 [#141](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/141) auth/account-switch verification |
-| Authenticated reset backend | Committed Sprint 3 scope; implementation pending | [T35 #142](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/142); merged transaction/rollback/security tests |
+| Preferences and personalised recommendation implementation | Backend storage/reads/replacement implemented under T01/T02; genre/popularity endpoint under T08; card/client integration under T10; no-match/retry/race UI implemented locally under T11; current-list filtering merged under T15; broader acceptance remains separate | Reviewed/merged implementation, executable tests, and consumer verification; see T02/T08/T11/T15 evidence |
+| Rating storage/API/UI protection | Storage/repository implemented under T30 and API under T31; UI pending | T30 [#137](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/137) and T31 [#138](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/138) are merged. T32 [#140](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/140), T33 [#139](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/139), and T34 [#141](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/141) retain independent verification/UI scope. |
+| Rating storage and repository | Implemented under T30 | T30 [#137](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/137) is merged with migration/repository tests. |
+| Rating API | Implemented under T31; independent verification pending | T31 [#138](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/138) ships `backend/tests/test_ratings_api.py`; T32 [#140](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/140) owns dedicated persistence/rollback/isolation verification. |
+| Rating UI and acceptance | Pending | T33 [#139](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/139) widget/saved state and T34 [#141](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/141) auth/account-switch verification. |
+| Authenticated reset backend | Implemented under T35; UI pending | [T35 #142](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/142); `backend/tests/test_profile_reset_api.py` covers confirmation, authentication, origin, isolation, rollback, preservation, and cold-start behaviour. Post-merge local verification on `05ee98232a96a10321d0e925c7e059d90c45d7c0` passed; hosted CI and independent review still require PR evidence. |
 | UI-driven design reconciliation | Documented locally; #136 coordination/review pending | Same reviewed change containing `docs/ui.md` and `docs/design.md` |
 | Backdrop #129-#131 | Conditional and pending; no shipped repository evidence | Reconcile only if nullable storage, migration/import, detail compatibility, and independent verification ship |
 | Final implementation reconciliation | Pending | Compare these contracts with merged implementation and verification evidence |

@@ -7,7 +7,7 @@ import {
   type RecommendationResult,
 } from "../api/recommendations.ts";
 import { useAuth } from "../auth/authState.ts";
-import MovieGrid from "../components/MovieGrid.tsx";
+import RecommendationFilter from "../components/RecommendationFilter.tsx";
 
 const RECOMMENDATION_LIMIT = 10;
 
@@ -181,20 +181,18 @@ function RecommendationsPage() {
               </div>
             </div>
             {load.result.movies.length > 0 ? (
-              <MovieGrid
+              <RecommendationFilter
                 ariaLabel="Popular alternatives"
-                movies={load.result.movies}
-                showReasons={false}
+                snapshot={load.result}
               />
             ) : null}
           </>
         ) : load.result.movies.length === 0 ? (
           <RecommendationState status="empty" />
         ) : (
-          <MovieGrid
+          <RecommendationFilter
             ariaLabel={sectionTitle}
-            movies={load.result.movies}
-            showReasons={load.result.personalised}
+            snapshot={load.result}
           />
         )}
       </section>
