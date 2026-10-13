@@ -6,14 +6,14 @@ Parent Story: [#18 / S02](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issue
 
 Branch: `113-no-match-retry-request-race`
 
-Base: team `main` at
-[`0a11da2737ef6445fb9bf9b54d82ef5dd9636034`](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/0a11da2737ef6445fb9bf9b54d82ef5dd9636034).
+Merged base: team `main` at
+[`3dcb51f`](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/3dcb51f).
 The required backend error/recovery contract is merged through
 [T09 PR #161](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/161),
 and the typed client/card container is merged through
 [T10 PR #160](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/160).
 
-Verification date: 2026-10-12. Environment: Windows, Node.js 24.15.0,
+Verification date: 2026-10-13. Environment: Windows, Node.js 24.15.0,
 npm 11.12.1.
 
 ## Scope and implementation
@@ -28,7 +28,7 @@ The page now distinguishes these response states:
 |---|---|
 | `personalised=true`, `noMatch=false` | `Recommended for you`; server-ordered cards and matched-genre reasons |
 | `mode=popular`, `noMatch=false` | `Popular` and `Not personalised`; this is cold start, not a failed personalisation request |
-| `mode=popular`, `noMatch=true`, alternatives present | No-match guidance, `Edit preferences`, `Retry`, and the returned cards under `Popular alternatives` |
+| `mode=popular`, `noMatch=true`, alternatives present | No-match guidance, `Edit preferences`, `Retry`, and the returned cards under `Popular alternatives`; the merged T15 filter operates on this accepted snapshot |
 | `noMatch=true`, `movies=[]` | The same no-match guidance/actions with zero fake cards |
 | Successful `movies=[]`, `noMatch=false` | The existing valid empty state; no error or no-match claim |
 | API/network failure | `Recommendations are unavailable`, safe error text, and `Retry`; never empty/no-match success |
@@ -37,7 +37,9 @@ The page now distinguishes these response states:
 Retry clears the failed/no-match view to loading and sends the same protected
 `GET /api/me/recommendations?limit=10` request for the currently authenticated
 account. It never reads, clears, or writes preferences. A successful retry
-replaces the error with the returned result.
+replaces the error with the returned result. When a no-match alternatives list
+was filtered, the newly accepted response becomes the new T15 snapshot and
+starts at `All genres`; the old temporary filter is not restored.
 
 Every request captures a monotonically increasing generation and the current
 `user.id` effect key. Cleanup aborts the request on navigation, logout, account
@@ -55,8 +57,10 @@ recommendation container was introduced.
 | 503/network failure is Error/Retry, not empty success | API 503 and rejected-network-promise cases assert the alert, retry action, zero empty-state claims, and zero preference requests |
 | Retry after recovery replaces the error | First request returns 503, the retry returns a personalised list, and the alert disappears; both attempts use the exact same endpoint/query |
 | `noMatch=true` shows guidance and alternatives | Separate cases cover two returned popular alternatives and zero alternatives; both retain edit/retry actions |
+| No-match alternatives preserve T15 filtering | A non-empty alternatives snapshot filters by canonical genre ID, `Clear filter` restores the full snapshot, and guidance/edit/retry remain visible |
+| Retry does not restore a stale T15 filter | A filtered no-match snapshot is replaced by a new retry response; both new movies render and the selection resets to `All genres` |
 | Cold start is not failed personalisation | Existing popular case now explicitly rejects the no-match heading while retaining `Popular` / `Not personalised` |
-| Old account responses cannot replace current data | Delayed A success after B renders is ignored; delayed A 401 cannot invoke B's unauthorized handler |
+| Old account responses cannot replace current data | Endpoint-specific mocks return the genre contract for `/api/genres`; delayed A recommendation success after B renders is ignored, and delayed A recommendation 401 cannot invoke B's unauthorized handler |
 | Navigation/logout invalidates old requests | Delayed results after leaving the route or completing logout cannot render private cards |
 | Current protected 401 uses the auth handler | Existing T10 test still verifies redirect to `/login`; T11 distinguishes it from an obsolete-account 401 |
 | One fetch path | Retry assertions see exactly two identical recommendation URLs and no preference endpoint call |
@@ -80,10 +84,10 @@ Recorded local results for the current implementation:
 
 | Check | Result |
 |---|---|
-| Focused recommendation UI suite | **17 passed** in 1 file |
-| Full frontend regression | **76 passed** across 8 files |
+| Focused recommendation UI suite | **19 passed** in 1 file |
+| Full frontend regression | **98 passed** across 9 files |
 | Frontend ESLint | Passed |
-| Frontend production build | Passed; 43 modules transformed |
+| Frontend production build | Passed; 44 modules transformed |
 | Recommendation API contract regression | **28 passed**, 1 pre-existing compatibility warning |
 | Branch whitespace check | Passed with no errors |
 
@@ -141,15 +145,17 @@ reference but not close Story #18.
 | Source failure shows error/retry and preserves preferences | Frontend never mutates preferences; T09 verifies persistence through backend failures. Integrated real-browser replay remains T12. |
 | Successful retry displays results | Implemented and focused-tested by T11; final acceptance remains T12. |
 
-Genre filtering, rating-informed ranking, and other Stories are outside T11.
-Story closure also requires clean-clone execution, green CI, independent
-review, merge to `main`, and applicable Definition of Done evidence.
+Genre filtering remains owned by T15; this post-merge repair only ensures the
+T11 no-match and retry states compose with the merged filter contract.
+Rating-informed ranking and other Stories remain outside T11. Story closure
+also requires clean-clone execution, green CI, independent review, merge to
+`main`, and applicable Definition of Done evidence.
 
 ## Publication gates
 
 | Evidence field | Current state |
 |---|---|
-| Tested T11 commit SHA | Pending commit; do not substitute the base SHA. |
+| Tested T11 implementation SHA | [`1c321953d1a80df35721388f55084aea0502b82d`](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/1c321953d1a80df35721388f55084aea0502b82d); the following evidence-only commit does not change implementation |
 | Implementation/test PR | Pending publication. |
 | Remote CI | Pending publication. |
 | Independent review | Pending review by a teammate who did not author the change. |
