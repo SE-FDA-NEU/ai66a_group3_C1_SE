@@ -49,9 +49,25 @@ python -m alembic -c backend/alembic.ini upgrade head
 python -m app.cli.import_tmdb_catalogue
 ```
 
-The current importer fetches one page of popular movies and the official genre
-list, with detail lookups only when needed for missing genre IDs. Keep the import
-finite. Any change to its page/request budget must be explicit and reviewed.
+The importer defaults to one page of popular movies and the official genre
+list, with detail lookups only when needed for missing genre IDs. An explicit
+`--pages` budget accepts 1–15 pages. For about 260 movies, use:
+
+```text
+python -m app.cli.import_tmdb_catalogue --pages 13
+```
+
+This makes 13 sequential popular-page requests plus one genre-list request;
+detail lookups are additional only when a record omits genre IDs. It is not a
+full-catalogue crawler or a scheduled sync. Invalid budgets fail before provider
+or database work. A failure on any page keeps the previous active catalogue.
+Counts may be lower after validation/deduplication or changing provider results.
+Back up an existing database first. Accounts, preferences and ratings are not
+deleted; retained movies preserve internal IDs. Movies outside the new snapshot
+remain stored but are not active runtime candidates. Reuse the chosen page
+budget on future imports: omitting it activates only the one-page snapshot.
+Runtime/API limits remain unchanged (at most ten movies per list). Keep any
+further page/request budget change explicit and reviewed.
 Success prints a safe provenance summary: `provider`, `active_revision`,
 `inserted`, `updated`, `rejected`, `movies`, `associated_genres`,
 `finite_popularity_movies`, `source_fetched_at`, and up to three provider

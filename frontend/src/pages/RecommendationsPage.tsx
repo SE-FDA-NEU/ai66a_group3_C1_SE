@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 import {
@@ -7,8 +7,10 @@ import {
   type RecommendationResult,
 } from "../api/recommendations.ts";
 import { useAuth } from "../auth/authState.ts";
-import MovieGrid from "../components/MovieGrid.tsx";
+import RecommendationFilter from "../components/RecommendationFilter.tsx";
 import { currentReturnPath } from "../navigation/movieDetailReturn.ts";
+
+const RECOMMENDATION_LIMIT = 10;
 
 type RecommendationStateProps = {
   status: "loading" | "empty";
@@ -42,21 +44,32 @@ function RecommendationsPage() {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [error, setError] = useState("");
   const [load, setLoad] = useState<RecommendationLoad>({ status: "loading" });
+  const [reloadVersion, setReloadVersion] = useState(0);
+  const requestGenerationRef = useRef(0);
   const user = auth.status === "authenticated" ? auth.user : null;
+  const userId = user?.id ?? null;
 
-  // The route is keyed by user.id (RequireAuth), so a new account remounts this
-  // page and aborts the previous account's request through the cleanup below.
   useEffect(() => {
-    const controller = new AbortController();
+    if (!userId) {
+      return;
+    }
 
-    getRecommendations(10, controller.signal)
+    const controller = new AbortController();
+    const requestGeneration = ++requestGenerationRef.current;
+    let isActive = true;
+    const isCurrentRequest = () =>
+      isActive &&
+      !controller.signal.aborted &&
+      requestGenerationRef.current === requestGeneration;
+
+    getRecommendations(RECOMMENDATION_LIMIT, controller.signal)
       .then((result) => {
-        if (!controller.signal.aborted) {
+        if (isCurrentRequest()) {
           setLoad({ status: "ready", result });
         }
       })
       .catch((error: unknown) => {
-        if (controller.signal.aborted) {
+        if (!isCurrentRequest()) {
           return;
         }
 
@@ -71,12 +84,22 @@ function RecommendationsPage() {
         });
       });
 
-    return () => controller.abort();
-  }, [handleUnauthorized]);
+    return () => {
+      isActive = false;
+      controller.abort();
+    };
+  }, [handleUnauthorized, reloadVersion, userId]);
+
+  function handleRetry() {
+    setLoad({ status: "loading" });
+    setReloadVersion((version) => version + 1);
+  }
 
   const result = load.status === "ready" ? load.result : null;
   const sectionTitle = result
-    ? result.personalised
+    ? result.noMatch
+      ? "Popular alternatives"
+      : result.personalised
       ? "Recommended for you"
       : "Popular"
     : "Your recommendations";
@@ -137,14 +160,42 @@ function RecommendationsPage() {
           <div className="recommendation-empty-state" role="alert">
             <h3>Recommendations are unavailable</h3>
             <p>{load.message}</p>
+            <button type="button" onClick={handleRetry}>
+              Retry
+            </button>
           </div>
+        ) : load.result.noMatch ? (
+          <>
+            <div className="recommendation-empty-state" role="status">
+              <h3>No movies matched your favourite genres.</h3>
+              <p>
+                {load.result.movies.length > 0
+                  ? "Try these popular alternatives, edit your preferences, or retry."
+                  : "Edit your preferences or retry to look for recommendations again."}
+              </p>
+              <div className="recommendation-actions">
+                <Link className="text-link" to="/preferences">
+                  Edit preferences
+                </Link>
+                <button type="button" onClick={handleRetry}>
+                  Retry
+                </button>
+              </div>
+            </div>
+            {load.result.movies.length > 0 ? (
+              <RecommendationFilter
+                ariaLabel="Popular alternatives"
+                snapshot={load.result}
+                returnTo={currentReturnPath(location)}
+              />
+            ) : null}
+          </>
         ) : load.result.movies.length === 0 ? (
           <RecommendationState status="empty" />
         ) : (
-          <MovieGrid
+          <RecommendationFilter
             ariaLabel={sectionTitle}
-            movies={load.result.movies}
-            showReasons={load.result.personalised}
+            snapshot={load.result}
             returnTo={currentReturnPath(location)}
           />
         )}

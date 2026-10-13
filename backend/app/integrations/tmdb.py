@@ -16,7 +16,8 @@ import httpx
 TMDB_BASE_URL = "https://api.themoviedb.org/3"
 TMDB_SOURCE = "tmdb"
 DEFAULT_TIMEOUT_SECONDS = 10.0
-MAX_POPULAR_PAGES = 1
+DEFAULT_POPULAR_PAGES = 1
+MAX_POPULAR_PAGES = 15
 
 
 class TmdbImportError(RuntimeError):
@@ -95,7 +96,7 @@ class TmdbClient:
     def fetch_popular_movies(self, page: int) -> list[Mapping[str, Any]]:
         """Return one explicitly bounded popular-movie page."""
 
-        if not 1 <= page <= MAX_POPULAR_PAGES:
+        if type(page) is not int or not 1 <= page <= MAX_POPULAR_PAGES:
             raise ValueError(
                 f"page must be an integer from 1 to {MAX_POPULAR_PAGES}"
             )

@@ -11,7 +11,12 @@ from typing import Any, Protocol
 from sqlalchemy.orm import Session
 
 from app.db.models import utc_now
-from app.integrations.tmdb import MAX_POPULAR_PAGES, TMDB_SOURCE, TmdbPayloadError
+from app.integrations.tmdb import (
+    DEFAULT_POPULAR_PAGES,
+    MAX_POPULAR_PAGES,
+    TMDB_SOURCE,
+    TmdbPayloadError,
+)
 from app.repositories.movies import (
     activate_catalogue_revision,
     create_catalogue_revision,
@@ -70,6 +75,7 @@ def import_tmdb_catalogue(
     *,
     client: TmdbCatalogueGateway,
     fetched_at: datetime | None = None,
+    pages: int = DEFAULT_POPULAR_PAGES,
 ) -> TmdbImportResult:
     """Create and activate one validated TMDb revision in the caller's transaction.
 
@@ -78,12 +84,16 @@ def import_tmdb_catalogue(
     failure cannot point runtime reads at a partial revision.
     """
 
+    if type(pages) is not int or not 1 <= pages <= MAX_POPULAR_PAGES:
+        raise ValueError(f"pages must be an integer from 1 to {MAX_POPULAR_PAGES}")
+
     source_fetched_at = _normalise_timestamp(fetched_at or utc_now())
     genres_by_id = _prepare_genres(client.fetch_genres())
     prepared_movies, rejected_movie_count = _prepare_movies(
         client=client,
         genres_by_id=genres_by_id,
         source_fetched_at=source_fetched_at,
+        pages=pages,
     )
     if not prepared_movies:
         raise TmdbPayloadError("TMDb did not return any usable movies")
@@ -167,12 +177,13 @@ def _prepare_movies(
     client: TmdbCatalogueGateway,
     genres_by_id: Mapping[int, str],
     source_fetched_at: datetime,
+    pages: int,
 ) -> tuple[list[_PreparedMovie], int]:
     prepared_movies: list[_PreparedMovie] = []
     seen_source_ids: set[str] = set()
     rejected_movie_count = 0
 
-    for page in range(1, MAX_POPULAR_PAGES + 1):
+    for page in range(1, pages + 1):
         for raw_movie in client.fetch_popular_movies(page):
             try:
                 prepared_movie = _prepare_movie(

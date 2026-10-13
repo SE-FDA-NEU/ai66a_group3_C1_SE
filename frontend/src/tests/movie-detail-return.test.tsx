@@ -72,6 +72,9 @@ describe("S3-T17 movie-detail return context", () => {
           },
         });
       }
+      if (request.method === "GET" && request.url === "/api/genres") {
+        return jsonResponse({ data: { genres: [action, drama] } });
+      }
       if (request.method === "GET" && request.url === "/api/movies/movie-a") {
         return jsonResponse({ data: { movie: detail } });
       }
@@ -123,6 +126,54 @@ describe("S3-T17 movie-detail return context", () => {
           request.method === "PUT" && request.url === "/api/me/preferences",
       ),
     ).toBe(false);
+  });
+
+  it("preserves recommendation return context for no-match alternatives", async () => {
+    window.history.pushState({}, "", "/recommendations?source=no-match#alternatives");
+
+    vi.spyOn(globalThis, "fetch").mockImplementation((input, init) => {
+      const method = init?.method ?? "GET";
+      const url = String(input);
+
+      if (method === "GET" && url === "/api/auth/me") {
+        return jsonResponse({
+          data: { user: { id: "account-a", email: "a@example.com" } },
+        });
+      }
+      if (method === "GET" && url === "/api/me/recommendations?limit=10") {
+        return jsonResponse({
+          data: {
+            movies: [{ ...recommendation, reason: { matchedGenres: [] } }],
+            mode: "popular",
+            personalised: false,
+            noMatch: true,
+          },
+        });
+      }
+      if (method === "GET" && url === "/api/genres") {
+        return jsonResponse({ data: { genres: [action, drama] } });
+      }
+      if (method === "GET" && url === "/api/movies/movie-a") {
+        return jsonResponse({ data: { movie: detail } });
+      }
+      return Promise.reject(new Error(`Unexpected request: ${method} ${url}`));
+    });
+
+    render(<App />);
+
+    expect(
+      await screen.findByRole("heading", { name: "Popular alternatives" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Filter by genre" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("link", { name: "View details for Movie A" }));
+
+    expect(window.location.pathname).toBe("/movies/movie-a");
+    expect(window.history.state.usr).toEqual({
+      returnTo: "/recommendations?source=no-match#alternatives",
+    });
+    expect(
+      await screen.findByRole("link", { name: "Back to recommendations" }),
+    ).toHaveAttribute("href", "/recommendations?source=no-match#alternatives");
   });
 
   it("uses the catalogue fallback when a detail route is opened directly", async () => {

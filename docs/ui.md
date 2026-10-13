@@ -131,14 +131,57 @@ server order with the shared movie cards and these states:
 | State | Rendered content |
 |---|---|
 | Loading | `Loading recommendations...` |
-| Popular (`mode=popular`) | Heading `Popular`, label `Not personalised`, cards without a genre-match reason |
+| Popular cold start (`mode=popular`, `noMatch=false`) | Heading `Popular`, label `Not personalised`, cards without a genre-match reason; it is not presented as a failed personalisation request |
 | Personalised (`mode=personalised`) | Heading `Recommended for you`, cards with `Matches your genres: <names>` from `reason.matchedGenres` |
-| Empty (`movies: []`) | `No recommendations available yet.` with a link to `/preferences`; zero cards |
-| Error | Alert `Recommendations are unavailable` with the API message; never shown as an empty result |
+| No match (`mode=popular`, `noMatch=true`) | `No movies matched your favourite genres.` with `Edit preferences` and `Retry`; render any returned `data.movies` once as `Popular alternatives` |
+| Valid empty (`movies: []`, `noMatch=false`) | `No recommendations available yet.` with a link to `/preferences`; zero cards and no error/no-match claim |
+| Error | Alert `Recommendations are unavailable` with the API/network message and `Retry`; never shown as empty or no-match data |
 | Protected API `401` | `handleUnauthorized` discards the account and opens `/login` |
 
-Retry, no-match guidance, and request-race handling are still owned by T11
-(#113); cold-start transitions by T13 (#115).
+T11 (#113) implements retry, no-match guidance, and request-race handling.
+Every attempt uses the single T10 client path with the same `limit=10` query.
+The component captures the authenticated `user.id` and a request generation;
+it aborts obsolete work and also rejects delayed completions whose generation
+is no longer current. An old success or `401` therefore cannot replace or sign
+out a newer account after retry, navigation, logout, or account switch.
+Cold-start transitions after a preference save remain owned by T13 (#115).
+
+### Current-list genre filtering (S3-T15, #117)
+
+The ready, non-empty recommendation list is passed to
+`frontend/src/components/RecommendationFilter.tsx` as one accepted response
+snapshot. `Filter by genre` defaults to `All genres`. Options use canonical IDs
+from the authenticated `GET /api/genres` active-catalogue list, not only genres
+present in these up-to-ten cards. A genre available elsewhere in the catalogue
+can therefore legitimately have no matches in the current snapshot.
+
+- Selection filters `snapshot.movies` locally and preserves server order,
+  card links, popular labels, and personalised matching reasons.
+- `Showing N of M movies` reports the visible count and original snapshot size.
+- Zero filtered matches show `No movies match this filter.` and
+  `Clear filter to see the full recommendation list.`, with `Show all movies`.
+  This is not an API failure, an empty source catalogue, or `noMatch=true`.
+- `Clear filter` or `All genres` restores the original snapshot. No preference
+  write, recommendations refetch, browser-storage write, or TMDb call occurs.
+- Each newly accepted response object resets selection to `All genres` and
+  becomes the only reset target, even if the catalogue revision is unchanged.
+  An ordinary rerender with the same response keeps the current filter.
+- Genre-option loading/failure does not hide valid cards. The disabled select
+  explains loading/unavailable options; `Retry filter options` retries only
+  `GET /api/genres`. A genre `401` uses central auth recovery. Cleanup aborts
+  old option requests and ignores their late success/error responses.
+- Account changes remount the guarded subtree, discarding the temporary filter.
+- A non-empty T11 no-match alternatives snapshot uses the same filter without
+  hiding its guidance, `Edit preferences`, or `Retry`. An accepted retry
+  response is a new snapshot and resets the temporary selection.
+
+T16 (#118) still owns independent S06 acceptance and committed-database
+preference comparisons. See [T15 evidence](evidence/s3-t15-recommendation-filter.md)
+for author tests and the isolated real-TMDb-catalogue browser smoke. This does
+not claim Story #23 is closed or that T13 is implemented.
+
+T11 remains responsible for retry, no-match guidance, and request-race
+handling; cold-start transitions remain owned by T13 (#115).
 
 Implementation handoff is explicit:
 
@@ -177,9 +220,9 @@ response completion can race.
 
 Current account isolation evidence is the `AuthProvider` ownership model and
 the `RequireAuth` subtree keyed by `user.id`. Movie-detail request cleanup is
-implemented today. Preference/rating/reset request invalidation is committed
-Sprint 3 behaviour with implementation pending because those API clients do
-not yet exist.
+implemented today. T11 adds recommendation request generation checks in
+`RecommendationsPage`; preference request invalidation is also implemented.
+Rating/reset UI invalidation remains owned by their dedicated tasks.
 
 ## 6. UI-driven architecture evidence
 
