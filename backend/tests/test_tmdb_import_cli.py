@@ -6,6 +6,7 @@ from contextlib import nullcontext
 from datetime import UTC, datetime
 from typing import Self
 
+import pytest
 from app.catalogue.tmdb_import import TmdbImportResult
 from app.cli import import_tmdb_catalogue as command
 
@@ -15,7 +16,7 @@ def test_blank_token_exits_nonzero_with_safe_actionable_guidance(
 ) -> None:
     monkeypatch.setenv("TMDB_READ_ACCESS_TOKEN", "")
 
-    exit_code = command.main()
+    exit_code = command.main([])
 
     captured = capsys.readouterr()
     assert exit_code == 1
@@ -26,8 +27,9 @@ def test_blank_token_exits_nonzero_with_safe_actionable_guidance(
     )
 
 
+@pytest.mark.parametrize("pages", [1, 13, 15])
 def test_success_output_records_safe_provenance_counts(
-    monkeypatch, capsys
+    monkeypatch, capsys, pages
 ) -> None:
     result = TmdbImportResult(
         active_revision_id="revision-opaque-id",
@@ -48,15 +50,22 @@ def test_success_output_records_safe_provenance_counts(
         lambda *_args: _FakeClient(),
     )
     monkeypatch.setattr(command, "SessionLocal", lambda: _FakeSession())
+    received_pages = []
+
+    def import_snapshot(_session, *, client, pages):
+        received_pages.append(pages)
+        return result
+
     monkeypatch.setattr(
         command,
         "import_tmdb_catalogue",
-        lambda _session, *, client: result,
+        import_snapshot,
     )
 
-    exit_code = command.main()
+    exit_code = command.main([] if pages == 1 else ["--pages", str(pages)])
 
     assert exit_code == 0
+    assert received_pages == [pages]
     assert capsys.readouterr().out == (
         "TMDb catalogue import complete\n"
         "provider=tmdb\n"
@@ -71,6 +80,18 @@ def test_success_output_records_safe_provenance_counts(
         "imported_at=2026-10-09T09:31:00Z\n"
         "sample_source_ids=101,202,303\n"
     )
+
+
+@pytest.mark.parametrize("pages", ["0", "16", "-1", "1.5", "many"])
+def test_invalid_page_budget_exits_before_client_or_database(monkeypatch, pages):
+    def forbidden(*_args, **_kwargs):
+        raise AssertionError("invalid arguments must not open a client or database")
+
+    monkeypatch.setattr(command.TmdbClient, "from_environment", forbidden)
+    monkeypatch.setattr(command, "SessionLocal", forbidden)
+    with pytest.raises(SystemExit) as error:
+        command.main(["--pages", pages])
+    assert error.value.code == 2
 
 
 class _FakeClient:

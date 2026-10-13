@@ -9,7 +9,13 @@ import httpx
 import pytest
 from app.catalogue.tmdb_import import import_tmdb_catalogue
 from app.db.database import Base
-from app.db.models import CatalogMovie, CatalogueRevision, User
+from app.db.models import (
+    CatalogMovie,
+    CatalogueRevision,
+    User,
+    UserGenrePreference,
+    UserMovieRating,
+)
 from app.integrations.tmdb import (
     TMDB_BASE_URL,
     TmdbAuthenticationError,
@@ -435,6 +441,139 @@ def test_public_movie_routes_do_not_trigger_network_or_import(
     assert list_response.status_code == 200
     assert popular_response.status_code == 200
     assert detail_response.status_code == 200
+
+
+@pytest.mark.parametrize("pages", [13, 15])
+def test_multi_page_import_deduplicates_and_preserves_personal_data(database, pages):
+    client = FakeTmdbClient(
+        genres=[{"id": 28, "name": "Action"}],
+        popular_pages={
+            page: [
+                {
+                    "id": (page - 1) * 20 + index,
+                    "title": f"Synthetic movie {(page - 1) * 20 + index}",
+                    "genre_ids": [28],
+                    "popularity": 100 - page,
+                }
+                for index in range(1, 21)
+            ]
+            for page in range(1, pages + 1)
+        },
+    )
+    with database() as session, session.begin():
+        import_tmdb_catalogue(session, client=client)
+        movie = get_movie_by_source_id(session, source="tmdb", source_id="1")
+        retained_id = movie.id
+        session.add(
+            User(
+                id="retained-account",
+                email_normalized="synthetic@example.com",
+                password_hash="synthetic-not-a-real-password",
+            )
+        )
+        session.flush()
+        session.add(UserGenrePreference(user_id="retained-account", genre_id=28))
+        session.add(
+            UserMovieRating(
+                id="retained-rating",
+                user_id="retained-account",
+                movie_id=retained_id,
+                rating=4,
+            )
+        )
+
+    # Duplicates across pages must not create duplicate rows or alter IDs.
+    client.popular_pages[2].append(client.popular_pages[1][0])
+    client.calls.clear()
+    with database() as session, session.begin():
+        result = import_tmdb_catalogue(session, client=client, pages=pages)
+
+    assert result.movie_count == pages * 20
+    assert result.inserted_movie_count == pages * 20 - 20
+    assert result.updated_movie_count == 20
+    assert result.rejected_movie_count == 1
+    assert client.calls == [
+        "genres",
+        *[f"popular:{page}" for page in range(1, pages + 1)],
+    ]
+    with database() as session:
+        movies = list(session.scalars(select(CatalogMovie)))
+        assert len(movies) == pages * 20
+        assert all(
+            movie.catalogue_revision_id == result.active_revision_id for movie in movies
+        )
+        assert (
+            get_movie_by_source_id(session, source="tmdb", source_id="1").id
+            == retained_id
+        )
+        assert (
+            session.get(User, "retained-account").password_hash
+            == "synthetic-not-a-real-password"
+        )
+        assert session.get(UserGenrePreference, ("retained-account", 28)) is not None
+        assert session.get(UserMovieRating, "retained-rating").rating == 4
+
+
+@pytest.mark.parametrize("pages", [0, 16, -1, True, 1.5, "13"])
+def test_invalid_import_budget_makes_no_provider_calls(database, pages):
+    client = _valid_tmdb_client()
+    with database() as session, pytest.raises(ValueError, match="pages must"):
+        import_tmdb_catalogue(session, client=client, pages=pages)
+    assert client.calls == []
+
+
+def test_later_page_failure_preserves_previous_snapshot(database):
+    with database() as session, session.begin():
+        previous = import_tmdb_catalogue(session, client=_valid_tmdb_client())
+
+    class LaterPageFailure(FakeTmdbClient):
+        def fetch_popular_movies(self, page):
+            if page == 3:
+                raise TmdbRateLimitError("TMDb rate limit reached")
+            return super().fetch_popular_movies(page)
+
+    valid = _valid_tmdb_client()
+    client = LaterPageFailure(
+        genres=valid.genres, popular_pages=valid.popular_pages, details=valid.details
+    )
+    with database() as session, pytest.raises(TmdbRateLimitError), session.begin():
+        import_tmdb_catalogue(session, client=client, pages=13)
+    with database() as session:
+        assert get_active_catalogue_revision(session).id == previous.active_revision_id
+        assert len(list(session.scalars(select(CatalogueRevision)))) == 1
+        assert (
+            get_movie_by_source_id(session, source="tmdb", source_id="101").title
+            == "First TMDb movie"
+        )
+
+
+@pytest.mark.parametrize("page", [1, 13, 15])
+def test_client_passes_the_bounded_page_to_tmdb(page):
+    requests = []
+
+    def handler(request):
+        requests.append(request)
+        return httpx.Response(200, json={"results": []})
+
+    with httpx.Client(
+        transport=httpx.MockTransport(handler), base_url=TMDB_BASE_URL
+    ) as http:
+        client = TmdbClient("synthetic-token", http_client=http)
+        assert client.fetch_popular_movies(page) == []
+    assert requests[0].url.params["page"] == str(page)
+
+
+@pytest.mark.parametrize("page", [0, 16, True, 1.5, "13"])
+def test_client_rejects_invalid_pages_without_http(page):
+    def forbidden(_request):
+        raise AssertionError("invalid page must not make an HTTP request")
+
+    with httpx.Client(
+        transport=httpx.MockTransport(forbidden), base_url=TMDB_BASE_URL
+    ) as http:
+        client = TmdbClient("synthetic-token", http_client=http)
+        with pytest.raises(ValueError, match="page must"):
+            client.fetch_popular_movies(page)
 
 
 def _seed_active_catalogue(database: sessionmaker[Session]) -> tuple[str, str]:

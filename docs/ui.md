@@ -117,6 +117,37 @@ server order with the shared movie cards and these states:
 | Error | Alert `Recommendations are unavailable` with the API message; never shown as an empty result |
 | Protected API `401` | `handleUnauthorized` discards the account and opens `/login` |
 
+### Current-list genre filtering (S3-T15, #117)
+
+The ready, non-empty recommendation list is passed to
+`frontend/src/components/RecommendationFilter.tsx` as one accepted response
+snapshot. `Filter by genre` defaults to `All genres`. Options use canonical IDs
+from the authenticated `GET /api/genres` active-catalogue list, not only genres
+present in these up-to-ten cards. A genre available elsewhere in the catalogue
+can therefore legitimately have no matches in the current snapshot.
+
+- Selection filters `snapshot.movies` locally and preserves server order,
+  card links, popular labels, and personalised matching reasons.
+- `Showing N of M movies` reports the visible count and original snapshot size.
+- Zero filtered matches show `No movies match this filter.` and
+  `Clear filter to see the full recommendation list.`, with `Show all movies`.
+  This is not an API failure, an empty source catalogue, or `noMatch=true`.
+- `Clear filter` or `All genres` restores the original snapshot. No preference
+  write, recommendations refetch, browser-storage write, or TMDb call occurs.
+- Each newly accepted response object resets selection to `All genres` and
+  becomes the only reset target, even if the catalogue revision is unchanged.
+  An ordinary rerender with the same response keeps the current filter.
+- Genre-option loading/failure does not hide valid cards. The disabled select
+  explains loading/unavailable options; `Retry filter options` retries only
+  `GET /api/genres`. A genre `401` uses central auth recovery. Cleanup aborts
+  old option requests and ignores their late success/error responses.
+- Account changes remount the guarded subtree, discarding the temporary filter.
+
+T16 (#118) still owns independent S06 acceptance and committed-database
+preference comparisons. See [T15 evidence](evidence/s3-t15-recommendation-filter.md)
+for author tests and the isolated real-TMDb-catalogue browser smoke. This does
+not claim Story #23 is closed or that T11/T13 are implemented.
+
 Retry, no-match guidance, and request-race handling are still owned by T11
 (#113); cold-start transitions by T13 (#115).
 

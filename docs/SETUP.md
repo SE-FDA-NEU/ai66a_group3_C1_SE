@@ -83,6 +83,13 @@ python -m alembic -c backend/alembic.ini upgrade head
 python -m app.cli.import_tmdb_catalogue
 ```
 
+To use a larger catalogue, run `python -m app.cli.import_tmdb_catalogue --pages 13`
+instead of the default import command (roughly 260 movies; 1–15 pages allowed).
+Back up an existing database first. Reuse `--pages 13` on subsequent refreshes;
+omitting it returns to a one-page active snapshot. Accounts, preferences and
+ratings are retained, and runtime list limits remain unchanged. See the
+[TMDb runbook](tmdb-sprint3-runbook.md) for the bounded import contract.
+
 ## Required import result and smoke
 
 A successful import prints this shape, with actual counts depending on the
