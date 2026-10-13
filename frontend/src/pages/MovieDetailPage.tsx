@@ -1,16 +1,19 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 
 import {
   getMovie,
   MovieApiError,
   type MovieDetail,
 } from "../api/movies.ts";
+import { resolveMovieDetailReturn } from "../navigation/movieDetailReturn.ts";
 
 const INFORMATION_UNAVAILABLE = "Information unavailable";
 
 function MovieDetailPage() {
   const { movieId = "" } = useParams();
+  const location = useLocation();
+  const returnDestination = resolveMovieDetailReturn(location.state);
   const [movie, setMovie] = useState<MovieDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -94,8 +97,8 @@ function MovieDetailPage() {
           <p className="eyebrow">Movie catalogue</p>
           <h1 id="movie-not-found-title">Movie not found</h1>
           <p className="muted">That movie is not available in the active catalogue.</p>
-          <Link className="button-link" to="/">
-            Return to catalogue
+          <Link className="button-link" to={returnDestination.to}>
+            {returnDestination.label}
           </Link>
         </section>
       </main>
@@ -113,8 +116,11 @@ function MovieDetailPage() {
             <button type="button" onClick={() => void handleRetry()}>
               Retry
             </button>
-            <Link className="button-link button-secondary" to="/">
-              Return to catalogue
+            <Link
+              className="button-link button-secondary"
+              to={returnDestination.to}
+            >
+              {returnDestination.label}
             </Link>
           </div>
         </section>
@@ -129,8 +135,9 @@ function MovieDetailPage() {
   return (
     <main className="page">
       <article className="movie-detail">
-        <Link className="text-link" to="/">
-          ← Back to catalogue
+        <Link className="text-link" to={returnDestination.to}>
+          <span aria-hidden="true">&larr; </span>
+          {returnDestination.label}
         </Link>
         <p className="eyebrow">Movie details</p>
         <h1>{movie.title}</h1>

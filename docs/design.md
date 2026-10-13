@@ -1,6 +1,6 @@
 # Sprint 3 design and contract reconciliation
 
-This document was reconciled with the local working tree on 2026-10-11. Every
+This document was reconciled with the local working tree on 2026-10-13. Every
 table and endpoint is marked as implemented or as committed Sprint 3 scope
 with implementation pending; no tested SHA or review approval is implied.
 Request and response shapes are in
@@ -175,8 +175,9 @@ separately as the implemented dedicated public popular route. The recommendation
 endpoint supports popular cold-start results and genre-based personalised
 results implemented under S3-T08. The `/recommendations` page consumes this
 response through the shared typed client and renders server-ordered movie cards
-under S3-T10. No-match guidance, retry and request-race handling remain with
-S3-T11; cold-start guidance and saved-preference transitions remain with S3-T13.
+under S3-T10. S3-T11 adds no-match guidance, error recovery, and account-keyed
+request-generation checks so obsolete results and 401 responses are ignored.
+Cold-start guidance and saved-preference transitions remain with S3-T13.
 
 The existing `GET /api/movies` route remains the public catalogue endpoint.
 Sprint 3 public popular-list consumers use `GET /api/movies/popular`. These are
@@ -414,7 +415,31 @@ Rating-adjusted ranking belongs to Story #22 / S05b and is planned Sprint 4.
 
 Evidence: `frontend/src/pages/HomePage.tsx` and `MovieDetailPage.tsx` use effect
 cleanup cancellation; `frontend/src/auth/AuthContext.tsx` owns account
-identity; `RequireAuth.tsx` keys protected content by `user.id`.
+identity; `RequireAuth.tsx` keys protected content by `user.id`; and
+`RecommendationsPage.tsx` combines abort cleanup with an account-keyed request
+generation before accepting success, error, or 401 results.
+
+### Safe movie-detail return context
+
+Shared movie cards pass a minimal `{ returnTo }` React Router state to the
+public detail route. The value is derived from the current list location; no
+account ID, genre preference, recommendation payload, or external URL is
+stored in it. `MovieDetailPage` resolves the value through a fixed movie-list
+allow-list (`/`, `/popular`, and `/recommendations`) before rendering any Back
+or Return link. Direct loads and rejected values fall back to `/`.
+
+This design uses an explicit destination rather than `navigate(-1)`: a direct
+URL, stale browser history entry, or externally supplied state therefore
+cannot send the viewer to an unvalidated origin. Returning to
+`/recommendations` runs the existing protected-route check and issues the
+normal recommendation GET for the still-current account. Detail navigation
+has no preference write path, leaving `user_genre_preferences` unchanged.
+
+Evidence: `frontend/src/navigation/movieDetailReturn.ts`,
+`RecommendationsPage.tsx`, the T15 `RecommendationFilter`, the shared
+`MovieGrid`/`MovieCard`, `MovieDetailPage.tsx`, and
+`movie-detail-return.test.tsx`. The recommendation path applies to ordinary
+results and T11 popular alternatives without bypassing the snapshot filter.
 
 ### Nullable catalogue fields for renderable detail states
 
@@ -485,7 +510,7 @@ test evidence, or a tested SHA.
 | Gate | Current status | Evidence needed before completion |
 |---|---|---|
 | Initial API/database/UI contract | Prepared locally; review/publication pending | Reviewed D1 contract link |
-| Preferences and personalised recommendation implementation | Backend storage/reads/replacement implemented under T01/T02; genre/popularity endpoint implemented locally under T08; UI and broader acceptance remain separate | Reviewed/merged T08 PR, executable tests, and consumer verification; see T02/T08 evidence |
+| Preferences and personalised recommendation implementation | Backend storage/reads/replacement implemented under T01/T02; genre/popularity endpoint under T08; card/client integration under T10; no-match/retry/race UI implemented locally under T11; current-list filtering merged under T15; broader acceptance remains separate | Reviewed/merged implementation, executable tests, and consumer verification; see T02/T08/T11/T15 evidence |
 | Rating storage/API/UI protection | Storage/repository implemented under T30 and API under T31; UI pending | T30 [#137](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/137) and T31 [#138](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/138) are merged. T32 [#140](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/140), T33 [#139](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/139), and T34 [#141](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/141) retain independent verification/UI scope. |
 | Rating storage and repository | Implemented under T30 | T30 [#137](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/137) is merged with migration/repository tests. |
 | Rating API | Implemented under T31; independent verification pending | T31 [#138](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/138) ships `backend/tests/test_ratings_api.py`; T32 [#140](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/140) owns dedicated persistence/rollback/isolation verification. |

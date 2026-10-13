@@ -1,7 +1,7 @@
 # Sprint 3 UI-state contract
 
 Contract revision: `S3-DRAFT`, reconciled with the current frontend on
-2026-10-08.
+2026-10-13.
 
 This document separates current UI evidence from committed Sprint 3 state
 contracts whose implementation is pending. These states are required Sprint
@@ -44,7 +44,7 @@ not included merely to reach a row count.
 | 401 | `INVALID_CREDENTIALS` | Email is unknown or password is wrong; do not reveal which | `Email or password is incorrect` | Edit credentials and submit again. |
 | 401 | `AUTHENTICATION_REQUIRED` | Protected route has a missing, expired, invalid, or revoked session | No private content is rendered; the central auth state opens `/login` | Sign in; clear previous account-scoped state. |
 | 403 | `ORIGIN_NOT_ALLOWED` | Browser session write fails same-origin protection | `Request origin is not allowed` | Retry only from the application origin; do not claim the write succeeded. |
-| 404 | `MOVIE_NOT_FOUND` | Opaque ID is not present in the active catalogue | Heading `Movie not found`; text `That movie is not available in the active catalogue.` | `Return to catalogue` opens `/`. |
+| 404 | `MOVIE_NOT_FOUND` | Opaque ID is not present in the active catalogue | Heading `Movie not found`; text `That movie is not available in the active catalogue.` | Return to the validated originating movie list; a direct or unsafe return context uses `Return to catalogue` and `/`. |
 | 409 | `EMAIL_ALREADY_REGISTERED` | Normalized email already exists | `This email is already registered` | Sign in or use a different email. |
 | 503 | `CATALOGUE_UNAVAILABLE` | No active local catalogue revision | Heading `Movies are unavailable`; text `Movie catalogue is unavailable` | `Retry`; operator fixes/imports the catalogue if it persists. |
 | 503 | `SERVICE_UNAVAILABLE` | Database read/write is unavailable | Heading `Movies are unavailable` (catalogue screen); text `Service is temporarily unavailable` | `Retry`; preserve previously committed/private state. |
@@ -52,6 +52,31 @@ not included merely to reach a row count.
 Messages must not include stack traces, SQL/database internals, passwords,
 session values, or TMDb credentials. The two Story messages remain exact:
 `Email or password is incorrect` and `This email is already registered`.
+
+### Movie-detail return context (S3-T17)
+
+Every shared movie card records only the current list location in React Router
+state before opening `/movies/:movieId`. The detail page accepts return paths
+whose parsed pathname is exactly `/`, `/popular`, or `/recommendations` and
+preserves that path's query string and fragment. Success, not-found, and error
+detail states all use the same validated destination.
+
+On `/recommendations`, `RecommendationsPage` passes that location through the
+T15 `RecommendationFilter` to `MovieGrid` and `MovieCard`; filtering therefore
+does not discard the return context. The same path is used for a non-empty T11
+popular-alternatives snapshot as for an ordinary recommendation snapshot.
+
+The state is navigation context, not trusted input or account data. Absolute
+URLs, scheme-relative values such as `//example.com`, backslashes, malformed
+values, non-string values, and internal paths outside the list allow-list are
+discarded. A direct detail URL has no return state and therefore renders
+`Return to catalogue` linking to `/`.
+
+Returning from a recommendation detail opens `/recommendations`, where the
+existing protected route and current session select the account and fetch its
+recommendations again. The round trip never serialises genre choices and never
+calls `PUT /api/me/preferences`, so the database remains the sole owner of the
+account's committed preferences.
 
 ## 3. Committed Sprint 3 rating UI contract (implementation pending)
 
@@ -111,11 +136,20 @@ server order with the shared movie cards and these states:
 | State | Rendered content |
 |---|---|
 | Loading | `Loading recommendations...` |
-| Popular (`mode=popular`) | Heading `Popular`, label `Not personalised`, cards without a genre-match reason |
+| Popular cold start (`mode=popular`, `noMatch=false`) | Heading `Popular`, label `Not personalised`, cards without a genre-match reason; it is not presented as a failed personalisation request |
 | Personalised (`mode=personalised`) | Heading `Recommended for you`, cards with `Matches your genres: <names>` from `reason.matchedGenres` |
-| Empty (`movies: []`) | `No recommendations available yet.` with a link to `/preferences`; zero cards |
-| Error | Alert `Recommendations are unavailable` with the API message; never shown as an empty result |
+| No match (`mode=popular`, `noMatch=true`) | `No movies matched your favourite genres.` with `Edit preferences` and `Retry`; render any returned `data.movies` once as `Popular alternatives` |
+| Valid empty (`movies: []`, `noMatch=false`) | `No recommendations available yet.` with a link to `/preferences`; zero cards and no error/no-match claim |
+| Error | Alert `Recommendations are unavailable` with the API/network message and `Retry`; never shown as empty or no-match data |
 | Protected API `401` | `handleUnauthorized` discards the account and opens `/login` |
+
+T11 (#113) implements retry, no-match guidance, and request-race handling.
+Every attempt uses the single T10 client path with the same `limit=10` query.
+The component captures the authenticated `user.id` and a request generation;
+it aborts obsolete work and also rejects delayed completions whose generation
+is no longer current. An old success or `401` therefore cannot replace or sign
+out a newer account after retry, navigation, logout, or account switch.
+Cold-start transitions after a preference save remain owned by T13 (#115).
 
 ### Current-list genre filtering (S3-T15, #117)
 
@@ -142,14 +176,17 @@ can therefore legitimately have no matches in the current snapshot.
   `GET /api/genres`. A genre `401` uses central auth recovery. Cleanup aborts
   old option requests and ignores their late success/error responses.
 - Account changes remount the guarded subtree, discarding the temporary filter.
+- A non-empty T11 no-match alternatives snapshot uses the same filter without
+  hiding its guidance, `Edit preferences`, or `Retry`. An accepted retry
+  response is a new snapshot and resets the temporary selection.
 
 T16 (#118) still owns independent S06 acceptance and committed-database
 preference comparisons. See [T15 evidence](evidence/s3-t15-recommendation-filter.md)
 for author tests and the isolated real-TMDb-catalogue browser smoke. This does
-not claim Story #23 is closed or that T11/T13 are implemented.
+not claim Story #23 is closed or that T13 is implemented.
 
-Retry, no-match guidance, and request-race handling are still owned by T11
-(#113); cold-start transitions by T13 (#115).
+T11 remains responsible for retry, no-match guidance, and request-race
+handling; cold-start transitions remain owned by T13 (#115).
 
 Implementation handoff is explicit:
 
@@ -188,9 +225,9 @@ response completion can race.
 
 Current account isolation evidence is the `AuthProvider` ownership model and
 the `RequireAuth` subtree keyed by `user.id`. Movie-detail request cleanup is
-implemented today. Preference/rating/reset request invalidation is committed
-Sprint 3 behaviour with implementation pending because those API clients do
-not yet exist.
+implemented today. T11 adds recommendation request generation checks in
+`RecommendationsPage`; preference request invalidation is also implemented.
+Rating/reset UI invalidation remains owned by their dedicated tasks.
 
 ## 6. UI-driven architecture evidence
 

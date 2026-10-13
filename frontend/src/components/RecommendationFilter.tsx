@@ -9,13 +9,18 @@ import MovieGrid from "./MovieGrid.tsx";
 type RecommendationFilterProps = {
   snapshot: RecommendationResult;
   ariaLabel: string;
+  returnTo?: string;
 };
 
 type GenreLoad =
   | { snapshot: RecommendationResult; status: "ready"; genres: Genre[] }
   | { snapshot: RecommendationResult; status: "error"; message: string };
 
-function RecommendationFilter({ snapshot, ariaLabel }: RecommendationFilterProps) {
+function RecommendationFilter({
+  snapshot,
+  ariaLabel,
+  returnTo,
+}: RecommendationFilterProps) {
   const { handleUnauthorized } = useAuth();
   const selectId = useId();
   const [selection, setSelection] = useState<{
@@ -126,8 +131,12 @@ function RecommendationFilter({ snapshot, ariaLabel }: RecommendationFilterProps
           </button>
         </div>
       ) : (
-        <MovieGrid ariaLabel={ariaLabel} movies={visibleMovies}
-          showReasons={snapshot.personalised} />
+        <MovieGrid
+          ariaLabel={ariaLabel}
+          movies={visibleMovies}
+          showReasons={snapshot.personalised}
+          returnTo={returnTo}
+        />
       )}
     </div>
   );

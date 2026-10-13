@@ -234,6 +234,13 @@ button:disabled {
   margin: 0.75rem 0 1rem;
 }
 
+.recommendation-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
 .preferences-card {
   width: min(100%, 680px);
 }

@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import {
   listPopularMovies,
   type MovieSummary,
 } from "../api/movies.ts";
 import MovieGrid from "../components/MovieGrid.tsx";
+import { currentReturnPath } from "../navigation/movieDetailReturn.ts";
 
 function PopularMoviesPage() {
+  const location = useLocation();
   const [movies, setMovies] = useState<MovieSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -86,7 +88,11 @@ function PopularMoviesPage() {
           <h2>Popular movies are not available yet</h2>
         </section>
       ) : (
-        <MovieGrid ariaLabel="Popular movies" movies={movies} />
+        <MovieGrid
+          ariaLabel="Popular movies"
+          movies={movies}
+          returnTo={currentReturnPath(location)}
+        />
       )}
     </main>
   );
