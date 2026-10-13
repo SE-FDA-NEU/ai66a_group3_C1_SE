@@ -156,9 +156,9 @@ also requires clean-clone execution, green CI, independent review, merge to
 | Evidence field | Current state |
 |---|---|
 | Tested T11 implementation SHA | [`1c321953d1a80df35721388f55084aea0502b82d`](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/1c321953d1a80df35721388f55084aea0502b82d); the following evidence-only commit does not change implementation |
-| Implementation/test PR | Pending publication. |
-| Remote CI | Pending publication. |
-| Independent review | Pending review by a teammate who did not author the change. |
+| Implementation/test PR | Published as [PR #164](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/164). |
+| Remote CI | Python tests, Node build/tests, and secret scan passed on the published branch in [run 38345766804](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/38345766804). |
+| Independent review | Approved by [hoang3003](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/164#pullrequestreview-5495078716), [vu-huzy](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/164#pullrequestreview-5498200281), [anotify-vie](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/164#pullrequestreview-5498706270), and [kietxuan](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/164#pullrequestreview-5499159520). |
 
-Before closing #113, link the exact tested commit, PR, green CI run, and
-independent approval. Rerun the commands above if implementation changes.
+The exact tested implementation, published PR, green CI run, and independent
+approvals are linked above. Rerun the commands above if implementation changes.
