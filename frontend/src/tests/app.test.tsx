@@ -34,6 +34,7 @@ afterEach(() => {
   window.history.replaceState({}, "", "/");
 });
 
+
 describe("S13 authentication UI", () => {
   it("renders the login route", () => {
     window.history.pushState({}, "", "/login");
@@ -46,96 +47,201 @@ describe("S13 authentication UI", () => {
 
   it("opens recommendations after a successful login", async () => {
     window.history.pushState({}, "", "/login");
+
     const fetchMock = vi
       .spyOn(globalThis, "fetch")
-      .mockImplementationOnce(() =>
-        jsonResponse({ data: { user: { id: "user-1", email: "viewer@example.com" } } }),
-      )
-      .mockImplementationOnce(() => emptyRecommendations());
+      .mockImplementation((input) => {
+        const path = String(input);
+
+        if (path === "/api/auth/login") {
+          return jsonResponse({
+            data: {
+              user: { id: "user-1", email: "viewer@example.com" },
+            },
+          });
+        }
+
+        if (path === "/api/me/recommendations?limit=10") {
+          return emptyRecommendations();
+        }
+
+        throw new Error(`Unexpected request: ${path}`);
+      });
 
     render(<App />);
-    fireEvent.change(screen.getByLabelText("Email"), { target: { value: "viewer@example.com" } });
-    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "movie123" } });
+
+    fireEvent.change(screen.getByLabelText("Email"), {
+      target: { value: "viewer@example.com" },
+    });
+    fireEvent.change(screen.getByLabelText("Password"), {
+      target: { value: "movie123" },
+    });
     fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
 
-    expect(await screen.findByRole("heading", { name: "Recommendations" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: "Recommendations" }),
+    ).toBeInTheDocument();
     expect(window.location.pathname).toBe("/recommendations");
-    expect(fetchMock).toHaveBeenNthCalledWith(
-      1,
+
+    expect(fetchMock).toHaveBeenCalledWith(
       "/api/auth/login",
-      expect.objectContaining({ method: "POST", credentials: "include" }),
+      expect.objectContaining({
+        method: "POST",
+        credentials: "include",
+      }),
     );
   });
 
   it("shows the exact invalid-credentials message", async () => {
     window.history.pushState({}, "", "/login");
+
     vi.spyOn(globalThis, "fetch").mockImplementationOnce(() =>
-      jsonResponse({ error: { code: "INVALID_CREDENTIALS", message: "Email or password is incorrect" } }, 401),
+      jsonResponse(
+        {
+          error: {
+            code: "INVALID_CREDENTIALS",
+            message: "Email or password is incorrect",
+          },
+        },
+        401,
+      ),
     );
 
     render(<App />);
-    fireEvent.change(screen.getByLabelText("Email"), { target: { value: "viewer@example.com" } });
-    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "wrong-pass" } });
+
+    fireEvent.change(screen.getByLabelText("Email"), {
+      target: { value: "viewer@example.com" },
+    });
+    fireEvent.change(screen.getByLabelText("Password"), {
+      target: { value: "wrong-pass" },
+    });
     fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent("Email or password is incorrect");
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Email or password is incorrect",
+    );
   });
 
   it("restores the authenticated session on the recommendations route", async () => {
     window.history.pushState({}, "", "/recommendations");
-    vi.spyOn(globalThis, "fetch")
-      .mockImplementationOnce(() =>
-        jsonResponse({ data: { user: { id: "user-1", email: "viewer@example.com" } } }),
-      )
-      .mockImplementationOnce(() => emptyRecommendations());
+
+    vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+      const path = String(input);
+
+      if (path === "/api/auth/me") {
+        return jsonResponse({
+          data: {
+            user: { id: "user-1", email: "viewer@example.com" },
+          },
+        });
+      }
+
+      if (path === "/api/me/recommendations?limit=10") {
+        return emptyRecommendations();
+      }
+
+      throw new Error(`Unexpected request: ${path}`);
+    });
 
     render(<App />);
 
-    expect(await screen.findByRole("heading", { name: "Recommendations" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: "Recommendations" }),
+    ).toBeInTheDocument();
     expect(screen.getByText("viewer@example.com")).toBeInTheDocument();
     expect(window.location.pathname).toBe("/recommendations");
   });
 
   it("redirects unauthenticated users from recommendations to login", async () => {
     window.history.pushState({}, "", "/recommendations");
+
     vi.spyOn(globalThis, "fetch").mockImplementationOnce(() =>
-      jsonResponse({ error: { code: "AUTHENTICATION_REQUIRED", message: "Authentication required" } }, 401),
+      jsonResponse(
+        {
+          error: {
+            code: "AUTHENTICATION_REQUIRED",
+            message: "Authentication required",
+          },
+        },
+        401,
+      ),
     );
 
     render(<App />);
 
-    await waitFor(() => expect(window.location.pathname).toBe("/login"));
-    expect(await screen.findByRole("heading", { name: "Sign in" })).toBeInTheDocument();
+    await waitFor(() => {
+      expect(window.location.pathname).toBe("/login");
+    });
+
+    expect(
+      await screen.findByRole("heading", { name: "Sign in" }),
+    ).toBeInTheDocument();
   });
 
   it("signs out and opens the home route", async () => {
     window.history.pushState({}, "", "/recommendations");
+
     const fetchMock = vi
       .spyOn(globalThis, "fetch")
-      .mockImplementationOnce(() =>
-        jsonResponse({ data: { user: { id: "user-1", email: "viewer@example.com" } } }),
-      )
-      .mockImplementationOnce(() => emptyRecommendations())
-      .mockImplementationOnce(() => Promise.resolve(new Response(null, { status: 204 })))
-      .mockImplementationOnce(() =>
-        jsonResponse({
-          data: { movies: [] },
-          meta: { count: 0, limit: 10, catalogueRevision: "revision-test" },
-        }),
-      );
+      .mockImplementation((input) => {
+        const path = String(input);
+
+        if (path === "/api/auth/me") {
+          return jsonResponse({
+            data: {
+              user: { id: "user-1", email: "viewer@example.com" },
+            },
+          });
+        }
+
+        if (path === "/api/me/recommendations?limit=10") {
+          return emptyRecommendations();
+        }
+
+        if (path === "/api/auth/logout") {
+          return Promise.resolve(
+            new Response(null, { status: 204 }),
+          );
+        }
+
+        if (path === "/api/movies?limit=10") {
+          return jsonResponse({
+            data: { movies: [] },
+            meta: {
+              count: 0,
+              limit: 10,
+              catalogueRevision: "revision-test",
+            },
+          });
+        }
+
+        throw new Error(`Unexpected request: ${path}`);
+      });
 
     render(<App />);
-    fireEvent.click(await screen.findByRole("button", { name: "Sign out" }));
 
-    await waitFor(() => expect(window.location.pathname).toBe("/"));
-    expect(await screen.findByRole("heading", { name: "Find your next movie" })).toBeInTheDocument();
-    expect(fetchMock).toHaveBeenNthCalledWith(
-      3,
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Sign out" }),
+    );
+
+    await waitFor(() => {
+      expect(window.location.pathname).toBe("/");
+    });
+
+    expect(
+      await screen.findByRole("heading", { name: "Find your next movie" }),
+    ).toBeInTheDocument();
+
+    expect(fetchMock).toHaveBeenCalledWith(
       "/api/auth/logout",
-      expect.objectContaining({ method: "POST", credentials: "include" }),
+      expect.objectContaining({
+        method: "POST",
+        credentials: "include",
+      }),
     );
   });
 });
+
 
 describe("S12 registration UI", () => {
   function renderRegistration() {
