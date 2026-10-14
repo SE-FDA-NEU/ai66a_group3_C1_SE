@@ -1,0 +1,30 @@
+INFO:     Started server process [24468]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:60667 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60669 - "POST /api/auth/register HTTP/1.1" 201 Created
+INFO:     127.0.0.1:60669 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60669 - "PUT /api/me/preferences HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60669 - "GET /api/me/recommendations?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50044 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50046 - "GET /api/me/recommendations?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50047 - "GET /api/genres HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60669 - "PUT /api/me/preferences HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60669 - "GET /api/me/recommendations?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62616 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62617 - "GET /api/me/recommendations?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62618 - "GET /api/genres HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60669 - "PUT /api/me/preferences HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60669 - "GET /api/me/recommendations?limit=10 HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:64135 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64136 - "GET /api/me/recommendations?limit=10 HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:60669 - "GET /api/me/recommendations?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64137 - "GET /api/me/recommendations?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64138 - "GET /api/genres HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60669 - "PUT /api/me/preferences HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57849 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57850 - "GET /api/me/recommendations?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57852 - "GET /api/genres HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60669 - "GET /api/me/recommendations HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:50142 - "GET /api/me/recommendations?limit=10 HTTP/1.1" 401 Unauthorized
