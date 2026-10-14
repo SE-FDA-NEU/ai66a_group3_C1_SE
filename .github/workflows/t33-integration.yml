@@ -1,0 +1,39 @@
+name: T33 rating UI and database acceptance
+
+on:
+  push:
+    branches: ["**"]
+    paths: ["backend/**", "frontend/**", ".github/workflows/t33-integration.yml"]
+  pull_request:
+    branches: [main, develop]
+    paths: ["backend/**", "frontend/**", ".github/workflows/t33-integration.yml"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rating-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONUTF8: "1"
+      TMDB_READ_ACCESS_TOKEN: ""
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Install locked dependencies
+        run: |
+          python -m pip install -r backend/requirements.lock.txt
+          python -m pip install -e "./backend[dev]" --no-deps
+          npm --prefix frontend ci
+      - name: Verify UI and committed database state
+        run: npm --prefix frontend run test:t33:integration

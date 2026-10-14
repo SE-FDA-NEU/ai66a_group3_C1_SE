@@ -1,23 +1,27 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 
-import {
-  getMovie,
-  MovieApiError,
-  type MovieDetail,
-} from "../api/movies.ts";
+import { getMovie, MovieApiError, type MovieDetail } from "../api/movies.ts";
 import { resolveMovieDetailReturn } from "../navigation/movieDetailReturn.ts";
+import MovieRating from "../components/MovieRating.tsx";
 
 const INFORMATION_UNAVAILABLE = "Information unavailable";
+
+type DetailLoad = { movieId: string } & (
+  | { status: "ready"; movie: MovieDetail }
+  | { status: "notFound" }
+  | { status: "error"; message: string }
+);
 
 function MovieDetailPage() {
   const { movieId = "" } = useParams();
   const location = useLocation();
   const returnDestination = resolveMovieDetailReturn(location.state);
-  const [movie, setMovie] = useState<MovieDetail | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [notFound, setNotFound] = useState(false);
+  const [load, setLoad] = useState<DetailLoad | null>(null);
+  const [retry, setRetry] = useState(0);
+  // A route change must not leave the previous movie's private widget mounted.
+  const currentLoad = load?.movieId === movieId ? load : null;
+  const movie = currentLoad?.status === "ready" ? currentLoad.movie : null;
 
   useEffect(() => {
     let cancelled = false;
@@ -25,7 +29,7 @@ function MovieDetailPage() {
     getMovie(movieId)
       .then((result) => {
         if (!cancelled) {
-          setMovie(result);
+          setLoad({ movieId, status: "ready", movie: result });
         }
       })
       .catch((error) => {
@@ -33,56 +37,32 @@ function MovieDetailPage() {
           return;
         }
 
-        setMovie(null);
-
         if (
           error instanceof MovieApiError &&
           (error.status === 404 || error.code === "MOVIE_NOT_FOUND")
         ) {
-          setNotFound(true);
+          setLoad({ movieId, status: "notFound" });
         } else {
-          setError(
-            error instanceof Error ? error.message : "Something went wrong",
-          );
-        }
-      })
-      .finally(() => {
-        if (!cancelled) {
-          setIsLoading(false);
+          setLoad({
+            movieId,
+            status: "error",
+            message:
+              error instanceof Error ? error.message : "Something went wrong",
+          });
         }
       });
 
     return () => {
       cancelled = true;
     };
-  }, [movieId]);
+  }, [movieId, retry]);
 
-  async function handleRetry() {
-    setIsLoading(true);
-    setError("");
-    setNotFound(false);
-
-    try {
-      setMovie(await getMovie(movieId));
-    } catch (error) {
-      setMovie(null);
-
-      if (
-        error instanceof MovieApiError &&
-        (error.status === 404 || error.code === "MOVIE_NOT_FOUND")
-      ) {
-        setNotFound(true);
-      } else {
-        setError(
-          error instanceof Error ? error.message : "Something went wrong",
-        );
-      }
-    } finally {
-      setIsLoading(false);
-    }
+  function handleRetry() {
+    setLoad(null);
+    setRetry((value) => value + 1);
   }
 
-  if (isLoading) {
+  if (!currentLoad) {
     return (
       <main className="page page--centered">
         <p role="status">Loading movie...</p>
@@ -90,13 +70,18 @@ function MovieDetailPage() {
     );
   }
 
-  if (notFound) {
+  if (currentLoad.status === "notFound") {
     return (
       <main className="page page--centered">
-        <section className="content-card" aria-labelledby="movie-not-found-title">
+        <section
+          className="content-card"
+          aria-labelledby="movie-not-found-title"
+        >
           <p className="eyebrow">Movie catalogue</p>
           <h1 id="movie-not-found-title">Movie not found</h1>
-          <p className="muted">That movie is not available in the active catalogue.</p>
+          <p className="muted">
+            That movie is not available in the active catalogue.
+          </p>
           <Link className="button-link" to={returnDestination.to}>
             {returnDestination.label}
           </Link>
@@ -105,13 +90,13 @@ function MovieDetailPage() {
     );
   }
 
-  if (error) {
+  if (currentLoad.status === "error") {
     return (
       <main className="page page--centered">
         <section className="content-card" role="alert">
           <p className="eyebrow">Movie catalogue</p>
           <h1>Movie details are unavailable</h1>
-          <p>{error}</p>
+          <p>{currentLoad.message}</p>
           <div className="detail-actions">
             <button type="button" onClick={() => void handleRetry()}>
               Retry
@@ -161,6 +146,7 @@ function MovieDetailPage() {
           <h2>Overview</h2>
           <p>{movie.overview ?? INFORMATION_UNAVAILABLE}</p>
         </section>
+        <MovieRating movieId={movie.id} />
       </article>
     </main>
   );

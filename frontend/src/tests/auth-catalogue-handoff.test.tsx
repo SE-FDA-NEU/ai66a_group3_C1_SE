@@ -1,7 +1,13 @@
 // @vitest-environment jsdom
 
 import "@testing-library/jest-dom/vitest";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import App from "../App";
@@ -40,23 +46,50 @@ function installFakeServer() {
     const body = init?.body ? JSON.parse(String(init.body)) : {};
 
     if (method === "POST" && url === "/api/auth/register") {
-      const account = { id: `user-${accounts.length + 1}`, email: body.email, password: body.password };
+      const account = {
+        id: `user-${accounts.length + 1}`,
+        email: body.email,
+        password: body.password,
+      };
       accounts.push(account);
-      return Promise.resolve(json({ data: { user: { id: account.id, email: account.email } } }, 201));
+      return Promise.resolve(
+        json({ data: { user: { id: account.id, email: account.email } } }, 201),
+      );
     }
     if (method === "POST" && url === "/api/auth/login") {
-      const account = accounts.find((a) => a.email === body.email && a.password === body.password);
+      const account = accounts.find(
+        (a) => a.email === body.email && a.password === body.password,
+      );
       if (!account) {
-        return Promise.resolve(json({ error: { message: "Email or password is incorrect" } }, 401));
+        return Promise.resolve(
+          json({ error: { message: "Email or password is incorrect" } }, 401),
+        );
       }
       activeSessionOwner = account;
-      return Promise.resolve(json({ data: { user: { id: account.id, email: account.email } } }));
+      return Promise.resolve(
+        json({ data: { user: { id: account.id, email: account.email } } }),
+      );
     }
     if (method === "GET" && url === "/api/auth/me") {
       return Promise.resolve(
         activeSessionOwner
-          ? json({ data: { user: { id: activeSessionOwner.id, email: activeSessionOwner.email } } })
-          : json({ error: { code: "AUTHENTICATION_REQUIRED", message: "Authentication required" } }, 401),
+          ? json({
+              data: {
+                user: {
+                  id: activeSessionOwner.id,
+                  email: activeSessionOwner.email,
+                },
+              },
+            })
+          : json(
+              {
+                error: {
+                  code: "AUTHENTICATION_REQUIRED",
+                  message: "Authentication required",
+                },
+              },
+              401,
+            ),
       );
     }
     if (method === "POST" && url === "/api/auth/logout") {
@@ -64,28 +97,56 @@ function installFakeServer() {
       return Promise.resolve(new Response(null, { status: 204 }));
     }
     if (method === "GET" && url === "/api/genres") {
-      return Promise.resolve(activeSessionOwner
-        ? json({ data: { genres: [{ id: 28, name: "Action" }] } })
-        : json({ error: { code: "AUTHENTICATION_REQUIRED", message: "Authentication required" } }, 401));
+      return Promise.resolve(
+        activeSessionOwner
+          ? json({ data: { genres: [{ id: 28, name: "Action" }] } })
+          : json(
+              {
+                error: {
+                  code: "AUTHENTICATION_REQUIRED",
+                  message: "Authentication required",
+                },
+              },
+              401,
+            ),
+      );
     }
     if (method === "GET" && url === "/api/me/recommendations?limit=10") {
       return Promise.resolve(
         activeSessionOwner
           ? json({
               data: {
-                movies: movies.map((movie) => ({ ...movie, reason: { matchedGenres: [] } })),
+                movies: movies.map((movie) => ({
+                  ...movie,
+                  reason: { matchedGenres: [] },
+                })),
                 mode: "popular",
                 personalised: false,
                 noMatch: false,
               },
-              meta: { count: 10, limit: 10, catalogueRevision: "revision-test" },
+              meta: {
+                count: 10,
+                limit: 10,
+                catalogueRevision: "revision-test",
+              },
             })
-          : json({ error: { code: "AUTHENTICATION_REQUIRED", message: "Authentication required" } }, 401),
+          : json(
+              {
+                error: {
+                  code: "AUTHENTICATION_REQUIRED",
+                  message: "Authentication required",
+                },
+              },
+              401,
+            ),
       );
     }
     if (method === "GET" && url === "/api/movies?limit=10") {
       return Promise.resolve(
-        json({ data: { movies }, meta: { count: 10, limit: 10, catalogueRevision: "revision-test" } }),
+        json({
+          data: { movies },
+          meta: { count: 10, limit: 10, catalogueRevision: "revision-test" },
+        }),
       );
     }
     if (method === "GET" && url.startsWith("/api/movies/")) {
@@ -93,10 +154,22 @@ function installFakeServer() {
       return Promise.resolve(
         movie
           ? json({
-              data: { movie: { ...movie, overview: "A real overview.", voteAverage: 7.5, voteCount: 100 } },
+              data: {
+                movie: {
+                  ...movie,
+                  overview: "A real overview.",
+                  voteAverage: 7.5,
+                  voteCount: 100,
+                },
+              },
               meta: { catalogueRevision: "revision-test" },
             })
-          : json({ error: { code: "MOVIE_NOT_FOUND", message: "Movie not found" } }, 404),
+          : json(
+              {
+                error: { code: "MOVIE_NOT_FOUND", message: "Movie not found" },
+              },
+              404,
+            ),
       );
     }
     return Promise.reject(new Error(`Unexpected request: ${method} ${url}`));
@@ -125,19 +198,28 @@ describe("T20 integrated auth-to-catalogue handoff", () => {
     type("Email", "handoff@example.com");
     type("Password", "movie123");
     fireEvent.click(screen.getByRole("button", { name: "Create account" }));
-    expect(await screen.findByRole("heading", { name: "Sign in" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: "Sign in" }),
+    ).toBeInTheDocument();
     type("Email", "handoff@example.com");
     type("Password", "movie123");
     fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
 
     // The signed-in account reaches the real recommendation landing page.
-    expect(await screen.findByRole("heading", { name: "Recommendations" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: "Recommendations" }),
+    ).toBeInTheDocument();
     expect(window.location.pathname).toBe("/recommendations");
     expect(screen.getByText("handoff@example.com")).toBeInTheDocument();
-    expect(await screen.findByRole("heading", { name: "Popular" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: "Popular" }),
+    ).toBeInTheDocument();
     expect(requests).toContain("GET /api/me/recommendations?limit=10");
     await waitFor(
-      () => expect(screen.getByRole("combobox", { name: "Filter by genre" })).toBeEnabled(),
+      () =>
+        expect(
+          screen.getByRole("combobox", { name: "Filter by genre" }),
+        ).toBeEnabled(),
       { timeout: 5_000 },
     );
 
@@ -145,7 +227,9 @@ describe("T20 integrated auth-to-catalogue handoff", () => {
     fireEvent.click(screen.getByRole("button", { name: "Sign out" }));
     await waitFor(() => expect(window.location.pathname).toBe("/"));
     expect(await screen.findByText("Movie 1")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("link", { name: "View details for Movie 1" }));
+    fireEvent.click(
+      screen.getByRole("link", { name: "View details for Movie 1" }),
+    );
     expect(await screen.findByText("A real overview.")).toBeInTheDocument();
     expect(window.location.pathname).toBe("/movies/movie-1");
 
@@ -155,21 +239,31 @@ describe("T20 integrated auth-to-catalogue handoff", () => {
     window.history.pushState({}, "", "/recommendations");
     render(<App />);
     await waitFor(() => expect(window.location.pathname).toBe("/login"));
-    expect(await screen.findByRole("heading", { name: "Sign in" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: "Sign in" }),
+    ).toBeInTheDocument();
     expect(screen.queryByText("handoff@example.com")).not.toBeInTheDocument();
 
     expect(requests).toContain("POST /api/auth/logout");
     // Signing in already identifies the account, so /me runs only on the fresh load.
-    expect(requests.filter((request) => request === "GET /api/auth/me")).toHaveLength(1);
+    expect(
+      requests.filter((request) => request === "GET /api/auth/me"),
+    ).toHaveLength(1);
   });
 
-  it("keeps the catalogue and movie detail public without any session check", async () => {
+  it("keeps movie details public while checking rating eligibility without private reads", async () => {
     const { requests } = installFakeServer();
     window.history.pushState({}, "", "/movies/movie-3");
 
     render(<App />);
 
     expect(await screen.findByText("A real overview.")).toBeInTheDocument();
-    expect(requests.some((request) => request.includes("/api/auth/"))).toBe(false);
+    expect(
+      await screen.findByRole("link", { name: "Sign in to rate this movie" }),
+    ).toHaveAttribute("href", "/login");
+    expect(requests).toContain("GET /api/auth/me");
+    expect(requests.some((request) => request.includes("/api/me/"))).toBe(
+      false,
+    );
   });
 });
