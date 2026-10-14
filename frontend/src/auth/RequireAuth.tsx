@@ -1,5 +1,5 @@
 import { Fragment, useEffect, type ReactNode } from "react";
-import { Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 
 import { useAuth } from "./authState.ts";
 
@@ -21,9 +21,24 @@ function RequireAuth({ children }: { children: ReactNode }) {
   if (auth.status === "error") {
     return (
       <main className="page page--centered">
-        <p className="form-error" role="alert">
-          {auth.message}
-        </p>
+        <section className="content-card" role="alert">
+          <h1>We couldn't check your session</h1>
+          <p id="session-error-message">
+            {auth.message} Choose Retry to check again.
+          </p>
+          <div className="detail-actions">
+            <button
+              type="button"
+              onClick={() => void refresh()}
+              aria-describedby="session-error-message"
+            >
+              Retry
+            </button>
+            <Link className="button-link button-secondary" to="/">
+              Browse the catalogue
+            </Link>
+          </div>
+        </section>
       </main>
     );
   }
