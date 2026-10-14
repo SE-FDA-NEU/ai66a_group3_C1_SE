@@ -1,4 +1,5 @@
 import type { Genre } from "./movies.ts";
+import { fallbackErrorMessage, NETWORK_FAILURE_MESSAGE } from "./requestFailure.ts";
 
 type GenreListResponse = {
   data: {
@@ -35,14 +36,27 @@ async function readError(response: Response): Promise<PreferenceApiError> {
   }
 
   return new PreferenceApiError(
-    body?.error?.message ?? "Something went wrong",
+    body?.error?.message ?? fallbackErrorMessage(response.status),
     response.status,
     body?.error?.code,
   );
 }
 
+// A rejected fetch means the API was unreachable; say so and what to do next.
+// An aborted request keeps its original error so callers can ignore it.
+async function send(path: string, init: RequestInit): Promise<Response> {
+  try {
+    return await fetch(path, init);
+  } catch (error) {
+    if (init.signal?.aborted) {
+      throw error;
+    }
+    throw new PreferenceApiError(NETWORK_FAILURE_MESSAGE, 0);
+  }
+}
+
 async function getGenreList(path: string, signal?: AbortSignal): Promise<Genre[]> {
-  const response = await fetch(path, {
+  const response = await send(path, {
     credentials: "include",
     signal,
   });
@@ -67,7 +81,7 @@ export async function savePreferences(
   genreIds: number[],
   signal?: AbortSignal,
 ): Promise<Genre[]> {
-  const response = await fetch("/api/me/preferences", {
+  const response = await send("/api/me/preferences", {
     method: "PUT",
     credentials: "include",
     headers: {

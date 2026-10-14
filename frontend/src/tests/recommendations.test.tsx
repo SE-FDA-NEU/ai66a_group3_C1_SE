@@ -417,7 +417,7 @@ describe("T11 no-match, retry, and request-race states", () => {
     renderRecommendations(() => Promise.reject(new TypeError("Network unavailable")));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
-      "Network unavailable",
+      "We can't reach the server. Check your connection, then try again.",
     );
     expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
     expect(

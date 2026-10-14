@@ -195,7 +195,9 @@ describe("S3-T15 current recommendation snapshot filter", () => {
 
   it("a network failure is a filter error, not an empty movie list", async () => {
     vi.spyOn(globalThis, "fetch").mockRejectedValue(new TypeError("Failed to fetch"));
-    mount(); expect(await screen.findByRole("alert")).toHaveTextContent("Failed to fetch");
+    mount(); expect(await screen.findByRole("alert")).toHaveTextContent(
+      "We can't reach the server. Check your connection, then try again.",
+    );
     expect(titles()).toHaveLength(5);
     expect(screen.queryByText("No movies match this filter.")).not.toBeInTheDocument();
   });
