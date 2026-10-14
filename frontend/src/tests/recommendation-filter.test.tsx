@@ -46,7 +46,7 @@ function installGenres() {
 
 function mount(snapshot = fixture(), handleUnauthorized = vi.fn()) {
   const auth: AuthContextValue = { status: "authenticated", user: { id: "user-a", email: "a@example.com" },
-    refresh: vi.fn(), signIn: vi.fn(), signOut: vi.fn(), handleUnauthorized };
+    refresh: vi.fn(), signIn: vi.fn(), signOut: vi.fn(), handleUnauthorized, recommendationVersion: 0, invalidateRecommendations: vi.fn() };
   function view(nextSnapshot: RecommendationResult) {
     return <MemoryRouter><AuthContext.Provider value={auth}>
       <RecommendationFilter snapshot={nextSnapshot} ariaLabel="Recommendations" />

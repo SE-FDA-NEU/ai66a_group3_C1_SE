@@ -57,6 +57,8 @@ function mount(state: AuthState = A, movieId = "movie-a", strict = false) {
       signIn: vi.fn(),
       signOut: vi.fn(),
       handleUnauthorized: unauthorized,
+      recommendationVersion: 0,
+      invalidateRecommendations: vi.fn(),
     };
     const content = (
       <MemoryRouter initialEntries={["/movies/test"]}>
