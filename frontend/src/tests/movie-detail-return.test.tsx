@@ -8,6 +8,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import App from "../App";
 import { resolveMovieDetailReturn } from "../navigation/movieDetailReturn.ts";
 import MovieDetailPage from "../pages/MovieDetailPage.tsx";
+import { AuthProvider } from "../auth/AuthContext.tsx";
 
 const action = { id: 28, name: "Action" };
 const drama = { id: 18, name: "Drama" };
@@ -78,6 +79,8 @@ describe("S3-T17 movie-detail return context", () => {
       if (request.method === "GET" && request.url === "/api/movies/movie-a") {
         return jsonResponse({ data: { movie: detail } });
       }
+      if (request.url === "/api/me/ratings/movie-a")
+        return jsonResponse({ data: { movieId: "movie-a", rating: null } });
       if (request.method === "PUT" && request.url === "/api/me/preferences") {
         savedPreferenceIds.splice(0);
         return jsonResponse({ data: { genres: [] } });
@@ -129,7 +132,11 @@ describe("S3-T17 movie-detail return context", () => {
   });
 
   it("preserves recommendation return context for no-match alternatives", async () => {
-    window.history.pushState({}, "", "/recommendations?source=no-match#alternatives");
+    window.history.pushState(
+      {},
+      "",
+      "/recommendations?source=no-match#alternatives",
+    );
 
     vi.spyOn(globalThis, "fetch").mockImplementation((input, init) => {
       const method = init?.method ?? "GET";
@@ -156,6 +163,8 @@ describe("S3-T17 movie-detail return context", () => {
       if (method === "GET" && url === "/api/movies/movie-a") {
         return jsonResponse({ data: { movie: detail } });
       }
+      if (url === "/api/me/ratings/movie-a")
+        return jsonResponse({ data: { movieId: "movie-a", rating: null } });
       return Promise.reject(new Error(`Unexpected request: ${method} ${url}`));
     });
 
@@ -164,8 +173,12 @@ describe("S3-T17 movie-detail return context", () => {
     expect(
       await screen.findByRole("heading", { name: "Popular alternatives" }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("combobox", { name: "Filter by genre" })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("link", { name: "View details for Movie A" }));
+    expect(
+      screen.getByRole("combobox", { name: "Filter by genre" }),
+    ).toBeInTheDocument();
+    fireEvent.click(
+      screen.getByRole("link", { name: "View details for Movie A" }),
+    );
 
     expect(window.location.pathname).toBe("/movies/movie-a");
     expect(window.history.state.usr).toEqual({
@@ -180,14 +193,15 @@ describe("S3-T17 movie-detail return context", () => {
     window.history.pushState({}, "", "/movies/movie-a");
     const fetchMock = vi
       .spyOn(globalThis, "fetch")
-      .mockImplementationOnce(() => jsonResponse({ data: { movie: detail } }))
-      .mockImplementationOnce(() =>
-        jsonResponse({
-          data: { movies: [recommendation] },
-          meta: { count: 1, limit: 10, catalogueRevision: "revision-test" },
-        }),
-      );
-
+      .mockImplementation((input) => {
+        if (String(input) === "/api/auth/me") return jsonResponse({}, 401);
+        if (String(input) === "/api/movies?limit=10")
+          return jsonResponse({ data: { movies: [recommendation] } });
+        return Promise.reject(
+          new Error(`Unexpected request: ${String(input)}`),
+        );
+      })
+      .mockImplementationOnce(() => jsonResponse({ data: { movie: detail } }));
     render(<App />);
 
     const returnLink = await screen.findByRole("link", {
@@ -201,7 +215,7 @@ describe("S3-T17 movie-detail return context", () => {
       await screen.findByRole("heading", { name: "Find your next movie" }),
     ).toBeInTheDocument();
     expect(fetchMock).toHaveBeenNthCalledWith(1, "/api/movies/movie-a");
-    expect(fetchMock).toHaveBeenNthCalledWith(2, "/api/movies?limit=10");
+    expect(fetchMock).toHaveBeenCalledWith("/api/movies?limit=10");
   });
 
   it("rejects an external return URL before rendering the detail back link", async () => {
@@ -218,9 +232,11 @@ describe("S3-T17 movie-detail return context", () => {
           },
         ]}
       >
-        <Routes>
-          <Route path="/movies/:movieId" element={<MovieDetailPage />} />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route path="/movies/:movieId" element={<MovieDetailPage />} />
+          </Routes>
+        </AuthProvider>
       </MemoryRouter>,
     );
 

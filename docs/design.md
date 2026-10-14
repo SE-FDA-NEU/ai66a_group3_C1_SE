@@ -360,7 +360,8 @@ Impact. A copy of the database holds no cookie value that a browser could send, 
 
 Status: preference storage/reads/replacement implemented under T01/T02,
 rating storage/repository under T30, rating API under T31, and reset backend
-under T35; rating/reset UI remains pending.
+under T35; the account rating widget is implemented under T33, while reset UI
+remains pending.
 
 Preferences, ratings, and reset are account-owned operations. Their target
 user is resolved only from the valid `ams_session` row. Request bodies do not

@@ -444,6 +444,65 @@ def test_t17_recommendation_detail_round_trip_preserves_database_preferences(
     ]
 
 
+def test_t18_detail_is_public_and_saved_preferences_survive_a_fresh_session(
+    database_session: Session,
+) -> None:
+    revision_id = _seed_small_catalogue(database_session)
+    detailed = upsert_catalogue_movie(
+        database_session,
+        catalogue_revision_id=revision_id,
+        source="synthetic-test",
+        source_id="detailed",
+        title="Detailed Action",
+        release_year=2025,
+        overview="A movie with every detail field.",
+        popularity_score=99.0,
+    )
+    replace_movie_genres(database_session, movie=detailed, genre_ids=[1])
+    database_session.commit()
+
+    email = "t18-detail-acceptance@example.com"
+    http, user_id = _sign_in(email)
+    _save_preferences(http, [1])
+    recommendations = http.get("/api/me/recommendations?limit=2")
+    assert recommendations.status_code == 200
+    assert recommendations.json()["data"]["movies"][0]["id"] == detailed.id
+
+    # A visitor with no session cookie can read the same movie (AC1).
+    visitor = TestClient(app)
+    detail = visitor.get(f"/api/movies/{detailed.id}")
+    assert detail.status_code == 200
+    movie = detail.json()["data"]["movie"]
+    assert movie["title"] == "Detailed Action"
+    assert movie["releaseYear"] == 2025
+    assert movie["overview"] == "A movie with every detail field."
+    assert movie["genres"] == [{"id": 1, "name": "Action"}]
+
+    # An unknown ID opens no other movie (AC2).
+    unknown = visitor.get("/api/movies/does-not-exist")
+    assert unknown.status_code == 404
+    assert unknown.json()["error"]["code"] == "MOVIE_NOT_FOUND"
+    assert unknown.json()["error"]["message"] == "Movie not found"
+
+    # A new session for the same account (a browser refresh or another device)
+    # still sees the saved genres and the same recommendation list (AC4).
+    refreshed = TestClient(app)
+    login = refreshed.post(
+        "/api/auth/login",
+        json={"email": email, "password": PASSWORD},
+        headers=HEADERS,
+    )
+    assert login.status_code == 200
+    assert refreshed.get("/api/me/preferences").json()["data"]["genres"] == [
+        {"id": 1, "name": "Action"}
+    ]
+    assert (
+        refreshed.get("/api/me/recommendations?limit=2").json()["data"]
+        == recommendations.json()["data"]
+    )
+    assert _committed_preference_rows(database_session) == [(user_id, 1)]
+
+
 def _is_failure_query(stage: str, statement: str) -> bool:
     """Select the actual SQLite query boundary to interrupt, not its result."""
 
