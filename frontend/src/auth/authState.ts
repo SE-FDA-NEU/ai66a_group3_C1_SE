@@ -16,6 +16,8 @@ export type AuthContextValue = AuthState & {
   signOut: () => Promise<void>;
   // Call when a protected API answers 401: drops the account so guards redirect.
   handleUnauthorized: () => void;
+  recommendationVersion: number;
+  invalidateRecommendations: () => void;
 };
 
 export const AuthContext = createContext<AuthContextValue | null>(null);

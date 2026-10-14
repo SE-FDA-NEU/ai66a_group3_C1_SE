@@ -11,7 +11,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>({ status: "unknown" });
   const { pathname } = useLocation();
   const pendingCheck = useRef<Promise<void> | null>(null);
-
+  const [recommendationVersion, setRecommendationVersion] = useState(0);
+  
   const refresh = useCallback(() => {
     if (pendingCheck.current) {
       return pendingCheck.current;
@@ -57,11 +58,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   if (state.status === "unauthenticated" && state.justSignedOut && pathname === "/") {
     setState({ status: "unauthenticated" });
   }
+  
+  const invalidateRecommendations = useCallback(() => {
+  setRecommendationVersion((version) => version + 1);
+}, []);
 
   const value = useMemo<AuthContextValue>(
-    () => ({ ...state, refresh, signIn, signOut, handleUnauthorized }),
-    [state, refresh, signIn, signOut, handleUnauthorized],
-  );
+  () => ({
+    ...state,
+    refresh,
+    signIn,
+    signOut,
+    handleUnauthorized,
+    recommendationVersion,
+    invalidateRecommendations,
+  }),
+  [
+    state,
+    refresh,
+    signIn,
+    signOut,
+    handleUnauthorized,
+    recommendationVersion,
+    invalidateRecommendations,
+  ],
+);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

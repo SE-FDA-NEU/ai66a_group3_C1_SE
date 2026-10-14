@@ -15,7 +15,10 @@ const LIMIT_MESSAGE =
   "You can select up to 5 genres. Your previous 5 selections are still selected.";
 
 function PreferencesPage() {
-  const { handleUnauthorized } = useAuth();
+  const {
+    handleUnauthorized,
+    invalidateRecommendations,
+  } = useAuth();
   const navigate = useNavigate();
 
   const [isSaving, setIsSaving] = useState(false);
@@ -142,6 +145,7 @@ function PreferencesPage() {
 
       if (!isCurrentRequest()) return;
 
+      invalidateRecommendations();
       navigate("/recommendations");
     } catch (error: unknown) {
       if (!isCurrentRequest()) return;
