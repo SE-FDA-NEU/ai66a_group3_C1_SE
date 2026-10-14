@@ -60,10 +60,21 @@ function HomePage() {
           <p className="eyebrow">AI Movie Recommendation System</p>
           <h1>Find your next movie</h1>
           <p className="muted">Browse the public local movie catalogue.</p>
+          <p className="muted" id="start-hint">
+            Choose Start to pick up to 5 favourite genres and get
+            recommendations saved to your account.
+          </p>
         </div>
         <nav className="catalogue-actions" aria-label="Public navigation">
-          <Link className="button-link" to="/preferences">
+          <Link
+            className="button-link"
+            to="/preferences"
+            aria-describedby="start-hint"
+          >
             Start
+          </Link>
+          <Link className="button-link button-secondary" to="/recommendations">
+            My recommendations
           </Link>
           <Link className="button-link button-secondary" to="/popular">
             Popular movies
