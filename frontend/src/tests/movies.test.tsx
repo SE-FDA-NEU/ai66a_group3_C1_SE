@@ -77,7 +77,9 @@ describe("T15 public catalogue UI", () => {
     );
 
     expect(window.location.pathname).toBe("/movies/movie-3");
-    expect(await screen.findByRole("heading", { name: "Movie 3" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: "Movie 3" }),
+    ).toBeInTheDocument();
     expect(fetchMock).toHaveBeenNthCalledWith(2, "/api/movies/movie-3");
   });
 
@@ -104,8 +106,12 @@ describe("T15 public catalogue UI", () => {
 
     render(<App />);
 
-    expect(await screen.findByRole("heading", { name: "Incomplete Movie" })).toBeInTheDocument();
-    expect(screen.getAllByText("Information unavailable").length).toBeGreaterThanOrEqual(2);
+    expect(
+      await screen.findByRole("heading", { name: "Incomplete Movie" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getAllByText("Information unavailable").length,
+    ).toBeGreaterThanOrEqual(2);
   });
 
   it("shows the documented not-found state for an unknown movie id", async () => {
@@ -126,8 +132,12 @@ describe("T15 public catalogue UI", () => {
 
     render(<App />);
 
-    expect(await screen.findByRole("heading", { name: "Movie not found" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Return to catalogue" })).toHaveAttribute("href", "/");
+    expect(
+      await screen.findByRole("heading", { name: "Movie not found" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Return to catalogue" }),
+    ).toHaveAttribute("href", "/");
   });
 
   it("retries the public catalogue request after an unavailable response", async () => {
@@ -160,31 +170,48 @@ describe("T15 public catalogue UI", () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
-  it("keeps public movie detail accessible without an auth request", async () => {
+  it("keeps public details accessible after session checking without private rating requests", async () => {
     window.history.pushState({}, "", "/movies/public-movie");
 
-    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementationOnce(() =>
-      jsonResponse({
-        data: {
-          movie: {
-            id: "public-movie",
-            title: "Public Movie",
-            releaseYear: 2025,
-            genres: [{ id: 18, name: "Drama" }],
-            overview: "Public detail.",
-            popularityScore: 10,
-            voteAverage: 8,
-            voteCount: 20,
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockImplementation((input) => {
+        if (String(input) === "/api/auth/me")
+          return jsonResponse(
+            { error: { code: "AUTHENTICATION_REQUIRED" } },
+            401,
+          );
+        return Promise.reject(
+          new Error(`Unexpected private request: ${String(input)}`),
+        );
+      })
+      .mockImplementationOnce(() =>
+        jsonResponse({
+          data: {
+            movie: {
+              id: "public-movie",
+              title: "Public Movie",
+              releaseYear: 2025,
+              genres: [{ id: 18, name: "Drama" }],
+              overview: "Public detail.",
+              popularityScore: 10,
+              voteAverage: 8,
+              voteCount: 20,
+            },
           },
-        },
-        meta: { catalogueRevision: "revision-test" },
-      }),
-    );
+          meta: { catalogueRevision: "revision-test" },
+        }),
+      );
 
     render(<App />);
 
-    expect(await screen.findByRole("heading", { name: "Public Movie" })).toBeInTheDocument();
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(
+      await screen.findByRole("heading", { name: "Public Movie" }),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByRole("link", { name: "Sign in to rate this movie" }),
+    ).toHaveAttribute("href", "/login");
+    expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(fetchMock).toHaveBeenCalledWith("/api/movies/public-movie");
   });
 });

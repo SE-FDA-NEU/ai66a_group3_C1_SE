@@ -786,9 +786,21 @@ popularity/title/ID ranker.
 
 The preference storage and reads are implemented under S3-T01, preference
 replacement under S3-T02, rating storage under S3-T30, rating reads/writes
-under S3-T31, and the profile-reset backend under S3-T35. Rating/reset UI and
+under S3-T31, and the profile-reset backend under S3-T35. The account rating
+widget and typed client are implemented under S3-T33 (#139). Reset UI and
 NLP endpoints remain separate work. The backend reset evidence must not be
 used to close Story #33 / S11 UI acceptance.
+
+The T33 widget checks the existing session on valid public movie details without
+blocking public content. Guests do not issue private rating reads/writes, and a
+rating action leads to `/login`. Authenticated GET/PUT requests include session
+cookies and use opaque movie IDs; no account identifier is sent. Unrated is
+`null`, draft selection is separate from the last confirmed committed value,
+and save success appears only after a validated acknowledgement. Failed reads
+and saves have separate retry actions. Account/movie changes or logout discard
+private widget state and ignore old responses, including stale `401` errors.
+The current protected `401` calls the central handler and navigates to login.
+Saving a rating does not rerank Sprint 3 recommendations or write preferences.
 
 Section 8 documents both the existing public catalogue endpoint and the
 implemented dedicated popular movie endpoint.

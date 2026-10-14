@@ -184,6 +184,23 @@ npm --prefix frontend run lint
 npm --prefix frontend run build
 ```
 
+For the S3-T33 rating UI/API/database acceptance journey, after installing both
+locked runtimes, also run from the repository root:
+
+```text
+npm --prefix frontend run test:t33:integration
+```
+
+This separate jsdom suite forwards real UI requests to FastAPI TestClient and a
+new migrated temporary SQLite database, with synthetic M2 fixtures and no live
+TMDb token/network. It does not seed or change your existing database. It verifies
+save/update, injected commit failure and rollback, retry, session restoration,
+account isolation, unchanged preferences and unchanged Sprint 3 ranking. It is
+not a browser-cookie or visual end-to-end test. The repository `.venv` is detected
+automatically on Windows/Linux; set `T33_PYTHON` if using another installed Python
+3.12 environment. See [T33 evidence](evidence/s3-t33-rating-control.md) for focused
+commands and real-browser reviewer steps.
+
 Historical results on commit `4bfae7c`: 100 backend tests passed and 2 skipped,
 and 41 frontend tests passed across 5 files. These are not current-candidate
 results. For automated verification use a separate test database with migrations
