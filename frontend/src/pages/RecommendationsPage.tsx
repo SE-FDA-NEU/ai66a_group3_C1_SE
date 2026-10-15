@@ -206,6 +206,15 @@ function RecommendationsPage() {
         </div>
       </header>
 
+      <nav className="page-nav" aria-label="Recommendation navigation">
+        <Link className="text-link" to="/preferences">
+          Change my genres
+        </Link>
+        <Link className="text-link" to="/">
+          Browse the catalogue
+        </Link>
+      </nav>
+
       {error ? (
         <p className="form-error" role="alert">
           {error}
@@ -233,14 +242,20 @@ function RecommendationsPage() {
         {load.status === "loading" ? (
           <RecommendationState status="loading" />
         ) : load.status === "error" ? (
-          <div
-            className="recommendation-empty-state"
-            role="alert"
-          >
-            <h3>Recommendations are unavailable</h3>
-            <p>{load.message}</p>
+          <div className="recommendation-empty-state" role="alert">
+            <h3 id="recommendation-error-title">
+              Recommendations are unavailable
+            </h3>
 
-            <button type="button" onClick={handleRetry}>
+            <p id="recommendation-error-message">
+              {load.message} Choose Retry to load your recommendations again.
+            </p>
+
+            <button
+              type="button"
+              onClick={handleRetry}
+              aria-describedby="recommendation-error-title recommendation-error-message"
+            >
               Retry
             </button>
           </div>

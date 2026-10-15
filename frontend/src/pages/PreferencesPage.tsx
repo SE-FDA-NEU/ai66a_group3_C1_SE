@@ -12,7 +12,9 @@ import { useAuth } from "../auth/authState.ts";
 
 const MAX_GENRES = 5;
 const LIMIT_MESSAGE =
-  "You can select up to 5 genres. Your previous 5 selections are still selected.";
+  "You can select up to 5 genres. Your previous 5 selections are still selected. Clear one genre to choose a different one.";
+const SELECTION_REQUIRED_MESSAGE =
+  "Select at least one genre (up to 5), then choose Save preferences.";
 
 function PreferencesPage() {
   const {
@@ -94,6 +96,7 @@ function PreferencesPage() {
   }
 
   function handleGenreChange(genreId: number, checked: boolean) {
+    setSaveError("");
     setSelectedIds((current) => {
       const next = new Set(current);
 
@@ -118,7 +121,7 @@ function PreferencesPage() {
     if (isSaving) return;
 
     if (selectedIds.size < 1 || selectedIds.size > MAX_GENRES) {
-      setSaveError("Select 1 to 5 genres");
+      setSaveError(SELECTION_REQUIRED_MESSAGE);
       return;
     }
 
@@ -159,9 +162,11 @@ function PreferencesPage() {
       }
 
       setSaveError(
-        error instanceof Error
-          ? error.message
-          : "Something went wrong",
+        `${
+          error instanceof Error
+            ? error.message
+            : "Your preferences could not be saved."
+        } Your selections are kept. Choose Save preferences to try again.`,
       );
     } finally {
       if (isCurrentRequest()) {
@@ -176,10 +181,20 @@ function PreferencesPage() {
         className="content-card preferences-card"
         aria-labelledby="preferences-title"
       >
+        <nav className="page-nav" aria-label="Preference navigation">
+          <Link className="text-link" to="/recommendations">
+            Back to recommendations
+          </Link>
+          <Link className="text-link" to="/">
+            Browse the catalogue
+          </Link>
+        </nav>
         <p className="eyebrow">AI Movie Recommendation System</p>
         <h1 id="preferences-title">Movie Preferences</h1>
         <p className="muted" id="genre-selection-help">
-          Choose up to 5 favourite genres from the active movie catalogue.
+          Choose 1 to 5 favourite genres from the active movie catalogue, then
+          choose Save preferences. Once you have 5, clear one to pick a
+          different genre.
         </p>
 
         {isLoading ? (
@@ -188,9 +203,15 @@ function PreferencesPage() {
           </p>
         ) : error ? (
           <div className="preference-status" role="alert">
-            <h2>Genres are unavailable</h2>
-            <p>{error}</p>
-            <button type="button" onClick={handleRetry}>
+            <h2 id="preference-load-error-title">Genres are unavailable</h2>
+            <p id="preference-load-error-message">
+              {error} Choose Retry to load the genres again.
+            </p>
+            <button
+              type="button"
+              onClick={handleRetry}
+              aria-describedby="preference-load-error-title preference-load-error-message"
+            >
               Retry
             </button>
           </div>
@@ -207,7 +228,11 @@ function PreferencesPage() {
         ) : (
           <fieldset
             className="genre-picker"
-            aria-describedby="genre-selection-help genre-selection-count"
+            aria-describedby={
+              saveError
+                ? "genre-selection-help genre-selection-count preference-save-error"
+                : "genre-selection-help genre-selection-count"
+            }
           >
             <legend>Favourite genres</legend>
             <p id="genre-selection-count" className="selection-count" aria-live="polite">
@@ -277,7 +302,11 @@ function PreferencesPage() {
           </p>
         ) : null}
         {saveError ? (
-          <p className="form-error preference-save-error" role="alert">
+          <p
+            id="preference-save-error"
+            className="form-error preference-save-error"
+            role="alert"
+          >
             {saveError}
           </p>
         ) : null}
@@ -286,11 +315,7 @@ function PreferencesPage() {
             <button
               type="button"
               onClick={() => void handleSave()}
-              disabled={
-                isSaving ||
-                selectedIds.size < 1 ||
-                selectedIds.size > MAX_GENRES
-              }
+              disabled={isSaving}
             >
               {isSaving ? "Saving..." : "Save preferences"}
             </button>

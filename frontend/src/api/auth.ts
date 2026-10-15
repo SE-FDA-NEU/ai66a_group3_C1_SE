@@ -1,3 +1,5 @@
+import { fallbackErrorMessage, NETWORK_FAILURE_MESSAGE } from "./requestFailure.ts";
+
 export type User = {
   id: string;
   email: string;
@@ -40,7 +42,7 @@ async function readError(response: Response): Promise<ApiError> {
   }
 
   return new ApiError(
-    body?.error?.message ?? "Something went wrong",
+    body?.error?.message ?? fallbackErrorMessage(response.status),
     response.status,
     body?.error?.code,
   );
@@ -80,9 +82,17 @@ export async function register(email: string, password: string): Promise<User> {
 }
 
 export async function getCurrentUser(): Promise<User> {
-  const response = await fetch("/api/auth/me", {
-    credentials: "include",
-  });
+  let response: Response;
+
+  try {
+    response = await fetch("/api/auth/me", {
+      credentials: "include",
+    });
+  } catch {
+    // The session check gates every protected page, so an unreachable API
+    // needs a message the viewer can act on rather than the browser's own.
+    throw new ApiError(NETWORK_FAILURE_MESSAGE, 0);
+  }
 
   if (!response.ok) {
     throw await readError(response);

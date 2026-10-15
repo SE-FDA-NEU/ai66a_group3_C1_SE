@@ -1,4 +1,5 @@
 import type { Genre, MovieSummary } from "./movies.ts";
+import { fallbackErrorMessage, NETWORK_FAILURE_MESSAGE } from "./requestFailure.ts";
 
 export type RecommendationMovie = MovieSummary & {
   reason: {
@@ -46,7 +47,7 @@ async function readError(response: Response): Promise<RecommendationApiError> {
   }
 
   return new RecommendationApiError(
-    body?.error?.message ?? "Something went wrong",
+    body?.error?.message ?? fallbackErrorMessage(response.status),
     response.status,
     body?.error?.code,
   );
@@ -56,10 +57,19 @@ export async function getRecommendations(
   limit = 10,
   signal?: AbortSignal,
 ): Promise<RecommendationResult> {
-  const response = await fetch(`/api/me/recommendations?limit=${limit}`, {
-    credentials: "include",
-    signal,
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(`/api/me/recommendations?limit=${limit}`, {
+      credentials: "include",
+      signal,
+    });
+  } catch (error) {
+    if (signal?.aborted) {
+      throw error;
+    }
+    throw new RecommendationApiError(NETWORK_FAILURE_MESSAGE, 0);
+  }
 
   if (!response.ok) {
     throw await readError(response);
