@@ -57,6 +57,8 @@ function AccountHarness({
     signIn: async () => {},
     signOut: async () => {},
     handleUnauthorized: onUnauthorized,
+    recommendationVersion: 0,
+    invalidateRecommendations: () => {},
   };
 
   return (

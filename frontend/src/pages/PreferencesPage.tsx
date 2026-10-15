@@ -17,7 +17,10 @@ const SELECTION_REQUIRED_MESSAGE =
   "Select at least one genre (up to 5), then choose Save preferences.";
 
 function PreferencesPage() {
-  const { handleUnauthorized } = useAuth();
+  const {
+    handleUnauthorized,
+    invalidateRecommendations,
+  } = useAuth();
   const navigate = useNavigate();
 
   const [isSaving, setIsSaving] = useState(false);
@@ -145,6 +148,7 @@ function PreferencesPage() {
 
       if (!isCurrentRequest()) return;
 
+      invalidateRecommendations();
       navigate("/recommendations");
     } catch (error: unknown) {
       if (!isCurrentRequest()) return;

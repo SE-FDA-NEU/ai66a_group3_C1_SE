@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
@@ -8,6 +9,7 @@ import {
 } from "../api/recommendations.ts";
 import { useAuth } from "../auth/authState.ts";
 import RecommendationFilter from "../components/RecommendationFilter.tsx";
+import RecommendationGuidance from "../components/RecommendationGuidance.tsx";
 import { currentReturnPath } from "../navigation/movieDetailReturn.ts";
 
 const RECOMMENDATION_LIMIT = 10;
@@ -16,7 +18,9 @@ type RecommendationStateProps = {
   status: "loading" | "empty";
 };
 
-export function RecommendationState({ status }: RecommendationStateProps) {
+export function RecommendationState({
+  status,
+}: RecommendationStateProps) {
   if (status === "loading") {
     return <p role="status">Loading recommendations...</p>;
   }
@@ -37,17 +41,45 @@ type RecommendationLoad =
   | { status: "error"; message: string }
   | { status: "ready"; result: RecommendationResult };
 
+type RecommendationSnapshot = {
+  userId: string;
+  recommendationVersion: number;
+  reloadVersion: number;
+  load: RecommendationLoad;
+};
+
 function RecommendationsPage() {
   const location = useLocation();
   const auth = useAuth();
-  const { handleUnauthorized } = auth;
+
+  const {
+    handleUnauthorized,
+    recommendationVersion,
+  } = auth;
+
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [error, setError] = useState("");
-  const [load, setLoad] = useState<RecommendationLoad>({ status: "loading" });
+
+  const [snapshot, setSnapshot] =
+    useState<RecommendationSnapshot | null>(null);
+
   const [reloadVersion, setReloadVersion] = useState(0);
   const requestGenerationRef = useRef(0);
-  const user = auth.status === "authenticated" ? auth.user : null;
+
+  const user =
+    auth.status === "authenticated" ? auth.user : null;
+
   const userId = user?.id ?? null;
+
+  // A snapshot is valid only for the current account and request version.
+  // Changing preferences or retrying immediately hides the old result.
+  const load: RecommendationLoad =
+    snapshot &&
+    snapshot.userId === userId &&
+    snapshot.recommendationVersion === recommendationVersion &&
+    snapshot.reloadVersion === reloadVersion
+      ? snapshot.load
+      : { status: "loading" };
 
   useEffect(() => {
     if (!userId) {
@@ -57,6 +89,7 @@ function RecommendationsPage() {
     const controller = new AbortController();
     const requestGeneration = ++requestGenerationRef.current;
     let isActive = true;
+
     const isCurrentRequest = () =>
       isActive &&
       !controller.signal.aborted &&
@@ -64,23 +97,44 @@ function RecommendationsPage() {
 
     getRecommendations(RECOMMENDATION_LIMIT, controller.signal)
       .then((result) => {
-        if (isCurrentRequest()) {
-          setLoad({ status: "ready", result });
-        }
-      })
-      .catch((error: unknown) => {
         if (!isCurrentRequest()) {
           return;
         }
 
-        if (error instanceof RecommendationApiError && error.status === 401) {
+        setSnapshot({
+          userId,
+          recommendationVersion,
+          reloadVersion,
+          load: {
+            status: "ready",
+            result,
+          },
+        });
+      })
+      .catch((requestError: unknown) => {
+        if (!isCurrentRequest()) {
+          return;
+        }
+
+        if (
+          requestError instanceof RecommendationApiError &&
+          requestError.status === 401
+        ) {
           handleUnauthorized();
           return;
         }
 
-        setLoad({
-          status: "error",
-          message: error instanceof Error ? error.message : "Something went wrong",
+        setSnapshot({
+          userId,
+          recommendationVersion,
+          reloadVersion,
+          load: {
+            status: "error",
+            message:
+              requestError instanceof Error
+                ? requestError.message
+                : "Something went wrong",
+          },
         });
       });
 
@@ -88,20 +142,25 @@ function RecommendationsPage() {
       isActive = false;
       controller.abort();
     };
-  }, [handleUnauthorized, reloadVersion, userId]);
+  }, [
+    handleUnauthorized,
+    recommendationVersion,
+    reloadVersion,
+    userId,
+  ]);
 
   function handleRetry() {
-    setLoad({ status: "loading" });
     setReloadVersion((version) => version + 1);
   }
 
   const result = load.status === "ready" ? load.result : null;
+
   const sectionTitle = result
     ? result.noMatch
       ? "Popular alternatives"
       : result.personalised
-      ? "Recommended for you"
-      : "Popular"
+        ? "Recommended for you"
+        : "Popular"
     : "Your recommendations";
 
   async function handleSignOut() {
@@ -110,8 +169,13 @@ function RecommendationsPage() {
 
     try {
       await auth.signOut();
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "Something went wrong");
+    } catch (signOutError: unknown) {
+      setError(
+        signOutError instanceof Error
+          ? signOutError.message
+          : "Something went wrong",
+      );
+
       setIsSigningOut(false);
     }
   }
@@ -120,12 +184,17 @@ function RecommendationsPage() {
     <main className="page">
       <header className="topbar">
         <div>
-          <p className="eyebrow">AI Movie Recommendation System</p>
+          <p className="eyebrow">
+            AI Movie Recommendation System
+          </p>
           <h1>Recommendations</h1>
         </div>
 
         <div className="session-actions">
-          {user ? <span className="muted">{user.email}</span> : null}
+          {user ? (
+            <span className="muted">{user.email}</span>
+          ) : null}
+
           <button
             type="button"
             className="button-secondary"
@@ -158,19 +227,30 @@ function RecommendationsPage() {
       >
         <div className="section-heading">
           <p className="eyebrow">Your next watch</p>
-          <h2 id="recommendations-title">{sectionTitle}</h2>
+
+          <h2 id="recommendations-title">
+            {sectionTitle}
+          </h2>
+
           {result && result.mode === "popular" ? (
-            <p className="muted recommendation-mode">Not personalised</p>
+            <p className="muted recommendation-mode">
+              Not personalised
+            </p>
           ) : null}
         </div>
+
         {load.status === "loading" ? (
           <RecommendationState status="loading" />
         ) : load.status === "error" ? (
           <div className="recommendation-empty-state" role="alert">
-            <h3 id="recommendation-error-title">Recommendations are unavailable</h3>
+            <h3 id="recommendation-error-title">
+              Recommendations are unavailable
+            </h3>
+
             <p id="recommendation-error-message">
               {load.message} Choose Retry to load your recommendations again.
             </p>
+
             <button
               type="button"
               onClick={handleRetry}
@@ -181,22 +261,12 @@ function RecommendationsPage() {
           </div>
         ) : load.result.noMatch ? (
           <>
-            <div className="recommendation-empty-state" role="status">
-              <h3>No movies matched your favourite genres.</h3>
-              <p>
-                {load.result.movies.length > 0
-                  ? "Try these popular alternatives, edit your preferences, or retry."
-                  : "Edit your preferences or retry to look for recommendations again."}
-              </p>
-              <div className="recommendation-actions">
-                <Link className="text-link" to="/preferences">
-                  Edit preferences
-                </Link>
-                <button type="button" onClick={handleRetry}>
-                  Retry
-                </button>
-              </div>
-            </div>
+            <RecommendationGuidance
+              variant="no-match"
+              hasAlternatives={load.result.movies.length > 0}
+              onRetry={handleRetry}
+            />
+
             {load.result.movies.length > 0 ? (
               <RecommendationFilter
                 ariaLabel="Popular alternatives"
@@ -206,13 +276,19 @@ function RecommendationsPage() {
             ) : null}
           </>
         ) : load.result.movies.length === 0 ? (
-          <RecommendationState status="empty" />
+          <RecommendationGuidance variant="empty" />
         ) : (
-          <RecommendationFilter
-            ariaLabel={sectionTitle}
-            snapshot={load.result}
-            returnTo={currentReturnPath(location)}
-          />
+          <>
+            {!load.result.personalised ? (
+              <RecommendationGuidance variant="cold-start" />
+            ) : null}
+
+            <RecommendationFilter
+              ariaLabel={sectionTitle}
+              snapshot={load.result}
+              returnTo={currentReturnPath(location)}
+            />
+          </>
         )}
       </section>
     </main>

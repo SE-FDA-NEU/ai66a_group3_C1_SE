@@ -41,8 +41,11 @@ Preference storage, reads, and atomic replacement are implemented under
 T01/T02. The genre/popularity-only personalised recommendation backend is
 implemented under T08. Account-owned rating storage and its repository are
 implemented under T30, the protected rating API under T31, and the atomic
-authenticated reset backend under T35. Preference UI and rating/reset UI
-remain separate Sprint 3 work. Rating/reset session isolation supports Story
+authenticated reset backend under T35. T33 adds the separate typed rating client
+and account/movie-keyed widget on public details, using the existing AuthProvider
+and protected rating API. Public details remain accessible during session checks
+or private rating failures. Profile-reset UI remains separate work. Rating/reset
+session isolation supports Story
 #45 / S13.
 Rating-adjusted ranking remains Story #22 / S05b planned for Sprint 4.
 

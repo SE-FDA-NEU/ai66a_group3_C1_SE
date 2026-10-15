@@ -81,6 +81,8 @@ function RecommendationAccountHarness({
     signIn: async () => {},
     signOut: async () => {},
     handleUnauthorized: onUnauthorized,
+    recommendationVersion: 0,
+    invalidateRecommendations: vi.fn(),
   };
 
   return (
@@ -133,6 +135,17 @@ describe("T10 recommendation cards", () => {
       await screen.findByRole("heading", { name: "Popular" }, { timeout: 5_000 }),
     ).toBeInTheDocument();
     expect(screen.getByText("Not personalised")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", {
+        name: "Recommendations based on popular movies",
+      }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole("link", {
+        name: "Enter preferences →",
+      }),
+    ).toHaveAttribute("href", "/preferences");
     expect(
       screen.queryByRole("heading", {
         name: "No movies matched your favourite genres.",
@@ -205,15 +218,26 @@ describe("T10 recommendation cards", () => {
     expect(document.querySelectorAll(".movie-card")).toHaveLength(0);
   });
 
-  it("renders zero cards and the empty state when the result is empty", async () => {
+  it("renders zero cards and no-data guidance when the result is empty", async () => {
     renderRecommendations(() => jsonResponse(popularBody([])));
 
-    expect(await screen.findByRole("heading", { name: "No recommendations available yet." })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", {
+        name: "No recommendations available yet.",
+      }),
+    ).toBeInTheDocument();
+
     expect(document.querySelectorAll(".movie-card")).toHaveLength(0);
-    expect(screen.getByRole("link", { name: "Enter preferences →" })).toHaveAttribute(
-      "href",
-      "/preferences",
-    );
+
+    expect(
+      screen.getByRole("link", {
+        name: "Enter preferences →",
+      }),
+    ).toHaveAttribute("href", "/preferences");
+
+    expect(
+      screen.queryByRole("button", { name: "Retry" }),
+    ).not.toBeInTheDocument();
   });
 
   it("sends the visitor to login when the protected API reports 401", async () => {
@@ -513,6 +537,8 @@ describe("T11 no-match, retry, and request-race states", () => {
       signIn: async () => {},
       signOut: async () => {},
       handleUnauthorized: vi.fn(),
+      recommendationVersion: 0,
+      invalidateRecommendations: vi.fn(),
     };
 
     vi.spyOn(globalThis, "fetch").mockReturnValue(pendingRequest.promise);
