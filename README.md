@@ -481,6 +481,20 @@ python -m pytest backend/tests/test_auth_sessions.py -v
 npm --prefix frontend test
 ```
 
+The S04 cold-start browser acceptance suite uses Chromium, real sign-in/API
+requests, and a migrated temporary SQLite database on dedicated ports 8014 and
+5174. Install the browser once with `cd frontend` then
+`npx playwright install chromium`, return to the repository root, and run:
+
+```bash
+npm --prefix frontend run test:s04:e2e
+python backend/scripts/collect_s04_evidence.py
+```
+
+The runner selects the repository `.venv` Python when present; otherwise it
+uses `python` on PATH. Override it with `S04_PYTHON` if needed. No TMDb token
+is required. See the [S04 AC matrix, evidence, and reviewer steps](docs/evidence/s3-t14-cold-start-acceptance/README.md).
+
 
 ## Lint Backend
 

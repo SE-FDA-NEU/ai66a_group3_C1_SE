@@ -26,6 +26,8 @@ checkpoints/
 # Frontend
 frontend/node_modules/
 frontend/dist/
+frontend/test-results/
+frontend/playwright-report/
 
 # Editor / OS junk
 .vscode/

@@ -1,0 +1,23 @@
+{
+  "revision": "s04-browser-main",
+  "genres": [
+    { "id": 8101, "name": "Action" },
+    { "id": 8102, "name": "Comedy" },
+    { "id": 8103, "name": "Archive" }
+  ],
+  "movies": [
+    { "id": "20000000-0000-0000-0000-000000000001", "title": "A", "popularity": 90, "genreIds": [8101] },
+    { "id": "20000000-0000-0000-0000-000000000002", "title": "B", "popularity": 80, "genreIds": [8101] },
+    { "id": "20000000-0000-0000-0000-000000000003", "title": "C", "popularity": 80, "genreIds": [8102] },
+    { "id": "20000000-0000-0000-0000-000000000004", "title": "D", "popularity": 70, "genreIds": [8101] },
+    { "id": "20000000-0000-0000-0000-000000000005", "title": "E", "popularity": 60, "genreIds": [8102] },
+    { "id": "20000000-0000-0000-0000-000000000006", "title": "F", "popularity": 50, "genreIds": [8101] },
+    { "id": "20000000-0000-0000-0000-000000000007", "title": "G", "popularity": 40, "genreIds": [8102] },
+    { "id": "20000000-0000-0000-0000-000000000008", "title": "H", "popularity": 30, "genreIds": [8101] },
+    { "id": "20000000-0000-0000-0000-000000000009", "title": "I", "popularity": 20, "genreIds": [8102] },
+    { "id": "20000000-0000-0000-0000-000000000010", "title": "J", "popularity": 10, "genreIds": [8101] },
+    { "id": "20000000-0000-0000-0000-000000000011", "title": "K", "popularity": 5, "genreIds": [8102] },
+    { "id": "20000000-0000-0000-0000-000000000012", "title": "L", "popularity": 1, "genreIds": [8101] },
+    { "id": "20000000-0000-0000-0000-000000000013", "title": "Archive candidate", "popularity": null, "genreIds": [8103] }
+  ]
+}
