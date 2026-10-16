@@ -1,0 +1,20 @@
+[
+  {
+    "method": "GET",
+    "path": "/api/me/recommendations?limit=10",
+    "status": 200,
+    "body": {
+      "data": {
+        "movies": [],
+        "mode": "popular",
+        "personalised": false,
+        "noMatch": false
+      },
+      "meta": {
+        "count": 0,
+        "limit": 10,
+        "catalogueRevision": "s04-empty"
+      }
+    }
+  }
+]

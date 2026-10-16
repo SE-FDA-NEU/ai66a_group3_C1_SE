@@ -1,0 +1,660 @@
+{
+  "old": {
+    "responses": [
+      {
+        "status": 200,
+        "body": {
+          "data": {
+            "movies": [
+              {
+                "id": "20000000-0000-0000-0000-000000000001",
+                "title": "A",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8101,
+                    "name": "Action"
+                  }
+                ],
+                "popularityScore": 90,
+                "reason": {
+                  "matchedGenres": []
+                }
+              },
+              {
+                "id": "20000000-0000-0000-0000-000000000002",
+                "title": "B",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8101,
+                    "name": "Action"
+                  }
+                ],
+                "popularityScore": 80,
+                "reason": {
+                  "matchedGenres": []
+                }
+              },
+              {
+                "id": "20000000-0000-0000-0000-000000000003",
+                "title": "C",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8102,
+                    "name": "Comedy"
+                  }
+                ],
+                "popularityScore": 80,
+                "reason": {
+                  "matchedGenres": []
+                }
+              },
+              {
+                "id": "20000000-0000-0000-0000-000000000004",
+                "title": "D",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8101,
+                    "name": "Action"
+                  }
+                ],
+                "popularityScore": 70,
+                "reason": {
+                  "matchedGenres": []
+                }
+              },
+              {
+                "id": "20000000-0000-0000-0000-000000000005",
+                "title": "E",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8102,
+                    "name": "Comedy"
+                  }
+                ],
+                "popularityScore": 60,
+                "reason": {
+                  "matchedGenres": []
+                }
+              },
+              {
+                "id": "20000000-0000-0000-0000-000000000006",
+                "title": "F",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8101,
+                    "name": "Action"
+                  }
+                ],
+                "popularityScore": 50,
+                "reason": {
+                  "matchedGenres": []
+                }
+              },
+              {
+                "id": "20000000-0000-0000-0000-000000000007",
+                "title": "G",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8102,
+                    "name": "Comedy"
+                  }
+                ],
+                "popularityScore": 40,
+                "reason": {
+                  "matchedGenres": []
+                }
+              },
+              {
+                "id": "20000000-0000-0000-0000-000000000008",
+                "title": "H",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8101,
+                    "name": "Action"
+                  }
+                ],
+                "popularityScore": 30,
+                "reason": {
+                  "matchedGenres": []
+                }
+              },
+              {
+                "id": "20000000-0000-0000-0000-000000000009",
+                "title": "I",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8102,
+                    "name": "Comedy"
+                  }
+                ],
+                "popularityScore": 20,
+                "reason": {
+                  "matchedGenres": []
+                }
+              },
+              {
+                "id": "20000000-0000-0000-0000-000000000010",
+                "title": "J",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8101,
+                    "name": "Action"
+                  }
+                ],
+                "popularityScore": 10,
+                "reason": {
+                  "matchedGenres": []
+                }
+              }
+            ],
+            "mode": "popular",
+            "personalised": false,
+            "noMatch": false
+          },
+          "meta": {
+            "count": 10,
+            "limit": 10,
+            "catalogueRevision": "s04-browser-main"
+          }
+        }
+      },
+      {
+        "status": 200,
+        "body": {
+          "data": {
+            "movies": [
+              {
+                "id": "20000000-0000-0000-0000-000000000001",
+                "title": "A",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8101,
+                    "name": "Action"
+                  }
+                ],
+                "popularityScore": 90,
+                "reason": {
+                  "matchedGenres": []
+                }
+              },
+              {
+                "id": "20000000-0000-0000-0000-000000000002",
+                "title": "B",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8101,
+                    "name": "Action"
+                  }
+                ],
+                "popularityScore": 80,
+                "reason": {
+                  "matchedGenres": []
+                }
+              },
+              {
+                "id": "20000000-0000-0000-0000-000000000003",
+                "title": "C",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8102,
+                    "name": "Comedy"
+                  }
+                ],
+                "popularityScore": 80,
+                "reason": {
+                  "matchedGenres": []
+                }
+              },
+              {
+                "id": "20000000-0000-0000-0000-000000000004",
+                "title": "D",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8101,
+                    "name": "Action"
+                  }
+                ],
+                "popularityScore": 70,
+                "reason": {
+                  "matchedGenres": []
+                }
+              },
+              {
+                "id": "20000000-0000-0000-0000-000000000005",
+                "title": "E",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8102,
+                    "name": "Comedy"
+                  }
+                ],
+                "popularityScore": 60,
+                "reason": {
+                  "matchedGenres": []
+                }
+              },
+              {
+                "id": "20000000-0000-0000-0000-000000000006",
+                "title": "F",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8101,
+                    "name": "Action"
+                  }
+                ],
+                "popularityScore": 50,
+                "reason": {
+                  "matchedGenres": []
+                }
+              },
+              {
+                "id": "20000000-0000-0000-0000-000000000007",
+                "title": "G",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8102,
+                    "name": "Comedy"
+                  }
+                ],
+                "popularityScore": 40,
+                "reason": {
+                  "matchedGenres": []
+                }
+              },
+              {
+                "id": "20000000-0000-0000-0000-000000000008",
+                "title": "H",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8101,
+                    "name": "Action"
+                  }
+                ],
+                "popularityScore": 30,
+                "reason": {
+                  "matchedGenres": []
+                }
+              },
+              {
+                "id": "20000000-0000-0000-0000-000000000009",
+                "title": "I",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8102,
+                    "name": "Comedy"
+                  }
+                ],
+                "popularityScore": 20,
+                "reason": {
+                  "matchedGenres": []
+                }
+              },
+              {
+                "id": "20000000-0000-0000-0000-000000000010",
+                "title": "J",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8101,
+                    "name": "Action"
+                  }
+                ],
+                "popularityScore": 10,
+                "reason": {
+                  "matchedGenres": []
+                }
+              }
+            ],
+            "mode": "popular",
+            "personalised": false,
+            "noMatch": false
+          },
+          "meta": {
+            "count": 10,
+            "limit": 10,
+            "catalogueRevision": "s04-browser-main"
+          }
+        }
+      }
+    ],
+    "completed": 2
+  },
+  "fresh": {
+    "responses": [
+      {
+        "status": 200,
+        "body": {
+          "data": {
+            "movies": [
+              {
+                "id": "20000000-0000-0000-0000-000000000001",
+                "title": "A",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8101,
+                    "name": "Action"
+                  }
+                ],
+                "popularityScore": 90,
+                "reason": {
+                  "matchedGenres": [
+                    {
+                      "id": 8101,
+                      "name": "Action"
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "20000000-0000-0000-0000-000000000002",
+                "title": "B",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8101,
+                    "name": "Action"
+                  }
+                ],
+                "popularityScore": 80,
+                "reason": {
+                  "matchedGenres": [
+                    {
+                      "id": 8101,
+                      "name": "Action"
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "20000000-0000-0000-0000-000000000004",
+                "title": "D",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8101,
+                    "name": "Action"
+                  }
+                ],
+                "popularityScore": 70,
+                "reason": {
+                  "matchedGenres": [
+                    {
+                      "id": 8101,
+                      "name": "Action"
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "20000000-0000-0000-0000-000000000006",
+                "title": "F",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8101,
+                    "name": "Action"
+                  }
+                ],
+                "popularityScore": 50,
+                "reason": {
+                  "matchedGenres": [
+                    {
+                      "id": 8101,
+                      "name": "Action"
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "20000000-0000-0000-0000-000000000008",
+                "title": "H",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8101,
+                    "name": "Action"
+                  }
+                ],
+                "popularityScore": 30,
+                "reason": {
+                  "matchedGenres": [
+                    {
+                      "id": 8101,
+                      "name": "Action"
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "20000000-0000-0000-0000-000000000010",
+                "title": "J",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8101,
+                    "name": "Action"
+                  }
+                ],
+                "popularityScore": 10,
+                "reason": {
+                  "matchedGenres": [
+                    {
+                      "id": 8101,
+                      "name": "Action"
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "20000000-0000-0000-0000-000000000012",
+                "title": "L",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8101,
+                    "name": "Action"
+                  }
+                ],
+                "popularityScore": 1,
+                "reason": {
+                  "matchedGenres": [
+                    {
+                      "id": 8101,
+                      "name": "Action"
+                    }
+                  ]
+                }
+              }
+            ],
+            "mode": "personalised",
+            "personalised": true,
+            "noMatch": false
+          },
+          "meta": {
+            "count": 7,
+            "limit": 10,
+            "catalogueRevision": "s04-browser-main"
+          }
+        }
+      },
+      {
+        "status": 200,
+        "body": {
+          "data": {
+            "movies": [
+              {
+                "id": "20000000-0000-0000-0000-000000000001",
+                "title": "A",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8101,
+                    "name": "Action"
+                  }
+                ],
+                "popularityScore": 90,
+                "reason": {
+                  "matchedGenres": [
+                    {
+                      "id": 8101,
+                      "name": "Action"
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "20000000-0000-0000-0000-000000000002",
+                "title": "B",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8101,
+                    "name": "Action"
+                  }
+                ],
+                "popularityScore": 80,
+                "reason": {
+                  "matchedGenres": [
+                    {
+                      "id": 8101,
+                      "name": "Action"
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "20000000-0000-0000-0000-000000000004",
+                "title": "D",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8101,
+                    "name": "Action"
+                  }
+                ],
+                "popularityScore": 70,
+                "reason": {
+                  "matchedGenres": [
+                    {
+                      "id": 8101,
+                      "name": "Action"
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "20000000-0000-0000-0000-000000000006",
+                "title": "F",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8101,
+                    "name": "Action"
+                  }
+                ],
+                "popularityScore": 50,
+                "reason": {
+                  "matchedGenres": [
+                    {
+                      "id": 8101,
+                      "name": "Action"
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "20000000-0000-0000-0000-000000000008",
+                "title": "H",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8101,
+                    "name": "Action"
+                  }
+                ],
+                "popularityScore": 30,
+                "reason": {
+                  "matchedGenres": [
+                    {
+                      "id": 8101,
+                      "name": "Action"
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "20000000-0000-0000-0000-000000000010",
+                "title": "J",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8101,
+                    "name": "Action"
+                  }
+                ],
+                "popularityScore": 10,
+                "reason": {
+                  "matchedGenres": [
+                    {
+                      "id": 8101,
+                      "name": "Action"
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "20000000-0000-0000-0000-000000000012",
+                "title": "L",
+                "releaseYear": null,
+                "genres": [
+                  {
+                    "id": 8101,
+                    "name": "Action"
+                  }
+                ],
+                "popularityScore": 1,
+                "reason": {
+                  "matchedGenres": [
+                    {
+                      "id": 8101,
+                      "name": "Action"
+                    }
+                  ]
+                }
+              }
+            ],
+            "mode": "personalised",
+            "personalised": true,
+            "noMatch": false
+          },
+          "meta": {
+            "count": 7,
+            "limit": 10,
+            "catalogueRevision": "s04-browser-main"
+          }
+        }
+      }
+    ],
+    "completed": 2
+  }
+}

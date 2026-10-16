@@ -1,0 +1,59 @@
+name: S04 real browser acceptance
+
+on:
+  push:
+    paths: ["backend/**", "frontend/**", ".github/workflows/s04-e2e.yml"]
+  pull_request:
+    branches: [main, develop]
+    paths: ["backend/**", "frontend/**", ".github/workflows/s04-e2e.yml"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  s04-runner-cleanup:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Verify parent cleanup after forced backend termination
+        run: npm --prefix frontend run test:s04:runner
+
+  s04-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TMDB_READ_ACCESS_TOKEN: ""
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Install locked dependencies and Chromium
+        run: |
+          python -m pip install -r backend/requirements.lock.txt
+          python -m pip install -e "./backend[dev]" --no-deps
+          npm --prefix frontend ci
+          cd frontend
+          npx playwright install --with-deps chromium
+      - name: Verify real auth, API, database and browser
+        run: npm --prefix frontend run test:s04:e2e
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: s04-browser-and-api-evidence
+          path: frontend/test-results/
+          retention-days: 14

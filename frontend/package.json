@@ -9,6 +9,8 @@
     "test": "vitest run",
     "test:t16:integration": "vitest run --config vitest.t16.config.ts",
     "test:t33:integration": "vitest run --config vitest.t33.config.ts",
+    "test:s04:e2e": "node scripts/run-s04-e2e.mjs",
+    "test:s04:runner": "node --test scripts/run-s04-e2e.node-test.mjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -19,6 +21,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.64.1",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@types/node": "^24.13.3",
