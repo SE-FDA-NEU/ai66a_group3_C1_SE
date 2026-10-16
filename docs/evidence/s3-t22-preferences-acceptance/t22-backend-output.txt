@@ -1,0 +1,44 @@
+INFO:     Started server process [39252]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:64435 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54959 - "GET /api/movies?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54960 - "GET /api/movies?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54961 - "GET /api/auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:63483 - "POST /api/auth/register HTTP/1.1" 201 Created
+INFO:     127.0.0.1:55826 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59910 - "GET /api/me/recommendations?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65377 - "GET /api/genres HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50061 - "GET /api/movies?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56558 - "GET /api/me/preferences HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56556 - "GET /api/movies?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56557 - "GET /api/genres HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58138 - "PUT /api/me/preferences HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59849 - "GET /api/me/recommendations?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64452 - "GET /api/genres HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51425 - "GET /api/me/preferences HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51424 - "GET /api/genres HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64156 - "PUT /api/me/preferences HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:49883 - "PUT /api/me/preferences HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56857 - "GET /api/me/recommendations?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53935 - "GET /api/genres HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52070 - "GET /api/genres HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56787 - "PUT /api/me/preferences HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:59086 - "GET /api/me/preferences HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59085 - "GET /api/genres HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58636 - "PUT /api/me/preferences HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50342 - "GET /api/me/recommendations?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51882 - "GET /api/genres HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56537 - "POST /api/auth/logout HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:58729 - "GET /api/movies?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51352 - "GET /api/movies?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64208 - "POST /api/auth/register HTTP/1.1" 201 Created
+INFO:     127.0.0.1:49830 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62783 - "GET /api/me/recommendations?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50348 - "GET /api/genres HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55510 - "GET /api/me/preferences HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55509 - "GET /api/genres HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50757 - "PUT /api/me/preferences HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52293 - "GET /api/me/recommendations?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54443 - "GET /api/genres HTTP/1.1" 200 OK
