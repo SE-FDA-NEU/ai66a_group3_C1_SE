@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 
 import type { Genre, MovieSummary } from "../api/movies.ts";
+import { formatPopularityScore, POPULARITY_LABEL } from "../formatPopularity.ts";
 import { movieDetailReturnState } from "../navigation/movieDetailReturn.ts";
 
 const INFORMATION_UNAVAILABLE = "Information unavailable";
@@ -24,6 +25,10 @@ function MovieCard({ movie, matchedGenres, returnTo }: MovieCardProps) {
             ? movie.genres.map((genre) => genre.name).join(" · ")
             : INFORMATION_UNAVAILABLE}
         </p>
+        <dl className="movie-popularity">
+          <dt>{POPULARITY_LABEL}</dt>
+          <dd>{formatPopularityScore(movie.popularityScore)}</dd>
+        </dl>
         {matchedGenres && matchedGenres.length > 0 ? (
           <p className="movie-reason">
             Matches your genres: {matchedGenres.map((genre) => genre.name).join(" · ")}
