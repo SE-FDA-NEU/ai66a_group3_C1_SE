@@ -1,3 +1,4 @@
+// Run with node --test; keep this filename outside Vitest's *.test.* discovery.
 import assert from "node:assert/strict";
 import { mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";

@@ -4,7 +4,7 @@ Run date: 2026-10-16 (Asia/Ho_Chi_Minh).
 
 - Task: [S3-T14 #116](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/116).
 - Parent Story: [S04 #20](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/20); keep open until the complete AC and [DoD](../../definition-of-done.md) pass.
-- Tested source: local working tree based on [`fbc1897c5792a6b4e6d91d0c3c14a8b31c9f24d2`](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/fbc1897c5792a6b4e6d91d0c3c14a8b31c9f24d2), including the parent-runner cleanup fix. [results.json](results.json) records the base commit, working-tree status, and SHA-256 manifest for the actual application, fixture, harness, wrapper and cleanup tests. This run started at **14:51:48 Asia/Ho_Chi_Minh**.
+- Tested source: local working tree based on [`6a57b6ebbb58217525cf127ffbd31ebb3fdfd6aa`](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/6a57b6ebbb58217525cf127ffbd31ebb3fdfd6aa), including the Node/Vitest test-discovery fix. [results.json](results.json) records the base commit, working-tree status, and SHA-256 manifest for the actual application, fixture, harness, wrapper and cleanup tests. This run started at **14:58:41 Asia/Ho_Chi_Minh**.
 - Hosted CI: [S04 acceptance succeeded](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/38864844350/job/116855188548) on [PR #176](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/176); [Python and frontend CI also succeeded](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/38864844447).
 - Independent review: [Hoàng (`@hoang3003`) approved](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/176#pullrequestreview-5544269476) at **14:16:59 Asia/Ho_Chi_Minh** on 2026-10-16. These hosted results and approval apply to `fbc1897`; the cleanup changes here have the local verification below.
 - Scope: acceptance automation and evidence. Existing production components, auth, API and ranking are reused unchanged.
@@ -94,9 +94,10 @@ Additional task checks:
 
 | Command from repository root | Local result |
 |---|---|
-| `npm --prefix frontend run test:s04:e2e` | 7 passed in 10.0s, no retries, no skips; Chromium 156.0.8078.4; [actual output](t14-browser-run-output.txt) |
+| `npm --prefix frontend run test:s04:e2e` | 7 passed in 14.1s, no retries, no skips; Chromium 156.0.8078.4; [actual output](t14-browser-run-output.txt) |
 | `.venv/bin/python backend/scripts/collect_s04_evidence.py` | Exported all 7 cases: API JSON, screenshots, fixture summaries and source manifest; refuses failed/flaky/partial runs |
 | `npm --prefix frontend run test:s04:runner` | 3 passed: forced backend termination followed by Playwright success/failure, startup failure; another run's database survives; [actual output](t14-runner-cleanup-output.txt) |
+| `npm --prefix frontend test` | 199 passed in 18 files; Vitest does not collect the Node runner checks |
 | `.venv/bin/python -m ruff check backend/scripts/s04_acceptance_server.py backend/scripts/collect_s04_evidence.py --output-format=concise` | All checks passed |
 | `npm --prefix frontend run lint` | Passed |
 | `npm --prefix frontend run build` | Passed |
@@ -106,11 +107,17 @@ run. Cleanup tests hold the database file open in a backend subprocess, kill
 that subprocess without cleanup, and verify removal only after it stops;
 a separate `s04-browser-*` directory and its database remain intact.
 Python 3.12.4 and Node v24.21.0 were used locally on macOS. The
-[workflow](../../../.github/workflows/s04-e2e.yml) now also runs these cleanup
-tests on Ubuntu and Windows; this local run does not claim Windows execution.
-The earlier full regression baseline was 373 backend tests passed (1 existing
-skip) and 199 frontend tests passed; those full suites were not rerun for this
-runner-only fix.
+[workflow](../../../.github/workflows/s04-e2e.yml) also runs these cleanup
+tests on Ubuntu and Windows. On `6a57b6e`, both
+[Windows cleanup](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/38870301880/job/116872558234)
+and [Ubuntu cleanup](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/38870301880/job/116872558423)
+passed. The full frontend suite on that commit failed because Vitest collected
+the Node `node:test` file named `*.test.mjs`. The file is now named
+`run-s04-e2e.node-test.mjs`, outside Vitest's discovery pattern, and is still run
+explicitly by `test:s04:runner`. The commands above verify both runners after
+that rename.
+The earlier backend regression baseline was 373 tests passed (1 existing
+skip); the full backend suite was not rerun for this test-discovery fix.
 
 ## Reproducible reviewer steps
 

@@ -1,13 +1,13 @@
 
 > frontend@0.0.0 test:s04:runner
-> node --test scripts/run-s04-e2e.test.mjs
+> node --test scripts/run-s04-e2e.node-test.mjs
 
 s04_temporary_database_removed=true
-✔ cleans only this run after forced backend termination and Playwright exit 0 (103.892ms)
+✔ cleans only this run after forced backend termination and Playwright exit 0 (142.947583ms)
 s04_temporary_database_removed=true
-✔ cleans only this run after forced backend termination and Playwright exit 7 (157.867417ms)
+✔ cleans only this run after forced backend termination and Playwright exit 7 (175.05925ms)
 s04_temporary_database_removed=true
-✔ cleans the owned directory when Playwright fails during startup (50.574417ms)
+✔ cleans the owned directory when Playwright fails during startup (86.377625ms)
 ℹ tests 3
 ℹ suites 0
 ℹ pass 3
@@ -15,4 +15,4 @@ s04_temporary_database_removed=true
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 384.00625
+ℹ duration_ms 500.402083

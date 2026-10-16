@@ -24,39 +24,6 @@
   },
   {
     "method": "GET",
-    "path": "/api/genres",
-    "status": 200,
-    "body": {
-      "data": {
-        "genres": [
-          {
-            "id": 8101,
-            "name": "Action"
-          },
-          {
-            "id": 8103,
-            "name": "Archive"
-          },
-          {
-            "id": 8102,
-            "name": "Comedy"
-          }
-        ]
-      }
-    }
-  },
-  {
-    "method": "GET",
-    "path": "/api/me/preferences",
-    "status": 200,
-    "body": {
-      "data": {
-        "genres": []
-      }
-    }
-  },
-  {
-    "method": "GET",
     "path": "/api/me/preferences",
     "status": 200,
     "body": {
@@ -85,6 +52,39 @@
             "name": "Comedy"
           }
         ]
+      }
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/api/genres",
+    "status": 200,
+    "body": {
+      "data": {
+        "genres": [
+          {
+            "id": 8101,
+            "name": "Action"
+          },
+          {
+            "id": 8103,
+            "name": "Archive"
+          },
+          {
+            "id": 8102,
+            "name": "Comedy"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/api/me/preferences",
+    "status": 200,
+    "body": {
+      "data": {
+        "genres": []
       }
     }
   },

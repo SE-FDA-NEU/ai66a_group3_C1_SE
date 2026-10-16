@@ -12,7 +12,7 @@ const git = (...args: string[]) => execFileSync("git", args, { cwd: root, encodi
 const supportFiles = [
   "frontend/package.json", "frontend/package-lock.json", "frontend/playwright.s04.config.ts",
   "frontend/vite.s04.config.ts", "frontend/e2e/s04.acceptance.ts",
-  "frontend/scripts/run-s04-e2e.mjs", "frontend/scripts/run-s04-e2e.test.mjs",
+  "frontend/scripts/run-s04-e2e.mjs", "frontend/scripts/run-s04-e2e.node-test.mjs",
   "backend/requirements.lock.txt", "backend/pyproject.toml", "backend/alembic.ini",
   "backend/scripts/s04_acceptance_server.py", "backend/scripts/collect_s04_evidence.py",
   "backend/scripts/verify_s09_popular_ui.py",

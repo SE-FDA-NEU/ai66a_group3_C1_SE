@@ -1,15 +1,15 @@
 {
   "stats": {
-    "startTime": "2026-10-16T07:51:48.561Z",
-    "duration": 10012.276,
+    "startTime": "2026-10-16T07:58:41.446Z",
+    "duration": 14104.451000000001,
     "expected": 7,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0
   },
   "testedSource": {
-    "testedCommit": "fbc1897c5792a6b4e6d91d0c3c14a8b31c9f24d2",
-    "workingTree": "M .github/workflows/s04-e2e.yml\n M backend/scripts/s04_acceptance_server.py\n M docs/evidence/s3-t14-cold-start-acceptance/t14-browser-run-output.txt\n M frontend/package.json\n M frontend/playwright.s04.config.ts\n?? backend.zip\n?? frontend.zip\n?? frontend/scripts/\n?? s3-t14-cold-start-acceptance.zip",
+    "testedCommit": "6a57b6ebbb58217525cf127ffbd31ebb3fdfd6aa",
+    "workingTree": "M docs/evidence/s3-t14-cold-start-acceptance/t14-browser-run-output.txt\n M docs/evidence/s3-t14-cold-start-acceptance/t14-runner-cleanup-output.txt\n M frontend/package.json\n M frontend/playwright.s04.config.ts\n D frontend/scripts/run-s04-e2e.test.mjs\n?? backend.zip\n?? frontend.zip\n?? frontend/scripts/run-s04-e2e.node-test.mjs\n?? s3-t14-cold-start-acceptance.zip",
     "node": "v24.21.0",
     "python": "Python 3.12.4",
     "sourceSha256": {
@@ -67,10 +67,10 @@
       "backend/tests/fixtures/s04_browser_acceptance.json": "e3640a9326a01627bfc13e2e3d622102aca44431e4b334c98843794faa241c02",
       "frontend/e2e/s04.acceptance.ts": "130d1ad0b5085a20871b7fe2733b46b86c8d22148aa2f2c2294aa96f4344c618",
       "frontend/package-lock.json": "e0ba953c34e929a439d76eba60bec56457693e89826a35164ce493535bb3f014",
-      "frontend/package.json": "945663c25761f0d08535f880e6aa1451bc1c4c8502669e36084fd2f4e7bf9aac",
-      "frontend/playwright.s04.config.ts": "13898756dd3b273ba081021472838e734e76fa74ba231e99744934ac46811fc7",
+      "frontend/package.json": "07958cf9fe4300f805ace47c70d892924ae6f703ee6269d6fa36c9ae31cca33b",
+      "frontend/playwright.s04.config.ts": "bbacb4a5bf8a82aa279e051faebf781506759ade807f258a076c0c01b5dc00df",
       "frontend/scripts/run-s04-e2e.mjs": "21d407c4d71288017b5e7a19e9beebe70e529532af99bd75ac20b05665d06dba",
-      "frontend/scripts/run-s04-e2e.test.mjs": "39dc110be976e78a5c5c9d0a2fdfe77775adc9928ef644c5f8fb50dbcf448c1e",
+      "frontend/scripts/run-s04-e2e.node-test.mjs": "4034b3b9ce22bea5c6f719a9d182b04672b9b6706bb63dad96a723b9263fabda",
       "frontend/src/App.tsx": "c4080fe9f7c6293b0b15f62639373ecc29c0e8baf9652668e0a8b35b6d276df7",
       "frontend/src/RecommendationExplanationPage.tsx": "7656f3eb7b6bd8c32f46aac59422287548a2e15fc9b53c814eb5c685483a5025",
       "frontend/src/api/auth.ts": "5afa942be0728594cd642357727f315b57784065f321e154b071464c8510d553",
@@ -125,7 +125,7 @@
     {
       "test": "AC1/AC2/AC4: real sign-in, A90 B80 C80 top ten, Enter preferences and fresh matches",
       "status": "passed",
-      "durationMs": 1426,
+      "durationMs": 1738,
       "evidence": [
         "01-database-fixture.json",
         "01-cold-start.png",
@@ -139,7 +139,7 @@
     {
       "test": "AC4: saved genres with no match show true popular alternatives and edit/retry",
       "status": "passed",
-      "durationMs": 926,
+      "durationMs": 1264,
       "evidence": [
         "02-database-fixture.json",
         "02-recommendations-api.json",
@@ -151,7 +151,7 @@
     {
       "test": "AC3: successful empty shows guidance and zero cards",
       "status": "passed",
-      "durationMs": 622,
+      "durationMs": 923,
       "evidence": [
         "03-database-fixture.json",
         "03-empty-fixture.json",
@@ -164,7 +164,7 @@
     {
       "test": "AC3: successful no-popularity shows guidance and zero cards",
       "status": "passed",
-      "durationMs": 678,
+      "durationMs": 824,
       "evidence": [
         "04-database-fixture.json",
         "04-empty-fixture.json",
@@ -177,7 +177,7 @@
     {
       "test": "AC4: no-match without usable popular alternatives still has edit/retry and zero cards",
       "status": "passed",
-      "durationMs": 728,
+      "durationMs": 1072,
       "evidence": [
         "05-database-fixture.json",
         "05-recommendations-api.json",
@@ -189,7 +189,7 @@
     {
       "test": "real SQL failure is Error/Retry, preserves genres and recovers",
       "status": "passed",
-      "durationMs": 1017,
+      "durationMs": 1150,
       "evidence": [
         "06-database-fixture.json",
         "06-db-failure.png",
@@ -203,7 +203,7 @@
     {
       "test": "delayed real cold-start response cannot replace results after a real genre save",
       "status": "passed",
-      "durationMs": 1202,
+      "durationMs": 1241,
       "evidence": [
         "07-database-fixture.json",
         "07-fresh-loading.png",
