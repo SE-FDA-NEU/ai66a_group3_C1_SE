@@ -12,6 +12,7 @@ const git = (...args: string[]) => execFileSync("git", args, { cwd: root, encodi
 const supportFiles = [
   "frontend/package.json", "frontend/package-lock.json", "frontend/playwright.s04.config.ts",
   "frontend/vite.s04.config.ts", "frontend/e2e/s04.acceptance.ts",
+  "frontend/scripts/run-s04-e2e.mjs", "frontend/scripts/run-s04-e2e.test.mjs",
   "backend/requirements.lock.txt", "backend/pyproject.toml", "backend/alembic.ini",
   "backend/scripts/s04_acceptance_server.py", "backend/scripts/collect_s04_evidence.py",
   "backend/scripts/verify_s09_popular_ui.py",
@@ -52,13 +53,11 @@ export default defineConfig({
       cwd: root,
       url: "http://127.0.0.1:8014/__acceptance/ready",
       reuseExistingServer: false,
-      gracefulShutdown: { signal: "SIGTERM", timeout: 5000 },
     },
     {
       command: "node node_modules/vite/bin/vite.js --config vite.s04.config.ts --host 127.0.0.1 --port 5174 --strictPort",
       url: "http://127.0.0.1:5174",
       reuseExistingServer: false,
-      gracefulShutdown: { signal: "SIGTERM", timeout: 5000 },
     },
   ],
 });

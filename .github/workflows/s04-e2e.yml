@@ -15,6 +15,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  s04-runner-cleanup:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Verify parent cleanup after forced backend termination
+        run: npm --prefix frontend run test:s04:runner
+
   s04-acceptance:
     runs-on: ubuntu-latest
     timeout-minutes: 10

@@ -493,7 +493,16 @@ python backend/scripts/collect_s04_evidence.py
 
 The runner selects the repository `.venv` Python when present; otherwise it
 uses `python` on PATH. Override it with `S04_PYTHON` if needed. No TMDb token
-is required. See the [S04 AC matrix, evidence, and reviewer steps](docs/evidence/s3-t14-cold-start-acceptance/README.md).
+is required. The parent runner owns one temporary database directory per run
+and removes it in `finally` after Playwright and its servers stop, including
+forced backend shutdown on Windows. Run `npm --prefix frontend run test:s04:runner`
+to check cleanup and isolation from other runs.
+
+[PR #176](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/176) has
+[successful S04 CI](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/38864844350/job/116855188548)
+and [Hoàng's approval](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/176#pullrequestreview-5544269476)
+on `fbc1897`. See the [S04 AC matrix, refreshed evidence, and reviewer steps](docs/evidence/s3-t14-cold-start-acceptance/README.md)
+for the local runner fix and its source manifest.
 
 
 ## Lint Backend

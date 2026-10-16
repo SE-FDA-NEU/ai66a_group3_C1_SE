@@ -1,8 +1,8 @@
 """Test-only S04 HTTP harness; never imported by the production application.
 
-Owns a migrated temporary SQLite DB. Controls change actual catalogue data or
+Uses the parent runner's temporary SQLite DB. Controls change actual catalogue data or
 delay already-computed ASGI responses; auth, routes, queries and JSON stay real.
-Run only via playwright.s04.config.ts, bound to loopback on a dedicated port.
+Run only via run-s04-e2e.mjs, bound to loopback on a dedicated port.
 """
 
 from __future__ import annotations
@@ -12,10 +12,8 @@ import json
 import os
 import sqlite3
 import sys
-from collections.abc import Callable
-from contextlib import asynccontextmanager, closing
+from contextlib import closing
 from pathlib import Path
-from tempfile import TemporaryDirectory
 
 from verify_s09_popular_ui import run_migrations, sqlite_url, utc_timestamp
 
@@ -73,20 +71,11 @@ def seed_database(path: Path, fixture: dict) -> None:
         )
 
 
-def build_harness(path: Path, fixture: dict, cleanup: Callable[[], None]):
+def build_harness(path: Path, fixture: dict):
     from app.main import app as production_app
     from fastapi import FastAPI, HTTPException
 
-    @asynccontextmanager
-    async def lifespan(_app):
-        try:
-            yield
-        finally:
-            # Uvicorn re-raises SIGTERM after shutdown, before main's finally
-            # can run. Dispose and remove the DB within the ASGI lifespan.
-            cleanup()
-
-    controls = FastAPI(lifespan=lifespan)
+    controls = FastAPI()
     gates: dict[str, dict] = {}
     capturing: str | None = None
     broken = False
@@ -243,29 +232,23 @@ def main() -> None:
     import uvicorn
 
     # Override configuration before importing any application module.
-    temporary = TemporaryDirectory(prefix="s04-browser-")
-    with temporary as directory:
-        path = Path(directory) / "acceptance.db"
-        os.environ["DATABASE_URL"] = sqlite_url(path)
-        os.environ["TMDB_READ_ACCESS_TOKEN"] = ""
-        os.environ["SESSION_COOKIE_SECURE"] = "false"
-        run_migrations(os.environ["DATABASE_URL"], dict(os.environ))
-        fixture = json.loads(FIXTURE.read_text(encoding="utf-8"))
-        seed_database(path, fixture)
-        sys.path.insert(0, str(ROOT / "backend"))
-        from app.db.database import engine
+    directory = os.environ.get("S04_DATABASE_DIR")
+    if not directory:
+        raise RuntimeError("Run via npm --prefix frontend run test:s04:e2e")
+    path = Path(directory) / "acceptance.db"
+    os.environ["DATABASE_URL"] = sqlite_url(path)
+    os.environ["TMDB_READ_ACCESS_TOKEN"] = ""
+    os.environ["SESSION_COOKIE_SECURE"] = "false"
+    run_migrations(os.environ["DATABASE_URL"], dict(os.environ))
+    fixture = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    seed_database(path, fixture)
+    sys.path.insert(0, str(ROOT / "backend"))
+    from app.db.database import engine
 
-        def cleanup():
-            engine.dispose()
-            temporary.cleanup()
-            print("s04_temporary_database_removed=true", flush=True)
-
-        try:
-            uvicorn.run(
-                build_harness(path, fixture, cleanup), host="127.0.0.1", port=8014
-            )
-        finally:
-            cleanup()
+    try:
+        uvicorn.run(build_harness(path, fixture), host="127.0.0.1", port=8014)
+    finally:
+        engine.dispose()
 
 
 if __name__ == "__main__":

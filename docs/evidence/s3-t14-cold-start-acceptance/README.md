@@ -4,8 +4,9 @@ Run date: 2026-10-16 (Asia/Ho_Chi_Minh).
 
 - Task: [S3-T14 #116](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/116).
 - Parent Story: [S04 #20](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/20); keep open until the complete AC and [DoD](../../definition-of-done.md) pass.
-- Tested source: [`f92a4a4c1640925eb0a617ba3be162f82127b00d`](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/f92a4a4c1640925eb0a617ba3be162f82127b00d), with a clean working tree. [results.json](results.json) records that commit and the SHA-256 manifest for the actual application, fixture and harness files. The following evidence commit changes only documentation/generated artifacts.
-- Independent review and hosted CI: pending the T14 PR. Local success does not establish either gate.
+- Tested source: local working tree based on [`fbc1897c5792a6b4e6d91d0c3c14a8b31c9f24d2`](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/fbc1897c5792a6b4e6d91d0c3c14a8b31c9f24d2), including the parent-runner cleanup fix. [results.json](results.json) records the base commit, working-tree status, and SHA-256 manifest for the actual application, fixture, harness, wrapper and cleanup tests. This run started at **14:51:48 Asia/Ho_Chi_Minh**.
+- Hosted CI: [S04 acceptance succeeded](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/38864844350/job/116855188548) on [PR #176](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/176); [Python and frontend CI also succeeded](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/38864844447).
+- Independent review: [Hoàng (`@hoang3003`) approved](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/176#pullrequestreview-5544269476) at **14:16:59 Asia/Ho_Chi_Minh** on 2026-10-16. These hosted results and approval apply to `fbc1897`; the cleanup changes here have the local verification below.
 - Scope: acceptance automation and evidence. Existing production components, auth, API and ranking are reused unchanged.
 
 ## Reviewed/merged prerequisites
@@ -25,11 +26,18 @@ it does not reimplement their features or claim another task's completion.
 
 ## Controlled setup and test boundaries
 
+[Parent runner](../../../frontend/scripts/run-s04-e2e.mjs) creates a unique
+`s04-browser-*` directory and passes it to the backend as `S04_DATABASE_DIR`.
 [Playwright configuration](../../../frontend/playwright.s04.config.ts) starts
 the [test-only server](../../../backend/scripts/s04_acceptance_server.py) and
 Vite on loopback ports **8014/5174**, refusing to reuse existing servers.
-The server creates its own temporary SQLite file, applies the real Alembic
-migrations using the existing T21 migration helper, and deletes it on shutdown.
+The server creates `acceptance.db` inside that directory and applies the real
+Alembic migrations using the existing T21 migration helper. Playwright stops
+its server process trees before exiting; the parent awaits that exit and
+removes only its own directory in `finally`, on both successful and failed runs.
+Cleanup does not depend on ASGI lifespan callbacks or graceful SIGTERM, which
+Playwright does not support on Windows. No prefix scan or deletion of other
+runs' directories is used.
 The normal `.env` database is never selected. Auth, sessions, preferences,
 recommendation queries and responses run through the production FastAPI app.
 Registration uses the real API; each fresh browser context signs in through
@@ -86,35 +94,37 @@ Additional task checks:
 
 | Command from repository root | Local result |
 |---|---|
-| `npm --prefix frontend run test:s04:e2e` | 7 passed in 9.8s, no retries, no skips; Chromium 156.0.8078.4; [actual output](t14-browser-run-output.txt) |
-| `python backend/scripts/collect_s04_evidence.py` | Exports API JSON, screenshots, fixture summaries and source manifest; refuses failed/flaky/partial runs |
-| `python -m pytest backend/tests/test_popular_recommendations.py backend/tests/test_personalised_recommendations_api.py backend/tests/test_recommendation_fixtures.py -q -p no:cacheprovider` | 43 passed |
-| `npm --prefix frontend test -- src/tests/recommendations.test.tsx src/tests/recommendation-preference-transition.test.tsx` | 22 passed in 2 files |
-| `python -m pytest backend/tests -q -p no:cacheprovider` | 373 passed, 1 skipped, 1 existing Starlette deprecation warning |
-| `npm --prefix frontend test` | 199 passed in 18 files |
-| `python -m ruff check backend --output-format=concise` | All checks passed |
+| `npm --prefix frontend run test:s04:e2e` | 7 passed in 10.0s, no retries, no skips; Chromium 156.0.8078.4; [actual output](t14-browser-run-output.txt) |
+| `.venv/bin/python backend/scripts/collect_s04_evidence.py` | Exported all 7 cases: API JSON, screenshots, fixture summaries and source manifest; refuses failed/flaky/partial runs |
+| `npm --prefix frontend run test:s04:runner` | 3 passed: forced backend termination followed by Playwright success/failure, startup failure; another run's database survives; [actual output](t14-runner-cleanup-output.txt) |
+| `.venv/bin/python -m ruff check backend/scripts/s04_acceptance_server.py backend/scripts/collect_s04_evidence.py --output-format=concise` | All checks passed |
 | `npm --prefix frontend run lint` | Passed |
 | `npm --prefix frontend run build` | Passed |
 
-The successful shutdown left **zero** `s04-browser-*` temporary directories.
-Python 3.12.4 and Node v24.21.0 were used locally. The backend skip is the
-existing `test_auth_catalogue_handoff.py` rating-write placeholder (its reason
-still says S05a is pending). Rating suites already exist separately; T14
-does not change or conceal that unrelated placeholder.
+The parent logged `s04_temporary_database_removed=true` after the seven-test
+run. Cleanup tests hold the database file open in a backend subprocess, kill
+that subprocess without cleanup, and verify removal only after it stops;
+a separate `s04-browser-*` directory and its database remain intact.
+Python 3.12.4 and Node v24.21.0 were used locally on macOS. The
+[workflow](../../../.github/workflows/s04-e2e.yml) now also runs these cleanup
+tests on Ubuntu and Windows; this local run does not claim Windows execution.
+The earlier full regression baseline was 373 backend tests passed (1 existing
+skip) and 199 frontend tests passed; those full suites were not rerun for this
+runner-only fix.
 
 ## Reproducible reviewer steps
 
-1. Check out the tested source commit linked above and install the locked backend/frontend dependencies using the repository README. Activate Python 3.12; alternatively set `S04_PYTHON` to its executable. Keep ports 8014/5174 free.
+1. Check out the cleanup change based on the commit linked above and install the locked backend/frontend dependencies using the repository README. Compare the runtime/test files with `testedSource.sourceSha256` in `results.json`. Activate Python 3.12; alternatively set `S04_PYTHON` to its executable. Keep ports 8014/5174 free.
 2. In `frontend`, run `npx playwright install chromium` once (`npx playwright install --with-deps chromium` on Linux CI), then return to the repository root. A provider token is unnecessary.
-3. Run the focused backend/frontend commands above, followed by `npm --prefix frontend run test:s04:e2e`. Require all seven tests to pass without retries.
+3. Run `npm --prefix frontend run test:s04:runner`, followed by `npm --prefix frontend run test:s04:e2e`. Require all seven browser tests to pass without retries and the parent cleanup marker to appear after the results.
 4. Run `python backend/scripts/collect_s04_evidence.py`. Inspect `results.json`, every API JSON and the linked screenshots. Each case logs only safe recommendation/genre/preference bodies, browser version and fixture metadata; auth cookies, passwords and trace/HAR files are excluded.
-5. Run the full regressions, lint and build above. The dedicated [CI workflow](../../../.github/workflows/s04-e2e.yml) repeats the browser run and uploads `frontend/test-results/` even on failure.
-6. An independent teammate reviews the actual tested diff and records approval on the PR. Link that review and green hosted CI before marking T14 complete. Do not merge or close Story #20 based solely on this local run.
+5. Run lint and build above. The dedicated [CI workflow](../../../.github/workflows/s04-e2e.yml) repeats the browser run, checks cleanup on Ubuntu/Windows, and uploads `frontend/test-results/` even on failure.
+6. The hosted CI and Hoàng approval for `fbc1897` are linked above. Publish the cleanup change and verify its new hosted checks and review before merge; keep the distinction between the approved base and this local patch. Do not close Story #20 based solely on this local run.
 
 ## Explicit remaining gates
 
 - Unimplemented S04 behavioural criteria identified by these four AC: **none**. All four have real-browser/API coverage.
-- Tested immutable source commit: linked above; the evidence-only commit does not change any hashed runtime/test file.
-- Independent teammate approval, hosted CI, merge and clean-clone reviewer verification: **pending**. No review approval is inferred from automated tests or the author's own inspection.
+- Tested source: base commit plus the local cleanup changes, identified by the refreshed SHA-256 manifest above.
+- Hosted CI and independent approval for `fbc1897`: **passed**, with permanent links above. The local cleanup patch still needs publication and its own hosted checks/review; PR #176 is open and unmerged. Clean-clone reviewer verification is not recorded here.
 - Required Sprint 3 TMDb staging/demo import and provenance smoke: **not performed by this synthetic suite**. Track separately using the [runbook](../../tmdb-sprint3-runbook.md); passing controlled tests does not satisfy that DoD gate.
 - Story #20 and task #116 remain open until their respective remaining checks pass.

@@ -1,19 +1,19 @@
 {
   "stats": {
-    "startTime": "2026-10-16T07:01:44.448Z",
-    "duration": 9805.11,
+    "startTime": "2026-10-16T07:51:48.561Z",
+    "duration": 10012.276,
     "expected": 7,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0
   },
   "testedSource": {
-    "testedCommit": "f92a4a4c1640925eb0a617ba3be162f82127b00d",
-    "workingTree": "",
+    "testedCommit": "fbc1897c5792a6b4e6d91d0c3c14a8b31c9f24d2",
+    "workingTree": "M .github/workflows/s04-e2e.yml\n M backend/scripts/s04_acceptance_server.py\n M docs/evidence/s3-t14-cold-start-acceptance/t14-browser-run-output.txt\n M frontend/package.json\n M frontend/playwright.s04.config.ts\n?? backend.zip\n?? frontend.zip\n?? frontend/scripts/\n?? s3-t14-cold-start-acceptance.zip",
     "node": "v24.21.0",
     "python": "Python 3.12.4",
     "sourceSha256": {
-      ".github/workflows/s04-e2e.yml": "5af6b78f2d4a99a22098448a5591635da99c148209b0bcab40f86eda785dac6c",
+      ".github/workflows/s04-e2e.yml": "7060a3c25534f4915b942744d224a198fc6bff7f1198de7d66913200d958f368",
       "backend/alembic.ini": "6da7d0dd89308667b781e65ae2219e5cf42525ff86ac63911f2efd6915968a7d",
       "backend/alembic/README": "31595cf53626af9ed16e15c44fa43183209cc163fbc3ebcb904b22ac436a8884",
       "backend/alembic/env.py": "30ea56b904a91ee9df6a0ba434fdddc50c46750d6346d253290cf61e37e08752",
@@ -62,13 +62,15 @@
       "backend/pyproject.toml": "d58c9d1fcc6961b2971727f39614cfb025d38a41b2d0ec22c1e5ba2f710cdc08",
       "backend/requirements.lock.txt": "544977f3d8945cd074cb67f2ac4a73d1b4c64e1b063a34eed7c1cf1fee7ea83a",
       "backend/scripts/collect_s04_evidence.py": "224a9c65fdb525434171f2e3e147b33bff7e4519132dd4d4797d0d35e9274dcf",
-      "backend/scripts/s04_acceptance_server.py": "773391d18b35f688c36c15d06735f7f9b4ed2e61f14322d2d12a9ec9cc65b80f",
+      "backend/scripts/s04_acceptance_server.py": "f7f5a87a9e42f59765f6c81a9202f9b529cc251bfadeef5d94f9b1a4a59f6cb1",
       "backend/scripts/verify_s09_popular_ui.py": "839763cc7151d29a908d9fbe9a9d94fffe356521a4ab0b3d2dc4c18496793456",
       "backend/tests/fixtures/s04_browser_acceptance.json": "e3640a9326a01627bfc13e2e3d622102aca44431e4b334c98843794faa241c02",
       "frontend/e2e/s04.acceptance.ts": "130d1ad0b5085a20871b7fe2733b46b86c8d22148aa2f2c2294aa96f4344c618",
       "frontend/package-lock.json": "e0ba953c34e929a439d76eba60bec56457693e89826a35164ce493535bb3f014",
-      "frontend/package.json": "a56c2ed8a4062af2ebdfac0ac939e544ce09e2420e6747aec321414b04f36600",
-      "frontend/playwright.s04.config.ts": "f0e29865130019da6eba667733c737b8f4a5277a0c876fa780bf57be355ee8e7",
+      "frontend/package.json": "945663c25761f0d08535f880e6aa1451bc1c4c8502669e36084fd2f4e7bf9aac",
+      "frontend/playwright.s04.config.ts": "13898756dd3b273ba081021472838e734e76fa74ba231e99744934ac46811fc7",
+      "frontend/scripts/run-s04-e2e.mjs": "21d407c4d71288017b5e7a19e9beebe70e529532af99bd75ac20b05665d06dba",
+      "frontend/scripts/run-s04-e2e.test.mjs": "39dc110be976e78a5c5c9d0a2fdfe77775adc9928ef644c5f8fb50dbcf448c1e",
       "frontend/src/App.tsx": "c4080fe9f7c6293b0b15f62639373ecc29c0e8baf9652668e0a8b35b6d276df7",
       "frontend/src/RecommendationExplanationPage.tsx": "7656f3eb7b6bd8c32f46aac59422287548a2e15fc9b53c814eb5c685483a5025",
       "frontend/src/api/auth.ts": "5afa942be0728594cd642357727f315b57784065f321e154b071464c8510d553",
@@ -123,7 +125,7 @@
     {
       "test": "AC1/AC2/AC4: real sign-in, A90 B80 C80 top ten, Enter preferences and fresh matches",
       "status": "passed",
-      "durationMs": 1448,
+      "durationMs": 1426,
       "evidence": [
         "01-database-fixture.json",
         "01-cold-start.png",
@@ -137,7 +139,7 @@
     {
       "test": "AC4: saved genres with no match show true popular alternatives and edit/retry",
       "status": "passed",
-      "durationMs": 920,
+      "durationMs": 926,
       "evidence": [
         "02-database-fixture.json",
         "02-recommendations-api.json",
@@ -149,7 +151,7 @@
     {
       "test": "AC3: successful empty shows guidance and zero cards",
       "status": "passed",
-      "durationMs": 607,
+      "durationMs": 622,
       "evidence": [
         "03-database-fixture.json",
         "03-empty-fixture.json",
@@ -162,7 +164,7 @@
     {
       "test": "AC3: successful no-popularity shows guidance and zero cards",
       "status": "passed",
-      "durationMs": 560,
+      "durationMs": 678,
       "evidence": [
         "04-database-fixture.json",
         "04-empty-fixture.json",
@@ -175,7 +177,7 @@
     {
       "test": "AC4: no-match without usable popular alternatives still has edit/retry and zero cards",
       "status": "passed",
-      "durationMs": 811,
+      "durationMs": 728,
       "evidence": [
         "05-database-fixture.json",
         "05-recommendations-api.json",
@@ -187,7 +189,7 @@
     {
       "test": "real SQL failure is Error/Retry, preserves genres and recovers",
       "status": "passed",
-      "durationMs": 995,
+      "durationMs": 1017,
       "evidence": [
         "06-database-fixture.json",
         "06-db-failure.png",
@@ -201,7 +203,7 @@
     {
       "test": "delayed real cold-start response cannot replace results after a real genre save",
       "status": "passed",
-      "durationMs": 1212,
+      "durationMs": 1202,
       "evidence": [
         "07-database-fixture.json",
         "07-fresh-loading.png",

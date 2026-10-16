@@ -9,7 +9,8 @@
     "test": "vitest run",
     "test:t16:integration": "vitest run --config vitest.t16.config.ts",
     "test:t33:integration": "vitest run --config vitest.t33.config.ts",
-    "test:s04:e2e": "playwright test --config playwright.s04.config.ts",
+    "test:s04:e2e": "node scripts/run-s04-e2e.mjs",
+    "test:s04:runner": "node --test scripts/run-s04-e2e.test.mjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },
