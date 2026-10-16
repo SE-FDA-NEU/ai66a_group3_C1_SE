@@ -1,0 +1,55 @@
+name: T34 browser rating protection acceptance
+
+on:
+  push:
+    branches: ["**"]
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - ".github/workflows/t34-browser-acceptance.yml"
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - ".github/workflows/t34-browser-acceptance.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  browser-rating-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      PYTHONUTF8: "1"
+      TMDB_READ_ACCESS_TOKEN: ""
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Install locked dependencies
+        run: |
+          python -m pip install -r backend/requirements.lock.txt
+          python -m pip install -e "./backend[dev]" --no-deps
+          npm --prefix frontend ci
+      - name: Verify browser, API, and isolated database journey
+        run: |
+          python backend/scripts/verify_s13_rating_ui.py \
+            --evidence-dir .artifacts/s3-t34-rating-acceptance
+      - name: Upload T34 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: s3-t34-rating-acceptance-${{ github.sha }}
+          path: .artifacts/s3-t34-rating-acceptance
+          if-no-files-found: error
+          retention-days: 14
