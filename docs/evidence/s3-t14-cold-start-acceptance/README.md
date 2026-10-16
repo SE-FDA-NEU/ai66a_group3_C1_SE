@@ -4,7 +4,7 @@ Run date: 2026-10-16 (Asia/Ho_Chi_Minh).
 
 - Task: [S3-T14 #116](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/116).
 - Parent Story: [S04 #20](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/20); keep open until the complete AC and [DoD](../../definition-of-done.md) pass.
-- Tested source: the exact commit and file SHA-256 manifest are recorded in [results.json](results.json). The final immutable candidate link is pending the acceptance commit/run.
+- Tested source: [`f92a4a4c1640925eb0a617ba3be162f82127b00d`](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/f92a4a4c1640925eb0a617ba3be162f82127b00d), with a clean working tree. [results.json](results.json) records that commit and the SHA-256 manifest for the actual application, fixture and harness files. The following evidence commit changes only documentation/generated artifacts.
 - Independent review and hosted CI: pending the T14 PR. Local success does not establish either gate.
 - Scope: acceptance automation and evidence. Existing production components, auth, API and ranking are reused unchanged.
 
@@ -86,7 +86,7 @@ Additional task checks:
 
 | Command from repository root | Local result |
 |---|---|
-| `npm --prefix frontend run test:s04:e2e` | 7 passed, no retries, no skips; Chromium 156.0.8078.4 |
+| `npm --prefix frontend run test:s04:e2e` | 7 passed in 9.8s, no retries, no skips; Chromium 156.0.8078.4; [actual output](t14-browser-run-output.txt) |
 | `python backend/scripts/collect_s04_evidence.py` | Exports API JSON, screenshots, fixture summaries and source manifest; refuses failed/flaky/partial runs |
 | `python -m pytest backend/tests/test_popular_recommendations.py backend/tests/test_personalised_recommendations_api.py backend/tests/test_recommendation_fixtures.py -q -p no:cacheprovider` | 43 passed |
 | `npm --prefix frontend test -- src/tests/recommendations.test.tsx src/tests/recommendation-preference-transition.test.tsx` | 22 passed in 2 files |
@@ -96,6 +96,7 @@ Additional task checks:
 | `npm --prefix frontend run lint` | Passed |
 | `npm --prefix frontend run build` | Passed |
 
+The successful shutdown left **zero** `s04-browser-*` temporary directories.
 Python 3.12.4 and Node v24.21.0 were used locally. The backend skip is the
 existing `test_auth_catalogue_handoff.py` rating-write placeholder (its reason
 still says S05a is pending). Rating suites already exist separately; T14
@@ -113,7 +114,7 @@ does not change or conceal that unrelated placeholder.
 ## Explicit remaining gates
 
 - Unimplemented S04 behavioural criteria identified by these four AC: **none**. All four have real-browser/API coverage.
-- Final tested immutable candidate link: pending the source commit/run, with per-file hashes already included in the machine-readable results.
+- Tested immutable source commit: linked above; the evidence-only commit does not change any hashed runtime/test file.
 - Independent teammate approval, hosted CI, merge and clean-clone reviewer verification: **pending**. No review approval is inferred from automated tests or the author's own inspection.
 - Required Sprint 3 TMDb staging/demo import and provenance smoke: **not performed by this synthetic suite**. Track separately using the [runbook](../../tmdb-sprint3-runbook.md); passing controlled tests does not satisfy that DoD gate.
 - Story #20 and task #116 remain open until their respective remaining checks pass.

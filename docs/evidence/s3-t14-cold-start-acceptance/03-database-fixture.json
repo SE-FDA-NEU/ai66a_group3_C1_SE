@@ -1,0 +1,21 @@
+{
+  "ready": {
+    "harness": "s04-temporary-db",
+    "migrationVersion": "b7e4c2d91f30"
+  },
+  "seed": {
+    "scenario": "ranked",
+    "preferences": [
+      [
+        "8cc36d3d-492a-4f94-9742-8bcb5a2f4b41",
+        8101
+      ],
+      [
+        "c2c2e276-b2c2-4ae8-8036-e8a3f7b3726c",
+        8103
+      ]
+    ],
+    "activeMovies": 13,
+    "finitePopularity": 12
+  }
+}
