@@ -1,0 +1,25 @@
+S13 / T34 rating protection and recovery acceptance
+run_at=2026-10-16T13:52:38+07:00
+base_commit=e47830511a6321cf1543bef7b18895769bd2a99f
+working_tree=local changes present
+candidate_source_sha256=ce732519d49e0da195edb370ad7b64679f5e67292c352c33f69a447385d08d11
+python=3.12.3
+node=v24.20.0
+browser_product=Chrome/155.0.8059.79
+browser_executable=C:\Program Files\Google\Chrome\Application\chrome.exe
+database=migrated temporary file-backed SQLite
+catalogue=reviewed S3-T06 deterministic fixture
+guest_public_detail=PASS
+guest_rating_action_login_without_private_mutation=PASS
+account_a_save_update_failure_retry=PASS
+account_a_b_rating_isolation=PASS
+delayed_account_response_isolation=PASS
+delayed_movie_response_isolation=PASS
+revoked_session_central_401=PASS
+expired_session_central_401=PASS
+zero_ratings_recommendations=PASS
+return_context_and_preferences=PASS
+recommendation_account_cache_isolation=PASS
+database_integrity=ok
+independent_review=pending pull-request reviewer
+result=PASS

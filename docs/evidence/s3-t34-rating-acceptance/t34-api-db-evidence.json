@@ -1,0 +1,609 @@
+{
+  "finalDatabase": {
+    "integrityCheck": "ok",
+    "preferences": [
+      {
+        "account": "t34-account-a@example.test",
+        "genre_id": 7103
+      },
+      {
+        "account": "t34-account-b@example.test",
+        "genre_id": 7102
+      }
+    ],
+    "ratings": [
+      {
+        "account": "t34-account-a@example.test",
+        "movie_id": "10000000-0000-0000-0000-000000000001",
+        "rating": 5
+      },
+      {
+        "account": "t34-account-b@example.test",
+        "movie_id": "10000000-0000-0000-0000-000000000001",
+        "rating": 2
+      }
+    ],
+    "sessionCounts": [
+      {
+        "account": "t34-account-a@example.test",
+        "expired": 2,
+        "revoked": 2,
+        "valid": 0
+      },
+      {
+        "account": "t34-account-b@example.test",
+        "expired": 0,
+        "revoked": 3,
+        "valid": 0
+      }
+    ]
+  },
+  "observations": {
+    "browserRequests": [
+      {
+        "phase": "guest-and-account-a",
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/api/movies/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "path": "/api/movies/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "path": "/api/auth/me",
+            "status": 401
+          },
+          {
+            "method": "POST",
+            "path": "/api/auth/login",
+            "status": 200
+          },
+          {
+            "error": "AbortError",
+            "method": "GET",
+            "path": "/api/me/recommendations?limit=10"
+          },
+          {
+            "method": "GET",
+            "path": "/api/me/recommendations?limit=10",
+            "status": 200
+          },
+          {
+            "error": "AbortError",
+            "method": "GET",
+            "path": "/api/genres"
+          },
+          {
+            "method": "GET",
+            "path": "/api/genres",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "path": "/api/movies/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "path": "/api/movies/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "error": "AbortError",
+            "method": "GET",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000001"
+          },
+          {
+            "method": "GET",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "method": "PUT",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "method": "PUT",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000001",
+            "status": 503
+          },
+          {
+            "method": "PUT",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "error": "AbortError",
+            "method": "GET",
+            "path": "/api/me/recommendations?limit=10"
+          },
+          {
+            "method": "GET",
+            "path": "/api/me/recommendations?limit=10",
+            "status": 200
+          },
+          {
+            "error": "AbortError",
+            "method": "GET",
+            "path": "/api/genres"
+          },
+          {
+            "method": "GET",
+            "path": "/api/genres",
+            "status": 200
+          }
+        ]
+      },
+      {
+        "phase": "account-b-isolation",
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/api/movies/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "path": "/api/movies/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "path": "/api/auth/me",
+            "status": 401
+          },
+          {
+            "method": "POST",
+            "path": "/api/auth/login",
+            "status": 200
+          },
+          {
+            "error": "AbortError",
+            "method": "GET",
+            "path": "/api/me/recommendations?limit=10"
+          },
+          {
+            "method": "GET",
+            "path": "/api/me/recommendations?limit=10",
+            "status": 200
+          },
+          {
+            "error": "AbortError",
+            "method": "GET",
+            "path": "/api/genres"
+          },
+          {
+            "method": "GET",
+            "path": "/api/genres",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "path": "/api/movies/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "path": "/api/movies/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "error": "AbortError",
+            "method": "GET",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000001"
+          },
+          {
+            "method": "GET",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "method": "PUT",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "method": "PUT",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000001",
+            "status": 503
+          },
+          {
+            "method": "PUT",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "error": "AbortError",
+            "method": "GET",
+            "path": "/api/me/recommendations?limit=10"
+          },
+          {
+            "method": "GET",
+            "path": "/api/me/recommendations?limit=10",
+            "status": 200
+          },
+          {
+            "error": "AbortError",
+            "method": "GET",
+            "path": "/api/genres"
+          },
+          {
+            "method": "GET",
+            "path": "/api/genres",
+            "status": 200
+          },
+          {
+            "method": "POST",
+            "path": "/api/auth/logout",
+            "status": 204
+          },
+          {
+            "method": "GET",
+            "path": "/api/movies?limit=10",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "path": "/api/movies?limit=10",
+            "status": 200
+          },
+          {
+            "method": "POST",
+            "path": "/api/auth/login",
+            "status": 200
+          },
+          {
+            "error": "AbortError",
+            "method": "GET",
+            "path": "/api/me/recommendations?limit=10"
+          },
+          {
+            "method": "GET",
+            "path": "/api/me/recommendations?limit=10",
+            "status": 200
+          },
+          {
+            "error": "AbortError",
+            "method": "GET",
+            "path": "/api/genres"
+          },
+          {
+            "method": "GET",
+            "path": "/api/genres",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "path": "/api/movies/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "path": "/api/movies/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "error": "AbortError",
+            "method": "GET",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000001"
+          },
+          {
+            "method": "GET",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "method": "PUT",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          }
+        ]
+      },
+      {
+        "phase": "delayed-account",
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/api/movies/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "path": "/api/movies/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "path": "/api/auth/me",
+            "status": 200
+          },
+          {
+            "method": "POST",
+            "path": "/api/auth/login",
+            "status": 200
+          },
+          {
+            "error": "AbortError",
+            "method": "GET",
+            "path": "/api/me/recommendations?limit=10"
+          },
+          {
+            "method": "GET",
+            "path": "/api/me/recommendations?limit=10",
+            "status": 200
+          },
+          {
+            "error": "AbortError",
+            "method": "GET",
+            "path": "/api/genres"
+          },
+          {
+            "method": "GET",
+            "path": "/api/genres",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "path": "/api/movies/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "path": "/api/movies/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "error": "AbortError",
+            "method": "GET",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000001"
+          },
+          {
+            "method": "GET",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          }
+        ]
+      },
+      {
+        "phase": "delayed-movie",
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/api/movies/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "path": "/api/movies/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "path": "/api/auth/me",
+            "status": 200
+          },
+          {
+            "error": "AbortError",
+            "method": "GET",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000001"
+          },
+          {
+            "method": "GET",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "path": "/api/movies/10000000-0000-0000-0000-000000000002",
+            "status": 200
+          },
+          {
+            "error": "AbortError",
+            "method": "GET",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000002"
+          },
+          {
+            "method": "GET",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000002",
+            "status": 200
+          }
+        ]
+      },
+      {
+        "phase": "revoked-session",
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/api/movies/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "path": "/api/movies/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "path": "/api/auth/me",
+            "status": 200
+          },
+          {
+            "error": "AbortError",
+            "method": "GET",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000001"
+          },
+          {
+            "method": "GET",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "path": "/api/movies/10000000-0000-0000-0000-000000000002",
+            "status": 200
+          },
+          {
+            "error": "AbortError",
+            "method": "GET",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000002"
+          },
+          {
+            "method": "GET",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000002",
+            "status": 200
+          },
+          {
+            "method": "PUT",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000002",
+            "status": 401
+          }
+        ]
+      },
+      {
+        "phase": "expired-session",
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/api/movies/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "path": "/api/movies/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "path": "/api/auth/me",
+            "status": 200
+          },
+          {
+            "error": "AbortError",
+            "method": "GET",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000001"
+          },
+          {
+            "method": "GET",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "path": "/api/movies/10000000-0000-0000-0000-000000000002",
+            "status": 200
+          },
+          {
+            "error": "AbortError",
+            "method": "GET",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000002"
+          },
+          {
+            "method": "GET",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000002",
+            "status": 200
+          },
+          {
+            "method": "PUT",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000002",
+            "status": 401
+          },
+          {
+            "method": "POST",
+            "path": "/api/auth/login",
+            "status": 200
+          },
+          {
+            "error": "AbortError",
+            "method": "GET",
+            "path": "/api/me/recommendations?limit=10"
+          },
+          {
+            "method": "GET",
+            "path": "/api/me/recommendations?limit=10",
+            "status": 200
+          },
+          {
+            "error": "AbortError",
+            "method": "GET",
+            "path": "/api/genres"
+          },
+          {
+            "error": "AbortError",
+            "method": "GET",
+            "path": "/api/genres"
+          },
+          {
+            "method": "GET",
+            "path": "/api/movies/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "path": "/api/movies/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "error": "AbortError",
+            "method": "GET",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000001"
+          },
+          {
+            "method": "GET",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000001",
+            "status": 200
+          },
+          {
+            "method": "PUT",
+            "path": "/api/me/ratings/10000000-0000-0000-0000-000000000001",
+            "status": 401
+          }
+        ]
+      }
+    ],
+    "failureRecovery": {
+      "committedAfterRetry": 5,
+      "committedBeforeFailure": 3,
+      "draftDuringFailure": 5
+    },
+    "guest": {
+      "privateBrowserRatingRequests": [],
+      "privateWriteStatus": 401,
+      "publicDetailStatus": 200
+    },
+    "recommendations": {
+      "accountABrowserTitles": [
+        "Amber Velocity",
+        "Echo Arc",
+        "Glass Orchard"
+      ],
+      "accountBBrowserTitles": [
+        "Binary Picnic",
+        "Cobalt Relay",
+        "Echo Arc",
+        "Fjord Signal",
+        "Harbor Circuit",
+        "Indigo Parade"
+      ],
+      "afterRatingAccountAIds": [
+        "10000000-0000-0000-0000-000000000001",
+        "10000000-0000-0000-0000-000000000005",
+        "10000000-0000-0000-0000-000000000008"
+      ],
+      "zeroRatingsAccountAIds": [
+        "10000000-0000-0000-0000-000000000001",
+        "10000000-0000-0000-0000-000000000005",
+        "10000000-0000-0000-0000-000000000008"
+      ]
+    },
+    "sessionsInvalidated": {
+      "expiredAccountA": 2,
+      "revokedAccountB": 2
+    }
+  }
+}

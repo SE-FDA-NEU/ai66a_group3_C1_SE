@@ -1,0 +1,25 @@
+S13 / T34 local regression summary
+run_date=2026-10-16 Asia/Saigon
+base_commit=e47830511a6321cf1543bef7b18895769bd2a99f
+working_tree=local changes present
+
+command=python -m pytest backend/tests -q (fresh migrated temporary SQLite)
+result=373 passed, 1 skipped, 1 inherited Starlette/httpx deprecation warning
+
+command=npm --prefix frontend test
+result=18 test files, 199 passed
+
+command=npm --prefix frontend run test:t33:integration
+result=1 test file, 1 passed
+
+command=python -m ruff check backend
+result=PASS
+
+command=npm --prefix frontend run lint
+result=PASS
+
+command=npm --prefix frontend run build
+result=PASS (49 modules transformed)
+
+The skipped backend test and deprecation warning are inherited. T34 adds no skip.
+The generated regression database was removed after the completed run.
