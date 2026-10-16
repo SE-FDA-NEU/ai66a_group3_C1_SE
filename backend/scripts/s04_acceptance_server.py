@@ -11,6 +11,7 @@ import asyncio
 import json
 import os
 import sqlite3
+import subprocess
 import sys
 from contextlib import closing
 from pathlib import Path
@@ -89,7 +90,17 @@ def build_harness(path: Path, fixture: dict):
             migration = connection.execute(
                 "SELECT version_num FROM alembic_version"
             ).fetchone()[0]
-        return {"harness": "s04-temporary-db", "migrationVersion": migration}
+            catalogue = connection.execute(
+                """SELECT r.provider, r.id, COUNT(m.id) FROM catalogue_state s
+                   JOIN catalogue_revisions r ON r.id=s.active_revision_id
+                   LEFT JOIN catalog_movies m ON m.catalogue_revision_id=r.id
+                   GROUP BY r.id"""
+            ).fetchone()
+        return {
+            "harness": "s04-temporary-db",
+            "migrationVersion": migration,
+            "catalogue": catalogue,
+        }
 
     @controls.post("/__acceptance/scenario/{name}")
     def scenario(name: str):
@@ -237,11 +248,21 @@ def main() -> None:
         raise RuntimeError("Run via npm --prefix frontend run test:s04:e2e")
     path = Path(directory) / "acceptance.db"
     os.environ["DATABASE_URL"] = sqlite_url(path)
-    os.environ["TMDB_READ_ACCESS_TOKEN"] = ""
+    live = os.environ.get("S13_TMDB_SMOKE") == "1"
+    if not live:
+        os.environ["TMDB_READ_ACCESS_TOKEN"] = ""
     os.environ["SESSION_COOKIE_SECURE"] = "false"
     run_migrations(os.environ["DATABASE_URL"], dict(os.environ))
     fixture = json.loads(FIXTURE.read_text(encoding="utf-8"))
-    seed_database(path, fixture)
+    if live:
+        subprocess.run(
+            [sys.executable, "-m", "app.cli.import_tmdb_catalogue", "--pages", "1"],
+            cwd=ROOT,
+            env={**os.environ, "PYTHONPATH": str(ROOT / "backend")},
+            check=True,
+        )
+    else:
+        seed_database(path, fixture)
     sys.path.insert(0, str(ROOT / "backend"))
     from app.db.database import engine
 
