@@ -12,7 +12,8 @@ import json
 import os
 import sqlite3
 import sys
-from contextlib import closing
+from collections.abc import Callable
+from contextlib import asynccontextmanager, closing
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -72,11 +73,20 @@ def seed_database(path: Path, fixture: dict) -> None:
         )
 
 
-def build_harness(path: Path, fixture: dict):
+def build_harness(path: Path, fixture: dict, cleanup: Callable[[], None]):
     from app.main import app as production_app
     from fastapi import FastAPI, HTTPException
 
-    controls = FastAPI()
+    @asynccontextmanager
+    async def lifespan(_app):
+        try:
+            yield
+        finally:
+            # Uvicorn re-raises SIGTERM after shutdown, before main's finally
+            # can run. Dispose and remove the DB within the ASGI lifespan.
+            cleanup()
+
+    controls = FastAPI(lifespan=lifespan)
     gates: dict[str, dict] = {}
     capturing: str | None = None
     broken = False
@@ -233,7 +243,8 @@ def main() -> None:
     import uvicorn
 
     # Override configuration before importing any application module.
-    with TemporaryDirectory(prefix="s04-browser-") as directory:
+    temporary = TemporaryDirectory(prefix="s04-browser-")
+    with temporary as directory:
         path = Path(directory) / "acceptance.db"
         os.environ["DATABASE_URL"] = sqlite_url(path)
         os.environ["TMDB_READ_ACCESS_TOKEN"] = ""
@@ -244,10 +255,17 @@ def main() -> None:
         sys.path.insert(0, str(ROOT / "backend"))
         from app.db.database import engine
 
-        try:
-            uvicorn.run(build_harness(path, fixture), host="127.0.0.1", port=8014)
-        finally:
+        def cleanup():
             engine.dispose()
+            temporary.cleanup()
+            print("s04_temporary_database_removed=true", flush=True)
+
+        try:
+            uvicorn.run(
+                build_harness(path, fixture, cleanup), host="127.0.0.1", port=8014
+            )
+        finally:
+            cleanup()
 
 
 if __name__ == "__main__":
