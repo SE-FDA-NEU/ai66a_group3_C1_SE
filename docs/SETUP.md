@@ -201,6 +201,21 @@ automatically on Windows/Linux; set `T33_PYTHON` if using another installed Pyth
 3.12 environment. See [T33 evidence](evidence/s3-t33-rating-control.md) for focused
 commands and real-browser reviewer steps.
 
+For the independent S3-T34 real-browser rating protection/recovery journey, stop
+anything using ports 8000 and 5173, then run:
+
+```text
+python backend/scripts/verify_s13_rating_ui.py --evidence-dir docs/evidence/s3-t34-rating-acceptance
+```
+
+The runner starts real FastAPI/Vite/Chromium processes against a new migrated
+temporary SQLite database. It verifies guest access, save/update, injected
+transaction failure and retry, account/rating/recommendation isolation, delayed
+responses, revoked/expired 401 recovery, optional ratings, and return context.
+It deletes the temporary database/profile and never touches the configured
+development database. Pass `--browser <absolute-path>` if Chrome/Chromium/Edge
+cannot be detected. See [T34 evidence](evidence/s3-t34-rating-acceptance/README.md).
+
 Historical results on commit `4bfae7c`: 100 backend tests passed and 2 skipped,
 and 41 frontend tests passed across 5 files. These are not current-candidate
 results. For automated verification use a separate test database with migrations
