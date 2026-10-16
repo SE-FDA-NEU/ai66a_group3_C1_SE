@@ -1,0 +1,70 @@
+INFO:     Started server process [15420]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:51426 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51428 - "GET /api/movies/10000000-0000-0000-0000-000000000001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51428 - "PUT /api/me/ratings/10000000-0000-0000-0000-000000000001 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51429 - "POST /api/auth/register HTTP/1.1" 201 Created
+INFO:     127.0.0.1:51429 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51429 - "PUT /api/me/preferences HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64250 - "POST /api/auth/register HTTP/1.1" 201 Created
+INFO:     127.0.0.1:64250 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64250 - "PUT /api/me/preferences HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51429 - "GET /api/me/recommendations?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62426 - "GET /api/movies/10000000-0000-0000-0000-000000000001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62427 - "GET /api/movies/10000000-0000-0000-0000-000000000001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62428 - "GET /api/auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:64089 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55288 - "GET /api/me/recommendations?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60504 - "GET /api/genres HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59673 - "GET /api/movies/10000000-0000-0000-0000-000000000001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62176 - "GET /api/movies/10000000-0000-0000-0000-000000000001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61201 - "GET /api/me/ratings/10000000-0000-0000-0000-000000000001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55216 - "PUT /api/me/ratings/10000000-0000-0000-0000-000000000001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58225 - "PUT /api/me/ratings/10000000-0000-0000-0000-000000000001 HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:54709 - "PUT /api/me/ratings/10000000-0000-0000-0000-000000000001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49977 - "GET /api/me/recommendations?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54637 - "GET /api/genres HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51429 - "GET /api/me/recommendations?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49377 - "POST /api/auth/logout HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:55909 - "GET /api/movies?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56652 - "GET /api/movies?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56596 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49463 - "GET /api/me/recommendations?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49731 - "GET /api/genres HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59721 - "GET /api/movies/10000000-0000-0000-0000-000000000001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63188 - "GET /api/movies/10000000-0000-0000-0000-000000000001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56428 - "GET /api/me/ratings/10000000-0000-0000-0000-000000000001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60041 - "PUT /api/me/ratings/10000000-0000-0000-0000-000000000001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65478 - "GET /api/me/recommendations?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49744 - "GET /api/genres HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62165 - "POST /api/auth/logout HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:52632 - "GET /api/movies?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64961 - "GET /api/movies?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56566 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63454 - "GET /api/me/recommendations?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57447 - "GET /api/genres HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61754 - "GET /api/movies/10000000-0000-0000-0000-000000000001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61755 - "GET /api/movies/10000000-0000-0000-0000-000000000001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61756 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61757 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62190 - "GET /api/me/recommendations?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62191 - "GET /api/genres HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53967 - "GET /api/movies/10000000-0000-0000-0000-000000000001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58655 - "GET /api/movies/10000000-0000-0000-0000-000000000001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54661 - "GET /api/me/ratings/10000000-0000-0000-0000-000000000001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51284 - "GET /api/movies/10000000-0000-0000-0000-000000000001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51285 - "GET /api/movies/10000000-0000-0000-0000-000000000001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51286 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /api/me/ratings/10000000-0000-0000-0000-000000000001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /api/movies/10000000-0000-0000-0000-000000000002 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54059 - "GET /api/me/ratings/10000000-0000-0000-0000-000000000002 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59420 - "PUT /api/me/ratings/10000000-0000-0000-0000-000000000002 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:58869 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55352 - "GET /api/me/recommendations?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61354 - "GET /api/genres HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61879 - "GET /api/movies/10000000-0000-0000-0000-000000000001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57520 - "GET /api/movies/10000000-0000-0000-0000-000000000001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57118 - "GET /api/me/ratings/10000000-0000-0000-0000-000000000001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57961 - "PUT /api/me/ratings/10000000-0000-0000-0000-000000000001 HTTP/1.1" 401 Unauthorized
