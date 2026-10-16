@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 
 import { getMovie, MovieApiError, type MovieDetail } from "../api/movies.ts";
+import { formatPopularityScore, POPULARITY_LABEL } from "../formatPopularity.ts";
 import { resolveMovieDetailReturn } from "../navigation/movieDetailReturn.ts";
 import MovieRating from "../components/MovieRating.tsx";
 
@@ -139,6 +140,10 @@ function MovieDetailPage() {
                 ? movie.genres.map((genre) => genre.name).join(", ")
                 : INFORMATION_UNAVAILABLE}
             </dd>
+          </div>
+          <div>
+            <dt>{POPULARITY_LABEL}</dt>
+            <dd>{formatPopularityScore(movie.popularityScore)}</dd>
           </div>
         </dl>
 
