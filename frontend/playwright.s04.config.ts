@@ -12,6 +12,7 @@ const git = (...args: string[]) => execFileSync("git", args, { cwd: root, encodi
 const supportFiles = [
   "frontend/package.json", "frontend/package-lock.json", "frontend/playwright.s04.config.ts",
   "frontend/vite.s04.config.ts", "frontend/e2e/s04.acceptance.ts",
+  "frontend/e2e/s13.acceptance.ts", "backend/tests/test_auth_acceptance.py",
   "frontend/scripts/run-s04-e2e.mjs", "frontend/scripts/run-s04-e2e.node-test.mjs",
   "backend/requirements.lock.txt", "backend/pyproject.toml", "backend/alembic.ini",
   "backend/scripts/s04_acceptance_server.py", "backend/scripts/collect_s04_evidence.py",
@@ -23,7 +24,7 @@ const sourceFiles = git("ls-files", "--cached", "--others", "--exclude-standard"
 
 export default defineConfig({
   testDir: "./e2e",
-  testMatch: "s04.acceptance.ts",
+  testMatch: /s(04|13)\.acceptance\.ts/,
   fullyParallel: false,
   workers: 1,
   retries: 0,
