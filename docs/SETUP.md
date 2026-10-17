@@ -162,7 +162,7 @@ npm --prefix frontend run dev
 Open `http://127.0.0.1:8000/health`. The response is:
 
 ```json
-{"status":"ok","database":"connected","migrationVersion":"b7e4c2d91f30"}
+{"status":"ok","database":"connected","migrationVersion":"c6f8a2d4e901"}
 ```
 
 Open `http://localhost:5173/`. The existing home page reads its cards from the
@@ -234,10 +234,16 @@ The response is `503` with the code `SERVICE_UNAVAILABLE`. Apply migrations:
 python -m alembic -c backend/alembic.ini upgrade head
 ```
 
-Then open `/health` again. `migrationVersion` should be `b7e4c2d91f30`.
+Then open `/health` again. `migrationVersion` should be `c6f8a2d4e901`.
 
-This is the current Sprint 3 head through T30 rating storage. Verify the actual
-current head if later migrations are added. A healthy database alone does not
+This is the Sprint 3 head through T26 nullable backdrop storage, extending T30
+rating storage. Existing checkouts must apply the upgrade before restarting
+the application with the new model. No dependency reinstall, token or catalogue
+reimport is needed for this storage-only upgrade; preserve the existing `.env`
+and back up valuable data consistently first. Existing backdrop values remain
+null until #130 imports them, so no image is expected on screen from T26 alone.
+See [the storage handoff](backdrop-storage-contract.md) for focused tests.
+Verify the actual head if later migrations are added. A healthy database alone does not
 prove catalogue readiness; dev/staging/demo still needs the successful TMDb
 import and provenance smoke.
 
