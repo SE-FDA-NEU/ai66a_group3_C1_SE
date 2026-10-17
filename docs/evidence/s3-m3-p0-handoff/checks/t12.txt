@@ -1,0 +1,12 @@
+S02 / T12 real-DB browser acceptance
+run_at=2026-10-18T01:18:39+07:00
+base_commit=86a758eb2468f3e23357b69adf3c3183e5110a40
+browser=/Applications/Google Chrome.app/Contents/MacOS/Google Chrome
+database=migrated temporary file-backed SQLite
+fixture=backend/tests/fixtures/recommendations_s3_t06.json
+match=PASS; 10 distinct genre-matching cards with reasons
+no_match=PASS; 10 popular alternatives and edit/retry controls
+source_503=PASS; error/retry visible and preferences unchanged
+retry=PASS; real API and UI recovered to personalised cards
+current_401=PASS; login redirect, not source-error UI
+result=PASS

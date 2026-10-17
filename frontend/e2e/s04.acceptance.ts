@@ -18,7 +18,7 @@ async function control(request: APIRequestContext, operation: string) {
 
 async function screenshot(page: Page, info: TestInfo, name: string) {
   const path = info.outputPath(name);
-  await page.screenshot({ path, fullPage: true });
+  await page.screenshot({ path, fullPage: true, mask: [page.locator(".session-actions .muted")] });
   await info.attach(name, { path, contentType: "image/png" });
 }
 
@@ -120,6 +120,19 @@ async function saveGenre(page: Page, genre: string) {
 test("AC1/AC2/AC4: real sign-in, A90 B80 C80 top ten, Enter preferences and fresh matches", async ({ page, request }, info) => {
   await assertResult(await signIn(page, request), topTen);
   await assertCards(page, topTen);
+  // T18 covers field-by-field rendering in React tests. Reuse this migrated
+  // synthetic fixture to verify the missing-field seam in a real browser/API.
+  const detailResponse = page.waitForResponse(r => new URL(r.url()).pathname === `/api/movies/${fixture.movies[0].id}`);
+  await cards(page).getByRole("link").first().click();
+  const detail = (await (await detailResponse).json()).data.movie;
+  expect(detail.releaseYear).toBeNull();
+  expect(detail.overview).toBeNull();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("A");
+  await expect(page.getByText("Information unavailable", { exact: true })).toHaveCount(2);
+  await expect(page.locator(".movie-detail__facts")).toContainText("Action");
+  await screenshot(page, info, "missing-detail-fields.png");
+  await page.getByRole("link", { name: "Back to recommendations", exact: true }).click();
+  await assertCards(page, topTen);
   await expect(page.getByText("Not personalised", { exact: true })).toBeVisible();
   await screenshot(page, info, "cold-start.png");
   await page.getByRole("link", { name: "Enter preferences" }).click();
@@ -187,6 +200,10 @@ test("real SQL failure is Error/Retry, preserves genres and recovers", async ({ 
   expect(response.status()).toBe(503);
   expect((await response.json()).error.code).toBe("SERVICE_UNAVAILABLE");
   await expect(page.getByRole("heading", { name: "Recommendations are unavailable" })).toBeVisible();
+  await expect(page.getByRole("alert")).toContainText("Service is temporarily unavailable Choose Retry to load your recommendations again.");
+  await test.info().attach("actual-error-message.txt", {
+    body: await page.getByRole("alert").innerText(), contentType: "text/plain",
+  });
   await expect(page.getByRole("button", { name: "Retry", exact: true })).toBeVisible();
   await expect(cards(page)).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "No recommendations available yet." })).toHaveCount(0);

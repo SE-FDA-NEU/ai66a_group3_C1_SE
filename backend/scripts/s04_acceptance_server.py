@@ -249,19 +249,39 @@ def main() -> None:
     path = Path(directory) / "acceptance.db"
     os.environ["DATABASE_URL"] = sqlite_url(path)
     live = os.environ.get("S13_TMDB_SMOKE") == "1"
+    accepted = os.environ.get("S13_TMDB_DATABASE")
+    if accepted and not live:
+        raise RuntimeError("S13_TMDB_DATABASE requires S13_TMDB_SMOKE=1")
+    if accepted:
+        # Preserve the accepted database and revision. All browser account writes
+        # are confined to the runner-owned disposable backup, never the source.
+        source_path = Path(accepted).resolve()
+        with (
+            closing(sqlite3.connect(source_path.as_uri() + "?mode=ro", uri=True))
+            as source,
+            closing(sqlite3.connect(path)) as target,
+        ):
+            provider = source.execute(
+                "SELECT r.provider FROM catalogue_state s JOIN catalogue_revisions r "
+                "ON r.id=s.active_revision_id WHERE s.id=1"
+            ).fetchone()
+            if provider != ("tmdb",):
+                raise RuntimeError("Accepted source must have an active TMDb revision")
+            source.backup(target)
+        os.environ["TMDB_READ_ACCESS_TOKEN"] = ""
     if not live:
         os.environ["TMDB_READ_ACCESS_TOKEN"] = ""
     os.environ["SESSION_COOKIE_SECURE"] = "false"
     run_migrations(os.environ["DATABASE_URL"], dict(os.environ))
     fixture = json.loads(FIXTURE.read_text(encoding="utf-8"))
-    if live:
+    if live and not accepted:
         subprocess.run(
             [sys.executable, "-m", "app.cli.import_tmdb_catalogue", "--pages", "1"],
             cwd=ROOT,
             env={**os.environ, "PYTHONPATH": str(ROOT / "backend")},
             check=True,
         )
-    else:
+    elif not live:
         seed_database(path, fixture)
     sys.path.insert(0, str(ROOT / "backend"))
     from app.db.database import engine

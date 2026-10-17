@@ -1,0 +1,436 @@
+{
+  "testedCommit": "86a758eb2468f3e23357b69adf3c3183e5110a40",
+  "workingTree": "?? frontend/scripts/verify-m3-handoff.mjs",
+  "testedAt": "2026-10-17T18:21:41.328Z",
+  "mode": "live-tmdb-existing-snapshot-copy",
+  "os": "darwin 25.2.0 arm64",
+  "node": "v26.10.0",
+  "python": "Python 3.12.4",
+  "result": "PASS",
+  "checks": [
+    {
+      "name": "Guest first-screen → popular top ten → real public detail → rating login; zero private requests",
+      "result": "PASS"
+    },
+    {
+      "name": "S12 all four AC: visible registration, invalid fields/no write, case duplicate, Argon2id/public DTO",
+      "result": "PASS"
+    },
+    {
+      "name": "Cold-start → Enter preferences → corrective BR1 message → keyboard save → fresh current-account result → details → return; 375px no overflow",
+      "result": "PASS"
+    },
+    {
+      "name": "Signed-in first-screen Start reaches restored genre picker",
+      "result": "PASS"
+    },
+    {
+      "name": "Accepted source database provenance unchanged; all account writes confined to disposable copy",
+      "result": "PASS"
+    }
+  ],
+  "messages": {
+    "Enter a valid email address": "Enter a valid email address",
+    "Password must be at least 8 characters": "Password must be at least 8 characters",
+    "duplicate": "This email is already registered",
+    "zeroGenres": "Select at least one genre (up to 5), then choose Save preferences."
+  },
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/api/movies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies"
+    },
+    {
+      "status": 200,
+      "path": "/api/movies"
+    },
+    {
+      "status": 200,
+      "path": "/api/movies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies/popular"
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies/popular"
+    },
+    {
+      "status": 200,
+      "path": "/api/movies/popular"
+    },
+    {
+      "status": 200,
+      "path": "/api/movies/popular"
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies/b53a327a-a457-479d-af10-975ac7276d99"
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies/b53a327a-a457-479d-af10-975ac7276d99"
+    },
+    {
+      "status": 200,
+      "path": "/api/movies/b53a327a-a457-479d-af10-975ac7276d99"
+    },
+    {
+      "status": 200,
+      "path": "/api/movies/b53a327a-a457-479d-af10-975ac7276d99"
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me"
+    },
+    {
+      "status": 401,
+      "path": "/api/auth/me"
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/register"
+    },
+    {
+      "status": 201,
+      "path": "/api/auth/register"
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/register"
+    },
+    {
+      "status": 409,
+      "path": "/api/auth/register"
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login"
+    },
+    {
+      "status": 200,
+      "path": "/api/auth/login"
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/recommendations"
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/recommendations"
+    },
+    {
+      "status": 200,
+      "path": "/api/me/recommendations"
+    },
+    {
+      "method": "GET",
+      "path": "/api/genres"
+    },
+    {
+      "method": "GET",
+      "path": "/api/genres"
+    },
+    {
+      "status": 200,
+      "path": "/api/genres"
+    },
+    {
+      "method": "GET",
+      "path": "/api/genres"
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/preferences"
+    },
+    {
+      "method": "GET",
+      "path": "/api/genres"
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/preferences"
+    },
+    {
+      "status": 200,
+      "path": "/api/me/preferences"
+    },
+    {
+      "status": 200,
+      "path": "/api/genres"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/me/preferences"
+    },
+    {
+      "status": 200,
+      "path": "/api/me/preferences"
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/recommendations"
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/recommendations"
+    },
+    {
+      "status": 200,
+      "path": "/api/me/recommendations"
+    },
+    {
+      "method": "GET",
+      "path": "/api/genres"
+    },
+    {
+      "method": "GET",
+      "path": "/api/genres"
+    },
+    {
+      "status": 200,
+      "path": "/api/genres"
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies/b53a327a-a457-479d-af10-975ac7276d99"
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies/b53a327a-a457-479d-af10-975ac7276d99"
+    },
+    {
+      "status": 200,
+      "path": "/api/movies/b53a327a-a457-479d-af10-975ac7276d99"
+    },
+    {
+      "status": 200,
+      "path": "/api/movies/b53a327a-a457-479d-af10-975ac7276d99"
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/ratings/b53a327a-a457-479d-af10-975ac7276d99"
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/ratings/b53a327a-a457-479d-af10-975ac7276d99"
+    },
+    {
+      "status": 200,
+      "path": "/api/me/ratings/b53a327a-a457-479d-af10-975ac7276d99"
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/recommendations"
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/recommendations"
+    },
+    {
+      "status": 200,
+      "path": "/api/me/recommendations"
+    },
+    {
+      "method": "GET",
+      "path": "/api/genres"
+    },
+    {
+      "method": "GET",
+      "path": "/api/genres"
+    },
+    {
+      "status": 200,
+      "path": "/api/genres"
+    },
+    {
+      "method": "GET",
+      "path": "/api/genres"
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/preferences"
+    },
+    {
+      "method": "GET",
+      "path": "/api/genres"
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/preferences"
+    },
+    {
+      "status": 200,
+      "path": "/api/me/preferences"
+    },
+    {
+      "status": 200,
+      "path": "/api/genres"
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies"
+    },
+    {
+      "status": 200,
+      "path": "/api/movies"
+    },
+    {
+      "status": 200,
+      "path": "/api/movies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/genres"
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/preferences"
+    },
+    {
+      "method": "GET",
+      "path": "/api/genres"
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/preferences"
+    },
+    {
+      "status": 200,
+      "path": "/api/genres"
+    },
+    {
+      "status": 200,
+      "path": "/api/me/preferences"
+    }
+  ],
+  "verifierSha256": "d7910a874103b7b05a058a8ae4b06df3c4b2a4b0fd4aee3ae05fc33a6acc7218",
+  "sourceProvenance": {
+    "revision": [
+      {
+        "id": "709fe328-26fd-4bed-b1b2-e0e87cbaa00c",
+        "provider": "tmdb",
+        "created_at": "2026-10-17 18:15:40.176944",
+        "inserted_movie_count": 20,
+        "updated_movie_count": 0,
+        "rejected_movie_count": 0
+      }
+    ],
+    "counts": [
+      {
+        "movies": 20,
+        "distinct_source_ids": 20,
+        "non_tmdb": 0,
+        "finite_popularity": 20,
+        "fetch_timestamps": 20,
+        "first_fetched_at": "2026-10-17 18:15:38.576552",
+        "last_fetched_at": "2026-10-17 18:15:38.576552",
+        "missing_year": 0,
+        "missing_overview": 0
+      }
+    ],
+    "associated_genres": [
+      {
+        "count": 12
+      }
+    ],
+    "samples": [
+      {
+        "id": "36be011b-3d65-4f3f-8e54-ab14f043c2fc",
+        "source": "tmdb",
+        "source_id": "1058424",
+        "source_fetched_at": "2026-10-17 18:15:38.576552"
+      },
+      {
+        "id": "698dc16f-3350-453b-b270-4e5a1637c88a",
+        "source": "tmdb",
+        "source_id": "1084244",
+        "source_fetched_at": "2026-10-17 18:15:38.576552"
+      },
+      {
+        "id": "fe02a303-2fe4-47db-a7d3-79826b5b10d3",
+        "source": "tmdb",
+        "source_id": "1101383",
+        "source_fetched_at": "2026-10-17 18:15:38.576552"
+      }
+    ],
+    "migration": [
+      {
+        "version_num": "c6f8a2d4e901"
+      }
+    ]
+  },
+  "acceptanceProvenance": {
+    "revision": [
+      {
+        "id": "709fe328-26fd-4bed-b1b2-e0e87cbaa00c",
+        "provider": "tmdb",
+        "created_at": "2026-10-17 18:15:40.176944",
+        "inserted_movie_count": 20,
+        "updated_movie_count": 0,
+        "rejected_movie_count": 0
+      }
+    ],
+    "counts": [
+      {
+        "movies": 20,
+        "distinct_source_ids": 20,
+        "non_tmdb": 0,
+        "finite_popularity": 20,
+        "fetch_timestamps": 20,
+        "first_fetched_at": "2026-10-17 18:15:38.576552",
+        "last_fetched_at": "2026-10-17 18:15:38.576552",
+        "missing_year": 0,
+        "missing_overview": 0
+      }
+    ],
+    "associated_genres": [
+      {
+        "count": 12
+      }
+    ],
+    "samples": [
+      {
+        "id": "36be011b-3d65-4f3f-8e54-ab14f043c2fc",
+        "source": "tmdb",
+        "source_id": "1058424",
+        "source_fetched_at": "2026-10-17 18:15:38.576552"
+      },
+      {
+        "id": "698dc16f-3350-453b-b270-4e5a1637c88a",
+        "source": "tmdb",
+        "source_id": "1084244",
+        "source_fetched_at": "2026-10-17 18:15:38.576552"
+      },
+      {
+        "id": "fe02a303-2fe4-47db-a7d3-79826b5b10d3",
+        "source": "tmdb",
+        "source_id": "1101383",
+        "source_fetched_at": "2026-10-17 18:15:38.576552"
+      }
+    ],
+    "migration": [
+      {
+        "version_num": "c6f8a2d4e901"
+      }
+    ]
+  },
+  "browser": "156.0.8078.4",
+  "stage": "keyboard save",
+  "passwordHashOnly": true,
+  "duplicateValidation": [],
+  "keyboardFocus": {
+    "active": true,
+    "outlineWidth": "1px"
+  },
+  "liveMissingFieldCoverage": "Not exercised: source has no missing year/overview; reuse synthetic T18 evidence"
+}
