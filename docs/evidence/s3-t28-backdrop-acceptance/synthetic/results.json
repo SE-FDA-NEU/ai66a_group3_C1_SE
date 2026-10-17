@@ -1,0 +1,579 @@
+{
+  "mode": "synthetic-offline",
+  "result": "PASS",
+  "cases": [
+    {
+      "name": "bright-desktop",
+      "expected": "Correct movie, readable gradient/overlay, no overflow",
+      "actual": {
+        "viewport": 1280,
+        "documentWidth": 1280,
+        "title": "Backdrop Alpha",
+        "imageSrc": "https://image.tmdb.org/t/p/w780/t28-alpha.jpg",
+        "imageNaturalWidth": 780,
+        "imageOpacity": "1",
+        "gradient": "linear-gradient(135deg, rgb(18, 41, 75) 0%, rgb(36, 52, 87) 45%, rgb(70, 53, 76) 100%)",
+        "overlay": "linear-gradient(90deg, rgba(5, 12, 26, 0.92) 0%, rgba(5, 12, 26, 0.74) 58%, rgba(5, 12, 26, 0.56) 100%)"
+      },
+      "result": "PASS"
+    },
+    {
+      "name": "bright-mobile",
+      "expected": "Correct movie, readable gradient/overlay, no overflow",
+      "actual": {
+        "viewport": 375,
+        "documentWidth": 375,
+        "title": "Backdrop Alpha",
+        "imageSrc": "https://image.tmdb.org/t/p/w780/t28-alpha.jpg",
+        "imageNaturalWidth": 780,
+        "imageOpacity": "1",
+        "gradient": "linear-gradient(135deg, rgb(18, 41, 75) 0%, rgb(36, 52, 87) 45%, rgb(70, 53, 76) 100%)",
+        "overlay": "linear-gradient(0deg, rgba(5, 12, 26, 0.94) 0%, rgba(5, 12, 26, 0.72) 65%, rgba(5, 12, 26, 0.54) 100%)"
+      },
+      "result": "PASS"
+    },
+    {
+      "name": "dark-mobile",
+      "expected": "Correct movie, readable gradient/overlay, no overflow",
+      "actual": {
+        "viewport": 375,
+        "documentWidth": 375,
+        "title": "Backdrop Gamma",
+        "imageSrc": "https://image.tmdb.org/t/p/w780/t28-gamma.jpg",
+        "imageNaturalWidth": 780,
+        "imageOpacity": "1",
+        "gradient": "linear-gradient(135deg, rgb(18, 41, 75) 0%, rgb(36, 52, 87) 45%, rgb(70, 53, 76) 100%)",
+        "overlay": "linear-gradient(0deg, rgba(5, 12, 26, 0.94) 0%, rgba(5, 12, 26, 0.72) 65%, rgba(5, 12, 26, 0.54) 100%)"
+      },
+      "result": "PASS"
+    },
+    {
+      "name": "null-mobile",
+      "expected": "Correct movie, readable gradient/overlay, no overflow",
+      "actual": {
+        "viewport": 375,
+        "documentWidth": 375,
+        "title": "Backdrop Beta",
+        "imageSrc": null,
+        "imageNaturalWidth": 0,
+        "imageOpacity": null,
+        "gradient": "linear-gradient(135deg, rgb(18, 41, 75) 0%, rgb(36, 52, 87) 45%, rgb(70, 53, 76) 100%)",
+        "overlay": "linear-gradient(0deg, rgba(5, 12, 26, 0.94) 0%, rgba(5, 12, 26, 0.72) 65%, rgba(5, 12, 26, 0.54) 100%)"
+      },
+      "result": "PASS"
+    },
+    {
+      "name": "broken-mobile",
+      "expected": "Correct movie, readable gradient/overlay, no overflow",
+      "actual": {
+        "viewport": 375,
+        "documentWidth": 375,
+        "title": "Backdrop Alpha",
+        "imageSrc": null,
+        "imageNaturalWidth": 0,
+        "imageOpacity": null,
+        "gradient": "linear-gradient(135deg, rgb(18, 41, 75) 0%, rgb(36, 52, 87) 45%, rgb(70, 53, 76) 100%)",
+        "overlay": "linear-gradient(0deg, rgba(5, 12, 26, 0.94) 0%, rgba(5, 12, 26, 0.72) 65%, rgba(5, 12, 26, 0.54) 100%)"
+      },
+      "result": "PASS"
+    },
+    {
+      "name": "delayed-real-details-A-to-B",
+      "expected": "Delayed SQL/API response A cannot replace B",
+      "actual": {
+        "viewport": 1280,
+        "documentWidth": 1280,
+        "title": "Backdrop Beta",
+        "imageSrc": null,
+        "imageNaturalWidth": 0,
+        "imageOpacity": null,
+        "gradient": "linear-gradient(135deg, rgb(18, 41, 75) 0%, rgb(36, 52, 87) 45%, rgb(70, 53, 76) 100%)",
+        "overlay": "linear-gradient(90deg, rgba(5, 12, 26, 0.92) 0%, rgba(5, 12, 26, 0.74) 58%, rgba(5, 12, 26, 0.56) 100%)"
+      },
+      "result": "PASS"
+    },
+    {
+      "name": "delayed-image-events-A-to-C",
+      "expected": "Old image load/error cannot change the new movie",
+      "actual": {
+        "viewport": 1280,
+        "documentWidth": 1280,
+        "title": "Backdrop Gamma",
+        "imageSrc": "https://image.tmdb.org/t/p/w780/t28-gamma.jpg",
+        "imageNaturalWidth": 780,
+        "imageOpacity": "1",
+        "gradient": "linear-gradient(135deg, rgb(18, 41, 75) 0%, rgb(36, 52, 87) 45%, rgb(70, 53, 76) 100%)",
+        "overlay": "linear-gradient(90deg, rgba(5, 12, 26, 0.92) 0%, rgba(5, 12, 26, 0.74) 58%, rgba(5, 12, 26, 0.56) 100%)"
+      },
+      "result": "PASS"
+    },
+    {
+      "name": "broken-A-does-not-poison-C",
+      "expected": "A failed image state resets for another movie",
+      "actual": {
+        "viewport": 1280,
+        "documentWidth": 1280,
+        "title": "Backdrop Gamma",
+        "imageSrc": "https://image.tmdb.org/t/p/w780/t28-gamma.jpg",
+        "imageNaturalWidth": 780,
+        "imageOpacity": "1",
+        "gradient": "linear-gradient(135deg, rgb(18, 41, 75) 0%, rgb(36, 52, 87) 45%, rgb(70, 53, 76) 100%)",
+        "overlay": "linear-gradient(90deg, rgba(5, 12, 26, 0.92) 0%, rgba(5, 12, 26, 0.74) 58%, rgba(5, 12, 26, 0.56) 100%)"
+      },
+      "result": "PASS"
+    },
+    {
+      "name": "account-rating-and-delayed-old-account",
+      "expected": "A rating 5 cannot replace B rating 2",
+      "actual": "Real login/logout, delayed A rating discarded; B=2/5",
+      "result": "PASS"
+    },
+    {
+      "name": "delayed-rating-movie-A-to-B",
+      "expected": "A saved rating cannot reappear on unrated movie B",
+      "actual": {
+        "viewport": 1280,
+        "documentWidth": 1280,
+        "title": "Backdrop Beta",
+        "imageSrc": null,
+        "imageNaturalWidth": 0,
+        "imageOpacity": null,
+        "gradient": "linear-gradient(135deg, rgb(18, 41, 75) 0%, rgb(36, 52, 87) 45%, rgb(70, 53, 76) 100%)",
+        "overlay": "linear-gradient(90deg, rgba(5, 12, 26, 0.92) 0%, rgba(5, 12, 26, 0.74) 58%, rgba(5, 12, 26, 0.56) 100%)"
+      },
+      "result": "PASS"
+    },
+    {
+      "name": "UI-ranking-after-media-only-update",
+      "expected": "A90/B80/C80 and saved genres stay identical after enrichment",
+      "actual": {
+        "before": [
+          "Backdrop Alpha",
+          "Backdrop Beta",
+          "Backdrop Gamma"
+        ],
+        "after": [
+          "Backdrop Alpha",
+          "Backdrop Beta",
+          "Backdrop Gamma"
+        ],
+        "unchangedPreferences": true,
+        "ownRating": 5,
+        "newMediaVisible": true
+      },
+      "result": "PASS"
+    },
+    {
+      "name": "media-audit-valid-11",
+      "expected": "All non-media rows and account ranking preserved",
+      "actual": {
+        "scenario": "valid",
+        "result": "PASS",
+        "requests": [
+          101,
+          102,
+          103
+        ],
+        "counts": {
+          "eligible_movie_count": 3,
+          "fetched_movie_count": 3,
+          "updated_movie_count": 0,
+          "cleared_movie_count": 0,
+          "unchanged_movie_count": 3,
+          "missing_movie_count": 0,
+          "invalid_movie_count": 0
+        },
+        "rolledBack": false,
+        "nonMediaRowsPreserved": true,
+        "rankingPreserved": true,
+        "beforeNonMediaSha256": "4e477db3ad26b45bb4076c1e6a8ec0b8310af115ce692163c0eddcfec02748b5",
+        "afterNonMediaSha256": "4e477db3ad26b45bb4076c1e6a8ec0b8310af115ce692163c0eddcfec02748b5",
+        "rankingIds": {
+          "a": [
+            "t28-movie-a",
+            "t28-movie-b",
+            "t28-movie-c"
+          ],
+          "b": [
+            "t28-movie-b",
+            "t28-movie-c"
+          ]
+        }
+      },
+      "result": "PASS"
+    },
+    {
+      "name": "media-audit-valid-12",
+      "expected": "All non-media rows and account ranking preserved",
+      "actual": {
+        "scenario": "valid",
+        "result": "PASS",
+        "requests": [
+          101,
+          102,
+          103
+        ],
+        "counts": {
+          "eligible_movie_count": 3,
+          "fetched_movie_count": 3,
+          "updated_movie_count": 0,
+          "cleared_movie_count": 0,
+          "unchanged_movie_count": 3,
+          "missing_movie_count": 0,
+          "invalid_movie_count": 0
+        },
+        "rolledBack": false,
+        "nonMediaRowsPreserved": true,
+        "rankingPreserved": true,
+        "beforeNonMediaSha256": "4e477db3ad26b45bb4076c1e6a8ec0b8310af115ce692163c0eddcfec02748b5",
+        "afterNonMediaSha256": "4e477db3ad26b45bb4076c1e6a8ec0b8310af115ce692163c0eddcfec02748b5",
+        "rankingIds": {
+          "a": [
+            "t28-movie-a",
+            "t28-movie-b",
+            "t28-movie-c"
+          ],
+          "b": [
+            "t28-movie-b",
+            "t28-movie-c"
+          ]
+        }
+      },
+      "result": "PASS"
+    },
+    {
+      "name": "media-audit-missing-13",
+      "expected": "All non-media rows and account ranking preserved",
+      "actual": {
+        "scenario": "missing",
+        "result": "PASS",
+        "requests": [
+          101,
+          102,
+          103
+        ],
+        "counts": {
+          "eligible_movie_count": 3,
+          "fetched_movie_count": 3,
+          "updated_movie_count": 0,
+          "cleared_movie_count": 0,
+          "unchanged_movie_count": 0,
+          "missing_movie_count": 3,
+          "invalid_movie_count": 0
+        },
+        "rolledBack": false,
+        "nonMediaRowsPreserved": true,
+        "rankingPreserved": true,
+        "beforeNonMediaSha256": "4e477db3ad26b45bb4076c1e6a8ec0b8310af115ce692163c0eddcfec02748b5",
+        "afterNonMediaSha256": "4e477db3ad26b45bb4076c1e6a8ec0b8310af115ce692163c0eddcfec02748b5",
+        "rankingIds": {
+          "a": [
+            "t28-movie-a",
+            "t28-movie-b",
+            "t28-movie-c"
+          ],
+          "b": [
+            "t28-movie-b",
+            "t28-movie-c"
+          ]
+        }
+      },
+      "result": "PASS"
+    },
+    {
+      "name": "media-audit-invalid-14",
+      "expected": "All non-media rows and account ranking preserved",
+      "actual": {
+        "scenario": "invalid",
+        "result": "PASS",
+        "requests": [
+          101,
+          102,
+          103
+        ],
+        "counts": {
+          "eligible_movie_count": 3,
+          "fetched_movie_count": 3,
+          "updated_movie_count": 0,
+          "cleared_movie_count": 0,
+          "unchanged_movie_count": 0,
+          "missing_movie_count": 0,
+          "invalid_movie_count": 3
+        },
+        "rolledBack": false,
+        "nonMediaRowsPreserved": true,
+        "rankingPreserved": true,
+        "beforeNonMediaSha256": "4e477db3ad26b45bb4076c1e6a8ec0b8310af115ce692163c0eddcfec02748b5",
+        "afterNonMediaSha256": "4e477db3ad26b45bb4076c1e6a8ec0b8310af115ce692163c0eddcfec02748b5",
+        "rankingIds": {
+          "a": [
+            "t28-movie-a",
+            "t28-movie-b",
+            "t28-movie-c"
+          ],
+          "b": [
+            "t28-movie-b",
+            "t28-movie-c"
+          ]
+        }
+      },
+      "result": "PASS"
+    },
+    {
+      "name": "media-audit-failure-15",
+      "expected": "All non-media rows and account ranking preserved",
+      "actual": {
+        "scenario": "failure",
+        "result": "PASS",
+        "requests": [
+          101,
+          102
+        ],
+        "counts": null,
+        "rolledBack": true,
+        "nonMediaRowsPreserved": true,
+        "rankingPreserved": true,
+        "beforeNonMediaSha256": "4e477db3ad26b45bb4076c1e6a8ec0b8310af115ce692163c0eddcfec02748b5",
+        "afterNonMediaSha256": "4e477db3ad26b45bb4076c1e6a8ec0b8310af115ce692163c0eddcfec02748b5",
+        "rankingIds": {
+          "a": [
+            "t28-movie-a",
+            "t28-movie-b",
+            "t28-movie-c"
+          ],
+          "b": [
+            "t28-movie-b",
+            "t28-movie-c"
+          ]
+        }
+      },
+      "result": "PASS"
+    },
+    {
+      "name": "media-audit-clear-16",
+      "expected": "All non-media rows and account ranking preserved",
+      "actual": {
+        "scenario": "clear",
+        "result": "PASS",
+        "requests": [
+          101,
+          102,
+          103
+        ],
+        "counts": {
+          "eligible_movie_count": 3,
+          "fetched_movie_count": 3,
+          "updated_movie_count": 2,
+          "cleared_movie_count": 2,
+          "unchanged_movie_count": 1,
+          "missing_movie_count": 0,
+          "invalid_movie_count": 0
+        },
+        "rolledBack": false,
+        "nonMediaRowsPreserved": true,
+        "rankingPreserved": true,
+        "beforeNonMediaSha256": "4e477db3ad26b45bb4076c1e6a8ec0b8310af115ce692163c0eddcfec02748b5",
+        "afterNonMediaSha256": "4e477db3ad26b45bb4076c1e6a8ec0b8310af115ce692163c0eddcfec02748b5",
+        "rankingIds": {
+          "a": [
+            "t28-movie-a",
+            "t28-movie-b",
+            "t28-movie-c"
+          ],
+          "b": [
+            "t28-movie-b",
+            "t28-movie-c"
+          ]
+        }
+      },
+      "result": "PASS"
+    },
+    {
+      "name": "actual-API-null-and-unknown",
+      "expected": "200/null after clear, unknown 404",
+      "actual": {
+        "noMedia": {
+          "data": {
+            "movie": {
+              "id": "t28-movie-a",
+              "title": "Backdrop Alpha",
+              "releaseYear": 2026,
+              "genres": [
+                {
+                  "id": 28,
+                  "name": "Action"
+                }
+              ],
+              "overview": "Entirely invented overview for Backdrop Alpha.",
+              "popularityScore": 90,
+              "voteAverage": 7,
+              "voteCount": 100,
+              "backdropUrl": null
+            }
+          },
+          "meta": {
+            "catalogueRevision": "t28-synthetic-tmdb"
+          }
+        },
+        "unknown": {
+          "error": {
+            "code": "MOVIE_NOT_FOUND",
+            "message": "Movie not found",
+            "requestId": "req_aa23915c5e10452383032ef992fb8407"
+          }
+        }
+      },
+      "result": "PASS"
+    }
+  ],
+  "testedCommit": "c5b3221573f075d5063839c59f308221d25ae167",
+  "workingTree": "modified",
+  "sourceSha256Lf": "3034351f76bc3cc5b6e32b8243f66b0abaf1b800ee87830e5cd1047de5f75065",
+  "sourceFiles": [
+    ".github/workflows/backdrop-acceptance.yml",
+    "backend/alembic/README",
+    "backend/alembic/env.py",
+    "backend/alembic/script.py.mako",
+    "backend/alembic/versions/2d8a3f83d517_bootstrap_database.py",
+    "backend/alembic/versions/4bde7d96c1c2_create_catalogue_storage.py",
+    "backend/alembic/versions/7f5b1d2a6e90_create_users.py",
+    "backend/alembic/versions/8c1e2f4a7b90_create_auth_sessions.py",
+    "backend/alembic/versions/9d2f5a1c3b84_create_user_genre_preferences.py",
+    "backend/alembic/versions/b7e4c2d91f30_create_user_movie_ratings.py",
+    "backend/alembic/versions/c6f8a2d4e901_add_movie_backdrop_path.py",
+    "backend/app/__init__.py",
+    "backend/app/catalogue/__init__.py",
+    "backend/app/catalogue/backdrops.py",
+    "backend/app/catalogue/m2_seed.py",
+    "backend/app/catalogue/tmdb_import.py",
+    "backend/app/cli/__init__.py",
+    "backend/app/cli/bootstrap_m2_catalogue.py",
+    "backend/app/cli/import_tmdb_catalogue.py",
+    "backend/app/db/__init__.py",
+    "backend/app/db/database.py",
+    "backend/app/db/models.py",
+    "backend/app/integrations/__init__.py",
+    "backend/app/integrations/tmdb.py",
+    "backend/app/main.py",
+    "backend/app/recommendations/__init__.py",
+    "backend/app/recommendations/ranker.py",
+    "backend/app/recommendations/service.py",
+    "backend/app/repositories/__init__.py",
+    "backend/app/repositories/movies.py",
+    "backend/app/repositories/preferences.py",
+    "backend/app/repositories/profile.py",
+    "backend/app/repositories/ratings.py",
+    "backend/app/repositories/recommendations.py",
+    "backend/app/repositories/users.py",
+    "backend/app/schemas/__init__.py",
+    "backend/app/schemas/accounts.py",
+    "backend/app/schemas/auth.py",
+    "backend/app/schemas/movies.py",
+    "backend/app/schemas/preferences.py",
+    "backend/app/schemas/profile.py",
+    "backend/app/schemas/ratings.py",
+    "backend/app/schemas/recommendations.py",
+    "backend/app/security/__init__.py",
+    "backend/app/security/origin.py",
+    "backend/app/security/passwords.py",
+    "backend/app/security/sessions.py",
+    "backend/requirements.lock.txt",
+    "backend/scripts/t28_backdrop_server.py",
+    "backend/tests/filter_verification_support.py",
+    "backend/tests/fixtures/recommendations_s3_t06.json",
+    "backend/tests/fixtures/s04_browser_acceptance.json",
+    "backend/tests/support/backdrop_acceptance.py",
+    "backend/tests/support/t16_acceptance_bridge.py",
+    "backend/tests/support/t33_rating_bridge.py",
+    "backend/tests/test_account_migration.py",
+    "backend/tests/test_auth_acceptance.py",
+    "backend/tests/test_auth_catalogue_handoff.py",
+    "backend/tests/test_auth_sessions.py",
+    "backend/tests/test_backdrop_acceptance.py",
+    "backend/tests/test_backdrop_storage.py",
+    "backend/tests/test_catalogue_migration.py",
+    "backend/tests/test_filter_preference_preservation.py",
+    "backend/tests/test_genre_matching.py",
+    "backend/tests/test_health.py",
+    "backend/tests/test_m2_catalogue_bootstrap.py",
+    "backend/tests/test_movie_repository.py",
+    "backend/tests/test_movies_api.py",
+    "backend/tests/test_nlp_spike.py",
+    "backend/tests/test_passwords.py",
+    "backend/tests/test_personalised_recommendations_api.py",
+    "backend/tests/test_popular_recommendations.py",
+    "backend/tests/test_preference_migration.py",
+    "backend/tests/test_preferences_api.py",
+    "backend/tests/test_profile_reset_api.py",
+    "backend/tests/test_rating_migration.py",
+    "backend/tests/test_rating_repository.py",
+    "backend/tests/test_ratings_api.py",
+    "backend/tests/test_ratings_api_verification.py",
+    "backend/tests/test_recommendation_explanation_content.py",
+    "backend/tests/test_recommendation_fixtures.py",
+    "backend/tests/test_registration.py",
+    "backend/tests/test_registration_verification.py",
+    "backend/tests/test_tmdb_import.py",
+    "backend/tests/test_tmdb_import_cli.py",
+    "backend/tests/test_user_repository.py",
+    "frontend/package-lock.json",
+    "frontend/package.json",
+    "frontend/scripts/verify-t28-backdrop.mjs",
+    "frontend/src/App.tsx",
+    "frontend/src/RecommendationExplanationPage.tsx",
+    "frontend/src/api/auth.ts",
+    "frontend/src/api/movies.ts",
+    "frontend/src/api/preferences.ts",
+    "frontend/src/api/ratings.ts",
+    "frontend/src/api/recommendations.ts",
+    "frontend/src/api/requestFailure.ts",
+    "frontend/src/auth/AuthContext.tsx",
+    "frontend/src/auth/RequireAuth.tsx",
+    "frontend/src/auth/authState.ts",
+    "frontend/src/components/MovieBackdropHero.tsx",
+    "frontend/src/components/MovieCard.tsx",
+    "frontend/src/components/MovieGrid.tsx",
+    "frontend/src/components/MovieRating.tsx",
+    "frontend/src/components/RecommendationFilter.tsx",
+    "frontend/src/components/RecommendationGuidance.tsx",
+    "frontend/src/components/backdropUrl.ts",
+    "frontend/src/formatPopularity.ts",
+    "frontend/src/index.css",
+    "frontend/src/main.tsx",
+    "frontend/src/navigation/movieDetailReturn.ts",
+    "frontend/src/pages/HomePage.tsx",
+    "frontend/src/pages/LoginPage.tsx",
+    "frontend/src/pages/MovieDetailPage.tsx",
+    "frontend/src/pages/PopularMoviesPage.tsx",
+    "frontend/src/pages/PreferencesPage.tsx",
+    "frontend/src/pages/ProtectedPlaceholderPage.tsx",
+    "frontend/src/pages/RecommendationsPage.tsx",
+    "frontend/src/pages/RegisterPage.tsx",
+    "frontend/src/protectedRoutes.tsx",
+    "frontend/src/tests/app.test.tsx",
+    "frontend/src/tests/auth-catalogue-handoff.test.tsx",
+    "frontend/src/tests/movie-backdrop.test.tsx",
+    "frontend/src/tests/movie-detail-acceptance.test.tsx",
+    "frontend/src/tests/movie-detail-rating.test.tsx",
+    "frontend/src/tests/movie-detail-return.test.tsx",
+    "frontend/src/tests/movie-popularity.test.tsx",
+    "frontend/src/tests/movie-rating.test.tsx",
+    "frontend/src/tests/movies.test.tsx",
+    "frontend/src/tests/popular-movies.test.tsx",
+    "frontend/src/tests/preference-usability.test.tsx",
+    "frontend/src/tests/preferences-account-switch.test.tsx",
+    "frontend/src/tests/preferences.test.tsx",
+    "frontend/src/tests/rating-session-refresh.test.tsx",
+    "frontend/src/tests/ratings-client.test.ts",
+    "frontend/src/tests/recommendation-explanation.test.tsx",
+    "frontend/src/tests/recommendation-filter-acceptance.test.tsx",
+    "frontend/src/tests/recommendation-filter.test.tsx",
+    "frontend/src/tests/recommendation-preference-transition.test.tsx",
+    "frontend/src/tests/recommendations.test.tsx"
+  ],
+  "testedAt": "2026-10-17T16:47:55.691Z",
+  "node": "v24.19.0",
+  "python": "Python 3.12.6",
+  "browser": "155.0.4283.45",
+  "temporaryDatabaseRemoved": true
+}

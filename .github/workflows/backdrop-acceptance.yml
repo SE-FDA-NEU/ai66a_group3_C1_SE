@@ -1,0 +1,49 @@
+name: T28 independent backdrop acceptance
+
+on:
+  push:
+    paths: ["backend/**", "frontend/**", ".github/workflows/backdrop-acceptance.yml"]
+  pull_request:
+    branches: [main, develop]
+    paths: ["backend/**", "frontend/**", ".github/workflows/backdrop-acceptance.yml"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backdrop-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      PYTHONUTF8: "1"
+      TMDB_READ_ACCESS_TOKEN: ""
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Install locked dependencies and Chromium
+        run: |
+          python -m pip install -r backend/requirements.lock.txt
+          python -m pip install -e "./backend[dev]" --no-deps
+          npm --prefix frontend ci
+          cd frontend
+          npx playwright install --with-deps chromium
+      - name: Independent populated DB and API verification
+        run: python -m pytest backend/tests/test_backdrop_acceptance.py backend/tests/test_backdrop_storage.py -q
+      - name: Offline real browser API and DB acceptance
+        run: npm --prefix frontend run test:t28:acceptance
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t28-backdrop-${{ github.sha }}
+          path: frontend/test-results/t28-synthetic/
+          if-no-files-found: error
+          retention-days: 14
