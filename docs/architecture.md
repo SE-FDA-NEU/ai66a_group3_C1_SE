@@ -139,8 +139,10 @@ the M2 Alembic migrations:
 movie counters. `catalogue_state.active_revision_id` is required and points to
 the active revision. S3-T01 migration `9d2f5a1c3b84` added
 `user_genre_preferences`; S3-T30 migration `b7e4c2d91f30` added
-`user_movie_ratings` and is the single current Alembic head. The ERD image does
-not show those two Sprint 3 tables yet. No import-run table has been migrated.
+`user_movie_ratings`. S3-T26 migration `c6f8a2d4e901` extends that revision with
+nullable `catalog_movies.backdrop_path` and is the single current head. The ERD
+image is a historical baseline, not proof of the new field; the table contract
+and migrations are authoritative. No import-run table has been migrated.
 
 ### Sprint 3 personalisation storage
 
@@ -224,9 +226,15 @@ Story #22 / S05b and is planned Sprint 4 behaviour.
 
 ## 8. Backdrop reconciliation
 
-The current model, catalogue migration, TMDb mapper, movie DTOs, detail route,
-and frontend contain no `backdrop` field. There is no nullable-backdrop
-migration or importer/detail compatibility implementation in this repository.
-The repository also contains no evidence linking tasks/issues #129-#131 to
-completed backdrop work. Backdrop remains pending/stretch work; this contract
-must not be read as completion evidence.
+S3-T26 / #129 adds nullable TEXT `CatalogMovie.backdrop_path` through migration
+`c6f8a2d4e901`, extending the rating head `b7e4c2d91f30`. The internal repository
+helper updates only this path and leaves commit/rollback to its caller.
+Existing core reimports preserve a stored path; explicit null clearing is a
+separate media write. IDs, the active catalogue and account data are preserved.
+
+T26 does not implement TMDb mapping, `backdropUrl`, or visible UI. Those remain
+#130 and the Sprint 3 UI task, with full acceptance under #131. Public movie
+DTOs and runtime network behaviour are unchanged. See the
+[storage handoff](backdrop-storage-contract.md) and
+[actual T26 evidence](evidence/s3-t26-backdrop-storage.md); storage completion
+must not be described as completion of the whole backdrop feature.

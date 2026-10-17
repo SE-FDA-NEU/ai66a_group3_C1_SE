@@ -70,7 +70,12 @@ implemented under Sprint 3 T19 (#121).
 
 PlantUML source: [images/erd.puml](images/erd.puml).
 
-The database has nine application tables, created by five Alembic revisions on top of the empty bootstrap revision: `4bde7d96c1c2` (catalogue), `7f5b1d2a6e90` (users), `8c1e2f4a7b90` (auth sessions), `9d2f5a1c3b84` (genre preferences, S3-T01), and `b7e4c2d91f30` (movie ratings, S3-T30). The single migration head is `b7e4c2d91f30`.
+The database has nine application tables. Five revisions after the empty
+bootstrap create those tables: `4bde7d96c1c2` (catalogue), `7f5b1d2a6e90`
+(users), `8c1e2f4a7b90` (sessions), `9d2f5a1c3b84` (preferences) and
+`b7e4c2d91f30` (ratings). S3-T26 adds a sixth additive revision,
+`c6f8a2d4e901`, for nullable `catalog_movies.backdrop_path`; this is the single
+current head and creates no additional table.
 
 The ERD in `docs/images/erd.png` is the M2 baseline. It shows the seven M2 tables: `users`, `auth_sessions`, `catalogue_revisions`, `catalogue_state`, `catalog_movies`, `genres`, and `movie_genres`. It does not yet show `user_genre_preferences` (S3-T01) or `user_movie_ratings` (S3-T30), both described below.
 
@@ -88,7 +93,7 @@ A trailing `?` marks a column that allows NULL. Every other column is NOT NULL.
 | `auth_sessions` | Server-side login sessions | `token_digest` VARCHAR(64), `user_id` VARCHAR(36), `created_at` DATETIME, `expires_at` DATETIME, `revoked_at` DATETIME? | `token_digest` | `user_id` to `users.id`, ON DELETE CASCADE, indexed | None |
 | `catalogue_revisions` | One seeded or imported snapshot of the catalogue | `id` VARCHAR(36), `provider` VARCHAR(32), `created_at` DATETIME, `inserted_movie_count` INTEGER, `updated_movie_count` INTEGER, `rejected_movie_count` INTEGER | `id` | None | None |
 | `catalogue_state` | The one row that names the active revision | `id` INTEGER, `active_revision_id` VARCHAR(36), `updated_at` DATETIME | `id` | `active_revision_id` to `catalogue_revisions.id`, ON DELETE RESTRICT | CHECK `id = 1`; UNIQUE `active_revision_id` |
-| `catalog_movies` | Movies, each owned by one revision | `id` VARCHAR(36), `catalogue_revision_id` VARCHAR(36), `source` VARCHAR(32), `source_id` VARCHAR(128), `title` VARCHAR(500), `release_year` INTEGER?, `overview` TEXT?, `popularity_score` FLOAT?, `vote_average` FLOAT?, `vote_count` INTEGER?, `source_fetched_at` DATETIME | `id` | `catalogue_revision_id` to `catalogue_revisions.id`, ON DELETE RESTRICT, indexed | UNIQUE (`source`, `source_id`) |
+| `catalog_movies` | Movies, each owned by one revision | `id` VARCHAR(36), `catalogue_revision_id` VARCHAR(36), `source` VARCHAR(32), `source_id` VARCHAR(128), `title` VARCHAR(500), `release_year` INTEGER?, `overview` TEXT?, `backdrop_path` TEXT?, `popularity_score` FLOAT?, `vote_average` FLOAT?, `vote_count` INTEGER?, `source_fetched_at` DATETIME | `id` | `catalogue_revision_id` to `catalogue_revisions.id`, ON DELETE RESTRICT, indexed | UNIQUE (`source`, `source_id`) |
 | `genres` | Genres, keyed by the provider's genre ID | `id` INTEGER (not auto-incremented), `name` VARCHAR(100) | `id` | None | None |
 | `movie_genres` | Links each movie to its genres | `movie_id` VARCHAR(36), `genre_id` INTEGER | (`movie_id`, `genre_id`) | `movie_id` to `catalog_movies.id`, ON DELETE CASCADE; `genre_id` to `genres.id`, ON DELETE RESTRICT | None |
 | `user_genre_preferences` | Current genre choices owned by an account | `user_id` VARCHAR(36), `genre_id` INTEGER | (`user_id`, `genre_id`) | `user_id` to `users.id`, ON DELETE CASCADE; `genre_id` to `genres.id`, ON DELETE RESTRICT | None |
@@ -106,8 +111,9 @@ Multiplicities:
 Sprint 3 storage adds `user_genre_preferences` with composite primary key
 `(user_id, genre_id)` and `user_movie_ratings` with a separate opaque primary
 key plus a unique `(user_id, movie_id)` pair. Migration `9d2f5a1c3b84` (S3-T01)
-creates preferences; migration `b7e4c2d91f30` (S3-T30) creates ratings and is
-the current head. The rating migration enforces account/movie foreign keys,
+creates preferences; migration `b7e4c2d91f30` (S3-T30) creates ratings. The
+current head `c6f8a2d4e901` (S3-T26) adds only nullable backdrop storage. The
+rating migration continues to enforce account/movie foreign keys,
 cascading deletes, and a strict integer database check from 1 through 5.
 
 ### Business rules enforced in M2
@@ -456,11 +462,18 @@ Evidence: migration `4bde7d96c1c2`, `MovieDetailDto`,
 
 ## 9. Backdrop reconciliation
 
-No `backdrop` column, nullable-backdrop migration, TMDb backdrop mapping, DTO
-field, detail compatibility code, or related test exists in the current
-repository. No repository evidence maps issues #129-#131 to completed work.
-Backdrop work therefore remains pending/stretch and is not described as
-implemented.
+T26 / #129 implements nullable TEXT `catalog_movies.backdrop_path`, the
+`c6f8a2d4e901` migration, a transaction-owned repository setter and focused
+fresh/populated migration/storage tests. It stores paths only, not image data.
+The existing core upsert does not erase a media path, and a failed caller
+transaction rolls a media write back without changing account/catalogue data.
+
+This is storage-only implementation. TMDb mapping, safe `backdropUrl` in the
+details response and visible fallback UI remain separate work under #130 and
+S3-T37, accepted end-to-end under #131. Public DTOs are unchanged by T26. The
+historical ERD image is not an updated-field claim. See the consumer
+[handoff contract](backdrop-storage-contract.md) and
+[T26 verification record](evidence/s3-t26-backdrop-storage.md).
 
 ## 10. D1 contract publication and consumer handoff
 
@@ -518,7 +531,8 @@ test evidence, or a tested SHA.
 | Rating UI and acceptance | Pending | T33 [#139](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/139) widget/saved state and T34 [#141](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/141) auth/account-switch verification. |
 | Authenticated reset backend | Implemented under T35; UI pending | [T35 #142](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/142); `backend/tests/test_profile_reset_api.py` covers confirmation, authentication, origin, isolation, rollback, preservation, and cold-start behaviour. Post-merge local verification on `05ee98232a96a10321d0e925c7e059d90c45d7c0` passed; hosted CI and independent review still require PR evidence. |
 | UI-driven design reconciliation | Documented locally; #136 coordination/review pending | Same reviewed change containing `docs/ui.md` and `docs/design.md` |
-| Backdrop #129-#131 | Conditional and pending; no shipped repository evidence | Reconcile only if nullable storage, migration/import, detail compatibility, and independent verification ship |
+| Backdrop storage #129 | T26 storage/migration and focused tests implemented; review/merge remain separate | [Storage handoff](backdrop-storage-contract.md) and [actual verification](evidence/s3-t26-backdrop-storage.md) |
+| Backdrop import/API/UI and full acceptance | Pending under #130, S3-T37 and #131; not claimed by T26 | Reviewed implementation, real image/fallback browser evidence and independent acceptance |
 | Final implementation reconciliation | Pending | Compare these contracts with merged implementation and verification evidence |
 | Final evidence | Pending | Reviewed contract links, actual implementation evidence, final test results, and real tested SHA |
 

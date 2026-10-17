@@ -161,6 +161,29 @@ def upsert_catalogue_movie(
     return movie
 
 
+def set_movie_backdrop_path(
+    session: Session, *, movie_id: str, backdrop_path: str | None
+) -> CatalogMovie:
+    """Set storage-only media without touching identity or core catalogue fields.
+
+    The caller validates provider paths and controls commit/rollback.  An
+    explicit ``None`` clears the path; an unfetched/missing provider field must
+    skip this function so the last successful value is preserved.  URL
+    construction and TMDb mapping belong to the importer, not this repository.
+    """
+
+    if backdrop_path is not None and not isinstance(backdrop_path, str):
+        raise ValueError("backdrop_path must be a string or None")
+
+    movie = session.get(CatalogMovie, movie_id)
+    if movie is None:
+        raise ValueError("catalogue movie does not exist")
+
+    movie.backdrop_path = backdrop_path
+    session.flush()
+    return movie
+
+
 def upsert_genre(session: Session, *, genre_id: int, name: str) -> Genre:
     """Create or refresh a provider genre without duplicating its numeric ID."""
 
