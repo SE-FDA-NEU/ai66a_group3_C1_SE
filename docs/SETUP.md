@@ -90,6 +90,10 @@ omitting it returns to a one-page active snapshot. Accounts, preferences and
 ratings are retained, and runtime list limits remain unchanged. See the
 [TMDb runbook](tmdb-sprint3-runbook.md) for the bounded import contract.
 
+To add backdrops to an already imported active TMDb catalogue without changing
+its revision or accounts, use the bounded
+[backdrop enrichment command](backdrop-import-runbook.md#bounded-enrichment-for-an-existing-active-catalogue).
+
 ## Required import result and smoke
 
 A successful import prints this shape, with actual counts depending on the

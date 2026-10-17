@@ -3,8 +3,10 @@ from __future__ import annotations
 from collections.abc import Iterator
 
 import pytest
+from app.catalogue.backdrops import backdrop_url
 from app.catalogue.m2_seed import seed_m2_catalogue
 from app.db.database import Base
+from app.db.models import CatalogMovie
 from app.main import app, get_db
 from app.repositories.movies import (
     activate_catalogue_revision,
@@ -189,6 +191,48 @@ def test_movie_detail_returns_genres_and_treats_missing_fields_as_null(
     assert detail["releaseYear"] is None
     assert detail["overview"] is None
     assert detail["genres"] == []
+    assert detail["backdropUrl"] is None
+
+
+def test_movie_detail_has_exact_safe_backdrop_shape_and_never_fetches_tmdb(
+    client: tuple[TestClient, Session], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    http, database_session = client
+    movie_id = _seed_active_movies(database_session, count=1)[0]
+    movie = database_session.get(CatalogMovie, movie_id)
+    movie.backdrop_path = "/sample-backdrop.jpg"
+    database_session.commit()
+
+    def forbidden(*_args, **_kwargs):
+        raise AssertionError("details must not call TMDb")
+
+    monkeypatch.setattr("app.integrations.tmdb.TmdbClient._get_json", forbidden)
+    response = http.get(f"/api/movies/{movie_id}")
+    assert response.status_code == 200
+    assert response.json() == {
+        "data": {"movie": {
+            "id": movie_id,
+            "title": "Movie 00",
+            "releaseYear": 2000,
+            "genres": [{"id": 28, "name": "Action"}],
+            "overview": "Overview 0",
+            "popularityScore": 1.0,
+            "voteAverage": None,
+            "voteCount": None,
+            "backdropUrl": "https://image.tmdb.org/t/p/w780/sample-backdrop.jpg",
+        }},
+        "meta": {"catalogueRevision": response.json()["meta"]["catalogueRevision"]},
+    }
+    movie.backdrop_path = "https://evil.example/image.jpg"
+    database_session.commit()
+    assert http.get(f"/api/movies/{movie_id}").json()["data"]["movie"]["backdropUrl"] is None
+    assert http.get("/api/movies/unknown").status_code == 404
+
+
+@pytest.mark.parametrize("path", ["/../x.jpg", "//evil/x.jpg", "https://evil/x.jpg", "/x.jpg?token=secret", "/%2e%2e.jpg", "/x.svg", "/x\\y.jpg", " /x.jpg", "", None])
+def test_backdrop_builder_rejects_unsafe_or_missing_paths(path):
+    assert backdrop_url(path) is None
+    assert backdrop_url("/valid.jpg", size="original") is None
 
 
 def test_unknown_movie_id_returns_404(

@@ -7,7 +7,7 @@ from datetime import UTC, datetime
 from typing import Self
 
 import pytest
-from app.catalogue.tmdb_import import TmdbImportResult
+from app.catalogue.tmdb_import import TmdbBackdropEnrichmentResult, TmdbImportResult
 from app.cli import import_tmdb_catalogue as command
 
 
@@ -91,6 +91,57 @@ def test_invalid_page_budget_exits_before_client_or_database(monkeypatch, pages)
     monkeypatch.setattr(command, "SessionLocal", forbidden)
     with pytest.raises(SystemExit) as error:
         command.main(["--pages", pages])
+    assert error.value.code == 2
+
+
+def test_enrichment_cli_prints_bounded_safe_counts(monkeypatch, capsys):
+    result = TmdbBackdropEnrichmentResult(
+        eligible_movie_count=255,
+        fetched_movie_count=2,
+        updated_movie_count=1,
+        cleared_movie_count=0,
+        unchanged_movie_count=0,
+        missing_movie_count=1,
+        invalid_movie_count=0,
+    )
+    monkeypatch.setattr(command.TmdbClient, "from_environment", lambda *_args: _FakeClient())
+    monkeypatch.setattr(command, "SessionLocal", lambda: _FakeSession())
+    received = []
+
+    def enrich(_session, *, client, limit):
+        received.append(limit)
+        return result
+
+    monkeypatch.setattr(command, "enrich_tmdb_backdrops", enrich)
+    assert command.main(["--enrich-backdrops", "--limit", "2"]) == 0
+    assert received == [2]
+    assert capsys.readouterr().out == (
+        "TMDb backdrop enrichment complete\n"
+        "eligible=255\n"
+        "fetched=2\n"
+        "remaining=253\n"
+        "updated=1\n"
+        "cleared=0\n"
+        "unchanged=0\n"
+        "missing=1\n"
+        "invalid=0\n"
+    )
+
+
+@pytest.mark.parametrize("arguments", [
+    ["--enrich-backdrops", "--limit", "0"],
+    ["--enrich-backdrops", "--limit", "301"],
+    ["--enrich-backdrops", "--pages", "1"],
+    ["--limit", "2"],
+])
+def test_enrichment_cli_rejects_invalid_or_mixed_budgets_before_io(monkeypatch, arguments):
+    def forbidden(*_args, **_kwargs):
+        raise AssertionError("invalid arguments must not open a client or database")
+
+    monkeypatch.setattr(command.TmdbClient, "from_environment", forbidden)
+    monkeypatch.setattr(command, "SessionLocal", forbidden)
+    with pytest.raises(SystemExit) as error:
+        command.main(arguments)
     assert error.value.code == 2
 
 

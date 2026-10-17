@@ -7,7 +7,7 @@ from typing import Any
 import app.catalogue.tmdb_import as tmdb_import_module
 import httpx
 import pytest
-from app.catalogue.tmdb_import import import_tmdb_catalogue
+from app.catalogue.tmdb_import import enrich_tmdb_backdrops, import_tmdb_catalogue
 from app.db.database import Base
 from app.db.models import (
     CatalogMovie,
@@ -369,6 +369,126 @@ def test_reimport_updates_existing_tmdb_movies_without_changing_internal_ids(
         assert updated_movie.title == "Updated TMDb movie"
         assert active_revision is not None
         assert active_revision.id == second_result.active_revision_id
+
+
+def test_core_import_maps_valid_null_and_missing_backdrops_without_changing_identity(
+    database,
+) -> None:
+    client = FakeTmdbClient(
+        genres=[{"id": 28, "name": "Action"}],
+        popular_pages={1: [
+            {"id": 101, "title": "First", "genre_ids": [28], "overview": "Overview", "popularity": 9, "backdrop_path": "/sample-backdrop.jpg"},
+            {"id": 102, "title": "Second", "genre_ids": [28], "overview": "Other", "popularity": 8, "backdrop_path": None},
+        ]},
+    )
+    with database() as session, session.begin():
+        import_tmdb_catalogue(session, client=client)
+        first = get_movie_by_source_id(session, source="tmdb", source_id="101")
+        second = get_movie_by_source_id(session, source="tmdb", source_id="102")
+        original_ids = (first.id, second.id)
+        original_core = (first.overview, first.popularity_score, [g.id for g in first.genres])
+        assert first.backdrop_path == "/sample-backdrop.jpg"
+        assert second.backdrop_path is None
+
+    # A missing field is not an explicit null. Bad media cannot erase good media.
+    for invalid in ({}, {"backdrop_path": "https://evil.example/x.jpg"}, {"backdrop_path": "/../x.jpg"}):
+        client.popular_pages[1][0] = {key: value for key, value in client.popular_pages[1][0].items() if key != "backdrop_path"} | invalid
+        with database() as session, session.begin():
+            result = import_tmdb_catalogue(session, client=client)
+            assert result.updated_movie_count == 2
+            first = get_movie_by_source_id(session, source="tmdb", source_id="101")
+            second = get_movie_by_source_id(session, source="tmdb", source_id="102")
+            assert (first.id, second.id) == original_ids
+            assert (first.overview, first.popularity_score, [g.id for g in first.genres]) == original_core
+            assert first.backdrop_path == "/sample-backdrop.jpg"
+            assert second.backdrop_path is None
+
+    client.popular_pages[1][0]["backdrop_path"] = None
+    with database() as session, session.begin():
+        import_tmdb_catalogue(session, client=client)
+        first = get_movie_by_source_id(session, source="tmdb", source_id="101")
+        assert first.id == original_ids[0]
+        assert first.backdrop_path is None
+        assert len(list(session.scalars(select(CatalogMovie)))) == 2
+
+
+def test_enrichment_updates_only_media_and_preserves_catalogue_revision(database) -> None:
+    client = FakeTmdbClient(
+        genres=[{"id": 28, "name": "Action"}],
+        popular_pages={1: [
+            {"id": 101, "title": "First", "genre_ids": [28], "overview": "Overview", "popularity": 9},
+            {"id": 102, "title": "Second", "genre_ids": [28], "overview": "Other", "popularity": 8},
+        ]},
+        details={101: {"backdrop_path": "/sample-backdrop.jpg"}, 102: {"backdrop_path": None}},
+    )
+    with database() as session, session.begin():
+        imported = import_tmdb_catalogue(session, client=client)
+        first = get_movie_by_source_id(session, source="tmdb", source_id="101")
+        original_id = first.id
+        original_core = (first.title, first.overview, first.popularity_score, [g.id for g in first.genres])
+    client.calls.clear()
+    with database() as session, session.begin():
+        result = enrich_tmdb_backdrops(session, client=client)
+        assert (result.eligible_movie_count, result.fetched_movie_count, result.updated_movie_count) == (2, 2, 1)
+        assert result.cleared_movie_count == 0
+        assert client.calls == ["details:101", "details:102"]
+        first = get_movie_by_source_id(session, source="tmdb", source_id="101")
+        assert first.id == original_id
+        assert (first.title, first.overview, first.popularity_score, [g.id for g in first.genres]) == original_core
+        assert first.backdrop_path == "/sample-backdrop.jpg"
+        assert get_active_catalogue_revision(session).id == imported.active_revision_id
+
+    with database() as session, session.begin():
+        repeat = enrich_tmdb_backdrops(session, client=client)
+        assert repeat.updated_movie_count == 0
+        assert repeat.unchanged_movie_count == 2
+    client.details[101] = {"backdrop_path": None}
+    client.details[102] = {}
+    with database() as session, session.begin():
+        cleared = enrich_tmdb_backdrops(session, client=client)
+        assert (cleared.updated_movie_count, cleared.cleared_movie_count, cleared.missing_movie_count) == (1, 1, 1)
+        assert get_movie_by_source_id(session, source="tmdb", source_id="101").backdrop_path is None
+        assert get_active_catalogue_revision(session).id == imported.active_revision_id
+
+
+def test_enrichment_limit_and_failure_do_not_change_revision_or_partial_media(database):
+    client = _valid_tmdb_client()
+    with database() as session, session.begin():
+        imported = import_tmdb_catalogue(session, client=client)
+    client.details[101] = {"backdrop_path": "/first.jpg"}
+    client.details[202] = {"backdrop_path": "/second.jpg"}
+    client.calls.clear()
+    with database() as session, session.begin():
+        limited = enrich_tmdb_backdrops(session, client=client, limit=1)
+        assert (limited.eligible_movie_count, limited.fetched_movie_count) == (2, 1)
+        assert client.calls == ["details:101"]
+    class FailOnSecondMovie(FakeTmdbClient):
+        def fetch_movie_details(self, movie_id):
+            if movie_id == 202:
+                raise TmdbRateLimitError("TMDb rate limit reached")
+            return super().fetch_movie_details(movie_id)
+
+    failed_client = FailOnSecondMovie(details={101: {"backdrop_path": "/changed.jpg"}})
+    with database() as session, pytest.raises(TmdbRateLimitError), session.begin():
+        enrich_tmdb_backdrops(session, client=failed_client)
+    with database() as session:
+        assert get_movie_by_source_id(session, source="tmdb", source_id="101").backdrop_path == "/first.jpg"
+        assert get_active_catalogue_revision(session).id == imported.active_revision_id
+
+
+def test_enrichment_invalid_path_preserves_previous_value(database):
+    client = FakeTmdbClient(
+        genres=[{"id": 28, "name": "Action"}],
+        popular_pages={1: [{"id": 101, "title": "First", "genre_ids": [28], "backdrop_path": "/good.jpg"}]},
+        details={101: {"backdrop_path": "/../bad.jpg"}},
+    )
+    with database() as session, session.begin():
+        imported = import_tmdb_catalogue(session, client=client)
+    with database() as session, session.begin():
+        result = enrich_tmdb_backdrops(session, client=client)
+        assert (result.invalid_movie_count, result.updated_movie_count) == (1, 0)
+        assert get_movie_by_source_id(session, source="tmdb", source_id="101").backdrop_path == "/good.jpg"
+        assert get_active_catalogue_revision(session).id == imported.active_revision_id
 
 
 def test_database_failure_rolls_back_candidate_and_preserves_existing_tmdb_data(

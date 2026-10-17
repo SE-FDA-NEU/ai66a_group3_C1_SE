@@ -468,12 +468,14 @@ fresh/populated migration/storage tests. It stores paths only, not image data.
 The existing core upsert does not erase a media path, and a failed caller
 transaction rolls a media write back without changing account/catalogue data.
 
-This is storage-only implementation. TMDb mapping, safe `backdropUrl` in the
-details response and visible fallback UI remain separate work under #130 and
-S3-T37, accepted end-to-end under #131. Public DTOs are unchanged by T26. The
+T27 adds TMDb mapping, bounded media-only enrichment and a safe nullable
+`backdropUrl` in the details response on top of that storage. Visible fallback
+UI remains separate S3-T37 work, accepted end-to-end under #131. The
+public DTOs were unchanged by T26 alone. The
 historical ERD image is not an updated-field claim. See the consumer
 [handoff contract](backdrop-storage-contract.md) and
-[T26 verification record](evidence/s3-t26-backdrop-storage.md).
+[T26 verification record](evidence/s3-t26-backdrop-storage.md), plus the
+[T27 operator runbook](backdrop-import-runbook.md).
 
 ## 10. D1 contract publication and consumer handoff
 

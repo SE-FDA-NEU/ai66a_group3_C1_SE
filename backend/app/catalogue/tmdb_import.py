@@ -8,9 +8,11 @@ from datetime import UTC, date, datetime
 from math import isfinite
 from typing import Any, Protocol
 
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.db.models import utc_now
+from app.catalogue.backdrops import valid_backdrop_path
+from app.db.models import CatalogMovie, utc_now
 from app.integrations.tmdb import (
     DEFAULT_POPULAR_PAGES,
     MAX_POPULAR_PAGES,
@@ -20,8 +22,10 @@ from app.integrations.tmdb import (
 from app.repositories.movies import (
     activate_catalogue_revision,
     create_catalogue_revision,
+    get_active_catalogue_revision,
     get_movie_by_source_id,
     replace_movie_genres,
+    set_movie_backdrop_path,
     upsert_catalogue_movie,
     upsert_genre,
 )
@@ -53,6 +57,22 @@ class TmdbImportResult:
     sample_source_ids: tuple[str, ...]
 
 
+MAX_ENRICHMENT_MOVIES = 300
+
+
+@dataclass(frozen=True)
+class TmdbBackdropEnrichmentResult:
+    """Counts from one bounded media-only pass over the active TMDb catalogue."""
+
+    eligible_movie_count: int
+    fetched_movie_count: int
+    updated_movie_count: int
+    cleared_movie_count: int
+    unchanged_movie_count: int
+    missing_movie_count: int
+    invalid_movie_count: int
+
+
 @dataclass(frozen=True)
 class _PreparedMovie:
     source_id: str
@@ -64,6 +84,8 @@ class _PreparedMovie:
     vote_count: int | None
     genre_ids: tuple[int, ...]
     source_fetched_at: datetime
+    backdrop_fetched: bool
+    backdrop_path: str | None
 
 
 class _RejectedMovie(ValueError):
@@ -131,6 +153,10 @@ def import_tmdb_catalogue(
             source_fetched_at=prepared_movie.source_fetched_at,
         )
         replace_movie_genres(session, movie=movie, genre_ids=prepared_movie.genre_ids)
+        if prepared_movie.backdrop_fetched:
+            set_movie_backdrop_path(
+                session, movie_id=movie.id, backdrop_path=prepared_movie.backdrop_path
+            )
         if existing_movie is None:
             inserted_movie_count += 1
         else:
@@ -152,6 +178,68 @@ def import_tmdb_catalogue(
         source_fetched_at=source_fetched_at,
         imported_at=revision.created_at,
         sample_source_ids=tuple(movie.source_id for movie in prepared_movies[:3]),
+    )
+
+
+def enrich_tmdb_backdrops(
+    session: Session, *, client: TmdbCatalogueGateway, limit: int = MAX_ENRICHMENT_MOVIES
+) -> TmdbBackdropEnrichmentResult:
+    """Fetch media for existing active TMDb movies without changing the revision.
+
+    The caller owns the transaction. Any provider or database failure rolls
+    back the whole pass; a missing or invalid field leaves its old value alone.
+    There is at most one detail request per selected movie.
+    """
+
+    if type(limit) is not int or not 1 <= limit <= MAX_ENRICHMENT_MOVIES:
+        raise ValueError(f"limit must be an integer from 1 to {MAX_ENRICHMENT_MOVIES}")
+    revision = get_active_catalogue_revision(session)
+    if revision is None or revision.provider != TMDB_SOURCE:
+        raise ValueError("an active TMDb catalogue is required for backdrop enrichment")
+
+    active_movies = (
+        CatalogMovie.catalogue_revision_id == revision.id,
+        CatalogMovie.source == TMDB_SOURCE,
+    )
+    eligible = session.scalar(select(func.count()).select_from(CatalogMovie).where(*active_movies))
+    movies = list(
+        session.scalars(
+            select(CatalogMovie)
+            .where(*active_movies)
+            .order_by(CatalogMovie.source_id)
+            .limit(limit)
+        )
+    )
+    updated = cleared = unchanged = missing = invalid = 0
+    for movie in movies:
+        # Source IDs are positive integers because the core importer validated
+        # them. A corrupted row is a failure, not a reason to fetch a new URL.
+        if not movie.source_id.isdecimal() or int(movie.source_id) <= 0:
+            raise ValueError("active TMDb catalogue contains an invalid source ID")
+        details = client.fetch_movie_details(int(movie.source_id))
+        if "backdrop_path" not in details:
+            missing += 1
+            continue
+        path = details["backdrop_path"]
+        if path is not None and not valid_backdrop_path(path):
+            invalid += 1
+            continue
+        if movie.backdrop_path == path:
+            unchanged += 1
+            continue
+        set_movie_backdrop_path(session, movie_id=movie.id, backdrop_path=path)
+        updated += 1
+        if path is None:
+            cleared += 1
+
+    return TmdbBackdropEnrichmentResult(
+        eligible_movie_count=eligible or 0,
+        fetched_movie_count=len(movies),
+        updated_movie_count=updated,
+        cleared_movie_count=cleared,
+        unchanged_movie_count=unchanged,
+        missing_movie_count=missing,
+        invalid_movie_count=invalid,
     )
 
 
@@ -214,12 +302,18 @@ def _prepare_movie(
 ) -> _PreparedMovie:
     movie_id = _positive_integer(raw_movie.get("id"))
     title = _required_text(raw_movie.get("title"))
-    genre_ids = _movie_genre_ids(
+    genre_ids, details = _movie_genre_ids(
         raw_movie,
         movie_id=movie_id,
         client=client,
         known_genre_ids=genres_by_id,
     )
+    media = raw_movie if "backdrop_path" in raw_movie else details
+    backdrop_fetched = media is not None and "backdrop_path" in media
+    backdrop_path = media["backdrop_path"] if backdrop_fetched else None
+    if backdrop_path is not None and not valid_backdrop_path(backdrop_path):
+        backdrop_fetched = False
+        backdrop_path = None
     return _PreparedMovie(
         source_id=str(movie_id),
         title=title,
@@ -230,6 +324,8 @@ def _prepare_movie(
         vote_count=_non_negative_integer_or_none(raw_movie.get("vote_count")),
         genre_ids=genre_ids,
         source_fetched_at=source_fetched_at,
+        backdrop_fetched=backdrop_fetched,
+        backdrop_path=backdrop_path,
     )
 
 
@@ -239,7 +335,8 @@ def _movie_genre_ids(
     movie_id: int,
     client: TmdbCatalogueGateway,
     known_genre_ids: Mapping[int, str],
-) -> tuple[int, ...]:
+) -> tuple[tuple[int, ...], Mapping[str, Any] | None]:
+    details = None
     if "genre_ids" in raw_movie:
         raw_genre_ids = raw_movie["genre_ids"]
     else:
@@ -262,7 +359,7 @@ def _movie_genre_ids(
             raise _RejectedMovie("movie references an unknown genre")
         if genre_id not in genre_ids:
             genre_ids.append(genre_id)
-    return tuple(genre_ids)
+    return tuple(genre_ids), details
 
 
 def _positive_integer(value: Any) -> int:
