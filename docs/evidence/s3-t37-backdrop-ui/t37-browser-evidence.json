@@ -1,0 +1,115 @@
+{
+  "result": "PASS",
+  "testedAt": "2026-10-17T15:08:19.636Z",
+  "baseCommit": "d64cd29b27d5e01c6db4a94d02765f6873fea91f",
+  "workingTree": "modified",
+  "sourceSha256": "ced81bd4e18f24431f30ee894d560d9f1aaa2bd9ddc7fcfc5ed1d88c30c5b0b7",
+  "browser": "155.0.8059.84",
+  "api": {
+    "catalogueRevision": "a6443fc7-6299-4a8d-be5e-bd59452518bb",
+    "movieId": "0908f6a9-7aef-4614-b7d5-fe0ddeb76cbf",
+    "title": "Spider-Man: Brand New Day",
+    "backdropUrl": "https://image.tmdb.org/t/p/w780/4tjxYg2AbOzzG9G1YuiT2NzYhlH.jpg"
+  },
+  "desktop": {
+    "viewportWidth": 1280,
+    "documentWidth": 1280,
+    "title": "Spider-Man: Brand New Day",
+    "titleVisible": true,
+    "returnHref": "/",
+    "imageSrc": "https://image.tmdb.org/t/p/w780/4tjxYg2AbOzzG9G1YuiT2NzYhlH.jpg",
+    "imageNaturalWidth": 780,
+    "imageOpacity": "1",
+    "gradient": "linear-gradient(135deg, rgb(18, 41, 75) 0%, rgb(36, 52, 87) 45%, rgb(70, 53, 76) 100%)",
+    "overlay": "linear-gradient(90deg, rgba(5, 12, 26, 0.92) 0%, rgba(5, 12, 26, 0.74) 58%, rgba(5, 12, 26, 0.56) 100%)"
+  },
+  "mobile": {
+    "viewportWidth": 375,
+    "documentWidth": 375,
+    "title": "Spider-Man: Brand New Day",
+    "titleVisible": true,
+    "returnHref": "/",
+    "imageSrc": "https://image.tmdb.org/t/p/w780/4tjxYg2AbOzzG9G1YuiT2NzYhlH.jpg",
+    "imageNaturalWidth": 780,
+    "imageOpacity": "1",
+    "gradient": "linear-gradient(135deg, rgb(18, 41, 75) 0%, rgb(36, 52, 87) 45%, rgb(70, 53, 76) 100%)",
+    "overlay": "linear-gradient(0deg, rgba(5, 12, 26, 0.94) 0%, rgba(5, 12, 26, 0.72) 65%, rgba(5, 12, 26, 0.54) 100%)"
+  },
+  "keyboardFocus": {
+    "returnLinkFocused": true,
+    "outlineWidth": "3px"
+  },
+  "synthetic": {
+    "brightDesktop": {
+      "viewportWidth": 1280,
+      "documentWidth": 1280,
+      "title": "Spider-Man: Brand New Day",
+      "titleVisible": true,
+      "returnHref": "/",
+      "imageSrc": "https://image.tmdb.org/t/p/w780/4tjxYg2AbOzzG9G1YuiT2NzYhlH.jpg",
+      "imageNaturalWidth": 780,
+      "imageOpacity": "1",
+      "gradient": "linear-gradient(135deg, rgb(18, 41, 75) 0%, rgb(36, 52, 87) 45%, rgb(70, 53, 76) 100%)",
+      "overlay": "linear-gradient(90deg, rgba(5, 12, 26, 0.92) 0%, rgba(5, 12, 26, 0.74) 58%, rgba(5, 12, 26, 0.56) 100%)",
+      "result": "PASS"
+    },
+    "darkMobile": {
+      "viewportWidth": 375,
+      "documentWidth": 375,
+      "title": "Spider-Man: Brand New Day",
+      "titleVisible": true,
+      "returnHref": "/",
+      "imageSrc": "https://image.tmdb.org/t/p/w780/4tjxYg2AbOzzG9G1YuiT2NzYhlH.jpg",
+      "imageNaturalWidth": 780,
+      "imageOpacity": "1",
+      "gradient": "linear-gradient(135deg, rgb(18, 41, 75) 0%, rgb(36, 52, 87) 45%, rgb(70, 53, 76) 100%)",
+      "overlay": "linear-gradient(0deg, rgba(5, 12, 26, 0.94) 0%, rgba(5, 12, 26, 0.72) 65%, rgba(5, 12, 26, 0.54) 100%)",
+      "result": "PASS"
+    },
+    "brokenMobile": {
+      "viewportWidth": 375,
+      "documentWidth": 375,
+      "title": "Spider-Man: Brand New Day",
+      "titleVisible": true,
+      "returnHref": "/",
+      "imageSrc": null,
+      "imageNaturalWidth": 0,
+      "imageOpacity": null,
+      "gradient": "linear-gradient(135deg, rgb(18, 41, 75) 0%, rgb(36, 52, 87) 45%, rgb(70, 53, 76) 100%)",
+      "overlay": "linear-gradient(0deg, rgba(5, 12, 26, 0.94) 0%, rgba(5, 12, 26, 0.72) 65%, rgba(5, 12, 26, 0.54) 100%)",
+      "result": "PASS"
+    },
+    "nullDesktop": {
+      "viewportWidth": 1280,
+      "documentWidth": 1280,
+      "title": "Spider-Man: Brand New Day",
+      "titleVisible": true,
+      "returnHref": "/",
+      "imageSrc": null,
+      "imageNaturalWidth": 0,
+      "imageOpacity": null,
+      "gradient": "linear-gradient(135deg, rgb(18, 41, 75) 0%, rgb(36, 52, 87) 45%, rgb(70, 53, 76) 100%)",
+      "overlay": "linear-gradient(90deg, rgba(5, 12, 26, 0.92) 0%, rgba(5, 12, 26, 0.74) 58%, rgba(5, 12, 26, 0.56) 100%)",
+      "result": "PASS"
+    },
+    "omittedMobile": {
+      "viewportWidth": 375,
+      "documentWidth": 375,
+      "title": "Spider-Man: Brand New Day",
+      "titleVisible": true,
+      "returnHref": "/",
+      "imageSrc": null,
+      "imageNaturalWidth": 0,
+      "imageOpacity": null,
+      "gradient": "linear-gradient(135deg, rgb(18, 41, 75) 0%, rgb(36, 52, 87) 45%, rgb(70, 53, 76) 100%)",
+      "overlay": "linear-gradient(0deg, rgba(5, 12, 26, 0.94) 0%, rgba(5, 12, 26, 0.72) 65%, rgba(5, 12, 26, 0.54) 100%)",
+      "result": "PASS"
+    }
+  },
+  "cdnResponseStatuses": [
+    200
+  ],
+  "cdnCredentialHeaderSeen": false,
+  "cdnQuerySeen": false,
+  "unexpectedRequestHosts": []
+}

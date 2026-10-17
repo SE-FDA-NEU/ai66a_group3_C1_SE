@@ -15,6 +15,8 @@ export type MovieDetail = MovieSummary & {
   overview: string | null;
   voteAverage: number | null;
   voteCount: number | null;
+  // Older detail deployments may omit this additive field during rollout.
+  backdropUrl?: string | null;
 };
 
 type MovieListResponse = {
