@@ -4,6 +4,7 @@ import { Link, useLocation, useParams } from "react-router-dom";
 import { getMovie, MovieApiError, type MovieDetail } from "../api/movies.ts";
 import { formatPopularityScore, POPULARITY_LABEL } from "../formatPopularity.ts";
 import { resolveMovieDetailReturn } from "../navigation/movieDetailReturn.ts";
+import MovieBackdropHero from "../components/MovieBackdropHero.tsx";
 import MovieRating from "../components/MovieRating.tsx";
 
 const INFORMATION_UNAVAILABLE = "Information unavailable";
@@ -121,37 +122,42 @@ function MovieDetailPage() {
   return (
     <main className="page">
       <article className="movie-detail">
-        <Link className="text-link" to={returnDestination.to}>
+        <Link className="text-link movie-detail__return" to={returnDestination.to}>
           <span aria-hidden="true">&larr; </span>
           {returnDestination.label}
         </Link>
-        <p className="eyebrow">Movie details</p>
-        <h1>{movie.title}</h1>
+        <MovieBackdropHero
+          key={`${movie.id}:${movie.backdropUrl ?? ""}`}
+          title={movie.title}
+          backdropUrl={movie.backdropUrl}
+        />
 
-        <dl className="movie-detail__facts">
-          <div>
-            <dt>Year</dt>
-            <dd>{movie.releaseYear ?? INFORMATION_UNAVAILABLE}</dd>
-          </div>
-          <div>
-            <dt>Genres</dt>
-            <dd>
-              {movie.genres.length > 0
-                ? movie.genres.map((genre) => genre.name).join(", ")
-                : INFORMATION_UNAVAILABLE}
-            </dd>
-          </div>
-          <div>
-            <dt>{POPULARITY_LABEL}</dt>
-            <dd>{formatPopularityScore(movie.popularityScore)}</dd>
-          </div>
-        </dl>
+        <div className="movie-detail__body">
+          <dl className="movie-detail__facts">
+            <div>
+              <dt>Year</dt>
+              <dd>{movie.releaseYear ?? INFORMATION_UNAVAILABLE}</dd>
+            </div>
+            <div>
+              <dt>Genres</dt>
+              <dd>
+                {movie.genres.length > 0
+                  ? movie.genres.map((genre) => genre.name).join(", ")
+                  : INFORMATION_UNAVAILABLE}
+              </dd>
+            </div>
+            <div>
+              <dt>{POPULARITY_LABEL}</dt>
+              <dd>{formatPopularityScore(movie.popularityScore)}</dd>
+            </div>
+          </dl>
 
-        <section>
-          <h2>Overview</h2>
-          <p>{movie.overview ?? INFORMATION_UNAVAILABLE}</p>
-        </section>
-        <MovieRating movieId={movie.id} />
+          <section>
+            <h2>Overview</h2>
+            <p>{movie.overview ?? INFORMATION_UNAVAILABLE}</p>
+          </section>
+          <MovieRating movieId={movie.id} />
+        </div>
       </article>
     </main>
   );
