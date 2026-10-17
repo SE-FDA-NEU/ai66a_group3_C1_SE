@@ -38,13 +38,47 @@ authentication, rating ownership and Story #19 criteria are unchanged.
 Use Python 3.12, Node 24 and the locked dependencies in
 [SETUP.md](../../SETUP.md). Configure the private TMDb token only in `.env`;
 never put it in frontend variables, screenshots or this evidence folder.
-Apply migration `c6f8a2d4e901`, import a TMDb catalogue with at least one
-backdrop, and start backend and frontend in separate terminals:
+Choose the database path **before** running an importer. A default core import
+on an existing roughly 255-movie catalogue can replace the active snapshot
+with the default roughly 20-movie page. Do not core-import just to add or test
+backdrops.
+
+- **New/empty database:** follow [SETUP.md](../../SETUP.md) to create and
+  migrate it, then run the core TMDb import once. The default import fetches
+  one page; use the explicitly documented `--pages 13` option if the intended
+  new catalogue is the larger Sprint 3 snapshot.
+- **Existing active TMDb catalogue without backdrops:** preserve the existing
+  database and active catalogue. Apply the migration, then use the
+  [bounded enrichment command](../../backdrop-import-runbook.md#bounded-enrichment-for-an-existing-active-catalogue)
+  instead of a core import:
+
+  ```powershell
+  .\.venv\Scripts\python.exe -m alembic -c backend/alembic.ini upgrade head
+  .\.venv\Scripts\python.exe -m app.cli.import_tmdb_catalogue --enrich-backdrops --limit 300
+  ```
+
+- **Already enriched database:** do not import or enrich again. The local
+  database used for the recorded screenshots was already enriched; its detail
+  API returned a non-null `backdropUrl`. Start the services and run the
+  verifier directly.
+
+For a **new/empty database only**, after setting the private token, the
+bootstrap commands are:
 
 ```powershell
 .\.venv\Scripts\python.exe -m alembic -c backend/alembic.ini upgrade head
 .\.venv\Scripts\python.exe -m app.cli.import_tmdb_catalogue
+```
+
+Start the backend from the repository root in one terminal:
+
+```powershell
 .\.venv\Scripts\python.exe -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
+```
+
+Start the frontend from the repository root in a second terminal:
+
+```powershell
 npm.cmd --prefix frontend run dev -- --host 127.0.0.1
 ```
 
