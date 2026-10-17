@@ -136,10 +136,13 @@ overview: string | null
 popularityScore: number | null
 voteAverage: number | null
 voteCount: number | null
+backdropUrl: string | null
 ```
 
 The public movie `id` is the stable internal ID. A TMDb source ID is not part
-of a public DTO.
+of a public DTO. `backdropUrl` is a server-built HTTPS image URL from a
+validated local TMDb path, or JSON `null` when absent or invalid. It appears
+only on details; list and recommendation DTOs do not gain media fields.
 
 ### Sprint 3 recommendation and account DTOs
 

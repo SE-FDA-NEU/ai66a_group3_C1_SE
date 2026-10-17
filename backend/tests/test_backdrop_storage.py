@@ -317,20 +317,18 @@ def test_populated_upgrade_is_idempotent(database) -> None:
     assert _snapshot(engine, include_backdrop=True) == before
 
 
-def test_storage_does_not_expose_media_in_public_dtos(database) -> None:
+def test_storage_exposes_only_valid_url_in_detail_dto(database) -> None:
     engine, _url = database
     with Session(engine) as session, session.begin():
         movies.set_movie_backdrop_path(
             session, movie_id="movie-a", backdrop_path="/storage-only.jpg"
         )
         movie = movies.get_active_movie_by_id(session, movie_id="movie-a")
-        for dto in (
-            movies.to_movie_summary_dto(movie),
-            movies.to_movie_detail_dto(movie),
-        ):
-            payload = dto.model_dump()
-            assert "backdrop_path" not in payload
-            assert "backdropUrl" not in payload
+        summary = movies.to_movie_summary_dto(movie).model_dump()
+        detail = movies.to_movie_detail_dto(movie).model_dump()
+        assert "backdrop_path" not in summary | detail
+        assert "backdropUrl" not in summary
+        assert detail["backdropUrl"] == "https://image.tmdb.org/t/p/w780/storage-only.jpg"
 
 
 def test_existing_uniqueness_and_foreign_keys_still_reject_invalid_rows(

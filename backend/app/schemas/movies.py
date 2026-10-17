@@ -35,6 +35,7 @@ class MovieDetailDto(BaseModel):
     popularityScore: float | None
     voteAverage: float | None
     voteCount: int | None
+    backdropUrl: str | None
 
 
 class MovieListMeta(BaseModel):

@@ -107,7 +107,7 @@ class TmdbClient:
         return _required_object_list(payload, "results")
 
     def fetch_movie_details(self, movie_id: int) -> Mapping[str, Any]:
-        """Return details only when a popular-list record lacks genre IDs."""
+        """Return details for core genre fallback or bounded media enrichment."""
 
         if movie_id <= 0:
             raise ValueError("movie_id must be positive")

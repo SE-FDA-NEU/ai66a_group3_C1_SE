@@ -9,6 +9,7 @@ from math import isfinite
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session, selectinload
 
+from app.catalogue.backdrops import backdrop_url
 from app.db.models import (
     CatalogMovie,
     CatalogueRevision,
@@ -295,6 +296,7 @@ def to_movie_detail_dto(movie: CatalogMovie) -> MovieDetailDto:
         popularityScore=movie.popularity_score,
         voteAverage=movie.vote_average,
         voteCount=movie.vote_count,
+        backdropUrl=backdrop_url(movie.backdrop_path),
     )
 
 
