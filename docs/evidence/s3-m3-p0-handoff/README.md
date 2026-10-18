@@ -197,6 +197,9 @@ git status
 # Existing accepted DB: verify safe provenance first; do not seed or reimport it.
 node frontend/scripts/verify-m3-handoff.mjs data/app.db frontend/test-results/m3-live
 
+# Verifier regression tests (newline checks, process trees, cleanup/report failures).
+npm --prefix frontend run test:m3:verifier
+
 # Reuse S13 on a disposable backup of that accepted DB. Absolute path required.
 S13_TMDB_SMOKE=1 S13_TMDB_DATABASE="$PWD/data/app.db" TMDB_READ_ACCESS_TOKEN='' \
   npm --prefix frontend run test:s04:e2e -- s13.acceptance.ts --grep 'live TMDb'
@@ -211,6 +214,14 @@ npm --prefix frontend run build
 npm --prefix frontend run test:s04:runner
 TMDB_READ_ACCESS_TOKEN='' npm --prefix frontend run test:t16:integration
 ```
+
+The verifier normalizes CRLF to LF when comparing application files with Git;
+other byte changes still fail verification. It stops server process trees before
+removing the temporary database and retries transient removal errors up to ten
+times. `results.json` includes a separate `cleanup` result and errors even if
+cleanup fails; journey failures and completed checks are preserved. Either a
+journey or cleanup failure produces exit code 1. The regression suite includes
+a real Windows deletion-lock test, which is skipped on other platforms.
 
 Manual live replay (use disposable accounts in a copy of the accepted DB):
 

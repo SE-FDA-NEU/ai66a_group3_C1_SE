@@ -12,6 +12,7 @@
     "test:t28:acceptance": "node scripts/verify-t28-backdrop.mjs",
     "test:s04:e2e": "node scripts/run-s04-e2e.mjs",
     "test:s04:runner": "node --test scripts/run-s04-e2e.node-test.mjs",
+    "test:m3:verifier": "node --test scripts/verify-m3-handoff.node-test.mjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },

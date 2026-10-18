@@ -6,12 +6,13 @@ import assert from "node:assert/strict";
 import { spawn, execFileSync } from "node:child_process";
 import { createHash, randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
-import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile } from "node:fs/promises";
 import { createServer } from "node:net";
 import { tmpdir, platform, release, arch } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium, expect } from "@playwright/test";
+import { applicationFilesEqual, describeError, finishVerification } from "./verify-m3-support.mjs";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const [source, destination] = process.argv.slice(2);
@@ -35,9 +36,9 @@ const check = name => report.checks.push({ name, result: "PASS" });
 let temporary, browser, activePage;
 
 function start(command, args, env) {
-  const child = spawn(command, args, { cwd: root, env, stdio: "ignore" });
+  const child = spawn(command, args, { cwd: root, env, stdio: "ignore", detached: process.platform !== "win32" });
   child.on("error", () => {});
-  children.push(child);
+  children.push({ child, closed: new Promise(resolve => child.once("close", resolve)) });
   return child;
 }
 async function ready(url, child) {
@@ -68,13 +69,14 @@ with sqlite3.connect('file:'+sys.argv[1]+'?mode=ro',uri=True) as c:
 
 try {
   await mkdir(output, { recursive: true });
-  // Identify application files against the exact committed candidate. The only
-  // added executable is this verifier; its hash is recorded independently.
+  // Identify application files against the exact committed candidate.
+  // Verifier files have their hashes recorded independently.
   const application = git("ls-files", "backend/app", "backend/alembic", "frontend/src").split("\n");
   for (const file of application) {
-    assert.equal(Buffer.compare(await readFile(path.join(root, file)), execFileSync("git", ["show", `HEAD:${file}`], { cwd: root })), 0, `Uncommitted application file: ${file}`);
+    assert(applicationFilesEqual(await readFile(path.join(root, file)), execFileSync("git", ["show", `HEAD:${file}`], { cwd: root })), `Uncommitted application file: ${file}`);
   }
   report.verifierSha256 = createHash("sha256").update(await readFile(fileURLToPath(import.meta.url))).digest("hex");
+  report.verifierSupportSha256 = createHash("sha256").update(await readFile(new URL("./verify-m3-support.mjs", import.meta.url))).digest("hex");
   await freePort(8000); await freePort(5173);
   const sourcePath = path.resolve(source);
   report.sourceProvenance = provenance(sourcePath);
@@ -247,18 +249,13 @@ c=sqlite3.connect(sys.argv[1]); r=c.execute('SELECT password_hash FROM users WHE
   report.result = "PASS";
 } catch (error) {
   // Do not retain arbitrary error objects, request/response headers or auth data.
-  report.failure = { type: error.name, message: String(error.message).replace(/m3-[\w-]+@example\.test/gi, "[test account]") };
-  if (activePage) report.visibleErrors = await activePage.locator(".form-error").allTextContents();
+  report.failure = describeError(error);
+  if (activePage) {
+    try { report.visibleErrors = await activePage.locator(".form-error").allTextContents(); }
+    catch (diagnosticError) { report.diagnosticFailure = describeError(diagnosticError); }
+  }
   process.exitCode = 1;
 } finally {
-  if (browser) await browser.close();
-  for (const child of children.reverse()) {
-    if (child.exitCode !== null) continue;
-    const closed = new Promise(resolve => child.once("close", resolve));
-    child.kill("SIGTERM"); await Promise.race([closed, sleep(2000)]);
-    if (child.exitCode === null) { child.kill("SIGKILL"); await closed; }
-  }
-  if (temporary) await rm(temporary, { recursive: true, force: true });
-  await writeFile(path.join(output, "results.json"), JSON.stringify(report, null, 2) + "\n");
-  console.log(JSON.stringify({ result: report.result, checks: report.checks, failure: report.failure }));
+  process.exitCode = await finishVerification(report, { output, browser, children, temporary });
+  console.log(JSON.stringify({ result: report.result, checks: report.checks, failure: report.failure, cleanup: report.cleanup }));
 }
