@@ -1,0 +1,19 @@
+{
+  "result": "PASS",
+  "observedAtUtc": "2026-10-18T15:17:38.908359+00:00",
+  "mode": "same configured existing TMDb database; no alternate runtime DB",
+  "database": "data/app.db",
+  "provider": "tmdb",
+  "revision": "34b442f2-f5a8-4317-9f2f-468e6ec06a20",
+  "movies": 255,
+  "sourceIds": 255,
+  "firstRun": "Local review account: already_exists",
+  "repeat": "Local review account: already_exists",
+  "usersBefore": 1,
+  "usersAfter": 1,
+  "catalogueUnchanged": true,
+  "existingPersonalDataUnchanged": true,
+  "repeatAllTablesUnchanged": true,
+  "privateBackup": "Local ignored backup retained; never committed or used as the runtime database",
+  "tokenNeededForAccountProvisioning": false
+}

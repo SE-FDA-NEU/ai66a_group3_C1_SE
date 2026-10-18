@@ -12,9 +12,11 @@ iteration-date labels have not been updated. SM3 differs from SM1 (@hoang3003)
 and SM2 (@NguyenTuanAnh0608).
 
 Begin at the home page (`/`) and use visible controls; feature URLs do not need
-to be entered by hand. Follow [SETUP](docs/SETUP.md) first. Its disposable-account
-procedure uses registration, not published real passwords. Confirm the review
-machine's TMDb token/network arrangement before the session.
+to be entered by hand. Follow [SETUP](docs/SETUP.md) first, including its
+explicit account-provisioning step on the same TMDb-imported database. The
+public app-only review login is documented there; no real service password
+or TMDb token is published. Confirm the review machine's private TMDb
+token/network arrangement before the session.
 
 | P0 Story | Start from the home page and use | Screen / route | Issue |
 |---|---|---|---|
@@ -37,10 +39,11 @@ for actual issue/acceptance states, planning images and outstanding handoffs.
 - [Local setup and clean-clone guide](docs/SETUP.md)
 - [Required TMDb catalogue setup from Sprint 3](docs/tmdb-sprint3-runbook.md)
 
-For a disposable review account, create one through the local registration
-screen after setup. The [setup guide](docs/SETUP.md#disposable-test-account-and-p0-journey)
-gives the full test-account and restart procedure; no shared password is kept
-in this repository.
+The [setup guide](docs/SETUP.md#disposable-test-account-and-p0-journey)
+contains the PO-authorized application-only review account, the opt-in creation
+command, and the full P0/restart procedure. Provisioning uses the configured
+TMDb database, not a separate demo database. Fresh test users for registration
+and account-isolation checks are also created in that same database.
 
 ## Team and Sprint 1 roles
 
