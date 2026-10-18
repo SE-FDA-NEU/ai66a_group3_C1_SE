@@ -10,9 +10,6 @@ on:
       - "docs/images/erd*.puml"
       - "docs/evidence/s3-c05-ui/**"
       - "scripts/verify-m3-dossier.py"
-      - "scripts/render-m3.py"
-      - "scripts/inspect-m3-pdf.py"
-      - "scripts/export-m3.mjs"
       - ".github/workflows/c05-docs.yml"
   pull_request:
     branches: [main, develop]
@@ -23,9 +20,6 @@ on:
       - "docs/images/erd*.puml"
       - "docs/evidence/s3-c05-ui/**"
       - "scripts/verify-m3-dossier.py"
-      - "scripts/render-m3.py"
-      - "scripts/inspect-m3-pdf.py"
-      - "scripts/export-m3.mjs"
       - ".github/workflows/c05-docs.yml"
 
 permissions:
@@ -48,12 +42,11 @@ jobs:
           node-version: "24"
       - name: Validate dossier and source correspondence without UTF-8 mode
         run: python -X utf8=0 scripts/verify-m3-dossier.py
-      - name: Validate historical C01 audit and JavaScript syntax
+      - name: Validate historical C01 audit and Scrum linkage
         run: |
           node scripts/verify-s3-c01-docs.mjs
-          node --check scripts/export-m3.mjs
           node --test scripts/scrum-linkage.test.mjs
-      - name: Lint documentation helpers
+      - name: Lint dossier verifier
         run: |
           python -m pip install ruff==0.16.9
-          python -m ruff check scripts/render-m3.py scripts/inspect-m3-pdf.py scripts/verify-m3-dossier.py
+          python -m ruff check scripts/verify-m3-dossier.py
