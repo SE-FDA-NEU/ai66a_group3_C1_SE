@@ -403,7 +403,7 @@ to [#190](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/190), merged
 
 | Minimum | Result | Evidence |
 | ------- | ------ | -------- |
-| At least 4 merged PRs, each reviewed by another person | Met: 45 merged PRs, each with at least one formal `APPROVED` review, submitted before the merge, by a member other than the author | GraphQL query of PRs #143-#190 on 2026-10-18; formal reviews, not plain comments |
+| At least 4 merged PRs, each reviewed by another person | Met: 45 merged PRs, each with at least one formal `APPROVED` review, submitted before the merge, by a member other than the author. For 30 of them that approval covers the final head; for the other 15 (#145, #151, #156, #158, #159, #164, #170, #171, #173, #175, #176, #184, #187, #188, #190) the pre-merge approvals covered an earlier head | GraphQL query of PRs #143-#190 on 2026-10-18; formal reviews, not plain comments |
 | At least 5 issues closed, including P0 Stories marked `works` | Partly met: 51 issues closed, 8 Stories closed, but no P0 Story is marked `works` | [ui.md section 1](ui.md#1-p0-stories-and-status) |
 | Each member has a merged PR, a review given and a closed issue | Met, see the matrix below | GitHub PR, review and issue records |
 | README first screen lists the P0 Stories and where each starts | Met | [README](../README.md#sprint-3-review--start-here) |
@@ -507,7 +507,10 @@ Master are Nguyen Xuan Kiet and Tran Tuan Anh; the choice is a team decision.
 - **Submission receipt:** Not recorded. The PDF `Team03_M3.pdf` is prepared
   manually by the PO and kept outside Git; no LMS receipt exists in the
   repository.
-- **Documentation PR:** this wrap-up; the PR link is added when it is opened.
+- **Documentation PR:** [PR #191](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/191)
+  contains this wrap-up, together with the status updates to `docs/ui.md`
+  (merged PR #188, closed #136, the C03 final-head approval and the latest C04
+  results from PR #190).
 
 **Closure rule:** do not close #133 until the PO or the team has recorded the
 actual Sprint Review feedback, the retrospective action and its owner, the next
