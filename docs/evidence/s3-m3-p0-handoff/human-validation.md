@@ -1,6 +1,14 @@
 # Human-only acceptance gates — not completed by automation
 
-Status: **user-confirmed walkthrough; session details/sign-off pending**.
+Status: **PO Story acceptance recorded; original participant-session details unavailable**.
+
+During the PR #191 follow-up, the PO requested acceptance of the delivered P0
+and P1 capabilities against their completed AC/Issues and the existing
+verification evidence. [C02 reconciliation](../s3-c02-reconciliation.md) records
+that decision. This is not a newly witnessed trial, a claim that this file's
+pending rows passed, or a replacement for substantive independent PR review.
+The original observations/limitations below are retained as historical notes;
+any actual participant details supplied later must be recorded honestly.
 On 2026-10-18 the PO confirmed in chat that Trang, an unfamiliar participant,
 had already tried the P0 journeys unaided. This is a second-hand confirmation,
 not an observation by Codex. The session date, version and individual outcomes

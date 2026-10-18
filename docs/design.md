@@ -641,6 +641,14 @@ are made only where merged source and repository evidence now exist.
 
 ### C05 dossier integration after C03 merge
 
+Subsequent C02/PO reconciliation in PR #191 supersedes the pending acceptance
+and merge wording in this historical integration note: six P0 and separate
+S06/S09 are PO-accepted `works`; dossier PR #188 and C04 follow-up #190 are
+merged. See the [current acceptance ledger](evidence/s3-c02-reconciliation.md).
+This is a later acceptance decision, not a rerun or replacement of the
+original executable evidence. PDF/LMS and substantive wrap-up review remain
+separate; no human-session details are manufactured.
+
 C03 PR #187 is now merged into main. This C05 merge resolution preserves its
 current architecture/ERD images, nine-table model, API errors and corrected
 TMDb page budget. Historical M2 assets retain the explicit `-m2` filenames;

@@ -18,10 +18,14 @@ pins normalized executable-source fingerprints, so the tested source can be
 compared with the published commit without inventing a self-referential SHA.
 The final PR head needs its own hosted checks and independent review.
 
-All six P0 Stories and separate P1 S06/S09 remain **partly works** under the
-AC + DoD rule. Functional assertions below pass, but human session details and
-final acceptance review remain open. One intermittent T33 bridge failure is
-retained below. Do not claim an unconditional release pass or close Stories.
+Current PO decision, recorded in the PR #191 follow-up: all six P0 Stories and
+the separate P1 S06/S09 are accepted as **works**, supported by the passing AC
+matrix, checked Issues and merged implementation/verification evidence.
+[C02 acceptance ledger](../s3-c02-reconciliation.md) separates this new decision
+from the historical pending-sign-off snapshot. The original test files, SHAs,
+counts and intermittent T33 failure remain unchanged. Detailed notes of the
+previously PO-confirmed unaided trial are still unavailable; no new human
+session or unconditional release/independent-review pass is claimed.
 
 ## Latest evidence, separated by data source
 
@@ -61,8 +65,9 @@ imports remain available; CDN checks are separate from offline API acceptance.
 
 ## Complete P0 AC-to-evidence matrix
 
-AC order follows GitHub Stories. PASS denotes functional assertion only, not
-the Story's remaining independent AC + DoD sign-off. Links above locate reruns;
+AC order follows GitHub Stories. PASS denotes the recorded functional assertion;
+the subsequent PO acceptance decision is linked above, not retroactively added
+to those original runs. Links above locate reruns;
 the [historical detailed matrix](historical-initial-report.md#p0-ac-to-evidence-matrix)
 retains the exact test-case mapping and original run limitations.
 
@@ -103,8 +108,10 @@ rollback between deletes/at commit and actual uvicorn restart. Reset remains
 persist but Sprint 3 ranking is **genre + popularity**, not rating-adjusted S05b.
 
 P1 outside the six-P0 gate: S06 #23 filter/empty/reset/unchanged preferences
-passed (T16); S09 #31 exact order/empty passed (T21 + live DB oracle). Both remain
-**partly works** until final DoD, as do all six P0. No new closure was performed.
+passed (T16); S09 #31 exact order/empty passed (T21 + live DB oracle). Both are
+now PO-accepted **works**. S05a rating is supported separately by T32/T34 and
+included in C02's 30-point completed ledger. This documentation update does
+not itself close or mutate any Issue.
 
 ## Route/UI handoff for #136
 
@@ -167,6 +174,11 @@ other changes fail. It stops owned process trees before removal, retries locks
 and reports cleanup failures even after journey failures. Either failure exits 1.
 
 ## Limitations and final gates
+
+The following records the **original T25 gate state**, not a new check of
+today's issue states. Later merges/approvals are recorded in ui.md; the current
+PO acceptance is in the [C02 ledger](../s3-c02-reconciliation.md). Original
+test failures and unavailable participant details remain real limitations.
 
 - T33's first bridge run failed at logout while other suites were running;
   a standalone rerun and five additional repetitions passed. Keep both outcomes;
