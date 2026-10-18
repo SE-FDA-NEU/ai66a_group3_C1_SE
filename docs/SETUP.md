@@ -6,13 +6,13 @@ network access to TMDb. Automated checks use synthetic fixtures/mocks and no
 live token/provider network. The decision is in [design.md](design.md); manual
 smoke/provenance and verification ownership are in the [runbook](tmdb-sprint3-runbook.md).
 
-Tested by: Codex, Sprint 3, 2026-10-18, Windows PowerShell,
+Earlier clean-clone baseline tested by: Codex, Sprint 3, 2026-10-18, Windows PowerShell,
 Python 3.12.6 / Node.js 24.19.0 / Microsoft Edge 155.0.4283.62, committed
 application and verification-code SHA
 `05dda34900fd0fa80cfff323b353a8d4c220a4d8`.
 A fresh clone with new locked dependencies, a new TMDb database and an actual
-browser/process-restart journey passed. The follow-up changes only documentation
-and evidence, not executable code. See the [clean-clone record](evidence/s3-c04-clean-clone.md)
+browser/process-restart journey passed for that earlier candidate. Its original
+documentation follow-up did not change executable code. See the [clean-clone record](evidence/s3-c04-clean-clone.md)
 for the source fingerprint, provenance, screenshots, CI links and independent-review gate.
 
 ## Prerequisites
@@ -50,9 +50,11 @@ frontend variables, logs, screenshots, Git or group messages. Tests use a blank
 token and isolated test configuration. A teammate consuming an already-imported
 backend does not need a token. `.env` is ignored by Git.
 
-For an instructor on a new machine, the instructor or staging operator signs in
-to their own TMDb account, opens **Settings → API**, requests API access if
-needed, and copies the **API Read Access Token** into their private root `.env`.
+Before review, the PO/operator must arrange a valid TMDb Read Access Token and
+privately configure it on the review machine. Do not make obtaining an API
+account an undocumented surprise for the instructor. Alternatively the
+instructor can use their own token: sign in to TMDb, open **Settings → API**,
+request access if needed, and enter the **API Read Access Token** in root `.env`.
 TMDb documents this in its [API authentication guide](https://developer.themoviedb.org/v4/docs/authentication-application)
 and [API key FAQ](https://developer.themoviedb.org/docs/faq). This is the Bearer
 read token, not the v3 API key. The machine must be able to reach
@@ -60,6 +62,9 @@ read token, not the v3 API key. The machine must be able to reach
 obtain a token or reach TMDb, an operator can prepare a private staging backend
 with an accepted imported catalogue for review; do not share a team token or
 claim that a token-free clean clone has completed the live-import check.
+The public application test login below is not a TMDb token. Never paste the
+token into this document, a command line, GitHub, screenshots or frontend
+settings. Rotate any token disclosed in chat or another shared channel.
 
 ## Steps
 
@@ -88,6 +93,7 @@ npm --prefix frontend ci
 
 python -m alembic -c backend/alembic.ini upgrade head
 python -m app.cli.import_tmdb_catalogue
+python -m app.cli.create_review_account --confirm-local-demo
 ```
 
 ### Windows PowerShell
@@ -109,6 +115,7 @@ npm.cmd --prefix frontend ci
 
 .\.venv\Scripts\python.exe -m alembic -c backend/alembic.ini upgrade head
 .\.venv\Scripts\python.exe -m app.cli.import_tmdb_catalogue
+.\.venv\Scripts\python.exe -m app.cli.create_review_account --confirm-local-demo
 ```
 
 To use a larger catalogue, run `python -m app.cli.import_tmdb_catalogue --pages 13`
@@ -121,6 +128,14 @@ ratings are retained, and runtime list limits remain unchanged. See the
 To add backdrops to an already imported active TMDb catalogue without changing
 its revision or accounts, use the bounded
 [backdrop enrichment command](backdrop-import-runbook.md#bounded-enrichment-for-an-existing-active-catalogue).
+
+All commands and both application processes must use the **same**
+`DATABASE_URL` from root `.env` (normally `sqlite:///./data/app.db`). On an
+existing checkout with a successful TMDb import, keep its configured URL and
+catalogue; run only the review-account command if that is all that is missing.
+Do not switch to a separate demo database, reseed, or rerun an import merely
+to create the account. A fresh clone creates its own database by migrations
+and a real TMDb import; it does not copy the team's local database.
 
 ## Required import result and smoke
 
@@ -214,8 +229,45 @@ the current routes on the imported catalogue.
 
 ## Disposable test account and P0 journey
 
-Use the newly imported local database and a disposable email address you control.
-Keep the password private; no shared password is required or published.
+### Public application-only review account
+
+The PO confirmed that the following credentials are **only for this project's
+local demonstration**, are not a Gmail/service password, and may be published.
+
+| Field | Review value |
+|---|---|
+| Email | `kietxuan@gmail.com` |
+| Password | `123456789` |
+| Purpose | Local M3 application review only; no administrator role |
+| Database | The same configured SQLite database with its accepted TMDb catalogue |
+
+After the successful import, the account command shown above creates the user
+in that database with an Argon2id password hash. `--confirm-local-demo` opts
+in to these public **account credentials**, not to a demo catalogue or another
+database. It does not import/seed movies or create a parallel database. It
+requires an existing migrated SQLite file with a nonempty active TMDb revision
+and rejects a seed/no-catalogue or non-TMDb movie source.
+
+Expected output is `Local review account: created`, or `already_exists` on a
+repeat with matching credentials. Repeating it preserves the user ID, hash,
+preferences, ratings, sessions and catalogue. If the email already exists
+with a different password, it exits nonzero without resetting that password
+or deleting data. Contact the account owner instead of overwriting the database.
+The command requires explicit opt-in, refuses `APP_ENV=production`/`prod`,
+does not run at application startup and must never be used on a public or
+production deployment. Rotate/remove the demo account before such deployment.
+
+The instructor can start at `/`, choose **Sign in**, and use this account.
+If it already has saved preferences, it may open personalised results rather
+than cold start; that is persistence, not failed setup. Do not clear existing
+personal data merely to reproduce the new-account screenshot.
+
+### Full P0 and persistence journey
+
+For registration/cold-start/account-isolation checks, additionally create fresh
+test users through the UI **in this same TMDb database**, using non-production
+credentials. These test users do not require a different movie dataset or
+database. Keep any personal/service passwords private.
 
 1. Open only `http://localhost:5173/`. Select **Sign in**, then **Create an
    account** on the login page. Enter the disposable email and a unique password
@@ -246,8 +298,9 @@ Keep the password private; no shared password is required or published.
    movie: it shows **Not rated yet**, not the first account's rating.
 
 Normal journeys use visible links rather than typed feature URLs. These accounts
-are disposable with the local test database. For instructor review, create a
-new account during the session or arrange private staging-only credentials.
+are test users within the configured TMDb database. The documented public
+review account can be used for sign-in; separate new test users exercise
+registration and isolation without resetting that account's existing data.
 The [latest live evidence](evidence/s3-c04-final/live/results.json) records an
 actual process restart and a fresh browser context, not merely a page reload.
 
