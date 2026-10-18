@@ -334,13 +334,15 @@ restatement of the objective in
 
 ### Commitment and Story-point boundary
 
-- **Committed Story Points:** Not recorded. The original per-Story commitment
-  was not captured at Planning, and the C01 closeout lists "original committed
-  points" as unconfirmed. No number is reconstructed here.
-- **Scope reference, not a retroactive commitment:** the six P0 Stories total 24
-  points (S01 3, S02 5, S03 3, S04 5, S12 3, S13 5). S12 / #44 was closed on
-  2026-10-04 during Sprint 2, so its 3 points are not counted again; 21 points
-  of P0 scope remained for Sprint 3.
+- **Committed Story Points: 24.** The PO explicitly confirmed during the PR #191
+  follow-up that the commitment is the six-P0 baseline: S01 3, S02 5, S03 3,
+  S04 5, S12 3 and S13 5. This is a newly recorded PO clarification, not a
+  number derived from board card totals or a newly discovered Planning image.
+- **Previously delivered scope:** S12 / #44 was closed on 2026-10-04 during
+  Sprint 2. It remains in the PO-confirmed 24-point P0 review baseline, but
+  earns **zero additional completed points** in Sprint 3. The baseline therefore
+  contains 21 points of new P0 delivery and 3 points of previously delivered
+  registration functionality to reverify.
 - **Planning-state board:** the
   [PO-identified beginning-of-Sprint-3 image](images/sprint3/planning-board.png)
   shows global totals of Todo 53 / In Progress 0 / In Review 0 / Done 35. Those
@@ -367,23 +369,29 @@ the merge of [PR #178](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/178
 | S06 Filter recommendations by genre | [#23](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/23) | P1 | 3 | 2026-10-18 12:08 | `@kietxuan` |
 | S09 Browse popular movies | [#31](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/31) | P1 | 3 | 2026-10-18 12:08 | `@kietxuan` |
 
-**Verified completed Story Points:** 30 (P0: 21, P1: 9), counted once from
-Stories closed by the PO during the Sprint. S12 / #44 is excluded because it
-closed in Sprint 2.
+**Completed Story Points: 30** (new P0 delivery: 21; P1 delivery: 9).
+The PO has accepted the eight delivered Stories against the checked Story AC,
+merged implementation/verification Issues and recorded browser/API/database
+evidence, not merely their closed state. S12 / #44 is excluded because it
+closed in Sprint 2. [Acceptance basis and point ledger](evidence/s3-c02-reconciliation.md).
 
 **Velocity:** 30 Story Points.
 
-**Caveats on this count:**
+**Accounting and evidence boundaries:**
 
-- It counts GitHub closure. [docs/ui.md](ui.md) and the
-  [T25 acceptance handoff](evidence/s3-m3-p0-handoff/README.md) still show all
-  six P0 Stories as `partly works`, because the unaided-participant session
-  details and final sign-off remain open. No P0 Story is labelled `works`.
-- Seven of the eight closed Stories (all except S09 / #31) still have the
-  Definition-of-Done item "It does not depend on an unfinished story from
-  another team member" unchecked in their issue bodies.
-- The 9 P1 points (S05a, S06, S09) were not recorded as Sprint 3 commitments;
-  the C01 closeout treats them separately from the six-P0 gate.
+- [docs/ui.md](ui.md) and the [T25 handoff](evidence/s3-m3-p0-handoff/README.md)
+  now distinguish the PO's accepted `works` decision from the older pending
+  sign-off snapshot. Existing test results are reused with their actual source
+  versions; this documentation reconciliation is not a new application run.
+- The latest checked Story AC, Tasks and **Definition of Ready** are complete.
+  The dependency checkbox belongs to Ready, not to Definition of Done; neither
+  a tick nor issue closure alone replaces the linked verification evidence.
+- The 9 P1 points (S05a, S06, S09) are delivered scope additional to the P0
+  commitment. Consequently velocity 30 exceeds committed 24; this is explained
+  scope accounting, not an arithmetic correction to commitment.
+- Detailed notes for Trang's previously PO-confirmed unaided walkthrough are
+  still unavailable. They are not invented or represented as newly observed
+  tests. Administrative C02/review/submission obligations remain separate.
 
 ### Completed Sprint 3 items
 
@@ -404,7 +412,7 @@ to [#190](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/190), merged
 | Minimum | Result | Evidence |
 | ------- | ------ | -------- |
 | At least 4 merged PRs, each reviewed by another person | Met: 45 merged PRs, each with at least one formal `APPROVED` review, submitted before the merge, by a member other than the author. For 30 of them that approval covers the final head; for the other 15 (#145, #151, #156, #158, #159, #164, #170, #171, #173, #175, #176, #184, #187, #188, #190) the pre-merge approvals covered an earlier head | GraphQL query of PRs #143-#190 on 2026-10-18; formal reviews, not plain comments |
-| At least 5 issues closed, including P0 Stories marked `works` | Partly met: 51 issues closed, 8 Stories closed, but no P0 Story is marked `works` | [ui.md section 1](ui.md#1-p0-stories-and-status) |
+| At least 5 issues closed, including P0 Stories marked `works` | Met in the recorded snapshot: 51 issues closed, including the five P0 Stories newly closed in Sprint 3; all six P0 are accepted as `works`. S12 is already delivered and earns no Sprint 3 points | [ui.md section 1](ui.md#1-p0-stories-and-status), [acceptance ledger](evidence/s3-c02-reconciliation.md) |
 | Each member has a merged PR, a review given and a closed issue | Met, see the matrix below | GitHub PR, review and issue records |
 | README first screen lists the P0 Stories and where each starts | Met | [README](../README.md#sprint-3-review--start-here) |
 | README names the Sprint 3 PO and Scrum Master | Met: `@kietxuan` and `@vu-huzy` | [README](../README.md#sprint-3-review--start-here) |
@@ -443,7 +451,7 @@ non-contributor to write; that gate stays open.
 | [#22 / S05b](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/22) rating-informed ranking | Open; the C01 closeout places it in Sprint 4 | Sprint 4 |
 | [#24 / S07](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/24) and [#30 / S08](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/30) | Open; only the NLP Spike #43 was delivered, not production search or similarity | Not recorded; team decision required |
 | [#33 / S11](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/33) reset profile UI | Open; the authenticated reset backend (#142) shipped, the profile reset UI did not | Not recorded; team decision required |
-| P0 `works` status | All six P0 Stories remain `partly works` in `docs/ui.md` until the unaided-participant session details and sign-off are recorded | Not recorded |
+| P0 acceptance | Six P0 accepted as `works` by the PO against checked AC and existing verification; not unfinished Story delivery | Completed; detailed participant notes remain an audit limitation |
 | Unaided-participant session | A participant ("Trang") was confirmed second-hand by the PO; session date, version and per-journey outcomes are not recorded | Not recorded |
 | [#133 / S3-C02](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/133) | Open until this log is reviewed and merged and the items under the closure rule are recorded | This wrap-up |
 
@@ -508,12 +516,13 @@ Master are Nguyen Xuan Kiet and Tran Tuan Anh; the choice is a team decision.
   manually by the PO and kept outside Git; no LMS receipt exists in the
   repository.
 - **Documentation PR:** [PR #191](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/191)
-  contains this wrap-up, together with the status updates to `docs/ui.md`
+  contains this wrap-up, together with the PO-confirmed commitment and acceptance,
+  dossier-verifier corrections and status updates to `docs/ui.md`
   (merged PR #188, closed #136, the C03 final-head approval and the latest C04
   results from PR #190).
 
 **Closure rule:** do not close #133 until the PO or the team has recorded the
-actual Sprint Review feedback, the retrospective action and its owner, the next
+actual Sprint Review feedback, the retrospective action and its owner if held, the next
 Scrum Master, the Project-board link check, the final tested SHA and the LMS
 submission receipt, and a member other than the author has reviewed and merged
 this log.

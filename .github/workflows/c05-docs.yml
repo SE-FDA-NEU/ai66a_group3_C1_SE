@@ -2,7 +2,7 @@ name: Sprint 3 C05 dossier documentation
 
 on:
   push:
-    branches: ["docs/s3-c05-ui-dossier"]
+    branches: ["docs/s3-c05-ui-dossier", "133-sprint-3-wrap-up"]
     paths:
       - "docs/ui.md"
       - "docs/design.md"
@@ -10,6 +10,11 @@ on:
       - "docs/images/erd*.puml"
       - "docs/evidence/s3-c05-ui/**"
       - "scripts/verify-m3-dossier.py"
+      - "scripts/m3_dossier_cover.py"
+      - "scripts/test_m3_dossier_cover.py"
+      - "scripts/test_s3_closeout.py"
+      - "docs/sprint-log.md"
+      - "docs/evidence/s3-c02-reconciliation.md"
       - ".github/workflows/c05-docs.yml"
   pull_request:
     branches: [main, develop]
@@ -20,6 +25,11 @@ on:
       - "docs/images/erd*.puml"
       - "docs/evidence/s3-c05-ui/**"
       - "scripts/verify-m3-dossier.py"
+      - "scripts/m3_dossier_cover.py"
+      - "scripts/test_m3_dossier_cover.py"
+      - "scripts/test_s3_closeout.py"
+      - "docs/sprint-log.md"
+      - "docs/evidence/s3-c02-reconciliation.md"
       - ".github/workflows/c05-docs.yml"
 
 permissions:
@@ -29,7 +39,7 @@ jobs:
   s3-c05-docs:
     # The frozen M3 source manifest is a C05 gate, not a permanent gate on
     # later Sprint 4/5 application or design changes from other branches.
-    if: github.event_name != 'pull_request' || github.head_ref == 'docs/s3-c05-ui-dossier'
+    if: github.event_name != 'pull_request' || github.head_ref == 'docs/s3-c05-ui-dossier' || github.head_ref == '133-sprint-3-wrap-up'
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
@@ -41,7 +51,10 @@ jobs:
         with:
           node-version: "24"
       - name: Validate dossier and source correspondence without UTF-8 mode
-        run: python -X utf8=0 scripts/verify-m3-dossier.py
+        run: |
+          python -X utf8=0 scripts/verify-m3-dossier.py
+          python -m unittest discover -s scripts -p 'test_m3_dossier_cover.py' -v
+          python -m unittest discover -s scripts -p 'test_s3_closeout.py' -v
       - name: Validate historical C01 audit and Scrum linkage
         run: |
           node scripts/verify-s3-c01-docs.mjs
@@ -49,4 +62,4 @@ jobs:
       - name: Lint dossier verifier
         run: |
           python -m pip install ruff==0.16.9
-          python -m ruff check scripts/verify-m3-dossier.py
+          python -m ruff check scripts/verify-m3-dossier.py scripts/m3_dossier_cover.py scripts/test_m3_dossier_cover.py scripts/test_s3_closeout.py

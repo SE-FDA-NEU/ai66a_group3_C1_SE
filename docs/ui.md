@@ -70,18 +70,22 @@ Both original PNGs are preserved. [Capture provenance and version limits](eviden
 
 | Story | Screen(s) | Route | Status | Issue |
 |---|---|---|---|---|
-| S01 — Select favourite genres | Home; Movie Preferences; Recommendations | `/` → `/preferences` → `/recommendations` | [partly works](evidence/s3-m3-p0-handoff/README.md#complete-p0-ac-to-evidence-matrix) | [#17](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/17) |
-| S02 — Get recommendations from preferences | Movie Preferences; Recommendations | `/preferences` → `/recommendations` | [partly works](evidence/s3-m3-p0-handoff/README.md#complete-p0-ac-to-evidence-matrix) | [#18](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/18) |
-| S03 — View movie details | Catalogue; Recommendations; Movie detail | `/`, `/recommendations` → `/movies/:movieId` | [partly works](evidence/s3-m3-p0-handoff/README.md#complete-p0-ac-to-evidence-matrix) | [#19](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/19) |
-| S04 — Explore without preferences | Home; popular cold-start Recommendations | `/` → `/login` → `/recommendations` | [partly works](evidence/s3-m3-p0-handoff/README.md#complete-p0-ac-to-evidence-matrix) | [#20](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/20) |
-| S12 — Register an account | Create your account; Sign in | `/register` → `/login` | [partly works](evidence/s3-m3-p0-handoff/README.md#complete-p0-ac-to-evidence-matrix) | [#44](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/44) |
-| S13 — Sign in and sign out | Sign in; Recommendations; guarded screens | `/login` → `/recommendations` → `/` | [partly works](evidence/s3-m3-p0-handoff/README.md#complete-p0-ac-to-evidence-matrix) | [#45](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/45) |
+| S01 — Select favourite genres | Home; Movie Preferences; Recommendations | `/` → `/preferences` → `/recommendations` | [works](evidence/s3-m3-p0-handoff/README.md#complete-p0-ac-to-evidence-matrix) | [#17](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/17) |
+| S02 — Get recommendations from preferences | Movie Preferences; Recommendations | `/preferences` → `/recommendations` | [works](evidence/s3-m3-p0-handoff/README.md#complete-p0-ac-to-evidence-matrix) | [#18](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/18) |
+| S03 — View movie details | Catalogue; Recommendations; Movie detail | `/`, `/recommendations` → `/movies/:movieId` | [works](evidence/s3-m3-p0-handoff/README.md#complete-p0-ac-to-evidence-matrix) | [#19](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/19) |
+| S04 — Explore without preferences | Home; popular cold-start Recommendations | `/` → `/login` → `/recommendations` | [works](evidence/s3-m3-p0-handoff/README.md#complete-p0-ac-to-evidence-matrix) | [#20](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/20) |
+| S12 — Register an account | Create your account; Sign in | `/register` → `/login` | [works](evidence/s3-m3-p0-handoff/README.md#complete-p0-ac-to-evidence-matrix) | [#44](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/44) |
+| S13 — Sign in and sign out | Sign in; Recommendations; guarded screens | `/login` → `/recommendations` → `/` | [works](evidence/s3-m3-p0-handoff/README.md#complete-p0-ac-to-evidence-matrix) | [#45](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/45) |
 
-Every functional P0 AC has passing assertions in the T25 matrix. These statuses
-preserve the accepted handoff's conservative AC + [DoD](definition-of-done.md)
-boundary: unaided participant session date/version/per-journey outcomes and
-final sign-off remain incomplete. Issue closure (#44/#45, or #127) alone is
-not a new Story acceptance result. No partial Story is labelled `works`.
+Every functional P0 AC has passing assertions in the T25 matrix. During the
+PR #191 follow-up, the PO accepted these delivered capabilities against the
+checked Story AC and merged implementation/verification evidence. The
+[acceptance ledger](evidence/s3-c02-reconciliation.md) records that decision,
+including S12's earlier completion and the separately accepted P1 scope.
+`works` is not inferred from issue closure alone or presented as a new test run.
+The PO previously confirmed Trang's unaided trial; its detailed session notes
+remain unavailable, and no date/version/per-journey human result is invented.
+Final review of this documentation, C02 wrap-up and PDF/LMS remain separate.
 
 ### Candidate and evidence boundary
 
@@ -164,8 +168,8 @@ visible; browser S13 logout/replay separately passed. See [T25 limitations](evid
 
 | Story | Acceptance result and scope | Status | Evidence |
 |---|---|---|---|
-| S06 #23 — Filter the current recommendation list | Filter, zero-match guidance, clear/reset and unchanged committed preferences pass. T16 is React/API/SQLite integration, not browser E2E; T15/T16 browser evidence is separate. | [partly works](evidence/s3-m3-p0-handoff/verification.json) | [Latest T16 run](evidence/s3-m3-p0-handoff/latest/checks/t16.txt); [T16 detailed acceptance](evidence/s3-t16-filter-verification.md) |
-| S09 #31 — Browse popular movies | T21 synthetic browser exact ordering/top-ten/empty assertions pass; T25 live list matches the imported DB oracle. Final DoD remains open. | [partly works](evidence/s3-m3-p0-handoff/verification.json) | [Latest T21 run](evidence/s3-m3-p0-handoff/latest/checks/t21.txt); [T21 matrix](evidence/s3-t21-popular-acceptance/README.md); [live report](evidence/s3-m3-p0-handoff/latest/live/results.json) |
+| S06 #23 — Filter the current recommendation list | Filter, zero-match guidance, clear/reset and unchanged committed preferences pass. T16 is React/API/SQLite integration, not browser E2E; T15/T16 browser evidence is separate. PO acceptance recorded in C02. | [works](evidence/s3-c02-reconciliation.md) | [Latest T16 run](evidence/s3-m3-p0-handoff/latest/checks/t16.txt); [T16 detailed acceptance](evidence/s3-t16-filter-verification.md) |
+| S09 #31 — Browse popular movies | T21 synthetic browser exact ordering/top-ten/empty assertions pass; T25 live list matches the imported DB oracle. PO acceptance recorded in C02. | [works](evidence/s3-c02-reconciliation.md) | [Latest T21 run](evidence/s3-m3-p0-handoff/latest/checks/t21.txt); [T21 matrix](evidence/s3-t21-popular-acceptance/README.md); [live report](evidence/s3-m3-p0-handoff/latest/live/results.json) |
 
 <!-- pdf:page -->
 
@@ -536,8 +540,8 @@ there because the repository does not contain them.
    original board images and their global/unfiltered-count limitations.
 2. Record Trang's actual session date, tested version, catalogue revision and
    per-journey outcomes in [human-validation.md](evidence/s3-m3-p0-handoff/human-validation.md).
-   PO confirmation that the trial occurred is not an all-AC pass. Resolve the
-   T33 intermittency if it recurs on the final candidate.
+   The PO's current Story acceptance is recorded separately; do not fill these
+   historical details by inference. Resolve T33 intermittency if it recurs.
 3. A non-contributing teammate's approval of merged C03 head `95ab003` is
    recorded above (submitted after the merge, body `oke`). The #133 owner has
    drafted the Sprint 3 log and repository-minimum audit in
