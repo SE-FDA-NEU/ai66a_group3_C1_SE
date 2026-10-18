@@ -109,10 +109,28 @@ not a new Story acceptance result. No partial Story is labelled `works`.
   executable SHA `05dda34900fd0fa80cfff323b353a8d4c220a4d8`. Its separate
   20-movie imported revision is `6988eeeb-79e0-41ad-ab7a-5248f06a0659`;
   it is not the 255-movie source. [Restart/browser report](evidence/s3-c04-final/live/results.json).
-- Reused offline results: 419 backend passes / 1 inherited skip; 236 frontend
-  passes; S04/S13 10 synthetic browser passes / 1 intentional live skip;
-  separate S13 live case passes. These are recorded T25 results, not new runs
-  performed for this documentation change.
+- Reused offline results from the T25 handoff: 419 backend passes / 1 inherited
+  skip; 236 frontend passes; S04/S13 10 synthetic browser passes / 1 intentional
+  live skip; separate S13 live case passes. These are recorded T25 results, not
+  new runs performed for this documentation change, and they predate the later
+  C04 follow-up below.
+- **Latest C04 follow-up — [PR #190](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/190),
+  merged 2026-10-18 at `c843f87`.** Tester: Codex, not an independent teammate.
+  [Evidence](evidence/s3-c04-review-account.md) for executable candidate
+  `326aadf3ee32342c4e91297ee9e885663eccf565`; the later commit only documents
+  results and the Windows clone setting. The opt-in application-only review
+  account is provisioned in the same configured TMDb database
+  (`--confirm-local-demo`). On the existing 255-movie `data/app.db` it returned
+  `already_exists` twice and left catalogue, preference, rating and session data
+  unchanged; no import, migration or seed ran there. A separate fresh clone
+  imported real TMDb data (20 movies on the successful retry; an earlier 13-page
+  import timed out and is recorded as a failure), created the account in that
+  database and passed a real-browser replay: sign-in, the BR1 correction,
+  saving preferences, a rating and a restart of both processes. Full isolated
+  backend suite **434 passed / 1 inherited skip**; new-clone frontend **236
+  passed**, with lint and build passing. This is a new run on a newer
+  candidate; the 419 figure above remains the T25 result with its own date and
+  SHA and is not replaced. It is not an unaided human session.
 - [#131 backdrop acceptance](evidence/s3-t28-backdrop-acceptance/README.md)
   covers the shipped media chain. [C04 live CDN report](evidence/s3-c04-final/backdrop-live/results.json)
   separately proves image loading at 1280px and 375px.
@@ -130,9 +148,13 @@ C03 was subsequently merged through
 `95ab003f2123ae9c8d2d7f603d0f6cc7c5829be8`, merge `bf18ab8`.
 Its current architecture/ERD show nine application tables and the public image
 CDN boundary; the historical M2 diagrams are separate `*-m2` assets.
-The observed @kietxuan approval covered the earlier `9e444ad` head, not the
-later follow-up they authored. A non-contributor's final-head review remains
-to be recorded. See the [C05 follow-up record](evidence/s3-c05-ui/follow-up.md).
+The pre-merge @kietxuan approval covered the earlier `9e444ad` head, not the
+later follow-up they authored. @NguyenTuanAnh0608, who did not contribute to
+C03, then approved the exact final head `95ab003`
+([review](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/187#pullrequestreview-5563572255),
+15:00 UTC). It was submitted after the 13:13 UTC merge and its body is only
+`oke`, so it is a formal final-head approval, not a detailed reproduction
+report. See the [C05 follow-up record](evidence/s3-c05-ui/follow-up.md).
 
 T33's first bridge run failed at logout (`/login` versus `/`); a standalone rerun
 and five repetitions passed. The cause remains unproved. Keep the first failure
@@ -486,21 +508,24 @@ The source of truth is #134's [approved initial PR #144](https://github.com/SE-F
 and the merged [C03 reconciliation PR #187](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/187).
 The [HTTP DTO/error contracts](api.md), current nine-table diagrams and safe
 CDN/local-read boundary are retained from that main. #134 is closed; its
-final-head non-contributor review remains unrecorded at this follow-up.
-This same C05 change adds the matching preference-persistence/UI rationale to
+final-head approval by a non-contributor is recorded above.
+The C05 change adds the matching preference-persistence/UI rationale to
 [design.md §8](design.md#8-ui-driven-design-changes-with-repository-evidence).
-[Task #189](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/189) covers
-only the reviewed draft/source/tooling milestone; parent #136 remains open for
-the remaining acceptance/review evidence, final merged export and real submission.
+The dossier was merged to `main` through
+[PR #188](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/188) at
+`d6aff46` on 2026-10-18 14:34 UTC, with later fixes in
+[PR #190](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/190).
+[Task #189](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/189) and
+parent C05 [#136](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/136)
+are closed. Closing them records the merged dossier and tooling; it does not
+record a final PDF export or an LMS submission.
 
 C02 [#133](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/133) is open.
-[sprint-log.md](sprint-log.md) currently stops at Sprint 2. The merged
-[C01 reconciliation](sprint3-backlog-refinement.md) supplies original planning
-images, inventory, contribution links and unresolved point/board questions;
-it is supporting evidence, not a completed C02 Sprint 3 log. C02's log/evidence
-milestone is missing. Do not wait for its whole-Chore closure to draft this
-package, and do not invent committed/completed points, Review feedback,
-retrospective, handoff or submission receipt.
+Its Sprint 3 log is in [sprint-log.md](sprint-log.md), written from the C01
+reconciliation ([sprint3-backlog-refinement.md](sprint3-backlog-refinement.md))
+and live GitHub records. Sprint Review feedback, the retrospective action,
+the Scrum Master handoff and the submission receipt are marked "Not recorded"
+there because the repository does not contain them.
 
 <!-- pdf:page -->
 
@@ -513,27 +538,41 @@ retrospective, handoff or submission receipt.
    per-journey outcomes in [human-validation.md](evidence/s3-m3-p0-handoff/human-validation.md).
    PO confirmation that the trial occurred is not an all-AC pass. Resolve the
    T33 intermittency if it recurs on the final candidate.
-3. Record a non-contributing teammate's review of merged C03 head `95ab003`;
-   C03's merge/closure is already recorded and is not repeated. The #133 owner
-   supplies the actual Sprint 3 log/evidence milestone and repository-minimum
-   audit. Do not award points for partial Stories or count Tasks as points.
+3. A non-contributing teammate's approval of merged C03 head `95ab003` is
+   recorded above (submitted after the merge, body `oke`). The #133 owner has
+   drafted the Sprint 3 log and repository-minimum audit in
+   [sprint-log.md](sprint-log.md); it is not final until that change is
+   reviewed and merged. Do not award points for partial Stories or count Tasks
+   as points.
 4. Both PO-supplied application images now include the actual browser address
    bar and appear on page 3. Keep their provenance limits explicit: the exact
    running checkout, capture times and browser network transcript were not
    supplied. Reconfirm applicability if executable code changes before release;
    historical viewport previews are retained only as historical evidence.
-5. A real non-contributing teammate uses Review changes, leaves a substantive
-   comment on this dossier PR, reproduces relevant checks, and approves after
-   findings are resolved. No review has been generated on their behalf.
-6. PR #188 closes only draft/tooling Task #189 after actual review/CI/merge.
-   Keep parent #136 open. From a clean checkout of the completed merged `main`,
-   verify executable correspondence and required evidence/assets, then export
-   `Team03_M3.pdf`. Recheck pages 1–3, all text/images/links and agreement with
-   that exact merged SHA. A draft PDF exported now is not final submission.
+5. Dossier PR #188 is merged. Its only pre-merge approval
+   ([@kietxuan](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/188#pullrequestreview-5563237695),
+   body `nice`) covered the earlier head `b1529d5`, and @kietxuan contributed to
+   the follow-up changes. @NguyenTuanAnh0608
+   ([review](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/188#pullrequestreview-5563566209))
+   and @hoang3003
+   ([review](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/188#pullrequestreview-5563578837))
+   approved the exact final head `100fbde` at 14:59 and 15:02 UTC, after the
+   14:34 UTC merge, with short comments and no reproduction report. A
+   substantive, reproducible non-contributor review of the dossier is not
+   recorded. No review has been generated on anyone's behalf.
+6. PR #188 is merged, and Task #189 and parent #136 are closed. No clean-checkout
+   verification of the merged `main` and no `Team03_M3.pdf` export is recorded
+   here. To do: from a clean checkout of the merged `main`, verify executable
+   correspondence and required evidence/assets, export `Team03_M3.pdf`, and
+   recheck pages 1–3, all text/images/links and agreement with that exact
+   merged SHA. Record the export only after it is done. Issue closure does not
+   imply either.
 7. Confirm the actual LMS deadline in the course, submit before it, and save
-   the genuine receipt before closing #136. No authorized LMS session/deadline/receipt is available
-   here. Finally C02 records actual Review/submission outcomes and SM handoff.
+   the genuine receipt. No LMS session, deadline or receipt is recorded here.
+   C02 records the actual Review/submission outcomes and SM handoff once they
+   exist.
 
 Draft build and final-release conditions:
 [PDF export instructions](evidence/s3-c05-ui/README.md).
-No final export, approval, dossier merge, LMS submission or receipt is claimed.
+The dossier is merged to `main`. No final PDF export, LMS submission or receipt
+is claimed.
