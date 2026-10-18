@@ -4,6 +4,36 @@ For university students facing choice overload, this system turns a small set of
 genre preferences and optional ratings into transparent movie recommendations,
 rather than giving every viewer the same generic popularity list.
 
+## Sprint 3 review — start here
+
+**Sprint 3: 05–18 October 2026. Product Owner: @kietxuan.
+Scrum Master: @vu-huzy.** The PO confirmed these dates; the board's older
+iteration-date labels have not been updated. SM3 differs from SM1 (@hoang3003)
+and SM2 (@NguyenTuanAnh0608).
+
+Begin at the home page (`/`) and use visible controls; feature URLs do not need
+to be entered by hand. Follow [SETUP](docs/SETUP.md) first. Its disposable-account
+procedure uses registration, not published real passwords. Confirm the review
+machine's TMDb token/network arrangement before the session.
+
+| P0 Story | Start from the home page and use | Screen / route | Issue |
+|---|---|---|---|
+| S01 — Select favourite genres | Sign in → Enter preferences; authenticated home → Start also opens the picker | `/preferences` | [#17](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/17) |
+| S02 — Get personalised recommendations | Sign in → Enter preferences → choose 1–5 genres → Save preferences | `/preferences` → `/recommendations` | [#18](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/18) |
+| S03 — View movie details | View details on a visible movie card | `/movies/:movieId` | [#19](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/19) |
+| S04 — Explore without preferences | Register/sign in with a new account; see Popular / Not personalised | `/recommendations` | [#20](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/20) |
+| S12 — Register an account | Sign in → Create an account | `/register` | [#44](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/44) |
+| S13 — Sign in and sign out | Sign in; then use Sign out on recommendations | `/login` → `/recommendations` → `/` | [#45](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/45) |
+
+**Deliberate business-rule rejection (BR1):** open the picker with zero genres
+selected and choose **Save preferences**. Expect
+`Select at least one genre (up to 5), then choose Save preferences.`
+The picker remains open and no invalid selection is saved.
+
+These are review entry points, not an assertion that all Story DoD gates are
+complete. See the [Sprint 3 backlog reconciliation](docs/sprint3-backlog-refinement.md)
+for actual issue/acceptance states, planning images and outstanding handoffs.
+
 - [Local setup and clean-clone guide](docs/SETUP.md)
 - [Required TMDb catalogue setup from Sprint 3](docs/tmdb-sprint3-runbook.md)
 

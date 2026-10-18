@@ -1,0 +1,2339 @@
+{
+  "schemaVersion": 1,
+  "recordedDateLocal": "2026-10-18",
+  "timezone": "Asia/Ho_Chi_Minh",
+  "issue": 132,
+  "branch": "docs/s3-c01-backlog-closeout",
+  "applicationBase": "4ff81ab30df8cf448c3796f748b9451496e403c5",
+  "sprintDates": {
+    "start": "2026-10-05",
+    "end": "2026-10-18",
+    "basis": "PO confirmation in current chat; board screenshot date labels intentionally unchanged"
+  },
+  "counts": {
+    "tasks": 37,
+    "chores": 5,
+    "spikes": 1,
+    "total": 43,
+    "closed": 39,
+    "open": 4
+  },
+  "storyPoints": {
+    "productBacklog": 54,
+    "p0ProductTotal": 24,
+    "sprint3Committed": null,
+    "sprint3Completed": null,
+    "sprint3Velocity": null,
+    "basis": "Historical Planning commitment not supplied; no Story points counted per task or counted twice across sprints"
+  },
+  "planningImages": [
+    {
+      "path": "docs/images/sprint3/planning-board.png",
+      "sha256": "c380a05371877bc76cebce407e2f9a89eed66e8703f9c2a4f8712bed087f7ad7",
+      "role": "PO-supplied beginning-of-Sprint-3 status-board image",
+      "visible": {
+        "Todo": 53,
+        "InProgress": 0,
+        "InReview": 0,
+        "Done": 35
+      },
+      "captureDate": null,
+      "limitations": "Global unfiltered board; counts include other sprints; not 53 committed Sprint3 issues. Timestamp not visible."
+    },
+    {
+      "path": "docs/images/sprint3/iteration-board-snapshot.png",
+      "sha256": "83f84fcf08ffaaa6f781a5dc73cc1e59c21a7070de6256aebf5217ef005b2a0d",
+      "role": "PO-supplied later iteration-board snapshot",
+      "visible": {
+        "Sprint3": 43,
+        "NoSprint": 12,
+        "boardLabel": "Sep 22 - Oct 05"
+      },
+      "limitations": "Not grouped by status; visible #17-#20 are in No Sprint; total 43 does not enumerate or prove membership of all expected issues"
+    }
+  ],
+  "projectVerification": {
+    "state": "not independently enumerated",
+    "api": "Current token lacks read:project; no permission/token changes",
+    "browser": "Unauthenticated browser returned GitHub 404 on private Project 9; no authentication bypass",
+    "manualChecklistRequired": true
+  },
+  "inventory": [
+    {
+      "issue": 43,
+      "title": "[Spike] Validate TF-IDF text similarity for movie discovery",
+      "kind": "Spike",
+      "state": "closed",
+      "assignees": [
+        "kietxuan"
+      ],
+      "reviewer": "anotify-vie",
+      "reviewReceipt": {
+        "pr": 146,
+        "reviewer": "anotify-vie",
+        "state": "APPROVED",
+        "commit": "b3cccee3d6733353a857172c68569cf92ea69be0",
+        "body": "oke",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/146#pullrequestreview-5466856642",
+        "submitted_at": "2026-10-09T06:58:38Z",
+        "contributors": [
+          "kietxuan"
+        ]
+      },
+      "hardDependencies": [],
+      "milestoneNotes": null,
+      "estimateText": "4 hours",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 146,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/146",
+        "state": "closed",
+        "mergedAt": "2026-10-09T07:57:41Z",
+        "mergedLocal": "2026-10-09 14:57 +07:00",
+        "author": "kietxuan",
+        "head": "b3cccee3d6733353a857172c68569cf92ea69be0",
+        "merge": "9a774764aec788cc1322a3cb0685b4aad56ee6a2"
+      }
+    },
+    {
+      "issue": 103,
+      "title": "[Task] S3-T01 — Create account-owned preference storage and reads",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "vu-huzy"
+      ],
+      "reviewer": "kietxuan",
+      "reviewReceipt": {
+        "pr": 147,
+        "reviewer": "kietxuan",
+        "state": "APPROVED",
+        "commit": "39e283aca2bfb5762dbce1fddf77fd09876316fe",
+        "body": "da sua conflict ",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/147#pullrequestreview-5477388498",
+        "submitted_at": "2026-10-10T03:37:57Z",
+        "contributors": [
+          "vu-huzy"
+        ]
+      },
+      "hardDependencies": [
+        49,
+        56
+      ],
+      "milestoneNotes": "#134 initial account/schema contract",
+      "estimateText": "3",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 147,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/147",
+        "state": "closed",
+        "mergedAt": "2026-10-10T03:55:13Z",
+        "mergedLocal": "2026-10-10 10:55 +07:00",
+        "author": "vu-huzy",
+        "head": "39e283aca2bfb5762dbce1fddf77fd09876316fe",
+        "merge": "e26b0c9541f4dfdf2954ab0b5c45234bc3b4d70a"
+      }
+    },
+    {
+      "issue": 104,
+      "title": "[Task] S3-T02 — Validate and atomically replace favourite genres",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "kietxuan"
+      ],
+      "reviewer": "hoang3003",
+      "reviewReceipt": {
+        "pr": 152,
+        "reviewer": "hoang3003",
+        "state": "APPROVED",
+        "commit": "7f866b547f97fd22f3a674dbadc1899c422b655b",
+        "body": "very good lovely guys",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/152#pullrequestreview-5479729724",
+        "submitted_at": "2026-10-10T15:58:49Z",
+        "contributors": [
+          "kietxuan"
+        ]
+      },
+      "hardDependencies": [
+        103
+      ],
+      "milestoneNotes": null,
+      "estimateText": "3",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 152,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/152",
+        "state": "closed",
+        "mergedAt": "2026-10-10T16:02:44Z",
+        "mergedLocal": "2026-10-10 23:02 +07:00",
+        "author": "kietxuan",
+        "head": "7f866b547f97fd22f3a674dbadc1899c422b655b",
+        "merge": "ad3452572edad79faf6ef4e59628402dc5f7a9c9"
+      }
+    },
+    {
+      "issue": 105,
+      "title": "[Task] S3-T03 — Verify preference API persistence and account isolation",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "NguyenTuanAnh0608"
+      ],
+      "reviewer": "hoang3003",
+      "reviewReceipt": {
+        "pr": 159,
+        "reviewer": "hoang3003",
+        "state": "APPROVED",
+        "commit": "121bd2c9dfd10d67364d6f95d01bc43149e80034",
+        "body": "good good good",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/159#pullrequestreview-5486171590",
+        "submitted_at": "2026-10-12T02:55:49Z",
+        "contributors": [
+          "TuanAnh0608"
+        ]
+      },
+      "hardDependencies": [
+        104
+      ],
+      "milestoneNotes": null,
+      "estimateText": "3",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 159,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/159",
+        "state": "closed",
+        "mergedAt": "2026-10-12T05:44:36Z",
+        "mergedLocal": "2026-10-12 12:44 +07:00",
+        "author": "NguyenTuanAnh0608",
+        "head": "f62f550d8dfdba04fc186ab77c8ce9a8446f2cbd",
+        "merge": "74ea81471b40f3be2bdab1286ef7d0790f2d500c"
+      }
+    },
+    {
+      "issue": 106,
+      "title": "[Task] S3-T04 — Build home Start and genre-selection controls",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "NguyenTuanAnh0608"
+      ],
+      "reviewer": "hoang3003",
+      "reviewReceipt": {
+        "pr": 151,
+        "reviewer": "hoang3003",
+        "state": "APPROVED",
+        "commit": "4b0c831b915a1d384d506fa6fe67e364e1f3e77d",
+        "body": "ok",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/151#pullrequestreview-5486168401",
+        "submitted_at": "2026-10-12T02:54:53Z",
+        "contributors": [
+          "TuanAnh0608"
+        ]
+      },
+      "hardDependencies": [
+        103
+      ],
+      "milestoneNotes": "#134 initial UI contract",
+      "estimateText": "3",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 151,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/151",
+        "state": "closed",
+        "mergedAt": "2026-10-10T16:18:44Z",
+        "mergedLocal": "2026-10-10 23:18 +07:00",
+        "author": "NguyenTuanAnh0608",
+        "head": "4b0c831b915a1d384d506fa6fe67e364e1f3e77d",
+        "merge": "d5605b8cba148cd4cfb18666c04c74c43fb9c71e"
+      }
+    },
+    {
+      "issue": 107,
+      "title": "[Task] S3-T05 — Integrate preference save restore and navigation",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "anotify-vie"
+      ],
+      "reviewer": "hoang3003",
+      "reviewReceipt": {
+        "pr": 158,
+        "reviewer": "hoang3003",
+        "state": "APPROVED",
+        "commit": "c768d140e51490290116542015ee9d6251aea685",
+        "body": "ok",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/158#pullrequestreview-5558373657",
+        "submitted_at": "2026-10-17T15:02:56Z",
+        "contributors": []
+      },
+      "hardDependencies": [
+        104,
+        106
+      ],
+      "milestoneNotes": null,
+      "estimateText": "3",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 158,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/158",
+        "state": "closed",
+        "mergedAt": "2026-10-11T17:41:50Z",
+        "mergedLocal": "2026-10-12 00:41 +07:00",
+        "author": "anotify-vie",
+        "head": "c768d140e51490290116542015ee9d6251aea685",
+        "merge": "01db840841348ffbf2b840afc16bd883aeeff4e7"
+      }
+    },
+    {
+      "issue": 108,
+      "title": "[Task] S3-T06 — Define deterministic recommendation fixtures and examples",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "NguyenTuanAnh0608"
+      ],
+      "reviewer": "anotify-vie",
+      "reviewReceipt": {
+        "pr": 149,
+        "reviewer": "anotify-vie",
+        "state": "APPROVED",
+        "commit": "666550335047db36d2ca2ea415b09f1327968d38",
+        "body": "oke",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/149#pullrequestreview-5477908265",
+        "submitted_at": "2026-10-10T06:10:20Z",
+        "contributors": [
+          "TuanAnh0608"
+        ]
+      },
+      "hardDependencies": [],
+      "milestoneNotes": "#134 initial fixture contract",
+      "estimateText": "2",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 149,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/149",
+        "state": "closed",
+        "mergedAt": "2026-10-10T06:08:29Z",
+        "mergedLocal": "2026-10-10 13:08 +07:00",
+        "author": "NguyenTuanAnh0608",
+        "head": "666550335047db36d2ca2ea415b09f1327968d38",
+        "merge": "5251a88ab40daa46dcc12decfab56f01d30417d7"
+      }
+    },
+    {
+      "issue": 109,
+      "title": "[Task] S3-T07 — Implement genre matching and bounded baseline ranking",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "vu-huzy"
+      ],
+      "reviewer": "kietxuan",
+      "reviewReceipt": {
+        "pr": 154,
+        "reviewer": "kietxuan",
+        "state": "APPROVED",
+        "commit": "e5262dd5c835e042dbecc7a2a28fd30b97369928",
+        "body": "good, no conflict ",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/154#pullrequestreview-5479825058",
+        "submitted_at": "2026-10-10T16:18:27Z",
+        "contributors": [
+          "vu-huzy"
+        ]
+      },
+      "hardDependencies": [
+        108,
+        47
+      ],
+      "milestoneNotes": null,
+      "estimateText": "3",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 154,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/154",
+        "state": "closed",
+        "mergedAt": "2026-10-10T16:30:00Z",
+        "mergedLocal": "2026-10-10 23:30 +07:00",
+        "author": "vu-huzy",
+        "head": "e5262dd5c835e042dbecc7a2a28fd30b97369928",
+        "merge": "47ee577ebd9160801938915f4e5c955de1cf330f"
+      }
+    },
+    {
+      "issue": 110,
+      "title": "[Task] S3-T08 — Serve personalised recommendations and alternatives",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "hoang3003"
+      ],
+      "reviewer": "anotify-vie",
+      "reviewReceipt": {
+        "pr": 156,
+        "reviewer": "anotify-vie",
+        "state": "APPROVED",
+        "commit": "d345c8725f6788ae68db739454e056bca552b8ec",
+        "body": "OK",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/156#pullrequestreview-5483763866",
+        "submitted_at": "2026-10-11T15:00:27Z",
+        "contributors": [
+          "hoang3003"
+        ]
+      },
+      "hardDependencies": [
+        104,
+        109
+      ],
+      "milestoneNotes": "#134 approved initial recommendation contract",
+      "estimateText": "3 provisional hours. Re-estimate if implementation inspection identifies additional work.",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 156,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/156",
+        "state": "closed",
+        "mergedAt": "2026-10-11T13:51:00Z",
+        "mergedLocal": "2026-10-11 20:51 +07:00",
+        "author": "hoang3003",
+        "head": "d345c8725f6788ae68db739454e056bca552b8ec",
+        "merge": "b96ae77ff86d6107a2a1ae468f8cea42492608b3"
+      }
+    },
+    {
+      "issue": 111,
+      "title": "[Task] S3-T09 — Separate recommendation failures from valid empty results",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "kietxuan"
+      ],
+      "reviewer": "NguyenTuanAnh0608",
+      "reviewReceipt": {
+        "pr": 161,
+        "reviewer": "NguyenTuanAnh0608",
+        "state": "APPROVED",
+        "commit": "6ff13c155b3aff9babf1f48842f0449834757ad0",
+        "body": "okay",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/161#pullrequestreview-5488454729",
+        "submitted_at": "2026-10-12T08:55:07Z",
+        "contributors": [
+          "kietxuan"
+        ]
+      },
+      "hardDependencies": [
+        110
+      ],
+      "milestoneNotes": null,
+      "estimateText": "3",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 161,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/161",
+        "state": "closed",
+        "mergedAt": "2026-10-12T08:48:17Z",
+        "mergedLocal": "2026-10-12 15:48 +07:00",
+        "author": "kietxuan",
+        "head": "6ff13c155b3aff9babf1f48842f0449834757ad0",
+        "merge": "0a11da2737ef6445fb9bf9b54d82ef5dd9636034"
+      }
+    },
+    {
+      "issue": 112,
+      "title": "[Task] S3-T10 — Render popular and personalised recommendation cards",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "vu-huzy"
+      ],
+      "reviewer": "NguyenTuanAnh0608",
+      "reviewReceipt": {
+        "pr": 160,
+        "reviewer": "NguyenTuanAnh0608",
+        "state": "APPROVED",
+        "commit": "ef58744766da95aeaf1ef71e643b8d1af31f739b",
+        "body": "okay",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/160#pullrequestreview-5488450150",
+        "submitted_at": "2026-10-12T08:54:36Z",
+        "contributors": [
+          "vu-huzy"
+        ]
+      },
+      "hardDependencies": [
+        110,
+        58,
+        59
+      ],
+      "milestoneNotes": "#134 response contract; popular scaffolding can precede #110 final integration",
+      "estimateText": "4",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 160,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/160",
+        "state": "closed",
+        "mergedAt": "2026-10-12T08:35:21Z",
+        "mergedLocal": "2026-10-12 15:35 +07:00",
+        "author": "vu-huzy",
+        "head": "ef58744766da95aeaf1ef71e643b8d1af31f739b",
+        "merge": "5042dc0c70b7ec88cf0a07ff64bd6044897d4490"
+      }
+    },
+    {
+      "issue": 113,
+      "title": "[Task] S3-T11 — Implement no-match error retry and request-race states",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "NguyenTuanAnh0608"
+      ],
+      "reviewer": "kietxuan",
+      "reviewReceipt": {
+        "pr": 164,
+        "reviewer": "kietxuan",
+        "state": "APPROVED",
+        "commit": "17630bee6baee47223b7d44e01832193b3c4be3c",
+        "body": "CI green, fix PR content then merge",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/164#pullrequestreview-5499159520",
+        "submitted_at": "2026-10-13T05:25:28Z",
+        "contributors": [
+          "TuanAnh0608"
+        ]
+      },
+      "hardDependencies": [
+        111,
+        112
+      ],
+      "milestoneNotes": null,
+      "estimateText": "3",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 164,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/164",
+        "state": "closed",
+        "mergedAt": "2026-10-13T08:15:07Z",
+        "mergedLocal": "2026-10-13 15:15 +07:00",
+        "author": "NguyenTuanAnh0608",
+        "head": "8f5e816589da64c4790b7b37b8acb11026944d0a",
+        "merge": "434156701373cc6763e6272ee9bfe5f52a24a552"
+      }
+    },
+    {
+      "issue": 114,
+      "title": "[Task] S3-T12 — Verify five recommendation acceptance criteria",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "hoang3003"
+      ],
+      "reviewer": "kietxuan",
+      "reviewReceipt": {
+        "pr": 169,
+        "reviewer": "kietxuan",
+        "state": "APPROVED",
+        "commit": "548f14c4e8e1794ca303a615eee00608c1bf28ef",
+        "body": "tot roi",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/169#pullrequestreview-5517707506",
+        "submitted_at": "2026-10-14T12:16:05Z",
+        "contributors": [
+          "hoang3003"
+        ]
+      },
+      "hardDependencies": [
+        108,
+        111,
+        113
+      ],
+      "milestoneNotes": null,
+      "estimateText": "3",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 169,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/169",
+        "state": "closed",
+        "mergedAt": "2026-10-14T13:09:26Z",
+        "mergedLocal": "2026-10-14 20:09 +07:00",
+        "author": "hoang3003",
+        "head": "548f14c4e8e1794ca303a615eee00608c1bf28ef",
+        "merge": "1969d82ddbb83956095cd033e7eb529d5b4e47d8"
+      }
+    },
+    {
+      "issue": 115,
+      "title": "[Task] S3-T13 — Complete cold-start transitions after saving preferences",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "anotify-vie"
+      ],
+      "reviewer": "kietxuan",
+      "reviewReceipt": {
+        "pr": 171,
+        "reviewer": "kietxuan",
+        "state": "APPROVED",
+        "commit": "047d446a3cd6b3387afd4afd410d6efe01781b07",
+        "body": "chua ok lam ",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/171#pullrequestreview-5517719017",
+        "submitted_at": "2026-10-14T12:17:00Z",
+        "contributors": []
+      },
+      "hardDependencies": [
+        107,
+        110,
+        112,
+        113,
+        59
+      ],
+      "milestoneNotes": null,
+      "estimateText": "3",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 171,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/171",
+        "state": "closed",
+        "mergedAt": "2026-10-14T15:55:44Z",
+        "mergedLocal": "2026-10-14 22:55 +07:00",
+        "author": "anotify-vie",
+        "head": "7eb5b63b69499506309fe9a69cb4c6e09a9bf0d8",
+        "merge": "231dd9fd1f63153b95261489601e3442028465eb"
+      }
+    },
+    {
+      "issue": 116,
+      "title": "[Task] S3-T14 — Verify four cold-start acceptance criteria",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "anotify-vie"
+      ],
+      "reviewer": "kietxuan",
+      "reviewReceipt": {
+        "pr": 176,
+        "reviewer": "kietxuan",
+        "state": "APPROVED",
+        "commit": "6a57b6ebbb58217525cf127ffbd31ebb3fdfd6aa",
+        "body": "sua lam file the ",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/176#pullrequestreview-5544660607",
+        "submitted_at": "2026-10-16T07:58:20Z",
+        "contributors": []
+      },
+      "hardDependencies": [
+        107,
+        108,
+        112,
+        113,
+        115
+      ],
+      "milestoneNotes": null,
+      "estimateText": "3",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 176,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/176",
+        "state": "closed",
+        "mergedAt": "2026-10-16T08:31:50Z",
+        "mergedLocal": "2026-10-16 15:31 +07:00",
+        "author": "anotify-vie",
+        "head": "3e352d38b154ca22a6180e0f4e76612a103f865d",
+        "merge": "d7bb7b1f659879b572e0cf351cb4e6dc234df0a3"
+      }
+    },
+    {
+      "issue": 117,
+      "title": "[Task] S3-T15 — Filter only the currently displayed recommendation snapshot",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "kietxuan"
+      ],
+      "reviewer": "vu-huzy",
+      "reviewReceipt": {
+        "pr": 162,
+        "reviewer": "vu-huzy",
+        "state": "APPROVED",
+        "commit": "8b297ac2e7b59263a5f4a130a4db2038e9418120",
+        "body": "ok",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/162#pullrequestreview-5498194967",
+        "submitted_at": "2026-10-13T02:46:11Z",
+        "contributors": [
+          "kietxuan"
+        ]
+      },
+      "hardDependencies": [
+        112
+      ],
+      "milestoneNotes": null,
+      "estimateText": "3",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 162,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/162",
+        "state": "closed",
+        "mergedAt": "2026-10-13T03:01:21Z",
+        "mergedLocal": "2026-10-13 10:01 +07:00",
+        "author": "kietxuan",
+        "head": "8b297ac2e7b59263a5f4a130a4db2038e9418120",
+        "merge": "17ef831ab6194aa8675c624a2cb19c7aaa209657"
+      }
+    },
+    {
+      "issue": 118,
+      "title": "[Task] S3-T16 — Verify filter reset and unchanged preferences",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "kietxuan"
+      ],
+      "reviewer": "NguyenTuanAnh0608",
+      "reviewReceipt": {
+        "pr": 167,
+        "reviewer": "NguyenTuanAnh0608",
+        "state": "APPROVED",
+        "commit": "348167cf2b4f302bb7064990ab73027a229362d8",
+        "body": "okey\n",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/167#pullrequestreview-5516686166",
+        "submitted_at": "2026-10-14T10:43:42Z",
+        "contributors": [
+          "kietxuan"
+        ]
+      },
+      "hardDependencies": [
+        117
+      ],
+      "milestoneNotes": null,
+      "estimateText": "2",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 167,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/167",
+        "state": "closed",
+        "mergedAt": "2026-10-14T11:13:14Z",
+        "mergedLocal": "2026-10-14 18:13 +07:00",
+        "author": "kietxuan",
+        "head": "348167cf2b4f302bb7064990ab73027a229362d8",
+        "merge": "ad43ec76cf55b068ad4e1e28c475f53d9f409b43"
+      }
+    },
+    {
+      "issue": 119,
+      "title": "[Task] S3-T17 — Preserve details return context and account preferences",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "NguyenTuanAnh0608"
+      ],
+      "reviewer": "kietxuan",
+      "reviewReceipt": {
+        "pr": 165,
+        "reviewer": "kietxuan",
+        "state": "APPROVED",
+        "commit": "86bc165298bc4fad7aa1fb17e2159ee365751b5e",
+        "body": "can merge now ",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/165#pullrequestreview-5499165524",
+        "submitted_at": "2026-10-13T05:26:25Z",
+        "contributors": [
+          "TuanAnh0608"
+        ]
+      },
+      "hardDependencies": [
+        107,
+        112,
+        61
+      ],
+      "milestoneNotes": null,
+      "estimateText": "3",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 165,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/165",
+        "state": "closed",
+        "mergedAt": "2026-10-13T08:10:47Z",
+        "mergedLocal": "2026-10-13 15:10 +07:00",
+        "author": "NguyenTuanAnh0608",
+        "head": "86bc165298bc4fad7aa1fb17e2159ee365751b5e",
+        "merge": "cf87dacd6e22e5d95d84a55d4a1354804dfb1625"
+      }
+    },
+    {
+      "issue": 120,
+      "title": "[Task] S3-T18 — Complete movie-detail acceptance with signed-in return flow",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "vu-huzy"
+      ],
+      "reviewer": "kietxuan",
+      "reviewReceipt": {
+        "pr": 172,
+        "reviewer": "kietxuan",
+        "state": "APPROVED",
+        "commit": "dd6e4c272b8b287666d34f19db3d65b6b1f7645d",
+        "body": "tot roi",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/172#pullrequestreview-5517697619",
+        "submitted_at": "2026-10-14T12:15:18Z",
+        "contributors": [
+          "vu-huzy"
+        ]
+      },
+      "hardDependencies": [
+        119,
+        62
+      ],
+      "milestoneNotes": null,
+      "estimateText": "3",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 172,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/172",
+        "state": "closed",
+        "mergedAt": "2026-10-14T13:36:27Z",
+        "mergedLocal": "2026-10-14 20:36 +07:00",
+        "author": "vu-huzy",
+        "head": "dd6e4c272b8b287666d34f19db3d65b6b1f7645d",
+        "merge": "3b7d508b75e116e1cd41c492870de7a15e919bf1"
+      }
+    },
+    {
+      "issue": 121,
+      "title": "[Task] S3-T19 — Expose the public popular catalogue using shared ranking",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "anotify-vie"
+      ],
+      "reviewer": "NguyenTuanAnh0608",
+      "reviewReceipt": {
+        "pr": 145,
+        "reviewer": "NguyenTuanAnh0608",
+        "state": "APPROVED",
+        "commit": "293a985c69968b1a46711e43ba036d5071838106",
+        "body": "Request changes before merge:\n\nPlease rebase this branch after PR #144 is merged. Both PRs update\ndocs/api.md, and the rebased version must preserve the full Sprint 3\ncontract from C03.\n\nAfter the rebase, document /api/movies/popular separately from the existing\n/api/movies?limit=10 catalogue route, and mark only the new T19 endpoint as\nimplemented in M3.\n\nAlso remove the trailing blank line reported by:\n\n```bash\ngit diff --check upstream/main...HEAD",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/145#pullrequestreview-5466624301",
+        "submitted_at": "2026-10-09T06:37:52Z",
+        "contributors": []
+      },
+      "hardDependencies": [
+        58
+      ],
+      "milestoneNotes": null,
+      "estimateText": "2",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 145,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/145",
+        "state": "closed",
+        "mergedAt": "2026-10-09T09:37:59Z",
+        "mergedLocal": "2026-10-09 16:37 +07:00",
+        "author": "anotify-vie",
+        "head": "e73e8e2db12f7ddd60e108bd158eb52ae8c52576",
+        "merge": "e99d1355872991df85e92cf5c998a2c4c9df511e"
+      }
+    },
+    {
+      "issue": 122,
+      "title": "[Task] S3-T20 — Build popular-movie page and public navigation",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "hoang3003"
+      ],
+      "reviewer": "anotify-vie",
+      "reviewReceipt": {
+        "pr": 148,
+        "reviewer": "anotify-vie",
+        "state": "APPROVED",
+        "commit": "6321e702347a877850ca3215ca334bb288f2cfd2",
+        "body": "oke",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/148#pullrequestreview-5477907248",
+        "submitted_at": "2026-10-10T06:09:55Z",
+        "contributors": [
+          "hoang3003"
+        ]
+      },
+      "hardDependencies": [
+        121
+      ],
+      "milestoneNotes": null,
+      "estimateText": "3",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 148,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/148",
+        "state": "closed",
+        "mergedAt": "2026-10-09T17:41:32Z",
+        "mergedLocal": "2026-10-10 00:41 +07:00",
+        "author": "hoang3003",
+        "head": "6321e702347a877850ca3215ca334bb288f2cfd2",
+        "merge": "abc0b80ce16129414e8f4424ead0e10da79041a7"
+      }
+    },
+    {
+      "issue": 123,
+      "title": "[Task] S3-T21 — Verify popular ordering and missing-data behaviour",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "hoang3003"
+      ],
+      "reviewer": "anotify-vie",
+      "reviewReceipt": {
+        "pr": 155,
+        "reviewer": "anotify-vie",
+        "state": "APPROVED",
+        "commit": "87cf512ab569a528a10f901ade1a603618f82bce",
+        "body": "ok nice",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/155#pullrequestreview-5479871838",
+        "submitted_at": "2026-10-10T16:30:35Z",
+        "contributors": [
+          "hoang3003"
+        ]
+      },
+      "hardDependencies": [
+        122
+      ],
+      "milestoneNotes": null,
+      "estimateText": "2",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 155,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/155",
+        "state": "closed",
+        "mergedAt": "2026-10-10T16:30:50Z",
+        "mergedLocal": "2026-10-10 23:30 +07:00",
+        "author": "hoang3003",
+        "head": "87cf512ab569a528a10f901ade1a603618f82bce",
+        "merge": "0cfd4e8662adaf3b3aef9be7db77f43ca8c4c063"
+      }
+    },
+    {
+      "issue": 124,
+      "title": "[Task] S3-T22 — Verify full account preference recommendation journey",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "NguyenTuanAnh0608"
+      ],
+      "reviewer": "vu-huzy",
+      "reviewReceipt": {
+        "pr": 174,
+        "reviewer": "vu-huzy",
+        "state": "APPROVED",
+        "commit": "539b760b8b305dde6dcae16151548cb4854006a7",
+        "body": "ok",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/174#pullrequestreview-5547567313",
+        "submitted_at": "2026-10-16T12:09:43Z",
+        "contributors": [
+          "TuanAnh0608"
+        ]
+      },
+      "hardDependencies": [
+        105,
+        107,
+        114
+      ],
+      "milestoneNotes": null,
+      "estimateText": "Re-estimate during #132 refinement for the expanded browser/evidence checks.",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 174,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/174",
+        "state": "closed",
+        "mergedAt": "2026-10-16T07:43:22Z",
+        "mergedLocal": "2026-10-16 14:43 +07:00",
+        "author": "NguyenTuanAnh0608",
+        "head": "539b760b8b305dde6dcae16151548cb4854006a7",
+        "merge": "63dd701585958bb2ea453a6c070274bd6211b69d"
+      }
+    },
+    {
+      "issue": 125,
+      "title": "[Task] S3-T23 — Complete S13 authentication and account-isolation acceptance",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "anotify-vie"
+      ],
+      "reviewer": "hoang3003",
+      "reviewReceipt": {
+        "pr": 178,
+        "reviewer": "hoang3003",
+        "state": "APPROVED",
+        "commit": "5e19d5df307c003f1366e7fadf502c5fd6522dd4",
+        "body": "ok",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/178#pullrequestreview-5553320786",
+        "submitted_at": "2026-10-16T20:27:29Z",
+        "contributors": []
+      },
+      "hardDependencies": [
+        105,
+        114,
+        116,
+        140,
+        141,
+        142
+      ],
+      "milestoneNotes": null,
+      "estimateText": "4 provisional hours. Confirm remaining effort during #132 refinement.",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 178,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/178",
+        "state": "closed",
+        "mergedAt": "2026-10-17T04:42:07Z",
+        "mergedLocal": "2026-10-17 11:42 +07:00",
+        "author": "anotify-vie",
+        "head": "5e19d5df307c003f1366e7fadf502c5fd6522dd4",
+        "merge": "1c44eacd75360aef4abc8b4f55fbab2b27f17c2f"
+      }
+    },
+    {
+      "issue": 126,
+      "title": "[Task] S3-T24 — Check keyboard mobile and recoverable preference controls",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "vu-huzy"
+      ],
+      "reviewer": "hoang3003",
+      "reviewReceipt": {
+        "pr": 173,
+        "reviewer": "hoang3003",
+        "state": "APPROVED",
+        "commit": "5b5e17d6764fbf3a97e280c0a2f40fa6bcd114cd",
+        "body": "okok",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/173#pullrequestreview-5516739333",
+        "submitted_at": "2026-10-14T10:48:30Z",
+        "contributors": [
+          "vu-huzy"
+        ]
+      },
+      "hardDependencies": [
+        107,
+        113
+      ],
+      "milestoneNotes": null,
+      "estimateText": "Re-estimate during #132 refinement.",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 173,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/173",
+        "state": "closed",
+        "mergedAt": "2026-10-15T02:02:20Z",
+        "mergedLocal": "2026-10-15 09:02 +07:00",
+        "author": "vu-huzy",
+        "head": "9443828c037e546d066e0e6c9c8b86cbbe5ad23f",
+        "merge": "e47830511a6321cf1543bef7b18895769bd2a99f"
+      }
+    },
+    {
+      "issue": 127,
+      "title": "[Task] S3-T25 — Record M3 route-to-story acceptance handoff",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "anotify-vie"
+      ],
+      "reviewer": "hoang3003",
+      "reviewReceipt": null,
+      "hardDependencies": [
+        114,
+        116,
+        118,
+        120,
+        123,
+        124,
+        125,
+        126,
+        128,
+        131,
+        135
+      ],
+      "milestoneNotes": null,
+      "estimateText": "4  hours",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 184,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/184",
+        "state": "closed",
+        "mergedAt": "2026-10-18T09:37:21Z",
+        "mergedLocal": "2026-10-18 16:37 +07:00",
+        "author": "anotify-vie",
+        "head": "aed85fb4133f413a2cf147ff1bd7cbc7ff78bc8f",
+        "merge": "4ff81ab30df8cf448c3796f748b9451496e403c5"
+      }
+    },
+    {
+      "issue": 128,
+      "title": "[Task] S3-T29 — Make TMDb catalogue import the required Sprint 3 data source",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "kietxuan"
+      ],
+      "reviewer": "vu-huzy",
+      "reviewReceipt": {
+        "pr": 150,
+        "reviewer": "vu-huzy",
+        "state": "APPROVED",
+        "commit": "0f67184580bb1154f96cc1c8a4043a3b0e17c995",
+        "body": "ok",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/150#pullrequestreview-5477490126",
+        "submitted_at": "2026-10-10T04:06:45Z",
+        "contributors": [
+          "kietxuan"
+        ]
+      },
+      "hardDependencies": [],
+      "milestoneNotes": "#134 initial source contract + #135 setup guidance, not whole-Chore closure",
+      "estimateText": "4 hours.",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 150,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/150",
+        "state": "closed",
+        "mergedAt": "2026-10-10T03:39:49Z",
+        "mergedLocal": "2026-10-10 10:39 +07:00",
+        "author": "kietxuan",
+        "head": "0f67184580bb1154f96cc1c8a4043a3b0e17c995",
+        "merge": "102898dbc0c282b450c3f0151e2aac6d625531f8"
+      }
+    },
+    {
+      "issue": 129,
+      "title": "[Task] S3-T26 — Add nullable backdrop storage without changing catalogue identity",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "kietxuan"
+      ],
+      "reviewer": "NguyenTuanAnh0608",
+      "reviewReceipt": {
+        "pr": 180,
+        "reviewer": "NguyenTuanAnh0608",
+        "state": "APPROVED",
+        "commit": "231adf48bacd3e5a9c39c6be9d16e7bfc56f18d1",
+        "body": "oke",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/180#pullrequestreview-5556993047",
+        "submitted_at": "2026-10-17T08:22:51Z",
+        "contributors": [
+          "kietxuan"
+        ]
+      },
+      "hardDependencies": [
+        103,
+        104,
+        137,
+        128,
+        114,
+        116,
+        120,
+        124,
+        125
+      ],
+      "milestoneNotes": "Recorded G3: PO/SM confirmation, P0 verification, accepted #128, #134 media contract and #135 baseline; original capacity record not supplied",
+      "estimateText": "3",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 180,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/180",
+        "state": "closed",
+        "mergedAt": "2026-10-17T07:38:32Z",
+        "mergedLocal": "2026-10-17 14:38 +07:00",
+        "author": "kietxuan",
+        "head": "231adf48bacd3e5a9c39c6be9d16e7bfc56f18d1",
+        "merge": "e725d5280a294c42ff85d0eace8c7fcd5fe5bae6"
+      }
+    },
+    {
+      "issue": 130,
+      "title": "[Task] S3-T27 — Import backdrop paths and expose safe detail image URLs",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "NguyenTuanAnh0608"
+      ],
+      "reviewer": "hoang3003",
+      "reviewReceipt": {
+        "pr": 181,
+        "reviewer": "hoang3003",
+        "state": "APPROVED",
+        "commit": "c4e83e8a81c04c8639f7d53b43a1bb399af0650c",
+        "body": "ok",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/181#pullrequestreview-5558367255",
+        "submitted_at": "2026-10-17T15:01:38Z",
+        "contributors": [
+          "TuanAnh0608"
+        ]
+      },
+      "hardDependencies": [
+        128,
+        129
+      ],
+      "milestoneNotes": "#134 additive media contract and G3; does not wait for #131",
+      "estimateText": "4",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 181,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/181",
+        "state": "closed",
+        "mergedAt": "2026-10-17T13:27:41Z",
+        "mergedLocal": "2026-10-17 20:27 +07:00",
+        "author": "NguyenTuanAnh0608",
+        "head": "c4e83e8a81c04c8639f7d53b43a1bb399af0650c",
+        "merge": "d64cd29b27d5e01c6db4a94d02765f6873fea91f"
+      }
+    },
+    {
+      "issue": 131,
+      "title": "[Task] S3-T28 — Verify backdrop migration import and detail compatibility independently",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "kietxuan"
+      ],
+      "reviewer": "hoang3003",
+      "reviewReceipt": {
+        "pr": 183,
+        "reviewer": "hoang3003",
+        "state": "APPROVED",
+        "commit": "f42c965018c9d76f4234f9255f1246d14e0af08f",
+        "body": "ok\n",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/183#pullrequestreview-5558919091",
+        "submitted_at": "2026-10-17T16:56:31Z",
+        "contributors": [
+          "kietxuan"
+        ]
+      },
+      "hardDependencies": [
+        129,
+        130,
+        179
+      ],
+      "milestoneNotes": "Final UI verification after #179; no circular prerequisite on #131 for UI",
+      "estimateText": "4",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 183,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/183",
+        "state": "closed",
+        "mergedAt": "2026-10-17T16:58:14Z",
+        "mergedLocal": "2026-10-17 23:58 +07:00",
+        "author": "kietxuan",
+        "head": "f42c965018c9d76f4234f9255f1246d14e0af08f",
+        "merge": "86a758eb2468f3e23357b69adf3c3183e5110a40"
+      }
+    },
+    {
+      "issue": 132,
+      "title": "[Chore] S3-C01 — Refine the Sprint 3 backlog",
+      "kind": "Chore",
+      "state": "open",
+      "assignees": [
+        "kietxuan"
+      ],
+      "reviewer": "hoang3003",
+      "reviewReceipt": null,
+      "hardDependencies": [],
+      "milestoneNotes": "Planning first; truthful final backlog reconciliation; not blocked by PDF export",
+      "estimateText": null,
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": null
+    },
+    {
+      "issue": 133,
+      "title": "[Chore] S3-C02 — Complete the Sprint 3 wrap-up",
+      "kind": "Chore",
+      "state": "open",
+      "assignees": [
+        "vu-huzy"
+      ],
+      "reviewer": "kietxuan",
+      "reviewReceipt": null,
+      "hardDependencies": [
+        127,
+        136
+      ],
+      "milestoneNotes": "#132 planning evidence + actual Review and submission receipt; #133 log milestone is supplied to #136 earlier",
+      "estimateText": null,
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": null
+    },
+    {
+      "issue": 134,
+      "title": "[Chore] S3-C03 — Reconcile account recommendation and popularity contracts",
+      "kind": "Chore",
+      "state": "open",
+      "assignees": [
+        "hoang3003"
+      ],
+      "reviewer": "vu-huzy",
+      "reviewReceipt": {
+        "pr": 144,
+        "reviewer": "kietxuan",
+        "state": "APPROVED",
+        "commit": "6c6dd7880e4af1a1dd30d5a11068bc84a3b07e9d",
+        "body": "",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/144#pullrequestreview-5466721572",
+        "submitted_at": "2026-10-09T06:46:26Z",
+        "contributors": [
+          "hoang3003"
+        ]
+      },
+      "hardDependencies": [],
+      "milestoneNotes": "Initial PR #144 is merged; final API/schema/UI/design reconciliation remains open; coordinate design change with #136",
+      "estimateText": null,
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 144,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/144",
+        "state": "closed",
+        "mergedAt": "2026-10-09T06:47:32Z",
+        "mergedLocal": "2026-10-09 13:47 +07:00",
+        "author": "hoang3003",
+        "head": "6c6dd7880e4af1a1dd30d5a11068bc84a3b07e9d",
+        "merge": "79c4b985a1df4671abf998831053e1b580481be0"
+      },
+      "reviewReceiptScope": "PR144 initial contract only; final reconciliation/review pending"
+    },
+    {
+      "issue": 135,
+      "title": "[Chore] S3-C04 — Maintain isolated integration tests and clean-clone setup",
+      "kind": "Chore",
+      "state": "closed",
+      "assignees": [
+        "NguyenTuanAnh0608"
+      ],
+      "reviewer": "anotify-vie",
+      "reviewReceipt": null,
+      "hardDependencies": [
+        128,
+        131
+      ],
+      "milestoneNotes": "Final application candidate and #131, if shipping backdrop; early setup milestone precedes #128",
+      "estimateText": null,
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 185,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/185",
+        "state": "closed",
+        "mergedAt": "2026-10-18T08:40:53Z",
+        "mergedLocal": "2026-10-18 15:40 +07:00",
+        "author": "NguyenTuanAnh0608",
+        "head": "24a6645be191ecc16aeb2045cc76c3488718b384",
+        "merge": "0c4273ab792becb060fefd5e7341e755ed28d0a5"
+      }
+    },
+    {
+      "issue": 136,
+      "title": "[Chore] S3-C05 — Package M3 UI flow and accessibility evidence",
+      "kind": "Chore",
+      "state": "open",
+      "assignees": [
+        "anotify-vie"
+      ],
+      "reviewer": "hoang3003",
+      "reviewReceipt": null,
+      "hardDependencies": [
+        127,
+        128,
+        135
+      ],
+      "milestoneNotes": "#134 design milestone + #133 log/evidence milestone, not their whole-Chore closures",
+      "estimateText": null,
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": null
+    },
+    {
+      "issue": 137,
+      "title": "[Task] S3-T30 — Store one rating per authenticated account and movie",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "anotify-vie"
+      ],
+      "reviewer": "kietxuan",
+      "reviewReceipt": {
+        "pr": 153,
+        "reviewer": "kietxuan",
+        "state": "APPROVED",
+        "commit": "6b2456298124bd095a22f1d8f4ae3e11e5875ec8",
+        "body": "",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/153#pullrequestreview-5480529788",
+        "submitted_at": "2026-10-10T19:34:02Z",
+        "contributors": []
+      },
+      "hardDependencies": [
+        103
+      ],
+      "milestoneNotes": "#134 rating-schema contract; current Alembic head",
+      "estimateText": "3",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 153,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/153",
+        "state": "closed",
+        "mergedAt": "2026-10-11T04:42:09Z",
+        "mergedLocal": "2026-10-11 11:42 +07:00",
+        "author": "anotify-vie",
+        "head": "6b2456298124bd095a22f1d8f4ae3e11e5875ec8",
+        "merge": "8c5d400e59319c16130eb9d21498deeffe4cd919"
+      }
+    },
+    {
+      "issue": 138,
+      "title": "[Task] S3-T31 — Implement protected atomic rating reads and writes",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "vu-huzy"
+      ],
+      "reviewer": "NguyenTuanAnh0608",
+      "reviewReceipt": {
+        "pr": 157,
+        "reviewer": "NguyenTuanAnh0608",
+        "state": "APPROVED",
+        "commit": "f2fa19d4f4b023b4e4ca51131183a6a8cfee3e65",
+        "body": "oke",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/157#pullrequestreview-5486893332",
+        "submitted_at": "2026-10-12T05:43:42Z",
+        "contributors": [
+          "vu-huzy"
+        ]
+      },
+      "hardDependencies": [
+        137
+      ],
+      "milestoneNotes": "#134 payload/error/auth contract",
+      "estimateText": "5",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 157,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/157",
+        "state": "closed",
+        "mergedAt": "2026-10-12T02:36:42Z",
+        "mergedLocal": "2026-10-12 09:36 +07:00",
+        "author": "vu-huzy",
+        "head": "f2fa19d4f4b023b4e4ca51131183a6a8cfee3e65",
+        "merge": "f421f50d7933cc5a6ad1207d78c45d3ece19d17d"
+      }
+    },
+    {
+      "issue": 139,
+      "title": "[Task] S3-T33 — Add a safe account rating control and recoverable saved state",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "kietxuan"
+      ],
+      "reviewer": "NguyenTuanAnh0608",
+      "reviewReceipt": {
+        "pr": 170,
+        "reviewer": "NguyenTuanAnh0608",
+        "state": "APPROVED",
+        "commit": "41419146f11863541af8fcdf3940f2506311aa96",
+        "body": "okae",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/170#pullrequestreview-5516715106",
+        "submitted_at": "2026-10-14T10:46:19Z",
+        "contributors": [
+          "kietxuan"
+        ]
+      },
+      "hardDependencies": [
+        138,
+        119
+      ],
+      "milestoneNotes": "#134 component contract; shared detail-shell coordination",
+      "estimateText": "5",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 170,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/170",
+        "state": "closed",
+        "mergedAt": "2026-10-14T11:32:26Z",
+        "mergedLocal": "2026-10-14 18:32 +07:00",
+        "author": "kietxuan",
+        "head": "198e972d087abeaf78e25f57cd58f85d3c0893c4",
+        "merge": "0e6118b4a6fcaca78ce41a73e11103c18cf2ca4f"
+      }
+    },
+    {
+      "issue": 140,
+      "title": "[Task] S3-T32 — Verify rating API persistence, rollback and account isolation",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "anotify-vie"
+      ],
+      "reviewer": "NguyenTuanAnh0608",
+      "reviewReceipt": {
+        "pr": 166,
+        "reviewer": "NguyenTuanAnh0608",
+        "state": "APPROVED",
+        "commit": "66272eeb8e7da0043904425f20305fda4211a4fe",
+        "body": "oke",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/166#pullrequestreview-5498506241",
+        "submitted_at": "2026-10-13T03:40:05Z",
+        "contributors": []
+      },
+      "hardDependencies": [
+        138
+      ],
+      "milestoneNotes": null,
+      "estimateText": "3",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 166,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/166",
+        "state": "closed",
+        "mergedAt": "2026-10-13T03:26:54Z",
+        "mergedLocal": "2026-10-13 10:26 +07:00",
+        "author": "anotify-vie",
+        "head": "66272eeb8e7da0043904425f20305fda4211a4fe",
+        "merge": "3dcb51f7597747c185ff7dab110ce9e41861476c"
+      }
+    },
+    {
+      "issue": 141,
+      "title": "[Task] S3-T34 — Verify rating UI authentication guards and account-switch recovery",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "hoang3003"
+      ],
+      "reviewer": "vu-huzy",
+      "reviewReceipt": {
+        "pr": 177,
+        "reviewer": "vu-huzy",
+        "state": "APPROVED",
+        "commit": "bf65d4650abb64c5ba5c47e9b1e5a607fc75aa6d",
+        "body": "ok",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/177#pullrequestreview-5547564818",
+        "submitted_at": "2026-10-16T12:09:26Z",
+        "contributors": [
+          "hoang3003"
+        ]
+      },
+      "hardDependencies": [
+        140,
+        139
+      ],
+      "milestoneNotes": null,
+      "estimateText": "3",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 177,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/177",
+        "state": "closed",
+        "mergedAt": "2026-10-16T07:53:55Z",
+        "mergedLocal": "2026-10-16 14:53 +07:00",
+        "author": "hoang3003",
+        "head": "bf65d4650abb64c5ba5c47e9b1e5a607fc75aa6d",
+        "merge": "0db0419771161f5ace419496d3c9991fda51a55b"
+      }
+    },
+    {
+      "issue": 142,
+      "title": "[Task] S3-T35 — Implement an authenticated atomic personalisation-reset boundary",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "hoang3003"
+      ],
+      "reviewer": "vu-huzy",
+      "reviewReceipt": {
+        "pr": 163,
+        "reviewer": "vu-huzy",
+        "state": "APPROVED",
+        "commit": "e144500c5d284ed87b833f43d146dce84898def8",
+        "body": "ok ",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/163#pullrequestreview-5498509720",
+        "submitted_at": "2026-10-13T03:40:35Z",
+        "contributors": [
+          "hoang3003"
+        ]
+      },
+      "hardDependencies": [
+        104,
+        138
+      ],
+      "milestoneNotes": "#134 reset contract",
+      "estimateText": "4",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 163,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/163",
+        "state": "closed",
+        "mergedAt": "2026-10-12T19:29:31Z",
+        "mergedLocal": "2026-10-13 02:29 +07:00",
+        "author": "hoang3003",
+        "head": "e144500c5d284ed87b833f43d146dce84898def8",
+        "merge": "b8a3497740011c4f69f3d2a6b6c1fd8908ab71d5"
+      }
+    },
+    {
+      "issue": 168,
+      "title": "[Task] S3-T36 — Display TMDb popularity on movie cards and details",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "vu-huzy"
+      ],
+      "reviewer": "kietxuan",
+      "reviewReceipt": {
+        "pr": 175,
+        "reviewer": "kietxuan",
+        "state": "APPROVED",
+        "commit": "28114438098116b3e28e0ef081629b9680bdcaf1",
+        "body": "Please update PR #175's manual verification and evidence to use real TMDb-imported movies instead of the synthetic M2 catalogue.\n\nRequired changes:\n\n1. Configure the backend to use a database with an active TMDb-imported catalogue. Verify that the active catalogue revision has provider `tmdb`. Do not run the M2 bootstrap against this database.\n\n2. Keep the current implementation: read `popularityScore` from our backend API. Do not add frontend TMDb requests, expose tokens, change ranking, or add frontend sorting.\n\n3. Capture `/popular` on desktop and mobile:\n   - Show real TMDb movie titles and visible popularity values.\n   - Include the corresponding `GET /api/movies/popular?limit=10` response.\n   - Verify displayed order matches the API order, including higher/lower scores and ties.\n\n4. Open one of those movies:\n   - Capture its details page and `GET /api/movies/<movieId>` response.\n   - Verify the movie ID and displayed popularity agree with the card.\n   - Use the same catalogue revision for the API/UI comparison.\n   - Confirm public details still work for guests without private rating requests.\n\n5. Update the PR description with:\n   - The tested commit SHA.\n   - Catalogue provider, revision and imported movie count.\n   - Actual test/lint/build results.\n   - Clearly labelled screenshots and matching API evidence.\n\nKeep automated tests synthetic and independent of live TMDb. The live-data verification is a separate manual smoke test.\n\nIf the existing database already contains imported TMDb movies, reuse it without reseeding or re-importing. Use a disposable database if a fresh import is necessary.",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/175#pullrequestreview-5544475690",
+        "submitted_at": "2026-10-16T07:39:58Z",
+        "contributors": [
+          "vu-huzy"
+        ]
+      },
+      "hardDependencies": [
+        112,
+        119,
+        121,
+        122
+      ],
+      "milestoneNotes": null,
+      "estimateText": "4",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 175,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/175",
+        "state": "closed",
+        "mergedAt": "2026-10-16T12:08:47Z",
+        "mergedLocal": "2026-10-16 19:08 +07:00",
+        "author": "vu-huzy",
+        "head": "0a7b94ac6d37e5ab7bc168b6306288ff89eb8a49",
+        "merge": "2bf6d36b566a1b97a1eec7353be72790d218c9e5"
+      }
+    },
+    {
+      "issue": 179,
+      "title": "[Task] S3-T37 — Display movie-detail backdrops with safe fallback and navigation",
+      "kind": "Task",
+      "state": "closed",
+      "assignees": [
+        "hoang3003"
+      ],
+      "reviewer": "NguyenTuanAnh0608",
+      "reviewReceipt": {
+        "pr": 182,
+        "reviewer": "NguyenTuanAnh0608",
+        "state": "APPROVED",
+        "commit": "82df8ba5abd30e66b678e0bc36adf6532c559b8f",
+        "body": "iko",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/182#pullrequestreview-5558661763",
+        "submitted_at": "2026-10-17T16:05:44Z",
+        "contributors": [
+          "hoang3003"
+        ]
+      },
+      "hardDependencies": [
+        129,
+        130
+      ],
+      "milestoneNotes": "#134 media contract, admitted G3 and a coordinated single-writer slot",
+      "estimateText": "4",
+      "originalPlannedDay": null,
+      "originalPlannedDayBasis": "Not recorded in retrieved issue body; no past day assignment is invented",
+      "pr": {
+        "number": 182,
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/182",
+        "state": "closed",
+        "mergedAt": "2026-10-17T16:08:34Z",
+        "mergedLocal": "2026-10-17 23:08 +07:00",
+        "author": "hoang3003",
+        "head": "82df8ba5abd30e66b678e0bc36adf6532c559b8f",
+        "merge": "83d689da4e13b6e9fa5f58f55db1b1b59817b887"
+      }
+    }
+  ],
+  "storyAudit": [
+    {
+      "issue": 17,
+      "title": "[Story] S01 - Select favorite genres to start choosing a movie",
+      "priority": "P0",
+      "points": 3,
+      "issueState": "open",
+      "acceptanceStatus": "partly works",
+      "statusBasis": "Functional evidence exists; final T25 sign-off/review/human details remain pending; not all final DoD gates are asserted",
+      "rows": [
+        {
+          "ac": 1,
+          "text": "Given I am signed in on the home page, when I select Start, then the system opens `/preferences` and displays the available genres.",
+          "implementationIssues": [
+            106
+          ],
+          "implementationBaselineFiles": [],
+          "verificationIssues": [
+            105,
+            124
+          ],
+          "finalHandoffIssue": 127,
+          "finalHandoffPr": 184
+        },
+        {
+          "ac": 2,
+          "text": "Given I select 1 to 5 valid genres while signed in, when I confirm my selection, then the system saves the choices for my account and navigates to `/recommendations`.",
+          "implementationIssues": [
+            103,
+            104,
+            107
+          ],
+          "implementationBaselineFiles": [],
+          "verificationIssues": [
+            105,
+            124
+          ],
+          "finalHandoffIssue": 127,
+          "finalHandoffPr": 184
+        },
+        {
+          "ac": 3,
+          "text": "Given I have not selected any genre, when I confirm, then the system asks me to select at least one genre and keeps me on the same screen.",
+          "implementationIssues": [
+            104,
+            106,
+            107
+          ],
+          "implementationBaselineFiles": [],
+          "verificationIssues": [
+            105,
+            124
+          ],
+          "finalHandoffIssue": 127,
+          "finalHandoffPr": 184
+        },
+        {
+          "ac": 4,
+          "text": "Given I have selected 5 genres, when I try to select a sixth genre, then the system shows the limit and keeps the previous 5 selections.",
+          "implementationIssues": [
+            104,
+            106,
+            107
+          ],
+          "implementationBaselineFiles": [],
+          "verificationIssues": [
+            105,
+            124
+          ],
+          "finalHandoffIssue": 127,
+          "finalHandoffPr": 184
+        },
+        {
+          "ac": 5,
+          "text": "Given my signed-in account already has preferences, when I return to edit them, then the system shows my current selections and another account cannot see them.",
+          "implementationIssues": [
+            103,
+            104,
+            107
+          ],
+          "implementationBaselineFiles": [],
+          "verificationIssues": [
+            105,
+            124
+          ],
+          "finalHandoffIssue": 127,
+          "finalHandoffPr": 184
+        }
+      ]
+    },
+    {
+      "issue": 18,
+      "title": "[Story] S02 - Get a movie list based on preferences",
+      "priority": "P0",
+      "points": 5,
+      "issueState": "open",
+      "acceptanceStatus": "partly works",
+      "statusBasis": "Functional evidence exists; final T25 sign-off/review/human details remain pending; not all final DoD gates are asserted",
+      "rows": [
+        {
+          "ac": 1,
+          "text": "Given the signed-in account has selected valid favourite genres and matching movies exist, When recommendations are requested, Then the system displays up to 10 distinct movies that each match at least one selected genre.",
+          "implementationIssues": [
+            109,
+            110,
+            112
+          ],
+          "implementationBaselineFiles": [],
+          "verificationIssues": [
+            114
+          ],
+          "finalHandoffIssue": 127,
+          "finalHandoffPr": 184
+        },
+        {
+          "ac": 2,
+          "text": "Given recommendation results are displayed, When the user views a movie card, Then the card shows the movie title, genres, and a clear reason that names at least one matching selected genre.",
+          "implementationIssues": [
+            110,
+            112
+          ],
+          "implementationBaselineFiles": [],
+          "verificationIssues": [
+            114
+          ],
+          "finalHandoffIssue": 127,
+          "finalHandoffPr": 184
+        },
+        {
+          "ac": 3,
+          "text": "Given no movies match the selected genres, When recommendations are requested, Then the system shows a no-match message, up to 10 popular alternative movies, and actions to change preferences or retry.",
+          "implementationIssues": [
+            110,
+            111,
+            113
+          ],
+          "implementationBaselineFiles": [],
+          "verificationIssues": [
+            114
+          ],
+          "finalHandoffIssue": 127,
+          "finalHandoffPr": 184
+        },
+        {
+          "ac": 4,
+          "text": "Given the recommendation source fails, When recommendations are requested, Then the system shows an error message and a retry action while keeping the selected preferences unchanged.",
+          "implementationIssues": [
+            111,
+            113
+          ],
+          "implementationBaselineFiles": [],
+          "verificationIssues": [
+            114
+          ],
+          "finalHandoffIssue": 127,
+          "finalHandoffPr": 184
+        },
+        {
+          "ac": 5,
+          "text": "Given the user retries after a recommendation-source failure, When the request succeeds, Then the system displays the recommendation results.",
+          "implementationIssues": [
+            113
+          ],
+          "implementationBaselineFiles": [],
+          "verificationIssues": [
+            114
+          ],
+          "finalHandoffIssue": 127,
+          "finalHandoffPr": 184
+        }
+      ]
+    },
+    {
+      "issue": 19,
+      "title": "[Story] S03 - View movie details before deciding",
+      "priority": "P0",
+      "points": 3,
+      "issueState": "open",
+      "acceptanceStatus": "partly works",
+      "statusBasis": "Functional evidence exists; final T25 sign-off/review/human details remain pending; not all final DoD gates are asserted",
+      "rows": [
+        {
+          "ac": 1,
+          "text": "Given a movie card has a valid ID, when I select View details, then the system opens the correct route and displays the movie title, year, genres, and summary.",
+          "implementationIssues": [],
+          "implementationBaselineFiles": [
+            "backend/app/main.py",
+            "backend/app/repositories/movies.py",
+            "frontend/src/pages/MovieDetailPage.tsx"
+          ],
+          "verificationIssues": [
+            120
+          ],
+          "finalHandoffIssue": 127,
+          "finalHandoffPr": 184
+        },
+        {
+          "ac": 2,
+          "text": "Given the movie ID does not exist, when I open the details URL, then the system shows “Movie not found” and a link back to the movie list.",
+          "implementationIssues": [],
+          "implementationBaselineFiles": [
+            "backend/app/main.py",
+            "backend/app/repositories/movies.py",
+            "frontend/src/pages/MovieDetailPage.tsx"
+          ],
+          "verificationIssues": [
+            120
+          ],
+          "finalHandoffIssue": 127,
+          "finalHandoffPr": 184
+        },
+        {
+          "ac": 3,
+          "text": "Given the movie is missing a summary or year, when I open the details page, then the system shows “Information unavailable” for the missing field and still displays the remaining fields.",
+          "implementationIssues": [],
+          "implementationBaselineFiles": [
+            "backend/app/main.py",
+            "backend/app/repositories/movies.py",
+            "frontend/src/pages/MovieDetailPage.tsx"
+          ],
+          "verificationIssues": [
+            120
+          ],
+          "finalHandoffIssue": 127,
+          "finalHandoffPr": 184
+        },
+        {
+          "ac": 4,
+          "text": "Given I am viewing movie details, when I return to the movie list, then I can continue the recommendation flow with the signed-in account's saved preferences preserved.",
+          "implementationIssues": [
+            107,
+            112,
+            119
+          ],
+          "implementationBaselineFiles": [
+            "backend/app/main.py",
+            "backend/app/repositories/movies.py",
+            "frontend/src/pages/MovieDetailPage.tsx"
+          ],
+          "verificationIssues": [
+            120
+          ],
+          "finalHandoffIssue": 127,
+          "finalHandoffPr": 184
+        }
+      ]
+    },
+    {
+      "issue": 20,
+      "title": "[Story] S04 - Explore movies without preferences",
+      "priority": "P0",
+      "points": 5,
+      "issueState": "open",
+      "acceptanceStatus": "partly works",
+      "statusBasis": "Functional evidence exists; final T25 sign-off/review/human details remain pending; not all final DoD gates are asserted",
+      "rows": [
+        {
+          "ac": 1,
+          "text": "Given a newly signed-in account has no preferences and the fallback dataset contains Movie A with popularity score 90, Movie B with score 80, and Movie C with score 80, when I open the recommendations page, then Movie A appears first and Movies B and C are ordered alphabetically by title, with at most 10 movies displayed and marked as not personalised.",
+          "implementationIssues": [
+            110,
+            112,
+            115
+          ],
+          "implementationBaselineFiles": [],
+          "verificationIssues": [
+            116
+          ],
+          "finalHandoffIssue": 127,
+          "finalHandoffPr": 184
+        },
+        {
+          "ac": 2,
+          "text": "Given I am viewing the fallback movie list, when I select Enter preferences, then the system navigates to `/preferences`.",
+          "implementationIssues": [
+            106,
+            115
+          ],
+          "implementationBaselineFiles": [],
+          "verificationIssues": [
+            116
+          ],
+          "finalHandoffIssue": 127,
+          "finalHandoffPr": 184
+        },
+        {
+          "ac": 3,
+          "text": "Given the popular movie data is empty, when I open the recommendations page in a newly signed-in account, then the system shows a no-data message and guidance to enter preferences without displaying fake movies.",
+          "implementationIssues": [
+            111,
+            112,
+            113,
+            115
+          ],
+          "implementationBaselineFiles": [],
+          "verificationIssues": [
+            116
+          ],
+          "finalHandoffIssue": 127,
+          "finalHandoffPr": 184
+        },
+        {
+          "ac": 4,
+          "text": "Given valid preferences have been saved, when I open the recommendations page again, then the system uses the personalized behavior from S02 and follows BR4 if the result is empty.",
+          "implementationIssues": [
+            104,
+            107,
+            110,
+            112,
+            113,
+            115
+          ],
+          "implementationBaselineFiles": [],
+          "verificationIssues": [
+            116
+          ],
+          "finalHandoffIssue": 127,
+          "finalHandoffPr": 184
+        }
+      ]
+    },
+    {
+      "issue": 44,
+      "title": "[Story] S12 - Register an account to save personalisation",
+      "priority": "P0",
+      "points": 3,
+      "issueState": "closed",
+      "acceptanceStatus": "partly works",
+      "statusBasis": "Functional evidence exists; final T25 sign-off/review/human details remain pending; not all final DoD gates are asserted",
+      "rows": [
+        {
+          "ac": 1,
+          "text": "Given I enter a valid email address and a password with at least 8 characters,\n  when I submit the registration form, then the system creates one account and\n  sends me to `/login`.",
+          "implementationIssues": [],
+          "implementationBaselineFiles": [
+            "backend/app/main.py",
+            "backend/app/repositories/users.py",
+            "backend/app/security/passwords.py",
+            "frontend/src/pages/RegisterPage.tsx"
+          ],
+          "verificationIssues": [],
+          "finalHandoffIssue": 127,
+          "finalHandoffPr": 184
+        },
+        {
+          "ac": 2,
+          "text": "Given `user@example.com` is already registered, when I register\n  `USER@example.com`, then the system does not create another account and shows\n  `This email is already registered`.",
+          "implementationIssues": [],
+          "implementationBaselineFiles": [
+            "backend/app/main.py",
+            "backend/app/repositories/users.py",
+            "backend/app/security/passwords.py",
+            "frontend/src/pages/RegisterPage.tsx"
+          ],
+          "verificationIssues": [],
+          "finalHandoffIssue": 127,
+          "finalHandoffPr": 184
+        },
+        {
+          "ac": 3,
+          "text": "Given I enter an invalid email address or a password shorter than 8 characters,\n  when I submit the form, then the system shows a validation message and does\n  not create an account.",
+          "implementationIssues": [],
+          "implementationBaselineFiles": [
+            "backend/app/main.py",
+            "backend/app/repositories/users.py",
+            "backend/app/security/passwords.py",
+            "frontend/src/pages/RegisterPage.tsx"
+          ],
+          "verificationIssues": [],
+          "finalHandoffIssue": 127,
+          "finalHandoffPr": 184
+        },
+        {
+          "ac": 4,
+          "text": "Given registration succeeds, when the account is stored, then the password is\n  stored only as a secure hash and is never returned by an API response.",
+          "implementationIssues": [],
+          "implementationBaselineFiles": [
+            "backend/app/main.py",
+            "backend/app/repositories/users.py",
+            "backend/app/security/passwords.py",
+            "frontend/src/pages/RegisterPage.tsx"
+          ],
+          "verificationIssues": [],
+          "finalHandoffIssue": 127,
+          "finalHandoffPr": 184
+        }
+      ]
+    },
+    {
+      "issue": 45,
+      "title": "[Story] S13 - Sign in and sign out of my account",
+      "priority": "P0",
+      "points": 5,
+      "issueState": "closed",
+      "acceptanceStatus": "partly works",
+      "statusBasis": "Functional evidence exists; final T25 sign-off/review/human details remain pending; not all final DoD gates are asserted",
+      "rows": [
+        {
+          "ac": 1,
+          "text": "Given I enter the correct registered email and password, when I sign in, then\n  the system creates an authenticated session and opens `/recommendations`.",
+          "implementationIssues": [],
+          "implementationBaselineFiles": [
+            "backend/app/main.py",
+            "backend/app/security/sessions.py",
+            "frontend/src/auth/AuthContext.tsx",
+            "frontend/src/auth/RequireAuth.tsx"
+          ],
+          "verificationIssues": [
+            125,
+            140,
+            141
+          ],
+          "finalHandoffIssue": 127,
+          "finalHandoffPr": 184
+        },
+        {
+          "ac": 2,
+          "text": "Given I enter an unknown email or an incorrect password, when I sign in, then\n  the system shows `Email or password is incorrect` without stating which field\n  was wrong.",
+          "implementationIssues": [],
+          "implementationBaselineFiles": [
+            "backend/app/main.py",
+            "backend/app/security/sessions.py",
+            "frontend/src/auth/AuthContext.tsx",
+            "frontend/src/auth/RequireAuth.tsx"
+          ],
+          "verificationIssues": [
+            125,
+            140,
+            141
+          ],
+          "finalHandoffIssue": 127,
+          "finalHandoffPr": 184
+        },
+        {
+          "ac": 3,
+          "text": "Given I am signed out and open `/preferences` or try to save a rating, when\n  the protected action is requested, then the system sends me to `/login` and\n  does not read or save personalisation data.",
+          "implementationIssues": [
+            137,
+            138,
+            139
+          ],
+          "implementationBaselineFiles": [
+            "backend/app/main.py",
+            "backend/app/security/sessions.py",
+            "frontend/src/auth/AuthContext.tsx",
+            "frontend/src/auth/RequireAuth.tsx"
+          ],
+          "verificationIssues": [
+            125,
+            140,
+            141
+          ],
+          "finalHandoffIssue": 127,
+          "finalHandoffPr": 184
+        },
+        {
+          "ac": 4,
+          "text": "Given I am signed in, when I select Sign out, then the system invalidates the\n  current authenticated session, opens `/`, and a later request to `/preferences`\n  sends me to `/login`.",
+          "implementationIssues": [
+            139
+          ],
+          "implementationBaselineFiles": [
+            "backend/app/main.py",
+            "backend/app/security/sessions.py",
+            "frontend/src/auth/AuthContext.tsx",
+            "frontend/src/auth/RequireAuth.tsx"
+          ],
+          "verificationIssues": [
+            125,
+            140,
+            141
+          ],
+          "finalHandoffIssue": 127,
+          "finalHandoffPr": 184
+        },
+        {
+          "ac": 5,
+          "text": "Given Account A has saved preferences or ratings, when Account B signs in,\n  then Account B cannot view, update, reset, or receive recommendations from\n  Account A's personalisation data.",
+          "implementationIssues": [
+            103,
+            104,
+            110,
+            137,
+            138,
+            139,
+            142
+          ],
+          "implementationBaselineFiles": [
+            "backend/app/main.py",
+            "backend/app/security/sessions.py",
+            "frontend/src/auth/AuthContext.tsx",
+            "frontend/src/auth/RequireAuth.tsx"
+          ],
+          "verificationIssues": [
+            125,
+            140,
+            141
+          ],
+          "finalHandoffIssue": 127,
+          "finalHandoffPr": 184
+        }
+      ]
+    }
+  ],
+  "contributions": [
+    {
+      "member": "kietxuan",
+      "authoredMergedPr": 183,
+      "authoredMergedPrUrl": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/183",
+      "closedAssignedIssue": 131,
+      "closedIssueUrl": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/131",
+      "reviewGivenPr": 182,
+      "reviewGivenUrl": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/182#pullrequestreview-5558585526",
+      "reviewCommit": "0f8e352a0f0ff3f8a98e84b61e15e70f23936451",
+      "receivedIndependentApproval": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/183#pullrequestreview-5558919091",
+      "limitation": "Formal review evidence only; depth and manual reproduction are not inferred from APPROVED state"
+    },
+    {
+      "member": "hoang3003",
+      "authoredMergedPr": 182,
+      "authoredMergedPrUrl": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/182",
+      "closedAssignedIssue": 179,
+      "closedIssueUrl": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/179",
+      "reviewGivenPr": 183,
+      "reviewGivenUrl": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/183#pullrequestreview-5558919091",
+      "reviewCommit": "f42c965018c9d76f4234f9255f1246d14e0af08f",
+      "receivedIndependentApproval": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/182#pullrequestreview-5558661763",
+      "limitation": "Formal review evidence only; depth and manual reproduction are not inferred from APPROVED state"
+    },
+    {
+      "member": "anotify-vie",
+      "authoredMergedPr": 178,
+      "authoredMergedPrUrl": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/178",
+      "closedAssignedIssue": 125,
+      "closedIssueUrl": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/125",
+      "reviewGivenPr": 182,
+      "reviewGivenUrl": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/182#pullrequestreview-5558658388",
+      "reviewCommit": "82df8ba5abd30e66b678e0bc36adf6532c559b8f",
+      "receivedIndependentApproval": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/178#pullrequestreview-5553320786",
+      "limitation": "Formal review evidence only; depth and manual reproduction are not inferred from APPROVED state"
+    },
+    {
+      "member": "vu-huzy",
+      "authoredMergedPr": 175,
+      "authoredMergedPrUrl": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/175",
+      "closedAssignedIssue": 168,
+      "closedIssueUrl": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/168",
+      "reviewGivenPr": 177,
+      "reviewGivenUrl": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/177#pullrequestreview-5547564818",
+      "reviewCommit": "bf65d4650abb64c5ba5c47e9b1e5a607fc75aa6d",
+      "receivedIndependentApproval": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/175#pullrequestreview-5544475690",
+      "limitation": "Formal review evidence only; depth and manual reproduction are not inferred from APPROVED state"
+    },
+    {
+      "member": "NguyenTuanAnh0608",
+      "authoredMergedPr": 174,
+      "authoredMergedPrUrl": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/174",
+      "closedAssignedIssue": 124,
+      "closedIssueUrl": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/124",
+      "reviewGivenPr": 182,
+      "reviewGivenUrl": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/182#pullrequestreview-5558661763",
+      "reviewCommit": "82df8ba5abd30e66b678e0bc36adf6532c559b8f",
+      "receivedIndependentApproval": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/174#pullrequestreview-5547567313",
+      "limitation": "Formal review evidence only; depth and manual reproduction are not inferred from APPROVED state"
+    }
+  ],
+  "capacity": {
+    "historicalAvailability": null,
+    "actualRemainingHours": null,
+    "confirmedSevenDayCommitment": false,
+    "source": "Not supplied; local plan estimates are not member-confirmed availability",
+    "remainingOwners": [
+      {
+        "member": "kietxuan",
+        "work": [
+          132
+        ],
+        "hours": null
+      },
+      {
+        "member": "hoang3003",
+        "work": [
+          134
+        ],
+        "hours": null
+      },
+      {
+        "member": "anotify-vie",
+        "work": [
+          136
+        ],
+        "hours": null
+      },
+      {
+        "member": "vu-huzy",
+        "work": [
+          133
+        ],
+        "hours": null
+      },
+      {
+        "member": "NguyenTuanAnh0608",
+        "work": [],
+        "hours": null,
+        "note": "C04 already closed; setup/review follow-up if requested"
+      }
+    ]
+  },
+  "g3": {
+    "basis": "PO previously confirmed PO and SM agreed to implement backdrop in chat; implementation PRs are merged",
+    "originalDecisionTimestamp": null,
+    "originalCapacityRecord": null,
+    "doNotInfer": "Later prerequisite test results do not establish that all checks were available at the earlier admission time"
+  },
+  "openGates": [
+    "Member-confirmed capacity/remaining effort and original commitment if available",
+    "Manual Project membership/status/points/Story-iteration reconciliation",
+    "Independent C01 closeout review and merge",
+    "T25 is merged/closed, but final independent sign-off, participant details and C04 review clarification still need real records",
+    "C03 final contract reconciliation, C05 four-section dossier/design/PDF and C02 final wrap-up remain their owners' work"
+  ],
+  "safety": {
+    "scope": "README, C01 docs/evidence, supplied images, issue metadata only; no Story AC/points or product implementation changes",
+    "database": "Primary database hash unavailable due running-process lock; no main DB read-write, migration/import/seed or server stop performed; backend verification uses isolated runner",
+    "env": "Not read for credentials, not edited, not committed"
+  },
+  "parentChecks": {
+    "127": "REST parent request returned 404; no hierarchy mutation performed",
+    "128": "REST parent request returned 404; no hierarchy mutation performed"
+  },
+  "productApplicationEquivalentTo": "0c4273ab792becb060fefd5e7341e755ed28d0a5",
+  "externalChangesDuringWork": [
+    {
+      "issue": 127,
+      "change": "PR184 merged externally during C01 work; issue127 closed automatically",
+      "mergedAt": "2026-10-18T09:37:21Z",
+      "merge": "4ff81ab30df8cf448c3796f748b9451496e403c5",
+      "agentClosedIssue": false
+    }
+  ],
+  "reviewLimitations": {
+    "T25": "PR184 merged at 4ff81ab; only observed approval is kietxuan at older 4f3b2d2. Kiet authored follow-up aed85fb. No non-contributor approval of final head was observed.",
+    "C04": "PR185 merged; only observed approval is kietxuan, also a follow-up contributor. Independent review clarification remains unrecorded."
+  }
+}

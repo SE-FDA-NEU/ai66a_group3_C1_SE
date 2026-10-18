@@ -1,0 +1,35 @@
+name: Sprint 3 C01 documentation
+
+on:
+  push:
+    paths:
+      - "README.md"
+      - "docs/sprint3-backlog-refinement.md"
+      - "docs/evidence/s3-c01-backlog/**"
+      - "docs/images/sprint3/**"
+      - "scripts/verify-s3-c01-docs.mjs"
+      - ".github/workflows/c01-docs.yml"
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "README.md"
+      - "docs/sprint3-backlog-refinement.md"
+      - "docs/evidence/s3-c01-backlog/**"
+      - "docs/images/sprint3/**"
+      - "scripts/verify-s3-c01-docs.mjs"
+      - ".github/workflows/c01-docs.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  s3-c01-docs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Check C01 evidence, entry points, links and dependency graph
+        run: node scripts/verify-s3-c01-docs.mjs
