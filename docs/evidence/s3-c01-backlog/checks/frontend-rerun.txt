@@ -1,0 +1,15 @@
+
+> frontend@0.0.0 test
+> vitest run
+
+
+ RUN  v5.0.2 C:/Users/Admin/Desktop/Ki 1 Nam 3/Kỹ thuật phần mềm - Software Engineering/ai66a_group3_C1_SE/frontend
+
+
+ Test Files  20 passed (20)
+      Tests  236 passed (236)
+   Start at  16:35:59
+   Duration  6.58s (environment 50%, tests 35%, import 11%, transform 4%)
+
+    Isolate  20 workers spawned · ~2.10s startup each (spawn + environment, per file)
+             at least ~701ms faster with isolate: false — reuses workers across files instead of one per file

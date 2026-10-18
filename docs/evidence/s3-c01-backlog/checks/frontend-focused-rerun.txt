@@ -1,0 +1,12 @@
+
+> frontend@0.0.0 test
+> vitest run src/tests/movie-detail-rating.test.tsx
+
+
+ RUN  v5.0.2 C:/Users/Admin/Desktop/Ki 1 Nam 3/Kỹ thuật phần mềm - Software Engineering/ai66a_group3_C1_SE/frontend
+
+
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+   Start at  16:35:56
+   Duration  2.11s (environment 54%, tests 17%, transform 15%, import 13%)

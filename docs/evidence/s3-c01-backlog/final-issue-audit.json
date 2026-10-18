@@ -1,0 +1,654 @@
+{
+  "recordedAtUtc": "2026-10-18T09:46:56.5452599Z",
+  "inventory": [
+    {
+      "issue": 43,
+      "state": "closed",
+      "assignees": [
+        "kietxuan"
+      ],
+      "owner": "kietxuan",
+      "reviewer": "anotify-vie",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "c83bdba3c3edcf13129832faee13e6610ea68baeb1a9225f4961fe5ce10ff3b7",
+      "updatedAt": "2026-10-18T09:35:46Z"
+    },
+    {
+      "issue": 103,
+      "state": "closed",
+      "assignees": [
+        "vu-huzy"
+      ],
+      "owner": "vu-huzy",
+      "reviewer": "kietxuan",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "045e5516b0ba33ef8bb0159eb2ad82c4bdf6ff53b42b9ed32f0afc04917c886d",
+      "updatedAt": "2026-10-18T09:35:49Z"
+    },
+    {
+      "issue": 104,
+      "state": "closed",
+      "assignees": [
+        "kietxuan"
+      ],
+      "owner": "kietxuan",
+      "reviewer": "hoang3003",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "fa5624d841061f0fa6b05860dba0676233c85c369b5f9f5f437582d50b1a768a",
+      "updatedAt": "2026-10-18T09:35:51Z"
+    },
+    {
+      "issue": 105,
+      "state": "closed",
+      "assignees": [
+        "NguyenTuanAnh0608"
+      ],
+      "owner": "NguyenTuanAnh0608",
+      "reviewer": "hoang3003",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "4e833d314d71a10531b6d646b8c71a02588c62ecf495c906d97578667789afd0",
+      "updatedAt": "2026-10-18T09:35:54Z"
+    },
+    {
+      "issue": 106,
+      "state": "closed",
+      "assignees": [
+        "NguyenTuanAnh0608"
+      ],
+      "owner": "NguyenTuanAnh0608",
+      "reviewer": "hoang3003",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "be89070a6664fd97d65cbecb22e51e35fd66962db47cdc4ac597b5f7961aaa96",
+      "updatedAt": "2026-10-18T09:35:56Z"
+    },
+    {
+      "issue": 107,
+      "state": "closed",
+      "assignees": [
+        "anotify-vie"
+      ],
+      "owner": "anotify-vie",
+      "reviewer": "hoang3003",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "a48bc59285e398a02b926d1abcbcf0bfa7f5c4939477bfb6270a22f8fb971b45",
+      "updatedAt": "2026-10-18T09:35:59Z"
+    },
+    {
+      "issue": 108,
+      "state": "closed",
+      "assignees": [
+        "NguyenTuanAnh0608"
+      ],
+      "owner": "NguyenTuanAnh0608",
+      "reviewer": "anotify-vie",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "0e2b3fc3b7b7612f0792bb7db66cdb0202d51e3f5c50fd1188635ec302744a16",
+      "updatedAt": "2026-10-18T09:36:01Z"
+    },
+    {
+      "issue": 109,
+      "state": "closed",
+      "assignees": [
+        "vu-huzy"
+      ],
+      "owner": "vu-huzy",
+      "reviewer": "kietxuan",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "955a6786bf74278528b72ac756b3766b826f173592c88b7bb8674034041001b6",
+      "updatedAt": "2026-10-18T09:36:04Z"
+    },
+    {
+      "issue": 110,
+      "state": "closed",
+      "assignees": [
+        "hoang3003"
+      ],
+      "owner": "hoang3003",
+      "reviewer": "anotify-vie",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "592a4a1545350f05ecefbfd4d14eb8e8ecde615b38077e41a1e102a89c675fd9",
+      "updatedAt": "2026-10-18T09:36:06Z"
+    },
+    {
+      "issue": 111,
+      "state": "closed",
+      "assignees": [
+        "kietxuan"
+      ],
+      "owner": "kietxuan",
+      "reviewer": "NguyenTuanAnh0608",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "a0d2742f554c2fcfd79a7702c71d0d62f1f55d0f6d9168581d172d53c952b01e",
+      "updatedAt": "2026-10-18T09:36:08Z"
+    },
+    {
+      "issue": 112,
+      "state": "closed",
+      "assignees": [
+        "vu-huzy"
+      ],
+      "owner": "vu-huzy",
+      "reviewer": "NguyenTuanAnh0608",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "784cc48f6dfc5420d38e75ac18286d6c35e0ab5be9da0f8ab93b3bb9ebbe79d2",
+      "updatedAt": "2026-10-18T09:36:10Z"
+    },
+    {
+      "issue": 113,
+      "state": "closed",
+      "assignees": [
+        "NguyenTuanAnh0608"
+      ],
+      "owner": "NguyenTuanAnh0608",
+      "reviewer": "kietxuan",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "45f738e9329aed1f615718c3abdbf7197da4095d03ecf57d694e99a71c02d2db",
+      "updatedAt": "2026-10-18T09:36:13Z"
+    },
+    {
+      "issue": 114,
+      "state": "closed",
+      "assignees": [
+        "hoang3003"
+      ],
+      "owner": "hoang3003",
+      "reviewer": "kietxuan",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "c8a2d44ab9f9f92a55f1ede99ada2a1421891c6445e1dd3725c33faaff86f5b6",
+      "updatedAt": "2026-10-18T09:36:16Z"
+    },
+    {
+      "issue": 115,
+      "state": "closed",
+      "assignees": [
+        "anotify-vie"
+      ],
+      "owner": "anotify-vie",
+      "reviewer": "kietxuan",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "5c21747c83417065e538d9d3625ea6a1e803c6a7626a701278086e637ab9e8f0",
+      "updatedAt": "2026-10-18T09:36:18Z"
+    },
+    {
+      "issue": 116,
+      "state": "closed",
+      "assignees": [
+        "anotify-vie"
+      ],
+      "owner": "anotify-vie",
+      "reviewer": "kietxuan",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "bd48c5a27dd9ccc59ca53be6bb610257bd6390ac388b1bcdac08dce1f9b8c3fc",
+      "updatedAt": "2026-10-18T09:36:20Z"
+    },
+    {
+      "issue": 117,
+      "state": "closed",
+      "assignees": [
+        "kietxuan"
+      ],
+      "owner": "kietxuan",
+      "reviewer": "vu-huzy",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "183252658a8e1df9764cd791081ccf9550540e1d0885f3c52f84157618e231a6",
+      "updatedAt": "2026-10-18T09:36:24Z"
+    },
+    {
+      "issue": 118,
+      "state": "closed",
+      "assignees": [
+        "kietxuan"
+      ],
+      "owner": "kietxuan",
+      "reviewer": "NguyenTuanAnh0608",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "a69a760e86b83d4ac2da6fc0c2d47ab4cc55926821662ff17b322c84d8ef9e85",
+      "updatedAt": "2026-10-18T09:36:26Z"
+    },
+    {
+      "issue": 119,
+      "state": "closed",
+      "assignees": [
+        "NguyenTuanAnh0608"
+      ],
+      "owner": "NguyenTuanAnh0608",
+      "reviewer": "kietxuan",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "487a0cfcfe504f8423f51904112c60c9601405651c771413ef8dcd2fca85e289",
+      "updatedAt": "2026-10-18T09:36:29Z"
+    },
+    {
+      "issue": 120,
+      "state": "closed",
+      "assignees": [
+        "vu-huzy"
+      ],
+      "owner": "vu-huzy",
+      "reviewer": "kietxuan",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "44d615cd499d71f950d7c4129f8dbddc0fe31af75f55c43928ab0dff26c06721",
+      "updatedAt": "2026-10-18T09:36:31Z"
+    },
+    {
+      "issue": 121,
+      "state": "closed",
+      "assignees": [
+        "anotify-vie"
+      ],
+      "owner": "anotify-vie",
+      "reviewer": "NguyenTuanAnh0608",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "eb690acdeffb12c789006240abe876b6779eac04513dbaaa5d6a6ef37df02a94",
+      "updatedAt": "2026-10-18T09:36:34Z"
+    },
+    {
+      "issue": 122,
+      "state": "closed",
+      "assignees": [
+        "hoang3003"
+      ],
+      "owner": "hoang3003",
+      "reviewer": "anotify-vie",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "7063bbfc673db3062a773bbe4fdb4933c36ea52b1324b1db066ea4da0f2ea2c1",
+      "updatedAt": "2026-10-18T09:36:36Z"
+    },
+    {
+      "issue": 123,
+      "state": "closed",
+      "assignees": [
+        "hoang3003"
+      ],
+      "owner": "hoang3003",
+      "reviewer": "anotify-vie",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "1c0ef47d04f66d4d5bdb42bfeb063c4848a530c7ac37aa725f05640763178591",
+      "updatedAt": "2026-10-18T09:36:39Z"
+    },
+    {
+      "issue": 124,
+      "state": "closed",
+      "assignees": [
+        "NguyenTuanAnh0608"
+      ],
+      "owner": "NguyenTuanAnh0608",
+      "reviewer": "vu-huzy",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "ac755a353b3703448b9fc9275859246771f41f7f28b0b4ca9d681f2389a4a7e6",
+      "updatedAt": "2026-10-18T09:36:41Z"
+    },
+    {
+      "issue": 125,
+      "state": "closed",
+      "assignees": [
+        "anotify-vie"
+      ],
+      "owner": "anotify-vie",
+      "reviewer": "hoang3003",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "65ed9eb4a8c720f7f6b8915ded245855090582a20c68d214deef089e539dfff7",
+      "updatedAt": "2026-10-18T09:36:44Z"
+    },
+    {
+      "issue": 126,
+      "state": "closed",
+      "assignees": [
+        "vu-huzy"
+      ],
+      "owner": "vu-huzy",
+      "reviewer": "hoang3003",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "97078c43f1c0978ee87176a9fb47c879eab48094e085e840f3d4b963d80b1bae",
+      "updatedAt": "2026-10-18T09:36:46Z"
+    },
+    {
+      "issue": 127,
+      "state": "closed",
+      "assignees": [
+        "anotify-vie"
+      ],
+      "owner": "anotify-vie",
+      "reviewer": "hoang3003",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "52ca0b64f5b0b452cff25eda5778f805e5edec20455cf9f5b73c4fb70f426ed2",
+      "updatedAt": "2026-10-18T09:39:49Z"
+    },
+    {
+      "issue": 128,
+      "state": "closed",
+      "assignees": [
+        "kietxuan"
+      ],
+      "owner": "kietxuan",
+      "reviewer": "vu-huzy",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "b03500322dfb82c3a68cf2496afa435c58f4d8c93d3cc7b150267efe9bb42afd",
+      "updatedAt": "2026-10-18T09:36:51Z"
+    },
+    {
+      "issue": 129,
+      "state": "closed",
+      "assignees": [
+        "kietxuan"
+      ],
+      "owner": "kietxuan",
+      "reviewer": "NguyenTuanAnh0608",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "8460d945def3ddf744e3b0fe018210a71cd2cacded9d13065b9bb9109f805fa3",
+      "updatedAt": "2026-10-18T09:36:54Z"
+    },
+    {
+      "issue": 130,
+      "state": "closed",
+      "assignees": [
+        "NguyenTuanAnh0608"
+      ],
+      "owner": "NguyenTuanAnh0608",
+      "reviewer": "hoang3003",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "35cfcf92b8ec3c865edcf46299f56620523a07a6acd6c43cb84ea4dfb2f93828",
+      "updatedAt": "2026-10-18T09:36:56Z"
+    },
+    {
+      "issue": 131,
+      "state": "closed",
+      "assignees": [
+        "kietxuan"
+      ],
+      "owner": "kietxuan",
+      "reviewer": "hoang3003",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "b1e32d845752935b6a5258c2cc3e1f0ae1cc5cafa39f4aec625a5832a6fa707d",
+      "updatedAt": "2026-10-18T09:36:58Z"
+    },
+    {
+      "issue": 132,
+      "state": "open",
+      "assignees": [
+        "kietxuan"
+      ],
+      "owner": "kietxuan",
+      "reviewer": "hoang3003",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "34e3f0bf9f87c02625f2c4b4f328213c1df0f5737fd005efc230a419f31750d2",
+      "updatedAt": "2026-10-18T09:37:00Z"
+    },
+    {
+      "issue": 133,
+      "state": "open",
+      "assignees": [
+        "vu-huzy"
+      ],
+      "owner": "vu-huzy",
+      "reviewer": "kietxuan",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "1e4f5981bc6f8922151cb0c61099c7ef40192ffdce03c1af9afdc6071ba3b9a0",
+      "updatedAt": "2026-10-07T15:34:17Z"
+    },
+    {
+      "issue": 134,
+      "state": "open",
+      "assignees": [
+        "hoang3003"
+      ],
+      "owner": "hoang3003",
+      "reviewer": "vu-huzy",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "9f73eaa7ed548664eeea615ee79a7f2307a70ce47cf33f64982a4a65cf826716",
+      "updatedAt": "2026-10-18T09:39:51Z"
+    },
+    {
+      "issue": 135,
+      "state": "closed",
+      "assignees": [
+        "NguyenTuanAnh0608"
+      ],
+      "owner": "NguyenTuanAnh0608",
+      "reviewer": "anotify-vie",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "b48840f555f1d74e73979dbd0cf10d20e2212ecb78f75782f02d5cae0d805aa5",
+      "updatedAt": "2026-10-18T08:40:55Z"
+    },
+    {
+      "issue": 136,
+      "state": "open",
+      "assignees": [
+        "anotify-vie"
+      ],
+      "owner": "anotify-vie",
+      "reviewer": "hoang3003",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "849a77493fd6ddfbc85e63f88f3a255f0e004e80b747239e8229f1668d445e14",
+      "updatedAt": "2026-10-18T09:39:53Z"
+    },
+    {
+      "issue": 137,
+      "state": "closed",
+      "assignees": [
+        "anotify-vie"
+      ],
+      "owner": "anotify-vie",
+      "reviewer": "kietxuan",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "1f3b344cc807b1ff5814483c699bbfab00e62b56caa5a698053ff61b6a81fe1f",
+      "updatedAt": "2026-10-18T09:37:09Z"
+    },
+    {
+      "issue": 138,
+      "state": "closed",
+      "assignees": [
+        "vu-huzy"
+      ],
+      "owner": "vu-huzy",
+      "reviewer": "NguyenTuanAnh0608",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "a075cedc4d978801714288b834bbddfa1cdd75ab6cf757c8785ca7617ddcd4ac",
+      "updatedAt": "2026-10-18T09:37:11Z"
+    },
+    {
+      "issue": 139,
+      "state": "closed",
+      "assignees": [
+        "kietxuan"
+      ],
+      "owner": "kietxuan",
+      "reviewer": "NguyenTuanAnh0608",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "bb09c7e2fcdbe590f4d3636c08c7ea1858ca778fbfd7157ddfc9f2965774c7cb",
+      "updatedAt": "2026-10-18T09:37:14Z"
+    },
+    {
+      "issue": 140,
+      "state": "closed",
+      "assignees": [
+        "anotify-vie"
+      ],
+      "owner": "anotify-vie",
+      "reviewer": "NguyenTuanAnh0608",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "7684b1da956546489659427652c775dfc03e55f74f251fb844737b48b18551f1",
+      "updatedAt": "2026-10-18T09:37:16Z"
+    },
+    {
+      "issue": 141,
+      "state": "closed",
+      "assignees": [
+        "hoang3003"
+      ],
+      "owner": "hoang3003",
+      "reviewer": "vu-huzy",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "467cb2f7bfa2f1310186a31600a1c38422de9acc2cf6c519515c297af4e67afa",
+      "updatedAt": "2026-10-18T09:37:18Z"
+    },
+    {
+      "issue": 142,
+      "state": "closed",
+      "assignees": [
+        "hoang3003"
+      ],
+      "owner": "hoang3003",
+      "reviewer": "vu-huzy",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "9d44d271e96002cfd8ea72a6e2b8b209aa2dfd5501c51f9af6d52d704e3709e2",
+      "updatedAt": "2026-10-18T09:37:20Z"
+    },
+    {
+      "issue": 168,
+      "state": "closed",
+      "assignees": [
+        "vu-huzy"
+      ],
+      "owner": "vu-huzy",
+      "reviewer": "kietxuan",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "999843db661afcafef456799ccc5f4c10d585feeb0727da0484048296c68c0e2",
+      "updatedAt": "2026-10-18T09:37:24Z"
+    },
+    {
+      "issue": 179,
+      "state": "closed",
+      "assignees": [
+        "hoang3003"
+      ],
+      "owner": "hoang3003",
+      "reviewer": "NguyenTuanAnh0608",
+      "ownerMatchesAssignee": true,
+      "reviewerDifferentFromOwner": true,
+      "unresolvedLocalCodes": [],
+      "bodySha256": "c9e8c5aba3478e6ce8e09a156e0c21c1df10969c14fafef1f122d1c6b336fd9c",
+      "updatedAt": "2026-10-18T09:37:26Z"
+    }
+  ],
+  "stories": [
+    {
+      "issue": 17,
+      "criterionCount": 5,
+      "criteriaMatchOriginal": true,
+      "points": 3,
+      "pointsUnchanged": true
+    },
+    {
+      "issue": 18,
+      "criterionCount": 5,
+      "criteriaMatchOriginal": true,
+      "points": 5,
+      "pointsUnchanged": true
+    },
+    {
+      "issue": 19,
+      "criterionCount": 4,
+      "criteriaMatchOriginal": true,
+      "points": 3,
+      "pointsUnchanged": true
+    },
+    {
+      "issue": 20,
+      "criterionCount": 4,
+      "criteriaMatchOriginal": true,
+      "points": 5,
+      "pointsUnchanged": true
+    },
+    {
+      "issue": 44,
+      "criterionCount": 4,
+      "criteriaMatchOriginal": true,
+      "points": 3,
+      "pointsUnchanged": true
+    },
+    {
+      "issue": 45,
+      "criterionCount": 5,
+      "criteriaMatchOriginal": true,
+      "points": 5,
+      "pointsUnchanged": true
+    }
+  ],
+  "bodyOnlyChanges": true,
+  "projectFieldsVerified": false,
+  "privateProjectUnchanged": true
+}

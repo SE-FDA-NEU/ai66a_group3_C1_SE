@@ -1,0 +1,678 @@
+{
+  "recordedDateLocal": "2026-10-18",
+  "scope": "Authorized C01 issue-body metadata reconciliation only. No state/assignee/labels/points mutation; acceptance sections verified unchanged.",
+  "changes": [
+    {
+      "issue": 19,
+      "stateBefore": "open",
+      "stateAfter": "open",
+      "assigneesBefore": [
+        "NguyenTuanAnh0608"
+      ],
+      "assigneesAfter": [
+        "NguyenTuanAnh0608"
+      ],
+      "updatedAt": "2026-10-18T09:35:44Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/19",
+      "bodySha256Before": "e0023d8babe8f8fe2fb5b3a7df185d1e9a1453e742c48bf77b0642abc80aeb10",
+      "bodySha256After": "f9451cd5f2eeccd5418a19ce7504b730fddfd9840cb786fc5e8033871f6bd329",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 43,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "kietxuan"
+      ],
+      "assigneesAfter": [
+        "kietxuan"
+      ],
+      "updatedAt": "2026-10-18T09:35:46Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/43",
+      "bodySha256Before": "06bc9976fd6bae82720296be041355cd950953740b1a4a65ec1578e15ed5caf0",
+      "bodySha256After": "c83bdba3c3edcf13129832faee13e6610ea68baeb1a9225f4961fe5ce10ff3b7",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 103,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "vu-huzy"
+      ],
+      "assigneesAfter": [
+        "vu-huzy"
+      ],
+      "updatedAt": "2026-10-18T09:35:49Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/103",
+      "bodySha256Before": "dbb42b3d5a7ed34c77813b9b4d4b68b85e7824dbce9203e04c6fd46df41f288a",
+      "bodySha256After": "045e5516b0ba33ef8bb0159eb2ad82c4bdf6ff53b42b9ed32f0afc04917c886d",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 104,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "kietxuan"
+      ],
+      "assigneesAfter": [
+        "kietxuan"
+      ],
+      "updatedAt": "2026-10-18T09:35:51Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/104",
+      "bodySha256Before": "f53ae45f1493f81af02149bbd2ca92ff7efbf0790f421c0bd2226fb195e0c19f",
+      "bodySha256After": "fa5624d841061f0fa6b05860dba0676233c85c369b5f9f5f437582d50b1a768a",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 105,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "NguyenTuanAnh0608"
+      ],
+      "assigneesAfter": [
+        "NguyenTuanAnh0608"
+      ],
+      "updatedAt": "2026-10-18T09:35:54Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/105",
+      "bodySha256Before": "4c8473329c0ddd7de6c3615c8db02f475f3a83fb85f19a3868209fb22bf115f8",
+      "bodySha256After": "4e833d314d71a10531b6d646b8c71a02588c62ecf495c906d97578667789afd0",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 106,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "NguyenTuanAnh0608"
+      ],
+      "assigneesAfter": [
+        "NguyenTuanAnh0608"
+      ],
+      "updatedAt": "2026-10-18T09:35:56Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/106",
+      "bodySha256Before": "985b102437296bac60e8fb5832e7605d7f967982cfb04281f169df3e7afd9f96",
+      "bodySha256After": "be89070a6664fd97d65cbecb22e51e35fd66962db47cdc4ac597b5f7961aaa96",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 107,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "anotify-vie"
+      ],
+      "assigneesAfter": [
+        "anotify-vie"
+      ],
+      "updatedAt": "2026-10-18T09:35:59Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/107",
+      "bodySha256Before": "cb62444d81eee8ea5742c8e350f83f40384cc28d6446f683108a01c9ce8691bd",
+      "bodySha256After": "a48bc59285e398a02b926d1abcbcf0bfa7f5c4939477bfb6270a22f8fb971b45",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 108,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "NguyenTuanAnh0608"
+      ],
+      "assigneesAfter": [
+        "NguyenTuanAnh0608"
+      ],
+      "updatedAt": "2026-10-18T09:36:01Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/108",
+      "bodySha256Before": "1924530d1c087f9a8dfe6dfb8135b96130da50de904cf342ce474050dea69c49",
+      "bodySha256After": "0e2b3fc3b7b7612f0792bb7db66cdb0202d51e3f5c50fd1188635ec302744a16",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 109,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "vu-huzy"
+      ],
+      "assigneesAfter": [
+        "vu-huzy"
+      ],
+      "updatedAt": "2026-10-18T09:36:04Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/109",
+      "bodySha256Before": "24deec073bb5edcf86a444c83e5a12ee4537220140e6fe5c94897a62b613c91b",
+      "bodySha256After": "955a6786bf74278528b72ac756b3766b826f173592c88b7bb8674034041001b6",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 110,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "hoang3003"
+      ],
+      "assigneesAfter": [
+        "hoang3003"
+      ],
+      "updatedAt": "2026-10-18T09:36:06Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/110",
+      "bodySha256Before": "d23c181c42bbcc634e671566f27f4695d6ef95418fb9da4c94f4fa3f60ffcd09",
+      "bodySha256After": "592a4a1545350f05ecefbfd4d14eb8e8ecde615b38077e41a1e102a89c675fd9",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 111,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "kietxuan"
+      ],
+      "assigneesAfter": [
+        "kietxuan"
+      ],
+      "updatedAt": "2026-10-18T09:36:08Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/111",
+      "bodySha256Before": "cff71e16ec11ea30d15a19163ef82852b6ee03a3b0b48f3adb6a3950df6a4d18",
+      "bodySha256After": "a0d2742f554c2fcfd79a7702c71d0d62f1f55d0f6d9168581d172d53c952b01e",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 112,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "vu-huzy"
+      ],
+      "assigneesAfter": [
+        "vu-huzy"
+      ],
+      "updatedAt": "2026-10-18T09:36:10Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/112",
+      "bodySha256Before": "c59d51b26e0944c2f7a0ec4ae2ac76ad4a5431f6be8c307cc0470ccbcfe7ecf4",
+      "bodySha256After": "784cc48f6dfc5420d38e75ac18286d6c35e0ab5be9da0f8ab93b3bb9ebbe79d2",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 113,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "NguyenTuanAnh0608"
+      ],
+      "assigneesAfter": [
+        "NguyenTuanAnh0608"
+      ],
+      "updatedAt": "2026-10-18T09:36:13Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/113",
+      "bodySha256Before": "23cd7789d74003b53af6cc4d43459144aaeba7dd6bf2c6af033aae98f93f1ed8",
+      "bodySha256After": "45f738e9329aed1f615718c3abdbf7197da4095d03ecf57d694e99a71c02d2db",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 114,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "hoang3003"
+      ],
+      "assigneesAfter": [
+        "hoang3003"
+      ],
+      "updatedAt": "2026-10-18T09:36:16Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/114",
+      "bodySha256Before": "1c74009a38fedf1a1645a04c4ddfa0a4ec6296623bef212fb3a8a10b969d75c2",
+      "bodySha256After": "c8a2d44ab9f9f92a55f1ede99ada2a1421891c6445e1dd3725c33faaff86f5b6",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 115,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "anotify-vie"
+      ],
+      "assigneesAfter": [
+        "anotify-vie"
+      ],
+      "updatedAt": "2026-10-18T09:36:18Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/115",
+      "bodySha256Before": "a52e597e2889f06bd048c6164e4ed8cbb227001c4736da931d94b12b4f9b421f",
+      "bodySha256After": "5c21747c83417065e538d9d3625ea6a1e803c6a7626a701278086e637ab9e8f0",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 116,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "anotify-vie"
+      ],
+      "assigneesAfter": [
+        "anotify-vie"
+      ],
+      "updatedAt": "2026-10-18T09:36:20Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/116",
+      "bodySha256Before": "c10501189b1c54f571dd53f0b7903698caf32176f000007a5814511fe5765989",
+      "bodySha256After": "bd48c5a27dd9ccc59ca53be6bb610257bd6390ac388b1bcdac08dce1f9b8c3fc",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 117,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "kietxuan"
+      ],
+      "assigneesAfter": [
+        "kietxuan"
+      ],
+      "updatedAt": "2026-10-18T09:36:24Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/117",
+      "bodySha256Before": "e09bb164fae55ab54e1b1afd658b73ae7221f3787712580c07f75f57340cc59d",
+      "bodySha256After": "183252658a8e1df9764cd791081ccf9550540e1d0885f3c52f84157618e231a6",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 118,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "kietxuan"
+      ],
+      "assigneesAfter": [
+        "kietxuan"
+      ],
+      "updatedAt": "2026-10-18T09:36:26Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/118",
+      "bodySha256Before": "c82fc237d24ae7acb2ab8ad1e22156b25231650d523fa36f401753f13b9d1d4a",
+      "bodySha256After": "a69a760e86b83d4ac2da6fc0c2d47ab4cc55926821662ff17b322c84d8ef9e85",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 119,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "NguyenTuanAnh0608"
+      ],
+      "assigneesAfter": [
+        "NguyenTuanAnh0608"
+      ],
+      "updatedAt": "2026-10-18T09:36:29Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/119",
+      "bodySha256Before": "378b4c84e077048e5d1e0abf4625ca649d19394b4ad9cd01b074f2b41b8a3ad8",
+      "bodySha256After": "487a0cfcfe504f8423f51904112c60c9601405651c771413ef8dcd2fca85e289",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 120,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "vu-huzy"
+      ],
+      "assigneesAfter": [
+        "vu-huzy"
+      ],
+      "updatedAt": "2026-10-18T09:36:31Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/120",
+      "bodySha256Before": "a1b425652dc9481ba3812fe154f8a2fa12157356b6e84c986c71c15b1b1ba9d0",
+      "bodySha256After": "44d615cd499d71f950d7c4129f8dbddc0fe31af75f55c43928ab0dff26c06721",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 121,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "anotify-vie"
+      ],
+      "assigneesAfter": [
+        "anotify-vie"
+      ],
+      "updatedAt": "2026-10-18T09:36:34Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/121",
+      "bodySha256Before": "e8760d49bc32d2328a04b5755b7bfe7711a65302643f851c199826eb1e1b481a",
+      "bodySha256After": "eb690acdeffb12c789006240abe876b6779eac04513dbaaa5d6a6ef37df02a94",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 122,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "hoang3003"
+      ],
+      "assigneesAfter": [
+        "hoang3003"
+      ],
+      "updatedAt": "2026-10-18T09:36:36Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/122",
+      "bodySha256Before": "8eeb460bacff0ac7156e2ec8cbb06350574f9dd4de2a204d61ef0977d584d66c",
+      "bodySha256After": "7063bbfc673db3062a773bbe4fdb4933c36ea52b1324b1db066ea4da0f2ea2c1",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 123,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "hoang3003"
+      ],
+      "assigneesAfter": [
+        "hoang3003"
+      ],
+      "updatedAt": "2026-10-18T09:36:39Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/123",
+      "bodySha256Before": "5ac6a12fc64831406e7bd160d1df801362ddc156c8ec2f09b39da712af3b319c",
+      "bodySha256After": "1c0ef47d04f66d4d5bdb42bfeb063c4848a530c7ac37aa725f05640763178591",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 124,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "NguyenTuanAnh0608"
+      ],
+      "assigneesAfter": [
+        "NguyenTuanAnh0608"
+      ],
+      "updatedAt": "2026-10-18T09:36:41Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/124",
+      "bodySha256Before": "42c44350efb5f172c5104e5ea6d359639a3b51a888b6e1b8b98da95b51365b92",
+      "bodySha256After": "ac755a353b3703448b9fc9275859246771f41f7f28b0b4ca9d681f2389a4a7e6",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 125,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "anotify-vie"
+      ],
+      "assigneesAfter": [
+        "anotify-vie"
+      ],
+      "updatedAt": "2026-10-18T09:36:44Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/125",
+      "bodySha256Before": "8de7302ebf4c7271e424a751eebac823c3d894d3da304b58c590a709c180a364",
+      "bodySha256After": "65ed9eb4a8c720f7f6b8915ded245855090582a20c68d214deef089e539dfff7",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 126,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "vu-huzy"
+      ],
+      "assigneesAfter": [
+        "vu-huzy"
+      ],
+      "updatedAt": "2026-10-18T09:36:46Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/126",
+      "bodySha256Before": "8755501317a96a186091cbd38bdb5db2e6b5e35edb26056924165684a8753a6b",
+      "bodySha256After": "97078c43f1c0978ee87176a9fb47c879eab48094e085e840f3d4b963d80b1bae",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 127,
+      "stateBefore": "open",
+      "stateAfter": "open",
+      "assigneesBefore": [
+        "anotify-vie"
+      ],
+      "assigneesAfter": [
+        "anotify-vie"
+      ],
+      "updatedAt": "2026-10-18T09:36:49Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/127",
+      "bodySha256Before": "31405e425643ad54f9951278ec7a2d6830d59d3dbf41304e5a6023d0e83873a8",
+      "bodySha256After": "27e744af97b62b24ea2f7af3135af0fcd5f7be9b578427cf42562327e8a3d0d0",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 128,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "kietxuan"
+      ],
+      "assigneesAfter": [
+        "kietxuan"
+      ],
+      "updatedAt": "2026-10-18T09:36:51Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/128",
+      "bodySha256Before": "dd02ecf9df9769588ee6601082d2d397762da61b5a1611f23ddb2bcd081469c4",
+      "bodySha256After": "b03500322dfb82c3a68cf2496afa435c58f4d8c93d3cc7b150267efe9bb42afd",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 129,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "kietxuan"
+      ],
+      "assigneesAfter": [
+        "kietxuan"
+      ],
+      "updatedAt": "2026-10-18T09:36:54Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/129",
+      "bodySha256Before": "554f5fe283d8ffd77b8fbb02094c780a3d2b6554d3d96833595ed1e62f02377d",
+      "bodySha256After": "8460d945def3ddf744e3b0fe018210a71cd2cacded9d13065b9bb9109f805fa3",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 130,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "NguyenTuanAnh0608"
+      ],
+      "assigneesAfter": [
+        "NguyenTuanAnh0608"
+      ],
+      "updatedAt": "2026-10-18T09:36:56Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/130",
+      "bodySha256Before": "277fa8ae87f1df50b6efc863d84808f8b52110b70db386731fa9821b2541d657",
+      "bodySha256After": "35cfcf92b8ec3c865edcf46299f56620523a07a6acd6c43cb84ea4dfb2f93828",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 131,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "kietxuan"
+      ],
+      "assigneesAfter": [
+        "kietxuan"
+      ],
+      "updatedAt": "2026-10-18T09:36:58Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/131",
+      "bodySha256Before": "ea0321e9b3b86a1faec57d8c89d285995100b90afdb3ec62441e5068c03c98d0",
+      "bodySha256After": "b1e32d845752935b6a5258c2cc3e1f0ae1cc5cafa39f4aec625a5832a6fa707d",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 132,
+      "stateBefore": "open",
+      "stateAfter": "open",
+      "assigneesBefore": [
+        "kietxuan"
+      ],
+      "assigneesAfter": [
+        "kietxuan"
+      ],
+      "updatedAt": "2026-10-18T09:37:00Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/132",
+      "bodySha256Before": "834d5eace2544bc0c4b22af3e14ec04fd24b03caf5c43be9d53844aace9493f6",
+      "bodySha256After": "34e3f0bf9f87c02625f2c4b4f328213c1df0f5737fd005efc230a419f31750d2",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 134,
+      "stateBefore": "open",
+      "stateAfter": "open",
+      "assigneesBefore": [
+        "hoang3003"
+      ],
+      "assigneesAfter": [
+        "hoang3003"
+      ],
+      "updatedAt": "2026-10-18T09:37:03Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/134",
+      "bodySha256Before": "0a6d54eafa3d8913c9b740994018f2e06cfb7e491f260eca184d259145550296",
+      "bodySha256After": "8f66ad13b8e0a4990792c5ec1e95e92d0c1503db06c876f23acfbdfd5418775c",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 136,
+      "stateBefore": "open",
+      "stateAfter": "open",
+      "assigneesBefore": [
+        "anotify-vie"
+      ],
+      "assigneesAfter": [
+        "anotify-vie"
+      ],
+      "updatedAt": "2026-10-18T09:37:06Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/136",
+      "bodySha256Before": "b6de8d93765818c57cf0a51b713be576f45d9653859148bdc48629edbe84b6ae",
+      "bodySha256After": "0464bcf44b51e847b86e7effce71d216e52fad22e02024685f52ad8b3aa16e28",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 137,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "anotify-vie"
+      ],
+      "assigneesAfter": [
+        "anotify-vie"
+      ],
+      "updatedAt": "2026-10-18T09:37:09Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/137",
+      "bodySha256Before": "df530f73b9f4300aee089624f7014ff3add642c631ec862870d7c3fb053d7919",
+      "bodySha256After": "1f3b344cc807b1ff5814483c699bbfab00e62b56caa5a698053ff61b6a81fe1f",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 138,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "vu-huzy"
+      ],
+      "assigneesAfter": [
+        "vu-huzy"
+      ],
+      "updatedAt": "2026-10-18T09:37:11Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/138",
+      "bodySha256Before": "b2e466d85137c6dc5ddb0b03aec5fb5121325bf720015ea428ea8d8c946f2060",
+      "bodySha256After": "a075cedc4d978801714288b834bbddfa1cdd75ab6cf757c8785ca7617ddcd4ac",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 139,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "kietxuan"
+      ],
+      "assigneesAfter": [
+        "kietxuan"
+      ],
+      "updatedAt": "2026-10-18T09:37:14Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/139",
+      "bodySha256Before": "27b52f0477552092c3e20bc12e2e04f917496a9ecec43d2923711926bda711f7",
+      "bodySha256After": "bb09c7e2fcdbe590f4d3636c08c7ea1858ca778fbfd7157ddfc9f2965774c7cb",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 140,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "anotify-vie"
+      ],
+      "assigneesAfter": [
+        "anotify-vie"
+      ],
+      "updatedAt": "2026-10-18T09:37:16Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/140",
+      "bodySha256Before": "dffc8ac9f1ba35da77aaafe984aa3a420ed5ebea85d4841056c652405759e1e5",
+      "bodySha256After": "7684b1da956546489659427652c775dfc03e55f74f251fb844737b48b18551f1",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 141,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "hoang3003"
+      ],
+      "assigneesAfter": [
+        "hoang3003"
+      ],
+      "updatedAt": "2026-10-18T09:37:18Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/141",
+      "bodySha256Before": "e629bd4526a53e9aa91e88e6a797db291e6507e9c0037ca57643be28960d19ab",
+      "bodySha256After": "467cb2f7bfa2f1310186a31600a1c38422de9acc2cf6c519515c297af4e67afa",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 142,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "hoang3003"
+      ],
+      "assigneesAfter": [
+        "hoang3003"
+      ],
+      "updatedAt": "2026-10-18T09:37:20Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/142",
+      "bodySha256Before": "96789c68abff17271de9e5e20964e7f5df23872adc46c3f9b1d4862b5707f650",
+      "bodySha256After": "9d44d271e96002cfd8ea72a6e2b8b209aa2dfd5501c51f9af6d52d704e3709e2",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 168,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "vu-huzy"
+      ],
+      "assigneesAfter": [
+        "vu-huzy"
+      ],
+      "updatedAt": "2026-10-18T09:37:24Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/168",
+      "bodySha256Before": "08af8e35dda11b01b0ce49a9de7d5e909ff36a727d204133f8671bc56c234b1a",
+      "bodySha256After": "999843db661afcafef456799ccc5f4c10d585feeb0727da0484048296c68c0e2",
+      "acceptanceCriteriaUnchanged": true
+    },
+    {
+      "issue": 179,
+      "stateBefore": "closed",
+      "stateAfter": "closed",
+      "assigneesBefore": [
+        "hoang3003"
+      ],
+      "assigneesAfter": [
+        "hoang3003"
+      ],
+      "updatedAt": "2026-10-18T09:37:26Z",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/179",
+      "bodySha256Before": "9a6e0e232857e07907777dfca312be3a7ac67a2935fcf4d8168ff61c2a847bf4",
+      "bodySha256After": "c9e8c5aba3478e6ce8e09a156e0c21c1df10969c14fafef1f122d1c6b336fd9c",
+      "acceptanceCriteriaUnchanged": true
+    }
+  ]
+}

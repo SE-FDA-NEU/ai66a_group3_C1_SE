@@ -1,0 +1,32 @@
+
+> frontend@0.0.0 test
+> vitest run
+
+
+ RUN  v5.0.2 C:/Users/Admin/Desktop/Ki 1 Nam 3/Kỹ thuật phần mềm - Software Engineering/ai66a_group3_C1_SE/frontend
+
+ ❯ src/tests/movie-detail-rating.test.tsx (5 tests | 1 failed) 633ms
+   × public content stays visible while session checking waits without private reads 55ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/tests/movie-detail-rating.test.tsx > public content stays visible while session checking waits without private reads
+AssertionError: expected "fetch" to be called 2 times, but got 1 times
+ ❯ src/tests/movie-detail-rating.test.tsx:75:17
+     73|   await screen.findByText("Public overview");
+     74|   expect(screen.getByText("Checking sign-in status...")).toBeInTheDocu…
+     75|   expect(fetch).toHaveBeenCalledTimes(2);
+       |                 ^
+     76|   await act(async () => {
+     77|     session.resolve(json({}, 401));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 19 passed (20)
+      Tests  1 failed | 235 passed (236)
+   Start at  16:32:34
+   Duration  7.05s (environment 62%, tests 20%, import 12%, transform 5%)
+
+    Isolate  20 workers spawned · ~2.70s startup each (spawn + environment, per file)
+             at least ~899ms faster with isolate: false — reuses workers across files instead of one per file
