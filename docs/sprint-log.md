@@ -305,3 +305,212 @@ These fields must be completed from the team's actual decision.
   screenshot is committed, the retrospective action and owner are recorded,
   the next Sprint Master handoff is recorded, every open item has an agreed
   next iteration, and the documentation PR is reviewed and merged.
+
+---
+
+## Sprint 3 - 2026-10-05 to 2026-10-18
+
+**Official Sprint dates:** 2026-10-05 to 2026-10-18, confirmed by the Product
+Owner and recorded in the
+[Sprint 3 backlog reconciliation](sprint3-backlog-refinement.md). The Project
+board's older iteration-date label was deliberately left unchanged.
+
+**Sprint Planning date:** Not recorded.
+
+**Roles:** Product Owner `@kietxuan`; Scrum Master `@vu-huzy`. The Sprint 3
+Scrum Master differs from Sprint 1 (`@hoang3003`) and Sprint 2
+(`@NguyenTuanAnh0608`).
+
+This section was written on 2026-10-18 from GitHub issue, pull-request and
+review records at `main` commit `c843f8775f993f67a57c4b5b99d1011b928aa882`.
+Facts that those sources do not contain are marked "Not recorded".
+
+### Sprint goal
+
+Make every P0 Story work end to end through the interface, using database-backed
+TMDb catalogue data and clear user-facing error messages. This is a concise
+restatement of the objective in
+[#132 / S3-C01](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/132).
+
+### Commitment and Story-point boundary
+
+- **Committed Story Points:** Not recorded. The original per-Story commitment
+  was not captured at Planning, and the C01 closeout lists "original committed
+  points" as unconfirmed. No number is reconstructed here.
+- **Scope reference, not a retroactive commitment:** the six P0 Stories total 24
+  points (S01 3, S02 5, S03 3, S04 5, S12 3, S13 5). S12 / #44 was closed on
+  2026-10-04 during Sprint 2, so its 3 points are not counted again; 21 points
+  of P0 scope remained for Sprint 3.
+- **Planning-state board:** the
+  [PO-identified beginning-of-Sprint-3 image](images/sprint3/planning-board.png)
+  shows global totals of Todo 53 / In Progress 0 / In Review 0 / Done 35. Those
+  totals include Sprint 2 cards and are not Sprint 3 points. The
+  [later iteration view](images/sprint3/iteration-board-snapshot.png) shows 43
+  Sprint 3 items (37 Task, 5 Chore, 1 Spike) and places Stories #17-#20 under
+  "No Sprint".
+- Tasks, Chores and Spikes carry no Story Points and are not counted in velocity.
+
+### Result
+
+GitHub records eight Stories closed during Sprint 3. Seven were closed by the PO
+in one action on 2026-10-18 between 12:08:33 and 12:08:50 UTC; S13 was closed by
+the merge of [PR #178](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/178).
+
+| Story | Issue | Priority | Points | Closed (UTC) | Closed by |
+| ----- | ----- | :------: | -----: | ------------ | --------- |
+| S01 Select favourite genres | [#17](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/17) | P0 | 3 | 2026-10-18 12:08 | `@kietxuan` |
+| S02 Get recommendations from preferences | [#18](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/18) | P0 | 5 | 2026-10-18 12:08 | `@kietxuan` |
+| S03 View movie details | [#19](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/19) | P0 | 3 | 2026-10-18 12:08 | `@kietxuan` |
+| S04 Explore without preferences | [#20](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/20) | P0 | 5 | 2026-10-18 12:08 | `@kietxuan` |
+| S13 Sign in and sign out | [#45](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/45) | P0 | 5 | 2026-10-17 04:42 | `@anotify-vie` (PR #178 merge) |
+| S05a Rate a movie | [#21](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/21) | P1 | 3 | 2026-10-18 12:08 | `@kietxuan` |
+| S06 Filter recommendations by genre | [#23](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/23) | P1 | 3 | 2026-10-18 12:08 | `@kietxuan` |
+| S09 Browse popular movies | [#31](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/31) | P1 | 3 | 2026-10-18 12:08 | `@kietxuan` |
+
+**Verified completed Story Points:** 30 (P0: 21, P1: 9), counted once from
+Stories closed by the PO during the Sprint. S12 / #44 is excluded because it
+closed in Sprint 2.
+
+**Velocity:** 30 Story Points.
+
+**Caveats on this count:**
+
+- It counts GitHub closure. [docs/ui.md](ui.md) and the
+  [T25 acceptance handoff](evidence/s3-m3-p0-handoff/README.md) still show all
+  six P0 Stories as `partly works`, because the unaided-participant session
+  details and final sign-off remain open. No P0 Story is labelled `works`.
+- Seven of the eight closed Stories (all except S09 / #31) still have the
+  Definition-of-Done item "It does not depend on an unfinished story from
+  another team member" unchecked in their issue bodies.
+- The 9 P1 points (S05a, S06, S09) were not recorded as Sprint 3 commitments;
+  the C01 closeout treats them separately from the six-P0 gate.
+
+### Completed Sprint 3 items
+
+Issues closed from 2026-10-05 to 2026-10-18: **51**, namely 8 Stories (above),
+38 Tasks, 4 Chores and 1 Spike. Tasks are the 37 planned Sprint 3 Tasks plus
+[#189](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/189), the C05
+follow-up. The four closed Chores are #132 (C01), #134 (C03), #135 (C04) and
+#136 (C05); the Spike is [#43](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/43).
+The per-Task owner, reviewer, prerequisite and merged-PR table is in
+[sprint3-backlog-refinement.md](sprint3-backlog-refinement.md#4-current-inventory-and-dependency-map).
+
+**Merged pull requests:** 45 ([#143](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/143)
+to [#190](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/190), merged
+2026-10-08 to 2026-10-18).
+
+### Repository minimums for Milestone 3
+
+| Minimum | Result | Evidence |
+| ------- | ------ | -------- |
+| At least 4 merged PRs, each reviewed by another person | Met: 45 merged PRs, each with at least one formal `APPROVED` review, submitted before the merge, by a member other than the author | GraphQL query of PRs #143-#190 on 2026-10-18; formal reviews, not plain comments |
+| At least 5 issues closed, including P0 Stories marked `works` | Partly met: 51 issues closed, 8 Stories closed, but no P0 Story is marked `works` | [ui.md section 1](ui.md#1-p0-stories-and-status) |
+| Each member has a merged PR, a review given and a closed issue | Met, see the matrix below | GitHub PR, review and issue records |
+| README first screen lists the P0 Stories and where each starts | Met | [README](../README.md#sprint-3-review--start-here) |
+| README names the Sprint 3 PO and Scrum Master | Met: `@kietxuan` and `@vu-huzy` | [README](../README.md#sprint-3-review--start-here) |
+| `docs/SETUP.md` on `main` with a Sprint 3 "tested by" record | Present, with a caveat: both records name Codex (an AI tool), Sprint 3, 2026-10-18. A clean-clone run by a team member on a second machine is not recorded | [SETUP.md](SETUP.md), [clean-clone record](evidence/s3-c04-clean-clone.md) |
+| `docs/ui.md` has the four sections in order | Met: sections 1-4 appear in the required order | [ui.md](ui.md) |
+| Submitted Project-board link opens | Not verified: an unauthenticated request returns HTTP 404 and the available `gh` token lacks `read:project`. A member with board access, or the instructor's view, must confirm it | [Project 9](https://github.com/orgs/SE-FDA-NEU/projects/9) |
+
+### Individual contribution and independent-review evidence
+
+Closed-issue counts use the current assignee, as in the C01 reconciliation. The
+review column counts distinct Sprint 3 PRs on which the member submitted a formal
+approval for someone else's PR.
+
+| Member | Merged PRs authored | PRs approved for others | Issues closed | Sample formal review |
+| ------ | ------------------: | ----------------------: | ------------: | -------------------- |
+| Nguyen Xuan Kiet (`@kietxuan`) | 12 | 30 | 12 | [PR #153](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/153#pullrequestreview-5479847991) |
+| Tran Minh Hoang (`@hoang3003`) | 9 | 35 | 9 | [PR #150](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/150#pullrequestreview-5471905199) |
+| Tran Tuan Anh (`@anotify-vie`) | 9 | 17 | 12 | [PR #151](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/151#pullrequestreview-5479199238) |
+| Vu Quoc Huy (`@vu-huzy`) | 7 | 27 | 8 | [PR #150](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/150#pullrequestreview-5477490126) |
+| Nguyen Tuan Anh (`@NguyenTuanAnh0608`) | 8 | 29 | 10 | [PR #150](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/150#pullrequestreview-5472634858) |
+| **Total** | **45** | - | **51** | - |
+
+C04 ([PR #185](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/185)) merged
+at 08:40 UTC on 2026-10-18 with one pre-merge approval, by `@kietxuan`, who also
+contributed to its follow-up commit. A second formal approval, by `@hoang3003`
+([review](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/185#pullrequestreview-5562668940)),
+was submitted at 11:08 UTC, after the merge. Its body is only "ok", so it does not
+record the inspection, findings and reproduction that
+[human-validation.md](evidence/s3-m3-p0-handoff/human-validation.md) asks a
+non-contributor to write; that gate stays open.
+
+### Unfinished work and carry-over
+
+| Item | Recorded state | Next iteration |
+| ---- | -------------- | -------------- |
+| [#22 / S05b](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/22) rating-informed ranking | Open; the C01 closeout places it in Sprint 4 | Sprint 4 |
+| [#24 / S07](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/24) and [#30 / S08](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/30) | Open; only the NLP Spike #43 was delivered, not production search or similarity | Not recorded; team decision required |
+| [#33 / S11](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/33) reset profile UI | Open; the authenticated reset backend (#142) shipped, the profile reset UI did not | Not recorded; team decision required |
+| P0 `works` status | All six P0 Stories remain `partly works` in `docs/ui.md` until the unaided-participant session details and sign-off are recorded | Not recorded |
+| Unaided-participant session | A participant ("Trang") was confirmed second-hand by the PO; session date, version and per-journey outcomes are not recorded | Not recorded |
+| [#133 / S3-C02](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/133) | Open until this log is reviewed and merged and the items under the closure rule are recorded | This wrap-up |
+
+No Sprint 3 issue carries the `carried-over` label. Applying it to the rows above
+is a team decision and is not done here.
+
+### Sprint Review
+
+**Review date:** Not recorded.
+
+**Repository outcomes available for demonstration:** the TMDb-imported catalogue
+with registration, sign-in and sign-out; genre preferences saved per account;
+personalised and popular recommendation cards with reasons, no-match, error and
+retry states; the popular-movie page and TMDb popularity display; movie details
+with backdrops; per-account ratings; genre filtering; the authenticated reset
+endpoint; the M3 UI dossier ([ui.md](ui.md)) and the clean-clone setup guide.
+
+**Feedback received:** Not recorded. Repository evidence shows delivered work but
+does not prove that a Sprint Review meeting took place or what was said.
+
+### Retrospective
+
+No Sprint 3 retrospective outcome is recorded in the repository or linked Issues.
+`docs/retro.md` is not created until the team holds the retrospective.
+
+| What went well | What did not go well | Lesson learned |
+| -------------- | -------------------- | -------------- |
+| Not recorded   | Not recorded         | Not recorded   |
+
+**Exactly one improvement action:** Not recorded.
+
+**Owner:** Not recorded.
+
+### Scrum Master handoff
+
+`@vu-huzy` is the Sprint 3 Scrum Master. The next Scrum Master, the handoff date
+and the handoff evidence are not recorded. Members who have not yet been Scrum
+Master are Nguyen Xuan Kiet and Tran Tuan Anh; the choice is a team decision.
+
+### Board and documentation evidence
+
+- **Planning-state board:** [PO-identified image](images/sprint3/planning-board.png)
+  and [iteration view](images/sprint3/iteration-board-snapshot.png); see the
+  boundary above. Neither carries a visible capture timestamp.
+- **Submission-day board:** [PO-supplied image](images/ui/submission-board.png)
+  with all four workflow columns: Todo 4 / In Progress 0 / In Review 0 / Done 87.
+  These are global card totals with no visible Sprint filter or timestamp; they
+  are not velocity or proof that a Story is accepted.
+  [Provenance and limits](evidence/s3-c05-ui/supplied-captures.md).
+- **M3 dossier:** [docs/ui.md](ui.md), merged to `main` through
+  [PR #188](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/188), with
+  later documentation fixes in PR #190.
+- **Tested state of `main`:** hosted workflows on `c843f87` (CI, S04 real browser,
+  T16, T28, T33, T34 and Sprint 3 C01 documentation) report success. The team
+  has not designated one "final tested SHA". The recorded executable candidates
+  are `326aadf3ee32342c4e91297ee9e885663eccf565` (clean clone and review account,
+  [SETUP.md](SETUP.md)) and the unpublished T25 snapshot
+  `05a78c1f503c10f6f5047655acb3800b21966e99`
+  ([handoff](evidence/s3-m3-p0-handoff/README.md)). Do not relabel either as the
+  merged head.
+- **Submission receipt:** Not recorded. The PDF `Team03_M3.pdf` is prepared
+  manually by the PO and kept outside Git; no LMS receipt exists in the
+  repository.
+- **Documentation PR:** this wrap-up; the PR link is added when it is opened.
+
+**Closure rule:** do not close #133 until the PO or the team has recorded the
+actual Sprint Review feedback, the retrospective action and its owner, the next
+Scrum Master, the Project-board link check, the final tested SHA and the LMS
+submission receipt, and a member other than the author has reviewed and merged
+this log.
