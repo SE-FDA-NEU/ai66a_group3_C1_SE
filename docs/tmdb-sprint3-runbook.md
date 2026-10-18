@@ -173,20 +173,26 @@ POST /api/auth/login
 GET  /api/auth/me
 GET  /api/genres
 GET  /api/me/preferences
+GET  /api/me/recommendations?limit=10
 PUT  /api/me/preferences              { "genreIds": [<activeGenreId>] }
 GET  /api/me/recommendations?limit=10
 GET  /api/me/ratings/<activeMovieId>
 PUT  /api/me/ratings/<activeMovieId>  { "rating": 4 }
+GET  /api/me/ratings/<activeMovieId>
 POST /api/me/profile/reset            { "confirm": true }
+GET  /api/me/recommendations?limit=10
 ```
 
-The first recommendation request for a disposable account is popular cold
-start; after the preference PUT it is personalised when matches exist or a
-successful `noMatch=true` popular alternative response otherwise. Confirm the
-rating GET moves from `null` to `4`. The reset POST is backend-only and must be
-run last: it removes only that disposable account's preferences/ratings, after
-which recommendations return to cold start. `/profile` remains a UI
-placeholder; do not claim reset-UI acceptance from this API smoke.
+For a newly registered disposable account, the first recommendation GET runs
+before any preference write and returns popular cold start (`mode="popular"`,
+`personalised=false`, `noMatch=false`). The GET after the preference PUT is
+personalised when matches exist or a successful `noMatch=true` popular
+alternative response otherwise. The rating GET before and after its PUT
+confirms the committed value moves from `null` to `4`. The reset POST is
+backend-only and must be the last write: it removes only that disposable
+account's preferences/ratings. The final recommendation GET verifies the
+return to popular cold start. `/profile` remains a UI placeholder; do not
+claim reset-UI acceptance from this API smoke.
 
 All application routes above read/write SQLite only; none calls TMDb metadata
 when the user opens a page. Keep provider source IDs in operator evidence;

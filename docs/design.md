@@ -41,7 +41,7 @@ read the local database and never call the TMDb metadata API.
 | Browser frontend | React, TypeScript, Vite, React Router | Renders public and signed-in experiences, including preferences, recommendations, rating controls, and backdrop fallback. Calls relative `/api` paths; a detail backdrop loads only from the allowlisted public image CDN URL returned by the API. |
 | Backend API | Python 3.12, FastAPI, Pydantic | Validates input, resolves the session cookie to an account, applies the business rules, and returns DTOs and error envelopes. |
 | SQLite database | SQLite, SQLAlchemy, Alembic | Stores all nine application tables, including preferences, ratings, and nullable backdrop paths. The backend turns on `PRAGMA foreign_keys` for every connection. |
-| TMDb importer | Python command, httpx | Required catalogue preparation for Sprint 3 dev/staging/demo. Fetches genres and one page of popular movies, writes a new revision, and activates it only after every write succeeds. |
+| TMDb importer | Python command, httpx | Required catalogue preparation for Sprint 3 dev/staging/demo. Fetches genres and a bounded number of popular pages (default 1; `--pages` accepts 1–15), writes a new revision, and activates it only after every write succeeds. |
 | TMDb API | External service | Source of movie, genre, and backdrop-path metadata for the importer only. It is not called when a user opens a page. |
 | TMDb image CDN | External public CDN | Serves backdrop image bytes to the browser without exposing or requiring the metadata API token. |
 
