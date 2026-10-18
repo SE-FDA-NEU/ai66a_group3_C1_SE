@@ -1,0 +1,15 @@
+
+> frontend@0.0.0 test
+> vitest run
+
+
+ RUN  v5.0.2 /private/tmp/m3-handoff-86a758e/clean-clone/frontend
+
+
+ Test Files  20 passed (20)
+      Tests  236 passed (236)
+   Start at  01:13:29
+   Duration  4.68s (environment 44%, tests 39%, import 13%, transform 4%)
+
+    Isolate  20 workers spawned · ~771ms startup each (spawn + environment, per file)
+             at least ~1.43s faster with isolate: false — reuses workers across files instead of one per file

@@ -1,0 +1,12 @@
+S02 / T12 real-DB browser acceptance
+run_at=2026-10-18T15:54:29+07:00
+base_commit=05a78c1f503c10f6f5047655acb3800b21966e99
+browser=C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe
+database=migrated temporary file-backed SQLite
+fixture=backend\tests\fixtures\recommendations_s3_t06.json
+match=PASS; 10 distinct genre-matching cards with reasons
+no_match=PASS; 10 popular alternatives and edit/retry controls
+source_503=PASS; error/retry visible and preferences unchanged
+retry=PASS; real API and UI recovered to personalised cards
+current_401=PASS; login redirect, not source-error UI
+result=PASS

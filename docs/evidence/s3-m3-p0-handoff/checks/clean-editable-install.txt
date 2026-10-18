@@ -1,0 +1,22 @@
+Obtaining file:///private/tmp/m3-handoff-86a758e/clean-clone/backend
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Checking if build backend supports build_editable: started
+  Checking if build backend supports build_editable: finished with status 'done'
+  Getting requirements to build editable: started
+  Getting requirements to build editable: finished with status 'done'
+  Preparing editable metadata (pyproject.toml): started
+  Preparing editable metadata (pyproject.toml): finished with status 'done'
+Checking if build backend supports build_editable: started
+Checking if build backend supports build_editable: finished with status 'done'
+Building wheels for collected packages: ai-movie-recommendation-backend
+  Building editable for ai-movie-recommendation-backend (pyproject.toml): started
+  Building editable for ai-movie-recommendation-backend (pyproject.toml): finished with status 'done'
+  Created wheel for ai-movie-recommendation-backend: filename=ai_movie_recommendation_backend-0.1.0-0.editable-py3-none-any.whl size=3142 sha256=368076f521379146e13d1047be79fd8b153bee371c8b6bfb05ef224cd097f884
+  Stored in directory: /private/var/folders/k5/w77q5v455sqchk9vfs41w8_h0000gn/T/pip-ephem-wheel-cache-eg0nbvnf/wheels/63/74/8a/3baa88d796e9713733f59863dae961e5a75534b5ead0c0ab9a
+Successfully built ai-movie-recommendation-backend
+Installing collected packages: ai-movie-recommendation-backend
+Successfully installed ai-movie-recommendation-backend-0.1.0
+
+[notice] A new release of pip is available: 24.0 -> 26.2.1
+[notice] To update, run: /private/tmp/m3-handoff-86a758e/clean-clone/.venv/bin/python -m pip install --upgrade pip

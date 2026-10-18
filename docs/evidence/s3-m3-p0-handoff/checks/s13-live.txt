@@ -1,0 +1,19 @@
+
+> frontend@0.0.0 test:s04:e2e
+> node scripts/run-s04-e2e.mjs s13.acceptance.ts --grep live TMDb
+
+[WebServer] INFO:     Started server process [44615]
+[WebServer] INFO:     Waiting for application startup.
+[WebServer] INFO:     Application startup complete.
+[WebServer] INFO:     Uvicorn running on http://127.0.0.1:8014 (Press CTRL+C to quit)
+[WebServer] (node:44650) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:44653) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/s13.acceptance.ts:212:1 › S13 live TMDb environment smoke (separate from synthetic acceptance) (2.6s)
+
+  1 passed (4.6s)
+s04_temporary_database_removed=true

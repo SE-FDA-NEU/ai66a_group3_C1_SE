@@ -1,0 +1,214 @@
+{
+  "schemaVersion": 2,
+  "recordKind": "Post-C04 executable acceptance with explicit open human/review gates",
+  "logFormatting": "Console transcripts normalized to LF with trailing spaces and EOF blank lines removed before commit; no test outcomes removed or changed.",
+  "recordedDateLocal": "2026-10-18",
+  "timezone": "Asia/Ho_Chi_Minh",
+  "pullRequest": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/184",
+  "issue": 127,
+  "tester": "Codex local verification at PO request; not independent teammate approval",
+  "candidate": {
+    "publicApplicationMain": "0c4273ab792becb060fefd5e7341e755ed28d0a5",
+    "applicationMatchesPublicMain": true,
+    "applicationFileCount": 97,
+    "testedLocalIntegrationSnapshot": "05a78c1f503c10f6f5047655acb3800b21966e99",
+    "localSnapshotPublished": false,
+    "publication": "Single local follow-up integration commit is amended with generated evidence, then published. Local SHA in raw reports is not a GitHub receipt.",
+    "sourceManifest": "latest/source-manifest.json",
+    "normalization": "Only CRLF -> LF bytes; no other trimming/decoding",
+    "executableTreeSha256": "2985bd56d5ff942f87e8e7f31a96f98fcb1689f9ad681c233203a0cd91f20ccf",
+    "finalHeadRequirement": "Compare the published head's executable manifest, inspect own hosted CI and obtain final independent review. Docs/evidence are outside the executable fingerprint."
+  },
+  "environment": {
+    "os": "Windows 10.0.26300 x64",
+    "python": "3.12.6",
+    "node": "v24.19.0",
+    "npm": "11.17.0",
+    "browser": "Microsoft Edge 155.0.4283.62",
+    "channelOverrides": [
+      "M3_BROWSER_CHANNEL=msedge",
+      "S04_BROWSER_CHANNEL=msedge"
+    ]
+  },
+  "safety": {
+    "sourceDatabaseSha256Before": "a0488d0bf5f8ef63ac58e174a3749d705c35cd5efcbab1229893259489931776",
+    "sourceDatabaseSha256After": "a0488d0bf5f8ef63ac58e174a3749d705c35cd5efcbab1229893259489931776",
+    "sourceDatabaseUnchanged": true,
+    "sourceOpenedReadOnlyForBackup": true,
+    "liveWritesInDisposableCopiesOnly": true,
+    "runtimeProviderNetworkingDisabled": true,
+    "credentialArtifactsCommitted": false
+  },
+  "acceptedSource": {
+    "provider": "tmdb",
+    "activeRevision": "34b442f2-f5a8-4317-9f2f-468e6ec06a20",
+    "activeMovies": 255,
+    "distinctSourceIds": 255,
+    "finitePopularity": 255,
+    "fetchTimestamps": 255,
+    "associatedGenres": 17,
+    "migrationHead": "c6f8a2d4e901",
+    "missingYear": 0,
+    "missingOverview": 0,
+    "provenance": "latest/live/results.json"
+  },
+  "runs": [
+    {
+      "command": ".venv\\Scripts\\python.exe backend/scripts/run_isolated_tests.py -q",
+      "result": "419 passed, 1 inherited skip, 1 inherited Starlette/httpx warning",
+      "evidence": "latest/checks/backend-tests.txt"
+    },
+    {
+      "command": ".venv\\Scripts\\python.exe -m ruff check backend",
+      "result": "PASS",
+      "evidence": "latest/checks/ruff.txt"
+    },
+    {
+      "command": "npm.cmd --prefix frontend test",
+      "result": "236 passed / 20 files",
+      "evidence": "latest/checks/frontend-tests.txt"
+    },
+    {
+      "command": "npm.cmd --prefix frontend run lint",
+      "result": "PASS",
+      "evidence": "latest/checks/lint.txt"
+    },
+    {
+      "command": "npm.cmd --prefix frontend run build",
+      "result": "PASS",
+      "evidence": "latest/checks/build.txt"
+    },
+    {
+      "command": "npm.cmd --prefix frontend run test:m3:verifier",
+      "result": "11 passed, 0 skipped on Windows",
+      "evidence": "latest/checks/m3-verifier.txt",
+      "ci": "New step in s04-runner-cleanup matrix ubuntu-latest/windows-latest"
+    },
+    {
+      "command": "npm.cmd --prefix frontend run test:s04:runner",
+      "result": "3 passed",
+      "evidence": "latest/checks/s04-cleanup.txt"
+    },
+    {
+      "command": "npm.cmd --prefix frontend run test:s04:e2e",
+      "result": "10 passed, 1 intentional opt-in live skip",
+      "mode": "synthetic offline real browser/API/SQLite",
+      "evidence": "latest/synthetic-results.json"
+    },
+    {
+      "command": "S13_TMDB_SMOKE=1 S13_TMDB_DATABASE=<absolute accepted DB> npm.cmd --prefix frontend run test:s04:e2e -- s13.acceptance.ts --grep 'live TMDb'",
+      "result": "1 passed",
+      "mode": "live accepted snapshot copied read-only",
+      "evidence": "latest/s13-live-results.json"
+    },
+    {
+      "command": "node frontend/scripts/verify-m3-handoff.mjs data/app.db docs/evidence/s3-m3-p0-handoff/latest/live",
+      "result": "PASS, 5 grouped checks, cleanup PASS",
+      "mode": "accepted 255-movie snapshot copied read-only",
+      "evidence": "latest/live/results.json"
+    },
+    {
+      "command": "python backend/scripts/verify_s02_recommendations_ui.py --evidence-dir frontend/test-results/t25-final-t12 --browser <installed Edge>",
+      "result": "PASS",
+      "mode": "synthetic browser",
+      "evidence": "latest/checks/t12.txt"
+    },
+    {
+      "command": "python backend/scripts/verify_s09_popular_ui.py --evidence-dir frontend/test-results/t25-final-t21 --browser <installed Edge>",
+      "result": "PASS",
+      "mode": "synthetic browser",
+      "evidence": "latest/checks/t21.txt"
+    },
+    {
+      "command": "python backend/scripts/verify_s01_preferences_ui.py --database <disposable SQLite backup> --evidence-dir frontend/test-results/t25-final-t22 --browser <installed Edge>",
+      "result": "All five ACs and recovery/server validation PASS",
+      "mode": "accepted 255-movie snapshot copied read-only",
+      "evidence": "latest/checks/t22-live.txt"
+    },
+    {
+      "command": "npm.cmd --prefix frontend run test:t16:integration",
+      "result": "1 passed",
+      "mode": "React to actual Python API/SQLite bridge, not browser",
+      "evidence": "latest/checks/t16.txt"
+    },
+    {
+      "command": "npm.cmd --prefix frontend run test:t33:integration",
+      "result": "First attempt FAIL at logout /login vs /; standalone rerun PASS and five further standalone repetitions PASS",
+      "mode": "React/Python bridge, not browser",
+      "evidence": [
+        "latest/checks/t33.txt",
+        "latest/checks/t33-rerun.txt",
+        "latest/checks/t25-t33-repeat-1.txt",
+        "latest/checks/t25-t33-repeat-2.txt",
+        "latest/checks/t25-t33-repeat-3.txt",
+        "latest/checks/t25-t33-repeat-4.txt",
+        "latest/checks/t25-t33-repeat-5.txt"
+      ],
+      "limitation": "Intermittency unresolved; definitive root cause not proved, initial failure retained"
+    },
+    {
+      "command": "npm.cmd --prefix frontend run test:t28:acceptance -- --evidence-dir frontend/test-results/t25-final-t28-synthetic",
+      "result": "18 passed, temporary database removed",
+      "mode": "synthetic backdrop compatibility",
+      "evidence": "latest/checks/t28-synthetic.txt"
+    },
+    {
+      "command": "pip check; npm.cmd --prefix frontend run test:m3:verifier; npm.cmd --prefix frontend run build",
+      "result": "PASS; 11 passed; PASS",
+      "mode": "Reused C04 fresh-installed clone advanced to local integration snapshot, not another new installation"
+    },
+    {
+      "command": "node frontend/scripts/verify-m3-handoff.mjs data/app.db <latest/clone-live>",
+      "result": "PASS, 5 grouped checks, cleanup PASS",
+      "mode": "C04 clone advanced to integration snapshot; separate 20-movie accepted TMDb snapshot copied read-only",
+      "evidence": "latest/clone-live/results.json"
+    }
+  ],
+  "reusedC04": {
+    "pr": 185,
+    "mergeCommit": "0c4273ab792becb060fefd5e7341e755ed28d0a5",
+    "state": "merged",
+    "setupEvidence": "../s3-c04-clean-clone.md",
+    "visibleRestart": "../s3-c04-final/live/results.json",
+    "backdrop": "../s3-c04-final/backdrop-live/results.json",
+    "independentReviewClarification": "pending real non-contributor record; future review promised by PO is not observed review"
+  },
+  "humanWalkthrough": {
+    "participant": "Trang",
+    "basis": "PO confirmed in current chat on 2026-10-18 that unfamiliar person had tried P0 journeys unaided",
+    "independentlyObservedByCodex": false,
+    "actualSessionDate": null,
+    "testedVersion": null,
+    "individualJourneyResults": null,
+    "record": "human-validation.md",
+    "status": "user-confirmed, session details/sign-off pending"
+  },
+  "p0Statuses": {
+    "S01 #17": "partly works",
+    "S02 #18": "partly works",
+    "S03 #19": "partly works",
+    "S04 #20": "partly works",
+    "S12 #44": "partly works",
+    "S13 #45": "partly works"
+  },
+  "p1Statuses": {
+    "S06 #23": "partly works",
+    "S09 #31": "partly works"
+  },
+  "remainingGates": [
+    "Inspect own hosted checks on final published PR184 head",
+    "Independent substantive review of final T25 head by non-contributor; old Kiet approval is historical",
+    "Record actual Trang session date/version/per-journey outcomes without invention",
+    "C04 independent review clarification on actual GitHub record",
+    "Keep T33 bridge intermittency visible; investigate if reproduced in final CI or browser",
+    "PO reconciliation of already closed #44/#45; do not newly close incomplete Stories",
+    "#136 dossier/address-bar captures/PDF review/merge and LMS receipt are separate"
+  ],
+  "historicalEvidence": "historical-initial-verification.json",
+  "limitations": [
+    "No completed reset UI claim; reset tested through API/DB",
+    "Sprint 3 ratings persist but do not affect recommendation ranking",
+    "Live null-field coverage absent; synthetic cases kept separate",
+    "Screenshot captures are viewport only, not address-bar submission evidence"
+  ]
+}

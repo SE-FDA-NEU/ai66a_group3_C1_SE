@@ -1,0 +1,14 @@
+[
+  {
+    "command": "python -m alembic -c backend/alembic.ini upgrade head",
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": "INFO  [alembic.runtime.migration] Context impl SQLiteImpl.\nINFO  [alembic.runtime.migration] Will assume non-transactional DDL.\nINFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database\nINFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage\nINFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users\nINFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions\nINFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences\nINFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings\nINFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.\n"
+  },
+  {
+    "command": "python -m app.cli.import_tmdb_catalogue",
+    "exitCode": 0,
+    "stdout": "TMDb catalogue import complete\nprovider=tmdb\nactive_revision=709fe328-26fd-4bed-b1b2-e0e87cbaa00c\ninserted=20\nupdated=0\nrejected=0\nmovies=20\nassociated_genres=12\nfinite_popularity_movies=20\nsource_fetched_at=2026-10-17T18:15:38.576552Z\nimported_at=2026-10-17T18:15:40.176944Z\nsample_source_ids=969681,1291595,1148365\n",
+    "stderr": ""
+  }
+]

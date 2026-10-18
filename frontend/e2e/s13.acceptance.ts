@@ -119,6 +119,11 @@ test("S13 AC3: guest routes and rating CTA reach login without private requests 
     await page.goto(route);
     await expect(page).toHaveURL(/\/login$/);
   }
+  // Separate negative detail URL check, not a required discovery journey.
+  await page.goto("/movies/m3-nonexistent-movie");
+  await expect(page.getByRole("heading", { name: "Movie not found", exact: true })).toBeVisible();
+  await page.getByRole("link", { name: "Return to catalogue", exact: true }).click();
+  await expect(page).toHaveURL("/");
   await page.goto(`/movies/${movie}`);
   await page.getByRole("link", { name: "Sign in to rate this movie", exact: true }).click();
   await expect(page).toHaveURL(/\/login$/);
@@ -205,24 +210,29 @@ test("S13 AC1/AC4/AC5: real login, save, logout/replay, switch, delayed A respon
 });
 
 test("S13 live TMDb environment smoke (separate from synthetic acceptance)", async ({ page, request }) => {
-  test.skip(!live, "Opt in with S13_TMDB_SMOKE=1; requires server-only TMDb token");
+  test.skip(!live, "Opt in with S13_TMDB_SMOKE=1; use accepted DB or server-only TMDb token");
   const ready = await (await request.get(`${controls}/ready`)).json();
   expect(ready.catalogue[0]).toBe("tmdb");
   expect(ready.catalogue[2]).toBeGreaterThan(0);
   const a = await register(request);
   const b = await register(request);
+  // Pick a genre of the top public movie so the same movie can later be
+  // reached by B through visible public catalogue navigation.
+  const catalogue = await (await request.get("/api/movies?limit=10")).json();
+  const publicMovie = catalogue.data.movies.find((movie: { genres: unknown[] }) => movie.genres.length > 0);
+  expect(publicMovie).toBeTruthy();
   await page.goto("/");
   await page.getByRole("link", { name: "Start", exact: true }).click();
   await expect(page).toHaveURL(/\/login$/);
   await login(page, a);
   await page.getByRole("link", { name: "Change my genres", exact: true }).click();
-  await page.getByRole("checkbox").first().check();
+  await page.getByRole("checkbox", { name: publicMovie.genres[0].name, exact: true }).check();
   await page.getByRole("button", { name: "Save preferences", exact: true }).click();
   await expect(page).toHaveURL(/\/recommendations$/);
   await expect(titles(page).first()).toBeVisible();
   const preferences = await (await page.request.get("/api/me/preferences")).json();
   const ranked = await (await page.request.get("/api/me/recommendations")).json();
-  const detail = page.locator("article.movie-card a").first();
+  const detail = page.locator(`article.movie-card a[href="/movies/${publicMovie.id}"]`);
   const href = (await detail.getAttribute("href"))!;
   await detail.click();
   await page.getByLabel("Your rating (1 to 5)").selectOption("4");
@@ -234,13 +244,16 @@ test("S13 live TMDb environment smoke (separate from synthetic acceptance)", asy
   await page.getByRole("link", { name: "Sign in", exact: true }).click();
   await login(page, b);
   expect((await (await page.request.get("/api/me/preferences")).json()).data.genres).toEqual([]);
-  await page.goto(href);
+  await page.getByRole("link", { name: "Browse the catalogue", exact: true }).click();
+  await page.locator(`article.movie-card a[href="${href}"]`).click();
   await expect(page.getByText("Not rated yet", { exact: true })).toBeVisible();
-  await page.goto("/recommendations");
+  await page.getByRole("link", { name: "Return to catalogue", exact: true }).click();
+  await page.getByRole("link", { name: "My recommendations", exact: true }).click();
   await signOut(page);
   await page.getByRole("link", { name: "Sign in", exact: true }).click();
   await login(page, a);
   expect(await (await page.request.get("/api/me/preferences")).json()).toEqual(preferences);
-  await page.goto(href);
+  await page.getByRole("link", { name: "Browse the catalogue", exact: true }).click();
+  await page.locator(`article.movie-card a[href="${href}"]`).click();
   await expect(page.getByText("Your saved rating: 4/5", { exact: true })).toBeVisible();
 });

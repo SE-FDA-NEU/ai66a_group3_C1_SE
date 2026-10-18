@@ -1,0 +1,13 @@
+S01 / T22 real-browser, database-backed acceptance
+run_at=2026-10-18T15:55:33+07:00
+tested_sha=05a78c1f503c10f6f5047655acb3800b21966e99
+browser=C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe
+catalogue_provider=tmdb; active_movies=255; active_genres=17
+AC1=PASS; first-screen Start reaches authenticated catalogue genres
+AC2=PASS; one and five save to SQLite and open recommendations
+AC3=PASS; zero choices show correction and preserve saved state
+AC4=PASS; sixth choice shows limit and preserves first five
+AC5=PASS; saved choices restore; second account starts empty
+request_failure=PASS; editable draft kept and visible Save retry succeeds
+server_validation=PASS; zero and sixth IDs rejected without overwriting saved rows
+result=PASS

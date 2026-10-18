@@ -1,0 +1,13 @@
+S01 / T22 real-browser, database-backed acceptance
+run_at=2026-10-18T01:19:39+07:00
+tested_sha=86a758eb2468f3e23357b69adf3c3183e5110a40
+browser=/Applications/Google Chrome.app/Contents/MacOS/Google Chrome
+catalogue_provider=tmdb; active_movies=20; active_genres=12
+AC1=PASS; first-screen Start reaches authenticated catalogue genres
+AC2=PASS; one and five save to SQLite and open recommendations
+AC3=PASS; zero choices show correction and preserve saved state
+AC4=PASS; sixth choice shows limit and preserves first five
+AC5=PASS; saved choices restore; second account starts empty
+request_failure=PASS; editable draft kept and visible Save retry succeeds
+server_validation=PASS; zero and sixth IDs rejected without overwriting saved rows
+result=PASS
