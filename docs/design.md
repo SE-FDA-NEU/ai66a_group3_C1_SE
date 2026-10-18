@@ -17,6 +17,15 @@ Historical M2 seed screenshots/test results below remain M2 evidence, not a
 substitute for the separate Sprint 3 live-import/acceptance records. See the tracked
 [TMDb Sprint 3 runbook](tmdb-sprint3-runbook.md).
 
+Post-M3 amendment (2026-10-19): Home, Popular and Recommendations use
+database-backed pages of at most ten. Their page controls use API totals;
+Home orders every active movie alphabetically, Popular ranks every eligible
+finite-popularity movie, and recommendation view filters apply to the complete
+selected base mode before slicing. Page and view genre live in the URL, while
+the existing AuthProvider owns session identity and shared navigation. These
+current rules supersede the Sprint 3 single-page UI descriptions below without
+changing recorded Sprint 3 acceptance evidence.
+
 ## 1. Architecture
 
 ![C4 container diagram](images/architecture.png)
@@ -73,7 +82,7 @@ implemented under Sprint 3 T19 (#121).
 | Registration and sign-in forms: `RegisterPage.tsx`, `LoginPage.tsx` | Forms that call the auth endpoints. | `@NguyenTuanAnh0608` (#50), `@anotify-vie` (#55) |
 | Route guards and stale-account state: `frontend/src/auth/`, `frontend/src/protectedRoutes.tsx` | Redirects unsigned visitors to `/login` and clears account state on sign-out. | `@vu-huzy` (#56) |
 | Recommendation landing and explanation pages: `RecommendationsPage.tsx`, `RecommendationExplanationPage.tsx` | The signed-in landing page and the public `/about-recommendations` page. | `@hoang3003` (#59, #64) |
-| Preference and recommendation state: `PreferencesPage.tsx`, `RecommendationsPage.tsx`, `RecommendationFilter.tsx` | Saves/restores current-account genres; renders personalised, cold-start, no-match, empty, error/retry, and snapshot-filter states with generation checks. | S3-T11/T13/T15 and T12/T14/T16/T22 acceptance |
+| Preference and recommendation state: `PreferencesPage.tsx`, `RecommendationsPage.tsx`, `RecommendationFilter.tsx` | Saves/restores current-account genres; renders personalised, cold-start, no-match, filtered-empty and error/retry states. The post-M3 view genre and page live in the URL; backend filtering precedes page slicing. | S3-T11/T13/T15 baseline; post-M3 amendment |
 | Backdrop import/API/UI: `tmdb_import.py`, `backdrops.py`, `MovieBackdropHero.tsx`, `backdropUrl.ts` | Stores/imports validated paths, exposes nullable safe detail URLs, and renders responsive image/fallback without metadata calls from the browser. | S3-T26/T27/T37 and T28/#131 acceptance |
 
 ## 2. Data model
@@ -138,7 +147,7 @@ cascading deletes, and a strict integer database check from 1 through 5.
 | Rule | Database | Service or query | Tests |
 |---|---|---|---|
 | S04 public catalogue ordering | None | `GET /api/movies` may include null/missing popularity; when popularity ordering is used, those entries sort after finite values, then by title and ID. | `test_movies_api.py` |
-| BR5: dedicated popular and recommendation fallback lists sort by popularity descending, then title A-Z, at most 10 | None | `GET /api/movies/popular` filters to finite popularity before deterministic popularity/title/ID ordering. The recommendation repository also excludes null popularity. | `test_popular_recommendations.py`, `test_movies_api.py` |
+| BR5: dedicated popular and recommendation fallback sets sort globally by popularity descending, title then ID, with at most 10 per page | None | `GET /api/movies/popular` filters to finite popularity before deterministic ordering and database pagination. | `test_popular_recommendations.py`, `test_catalogue_pagination.py` |
 | BR6: an unknown movie ID never shows another movie | `catalog_movies.id` is the primary key | Lookup by ID inside the active revision; a miss returns `404 MOVIE_NOT_FOUND` | `test_unknown_movie_id_returns_404` |
 | BR13: the explanation lists exactly 3 steps | None | Page content in `RecommendationExplanationPage.tsx` | `test_recommendation_explanation_content.py`, `recommendation-explanation.test.tsx` |
 | BR16: an email is unique after case-insensitive normalisation | UNIQUE `email_normalized` with NOCASE collation | The email is trimmed and lowercased; a duplicate returns `409 EMAIL_ALREADY_REGISTERED` | `test_registration.py`, `test_registration_verification.py`, `test_account_migration.py` |

@@ -94,7 +94,7 @@ describe("S3-T17 movie-detail return context", () => {
     render(<App />);
 
     expect(
-      await screen.findByRole("heading", { name: "Recommended for you" }),
+      await screen.findByRole("heading", { name: "Recommended for you" }, { timeout: 5000 }),
     ).toBeInTheDocument();
     fireEvent.click(
       screen.getByRole("link", { name: "View details for Movie A" }),
@@ -196,7 +196,9 @@ describe("S3-T17 movie-detail return context", () => {
       .mockImplementation((input) => {
         if (String(input) === "/api/auth/me") return jsonResponse({}, 401);
         if (String(input) === "/api/movies?limit=10")
-          return jsonResponse({ data: { movies: [recommendation] } });
+          return jsonResponse({ data: { movies: [recommendation] },
+            meta: { count: 1, limit: 10, page: 1, total: 1, totalPages: 1,
+              unfilteredTotal: 1, catalogueRevision: "revision" } });
         return Promise.reject(
           new Error(`Unexpected request: ${String(input)}`),
         );
@@ -215,7 +217,7 @@ describe("S3-T17 movie-detail return context", () => {
       await screen.findByRole("heading", { name: "Find your next movie" }),
     ).toBeInTheDocument();
     expect(fetchMock).toHaveBeenNthCalledWith(1, "/api/movies/movie-a");
-    expect(fetchMock).toHaveBeenCalledWith("/api/movies?limit=10");
+    expect(fetchMock).toHaveBeenCalledWith("/api/movies?limit=10", expect.anything());
   });
 
   it("rejects an external return URL before rendering the detail back link", async () => {

@@ -31,33 +31,32 @@ afterEach(() => {
 
 describe("T15 public catalogue UI", () => {
   it("loads ten public movie cards from the catalogue API", async () => {
-    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementationOnce(() =>
-      jsonResponse({
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation((input) =>
+      String(input) === "/api/auth/me" ? jsonResponse({ error: { code: "AUTHENTICATION_REQUIRED" } }, 401) : jsonResponse({
         data: { movies },
-        meta: { count: 10, limit: 10, catalogueRevision: "revision-test" },
+        meta: { count: 10, limit: 10, page: 1, total: 10, totalPages: 1,
+          unfilteredTotal: 10, catalogueRevision: "revision-test" },
       }),
     );
 
     render(<App />);
 
-    expect(screen.getByRole("status")).toHaveTextContent("Loading movies...");
+    expect(screen.getByText("Loading movies...")).toBeInTheDocument();
     expect(await screen.findByText("Movie 10")).toBeInTheDocument();
     expect(screen.getAllByRole("article")).toHaveLength(10);
-    expect(fetchMock).toHaveBeenCalledWith("/api/movies?limit=10");
+    expect(fetchMock).toHaveBeenCalledWith("/api/movies?limit=10", expect.anything());
     expect(screen.getByText("Information unavailable")).toBeInTheDocument();
   });
 
   it("opens the selected movie detail route using its internal id", async () => {
-    const fetchMock = vi
-      .spyOn(globalThis, "fetch")
-      .mockImplementationOnce(() =>
-        jsonResponse({
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+      const url = String(input);
+      if (url === "/api/auth/me") return jsonResponse({ error: { code: "AUTHENTICATION_REQUIRED" } }, 401);
+      if (url === "/api/movies?limit=10") return jsonResponse({
           data: { movies },
           meta: { count: 10, limit: 10, catalogueRevision: "revision-test" },
-        }),
-      )
-      .mockImplementationOnce(() =>
-        jsonResponse({
+        });
+      if (url === "/api/movies/movie-3") return jsonResponse({
           data: {
             movie: {
               ...movies[2],
@@ -67,8 +66,9 @@ describe("T15 public catalogue UI", () => {
             },
           },
           meta: { catalogueRevision: "revision-test" },
-        }),
-      );
+        });
+      return Promise.reject(new Error(`Unexpected request: ${url}`));
+    });
 
     render(<App />);
 
@@ -80,7 +80,7 @@ describe("T15 public catalogue UI", () => {
     expect(
       await screen.findByRole("heading", { name: "Movie 3" }),
     ).toBeInTheDocument();
-    expect(fetchMock).toHaveBeenNthCalledWith(2, "/api/movies/movie-3");
+    expect(fetchMock).toHaveBeenCalledWith("/api/movies/movie-3");
   });
 
   it("shows unavailable text for missing detail year and overview", async () => {
@@ -141,10 +141,11 @@ describe("T15 public catalogue UI", () => {
   });
 
   it("retries the public catalogue request after an unavailable response", async () => {
-    const fetchMock = vi
-      .spyOn(globalThis, "fetch")
-      .mockImplementationOnce(() =>
-        jsonResponse(
+    let attempt = 0;
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+      if (String(input) === "/api/auth/me") return jsonResponse({ error: { code: "AUTHENTICATION_REQUIRED" } }, 401);
+      attempt += 1;
+      return attempt === 1 ? jsonResponse(
           {
             error: {
               code: "CATALOGUE_UNAVAILABLE",
@@ -153,21 +154,19 @@ describe("T15 public catalogue UI", () => {
             },
           },
           503,
-        ),
-      )
-      .mockImplementationOnce(() =>
-        jsonResponse({
+        ) : jsonResponse({
           data: { movies },
           meta: { count: 10, limit: 10, catalogueRevision: "revision-test" },
-        }),
-      );
+        });
+    });
 
     render(<App />);
 
     fireEvent.click(await screen.findByRole("button", { name: "Retry" }));
 
     expect(await screen.findByText("Movie 10")).toBeInTheDocument();
-    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(attempt).toBe(2);
+    expect(fetchMock).toHaveBeenCalledWith("/api/auth/me", expect.anything());
   });
 
   it("keeps public details accessible after session checking without private rating requests", async () => {

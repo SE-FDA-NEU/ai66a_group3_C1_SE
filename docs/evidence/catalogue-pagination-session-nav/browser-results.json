@@ -1,0 +1,202 @@
+{
+  "screenshots": [
+    {
+      "name": "01-authenticated-home",
+      "url": "http://127.0.0.1:5173/",
+      "captureType": "browser viewport; address bar unavailable in this execution environment"
+    },
+    {
+      "name": "02-home-page-2",
+      "url": "http://127.0.0.1:5173/?page=2",
+      "captureType": "browser viewport; address bar unavailable in this execution environment"
+    },
+    {
+      "name": "03-popular-page-2",
+      "url": "http://127.0.0.1:5173/popular?page=2",
+      "captureType": "browser viewport; address bar unavailable in this execution environment"
+    },
+    {
+      "name": "04-filtered-recommendations-page-1",
+      "url": "http://127.0.0.1:5173/recommendations?genreId=35&page=1",
+      "captureType": "browser viewport; address bar unavailable in this execution environment"
+    },
+    {
+      "name": "05-filtered-recommendations-page-2",
+      "url": "http://127.0.0.1:5173/recommendations?genreId=35&page=2",
+      "captureType": "browser viewport; address bar unavailable in this execution environment"
+    },
+    {
+      "name": "06-zero-match-filter",
+      "url": "http://127.0.0.1:5173/recommendations?genreId=10402&page=1",
+      "captureType": "browser viewport; address bar unavailable in this execution environment"
+    },
+    {
+      "name": "07-clear-filter-restoration",
+      "url": "http://127.0.0.1:5173/recommendations?page=1",
+      "captureType": "browser viewport; address bar unavailable in this execution environment"
+    }
+  ],
+  "applicationApiRequests": [
+    {
+      "path": "/api/auth/login",
+      "method": "POST"
+    },
+    {
+      "path": "/api/me/recommendations?limit=10",
+      "method": "GET"
+    },
+    {
+      "path": "/api/me/recommendations?limit=10",
+      "method": "GET"
+    },
+    {
+      "path": "/api/auth/me",
+      "method": "GET"
+    },
+    {
+      "path": "/api/movies?limit=10",
+      "method": "GET"
+    },
+    {
+      "path": "/api/movies?limit=10",
+      "method": "GET"
+    },
+    {
+      "path": "/api/auth/me",
+      "method": "GET"
+    },
+    {
+      "path": "/api/movies?limit=10&page=2",
+      "method": "GET"
+    },
+    {
+      "path": "/api/movies?limit=10&page=2",
+      "method": "GET"
+    },
+    {
+      "path": "/api/auth/me",
+      "method": "GET"
+    },
+    {
+      "path": "/api/movies/popular?limit=10&page=2",
+      "method": "GET"
+    },
+    {
+      "path": "/api/movies/popular?limit=10&page=2",
+      "method": "GET"
+    },
+    {
+      "path": "/api/auth/me",
+      "method": "GET"
+    },
+    {
+      "path": "/api/genres",
+      "method": "GET"
+    },
+    {
+      "path": "/api/me/preferences",
+      "method": "GET"
+    },
+    {
+      "path": "/api/genres",
+      "method": "GET"
+    },
+    {
+      "path": "/api/me/preferences",
+      "method": "GET"
+    },
+    {
+      "path": "/api/me/preferences",
+      "method": "PUT"
+    },
+    {
+      "path": "/api/me/recommendations?limit=10",
+      "method": "GET"
+    },
+    {
+      "path": "/api/me/recommendations?limit=10",
+      "method": "GET"
+    },
+    {
+      "path": "/api/genres",
+      "method": "GET"
+    },
+    {
+      "path": "/api/genres",
+      "method": "GET"
+    },
+    {
+      "path": "/api/auth/me",
+      "method": "GET"
+    },
+    {
+      "path": "/api/me/recommendations?limit=10&genreId=35",
+      "method": "GET"
+    },
+    {
+      "path": "/api/me/recommendations?limit=10&genreId=35",
+      "method": "GET"
+    },
+    {
+      "path": "/api/genres",
+      "method": "GET"
+    },
+    {
+      "path": "/api/genres",
+      "method": "GET"
+    },
+    {
+      "path": "/api/auth/me",
+      "method": "GET"
+    },
+    {
+      "path": "/api/me/recommendations?limit=10&page=2&genreId=35",
+      "method": "GET"
+    },
+    {
+      "path": "/api/me/recommendations?limit=10&page=2&genreId=35",
+      "method": "GET"
+    },
+    {
+      "path": "/api/genres",
+      "method": "GET"
+    },
+    {
+      "path": "/api/genres",
+      "method": "GET"
+    },
+    {
+      "path": "/api/auth/me",
+      "method": "GET"
+    },
+    {
+      "path": "/api/me/recommendations?limit=10&genreId=10402",
+      "method": "GET"
+    },
+    {
+      "path": "/api/me/recommendations?limit=10&genreId=10402",
+      "method": "GET"
+    },
+    {
+      "path": "/api/genres",
+      "method": "GET"
+    },
+    {
+      "path": "/api/genres",
+      "method": "GET"
+    },
+    {
+      "path": "/api/me/recommendations?limit=10&catalogueRevision=25776801-1007-44c6-bee3-03e0d307d6e6",
+      "method": "GET"
+    },
+    {
+      "path": "/api/genres",
+      "method": "GET"
+    },
+    {
+      "path": "/api/genres",
+      "method": "GET"
+    }
+  ],
+  "note": "These are genuine Chrome viewport screenshots; this execution session could not capture Chrome window chrome/address bar (Windows screen capture returned an invalid handle). URLs were recorded by Playwright and no image was edited to add an address bar. See network-observation.json for all browser request hosts."
+}

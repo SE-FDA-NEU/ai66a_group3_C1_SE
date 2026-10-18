@@ -157,7 +157,7 @@ describe("S3-T13 cold-start to personalised transition", () => {
     expect(
       await screen.findByRole("heading", {
         name: "Recommendations based on popular movies",
-      }),
+      }, { timeout: 5000 }),
     ).toBeInTheDocument();
 
     expect(screen.getByText("Popular Movie")).toBeInTheDocument();

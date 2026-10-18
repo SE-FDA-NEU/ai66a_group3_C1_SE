@@ -99,6 +99,10 @@ export async function getCurrentUser(): Promise<User> {
   }
 
   const body = (await response.json()) as AuthResponse;
+  if (!body?.data?.user || typeof body.data.user.id !== "string" ||
+      typeof body.data.user.email !== "string") {
+    throw new ApiError("Unable to check your session", 0);
+  }
   return body.data.user;
 }
 

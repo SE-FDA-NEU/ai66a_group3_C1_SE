@@ -1,298 +1,142 @@
-
 import { useEffect, useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-
-import {
-  getRecommendations,
-  RecommendationApiError,
-  type RecommendationResult,
-} from "../api/recommendations.ts";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { getRecommendationPage, RecommendationApiError,
+  type RecommendationResult } from "../api/recommendations.ts";
+import type { PageMeta } from "../api/movies.ts";
 import { useAuth } from "../auth/authState.ts";
 import RecommendationFilter from "../components/RecommendationFilter.tsx";
 import RecommendationGuidance from "../components/RecommendationGuidance.tsx";
+import SessionNavigation from "../components/SessionNavigation.tsx";
 import { currentReturnPath } from "../navigation/movieDetailReturn.ts";
+import { pageSearch, readPage } from "../navigation/listPage.ts";
 
-const RECOMMENDATION_LIMIT = 10;
-
-type RecommendationStateProps = {
-  status: "loading" | "empty";
-};
-
-export function RecommendationState({
-  status,
-}: RecommendationStateProps) {
-  if (status === "loading") {
-    return <p role="status">Loading recommendations...</p>;
-  }
-
-  return (
-    <div className="recommendation-empty-state" role="status">
-      <h3>No recommendations available yet.</h3>
-      <p>Enter your preferences to get personalised recommendations.</p>
-      <Link className="text-link" to="/preferences">
-        Enter preferences &rarr;
-      </Link>
-    </div>
-  );
+export function RecommendationState({ status }: { status: "loading" | "empty" }) {
+  if (status === "loading") return <p role="status">Loading recommendations...</p>;
+  return <div className="recommendation-empty-state" role="status">
+    <h3>No recommendations available yet.</h3>
+    <p>Enter your preferences to get personalised recommendations.</p>
+    <Link className="text-link" to="/preferences">Enter preferences &rarr;</Link>
+  </div>;
 }
 
-type RecommendationLoad =
-  | { status: "loading" }
+type Load = { key: string } & (
+  | { status: "ready"; result: RecommendationResult; meta: PageMeta }
   | { status: "error"; message: string }
-  | { status: "ready"; result: RecommendationResult };
+);
 
-type RecommendationSnapshot = {
-  userId: string;
-  recommendationVersion: number;
-  reloadVersion: number;
-  load: RecommendationLoad;
-};
-
-function RecommendationsPage() {
+export default function RecommendationsPage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const auth = useAuth();
-
-  const {
-    handleUnauthorized,
-    recommendationVersion,
-  } = auth;
-
-  const [isSigningOut, setIsSigningOut] = useState(false);
-  const [error, setError] = useState("");
-
-  const [snapshot, setSnapshot] =
-    useState<RecommendationSnapshot | null>(null);
-
-  const [reloadVersion, setReloadVersion] = useState(0);
-  const requestGenerationRef = useRef(0);
-
-  const user =
-    auth.status === "authenticated" ? auth.user : null;
-
-  const userId = user?.id ?? null;
-
-  // A snapshot is valid only for the current account and request version.
-  // Changing preferences or retrying immediately hides the old result.
-  const load: RecommendationLoad =
-    snapshot &&
-    snapshot.userId === userId &&
-    snapshot.recommendationVersion === recommendationVersion &&
-    snapshot.reloadVersion === reloadVersion
-      ? snapshot.load
-      : { status: "loading" };
+  const { handleUnauthorized, recommendationVersion } = auth;
+  const page = readPage(location.search);
+  const rawGenre = new URLSearchParams(location.search).get("genreId");
+  const genreId = rawGenre && /^[1-9]\d*$/.test(rawGenre) && Number.isSafeInteger(Number(rawGenre)) ?
+    Number(rawGenre) : undefined;
+  const userId = auth.status === "authenticated" ? auth.user.id : null;
+  const [retry, setRetry] = useState(0);
+  const [load, setLoad] = useState<Load | null>(null);
+  const revision = useRef<string | undefined>(undefined);
+  const previousContext = useRef<{ userId: string; version: number } | null>(null);
+  const key = `${userId}:${recommendationVersion}:${page}:${genreId ?? ""}:${retry}`;
+  const current = load?.key === key ? load : null;
 
   useEffect(() => {
-    if (!userId) {
-      return;
+    const params = new URLSearchParams(location.search);
+    const rawPage = params.get("page");
+    if (rawPage !== null && rawPage !== String(page)) params.set("page", String(page));
+    if (rawGenre !== null && genreId === undefined) params.delete("genreId");
+    if (params.toString() !== location.search.replace(/^\?/, "")) {
+      navigate({ pathname: location.pathname, search: `?${params}` }, { replace: true });
     }
+  }, [location.pathname, location.search, navigate, page, rawGenre, genreId]);
 
+  useEffect(() => {
+    if (!userId) return;
+    const previous = previousContext.current;
+    previousContext.current = { userId, version: recommendationVersion };
+    if (previous && (previous.userId !== userId || previous.version !== recommendationVersion)) {
+      revision.current = undefined;
+      if (page !== 1 || genreId !== undefined)
+        navigate("/recommendations?page=1", { replace: true });
+    }
+  }, [userId, recommendationVersion, page, genreId, navigate]);
+
+  useEffect(() => {
+    if (!userId) return;
     const controller = new AbortController();
-    const requestGeneration = ++requestGenerationRef.current;
-    let isActive = true;
+    getRecommendationPage(page, genreId, revision.current, controller.signal).then(body => {
+      if (controller.signal.aborted) return;
+      revision.current = body.meta.catalogueRevision;
+      if (page > body.meta.totalPages && page !== 1) {
+        navigate({ pathname: location.pathname, search: pageSearch(location.search,
+          Math.max(1, body.meta.totalPages)) }, { replace: true });
+        return;
+      }
+      setLoad({ key, status: "ready", result: body.data, meta: body.meta });
+    }).catch(error => {
+      if (controller.signal.aborted) return;
+      if (error instanceof RecommendationApiError && error.status === 401) {
+        handleUnauthorized(); return;
+      }
+      if (error instanceof RecommendationApiError && error.code === "CATALOGUE_CHANGED") {
+        revision.current = undefined;
+        navigate({ pathname: location.pathname, search: pageSearch(location.search, 1) }, { replace: true });
+        if (page === 1) setRetry(value => value + 1);
+        return;
+      }
+      setLoad({ key, status: "error", message: error instanceof Error ? error.message : "Something went wrong" });
+    });
+    return () => controller.abort();
+  }, [userId, recommendationVersion, handleUnauthorized, page, genreId,
+    retry, key, navigate, location.pathname, location.search]);
 
-    const isCurrentRequest = () =>
-      isActive &&
-      !controller.signal.aborted &&
-      requestGenerationRef.current === requestGeneration;
-
-    getRecommendations(RECOMMENDATION_LIMIT, controller.signal)
-      .then((result) => {
-        if (!isCurrentRequest()) {
-          return;
-        }
-
-        setSnapshot({
-          userId,
-          recommendationVersion,
-          reloadVersion,
-          load: {
-            status: "ready",
-            result,
-          },
-        });
-      })
-      .catch((requestError: unknown) => {
-        if (!isCurrentRequest()) {
-          return;
-        }
-
-        if (
-          requestError instanceof RecommendationApiError &&
-          requestError.status === 401
-        ) {
-          handleUnauthorized();
-          return;
-        }
-
-        setSnapshot({
-          userId,
-          recommendationVersion,
-          reloadVersion,
-          load: {
-            status: "error",
-            message:
-              requestError instanceof Error
-                ? requestError.message
-                : "Something went wrong",
-          },
-        });
-      });
-
-    return () => {
-      isActive = false;
-      controller.abort();
-    };
-  }, [
-    handleUnauthorized,
-    recommendationVersion,
-    reloadVersion,
-    userId,
-  ]);
-
-  function handleRetry() {
-    setReloadVersion((version) => version + 1);
+  function changeGenre(next?: number) {
+    const params = new URLSearchParams(location.search);
+    params.set("page", "1");
+    if (next === undefined) params.delete("genreId");
+    else params.set("genreId", String(next));
+    navigate({ pathname: location.pathname, search: `?${params}` });
   }
 
-  const result = load.status === "ready" ? load.result : null;
+  const result = current?.status === "ready" ? current.result : null;
+  const meta = current?.status === "ready" ? current.meta : null;
+  const title = result?.noMatch ? "Popular alternatives" :
+    result?.personalised ? "Recommended for you" : result ? "Popular" : "Your recommendations";
 
-  const sectionTitle = result
-    ? result.noMatch
-      ? "Popular alternatives"
-      : result.personalised
-        ? "Recommended for you"
-        : "Popular"
-    : "Your recommendations";
-
-  async function handleSignOut() {
-    setError("");
-    setIsSigningOut(true);
-
-    try {
-      await auth.signOut();
-    } catch (signOutError: unknown) {
-      setError(
-        signOutError instanceof Error
-          ? signOutError.message
-          : "Something went wrong",
-      );
-
-      setIsSigningOut(false);
-    }
-  }
-
-  return (
-    <main className="page">
-      <header className="topbar">
-        <div>
-          <p className="eyebrow">
-            AI Movie Recommendation System
-          </p>
-          <h1>Recommendations</h1>
-        </div>
-
-        <div className="session-actions">
-          {user ? (
-            <span className="muted">{user.email}</span>
-          ) : null}
-
-          <button
-            type="button"
-            className="button-secondary"
-            onClick={handleSignOut}
-            disabled={isSigningOut}
-          >
-            {isSigningOut ? "Signing out..." : "Sign out"}
-          </button>
-        </div>
-      </header>
-
-      <nav className="page-nav" aria-label="Recommendation navigation">
-        <Link className="text-link" to="/preferences">
-          Change my genres
-        </Link>
-        <Link className="text-link" to="/">
-          Browse the catalogue
-        </Link>
-      </nav>
-
-      {error ? (
-        <p className="form-error" role="alert">
-          {error}
-        </p>
-      ) : null}
-
-      <section
-        className="content-card recommendations-card"
-        aria-labelledby="recommendations-title"
-      >
-        <div className="section-heading">
-          <p className="eyebrow">Your next watch</p>
-
-          <h2 id="recommendations-title">
-            {sectionTitle}
-          </h2>
-
-          {result && result.mode === "popular" ? (
-            <p className="muted recommendation-mode">
-              Not personalised
-            </p>
-          ) : null}
-        </div>
-
-        {load.status === "loading" ? (
-          <RecommendationState status="loading" />
-        ) : load.status === "error" ? (
-          <div className="recommendation-empty-state" role="alert">
-            <h3 id="recommendation-error-title">
-              Recommendations are unavailable
-            </h3>
-
-            <p id="recommendation-error-message">
-              {load.message} Choose Retry to load your recommendations again.
-            </p>
-
-            <button
-              type="button"
-              onClick={handleRetry}
-              aria-describedby="recommendation-error-title recommendation-error-message"
-            >
-              Retry
-            </button>
-          </div>
-        ) : load.result.noMatch ? (
-          <>
-            <RecommendationGuidance
-              variant="no-match"
-              hasAlternatives={load.result.movies.length > 0}
-              onRetry={handleRetry}
-            />
-
-            {load.result.movies.length > 0 ? (
-              <RecommendationFilter
-                ariaLabel="Popular alternatives"
-                snapshot={load.result}
-                returnTo={currentReturnPath(location)}
-              />
-            ) : null}
-          </>
-        ) : load.result.movies.length === 0 ? (
-          <RecommendationGuidance variant="empty" />
-        ) : (
-          <>
-            {!load.result.personalised ? (
-              <RecommendationGuidance variant="cold-start" />
-            ) : null}
-
-            <RecommendationFilter
-              ariaLabel={sectionTitle}
-              snapshot={load.result}
-              returnTo={currentReturnPath(location)}
-            />
-          </>
-        )}
-      </section>
-    </main>
-  );
+  return <main className="page">
+    <header className="topbar">
+      <div><p className="eyebrow">AI Movie Recommendation System</p><h1>Recommendations</h1></div>
+      <SessionNavigation currentPage="recommendations" />
+    </header>
+    <nav className="page-nav" aria-label="Recommendation navigation">
+      <Link className="text-link" to="/preferences">Change my genres</Link>
+      <Link className="text-link" to="/">Browse the catalogue</Link>
+    </nav>
+    <section className="content-card recommendations-card" aria-labelledby="recommendations-title">
+      <div className="section-heading"><p className="eyebrow">Your next watch</p>
+        <h2 id="recommendations-title">{title}</h2>
+        {result?.mode === "popular" ? <p className="muted recommendation-mode">Not personalised</p> : null}
+      </div>
+      {!current ? <RecommendationState status="loading" /> : current.status === "error" ?
+        <div className="recommendation-empty-state" role="alert">
+          <h3 id="recommendation-error-title">Recommendations are unavailable</h3>
+          <p id="recommendation-error-message">{current.message} Choose Retry to load your recommendations again.</p>
+          <button type="button" onClick={() => setRetry(value => value + 1)}
+            aria-describedby="recommendation-error-title recommendation-error-message">Retry</button>
+        </div> : <>
+          {result?.noMatch ? <RecommendationGuidance variant="no-match"
+            hasAlternatives={(meta?.unfilteredTotal ?? 0) > 0}
+            onRetry={() => setRetry(value => value + 1)} /> : null}
+          {result && !result.personalised && !result.noMatch && meta && meta.unfilteredTotal > 0 ?
+            <RecommendationGuidance variant="cold-start" /> : null}
+          {result && meta && meta.unfilteredTotal === 0 && !result.noMatch ?
+            <RecommendationState status="empty" /> : null}
+          {result && meta && (meta.unfilteredTotal > 0 || genreId !== undefined) ?
+            <RecommendationFilter snapshot={result} meta={meta} genreId={genreId}
+              onGenreChange={changeGenre} ariaLabel={title}
+              returnTo={currentReturnPath(location)} /> : null}
+        </>}
+    </section>
+  </main>;
 }
-
-export default RecommendationsPage;

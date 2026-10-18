@@ -11,6 +11,8 @@ from app.db.models import CatalogMovie
 from app.repositories.movies import to_movie_summary_dto
 from app.repositories.preferences import list_user_preference_genres
 from app.repositories.recommendations import (
+    count_genre_matched_movies,
+    count_popular_recommendation_movies,
     list_genre_matched_movies,
     list_popular_recommendation_movies,
 )
@@ -27,6 +29,8 @@ class AccountRecommendationResult:
     mode: Literal["popular", "personalised"]
     personalised: bool
     no_match: bool
+    total: int
+    unfiltered_total: int
 
 
 def build_account_recommendations(
@@ -34,6 +38,8 @@ def build_account_recommendations(
     *,
     user_id: str,
     limit: int,
+    page: int = 1,
+    genre_id: int | None = None,
 ) -> AccountRecommendationResult:
     """Build recommendations from one session-resolved account and local data.
 
@@ -46,15 +52,24 @@ def build_account_recommendations(
 
     selected_genres = list_user_preference_genres(session, user_id=user_id)
     if not selected_genres:
-        return _popular_result(session, limit=limit, no_match=False)
+        return _popular_result(session, limit=limit, page=page,
+                               genre_id=genre_id, no_match=False)
 
+    selected_ids = [genre.id for genre in selected_genres]
+    unfiltered_total = count_genre_matched_movies(session, genre_ids=selected_ids)
+    if unfiltered_total == 0:
+        return _popular_result(session, limit=limit, page=page,
+                               genre_id=genre_id, no_match=True)
+    total = count_genre_matched_movies(
+        session, genre_ids=selected_ids, view_genre_id=genre_id
+    ) if genre_id is not None else unfiltered_total
     matched_movies = list_genre_matched_movies(
         session,
-        genre_ids=(genre.id for genre in selected_genres),
+        genre_ids=selected_ids,
         limit=limit,
+        page=page,
+        view_genre_id=genre_id,
     )
-    if not matched_movies:
-        return _popular_result(session, limit=limit, no_match=True)
 
     return AccountRecommendationResult(
         movies=[
@@ -64,6 +79,8 @@ def build_account_recommendations(
         mode="personalised",
         personalised=True,
         no_match=False,
+        total=total,
+        unfiltered_total=unfiltered_total,
     )
 
 
@@ -71,9 +88,16 @@ def _popular_result(
     session: Session,
     *,
     limit: int,
+    page: int,
+    genre_id: int | None,
     no_match: bool,
 ) -> AccountRecommendationResult:
-    movies = list_popular_recommendation_movies(session, limit=limit)
+    unfiltered_total = count_popular_recommendation_movies(session)
+    total = (count_popular_recommendation_movies(session, view_genre_id=genre_id)
+             if genre_id is not None else unfiltered_total)
+    movies = list_popular_recommendation_movies(
+        session, limit=limit, page=page, view_genre_id=genre_id
+    )
     return AccountRecommendationResult(
         movies=[
             _to_recommendation_movie(movie, selected_genres=[]) for movie in movies
@@ -81,6 +105,8 @@ def _popular_result(
         mode="popular",
         personalised=False,
         no_match=no_match,
+        total=total,
+        unfiltered_total=unfiltered_total,
     )
 
 

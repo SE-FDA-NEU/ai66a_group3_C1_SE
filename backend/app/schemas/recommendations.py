@@ -44,6 +44,10 @@ class RecommendationMeta(BaseModel):
 
     count: int
     limit: int
+    page: int
+    total: int
+    totalPages: int
+    unfilteredTotal: int
     catalogueRevision: str
 
 

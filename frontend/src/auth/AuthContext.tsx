@@ -53,17 +53,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signIn = useCallback(async (email: string, password: string) => {
-    const user = await login(email, password);
-    sessionGeneration.current += 1;
+    const generation = ++sessionGeneration.current;
     pendingCheck.current = null;
-    setState({ status: "authenticated", user });
+    const user = await login(email, password);
+    if (generation === sessionGeneration.current)
+      setState({ status: "authenticated", user });
   }, []);
 
   const signOut = useCallback(async () => {
-    await logout();
-    sessionGeneration.current += 1;
+    const generation = ++sessionGeneration.current;
     pendingCheck.current = null;
-    setState({ status: "unauthenticated", justSignedOut: true });
+    await logout();
+    if (generation === sessionGeneration.current) {
+      setRecommendationVersion((version) => version + 1);
+      setState({ status: "unauthenticated", justSignedOut: true });
+    }
   }, []);
 
   const handleUnauthorized = useCallback(() => {

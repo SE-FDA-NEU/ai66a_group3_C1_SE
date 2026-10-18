@@ -643,6 +643,26 @@ button:disabled {
   margin: 0 0 1rem;
 }
 
+.page-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 1.5rem auto;
+}
+
+.page-controls button[aria-current="page"] {
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.session-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .page > .page-nav {
   width: min(100%, 960px);
   margin: -1rem auto 1.5rem;

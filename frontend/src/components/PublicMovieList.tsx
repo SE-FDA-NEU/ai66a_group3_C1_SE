@@ -1,0 +1,88 @@
+import { useEffect, useRef, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { listMoviePage, MovieApiError, type MovieSummary, type PageMeta } from "../api/movies.ts";
+import { currentReturnPath } from "../navigation/movieDetailReturn.ts";
+import { pageSearch, readPage, resultSummary } from "../navigation/listPage.ts";
+import MovieGrid from "./MovieGrid.tsx";
+import PageControls from "./PageControls.tsx";
+import SessionNavigation from "./SessionNavigation.tsx";
+
+type Load = { key: string } & (
+  | { status: "ready"; movies: MovieSummary[]; meta: PageMeta }
+  | { status: "error"; message: string }
+);
+
+export default function PublicMovieList({ kind }: { kind: "catalogue" | "popular" }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const page = readPage(location.search);
+  const [retry, setRetry] = useState(0);
+  const [load, setLoad] = useState<Load | null>(null);
+  const revision = useRef<string | undefined>(undefined);
+  const key = `${kind}:${page}:${retry}`;
+  const current = load?.key === key ? load : null;
+
+  useEffect(() => {
+    const raw = new URLSearchParams(location.search).get("page");
+    if (raw !== null && String(page) !== raw) {
+      navigate({ pathname: location.pathname, search: pageSearch(location.search, page) }, { replace: true });
+    }
+  }, [location.pathname, location.search, navigate, page]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    listMoviePage(kind, page, revision.current, controller.signal).then(body => {
+      if (controller.signal.aborted) return;
+      revision.current = body.meta.catalogueRevision;
+      if (page > body.meta.totalPages && page !== 1) {
+        navigate({ pathname: location.pathname, search: pageSearch(location.search,
+          Math.max(1, body.meta.totalPages)) }, { replace: true });
+        return;
+      }
+      setLoad({ key, status: "ready", movies: body.data.movies, meta: body.meta });
+    }).catch(error => {
+      if (controller.signal.aborted) return;
+      if (error instanceof MovieApiError && error.code === "CATALOGUE_CHANGED") {
+        revision.current = undefined;
+        navigate({ pathname: location.pathname, search: pageSearch(location.search, 1) }, { replace: true });
+        if (page === 1) setRetry(value => value + 1);
+        return;
+      }
+      setLoad({ key, status: "error", message: error instanceof Error ? error.message : "Something went wrong" });
+    });
+    return () => controller.abort();
+  }, [kind, page, retry, key, navigate, location.pathname, location.search]);
+
+  const popular = kind === "popular";
+  return <main className="page catalogue-page">
+    <header className="catalogue-header">
+      <div>
+        <p className="eyebrow">AI Movie Recommendation System</p>
+        <h1>{popular ? "Popular movies" : "Find your next movie"}</h1>
+        <p className="muted">{popular ? "Browse the highest-ranked movies in the active catalogue." : "Browse the public local movie catalogue."}</p>
+        {!popular ? <p className="muted" id="start-hint">Choose Start to pick up to 5 favourite genres and get recommendations saved to your account.</p> : null}
+      </div>
+      <nav className="catalogue-actions" aria-label="Public navigation">
+        {popular ? <Link className="button-link button-secondary" to="/">Movie catalogue</Link> : <>
+          <Link className="button-link" to="/preferences" aria-describedby="start-hint">Start</Link>
+          <Link className="button-link button-secondary" to="/popular">Popular movies</Link>
+          <Link className="button-link button-secondary" to="/about-recommendations">How recommendations work</Link>
+        </>}
+        <SessionNavigation />
+      </nav>
+    </header>
+    {!current ? <p className="status-panel" role="status">{popular ? "Loading popular movies..." : "Loading movies..."}</p> :
+      current.status === "error" ? <section className="status-panel" role="alert">
+        <h2>{popular ? "Popular movies are unavailable" : "Movies are unavailable"}</h2>
+        <p>{current.message}</p>
+        <button type="button" onClick={() => setRetry(value => value + 1)}>Retry</button>
+      </section> : current.meta.total === 0 ? <section className="status-panel" role="status">
+        <h2>{popular ? "Popular movies are not available yet" : "No movies available"}</h2>
+        {!popular ? <p className="muted">The active catalogue does not contain any movies yet.</p> : null}
+      </section> : <>
+        <p className="muted">{resultSummary(current.meta)}</p>
+        <MovieGrid ariaLabel={popular ? "Popular movies" : "Movie catalogue"} movies={current.movies} returnTo={currentReturnPath(location)} />
+        <PageControls meta={current.meta} />
+      </>}
+  </main>;
+}
