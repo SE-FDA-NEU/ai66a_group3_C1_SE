@@ -1,36 +1,28 @@
 # Milestone 3 — UI dossier
 
-**Submission status: DRAFT — final export pending merge and missing evidence.**
-Markdown is authoritative; if this PDF differs from the repository, use the repository.
+**Team:** Team 03 — AI Movie Recommendation System
 
-### Cover
+**Topic:** AI Movie Recommendation System
 
-| Field | Recorded value |
-|---|---|
-| Product / team | AI Movie Recommendation System / Team 03, AI66A Group 3 C1 |
-| Assigned topic | AI Movie Recommendation System |
-| Product Owner | Nguyen Xuan Kiet — `@kietxuan` |
-| Sprint 3 Scrum Master | Vu Quoc Huy — `@vu-huzy` |
-| Sprint 3 | 05–18 October 2026; PO-confirmed dates, Asia/Ho_Chi_Minh |
-| Repository | [SE-FDA-NEU/ai66a_group3_C1_SE](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE) |
-| Project board | [@group3_c1_se — Project 9](https://github.com/orgs/SE-FDA-NEU/projects/9) |
-| Setup guide | [docs/SETUP.md on main](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/docs/SETUP.md) |
-| Submitter | Nguyen Xuan Kiet |
+**Members:**
 
-| Member (README spelling) | GitHub | Student ID |
-|---|---|---|
-| Nguyen Xuan Kiet | `@kietxuan` | 11247306 |
-| Tran Minh Hoang | `@hoang3003` | 11247292 |
-| Tran Tuan Anh | `@anotify-vie` | 11247264 |
-| Vu Quoc Huy | `@vu-huzy` | 11247301 |
-| Nguyen Tuan Anh | `@NguyenTuanAnh0608` | 11247260 |
+- Nguyen Xuan Kiet (11247306)
+- Tran Minh Hoang (11247292)
+- Tran Tuan Anh (11247264)
+- Vu Quoc Huy (11247301)
+- Nguyen Tuan Anh (11247260)
 
-Names, roles and links: [README](../README.md). The PO supplied the exact topic,
-five student IDs and actual submitter in chat on 2026-10-18.
+**Product Owner:** `@kietxuan`
 
-Documentation base: merged `main` at
-`bf18ab860fc3e486b57fc3b5ccac4db94c283995` (C03 PR #187).
-This document has no independent review, approval, merge or LMS receipt yet.
+**Scrum Master:** `@vu-huzy` (Sprint 3)
+
+**Repository:** [SE-FDA-NEU/ai66a_group3_C1_SE](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE)
+
+**Project board:** [@group3_c1_se — Project 9](https://github.com/orgs/SE-FDA-NEU/projects/9)
+
+**Setup guide:** [docs/SETUP.md on main](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/docs/SETUP.md)
+
+**Submitted by:** Nguyen Xuan Kiet
 
 <!-- pdf:page -->
 
