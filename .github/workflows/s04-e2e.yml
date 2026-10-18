@@ -28,12 +28,15 @@ jobs:
           node-version: "24"
       - name: Verify parent cleanup after forced backend termination
         run: npm --prefix frontend run test:s04:runner
+      - name: Verify M3 newlines, process trees and cleanup reports
+        run: npm --prefix frontend run test:m3:verifier
 
   s04-acceptance:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
       TMDB_READ_ACCESS_TOKEN: ""
+      TMDB_NETWORK_DISABLED: "1"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

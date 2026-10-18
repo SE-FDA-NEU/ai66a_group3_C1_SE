@@ -1,0 +1,23 @@
+
+> frontend@0.0.0 test:m3:verifier
+> node --test scripts/verify-m3-handoff.node-test.mjs
+
+✔ clean CRLF checkout matches Git LF content, including Unicode and mixed newlines (1.1692ms)
+✔ newline normalization still detects content, whitespace, final newline and byte changes (0.2498ms)
+✔ Windows stops the entire tree and waits for server close before returning (5.0582ms)
+✔ Windows server close timeout is bounded and reported (22.4249ms)
+✔ stops a real server and its child holding the database before removal (513.5537ms)
+✔ writes report after persistent EBUSY when journey is PASS (4.9738ms)
+✔ writes report after persistent EBUSY when journey is FAIL (4.3064ms)
+✔ browser and server shutdown failures do not skip remaining cleanup or report (0.8846ms)
+✔ transient Windows lock is retried before writing a successful report (1527.5877ms)
+✔ successful cleanup preserves journey PASS and its exit code (4.76ms)
+✔ successful cleanup preserves journey FAIL and its exit code (6.2293ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2182.3646

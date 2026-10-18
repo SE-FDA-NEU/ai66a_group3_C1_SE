@@ -51,8 +51,8 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DATABASE_URL: sqlite:///./data/app.db
       TMDB_READ_ACCESS_TOKEN: ""
+      TMDB_NETWORK_DISABLED: "1"
 
     steps:
       - name: Checkout repository
@@ -71,22 +71,13 @@ jobs:
           python -m pip install -r backend/requirements.lock.txt
           python -m pip install -e "./backend[dev]" --no-deps
 
-      - name: Create local data directory
-        run: mkdir -p data
-
-      - name: Run database migrations
-        run: |
-          python -m alembic \
-            -c backend/alembic.ini \
-            upgrade head
-
       - name: Lint backend
         run: |
           ruff check backend --output-format=github
 
       - name: Run backend tests
         run: |
-          python -m pytest backend/tests \
+          python backend/scripts/run_isolated_tests.py \
             -v \
             --cov=backend/app \
             --cov-report=term-missing \
@@ -183,7 +174,7 @@ jobs:
       - name: Check forbidden files
         shell: bash
         run: |
-          if git ls-files | grep -E '(^|/)\.env$|\.sql$|\.sqlite$|\.sqlite3$|\.dump$'
+          if git ls-files | grep -E '(^|/)\.env$|\.db$|\.sql$|\.sqlite$|\.sqlite3$|\.dump$'
           then
             echo "::error::Environment files or database dumps must not be committed."
             exit 1

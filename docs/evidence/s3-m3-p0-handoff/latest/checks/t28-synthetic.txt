@@ -1,0 +1,23 @@
+
+> frontend@0.0.0 test:t28:acceptance
+> node scripts/verify-t28-backdrop.mjs --evidence-dir frontend/test-results/t25-final-t28-synthetic
+
+PASS bright-desktop
+PASS bright-mobile
+PASS dark-mobile
+PASS null-mobile
+PASS broken-mobile
+PASS delayed-real-details-A-to-B
+PASS delayed-image-events-A-to-C
+PASS broken-A-does-not-poison-C
+PASS account-rating-and-delayed-old-account
+PASS delayed-rating-movie-A-to-B
+PASS UI-ranking-after-media-only-update
+PASS media-audit-valid-11
+PASS media-audit-valid-12
+PASS media-audit-missing-13
+PASS media-audit-invalid-14
+PASS media-audit-failure-15
+PASS media-audit-clear-16
+PASS actual-API-null-and-unknown
+T28 synthetic-offline: PASS; 18 passed cases; temporary_database_removed=true

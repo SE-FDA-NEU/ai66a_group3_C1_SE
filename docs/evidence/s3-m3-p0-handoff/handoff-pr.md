@@ -1,50 +1,75 @@
-# Proposed title
+# T25 handoff PR and independent reviewer checklist
 
-[#127] Record final M3 P0 acceptance and #136 handoff evidence
+PR: [#184](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/184)
 
-# Proposed PR description
+Title: `[#127] Verify final M3 P0 acceptance and prepare handoff evidence`
 
-Refs #127, #136, #135. No Story closure keywords.
+This is an existing PR, not unpublished/proposed work. It integrates C04 merge
+`0c4273ab792becb060fefd5e7341e755ed28d0a5`. Product application files match that
+main. [verification.json](verification.json) records actual tested local snapshot
+and executable fingerprints. Final hosted checks must target the published head.
 
-Consolidates acceptance for application candidate
-`86a758eb2468f3e23357b69adf3c3183e5110a40`. Reuses merged T12/T14/T16/T18/T21/
-T22/T23/T24/T29 and rating/reset evidence, refreshes the real browser/API/SQLite
-checks, and records all six P0 ACs plus separate S06/S09 results.
+## What changed
 
-Adds a focused first-screen live handoff runner, allows the existing S13 live
-runner to use a disposable backup of an accepted TMDb snapshot, and replaces
-typed feature navigation in that live journey with visible links. Adds only
-missing real-browser fallback/not-found and exact-error assertions to the
-existing suites. Application source and production routes are unchanged.
+- Run M3 verifier regressions in the existing **Ubuntu/Windows** CI matrix;
+  previously `test:m3:verifier` existed but no workflow invoked it.
+- Explicitly disable provider networking in M3 runtime children. Allow installed
+  browser channel locally; keep default Playwright Chromium unchanged.
+- Refresh six-P0 matrix, separate S06/S09 report, current 255-film provenance,
+  C04 merged state, safe reproduction and #136 handoff.
+- Preserve old macOS evidence as history; add actual Windows logs/captures and
+  current executable-source hashes. No old count/SHA is silently overwritten.
+- Record PO-confirmed Trang walkthrough without inventing session details;
+  keep genuine review gates and T33 bridge intermittency explicit.
 
-Local results: 417 backend passes/1 inherited skip; 236 frontend passes; 10
-synthetic browser passes/1 opt-in live skip; separate live S13 1 pass; existing
-T12/T21/T22 verifiers pass; T16 integration 1 pass; runner cleanup 3 passes;
-linters/build pass. Fresh-clone locked installs, migration to `c6f8a2d4e901`,
-real TMDb import and first-screen browser smoke pass. The exact application
-candidate has 11 successful hosted checks; these local acceptance additions
-still need their own committed SHA, CI, independent approval and merge.
+## Verification actually performed
 
-All Story statuses remain `partly works` until the final AC + DoD gate is
-reviewed. Existing #44/#45 closures need PO reconciliation. No token, database,
-dump, password or cookie is included. Reset is API-only; ratings do not rerank
-Sprint 3 recommendations.
+- Isolated backend **419 passed / 1 inherited skip**; Ruff passed.
+- Frontend **236 passed**; lint and production build passed.
+- M3 verifier **11 passed on Windows**; S04 cleanup **3 passed**.
+- S04/S13 synthetic browser **10 passed / 1 intentional live skip**; separate
+  accepted-TMDb S13 **1 passed**; M3 live **five grouped checks + cleanup PASS**.
+- T12/T21 browser and T22 catalogue-copy verifier **PASS**; T16 bridge **1 passed**.
+- T33 bridge: first attempt failed at logout, then standalone rerun and five
+  further standalone repetitions passed. The first failure remains in evidence.
+- T28 synthetic backdrop **18 passed**, temporary database removed.
+- Existing C04 fresh-installed clone advanced to integrated source: `pip check`,
+  M3 verifier and build PASS; first-screen browser replay PASS on its separate
+  20-film TMDb snapshot. This is not another fresh dependency installation.
 
-Evidence: [acceptance matrix, route map, reproduction and remaining gates](README.md).
+Reproduction, source boundaries and current captures: [README](README.md).
+These are viewport screenshots, not #136 address-bar submission images.
+Reset remains API-only; ratings do not rerank Sprint 3 recommendations.
 
-# Independent reviewer checklist — pending
+## Definition of Done — remaining checks stay unchecked
 
-- Confirm the application matches the pinned SHA and inspect acceptance-source
-  hashes; record this PR's actual committed SHA and check URLs after publication.
-- Reproduce first-screen registration, guest detail/popular/login guards,
-  cold-start → genres → save → recommendations → details → return.
-- Inspect all five S13 ACs, API/database attack/reset/restart assertions,
-  stale-response cases and exact Story messages.
-- Check live provenance, synthetic separation, mobile keyboard/recovery and
-  no credentials/database artifacts in the diff.
-- Inspect C04 setup limitations and #136 address-bar/PDF requirements.
-- Leave a substantive review comment, resolve findings, approve independently,
-  then merge through the normal repository workflow.
+- [ ] Every #127 gate, including human/session details, is verified.
+- [x] Merged C04 fresh-clone/setup evidence is linked.
+- [x] Automated acceptance/verifier regression coverage is included.
+- [ ] Hosted CI on the final published head is green and inspected.
+- [x] No token, `.env`, DB/dump, password or cookie is intended in this diff.
+- [x] Setup/docs state is reconciled with merged C04.
+- [ ] Substantive independent review of this final head is recorded.
 
-PR URL, final branch CI, review comment/approval and merge: **not yet available**.
-This file is review-ready material, not a claim that a review occurred.
+## Independent reviewer checklist
+
+1. Compare final-head executable fingerprints and inspect the new M3 step in
+   **both OS jobs**, not merely the existence of the test file.
+2. Reproduce visible navigation from `/`: registration/login, cold start,
+   1–5 preferences, reasons, details/return and sign-out.
+3. Inspect exact messages, data/loading/empty/error/retry, BR1 rejection, all
+   five S13 ACs, API/DB attacks/reset/restart and stale-response cases.
+4. Check live provenance, unchanged accepted source, synthetic separation,
+   mobile/keyboard and no sensitive artifacts.
+5. Inspect failed T33 log and passing reruns; do not erase the first result or
+   claim a definitive cause without reproduction evidence.
+6. Complete [human validation](human-validation.md): actual Trang session
+   details and genuine independent C04 review clarification; confirm #136 limits.
+7. Leave substantive feedback, resolve it and formally approve/merge only after
+   mandatory gates pass. Kiet's `4f3b2d2` approval is historical because Kiet
+   contributes this follow-up; use a non-contributing reviewer.
+
+No Story is newly closed here. `Closes #127` should take effect only when the
+team merges after sign-off. PO reconciles already-closed #44/#45 separately.
+AI assistance: Codex for acceptance tooling, tests, evidence/docs and the single
+follow-up integration commit; no generated human approvals or test outcomes.

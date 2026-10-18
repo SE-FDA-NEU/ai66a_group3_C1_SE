@@ -1,0 +1,378 @@
+{
+  "recordKind": "historical initial macOS run, not the current verification manifest",
+  "supersededBy": "verification.json",
+  "hashScope": "Original recording only; original report text was subsequently amended. Do not use these hashes to validate the current docs or verifier.",
+  "testedCommit": "86a758eb2468f3e23357b69adf3c3183e5110a40",
+  "recordedAtUtc": "2026-10-17T18:30:11.806057+00:00",
+  "tester": "Codex local verification on user request; not independent teammate review",
+  "initialWorkingTree": "clean main, up to date with origin/main",
+  "finalWorkingTree": "M backend/scripts/s04_acceptance_server.py\n M docs/traceability.md\n M frontend/e2e/s04.acceptance.ts\n M frontend/e2e/s13.acceptance.ts\n?? docs/evidence/s3-m3-p0-handoff/\n?? frontend/scripts/verify-m3-handoff.mjs",
+  "applicationDiffFromHead": "none",
+  "acceptanceSourceSha256": {
+    "backend/scripts/s04_acceptance_server.py": "bd25fdf16bcb07da45e9440041ec9594151c0ca0a02a266a10f14ddb149b76ad",
+    "frontend/e2e/s04.acceptance.ts": "4514bca391917c125e360bf3d56b4a38bd438dd7463fb6d00c8dd5954ad419cb",
+    "frontend/e2e/s13.acceptance.ts": "f92d3e5a1b4f9c083683ce613e65cc4291dc128616c7e5031bd0e7e6d42b0102",
+    "frontend/scripts/verify-m3-handoff.mjs": "d7910a874103b7b05a058a8ae4b06df3c4b2a4b0fd4aee3ae05fc33a6acc7218",
+    "docs/traceability.md": "a1798f831eaa596a9149731e5d08fd4e00e48251186878e7055a635c8da8bd06"
+  },
+  "commands": [
+    {
+      "command": "git rev-parse HEAD; git status",
+      "outcome": "exact candidate SHA; initially clean main, up to date with origin/main"
+    },
+    {
+      "command": "TMDB_READ_ACCESS_TOKEN='' .venv/bin/python -m pytest backend/tests -v",
+      "exitCode": 0,
+      "outcome": "417 passed, 1 skipped; rerun with loopback permission",
+      "log": "checks/backend-tests.txt"
+    },
+    {
+      "command": "TMDB_READ_ACCESS_TOKEN='' npm --prefix frontend test",
+      "exitCode": 0,
+      "outcome": "236 passed / 20 files",
+      "log": "checks/frontend-tests.txt"
+    },
+    {
+      "command": ".venv/bin/python -m ruff check backend",
+      "exitCode": 0,
+      "outcome": "All checks passed",
+      "log": "checks/ruff.txt"
+    },
+    {
+      "command": "npm --prefix frontend run lint",
+      "exitCode": 0,
+      "outcome": "passed",
+      "log": "checks/lint.txt"
+    },
+    {
+      "command": "npm --prefix frontend run build",
+      "exitCode": 0,
+      "outcome": "passed",
+      "log": "checks/build.txt"
+    },
+    {
+      "command": "npm --prefix frontend run test:s04:runner",
+      "exitCode": 0,
+      "outcome": "3 passed"
+    },
+    {
+      "command": "npx --prefix frontend playwright install chromium",
+      "exitCode": 0,
+      "outcome": "Chromium 156.0.8078.4 installed"
+    },
+    {
+      "command": "TMDB_READ_ACCESS_TOKEN='' npm --prefix frontend run test:s04:e2e",
+      "exitCode": 0,
+      "outcome": "10 passed, 1 intentional opt-in live skip",
+      "log": "checks/s04-s13-synthetic.txt"
+    },
+    {
+      "command": "S13_TMDB_SMOKE=1 S13_TMDB_DATABASE='/Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/data/app.db' TMDB_READ_ACCESS_TOKEN='' npm --prefix frontend run test:s04:e2e -- s13.acceptance.ts --grep 'live TMDb'",
+      "exitCode": 0,
+      "outcome": "1 passed; copied existing accepted TMDb DB, no reimport",
+      "log": "checks/s13-live.txt"
+    },
+    {
+      "command": "TMDB_READ_ACCESS_TOKEN='' node frontend/scripts/verify-m3-handoff.mjs data/app.db docs/evidence/s3-m3-p0-handoff/live",
+      "exitCode": 0,
+      "outcome": "five grouped checks PASS; source provenance unchanged",
+      "log": "live/results.json"
+    },
+    {
+      "command": "TMDB_READ_ACCESS_TOKEN='' .venv/bin/python backend/scripts/verify_s02_recommendations_ui.py --evidence-dir /tmp/m3-handoff-86a758e/t12 --browser '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'",
+      "exitCode": 0,
+      "outcome": "PASS synthetic actual UI/API/DB",
+      "log": "checks/t12.txt"
+    },
+    {
+      "command": "DATABASE_URL='sqlite:////tmp/m3-handoff-86a758e/t22-copy.db' TMDB_READ_ACCESS_TOKEN='' .venv/bin/python -m alembic -c backend/alembic.ini upgrade head",
+      "exitCode": 0,
+      "outcome": "upgraded SQLite backup of accepted source to c6f8a2d4e901"
+    },
+    {
+      "command": "TMDB_READ_ACCESS_TOKEN='' .venv/bin/python backend/scripts/verify_s01_preferences_ui.py --database /tmp/m3-handoff-86a758e/t22-copy.db --evidence-dir /tmp/m3-handoff-86a758e/t22 --browser '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'",
+      "exitCode": 0,
+      "outcome": "all five AC + failure/recovery PASS live TMDb copy",
+      "log": "checks/t22-live.txt"
+    },
+    {
+      "command": "TMDB_READ_ACCESS_TOKEN='' .venv/bin/python backend/scripts/verify_s09_popular_ui.py --evidence-dir /tmp/m3-handoff-86a758e/t21 --browser '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'",
+      "exitCode": 0,
+      "outcome": "top ten/order/empty PASS synthetic real browser",
+      "log": "checks/t21.txt"
+    },
+    {
+      "command": "TMDB_READ_ACCESS_TOKEN='' npm --prefix frontend run test:t16:integration",
+      "exitCode": 0,
+      "outcome": "1 passed; real API/DB bridge",
+      "log": "checks/t16.txt"
+    },
+    {
+      "command": "git clone --no-hardlinks --quiet /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE /tmp/m3-handoff-86a758e/clean-clone",
+      "exitCode": 0,
+      "outcome": "fresh local clone at exact candidate; no previous config/db/dependencies"
+    },
+    {
+      "command": ".venv/bin/python -m venv /tmp/m3-handoff-86a758e/clean-clone/.venv",
+      "exitCode": 0,
+      "outcome": "fresh venv"
+    },
+    {
+      "cwd": "/tmp/m3-handoff-86a758e/clean-clone",
+      "command": ".venv/bin/python -m pip install -r backend/requirements.lock.txt",
+      "exitCode": 0,
+      "outcome": "locked install passed after DNS permission retry",
+      "log": "checks/clean-python-install.txt"
+    },
+    {
+      "cwd": "/tmp/m3-handoff-86a758e/clean-clone",
+      "command": ".venv/bin/python -m pip install -e './backend[dev]' --no-deps",
+      "exitCode": 0,
+      "outcome": "editable install passed after DNS permission retry",
+      "log": "checks/clean-editable-install.txt"
+    },
+    {
+      "cwd": "/tmp/m3-handoff-86a758e/clean-clone",
+      "command": "npm --prefix frontend ci",
+      "exitCode": 0,
+      "outcome": "241 packages installed; npm informational fsevents install-script warning",
+      "log": "checks/clean-node-install.txt"
+    },
+    {
+      "cwd": "/tmp/m3-handoff-86a758e/clean-clone",
+      "command": "python -m alembic -c backend/alembic.ini upgrade head; python -m app.cli.import_tmdb_catalogue",
+      "exitCode": 0,
+      "outcome": "fresh real TMDb import; no seed; separate snapshot",
+      "log": "checks/clean-migration-import.json"
+    },
+    {
+      "cwd": "/tmp/m3-handoff-86a758e/clean-clone",
+      "command": "TMDB_READ_ACCESS_TOKEN='' .venv/bin/python -m pytest backend/tests -v",
+      "exitCode": 0,
+      "outcome": "417 passed, 1 skipped after migrate-first ordering",
+      "log": "checks/clean-backend-tests.txt"
+    },
+    {
+      "cwd": "/tmp/m3-handoff-86a758e/clean-clone",
+      "command": "npm --prefix frontend test; npm --prefix frontend run lint; npm --prefix frontend run build; .venv/bin/python -m ruff check backend",
+      "exitCode": 0,
+      "outcome": "236 frontend passes, both linters and build passed; individual logs in checks/clean-*"
+    },
+    {
+      "cwd": "/tmp/m3-handoff-86a758e/clean-clone",
+      "command": "TMDB_READ_ACCESS_TOKEN='' node frontend/scripts/verify-m3-handoff.mjs data/app.db /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/docs/evidence/s3-m3-p0-handoff/clean-clone-live",
+      "exitCode": 0,
+      "outcome": "five grouped checks PASS with fresh dependencies/import; new verifier copied in, committed application unchanged",
+      "log": "clean-clone-live/results.json"
+    },
+    {
+      "command": "node --check frontend/scripts/verify-m3-handoff.mjs; git diff --check",
+      "exitCode": 0,
+      "outcome": "passed"
+    }
+  ],
+  "initialFailures": [
+    {
+      "command": "backend pytest / S04 browser inside sandbox",
+      "result": "411 passed, 1 skip, 6 HTTP setup errors; browser bind denied",
+      "reason": "sandbox loopback restriction; unrestricted reruns passed"
+    },
+    {
+      "command": "fresh-clone Python locked/editable install inside sandbox",
+      "result": "failed resolving dependency index/build dependency",
+      "reason": "sandbox DNS; unrestricted installs passed"
+    },
+    {
+      "command": "fresh-clone pytest started before migration",
+      "result": "416 passed, 1 skip, 1 health failure",
+      "reason": "ordering error in verification; migrate-first rerun passed 417/1"
+    },
+    {
+      "command": "new live verifier preliminary runs",
+      "result": "failed API relative URL and duplicate-form timing",
+      "reason": "verifier missing baseURL / SPA navigation race; corrected without app changes; subsequent accepted-source and clean-clone live PASS"
+    }
+  ],
+  "candidateGitHubChecks": [
+    {
+      "name": "Node build and tests",
+      "head_sha": "86a758eb2468f3e23357b69adf3c3183e5110a40",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/39051704039/job/117451478076"
+    },
+    {
+      "name": "Python tests",
+      "head_sha": "86a758eb2468f3e23357b69adf3c3183e5110a40",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/39051704039/job/117451478007"
+    },
+    {
+      "name": "browser-rating-acceptance",
+      "head_sha": "86a758eb2468f3e23357b69adf3c3183e5110a40",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/39051704248/job/117451452778"
+    },
+    {
+      "name": "s04-runner-cleanup (ubuntu-latest)",
+      "head_sha": "86a758eb2468f3e23357b69adf3c3183e5110a40",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/39051704079/job/117451452573"
+    },
+    {
+      "name": "filter-acceptance",
+      "head_sha": "86a758eb2468f3e23357b69adf3c3183e5110a40",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/39051704128/job/117451452508"
+    },
+    {
+      "name": "s04-runner-cleanup (windows-latest)",
+      "head_sha": "86a758eb2468f3e23357b69adf3c3183e5110a40",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/39051704079/job/117451452337"
+    },
+    {
+      "name": "No secrets committed",
+      "head_sha": "86a758eb2468f3e23357b69adf3c3183e5110a40",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/39051704039/job/117451452242"
+    },
+    {
+      "name": "s04-acceptance",
+      "head_sha": "86a758eb2468f3e23357b69adf3c3183e5110a40",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/39051704079/job/117451452142"
+    },
+    {
+      "name": "Detect stack",
+      "head_sha": "86a758eb2468f3e23357b69adf3c3183e5110a40",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/39051704039/job/117451452044"
+    },
+    {
+      "name": "backdrop-acceptance",
+      "head_sha": "86a758eb2468f3e23357b69adf3c3183e5110a40",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/39051703997/job/117451451566"
+    },
+    {
+      "name": "rating-acceptance",
+      "head_sha": "86a758eb2468f3e23357b69adf3c3183e5110a40",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/39051703968/job/117451451489"
+    }
+  ],
+  "historicalReviews": [
+    {
+      "pr": 173,
+      "reviewer": "NguyenTuanAnh0608",
+      "state": "APPROVED",
+      "commit": "5b5e17d6764fbf3a97e280c0a2f40fa6bcd114cd",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/173#pullrequestreview-5516676208"
+    },
+    {
+      "pr": 173,
+      "reviewer": "hoang3003",
+      "state": "APPROVED",
+      "commit": "5b5e17d6764fbf3a97e280c0a2f40fa6bcd114cd",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/173#pullrequestreview-5516739333"
+    },
+    {
+      "pr": 178,
+      "reviewer": "kietxuan",
+      "state": "APPROVED",
+      "commit": "5e19d5df307c003f1366e7fadf502c5fd6522dd4",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/178#pullrequestreview-5552264684"
+    },
+    {
+      "pr": 178,
+      "reviewer": "hoang3003",
+      "state": "APPROVED",
+      "commit": "5e19d5df307c003f1366e7fadf502c5fd6522dd4",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/178#pullrequestreview-5553320786"
+    },
+    {
+      "pr": 183,
+      "reviewer": "hoang3003",
+      "state": "APPROVED",
+      "commit": "f42c965018c9d76f4234f9255f1246d14e0af08f",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/183#pullrequestreview-5558919091"
+    }
+  ],
+  "remainingGates": [
+    "new acceptance changes uncommitted/unpublished; no own hosted CI, independent handoff approval or merge",
+    "C04 independent final setup/token provisioning/Tested-by record and stale README migration-head correction",
+    "PO reconciliation of already closed #44/#45",
+    "136 dossier address-bar captures, wireframes/design update and reviewed/merged PDF workflow"
+  ],
+  "p0Statuses": {
+    "S01 #17": "partly works",
+    "S02 #18": "partly works",
+    "S03 #19": "partly works",
+    "S04 #20": "partly works",
+    "S12 #44": "partly works",
+    "S13 #45": "partly works"
+  },
+  "p1Statuses": {
+    "S06 #23": "partly works",
+    "S09 #31": "partly works"
+  },
+  "safety": {
+    "forbiddenArtifactExtensions": false,
+    "configuredTokenFoundInEvidence": false,
+    "passwordHashFoundInEvidence": false,
+    "acceptedSourceNotOverwritten": true
+  },
+  "evidenceSha256": {
+    "README.md": "9d24e670ca5eaeb14c9dd8fad9c9a9ee73c2e4f5b3bf37e3f972d24102ae32c4",
+    "handoff-pr.md": "8b08f90c70a9d00c5ef3b7b640faf0ccd01f24cc055423dc77a5dfd07bb03cd6",
+    "clean-clone-live/live-personalised-mobile.png": "8936fa500de894f4598013cc3fc3de86370d160f5df5da70057c64eeff5ebfd4",
+    "clean-clone-live/live-mobile-corrective-message.png": "bc06621d54835995e04e32b6a28ae8c3640655d452cd4aecb3164e2cb21eaba4",
+    "clean-clone-live/live-first-screen.png": "0a705cf793a9f3cf49e296225d596fbc3cb087042e113951001b602c38cedf12",
+    "clean-clone-live/results.json": "0b039b515876a206f40f08a5f86ca6277b85ce84219c37ad698fc137b367565f",
+    "clean-clone-live/live-registration-validation.png": "fab00924e45cffcfb94e92eca76e19af52aa616b112a51f9b3b942563261c624",
+    "checks/clean-editable-install.txt": "a10977da3081c72bc448140c033e699dacad1fe1f2a9e2878690d42aea9ab90f",
+    "checks/ruff.txt": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "checks/clean-node-install.txt": "8a23da63518923a942d28e5323ea881faa2743bf6bd5679e639245b2b624959f",
+    "checks/frontend-tests.txt": "4df994b76721aaf8b945f904fc07b19407d09063b5ad04b1c8b41beafb542d10",
+    "checks/t16.txt": "55735889558e73086a036c4027ffa22068d2758006868bd8b84d4d69352c1c82",
+    "checks/clean-build.txt": "df38c2efa508ca4046dc8ca45e10d6cb90a5020577f891d7743223a5f771c2a3",
+    "checks/clean-ruff.txt": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "checks/t22-live.txt": "6e34bd3e8b0c88cb231b0efc4c6883f2e9f9061370eef00b317472f92fea5efa",
+    "checks/clean-migration-import.json": "3b2b2fe5cd0545996e9f3e0edae506021a07dbc5f224a2c7e0dfc6084aac013c",
+    "checks/build.txt": "23d63ad6f04752b537d465aaf0ff77d8780410aa884add0c11a4c22ad0ece45b",
+    "checks/t12.txt": "9aaae93b857127642d3eed2232246d3d44097dc2bb3ebbf69fc3c44bbafbb2cb",
+    "checks/clean-backend-tests.txt": "d0ee5bc6d3bd90e60380d8e6a568f118b73e0e409d067cf358d61cebbad6bee4",
+    "checks/clean-python-install.txt": "7bbdb1a3760863c91b6dab7375687a1ca8644020f25ec8789821e79f3999cfd2",
+    "checks/t21.txt": "29c76b973137d24d619584d8b00ff9b17dc315115aef32062ae4247c7bf2a949",
+    "checks/lint.txt": "31298a090b4d326219614a2b109f11bc9be6ea420c4b2fa47c181368d3733a26",
+    "checks/clean-lint.txt": "31298a090b4d326219614a2b109f11bc9be6ea420c4b2fa47c181368d3733a26",
+    "checks/s13-live.txt": "5c2ce297d95d63544941794474a882985376d24ce1b660fea088ee33c8cadfef",
+    "checks/clean-frontend-tests.txt": "d3dba57e7be228d96f49a56b6314f3bfdb9be54b34394f6bedc87272532414c2",
+    "checks/s04-s13-synthetic.txt": "c238b8ea56977e16d3f6905d6d586e13cd847ce81e92902a9bd02dbf7ca892fd",
+    "checks/backend-tests.txt": "9353aaae9929b8a1c48b4fda21db276a2c616e977a7d00a39001397225a1d7a6",
+    "live/live-personalised-mobile.png": "31d5dbeb66746f97efc0dfbc71d4eb01221928ad7a0566ab4f09d3cbd05a91c3",
+    "live/live-mobile-corrective-message.png": "bc06621d54835995e04e32b6a28ae8c3640655d452cd4aecb3164e2cb21eaba4",
+    "live/live-first-screen.png": "e216878ca3a2fb0a24a42a5c7354b133ca39a4c56f83146542e28e8d4554685f",
+    "live/results.json": "f49b030764125804308d84c85f7e7122b1c4628dc7a2f90cd85d625cd2b0dff9",
+    "live/live-registration-validation.png": "fab00924e45cffcfb94e92eca76e19af52aa616b112a51f9b3b942563261c624",
+    "live/s13-playwright-results.json": "09bea8c664596d45b518d1eba7d3be3d6aa05980ba58550fab6c86de886bf973",
+    "synthetic/recommendation-loading.png": "c2a8dfa888fe5bf5aedbb21ef7b195062a066a28b8a9f9080d6a4c9fcd38f7bd",
+    "synthetic/playwright-results.json": "f8c32c92819e11dc0dccd1a38835a8f4fd989f42ff30d3df87064792f6d39b04",
+    "synthetic/recommendation-error.png": "b333b63170b575fca45e64bd5af6a50085e5e8ad9278fdf8c679c7ed64bd6499",
+    "synthetic/missing-detail-fields.png": "27bd3511d3efb51f917275f388180fdae294bfbd065e72beec4216d14ff99be0",
+    "synthetic/recommendation-empty.png": "f2c07eb7d323baf75f5b20804dfa58c3d36f56fd6457c7f1f4a32c35db689ab7",
+    "synthetic/actual-error-message.txt": "fb089bdcd41c4be65e0d5ffc0355e87820de8c40a9c76f5fac876bfc5bfebbf1"
+  },
+  "logFormatting": "Trailing blank lines removed from five console transcripts before commit; recorded test outcomes unchanged."
+}

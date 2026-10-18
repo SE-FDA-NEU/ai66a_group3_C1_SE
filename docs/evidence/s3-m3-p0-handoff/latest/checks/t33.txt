@@ -1,0 +1,117 @@
+
+> frontend@0.0.0 test:t33:integration
+> vitest run --config vitest.t33.config.ts
+
+
+ RUN  v5.0.2 C:/Users/Admin/Desktop/Ki 1 Nam 3/Kỹ thuật phần mềm - Software Engineering/ai66a_group3_C1_SE/frontend
+
+ ❯ integration/t33-rating.acceptance.tsx (1 test | 1 failed) 6271ms
+   × real UI saves, rolls back, retries, reloads and isolates account ratings without changing preferences or ranking 2519ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  integration/t33-rating.acceptance.tsx > real UI saves, rolls back, retries, reloads and isolates account ratings without changing preferences or ranking
+AssertionError: expected '/login' to be '/' // Object.is equality
+
+Ignored nodes: comments, script, style
+<html>
+  <head />
+  <body>
+    <div />
+    <div />
+    <div />
+    <div>
+      <main
+        class="page page--centered"
+      >
+        <section
+          aria-labelledby="login-title"
+          class="auth-card"
+        >
+          <p
+            class="eyebrow"
+          >
+            AI Movie Recommendation System
+          </p>
+          <h1
+            id="login-title"
+          >
+            Sign in
+          </h1>
+          <p
+            class="muted"
+          >
+            Sign in to view your movie recommendations.
+          </p>
+          <form
+            class="auth-form"
+            novalidate=""
+          >
+            <label
+              for="email"
+            >
+              Email
+            </label>
+            <input
+              autocomplete="email"
+              id="email"
+              name="email"
+              type="email"
+              value=""
+            />
+            <label
+              for="password"
+            >
+              Password
+            </label>
+            <input
+              autocomplete="current-password"
+              id="password"
+              name="password"
+              type="password"
+              value=""
+            />
+            <button
+              type="submit"
+            >
+              Sign in
+            </button>
+          </form>
+          <p
+            class="auth-footer"
+          >
+            Need an account?
+            <a
+              data-discover="true"
+              href="/register"
+            >
+              Create an account
+            </a>
+          </p>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
+
+Expected: "/"
+Received: "/login"
+
+ ❯ integration/t33-rating.acceptance.tsx:153:56
+    151|   app = render(<App />);
+    152|   fireEvent.click(await screen.findByRole("button", { name: "Sign out"…
+    153|   await waitFor(() => expect(window.location.pathname).toBe("/"));
+       |                                                        ^
+    154|   const afterLogout = calls.length;
+    155|   app.unmount();
+ ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  15:54:20
+   Duration  8.08s (tests 79%, environment 14%, transform 4%, import 3%)

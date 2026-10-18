@@ -1,0 +1,30 @@
+
+> frontend@0.0.0 test:s04:e2e
+> node scripts/run-s04-e2e.mjs
+
+[WebServer] INFO:     Started server process [31208]
+[WebServer] INFO:     Waiting for application startup.
+[WebServer] INFO:     Application startup complete.
+[WebServer] INFO:     Uvicorn running on http://127.0.0.1:8014 (Press CTRL+C to quit)
+[WebServer] (node:15528) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 11 tests using 1 worker
+
+(node:30692) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok  1 e2e\s04.acceptance.ts:120:1 › AC1/AC2/AC4: real sign-in, A90 B80 C80 top ten, Enter preferences and fresh matches (1.6s)
+  ok  2 e2e\s04.acceptance.ts:149:1 › AC4: saved genres with no match show true popular alternatives and edit/retry (1.2s)
+  ok  3 e2e\s04.acceptance.ts:166:3 › AC3: successful empty shows guidance and zero cards (931ms)
+  ok  4 e2e\s04.acceptance.ts:166:3 › AC3: successful no-popularity shows guidance and zero cards (1.0s)
+  ok  5 e2e\s04.acceptance.ts:179:1 › AC4: no-match without usable popular alternatives still has edit/retry and zero cards (1.2s)
+  ok  6 e2e\s04.acceptance.ts:192:1 › real SQL failure is Error/Retry, preserves genres and recovers (1.6s)
+  ok  7 e2e\s04.acceptance.ts:221:1 › delayed real cold-start response cannot replace results after a real genre save (1.7s)
+  ok  8 e2e\s13.acceptance.ts:93:1 › S13 AC2: unknown email and incorrect password have the exact same visible message (1.2s)
+  ok  9 e2e\s13.acceptance.ts:110:1 › S13 AC3: guest routes and rating CTA reach login without private requests or writes (1.6s)
+  ok 10 e2e\s13.acceptance.ts:134:1 › S13 AC1/AC4/AC5: real login, save, logout/replay, switch, delayed A response and relogin (4.0s)
+  -  11 e2e\s13.acceptance.ts:212:1 › S13 live TMDb environment smoke (separate from synthetic acceptance)
+
+  1 skipped
+  10 passed (21.0s)
+s04_temporary_database_removed=true

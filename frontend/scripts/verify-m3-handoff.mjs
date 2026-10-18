@@ -87,14 +87,14 @@ try {
   const database = path.join(temporary, "acceptance.db");
   py(`import sqlite3,sys
 with sqlite3.connect('file:'+sys.argv[1]+'?mode=ro',uri=True) as s, sqlite3.connect(sys.argv[2]) as d: s.backup(d)`, sourcePath, database);
-  const env = { ...process.env, DATABASE_URL: `sqlite:///${database.replaceAll("\\", "/")}`, TMDB_READ_ACCESS_TOKEN: "", SESSION_COOKIE_SECURE: "false" };
+  const env = { ...process.env, DATABASE_URL: `sqlite:///${database.replaceAll("\\", "/")}`, TMDB_READ_ACCESS_TOKEN: "", TMDB_NETWORK_DISABLED: "1", SESSION_COOKIE_SECURE: "false" };
   execFileSync(python, ["-m", "alembic", "-c", "backend/alembic.ini", "upgrade", "head"], { cwd: root, env, stdio: "pipe" });
   report.acceptanceProvenance = provenance(database);
   assert.deepEqual(report.acceptanceProvenance.revision, report.sourceProvenance.revision);
   const api = start(python, ["-m", "uvicorn", "app.main:app", "--app-dir", "backend", "--host", "127.0.0.1", "--port", "8000"], env);
   const vite = start(process.execPath, ["frontend/node_modules/vite/bin/vite.js", "frontend", "--host", "127.0.0.1", "--port", "5173", "--strictPort"], env);
   await ready("http://127.0.0.1:8000/health", api); await ready(ui, vite);
-  browser = await chromium.launch();
+  browser = await chromium.launch({ channel: process.env.M3_BROWSER_CHANNEL || undefined });
   report.browser = browser.version();
   const context = await browser.newContext({ baseURL: ui, viewport: { width: 1280, height: 900 } });
   const page = await context.newPage();

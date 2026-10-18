@@ -106,6 +106,18 @@ def test_missing_token_is_rejected_without_echoing_it() -> None:
     assert "token-value" not in str(error.value)
 
 
+def test_offline_guard_blocks_real_client_even_with_inherited_token(monkeypatch) -> None:
+    monkeypatch.setenv("TMDB_READ_ACCESS_TOKEN", "private-local-token")
+    monkeypatch.setenv("TMDB_NETWORK_DISABLED", "1")
+
+    def forbidden_client(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("offline checks must not create a network client")
+
+    monkeypatch.setattr(httpx, "Client", forbidden_client)
+    with pytest.raises(TmdbConfigurationError, match="network access is disabled"):
+        TmdbClient.from_environment()
+
+
 @pytest.mark.parametrize(
     ("status_code", "error_type", "message"),
     [

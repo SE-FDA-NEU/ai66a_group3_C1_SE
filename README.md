@@ -7,6 +7,11 @@ rather than giving every viewer the same generic popularity list.
 - [Local setup and clean-clone guide](docs/SETUP.md)
 - [Required TMDb catalogue setup from Sprint 3](docs/tmdb-sprint3-runbook.md)
 
+For a disposable review account, create one through the local registration
+screen after setup. The [setup guide](docs/SETUP.md#disposable-test-account-and-p0-journey)
+gives the full test-account and restart procedure; no shared password is kept
+in this repository.
+
 ## Team and Sprint 1 roles
 
 | Member           | GitHub                                                       | Sprint 1 responsibility                                   |
@@ -272,7 +277,7 @@ Confirm that Alembic has exactly one migration head:
 Expected head:
 
 ```text
-b7e4c2d91f30 (head)
+c6f8a2d4e901 (head)
 ```
 
 

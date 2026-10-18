@@ -6,14 +6,18 @@ Related screen / route field must match one or more rows below. Update the
 affected issue, this file, and docs/requirements.md in the same PR whenever a
 route or requirement changes.
 
-Final M3 acceptance audit: [six-P0 AC matrix, route navigation, current-candidate
-results and #136 handoff](evidence/s3-m3-p0-handoff/README.md), application SHA
-`86a758eb2468f3e23357b69adf3c3183e5110a40`, verified 2026-10-18. All six P0
-Stories and the separately reported S06/S09 remain **partly works** under the
-final AC + DoD gate; functional checks passed, but independent acceptance-PR
-review/CI/merge and C04 handoff remain pending. This audit changes no route or
-requirement. Historical rows below are the original implementation crosswalk;
-their Open / Backlog wording is not the final-candidate test result.
+Final M3 acceptance audit: [six-P0 AC matrix, current results and #136 handoff](evidence/s3-m3-p0-handoff/README.md),
+verified 2026-10-18 after integrating merged C04 PR #185, application main
+`0c4273ab792becb060fefd5e7341e755ed28d0a5`. The exact tested local snapshot and
+executable-source fingerprints are in the [verification manifest](evidence/s3-m3-p0-handoff/verification.json);
+the final published acceptance head must have its own CI/review record.
+All six P0 Stories and separately reported S06/S09 remain **partly works** until
+their final AC + DoD gates pass. C04 is merged and the stale README head is fixed;
+independent review clarification and participant session details remain explicit
+[human-only checks](evidence/s3-m3-p0-handoff/human-validation.md). A T33 bridge
+logout intermittency observed during this audit is recorded, not hidden by a
+passing rerun. This audit changes no route or requirement. Historical rows below
+are the original implementation crosswalk; Open / Backlog is not a current test result.
 
 ## Screen and Story map
 
