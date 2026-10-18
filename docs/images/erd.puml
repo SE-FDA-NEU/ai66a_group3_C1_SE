@@ -1,5 +1,6 @@
 @startuml
-title Catalogue and account ERD - current migrations
+!pragma layout smetana
+title Catalogue and account ERD - Sprint 3 head c6f8a2d4e901
 
 hide circle
 hide methods
@@ -54,6 +55,7 @@ entity "catalog_movies" as movie_rows {
   * title : TEXT
   release_year : INTEGER <<NULL>>
   overview : TEXT <<NULL>>
+  backdrop_path : TEXT <<NULL>>
   popularity_score : REAL <<NULL>>
   vote_average : REAL <<NULL>>
   vote_count : INTEGER <<NULL>>
@@ -75,13 +77,25 @@ entity "user_genre_preferences" as user_genre_prefs {
   * genre_id : INTEGER <<PK, FK>>
 }
 
+entity "user_movie_ratings" as user_movie_ratings {
+  * id : TEXT <<PK>>
+  --
+  * user_id : TEXT <<FK, UQ(user_id, movie_id)>>
+  * movie_id : TEXT <<FK, UQ(user_id, movie_id)>>
+  * rating : INTEGER <<CHECK integer 1..5>>
+  * created_at : DATETIME
+  * updated_at : DATETIME
+}
+
 users "1" -- "0..*" auth_sessions
 users "1" -- "0..*" user_genre_prefs
 genres "1" -- "0..*" user_genre_prefs
+users "1" -- "0..*" user_movie_ratings
 rev "1" -- "0..*" movie_rows
-rev "0..1" -- "0..1" active_state
+rev "1" -- "0..1" active_state
 movie_rows "1" -- "0..*" movie_genre_links
 genres "1" -- "0..*" movie_genre_links
+movie_rows "1" -- "0..*" user_movie_ratings
 
 legend bottom
   | Notation | Meaning |
@@ -93,6 +107,7 @@ legend bottom
   | 0..1 | Zero or one |
   | 0..* | Zero or many |
 
-  Only tables created by the current Alembic migrations are shown.
+  Nine application tables at Alembic head c6f8a2d4e901 are shown.
+  alembic_version is migration bookkeeping and is not counted.
 endlegend
 @enduml

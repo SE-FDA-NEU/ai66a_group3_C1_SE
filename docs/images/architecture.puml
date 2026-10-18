@@ -1,29 +1,32 @@
 @startuml
+!pragma layout smetana
 !include <C4/C4_Container>
 
-title AI Movie Recommendation System - C4 container diagram
+title AI Movie Recommendation System - Sprint 3 C4 container diagram
 
 LAYOUT_LEFT_RIGHT()
 
-Person(viewer, "Viewer", "Browses the catalogue, registers/signs in, and views popular recommendations")
+Person(viewer, "Viewer", "Browses movies and uses account-owned preferences, recommendations, and ratings")
 
 System_Boundary(ams, "AI Movie Recommendation System") {
-    Container(web, "Browser frontend", "React, TypeScript, Vite", "Renders public and authenticated movie experiences")
-    Container(api, "Backend API", "FastAPI, Python 3.12", "Provides health, auth, catalogue reads, and popular/cold-start recommendations")
-    ContainerDb(db, "SQLite database", "SQLite, SQLAlchemy, Alembic", "Stores users, auth sessions, catalogue revisions/state, movies, genres, and movie-genre links")
-    Container(importer, "Optional server-side TMDb importer", "Python, httpx", "Imports provider data outside browser request handling")
+    Container(web, "Browser frontend", "React, TypeScript, Vite", "Renders catalogue, preferences, recommendations, ratings, and resilient backdrop UI")
+    Container(api, "Backend API", "FastAPI, Python 3.12", "Provides auth and business APIs that read local SQLite at request time")
+    ContainerDb(db, "SQLite database", "SQLite, SQLAlchemy, Alembic", "Stores nine application tables, including preferences, ratings, and nullable backdrop paths")
+    Container(importer, "Required Sprint 3 TMDb importer", "Python, httpx", "Prepares the local catalogue outside browser request handling")
 }
 
-System_Ext(tmdb, "TMDb API", "External movie and genre data provider")
+System_Ext(tmdb, "TMDb metadata API", "External movie, genre, and backdrop-path provider")
+System_Ext(image_cdn, "TMDb public image CDN", "Serves allowlisted backdrop image bytes without an API token")
 
 Rel(viewer, web, "Sends navigation, form, and selection input; receives rendered screens", "Browser UI")
 Rel(web, api, "Sends HTTPS JSON requests and the opaque session cookie", "HTTPS/JSON")
-Rel(api, web, "Returns account, movie, popular recommendation DTOs, and error envelopes", "HTTPS/JSON")
+Rel(api, web, "Returns account/movie DTOs, nullable backdrop URL, and safe error envelopes", "HTTPS/JSON")
 Rel(api, db, "Sends parameterized SQL queries and transaction commands", "SQL")
 Rel(db, api, "Returns result rows and transaction outcomes", "SQLite protocol")
-Rel(importer, tmdb, "Sends genre, popular-movie, and movie-detail requests", "HTTPS")
-Rel(tmdb, importer, "Returns provider movie and genre JSON records", "HTTPS/JSON")
-Rel(importer, db, "Writes validated imported provider records and catalogue revision state", "SQL transactions")
+Rel(importer, tmdb, "Fetches bounded genre, movie, and backdrop-path metadata", "Server-side HTTPS")
+Rel(tmdb, importer, "Returns provider metadata records", "HTTPS/JSON")
+Rel(importer, db, "Writes validated catalogue revisions and media paths", "SQL transactions")
+Rel(web, image_cdn, "Downloads an allowlisted w780 backdrop; no metadata call or token", "Public HTTPS")
 
 SHOW_LEGEND()
 @enduml
