@@ -76,10 +76,18 @@ for name in wireframes:
 accepted = json.loads(
     (ROOT / "docs/evidence/s3-m3-p0-handoff/latest/source-manifest.json").read_text()
 )
+intentional_ci_changes = []
 for name, digest in accepted["files"].items():
     actual = hashlib.sha256(
         (ROOT / name).read_bytes().replace(b"\r\n", b"\n")
     ).hexdigest()
+    if actual != digest and name == ".github/workflows/scrum-check.yml":
+        # The explicit C05 follow-up fixes metadata linkage; no application/test
+        # fingerprint is exempted. This difference must be reported, not hidden.
+        intentional_ci_changes.append(
+            {"path": name, "acceptedSha256": digest, "currentSha256": actual}
+        )
+        continue
     assert actual == digest, (
         f"Application/evidence source changed; re-evaluate acceptance: {name}"
     )
@@ -93,7 +101,9 @@ print(
             "apiErrorCases": 4,
             "wireframes": len(wireframes),
             "unalteredEvidenceCopies": len(manifest["assets"]),
-            "matchingRecordedExecutableFiles": len(accepted["files"]),
+            "matchingRecordedExecutableFiles": len(accepted["files"])
+            - len(intentional_ci_changes),
+            "intentionalCiChanges": intentional_ci_changes,
             "humanRequiredMarkers": text.count("HUMAN REQUIRED"),
             "scope": "Structure, local links and source correspondence only; not Story acceptance or release approval.",
         },

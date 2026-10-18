@@ -29,8 +29,10 @@ Names, roles and links: [README](../README.md). IDs, exact topic and submitter
 are absent from the inspected tracked Markdown and must be supplied by the team.
 The dossier owner is not automatically the LMS submitter.
 
-Documentation base: merged `main` at
+Original dossier base: merged `main` at
 `f9774cbe7248c29915086d29bf2b9f99c2aa528a` (PR #186).
+Conflict reconciliation integrates C03 PR #187 from merged main
+`bf18ab860fc3e486b57fc3b5ccac4db94c283995` (the exact merge SHA is recorded in the follow-up evidence).
 This document has no independent review, approval, merge or LMS receipt yet.
 
 <!-- pdf:page -->
@@ -118,7 +120,10 @@ not a new Story acceptance result. No partial Story is labelled `works`.
   All 202 recorded file hashes match this dossier's merged base after CRLF→LF
   normalization; [comparison and audit](evidence/s3-c05-ui/verification.json).
   This proves source correspondence, not a newly executed full acceptance run
-  of the future merged documentation SHA.
+  of the future merged documentation SHA. The conflict/linkage follow-up changes
+  only the recorded Scrum hygiene workflow: 201 historical paths still match;
+  that metadata-only workflow difference is explicitly reported and regression
+  tested, not claimed identical to the old executable manifest.
 - [T29 live import](evidence/t29-tmdb-live-smoke.md) is the required provider
   foundation. T25's latest live snapshot is provider `tmdb`, revision
   `34b442f2-f5a8-4317-9f2f-468e6ec06a20`: 255 distinct movies/source IDs,
@@ -192,7 +197,10 @@ session; Start opens the guarded preference route.
 Source: [HomePage.tsx](../frontend/src/pages/HomePage.tsx),
 [MovieCard.tsx](../frontend/src/components/MovieCard.tsx).
 Cards contain title, year, genres, TMDb popularity and View details; at most
-ten cards. Source loading/empty/error/data states remain distinct.
+ten cards. Source loading/empty/error/data states remain distinct. Loading says
+`Loading movies...`; empty says `No movies available` and
+`The active catalogue does not contain any movies yet.`; error shows
+`Movies are unavailable`, a safe API message and Retry.
 Actual data capture: [T25 live catalogue](images/ui/live-catalogue-viewport.png).
 
 <!-- pdf:page -->
@@ -404,7 +412,7 @@ unchanged Story AC. Error envelope details: [api.md](api.md).
 | `INVALID_CREDENTIALS` (401, login) | BR18; S13 AC2: unknown email and wrong password use the same non-disclosing response. | `Email or password is incorrect` |
 | `EMAIL_ALREADY_REGISTERED` (409, registration) | BR16; S12 AC2: case-insensitive email uniqueness; create no second account. | `This email is already registered` |
 | `MOVIE_NOT_FOUND` (404, detail) | BR6; S03 AC2: an unknown opaque ID must never show another film. | Heading: `Movie not found`. Paragraph: `That movie is not available in the active catalogue.` |
-| `SERVICE_UNAVAILABLE` (503, recommendations) | S02 AC4/AC5 and BR2–BR4 recommendation boundary: failed reads preserve saved preferences and offer retry; do not show an empty/no-match result. | Heading: `Recommendations are unavailable`. Paragraph: `Service is temporarily unavailable Choose Retry to load your recommendations again.` |
+| `SERVICE_UNAVAILABLE` (503, recommendations) | Technical failure under S02 AC4/AC5; BR8 requires preserving committed current-account preferences. Retry must not rewrite preferences or turn failure into empty/no-match data. | Heading: `Recommendations are unavailable`. Paragraph: `Service is temporarily unavailable Choose Retry to load your recommendations again.` |
 
 Exact Story messages above are preserved without extra punctuation in the
 rendered message. Login recovery is editing the form and Sign in; duplicate
@@ -493,8 +501,15 @@ The source of truth is #134's [approved initial PR #144](https://github.com/SE-F
 and [HTTP DTO/error contracts](api.md), reconciled here against shipped source
 and T25/C04/T28 evidence. Initial
 [formal approval](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/144#pullrequestreview-5466721572)
-is real; **final #134 reconciliation/independent review remains open**.
-This dossier updates the matching design explanation; it does not close #134.
+is real; C03 reconciliation is now merged through
+[PR #187](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/187), including
+the current API, architecture/ERD and UI-state corrections; issue #134 is closed.
+The recorded approval is on `9e444adf491eff5214c4ac5c0bd316792393da8d`,
+before the later `95ab003f2123ae9c8d2d7f603d0f6cc7c5829be8` follow-up;
+no approval of that later head is invented. This dossier retains
+those implemented semantics and adds the instructor-required presentation.
+The new dossier still requires its own substantive independent review; the
+C03 review must not be represented as approval of this later dossier.
 
 C02 [#133](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/133) is open.
 [sprint-log.md](sprint-log.md) currently stops at Sprint 2. The merged
@@ -516,7 +531,7 @@ retrospective, handoff or submission receipt.
    per-journey outcomes in [human-validation.md](evidence/s3-m3-p0-handoff/human-validation.md).
    PO confirmation that the trial occurred is not an all-AC pass. Resolve the
    T33 intermittency if it recurs on the final candidate.
-3. The #134 owner/reviewer signs off the final contract reconciliation; #133 owner
+3. Confirm the #134 reconciliation/review record for merged PR #187; #133 owner
    supplies the actual Sprint 3 log/evidence milestone and repository-minimum
    audit. Do not award points for partial Stories or count Tasks as points.
 4. Capture both final-candidate application images with the browser address

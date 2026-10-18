@@ -104,3 +104,21 @@ Manual inspection must verify text, all images/links, actual review/capture
 records and correspondence with the merged SHA; the exporter cannot certify
 independent review or submission. Confirm the real LMS deadline, submit and
 save the actual receipt. These final steps remain pending.
+
+## Conflict and linkage follow-up
+
+The follow-up merges current main after C03 PR #187, preserving its corrected
+API/architecture/ERD/runbook and the four-section C05 dossier. It fixes the
+Scrum hygiene linkage job to accept `Refs #136` and issue-prefixed titles.
+The same issue-existence/type/owner inspection runs for those references; no
+closing directive is required for partial delivery. Six regression cases
+execute the actual inline Actions parser via
+`node --test scripts/scrum-linkage.test.mjs`, also run by the linkage job.
+
+The 202-path original audit remains historical. The current checker explicitly
+reports the intentional `.github/workflows/scrum-check.yml` difference, while
+all other 201 historical paths (including product and tests) must still match.
+The review job and its real non-author approval requirement are unchanged.
+At inspection PR #188 had no submitted reviews; automation cannot supply an
+independent teammate approval. The UI/design conflict resolution is not itself
+a merge of the dossier into main or a final PDF/LMS completion claim.
