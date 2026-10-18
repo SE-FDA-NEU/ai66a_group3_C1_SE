@@ -1,0 +1,52 @@
+name: Sprint 3 C05 dossier documentation
+
+on:
+  push:
+    branches: ["docs/s3-c05-ui-dossier"]
+    paths:
+      - "docs/ui.md"
+      - "docs/design.md"
+      - "docs/images/ui/**"
+      - "docs/images/erd*.puml"
+      - "docs/evidence/s3-c05-ui/**"
+      - "scripts/verify-m3-dossier.py"
+      - ".github/workflows/c05-docs.yml"
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "docs/ui.md"
+      - "docs/design.md"
+      - "docs/images/ui/**"
+      - "docs/images/erd*.puml"
+      - "docs/evidence/s3-c05-ui/**"
+      - "scripts/verify-m3-dossier.py"
+      - ".github/workflows/c05-docs.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  s3-c05-docs:
+    # The frozen M3 source manifest is a C05 gate, not a permanent gate on
+    # later Sprint 4/5 application or design changes from other branches.
+    if: github.event_name != 'pull_request' || github.head_ref == 'docs/s3-c05-ui-dossier'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Validate dossier and source correspondence without UTF-8 mode
+        run: python -X utf8=0 scripts/verify-m3-dossier.py
+      - name: Validate historical C01 audit and Scrum linkage
+        run: |
+          node scripts/verify-s3-c01-docs.mjs
+          node --test scripts/scrum-linkage.test.mjs
+      - name: Lint dossier verifier
+        run: |
+          python -m pip install ruff==0.16.9
+          python -m ruff check scripts/verify-m3-dossier.py

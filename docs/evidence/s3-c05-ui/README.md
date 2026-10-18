@@ -1,0 +1,128 @@
+# C05 #136 — UI dossier build and evidence boundary
+
+This package contains authoritative [docs/ui.md](../../ui.md), matching
+[design reconciliation](../../design.md), ten labelled SVG wireframes, an
+updated M1 flow, and eight byte-for-byte evidence-image copies under
+[docs/images/ui](../../images/ui/asset-manifest.json), plus three original
+PO-supplied submission images. The wireframes are
+schematics; they are never presented as running-application captures.
+
+[verification.json](verification.json) compares all 202 recorded T25
+executable-file hashes with merged base
+`f9774cbe7248c29915086d29bf2b9f99c2aa528a`, CRLF→LF only. Its pass is source
+correspondence, not a new live acceptance run. [github-state.json](github-state.json)
+records the actual prerequisite issue/PR/review/check snapshot. Historical
+T25/C04 files are retained unchanged; their then-pending reviews have later
+formal approvals linked in the dossier. Review bodies saying `ok` do not
+establish a detailed reproduction report or approve this new dossier.
+
+[Hosted-check history](hosted-checks.md) preserves the initial PR unit-test
+failure, passing branch build and targeted replay without changing product/tests.
+
+[validation.json](validation.json) records the actual local structural/source,
+syntax/lint and PDF layout checks, including draft limitations.
+
+The original records above describe their original candidate. The later
+[follow-up](follow-up.md) reconciles merged C03 PR #187, inserts the topic/IDs
+supplied by the PO, and records new checks in
+[follow-up-validation.json](follow-up-validation.json). It does not rewrite
+historical results or claim a final submission.
+
+## Task and submission boundary
+
+PR #188 closes child [Task #189](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/189)
+only after its draft/source/tooling changes pass CI and actual independent
+review and are merged. It continues to reference parent
+[#136](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/136), which stays
+open for the remaining acceptance/review evidence, final merged PDF and LMS
+receipt. This avoids falsely closing a post-merge submission obligation just
+to satisfy the issue-linkage check. The PO must verify #189's Sprint 3 Project
+iteration; private-board membership is not assumed from the issue body.
+
+## Validate the repository dossier
+
+At the PO's request, the four PDF export/render/inspection/dependency helpers
+are removed from the current PR file set. PDF preparation is manual. The
+repository retains its Markdown, diagrams, original images and source checks;
+no PDF package installation or browser-based exporter is required by CI.
+
+```sh
+python -X utf8=0 scripts/verify-m3-dossier.py
+node scripts/verify-s3-c01-docs.mjs
+node --test scripts/scrum-linkage.test.mjs
+python -m ruff check scripts/verify-m3-dossier.py
+```
+
+Use the repository virtual-environment Python on Windows. The dossier verifier
+uses only the Python standard library. Application dependencies and lockfiles
+are unchanged. Historical validation JSON and follow-up records still name
+the tools used for those earlier runs; they are not current run instructions.
+Earlier commits are preserved, not rewritten to erase that history.
+
+## Draft limits and manual PDF preparation
+
+The draft keeps a visible draft status and footer on every page. It must not
+be uploaded as the final submission merely because no placeholder marker is
+left. Page 2 now contains the original planning board and PO-identified
+submission-day board. Both show global, unfiltered counts, not Sprint 3
+velocity. Page 3 uses two new PO-captured PNGs with actual browser address
+bars: S03 movie details and the S13 incorrect-credentials error. Historical
+viewport previews remain preserved but are not the page-3 submission images.
+
+The exact topic, five student IDs, roles and actual submitter are filled from
+the PO's supplied facts. [Supplied-capture provenance](supplied-captures.md)
+records hashes, visible URLs/message, limitations and a read-only local
+API/SQLite cross-check of the pictured movie against the 255-film TMDb revision.
+Exact browser capture times and the running process's SHA were not supplied;
+clipboard-file times and the workspace head are not substituted for them.
+The PO/SM must still verify instructor access to the private Project board.
+Preserve the original pixels; never draw browser chrome or relabel a historic
+capture as a later candidate. Reconfirm applicability if executable code changes.
+
+Participant session details, C02 log/minimum audit and the outstanding
+final-head non-contributor C03 review remain unrecorded. The C03 reconciliation
+itself is already merged. No source edit or image can substitute for those
+human outcomes. Re-run the structural check and inspect every rendered page
+after changes. The latest capture/layout checks are recorded separately in
+[capture-validation.json](capture-validation.json), not in the historical
+follow-up results.
+
+Before preparing the submission, obtain a substantive independent teammate
+review, resolve findings, receive approval and merge the completed dossier into
+`main`. An initial/old-head approval does not approve later changes. Use that
+merged Markdown and its images as the source for manual export or printing.
+
+The PO prepares `Team03_M3.pdf` manually and checks the cover, both board
+images on page 2, both address-bar application images on page 3, the four
+required sections, all text/images/links and agreement with merged `main`.
+Keep the PDF outside Git or in an ignored local output folder. No committed
+PDF or exporter-specific `release.json` is required by this workflow.
+
+Removing the tools does not complete missing acceptance, independent review,
+C02 evidence or LMS submission, and does not change the existing C05 issue
+completion boundary. Confirm the actual deadline, submit manually and retain
+the genuine receipt. No final export or submission is claimed here.
+
+## Conflict and linkage follow-up
+
+The follow-up merges current main after C03 PR #187, preserving its corrected
+API/architecture/ERD/runbook and the four-section C05 dossier. It fixes the
+Scrum hygiene linkage job to accept `Refs #136` and issue-prefixed titles.
+The same issue-existence/type/owner inspection runs for those references; no
+closing directive is required for partial delivery. Six regression cases
+execute the actual inline Actions parser via
+`node --test scripts/scrum-linkage.test.mjs`, also run by the linkage job.
+
+The 202-path original audit remains historical. The current checker explicitly
+reports the intentional `.github/workflows/scrum-check.yml` difference, while
+all other 201 historical paths (including product and tests) must still match.
+The review job and its real non-author approval requirement are unchanged.
+The initial inspection found no submitted reviews; a later @kietxuan approval
+covers an earlier head and Kiet contributes follow-up changes. Neither supplies
+substantive non-contributor approval of the final head. The UI/design conflict resolution is not itself
+a merge of the dossier into main or a final PDF/LMS completion claim.
+
+The PO-authorized Task #189 remains a useful draft/tooling delivery boundary
+even though the concurrent metadata parser now also accepts non-closing
+references. This follow-up preserves that parser and its regression tests;
+it does not replace or weaken the approval job.

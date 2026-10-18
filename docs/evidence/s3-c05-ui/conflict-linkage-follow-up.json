@@ -1,0 +1,45 @@
+{
+  "scope": "PR #188 conflict/linkage follow-up; not new product acceptance",
+  "integratedMain": "bf18ab860fc3e486b57fc3b5ccac4db94c283995",
+  "conflictsResolved": [
+    "docs/ui.md",
+    "docs/design.md"
+  ],
+  "resolution": "C03 current architecture/ERD/API/runbook retained; C05 four-section dossier and same-PR persistence/rating rationale retained.",
+  "issueLinkage": "Explicit Refs and [#issue] titles accepted; GitHub existence/type/owner inspection retained; no premature closure.",
+  "regressionResult": "\u2714 partial dossier delivery links Refs #136 without requiring issue closure (2.374042ms)\n\u2714 completed delivery still accepts closing directives (0.150417ms)\n\u2714 planned issue title is a valid link and is deduplicated against the body (0.144334ms)\n\u2714 negated closing prose and incidental dependency mentions do not claim linkage (0.156709ms)\n\u2714 each explicit issue directive is forwarded once for GitHub existence checks (0.09125ms)\n\u2714 missing metadata fails instead of silently passing (0.080042ms)\n\u2139 tests 6\n\u2139 suites 0\n\u2139 pass 6\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 62.173625\n",
+  "dossierCheck": {
+    "result": "PASS",
+    "requiredSections": 4,
+    "p0Stories": 6,
+    "apiErrorCases": 4,
+    "wireframes": 10,
+    "unalteredEvidenceCopies": 8,
+    "matchingRecordedExecutableFiles": 201,
+    "intentionalCiChanges": [
+      {
+        "path": ".github/workflows/scrum-check.yml",
+        "acceptedSha256": "cfc4e806ed3701690fc46633babef4f36bf8ab64da7e4c5ed7d50f4bceed2a8e",
+        "currentSha256": "4f99a1e8317887a99d0f186a05c370a08dfab61e83d6a109b447f847d4ffd62c"
+      }
+    ],
+    "humanRequiredMarkers": 9,
+    "scope": "Structure, local links and source correspondence only; not Story acceptance or release approval."
+  },
+  "independentReviewJob": "Byte-identical to pre-follow-up no_self_merge job; no approvals found on PR188 at inspection.",
+  "c03ObservedState": {
+    "issue134": "closed",
+    "pr187": "merged",
+    "mergeCommit": "bf18ab860fc3e486b57fc3b5ccac4db94c283995",
+    "approvalHead": "9e444adf491eff5214c4ac5c0bd316792393da8d",
+    "lastHead": "95ab003f2123ae9c8d2d7f603d0f6cc7c5829be8",
+    "reviewUrl": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/187#pullrequestreview-5563049458"
+  },
+  "sourceHashes": {
+    "docs/ui.md": "abf1927982ddc43c98e1fc62f7da36435feab95a47308a7cde1af6f4cff2493d",
+    "docs/design.md": "4825955726b95efb8e6c9495850a4d99680064bfa0d19dd0ff7b37dba85d76bc",
+    ".github/workflows/scrum-check.yml": "4f99a1e8317887a99d0f186a05c370a08dfab61e83d6a109b447f847d4ffd62c",
+    "scripts/scrum-linkage.test.mjs": "42ed1fe8927347f8dbcc0ff59d98f96d3124c014ce2f1a4c601fba1ef1319704",
+    "scripts/verify-m3-dossier.py": "a0c80fa27596daa9aeb102e326c191aab7ffad07e7caec84e5bae6fdb338e79a"
+  }
+}

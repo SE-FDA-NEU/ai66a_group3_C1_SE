@@ -1,276 +1,547 @@
-# Sprint 3 UI-state contract
+# Milestone 3 — UI dossier
 
-Contract revision: `S3-FINAL`, reconciled on 2026-10-18 against Sprint 3
-`main` SHA `f9774cbe7248c29915086d29bf2b9f99c2aa528a`.
+**Submission status: DRAFT — final export pending merge and missing evidence.**
+Markdown is authoritative; if this PDF differs from the repository, use the repository.
 
-This document records the implemented Sprint 3 UI states and their evidence.
-The profile/reset UI, rating-adjusted ranking, and NLP product behaviour remain
-unfinished and are labelled as such. HTTP payloads and errors are defined in
-[api.md](api.md).
+### Cover
 
-## 1. Current P0 screen: public catalogue `/`
+| Field | Recorded value |
+|---|---|
+| Product / team | AI Movie Recommendation System / Team 03, AI66A Group 3 C1 |
+| Assigned topic | AI Movie Recommendation System |
+| Product Owner | Nguyen Xuan Kiet — `@kietxuan` |
+| Sprint 3 Scrum Master | Vu Quoc Huy — `@vu-huzy` |
+| Sprint 3 | 05–18 October 2026; PO-confirmed dates, Asia/Ho_Chi_Minh |
+| Repository | [SE-FDA-NEU/ai66a_group3_C1_SE](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE) |
+| Project board | [@group3_c1_se — Project 9](https://github.com/orgs/SE-FDA-NEU/projects/9) |
+| Setup guide | [docs/SETUP.md on main](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/docs/SETUP.md) |
+| Submitter | Nguyen Xuan Kiet |
 
-The existing `HomePage` is the selected P0 screen because it calls the real
-`GET /api/movies?limit=10` boundary and implements all four required states.
+| Member (README spelling) | GitHub | Student ID |
+|---|---|---|
+| Nguyen Xuan Kiet | `@kietxuan` | 11247306 |
+| Tran Minh Hoang | `@hoang3003` | 11247292 |
+| Tran Tuan Anh | `@anotify-vie` | 11247264 |
+| Vu Quoc Huy | `@vu-huzy` | 11247301 |
+| Nguyen Tuan Anh | `@NguyenTuanAnh0608` | 11247260 |
 
-| State | Trigger | Exact rendered content | Recovery/transition |
+Names, roles and links: [README](../README.md). The PO supplied the exact topic,
+five student IDs and actual submitter in chat on 2026-10-18.
+
+Documentation base: merged `main` at
+`bf18ab860fc3e486b57fc3b5ccac4db94c283995` (C03 PR #187).
+This document has no independent review, approval, merge or LMS receipt yet.
+
+<!-- pdf:page -->
+
+### Submission page 2 — Sprint boards
+
+**After Sprint Planning — original PO-supplied image.**
+
+![Original beginning-of-Sprint-3 board supplied by the PO](images/ui/planning-board.png)
+
+PO-identified beginning-of-Sprint-3 image; global, unfiltered totals:
+Todo 53 / In Progress 0 / In Review 0 / Done 35, including Sprint 2.
+These are not Sprint 3 points or accepted Story counts.
+
+**On submission day — original PO-supplied image.**
+
+![Submission-day board supplied by the PO, all four workflow columns visible](images/ui/submission-board.png)
+
+PO-supplied on 2026-10-18; no visible filter or capture timestamp.
+Global totals: Todo 4 / In Progress 0 / In Review 0 / Done 87.
+Project Done does not prove issue closure, acceptance or submission.
+Both images are unaltered. [Provenance and access limits](evidence/s3-c05-ui/supplied-captures.md).
+
+<!-- pdf:page -->
+
+### Submission page 3 — Running P0 UI and visible error
+
+**S03 — movie details with the actual browser address bar.**
+
+![PO-captured movie details with backdrop, genres, overview, popularity and browser address bar](images/ui/p0-movie-detail-browser.png)
+
+PO-supplied: `/movies/18ae3a02-bbb5-4dbd-b038-057441fb77a5`,
+Spider-Man: Brand New Day; 2026; TMDb popularity 1024.51.
+
+**S13 — rejected sign-in with the actual browser address bar.**
+
+![PO-captured sign-in error: Email or password is incorrect; browser address bar visible](images/ui/login-error-browser.png)
+
+PO-supplied: `/login`, **Email or password is incorrect**.
+Contract: `INVALID_CREDENTIALS`, HTTP 401; the image itself is not a network log.
+Both original PNGs are preserved. [Capture provenance and version limits](evidence/s3-c05-ui/supplied-captures.md).
+
+<!-- pdf:page -->
+
+## 1. P0 Stories and status
+
+| Story | Screen(s) | Route | Status | Issue |
+|---|---|---|---|---|
+| S01 — Select favourite genres | Home; Movie Preferences; Recommendations | `/` → `/preferences` → `/recommendations` | [partly works](evidence/s3-m3-p0-handoff/README.md#complete-p0-ac-to-evidence-matrix) | [#17](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/17) |
+| S02 — Get recommendations from preferences | Movie Preferences; Recommendations | `/preferences` → `/recommendations` | [partly works](evidence/s3-m3-p0-handoff/README.md#complete-p0-ac-to-evidence-matrix) | [#18](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/18) |
+| S03 — View movie details | Catalogue; Recommendations; Movie detail | `/`, `/recommendations` → `/movies/:movieId` | [partly works](evidence/s3-m3-p0-handoff/README.md#complete-p0-ac-to-evidence-matrix) | [#19](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/19) |
+| S04 — Explore without preferences | Home; popular cold-start Recommendations | `/` → `/login` → `/recommendations` | [partly works](evidence/s3-m3-p0-handoff/README.md#complete-p0-ac-to-evidence-matrix) | [#20](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/20) |
+| S12 — Register an account | Create your account; Sign in | `/register` → `/login` | [partly works](evidence/s3-m3-p0-handoff/README.md#complete-p0-ac-to-evidence-matrix) | [#44](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/44) |
+| S13 — Sign in and sign out | Sign in; Recommendations; guarded screens | `/login` → `/recommendations` → `/` | [partly works](evidence/s3-m3-p0-handoff/README.md#complete-p0-ac-to-evidence-matrix) | [#45](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/45) |
+
+Every functional P0 AC has passing assertions in the T25 matrix. These statuses
+preserve the accepted handoff's conservative AC + [DoD](definition-of-done.md)
+boundary: unaided participant session date/version/per-journey outcomes and
+final sign-off remain incomplete. Issue closure (#44/#45, or #127) alone is
+not a new Story acceptance result. No partial Story is labelled `works`.
+
+### Candidate and evidence boundary
+
+- Exact T25 executed integration snapshot: `05a78c1f503c10f6f5047655acb3800b21966e99`,
+  explicitly unpublished. Its public application base is
+  `0c4273ab792becb060fefd5e7341e755ed28d0a5`. The published T25 head is
+  `aed85fb4133f413a2cf147ff1bd7cbc7ff78bc8f`, merged by PR #184 at
+  `4ff81ab30df8cf448c3796f748b9451496e403c5`. Do not relabel the unpublished
+  executed SHA as the later merged SHA.
+- The [original verification manifest](evidence/s3-m3-p0-handoff/verification.json)
+  pins executable digest `2985bd56d5ff942f87e8e7f31a96f98fcb1689f9ad681c233203a0cd91f20ccf`.
+  The original 202-path comparison remains historical after CRLF→LF
+  normalization; [original audit](evidence/s3-c05-ui/verification.json).
+  Concurrent follow-up `b1529d5` intentionally changed only the Scrum metadata
+  workflow: 201 historical files still match, including all product/tests;
+  the one workflow difference is reported and tested by six parser cases.
+  [Concurrent follow-up evidence](evidence/s3-c05-ui/conflict-linkage-follow-up.json).
+  This is source correspondence, not a new full product acceptance run.
+- [T29 live import](evidence/t29-tmdb-live-smoke.md) is the required provider
+  foundation. T25's latest live snapshot is provider `tmdb`, revision
+  `34b442f2-f5a8-4317-9f2f-468e6ec06a20`: 255 distinct movies/source IDs,
+  255 finite popularity values/fetch timestamps, 17 associated genres.
+  Tests write only to disposable backup copies. M2 seed is not live M3 evidence.
+- [C04 fresh-clone verification](evidence/s3-c04-clean-clone.md) tested committed
+  executable SHA `05dda34900fd0fa80cfff323b353a8d4c220a4d8`. Its separate
+  20-movie imported revision is `6988eeeb-79e0-41ad-ab7a-5248f06a0659`;
+  it is not the 255-movie source. [Restart/browser report](evidence/s3-c04-final/live/results.json).
+- Reused offline results: 419 backend passes / 1 inherited skip; 236 frontend
+  passes; S04/S13 10 synthetic browser passes / 1 intentional live skip;
+  separate S13 live case passes. These are recorded T25 results, not new runs
+  performed for this documentation change.
+- [#131 backdrop acceptance](evidence/s3-t28-backdrop-acceptance/README.md)
+  covers the shipped media chain. [C04 live CDN report](evidence/s3-c04-final/backdrop-live/results.json)
+  separately proves image loading at 1280px and 375px.
+
+The [GitHub snapshot](evidence/s3-c05-ui/github-state.json) records actual merged
+PRs #144/#184/#185/#186, final heads, formal reviews and checks observed on
+2026-10-18. Later @hoang3003 approvals exist for
+[T25](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/184#pullrequestreview-5562707423)
+and [C04](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/185#pullrequestreview-5562668940).
+Their review bodies say `ok`; they are not detailed reproduction reports.
+Historical handoff files are preserved, including their then-pending review notes.
+
+C03 was subsequently merged through
+[PR #187](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/187), final head
+`95ab003f2123ae9c8d2d7f603d0f6cc7c5829be8`, merge `bf18ab8`.
+Its current architecture/ERD show nine application tables and the public image
+CDN boundary; the historical M2 diagrams are separate `*-m2` assets.
+The observed @kietxuan approval covered the earlier `9e444ad` head, not the
+later follow-up they authored. A non-contributor's final-head review remains
+to be recorded. See the [C05 follow-up record](evidence/s3-c05-ui/follow-up.md).
+
+T33's first bridge run failed at logout (`/login` versus `/`); a standalone rerun
+and five repetitions passed. The cause remains unproved. Keep the first failure
+visible; browser S13 logout/replay separately passed. See [T25 limitations](evidence/s3-m3-p0-handoff/README.md#limitations-and-final-gates).
+
+### Separate P1 acceptance — outside the six-P0 gate
+
+| Story | Acceptance result and scope | Status | Evidence |
 |---|---|---|---|
-| Loading | Request is in flight | `Loading movies...` | Wait; stale results are ignored after unmount. |
-| Empty | `200` with `data.movies: []` | Heading `No movies available`; text `The active catalogue does not contain any movies yet.` | Valid empty state; do not show fake cards or treat it as an API error. |
-| Error | Non-success response or network/parse failure | Heading `Movies are unavailable`; safe API message or `Something went wrong`; button `Retry` | `Retry` issues a new list request and clears the previous error. |
-| Data | `200` with one or more movies | `Movie catalogue` grid with title, year/`Information unavailable`, genres/`Information unavailable`, and `View details` | Open `/movies/:movieId` using the opaque movie ID. |
+| S06 #23 — Filter the current recommendation list | Filter, zero-match guidance, clear/reset and unchanged committed preferences pass. T16 is React/API/SQLite integration, not browser E2E; T15/T16 browser evidence is separate. | [partly works](evidence/s3-m3-p0-handoff/verification.json) | [Latest T16 run](evidence/s3-m3-p0-handoff/latest/checks/t16.txt); [T16 detailed acceptance](evidence/s3-t16-filter-verification.md) |
+| S09 #31 — Browse popular movies | T21 synthetic browser exact ordering/top-ten/empty assertions pass; T25 live list matches the imported DB oracle. Final DoD remains open. | [partly works](evidence/s3-m3-p0-handoff/verification.json) | [Latest T21 run](evidence/s3-m3-p0-handoff/latest/checks/t21.txt); [T21 matrix](evidence/s3-t21-popular-acceptance/README.md); [live report](evidence/s3-m3-p0-handoff/latest/live/results.json) |
 
-These states are mutually exclusive. In particular:
+<!-- pdf:page -->
 
-- An API error is a non-2xx response and safe error envelope. It renders the
-  error state and must not be converted into an empty list.
-- A client-side validation error is detected before a request (for example,
-  missing login fields). It stays with the relevant form and is not an API
-  error or catalogue empty state.
-- A valid empty result is `200` with an empty array. It renders empty guidance,
-  not an alert and not invented data.
+### Updated M1 screen flow
 
-Current evidence: `frontend/src/pages/HomePage.tsx` and
-`frontend/src/tests/movies.test.tsx`.
+![M1 flow reconciled to implemented M3 routes, with planned routes distinguished](images/ui/screen-flow.svg)
 
-## 2. Mapping current API errors to UI behaviour
+Source: [screen-flow.puml](screen-flow.puml); PNG: [screen-flow.png](images/screen-flow.png).
+Solid arrows describe existing controls and guarded navigation. Dashed entries
+retain M1 `/search` and `/profile` scope without claiming current home links:
+`/search` is not registered and falls back to `/`; `/profile` is a protected
+placeholder. Similarity and reset UI are not implemented. A guest rating CTA
+opens `/login` without a private rating request. Direct detail visits return
+to `/`; list-origin visits use the validated catalogue/popular/recommendation
+return context. Recommendations refetch current-account data on return.
 
-These four API failures are the C05 UI mapping. Client-side “no genre”
-validation, successful no-match data, and a valid empty filter result are not
-API errors and are not used to inflate the table.
+<!-- pdf:page -->
 
-| HTTP status | API code | Business Rule | Exact rendered message | Recovery action | Evidence |
-|---:|---|---|---|---|---|
-| 401 | `INVALID_CREDENTIALS` | BR18 — authentication; do not reveal whether email or password was wrong | `Email or password is incorrect` | Edit the credentials and submit `Sign in` again. | [`LoginPage.tsx`](../frontend/src/pages/LoginPage.tsx), [`app.test.tsx`](../frontend/src/tests/app.test.tsx), [`s13.acceptance.ts`](../frontend/e2e/s13.acceptance.ts) |
-| 409 | `EMAIL_ALREADY_REGISTERED` | BR16 — normalized email is unique | `This email is already registered` | Sign in with the existing account or use a different email. | [`RegisterPage.tsx`](../frontend/src/pages/RegisterPage.tsx), [`app.test.tsx`](../frontend/src/tests/app.test.tsx), [M3 handoff browser verification](evidence/s3-m3-p0-handoff/README.md) |
-| 404 | `MOVIE_NOT_FOUND` | BR6 — an opaque movie ID opens only its own record | Heading `Movie not found`; text `That movie is not available in the active catalogue.`; return link is `Back to recommendations`, `Back to popular movies`, or `Return to catalogue` according to validated list context | Follow the rendered link to the validated originating list; direct/unsafe context returns to `/`. | [`MovieDetailPage.tsx`](../frontend/src/pages/MovieDetailPage.tsx), [`movie-detail-acceptance.test.tsx`](../frontend/src/tests/movie-detail-acceptance.test.tsx) |
-| 503 | `SERVICE_UNAVAILABLE` on recommendations | Technical failure, not a new Business Rule. BR8 is relevant only because committed current-account preferences must be preserved. | Heading `Recommendations are unavailable`; body `Service is temporarily unavailable Choose Retry to load your recommendations again.`; button `Retry` | Retry the same GET. Do not rewrite or clear preferences; a successful current request replaces the error. | [`RecommendationsPage.tsx`](../frontend/src/pages/RecommendationsPage.tsx), [`recommendations.test.tsx`](../frontend/src/tests/recommendations.test.tsx), [T12 source-failure/recovery evidence](evidence/s3-t12-recommendations-acceptance/README.md) |
+## 2. Wireframes
 
-For `401 AUTHENTICATION_REQUIRED` on a current protected request, the actual UI
-behaviour is central recovery and navigation to `/login`; it does not invent an
-inline “exact message”. An obsolete request's `401` is ignored. Other API
-codes retain the safe envelope and screen-specific error/retry behaviour in
-[api.md](api.md). Messages must not include stack traces, SQL/database
-internals, passwords, session values, or TMDb credentials.
+These are authored low-fidelity schematics of the inspected final application
+source, not screenshots or acceptance results. Bracketed text denotes data
+slots. All six P0 screens appear below; S04's cold start shares the
+Recommendations screen. The public popular screen is included separately for P1.
+Endpoints are local backend calls; no screen calls the TMDb metadata API.
 
-### Movie-detail return context (S3-T17)
+### Public catalogue — `/` (S01/S03/S04 entry)
 
-Every shared movie card records only the current list location in React Router
-state before opening `/movies/:movieId`. The detail page accepts return paths
-whose parsed pathname is exactly `/`, `/popular`, or `/recommendations` and
-preserves that path's query string and fragment. Success, not-found, and error
-detail states all use the same validated destination.
+The user comes here to … browse the local catalogue and start choosing movies.
 
-On `/recommendations`, `RecommendationsPage` passes that location through the
-T15 `RecommendationFilter` to `MovieGrid` and `MovieCard`; filtering therefore
-does not discard the return context. The same path is used for a non-empty T11
-popular-alternatives snapshot as for an ordinary recommendation snapshot.
+API endpoints: `GET /api/movies?limit=10`. Home itself does not check the
+session; Start opens the guarded preference route.
 
-The state is navigation context, not trusted input or account data. Absolute
-URLs, scheme-relative values such as `//example.com`, backslashes, malformed
-values, non-string values, and internal paths outside the list allow-list are
-discarded. A direct detail URL has no return state and therefore renders
-`Return to catalogue` linking to `/`.
+![Public catalogue wireframe](images/ui/home.svg)
 
-Returning from a recommendation detail opens `/recommendations`, where the
-existing protected route and current session select the account and fetch its
-recommendations again. The round trip never serialises genre choices and never
-calls `PUT /api/me/preferences`, so the database remains the sole owner of the
-account's committed preferences.
+Source: [HomePage.tsx](../frontend/src/pages/HomePage.tsx),
+[MovieCard.tsx](../frontend/src/components/MovieCard.tsx).
+Cards contain title, year, genres, TMDb popularity and View details; at most
+ten cards. Source loading/empty/error/data states remain distinct. Loading says
+`Loading movies...`; empty says `No movies available` and
+`The active catalogue does not contain any movies yet.`; error shows
+`Movies are unavailable`, a safe API message and Retry.
+Actual data capture: [T25 live catalogue](images/ui/live-catalogue-viewport.png).
 
-## 3. Implemented Sprint 3 rating UI
+<!-- pdf:page -->
 
-Movie detail remains public. A guest load calls only
-`GET /api/movies/{movieId}` and must not automatically call either private
-rating endpoint. If a guest chooses a rating action, open `/login` before any
-private rating GET/PUT.
+### Sign in — `/login` (S13)
 
-For an authenticated account and current movie, the implemented control has
-these states:
+The user comes here to … sign in to the current account.
 
-| State | UI contract |
-|---|---|
-| Loading | Show `Loading your rating...` while `GET /api/me/ratings/{movieId}` is current. Do not display another account/movie's value. |
-| Unrated | `rating: null`; show `Not rated yet`. Never display `0`. |
-| Committed | Show `Your saved rating: 4/5` (with the actual confirmed integer 1–5). |
-| Saving | Keep the prior committed value, disable duplicate submission, render button text `Saving...`, and show status `Saving your rating...`. A selected value is a draft until `200`. |
-| Success | Replace the committed value only after the acknowledgement matches the current movie and submitted rating; show `Rating saved.` |
-| Failure | Show `Your rating was not confirmed as saved. <safe error detail> Please retry.` Do not show success or replace the prior committed value. Keep the valid draft for retry. |
-| Retry | The button text is `Retry save`; resubmit the retained draft and change committed state only after a matching API acknowledgement. |
+API endpoints: `POST /api/auth/login`. Successful sign-in sets central account
+state and opens `/recommendations`; that screen owns its recommendation call.
 
-The rendered `<select>` exposes only 1–5 and disables save when no rating is
-selected. The typed client also rejects non-integer/out-of-range values before
-a request (`Choose a whole-number rating from 1 to 5`); server validation
-remains authoritative.
+![Sign-in wireframe](images/ui/login.svg)
 
-On a movie change, cancel/obsolete the old rating request and clear the old
-movie's transient state before loading the new key. A delayed response for
-movie A must not update movie B. On account change/logout, clear rating state
-and ignore every response captured for the previous account.
+Source: [LoginPage.tsx](../frontend/src/pages/LoginPage.tsx).
+Email/password labels, disabled `Signing in...`, inline API error and
+`Create an account` match the implemented form. Invalid credentials retain the
+form and exact Story message. Sign-out is a Recommendations action.
 
-Implementation/evidence: `frontend/src/api/ratings.ts`,
-`frontend/src/components/MovieRating.tsx`, `movie-rating.test.tsx`,
-`movie-detail-rating.test.tsx`, [T33 evidence](evidence/s3-t33-rating-control.md),
-and [T34 browser/API/DB acceptance](evidence/s3-t34-rating-acceptance/README.md).
+<!-- pdf:page -->
 
-## 4. Implemented preference/recommendation states and reset UI boundary
+### Create your account — `/register` (S12)
 
-- Preferences: initialise from the current account only. On successful save,
-  accept the committed response, invalidate that account's recommendation
-  result, then request/navigate to fresh recommendations. On failure, keep the
-  prior committed selection and show a retry path.
-- Recommendations: preserve `data.movies`, `mode`, `personalised`, `noMatch`,
-  and `reason.matchedGenres`. `mode=popular` with `noMatch=false` is cold start;
-  `mode=popular` with `noMatch=true` is a valid no-match result with popular
-  alternatives; neither is an API error.
-- Profile reset is not a current UI state. `/profile` remains a protected
-  placeholder. A future UI must require explicit confirmation before sending
-  `{ "confirm": true }` and invalidate private state only after `200`; the
-  implemented T35 backend does not by itself complete Story #33.
+The user comes here to … create an account to save preferences.
 
-The recommendation page (S3-T10) now calls `GET /api/me/recommendations?limit=10`
-through `frontend/src/api/recommendations.ts`. It renders `data.movies` in
-server order with the shared movie cards and these states:
+API endpoints: `POST /api/auth/register`; success `201` navigates to `/login`,
+without automatically signing in. Invalid local fields send no request.
 
-| State | Rendered content |
-|---|---|
-| Loading | `Loading recommendations...` |
-| Popular cold start (`mode=popular`, `noMatch=false`) | Heading `Popular`, label `Not personalised`, cards without a genre-match reason; it is not presented as a failed personalisation request |
-| Personalised (`mode=personalised`) | Heading `Recommended for you`, cards with `Matches your genres: <names>` from `reason.matchedGenres` |
-| No match (`mode=popular`, `noMatch=true`) | `No movies matched your favourite genres.` with `Edit preferences` and `Retry`; render any returned `data.movies` once as `Popular alternatives` |
-| Valid empty (`movies: []`, `noMatch=false`) | `No recommendations available yet.` with a link to `/preferences`; zero cards and no error/no-match claim |
-| Error | Alert `Recommendations are unavailable` with the API/network message and `Retry`; never shown as empty or no-match data |
-| Protected API `401` | `handleUnauthorized` discards the account and opens `/login` |
+![Registration wireframe](images/ui/register.svg)
 
-T11 (#113) implements retry, no-match guidance, and request-race handling.
-Every attempt uses the single T10 client path with the same `limit=10` query.
-The component captures the authenticated `user.id` and a request generation;
-it aborts obsolete work and also rejects delayed completions whose generation
-is no longer current. An old success or `401` therefore cannot replace or sign
-out a newer account after retry, navigation, logout, or account switch.
-Cold-start transitions after a preference save are implemented under T13
-(#115) and verified under T14.
+Source: [RegisterPage.tsx](../frontend/src/pages/RegisterPage.tsx).
+Empty/invalid email and passwords shorter than eight characters have field
+corrections. `Creating account...` disables duplicate submits. Duplicate email
+shows exactly `This email is already registered`; other request failures use
+the implemented safe service message. No password or credential appears in an asset.
 
-### Current-list genre filtering (S3-T15, #117)
+<!-- pdf:page -->
 
-The ready, non-empty recommendation list is passed to
-`frontend/src/components/RecommendationFilter.tsx` as one accepted response
-snapshot. `Filter by genre` defaults to `All genres`. Options use canonical IDs
-from the authenticated `GET /api/genres` active-catalogue list, not only genres
-present in these up-to-ten cards. A genre available elsewhere in the catalogue
-can therefore legitimately have no matches in the current snapshot.
+### Movie Preferences — `/preferences` (S01)
 
-- Selection filters `snapshot.movies` locally and preserves server order,
-  card links, popular labels, and personalised matching reasons.
-- `Showing N of M movies` reports the visible count and original snapshot size.
-- Zero filtered matches show `No movies match this filter.` and
-  `Clear filter to see the full recommendation list.`, with `Show all movies`.
-  This is not an API failure, an empty source catalogue, or `noMatch=true`.
-- `Clear filter` or `All genres` restores the original snapshot. No preference
-  write, recommendations refetch, browser-storage write, or TMDb call occurs.
-- Each newly accepted response object resets selection to `All genres` and
-  becomes the only reset target, even if the catalogue revision is unchanged.
-  An ordinary rerender with the same response keeps the current filter.
-- Genre-option loading/failure does not hide valid cards. The disabled select
-  explains loading/unavailable options; `Retry filter options` retries only
-  `GET /api/genres`. A genre `401` uses central auth recovery. Cleanup aborts
-  old option requests and ignores their late success/error responses.
-- Account changes remount the guarded subtree, discarding the temporary filter.
-- A non-empty T11 no-match alternatives snapshot uses the same filter without
-  hiding its guidance, `Edit preferences`, or `Retry`. An accepted retry
-  response is a new snapshot and resets the temporary selection.
+The user comes here to … select, save and revisit 1 to 5 favourite genres.
 
-T16 (#118) supplies independent S06 acceptance and committed-database
-preference comparisons. See [T15 evidence](evidence/s3-t15-recommendation-filter.md)
-for author tests and the isolated real-TMDb-catalogue browser smoke.
+API endpoints: `GET /api/auth/me` when guard identity is unknown;
+`GET /api/genres` and `GET /api/me/preferences` on load;
+`PUT /api/me/preferences` with 1–5 distinct canonical `genreIds` on save.
 
-T11 implements retry, no-match guidance, and request-race handling; T13
-implements the cold-start transition after a confirmed preference save.
+![Preference-picker wireframe](images/ui/preferences.svg)
 
-Implementation handoff is explicit:
+Source: [PreferencesPage.tsx](../frontend/src/pages/PreferencesPage.tsx).
+Saved selections restore; unavailable saved genres are labelled and remain
+selected/count toward five until cleared. Loading, no genres and load-error
+Retry replace the picker. A failed save retains the draft and offers Save retry.
+Only a committed save invalidates recommendations and navigates onward.
 
-- Shared cards, API client, and recommendation container integration belong to
-  [S3-T10 #112](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/112).
-- No-match errors, retry, and request-race states belong to
-  [S3-T11 #113](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/113).
-- Cold-start transitions after saving preferences belong to
-  [S3-T13 #115](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/115).
-- This UI-state explanation and the matching `docs/design.md` change must be
-  coordinated in the same reviewed change for
-  [S3-C05 #136](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/136).
+Client-only corrections (not API error rows):
+`Select at least one genre (up to 5), then choose Save preferences.`
+and `You can select up to 5 genres. Your previous 5 selections are still selected. Clear one genre to choose a different one.`
+Actual [mobile correction capture](images/ui/live-preferences-correction-viewport.png).
 
-The linked implementation and acceptance records provide the completion
-evidence; this C03/C05 documentation reconciliation still requires its own
-reviewed PR.
+<!-- pdf:page -->
 
-## 5. Account/cache/request invalidation
+### Recommendations — data (S02/S04; S06 separately)
 
-The current frontend has no shared query-cache library, so “cache” includes
-component state and any future request cache. Private keys must include the
-authenticated `user.id`; rating keys must also include `movieId`.
+The user comes here to … view recommendations and recover from unavailable data.
 
-| Event | Required invalidation |
-|---|---|
-| Preferences saved | After success, replace/invalidate the current user's preference entry and invalidate that user's recommendations. Ignore older preference/recommendation responses. |
-| Rating saved | After success, replace only the current `(userId, movieId)` committed rating state. Sprint 3 recommendations are not invalidated or reranked because they ignore ratings. |
-| Logout | After successful logout, abort/obsolete all private requests, clear all private account state, and let the guard return to `/`. Public catalogue/detail state may remain. |
-| Account switch | Increment the account request generation, clear/remount private state keyed by the old `user.id`, and reject every delayed old-account response. |
-| Movie switch | Increment the movie/rating request generation, clear transient rating state, and reject every delayed old-movie response. |
-| Future profile-reset UI | Only after reset success may a future client invalidate preferences, every rating for that user, recommendations, and profile summaries; no reset UI exists at the reconciled SHA. |
-| Protected API `401` | Use central authentication recovery (`handleUnauthorized`): discard private state and open `/login`; do not retry as the stale account. |
+API endpoints for all four following wireframes: `GET /api/auth/me` when guard
+identity is unknown; `GET /api/me/recommendations?limit=10` on entry/retry;
+`GET /api/genres` for filter options on a ready non-empty list;
+`POST /api/auth/logout` only on Sign out. Genre filtering sends no preference write.
 
-A response may update state only when its captured account ID, optional movie
-ID, and request generation still match current UI state. Aborting a request is
-preferred, but the identity/generation check is required because abort and
-response completion can race.
+![Recommendation data-state wireframe](images/ui/recommendations-data.svg)
 
-Current account isolation evidence is the `AuthProvider` ownership model and
-the `RequireAuth` subtree keyed by `user.id`. Movie-detail request cleanup is
-implemented. T11 adds recommendation request-generation checks in
-`RecommendationsPage`; preference save invalidation is implemented under T13,
-and rating account/movie invalidation is implemented and verified under
-T33/T34. Reset UI invalidation remains future work.
+Source: [RecommendationsPage.tsx](../frontend/src/pages/RecommendationsPage.tsx),
+[RecommendationGuidance.tsx](../frontend/src/components/RecommendationGuidance.tsx),
+[RecommendationFilter.tsx](../frontend/src/components/RecommendationFilter.tsx).
+Personalised cards show `Recommended for you` and `Matches your genres: <names>`.
+At most ten distinct cards retain server order.
 
-## 6. UI-driven design change: isolate asynchronous state by account/movie
+The S04 data variant uses `Popular`, `Not personalised`,
+`Recommendations based on popular movies`,
+`Add your favourite genres to get personalised recommendations.` and
+`Enter preferences →`. No-match is a valid response: `Popular alternatives`,
+`No movies matched your favourite genres.`, Edit preferences and Retry, with
+any returned alternatives rendered once. It is different from an API error.
+Real [T25 personalised capture](images/ui/live-personalised-viewport.png).
 
-1. **UI problem.** A request made for account A or movie A can complete after
-   the viewer has switched to account B, navigated to movie B, saved new
-   preferences, retried, or left the screen.
-2. **Risk.** A late completion could render A's rating/recommendations in B's
-   context, restore an old movie, or let an obsolete `401` clear B's valid
-   session.
-3. **Implemented design.** `AuthProvider` centrally owns account identity and
-   `RequireAuth` remounts the protected subtree by `user.id`.
-   `RecommendationsPage` captures `userId`, recommendation version, retry
-   version, and request generation. `PreferencesPage` and `MovieRating` abort
-   obsolete requests; rating state is mounted with the composite
-   `(userId, movieId)` key and uses a save generation. Detail state carries its
-   `movieId`. Cleanup/abort is paired with identity/generation checks because a
-   response can race with abort. Only a still-current protected `401` invokes
-   `handleUnauthorized`.
-4. **Evidence.** [T11](evidence/s3-t11-no-match-retry-request-races.md) covers
-   recommendation retry and delayed account success/error/401;
-   [T14/T13](evidence/s3-t14-cold-start-acceptance/README.md) covers a delayed
-   cold-start response after preference save; [T33](evidence/s3-t33-rating-control.md)
-   and [T34](evidence/s3-t34-rating-acceptance/README.md) cover delayed account
-   and movie rating responses plus central auth recovery.
+<!-- pdf:page -->
 
-The corresponding architecture explanation is in
+### Recommendations — empty
+
+The user comes here to … understand why the current recommendation list has no cards.
+
+API endpoints: same Recommendations boundary above; `GET /api/me/recommendations?limit=10`
+returns `200`, `movies: []`, `noMatch: false`. No filter-options request is
+mounted for the empty list. The session guard and Sign out retain their endpoints.
+
+![Recommendation empty-state wireframe](images/ui/recommendations-empty.svg)
+
+Exact current text: `No recommendations available yet.` and
+`No movies are currently available for this recommendation list.`;
+`Enter preferences →` opens `/preferences`.
+Zero cards is a valid data state, not `SERVICE_UNAVAILABLE` or a no-match claim.
+[Historical synthetic capture](images/ui/recommendations-empty-historical-viewport.png);
+[latest repeated assertions](evidence/s3-m3-p0-handoff/latest/synthetic-results.json).
+
+<!-- pdf:page -->
+
+### Recommendations — loading
+
+The user comes here to … wait for the current account's recommendation request.
+
+API endpoints: `GET /api/me/recommendations?limit=10` is pending;
+`GET /api/auth/me` may precede it if identity is unknown;
+`POST /api/auth/logout` remains the Sign out action. No filter-options request
+is mounted until a non-empty ready result is accepted.
+
+![Recommendation loading-state wireframe](images/ui/recommendations-loading.svg)
+
+Exact text: `Loading recommendations...`; section heading `Your recommendations`.
+No previous-account cards or false empty/error guidance is shown.
+[Historical synthetic capture](images/ui/recommendations-loading-historical-viewport.png);
+[latest repeated assertions](evidence/s3-m3-p0-handoff/latest/synthetic-results.json).
+
+<!-- pdf:page -->
+
+### Recommendations — error
+
+The user comes here to … understand a failed recommendation request and retry it.
+
+API endpoints: failed `GET /api/me/recommendations?limit=10`; Retry issues the
+same GET. The guard and Sign out endpoints remain as above; no filter-options
+request is mounted in the error state.
+
+![Recommendation error-state wireframe](images/ui/recommendations-error.svg)
+
+For `503 SERVICE_UNAVAILABLE`, exact heading and paragraph:
+`Recommendations are unavailable`;
+`Service is temporarily unavailable Choose Retry to load your recommendations again.`
+The button is `Retry`. A protected `401` instead clears central account state
+and opens `/login`. Delayed responses from obsolete attempts/accounts are ignored.
+[Historical error capture](images/ui/recommendations-error-historical-viewport.png)
+and [exact transcript](evidence/s3-m3-p0-handoff/synthetic/actual-error-message.txt).
+
+These four schematics show states required for one P0 screen. Synthetic
+empty/loading/error captures keep their historical origin; the latest T25
+synthetic suite repeats the assertions but does not recapture those files.
+
+<!-- pdf:page -->
+
+### Movie detail — `/movies/:movieId` (S03)
+
+The user comes here to … read a selected movie and return to the originating list.
+
+API endpoints: `GET /api/movies/{movieId}`; `GET /api/auth/me` if the rating
+widget needs to resolve identity. Only authenticated users call
+`GET /api/me/ratings/{movieId}`; Save rating calls
+`PUT /api/me/ratings/{movieId}` with strict integer `rating` 1–5.
+A guest sees the sign-in CTA and makes no private rating call.
+
+![Movie-detail wireframe](images/ui/movie-detail.svg)
+
+Source: [MovieDetailPage.tsx](../frontend/src/pages/MovieDetailPage.tsx),
+[MovieBackdropHero.tsx](../frontend/src/components/MovieBackdropHero.tsx),
+[MovieRating.tsx](../frontend/src/components/MovieRating.tsx).
+A null year/overview shows `Information unavailable`; unknown IDs show
+`Movie not found` with a return link. Backdrop omission/null/broken images retain
+a readable gradient/title. Ratings display `Not rated yet`,
+`Your saved rating: N/5`, `Saving...` and `Rating saved.` as appropriate.
+Failed saves preserve the committed value and draft. Ratings are optional and
+do not change Sprint 3 ranking. Real [C04 backdrop capture](images/ui/detail-backdrop-live-viewport.png).
+
+<!-- pdf:page -->
+
+### Popular movies — `/popular` (P1 S09)
+
+The user comes here to … browse the top ten eligible movies in popularity order.
+
+API endpoints: `GET /api/movies/popular?limit=10`; this is a public dedicated
+finite-popularity subset, separate from the public catalogue endpoint.
+
+![Popular-page wireframe, additional P1 evidence](images/ui/popular.svg)
+
+Source: [PopularMoviesPage.tsx](../frontend/src/pages/PopularMoviesPage.tsx).
+Popularity descending, title ascending, ID tie-break; at most ten distinct
+eligible movies. Exact empty text: `Popular movies are not available yet`.
+Loading: `Loading popular movies...`; error heading:
+`Popular movies are unavailable`, safe API message and Retry.
+
+### Accessibility and ownership checks
+
+Forms have associated labels; registration corrections use `aria-invalid`
+and `aria-describedby`. Loading uses status regions, API failures use alerts,
+and correction text explains the next action. Button disabled states prevent
+duplicate saves. T28 records keyboard focus, mobile width and overlay contrast
+checks. These are source and executable assertions, not a newly completed
+human accessibility audit. Account-keyed remounts and request generations
+prevent delayed account/movie data from replacing current state.
+
+<!-- pdf:page -->
+
+## 3. Error messages
+
+These four cases use implemented API codes and actual rendered messages.
+HTTP status is context within the code cell; it is not exposed as raw UI error
+text. Business rules refer to [business-rules.md](business-rules.md) and the
+unchanged Story AC. Error envelope details: [api.md](api.md).
+
+| API error code | Business Rule | Exact message the user sees |
+|---|---|---|
+| `INVALID_CREDENTIALS` (401, login) | BR18; S13 AC2: unknown email and wrong password use the same non-disclosing response. | `Email or password is incorrect` |
+| `EMAIL_ALREADY_REGISTERED` (409, registration) | BR16; S12 AC2: case-insensitive email uniqueness; create no second account. | `This email is already registered` |
+| `MOVIE_NOT_FOUND` (404, detail) | BR6; S03 AC2: an unknown opaque ID must never show another film. | Heading: `Movie not found`. Paragraph: `That movie is not available in the active catalogue.` |
+| `SERVICE_UNAVAILABLE` (503, recommendations) | S02 AC4/AC5 and BR8 current-account persistence: this is a technical failure, not a new Business Rule. Preserve saved preferences and offer retry; do not show an empty/no-match result. | Heading: `Recommendations are unavailable`. Paragraph: `Service is temporarily unavailable Choose Retry to load your recommendations again.` |
+
+Exact Story messages above are preserved without extra punctuation in the
+rendered message. Login recovery is editing the form and Sign in; duplicate
+registration recovery is Sign in or another email. Detail exposes the validated
+return link (direct visit: `Return to catalogue`). Recommendations exposes `Retry`.
+
+Proof: [T25 S12/S13/S03 matrix](evidence/s3-m3-p0-handoff/README.md#complete-p0-ac-to-evidence-matrix),
+[latest S13 live run](evidence/s3-m3-p0-handoff/latest/s13-live-results.json),
+[T12 error/retry rerun](evidence/s3-m3-p0-handoff/latest/checks/t12.txt),
+[exact error capture transcript](evidence/s3-m3-p0-handoff/synthetic/actual-error-message.txt).
+Code: [LoginPage](../frontend/src/pages/LoginPage.tsx),
+[RegisterPage](../frontend/src/pages/RegisterPage.tsx),
+[MovieDetailPage](../frontend/src/pages/MovieDetailPage.tsx),
+[RecommendationsPage](../frontend/src/pages/RecommendationsPage.tsx).
+
+Client validation (zero/six genre selection, invalid email, short password) is
+separate from API errors. `200` empty results, filtered zero matches, no-match
+popular alternatives and `Information unavailable` for null provider fields
+are not API error rows. Protected `AUTHENTICATION_REQUIRED` normally navigates
+to `/login`; it is not falsely counted as a visible error-message row.
+Network/non-JSON failures use [implemented safe fallbacks](../frontend/src/api/requestFailure.ts),
+not raw status pages or exception text. No raw HTTP response, SQL error, stack
+trace, token, password or session cookie is reproduced in this dossier.
+
+<!-- pdf:page -->
+
+## 4. What changed since M2
+
+### Saved preferences required persistent state and a fresh result generation
+
+M2's recommendation landing used only the popular cold-start response. The
+Sprint 3 UI must save a current account's 1–5 genres, restore them after revisit
+or restart, then show new recommendations immediately after a successful save.
+A component-only selection could neither survive a new session nor distinguish
+accounts; a late pre-save response could restore a stale popular list.
+
+The implemented change adds `user_genre_preferences`, composite primary key
+`(user_id, genre_id)` (migration `9d2f5a1c3b84`), authenticated genre/preference
+GETs, and atomic `PUT /api/me/preferences`. The session supplies the owner;
+strict validation happens before replacement and failures roll back. Only a
+committed response increments the account's recommendation version and opens
+`/recommendations`. That page accepts a response only for the current account,
+recommendation version, retry generation and active request. Old results and
+old `401`s cannot overwrite or sign out a newer account.
+
+The recommendation response preserves `data.movies`, `mode`, `personalised`,
+`noMatch` and `reason.matchedGenres`. Sprint 3 ranking uses saved genres and
+local popularity, not ratings. S06 filtering applies locally to one accepted
+snapshot; it neither saves genres nor refetches recommendations.
+
+Evidence: [T02 atomic preferences](evidence/s3-t02-atomic-preferences.md),
+[T22 preference acceptance](evidence/s3-t22-preferences-acceptance/README.md),
+[latest T22 rerun](evidence/s3-m3-p0-handoff/latest/checks/t22-live.txt),
+[S04 transition/race rerun](evidence/s3-m3-p0-handoff/latest/checks/s04-s13-synthetic.txt),
+[AuthContext](../frontend/src/auth/AuthContext.tsx),
+[PreferencesPage](../frontend/src/pages/PreferencesPage.tsx),
+[RecommendationsPage](../frontend/src/pages/RecommendationsPage.tsx).
+The matching design rationale is updated in [design.md §8](design.md#8-ui-driven-design-changes-with-repository-evidence)
+in this same documentation change.
+
+### Public detail acquired an optional backdrop and an account-scoped rating widget
+
+The shipped backdrop chain adds nullable TEXT `catalog_movies.backdrop_path`
+(migration `c6f8a2d4e901`) and safe nullable `backdropUrl` in the public detail
+DTO. Import/enrichment owns provider calls; the UI displays a permanent
+contrast layer and falls back on omitted/null/failed images. Images come from
+the public allowed CDN; metadata still comes from local SQLite. This is
+additive media scope and does not alter movie identity, revision, ranking or
+S03 AC/points. [#131 verification](evidence/s3-t28-backdrop-acceptance/README.md)
+and [C04 desktop/mobile live proof](evidence/s3-c04-final/backdrop-live/results.json)
+are reused because the enhancement shipped.
+
+The rating widget now exists under T33/T34, with account/movie-keyed committed
+and draft values. The actual failure copy is
+`Your rating was not confirmed as saved. Service is temporarily unavailable Please retry.`
+for a `SERVICE_UNAVAILABLE` API error; the committed value remains visible.
+The old draft's `Rating was not saved. Try again.` wording is superseded by
+the implemented [MovieRating](../frontend/src/components/MovieRating.tsx) and
+[T34 evidence](evidence/s3-t34-rating-acceptance/README.md).
+The reset endpoint exists, but `/profile` remains a protected placeholder;
+there is no completed reset flow, search or similarity UI claim.
+
+### Contract and wrap-up handoffs
+
+The source of truth is #134's [approved initial PR #144](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/144)
+and the merged [C03 reconciliation PR #187](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/187).
+The [HTTP DTO/error contracts](api.md), current nine-table diagrams and safe
+CDN/local-read boundary are retained from that main. #134 is closed; its
+final-head non-contributor review remains unrecorded at this follow-up.
+This same C05 change adds the matching preference-persistence/UI rationale to
 [design.md §8](design.md#8-ui-driven-design-changes-with-repository-evidence).
-Both files must be submitted in the same reviewed C03/C05 PR for #134/#136.
+[Task #189](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/189) covers
+only the reviewed draft/source/tooling milestone; parent #136 remains open for
+the remaining acceptance/review evidence, final merged export and real submission.
 
-## 7. Backdrop UI, fallback, and stale detail protection
+C02 [#133](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/133) is open.
+[sprint-log.md](sprint-log.md) currently stops at Sprint 2. The merged
+[C01 reconciliation](sprint3-backlog-refinement.md) supplies original planning
+images, inventory, contribution links and unresolved point/board questions;
+it is supporting evidence, not a completed C02 Sprint 3 log. C02's log/evidence
+milestone is missing. Do not wait for its whole-Chore closure to draft this
+package, and do not invent committed/completed points, Review feedback,
+retrospective, handoff or submission receipt.
 
-`MovieDetailPage` consumes the nullable additive `backdropUrl` from the public
-detail DTO and keys `MovieBackdropHero` by movie ID and URL. The client accepts
-only the reviewed `https://image.tmdb.org/t/p/w780/<file>` shape. Null, omitted,
-unsafe, or failed images keep the permanent CSS gradient/overlay and readable
-title; an image remains hidden until its load event succeeds. Detail cleanup
-and the movie/URL key prevent old detail or image events from replacing or
-poisoning the current movie.
+<!-- pdf:page -->
 
-The browser downloads image bytes from the public CDN only. It does not call
-TMDb metadata/configuration APIs and receives no token. Evidence is in
-`MovieBackdropHero.tsx`, `backdropUrl.ts`, `movie-backdrop.test.tsx`,
-[T37 UI evidence](evidence/s3-t37-backdrop-ui/README.md), and
-[T28 acceptance](evidence/s3-t28-backdrop-acceptance/README.md).
+### Publication and remaining human work
+
+1. Member IDs, exact topic, submitter and the submission-day board are supplied.
+   PO/SM still verifies instructor access to the private board. Preserve both
+   original board images and their global/unfiltered-count limitations.
+2. Record Trang's actual session date, tested version, catalogue revision and
+   per-journey outcomes in [human-validation.md](evidence/s3-m3-p0-handoff/human-validation.md).
+   PO confirmation that the trial occurred is not an all-AC pass. Resolve the
+   T33 intermittency if it recurs on the final candidate.
+3. Record a non-contributing teammate's review of merged C03 head `95ab003`;
+   C03's merge/closure is already recorded and is not repeated. The #133 owner
+   supplies the actual Sprint 3 log/evidence milestone and repository-minimum
+   audit. Do not award points for partial Stories or count Tasks as points.
+4. Both PO-supplied application images now include the actual browser address
+   bar and appear on page 3. Keep their provenance limits explicit: the exact
+   running checkout, capture times and browser network transcript were not
+   supplied. Reconfirm applicability if executable code changes before release;
+   historical viewport previews are retained only as historical evidence.
+5. A real non-contributing teammate uses Review changes, leaves a substantive
+   comment on this dossier PR, reproduces relevant checks, and approves after
+   findings are resolved. No review has been generated on their behalf.
+6. PR #188 closes only draft/tooling Task #189 after actual review/CI/merge.
+   Keep parent #136 open. From a clean checkout of the completed merged `main`,
+   verify executable correspondence and required evidence/assets, then export
+   `Team03_M3.pdf`. Recheck pages 1–3, all text/images/links and agreement with
+   that exact merged SHA. A draft PDF exported now is not final submission.
+7. Confirm the actual LMS deadline in the course, submit before it, and save
+   the genuine receipt before closing #136. No authorized LMS session/deadline/receipt is available
+   here. Finally C02 records actual Review/submission outcomes and SM handoff.
+
+Draft build and final-release conditions:
+[PDF export instructions](evidence/s3-c05-ui/README.md).
+No final export, approval, dossier merge, LMS submission or receipt is claimed.

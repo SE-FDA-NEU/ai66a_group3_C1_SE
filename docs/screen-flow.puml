@@ -1,62 +1,46 @@
 @startuml
-title AI Movie Recommendation System - Account-aware activity flow
-
-start
-
-:Open / public home;
-
-if (Use public discovery?) then (yes)
-  if (Browse popular movies?) then (yes)
-    :Open /popular;
-  else (search)
-    :Open /search or /about-recommendations;
-  endif
-  :Open /movies/:movieId when a movie is selected;
-  if (Save a rating while signed out?) then (yes)
-    :Open /login;
-  else (no)
-    :Return to the public list;
-  endif
-else (personalise)
-  if (Already registered?) then (yes)
-    :Open /login;
-  else (no)
-    :Open /register;
-    :Create account with a unique email;
-    :Open /login;
-  endif
-
-  :Authenticate the account;
-  :Open /recommendations;
-
-  if (Saved favourite genres?) then (yes)
-    :Request personal recommendations;
-  else (no)
-    :Show non-personalised popular fallback;
-    :Open /preferences from Enter preferences;
-    :Select 1 to 5 genres and save them for the current account;
-    :Open /recommendations;
-  endif
-
-  if (Matching movies found?) then (yes)
-    :Show at most 10 distinct recommended movies and reasons;
-    :Optionally filter the current displayed list;
-    :Open /movies/:movieId;
-    :View public similar movies;
-    if (Rate this movie?) then (yes)
-      :Save/update the current account rating from 1 to 5;
-    endif
-  else (no)
-    :Show no-match message and popular alternatives;
-    :Retry or open /preferences to edit genres;
-  endif
-
-  if (Manage account data?) then (yes)
-    :Open /profile;
-    :Confirm reset of only this account's genres and ratings;
-  endif
-  :Sign out and return to /;
-endif
-
-stop
+title M3 account-aware screen flow (2026-10-18)
+left to right direction
+skinparam shadowing false
+rectangle "Home /\nPublic catalogue; Start → guard" as Home
+rectangle "Sign in /login\nPublic" as Login
+rectangle "Create account /register\nPublic; success → login" as Register
+rectangle "Recommendations /recommendations\nAuthenticated; ≤10 cards\nCold start / personalised / no-match\nLoading / empty / error / retry" as Recs
+rectangle "Movie Preferences /preferences\nAuthenticated; save 1–5 genres" as Prefs
+rectangle "Movie detail /movies/:movieId\nPublic; rating private\nNull-field and backdrop fallbacks" as Detail
+rectangle "Popular /popular\nPublic; P1 S09" as Popular
+rectangle "Explanation /about-recommendations\nPublic; implemented" as About
+rectangle "Search /search\nPLANNED: no registered route\nUnknown URLs currently redirect to /" as Search #EEEEEE
+rectangle "Profile /profile\nProtected placeholder\nReset API only; no reset control" as Profile #EEEEEE
+Home --> Login : Sign in / guest Start
+Login --> Register : Create an account
+Register --> Login : 201 / Sign in
+Login --> Recs : successful sign-in
+Home --> Prefs : Start (signed in)
+Home --> Recs : My recommendations (guarded)
+Home --> Popular : Popular movies
+Home --> About : How recommendations work
+Home --> Detail : View details
+Popular --> Detail : View details
+Recs --> Detail : View details
+Detail --> Recs : validated return context
+Detail --> Popular : validated return context
+Detail --> Home : catalogue context / direct load
+Detail --> Login : guest rating CTA
+Recs --> Prefs : Enter preferences / Change my genres / Edit preferences
+Prefs --> Recs : committed save / Back to recommendations
+Prefs --> Home : Browse the catalogue
+Recs --> Home : Sign out / Browse the catalogue
+Home ..> Search : M1 planned navigation; absent in M3
+Home ..> Profile : M1 planned navigation; no visible home link
+note bottom of Recs
+  Protected entry checks GET /api/auth/me when unknown.
+  Missing/expired/revoked session → /login; sign-out → /.
+  Save success invalidates the account recommendation generation.
+  S06 current-list genre filtering never writes preferences.
+end note
+note bottom of Profile
+  Direct /profile is guarded, but only renders a placeholder.
+  POST /api/me/profile/reset exists; UI is still pending.
+end note
 @enduml

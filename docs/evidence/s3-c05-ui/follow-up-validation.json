@@ -1,0 +1,80 @@
+{
+  "scope": "Actual C05 documentation/tooling checks; not product acceptance, human approval or submission",
+  "executedAtUtc": "2026-10-18T13:47:43.656Z",
+  "originalPrHead": "2aa593764065e8ae1c67f5259e7c1dce56d32705",
+  "basePrHead": "b1529d510870310f33ede7761b13a993cb5696a4",
+  "integratedMain": "bf18ab860fc3e486b57fc3b5ccac4db94c283995",
+  "workingTree": "Uncommitted follow-up over the preserved concurrent remote head; source hashes identify the checked candidate",
+  "childTask": 189,
+  "parentChore": 136,
+  "sourceHashes": {
+    "docs/ui.md": "c4d78bcce0c01fd26335ca3140c70a74e85a623810c15a6491742c90f4dd957b",
+    "docs/design.md": "84ea6dad261a1e62da958751f1bd3184aaddb6e4d919877988eeb327ec36845e",
+    "scripts/verify-m3-dossier.py": "55376031e197f7515b7a6d9643996d57b0619613030b230b98711943c9c3a462",
+    "scripts/render-m3.py": "983f556215f76ef1c7e3171c1089330f58490ff01430dfd67d4883f38e60ddef",
+    "scripts/inspect-m3-pdf.py": "c29ef957e62b177f3bf763fab31984dc45ad60515c5e31e44697ecaed20d94a4",
+    "scripts/scrum-linkage.test.mjs": "8abb7fc077642ed666b3aabd0c333b417de5b4fc5236d1ef8d3ff40c9f66f1fe",
+    ".github/workflows/scrum-check.yml": "fcb800902c7002678450fc3e6940db588fcab2e9ff237b18d66dcabe6f48f07e",
+    ".github/workflows/c05-docs.yml": "ebe5579068f6a57a25cc7f3e6f79438475ea37407264c7a1e7b20e4a1e88094b",
+    "docs/evidence/s3-c05-ui/follow-up.md": "a06c82ca12777285a1b445d21a61399538af1de7a69eea15ea5d14b0be41b025",
+    "docs/evidence/s3-c05-ui/pr-body.md": "7a252c5d5d69392d663c2e247b91f0c8be93641fa629f1d51045d840b4c501a8"
+  },
+  "checks": {
+    "result": "PASS",
+    "requiredSections": 4,
+    "p0Stories": 6,
+    "apiErrorCases": 4,
+    "wireframes": 10,
+    "unalteredEvidenceCopies": 8,
+    "matchingRecordedExecutableFiles": 201,
+    "intentionalCiChanges": [
+      {
+        "path": ".github/workflows/scrum-check.yml",
+        "acceptedSha256": "cfc4e806ed3701690fc46633babef4f36bf8ab64da7e4c5ed7d50f4bceed2a8e",
+        "currentSha256": "4f99a1e8317887a99d0f186a05c370a08dfab61e83d6a109b447f847d4ffd62c"
+      }
+    ],
+    "currentErdTables": 9,
+    "poSuppliedStudentIds": 5,
+    "humanRequiredMarkers": 3,
+    "scope": "Structure, local links and source correspondence only; not Story acceptance or release approval.",
+    "utf8ModeDisabled": "PASS",
+    "scrumParserRegression": "6 PASS",
+    "c01HistoricalVerifier": "PASS",
+    "ruffHelpers": "PASS",
+    "javascriptSyntax": "PASS",
+    "productAndC03DiffFromBase": "none",
+    "concurrentWorkflowAndEvidenceDiffFromBase": "none",
+    "whitespace": "PASS"
+  },
+  "pdf": {
+    "mode": "draft; not for submission",
+    "checkoutHeadReported": "b1529d510870310f33ede7761b13a993cb5696a4",
+    "sourceSha256": "c4d78bcce0c01fd26335ca3140c70a74e85a623810c15a6491742c90f4dd957b",
+    "pdfSha256": "01a69443db91a218d621306ebde6afe973eaafcc599d002129e660714b5e34c1",
+    "pages": 19,
+    "outOfBoundsText": 0,
+    "requiredFirstThreePages": "PASS",
+    "visualInspection": "Cover, page-3 larger slots, table headers and all-page layout inspected; unchanged viewport previews still fail the address-bar submission requirement",
+    "finalMode": "Expected non-main/draft refusal observed before remote sync; no final PDF created"
+  },
+  "iterationFailures": [
+    {
+      "command": "node --test scripts/scrum-linkage.test.mjs",
+      "observed": "Existing LF-only workflow extraction failed on the CRLF Windows checkout",
+      "fix": "Normalize CRLF to LF in the test reader, preserving actual inline Actions parsing and all six regression cases",
+      "rerun": "6 PASS"
+    }
+  ],
+  "remaining": [
+    "actual submitter",
+    "submission-day board",
+    "two final-candidate address-bar captures",
+    "participant session details/outcomes",
+    "C03 final-head non-contributor review",
+    "C02 Sprint 3 log/minimum audit",
+    "C05 independent review/merge",
+    "final merged export and actual LMS receipt"
+  ],
+  "hostedFollowupChecks": "Pending at this pre-commit recording; inspect the pushed follow-up head"
+}

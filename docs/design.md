@@ -1,7 +1,7 @@
 # Sprint 3 design and contract reconciliation
 
 This document was reconciled on 2026-10-18 against Sprint 3 `main` SHA
-`f9774cbe7248c29915086d29bf2b9f99c2aa528a`. Tables, endpoints, modules, and
+`bf18ab860fc3e486b57fc3b5ccac4db94c283995`. Tables, endpoints, modules, and
 evidence below reflect that source. Profile/reset UI, rating-adjusted ranking,
 and NLP product scope remain explicitly unfinished.
 Request and response shapes are in
@@ -10,11 +10,11 @@ in [architecture.md](architecture.md).
 
 Sprint 3 decision update, 2026-10-06: TMDb is the required catalogue source for
 development, staging and demos. The existing importer is reused; operational
-readiness and verification are planned under
+readiness and verification are recorded under
 [#128](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/128) and
 [#135](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/135).
 Historical M2 seed screenshots/test results below remain M2 evidence, not a
-claim that the Sprint 3 live import or acceptance has passed. See the tracked
+substitute for the separate Sprint 3 live-import/acceptance records. See the tracked
 [TMDb Sprint 3 runbook](tmdb-sprint3-runbook.md).
 
 ## 1. Architecture
@@ -413,8 +413,8 @@ existence before deleting the current account's old rows. It flushes and
 prepares the sorted DTO before committing once. Insert/commit failures roll
 back both deletion and insertion; no post-commit database query is required to
 build a success response. [T02 evidence](evidence/s3-t02-atomic-preferences.md)
-records focused validation/security/rollback tests. T03 and the later UI
-acceptance tasks still own broader persistence and complete S01 verification.
+records focused validation/security/rollback tests. T03/T22/T25 record broader
+persistence and UI verification; final human/Story DoD gates remain separate.
 
 ### ADR-4: Sprint 3 recommendation inputs
 
@@ -428,6 +428,56 @@ stored by S05a but do not alter recommendation order in Sprint 3.
 Rating-adjusted ranking belongs to Story #22 / S05b and is planned Sprint 4.
 
 ## 8. UI-driven design changes with repository evidence
+
+### Preference persistence and recommendation generation (M3 reconciliation)
+
+The picker and immediate post-save recommendation flow required durable,
+account-owned selections instead of M2's popular-only landing. Migration
+`9d2f5a1c3b84` adds `user_genre_preferences`, uniquely keyed by
+`(user_id, genre_id)`. `GET /api/genres`, `GET /api/me/preferences` and atomic
+`PUT /api/me/preferences` supply canonical options, restored selections and
+committed saves. The session alone supplies the owner. The API rejects
+invalid/unknown IDs before replacing rows and rolls back on failure.
+
+Only successful preference commit calls `invalidateRecommendations()` and
+opens `/recommendations`. `AuthContext` increments the recommendation version;
+`RecommendationsPage` keys its snapshot by user, recommendation version and
+retry version, then checks the active request generation before accepting
+success/error/401. That prevents a delayed pre-save popular result or prior
+account response from replacing current personalised data. The ready list
+preserves `mode`, `personalised`, `noMatch` and `reason.matchedGenres`.
+S06's transient genre filter never writes preferences or changes server order.
+
+Evidence: [T22](evidence/s3-t22-preferences-acceptance/README.md),
+[latest T22 run](evidence/s3-m3-p0-handoff/latest/checks/t22-live.txt),
+[T25 S04/S13 race/ownership results](evidence/s3-m3-p0-handoff/latest/checks/s04-s13-synthetic.txt),
+`AuthContext.tsx`, `PreferencesPage.tsx`, `RecommendationsPage.tsx` and
+`RecommendationFilter.tsx`. The corresponding explanation and wireframes are
+in [ui.md §4](ui.md#4-what-changed-since-m2), updated in this same change.
+
+### Implemented rating UI and reset boundary
+
+T33's `MovieRating` is mounted on public detail. Guests resolve sign-in status
+but make no private rating GET/PUT; the CTA opens `/login`. The authenticated
+widget is keyed by `(user.id, movieId)` and separates committed rating from
+draft selection. Unrated text is `Not rated yet`, committed text is
+`Your saved rating: N/5`, and success text is `Rating saved.`. Saving disables
+duplicate submission and shows `Saving...` / `Saving your rating...`.
+
+A service-error save renders exactly
+`Your rating was not confirmed as saved. Service is temporarily unavailable Please retry.`
+and `Retry save`, retaining the prior committed value and draft. This replaces
+the historical draft copy `Rating was not saved. Try again.`. Old account/movie
+responses are discarded; protected 401 uses central recovery. [T34](evidence/s3-t34-rating-acceptance/README.md)
+and [C04 restart replay](evidence/s3-c04-final/live/results.json) record the
+implemented behaviour. T25 retains a first-run T33 bridge logout failure and
+passing reruns; its cause is not claimed resolved.
+
+`POST /api/me/profile/reset` implements the confirmed atomic backend boundary.
+The frontend `/profile` is still a guarded placeholder and sends no reset POST.
+The reset backend contract remains available for future UI reuse; no completed
+reset screen, search or similarity UI is claimed.
+
 
 ### Account/movie-keyed asynchronous state and stale-response rejection
 
@@ -525,9 +575,19 @@ a local proposal. `@kietxuan` approved head
 [review](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/144#pullrequestreview-5466721572)
 on 2026-10-09; GitHub merged it as
 `79c4b985a1df4671abf998831053e1b580481be0` at 13:47 Asia/Saigon. That receipt
-covers the initial contract. This final Sprint 3 reconciliation is a later
-change and must place `docs/ui.md` and `docs/design.md` in the same reviewed PR
-for #134/#136; this working tree does not invent that future review receipt.
+covers the initial contract. The later C03 reconciliation is now merged via
+[PR #187](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/187), merge
+`bf18ab860fc3e486b57fc3b5ccac4db94c283995`, and issue #134 is closed.
+Its [recorded approval](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/187#pullrequestreview-5563049458)
+is on `9e444adf491eff5214c4ac5c0bd316792393da8d`, before the later
+`95ab003f2123ae9c8d2d7f603d0f6cc7c5829be8` follow-up. This does not fabricate
+a review of that later head or of the C05 dossier. C05 updates `docs/ui.md`
+and this design explanation together and still needs its own real review.
+[Task #189](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/189) covers
+only the reviewed dossier draft/source and export-tooling milestone.
+Parent #136 remains open for actual final assets, human/C02 evidence, final
+merged PDF export and LMS submission/receipt. The
+[C05 follow-up](evidence/s3-c05-ui/follow-up.md) records the boundary.
 
 Initial consumers/dependencies:
 
@@ -577,4 +637,18 @@ are made only where merged source and repository evidence now exist.
 | Backdrop storage → importer → API → UI → acceptance | Implemented and merged through PRs #180–#183 | [storage](evidence/s3-t26-backdrop-storage.md), [enrichment](backdrop-import-runbook.md), [T37 UI](evidence/s3-t37-backdrop-ui/README.md), and [T28 acceptance](evidence/s3-t28-backdrop-acceptance/README.md) |
 | Database/diagrams | Nine application tables; head `c6f8a2d4e901`; current PNGs regenerated from current PlantUML | `backend/alembic/versions`, `docs/images/erd.puml`, and preserved M2 diagram assets |
 | Deliberately unfinished product scope | Not implemented | Profile/reset UI, rating-adjusted ranking (S05b), and NLP product behaviour remain future work; no completion is claimed |
-| Final documentation candidate | Reconciled against `f9774cbe7248c29915086d29bf2b9f99c2aa528a` on 2026-10-18 | Commit, push, CI, and record an independent review for this final C03/C05 change before calling the reconciliation itself reviewed |
+| C03 publication / C05 integration | C03 PR #187 merged at `bf18ab860fc3e486b57fc3b5ccac4db94c283995`; #134 closed | C05 preserves the merged contracts and current diagrams; its dossier review, approval and merge remain separate |
+
+### C05 dossier integration after C03 merge
+
+C03 PR #187 is now merged into main. This C05 merge resolution preserves its
+current architecture/ERD images, nine-table model, API errors and corrected
+TMDb page budget. Historical M2 assets retain the explicit `-m2` filenames;
+the current diagrams above must not be relabelled historical.
+
+The authoritative instructor dossier is [ui.md](ui.md), retaining its four
+required sections, all six P0 rows, separate P1 results and actual missing
+submission assets. The T25 matrix still reports all eight Stories as
+`partly works`; C03 contract publication is not new Story acceptance.
+Current C05 review/merge/PDF/LMS steps remain pending. Exact executed T25/C04
+snapshots and later real prerequisite approvals are linked in the dossier.

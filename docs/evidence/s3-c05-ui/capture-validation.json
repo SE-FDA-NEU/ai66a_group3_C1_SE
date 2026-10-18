@@ -1,0 +1,79 @@
+{
+  "scope": "C05 supplied-image/source/PDF checks only; not independent approval or final submission",
+  "status": "PASS for the documentation/capture integration milestone; release remains pending",
+  "observedDate": "2026-10-18",
+  "basePrHead": "439c42b95bbe1f3a999b4e4c6504f2b4b23024be",
+  "integratedMain": "bf18ab860fc3e486b57fc3b5ccac4db94c283995",
+  "checkedCandidate": "Uncommitted supplied-image follow-up over basePrHead; hashes below identify checked source",
+  "childTask": 189,
+  "parentChore": 136,
+  "sourceHashes": {
+    "docs/ui.md": "8c623967842e33bad498081e6f0c7b38105c19e9b1682ea636b0f97c5b323c90",
+    "docs/images/ui/asset-manifest.json": "1e0ce3a715e705d37b80fce988b310f26c6668c768fd0b8faefbf4aeefbb9b1d",
+    "scripts/verify-m3-dossier.py": "def8e1564935a2a62b790a3d14406471e8a1551bd1afcc951e13f63bd6afb61a",
+    "scripts/render-m3.py": "06233e11f7b4a41e60aafa5e1b35de3c44a8a3262d4a25f570c271e5ef36904d",
+    "scripts/inspect-m3-pdf.py": "2e7a94b4838b7a3b4d122466ba2864be1415c0c7cf468f20f27fcb2ff8f5358c"
+  },
+  "checks": {
+    "dossierVerifierUtf8ModeDisabled": "PASS",
+    "requiredSections": 4,
+    "p0Rows": 6,
+    "errorCases": 4,
+    "wireframes": 10,
+    "preservedHistoricalImageCopies": 8,
+    "suppliedOriginalPngs": 3,
+    "browserAddressBarCaptures": 2,
+    "matchingHistoricalSourcePaths": 201,
+    "intentionalSourceDifference": ".github/workflows/scrum-check.yml, already reported and tested by the earlier follow-up; no application/test exception",
+    "c01HistoricalVerifier": "PASS",
+    "ruffDocumentationHelpers": "PASS",
+    "javascriptSyntax": "PASS",
+    "actualScrumParserRegression": "6 PASS",
+    "whitespace": "PASS",
+    "diffInProductC03OrScrumWorkflowSinceBasePrHead": "none",
+    "finalModeGuard": "PASS: refused non-main unmerged draft as expected; no final PDF created"
+  },
+  "readOnlyDataCrossCheck": {
+    "observedAtUtc": "2026-10-18T14:09:58.724004+00:00",
+    "provider": "tmdb",
+    "activeRevision": "34b442f2-f5a8-4317-9f2f-468e6ec06a20",
+    "movies": 255,
+    "distinctSourceIds": 255,
+    "movieId": "18ae3a02-bbb5-4dbd-b038-057441fb77a5",
+    "sourceId": "969681",
+    "title": "Spider-Man: Brand New Day",
+    "popularityScore": 1024.5071,
+    "visibleFormattedPopularity": "1024.51",
+    "health": "database connected; migration c6f8a2d4e901",
+    "detailApiAndFrontendProxy": "Both returned matching movie and revision",
+    "sqliteAccess": "URI mode=ro and PRAGMA query_only=ON; catalogue fields only, no account rows or writes"
+  },
+  "pdf": {
+    "mode": "draft; not for submission",
+    "checkoutHeadInFooter": "439c42b95bbe1f3a999b4e4c6504f2b4b23024be",
+    "sourceSha256": "8c623967842e33bad498081e6f0c7b38105c19e9b1682ea636b0f97c5b323c90",
+    "pdfSha256": "0401962edc7ba697728d58ce20e42bb2ae49d5c9fa4c5b394b55e9843dadd7b1",
+    "pages": 19,
+    "page2RasterImages": 2,
+    "page3RasterImages": 2,
+    "requiredFirstThreePages": "PASS",
+    "outOfBoundsText": 0,
+    "visualInspection": "Cover, both board images, both browser captures, captions and remaining-page layout contact sheets inspected; no overlaps or clipped elements observed. Exact error copy is also printed as selectable caption text.",
+    "networkDuringExport": "external requests blocked"
+  },
+  "captureLimits": [
+    "PO-supplied screenshots, not browser interactions observed by Codex",
+    "Exact screenshot times and running-process SHA not supplied; clipboard-file times are not capture times",
+    "Error image has no network transcript; INVALID_CREDENTIALS and HTTP 401 are contract correspondence",
+    "Board counts are global/unfiltered and do not prove Story acceptance, issue closure or LMS submission"
+  ],
+  "remaining": [
+    "Substantive non-contributor review and actual PR #188 merge before closing Task #189",
+    "Actual participant session details and final acceptance sign-off",
+    "C03 final-head non-contributor review record",
+    "C02 Sprint 3 log and repository-minimum audit",
+    "Instructor access to the private board",
+    "Final export from completed merged main, PDF inspection and genuine LMS receipt before parent #136 closes"
+  ],
+  "hostedChecks": "Pending on the new commit when this pre-commit record was written; inspect the pushed head"
+}
