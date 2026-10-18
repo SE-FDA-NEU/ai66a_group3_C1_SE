@@ -3,6 +3,7 @@
 import hashlib
 import json
 import re
+import struct
 from pathlib import Path
 from xml.etree import ElementTree
 
@@ -62,6 +63,28 @@ for asset in manifest["assets"]:
     a, b = ROOT / asset["path"], ROOT / asset["source"]
     assert a.read_bytes() == b.read_bytes(), f"Altered evidence copy: {a}"
     assert hashlib.sha256(a.read_bytes()).hexdigest() == asset["sha256"]
+supplied = manifest["suppliedAssets"]
+expected_supplied = {
+    "docs/images/ui/submission-board.png": False,
+    "docs/images/ui/p0-movie-detail-browser.png": True,
+    "docs/images/ui/login-error-browser.png": True,
+}
+assert {asset["path"] for asset in supplied} == set(expected_supplied)
+for asset in supplied:
+    path = ROOT / asset["path"]
+    data = path.read_bytes()
+    assert data.startswith(b"\x89PNG\r\n\x1a\n"), f"Not a PNG: {path}"
+    assert hashlib.sha256(data).hexdigest() == asset["sha256"], path
+    assert len(data) == asset["bytes"], path
+    assert struct.unpack(">II", data[16:24]) == (asset["width"], asset["height"]), path
+    assert asset["browserAddressBar"] is expected_supplied[asset["path"]]
+    assert asset["transformation"] == "none; byte-for-byte copy of PO attachment"
+    assert asset["captureTimestamp"] is None or isinstance(asset["captureTimestamp"], str)
+    assert asset["path"].removeprefix("docs/") in text
+provenance = ROOT / manifest["suppliedAssetsProvenance"]
+assert provenance.exists()
+assert "not a browser network transcript" in provenance.read_text(encoding="utf-8")
+assert "| Submitter | Nguyen Xuan Kiet |" in text
 wireframes = ["home", "login", "register", "preferences", "movie-detail", "popular"] + [
     "recommendations-" + state for state in ["data", "empty", "loading", "error"]
 ]
@@ -114,6 +137,8 @@ print(
             "apiErrorCases": 4,
             "wireframes": len(wireframes),
             "unalteredEvidenceCopies": len(manifest["assets"]),
+            "poSuppliedOriginalPngs": len(supplied),
+            "addressBarCaptures": sum(asset["browserAddressBar"] for asset in supplied),
             "matchingRecordedExecutableFiles": len(accepted["files"])
             - len(intentional_ci_changes),
             "intentionalCiChanges": intentional_ci_changes,

@@ -15,7 +15,7 @@ Markdown is authoritative; if this PDF differs from the repository, use the repo
 | Repository | [SE-FDA-NEU/ai66a_group3_C1_SE](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE) |
 | Project board | [@group3_c1_se — Project 9](https://github.com/orgs/SE-FDA-NEU/projects/9) |
 | Setup guide | [docs/SETUP.md on main](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/docs/SETUP.md) |
-| Submitter | [HUMAN REQUIRED: actual submitter] |
+| Submitter | Nguyen Xuan Kiet |
 
 | Member (README spelling) | GitHub | Student ID |
 |---|---|---|
@@ -25,9 +25,8 @@ Markdown is authoritative; if this PDF differs from the repository, use the repo
 | Vu Quoc Huy | `@vu-huzy` | 11247301 |
 | Nguyen Tuan Anh | `@NguyenTuanAnh0608` | 11247260 |
 
-Names, roles and links: [README](../README.md). The PO supplied the exact topic
-and five student IDs on 2026-10-18. The actual LMS submitter is still
-unconfirmed; the dossier owner is not automatically the submitter.
+Names, roles and links: [README](../README.md). The PO supplied the exact topic,
+five student IDs and actual submitter in chat on 2026-10-18.
 
 Documentation base: merged `main` at
 `bf18ab860fc3e486b57fc3b5ccac4db94c283995` (C03 PR #187).
@@ -41,50 +40,37 @@ This document has no independent review, approval, merge or LMS receipt yet.
 
 ![Original beginning-of-Sprint-3 board supplied by the PO](images/ui/planning-board.png)
 
-Source: [C01 planning-image record](sprint3-backlog-refinement.md#3-planning-images-and-what-they-actually-show).
-The PO identifies this as the beginning-of-Sprint-3 board. It has no visible
-capture timestamp. Todo 53 / In Progress 0 / In Review 0 / Done 35 are global,
-unfiltered totals including Sprint 2 cards; they are not Sprint 3 points or
-accepted Story counts. The original file is copied unchanged, not reconstructed.
+PO-identified beginning-of-Sprint-3 image; global, unfiltered totals:
+Todo 53 / In Progress 0 / In Review 0 / Done 35, including Sprint 2.
+These are not Sprint 3 points or accepted Story counts.
 
-**On submission day — missing actual asset.**
+**On submission day — original PO-supplied image.**
 
-[HUMAN REQUIRED: capture the real submission-day board with visible workflow
-columns and the relevant Sprint 3 filter; record capture date/time, filter and
-board URL. Store the unaltered image under docs/images/ui/.]
+![Submission-day board supplied by the PO, all four workflow columns visible](images/ui/submission-board.png)
 
-The [later iteration snapshot](images/sprint3/iteration-board-snapshot.png)
-is a different grouping and is not submission-day evidence. Board access and
-its outdated iteration date label are explained in the C01 record. The PO/SM
-must verify that the submitted board link opens for the instructor.
+PO-supplied on 2026-10-18; no visible filter or capture timestamp.
+Global totals: Todo 4 / In Progress 0 / In Review 0 / Done 87.
+Project Done does not prove issue closure, acceptance or submission.
+Both images are unaltered. [Provenance and access limits](evidence/s3-c05-ui/supplied-captures.md).
 
 <!-- pdf:page -->
 
 ### Submission page 3 — Running P0 UI and visible error
 
-**Real database data — preview only; final address-bar capture required.**
+**S03 — movie details with the actual browser address bar.**
 
-![Real TMDb-imported local catalogue, original T25 viewport capture](images/ui/live-catalogue-viewport.png)
+![PO-captured movie details with backdrop, genres, overview, popularity and browser address bar](images/ui/p0-movie-detail-browser.png)
 
-Preview: `/`, accepted 255-movie TMDb snapshot, local FastAPI/SQLite.
-[Original live report](evidence/s3-m3-p0-handoff/latest/live/results.json).
-This unchanged viewport capture has no browser address bar.
+PO-supplied: `/movies/18ae3a02-bbb5-4dbd-b038-057441fb77a5`,
+Spider-Man: Brand New Day; 2026; TMDb popularity 1024.51.
 
-**Visible API error — historical preview; final address-bar capture required.**
+**S13 — rejected sign-in with the actual browser address bar.**
 
-![Historical real UI capture of a synthetic database-service error](images/ui/recommendations-error-historical-viewport.png)
+![PO-captured sign-in error: Email or password is incorrect; browser address bar visible](images/ui/login-error-browser.png)
 
-Preview: `/recommendations`, `SERVICE_UNAVAILABLE`.
-[Original error transcript](evidence/s3-m3-p0-handoff/synthetic/actual-error-message.txt).
-The synthetic capture used application base
-`86a758eb2468f3e23357b69adf3c3183e5110a40`; its privacy mask is original.
-It is not a final-candidate capture and has no browser address bar.
-
-[HUMAN REQUIRED: replace BOTH previews with genuine final-candidate browser
-captures showing the actual address bar: one P0 screen reading accepted TMDb
-data, one visible API error. Record URL, SHA, date, error trigger and provenance.
-Use a disposable test environment for the error; never damage the shared
-database or draw/paste browser chrome. Reinspect readability at normal PDF scale.]
+PO-supplied: `/login`, **Email or password is incorrect**.
+Contract: `INVALID_CREDENTIALS`, HTTP 401; the image itself is not a network log.
+Both original PNGs are preserved. [Capture provenance and version limits](evidence/s3-c05-ui/supplied-captures.md).
 
 <!-- pdf:page -->
 
@@ -513,7 +499,7 @@ This same C05 change adds the matching preference-persistence/UI rationale to
 [design.md §8](design.md#8-ui-driven-design-changes-with-repository-evidence).
 [Task #189](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/189) covers
 only the reviewed draft/source/tooling milestone; parent #136 remains open for
-the remaining assets, final merged export and real submission.
+the remaining acceptance/review evidence, final merged export and real submission.
 
 C02 [#133](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/133) is open.
 [sprint-log.md](sprint-log.md) currently stops at Sprint 2. The merged
@@ -528,9 +514,9 @@ retrospective, handoff or submission receipt.
 
 ### Publication and remaining human work
 
-1. Supply member IDs, exact assigned topic and submitter. PO/SM supplies the
-   real submission-day board and verifies instructor access. Preserve the
-   original planning screenshot and its stated limitations.
+1. Member IDs, exact topic, submitter and the submission-day board are supplied.
+   PO/SM still verifies instructor access to the private board. Preserve both
+   original board images and their global/unfiltered-count limitations.
 2. Record Trang's actual session date, tested version, catalogue revision and
    per-journey outcomes in [human-validation.md](evidence/s3-m3-p0-handoff/human-validation.md).
    PO confirmation that the trial occurred is not an all-AC pass. Resolve the
@@ -539,8 +525,11 @@ retrospective, handoff or submission receipt.
    C03's merge/closure is already recorded and is not repeated. The #133 owner
    supplies the actual Sprint 3 log/evidence milestone and repository-minimum
    audit. Do not award points for partial Stories or count Tasks as points.
-4. Capture both final-candidate application images with the browser address
-   bar. All current viewport previews fail this specific submission requirement.
+4. Both PO-supplied application images now include the actual browser address
+   bar and appear on page 3. Keep their provenance limits explicit: the exact
+   running checkout, capture times and browser network transcript were not
+   supplied. Reconfirm applicability if executable code changes before release;
+   historical viewport previews are retained only as historical evidence.
 5. A real non-contributing teammate uses Review changes, leaves a substantive
    comment on this dossier PR, reproduces relevant checks, and approves after
    findings are resolved. No review has been generated on their behalf.

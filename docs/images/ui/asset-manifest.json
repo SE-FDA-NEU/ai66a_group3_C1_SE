@@ -65,5 +65,53 @@
       "kind": "browser viewport capture; not submission-ready address-bar evidence"
     }
   ],
+  "suppliedAssets": [
+    {
+      "path": "docs/images/ui/submission-board.png",
+      "originalFilename": "codex-clipboard-1ca13d0f-7289-46d1-9571-6bb39f39600e.png",
+      "sha256": "aa28067a3f644e4f19f5994516bd509e6b2ee3a898aa3219ec9fe820b3e8b07b",
+      "bytes": 127026,
+      "width": 1917,
+      "height": 915,
+      "receivedDate": "2026-10-18",
+      "captureTimestamp": null,
+      "clipboardFileLastWriteUtc": "2026-10-18T13:56:18.1834371Z",
+      "transformation": "none; byte-for-byte copy of PO attachment",
+      "browserAddressBar": false,
+      "kind": "PO-identified submission-day board; global unfiltered counts"
+    },
+    {
+      "path": "docs/images/ui/p0-movie-detail-browser.png",
+      "originalFilename": "codex-clipboard-9048f709-8c02-4315-80cd-a68410760347.png",
+      "sha256": "081e2ceda99511c78870c79ff4d9ed5b16cb668d97626aea2e085445425e90ee",
+      "bytes": 459771,
+      "width": 1917,
+      "height": 1022,
+      "receivedDate": "2026-10-18",
+      "captureTimestamp": null,
+      "clipboardFileLastWriteUtc": "2026-10-18T14:05:41.8897984Z",
+      "transformation": "none; byte-for-byte copy of PO attachment",
+      "browserAddressBar": true,
+      "url": "http://localhost:5173/movies/18ae3a02-bbb5-4dbd-b038-057441fb77a5",
+      "kind": "PO-captured running movie-detail page with browser chrome"
+    },
+    {
+      "path": "docs/images/ui/login-error-browser.png",
+      "originalFilename": "codex-clipboard-72f7224a-cbcb-4a90-a267-10ae2b5000c5.png",
+      "sha256": "5df3dfdeaea093ae456b022241a439e8d799161e7279d2ee0d0af03c6463f2df",
+      "bytes": 73478,
+      "width": 1915,
+      "height": 1021,
+      "receivedDate": "2026-10-18",
+      "captureTimestamp": null,
+      "clipboardFileLastWriteUtc": "2026-10-18T14:06:32.5909393Z",
+      "transformation": "none; byte-for-byte copy of PO attachment",
+      "browserAddressBar": true,
+      "url": "http://localhost:5173/login",
+      "visibleMessage": "Email or password is incorrect",
+      "kind": "PO-captured sign-in error with browser chrome; password visually masked"
+    }
+  ],
+  "suppliedAssetsProvenance": "docs/evidence/s3-c05-ui/supplied-captures.md",
   "authoredWireframes": "SVG files are labelled schematics, not screenshots or test results."
 }

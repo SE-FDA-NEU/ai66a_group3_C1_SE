@@ -3,7 +3,8 @@
 This package contains authoritative [docs/ui.md](../../ui.md), matching
 [design reconciliation](../../design.md), ten labelled SVG wireframes, an
 updated M1 flow, and eight byte-for-byte evidence-image copies under
-[docs/images/ui](../../images/ui/asset-manifest.json). The wireframes are
+[docs/images/ui](../../images/ui/asset-manifest.json), plus three original
+PO-supplied submission images. The wireframes are
 schematics; they are never presented as running-application captures.
 
 [verification.json](verification.json) compares all 202 recorded T25
@@ -33,7 +34,7 @@ PR #188 closes child [Task #189](https://github.com/SE-FDA-NEU/ai66a_group3_C1_S
 only after its draft/source/tooling changes pass CI and actual independent
 review and are merged. It continues to reference parent
 [#136](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/136), which stays
-open for the remaining captures, human/C02 evidence, final merged PDF and LMS
+open for the remaining acceptance/review evidence, final merged PDF and LMS
 receipt. This avoids falsely closing a post-merge submission obligation just
 to satisfy the issue-linkage check. The PO must verify #189's Sprint 3 Project
 iteration; private-board membership is not assumed from the issue body.
@@ -69,26 +70,31 @@ application screenshots or new acceptance evidence.
 
 ## Draft limits and final export
 
-The draft deliberately contains visible `HUMAN REQUIRED` fields and a draft
-footer on every page. It must not be uploaded as the submission. Page 2 has
-one authentic planning image and a missing submission-day slot. Page 3
-has two authentic viewport previews, explicitly labelled with their actual
-live versus historical synthetic source; **neither has an address bar**.
-No existing viewport capture is silently promoted to a required final image.
-The full-height catalogue preview is small at normal page scale; use a
-readable final browser-chrome capture with enough P0 content visible to
-identify the running data. Readability of final replacements needs reinspection.
+The draft keeps a visible draft status and footer on every page. It must not
+be uploaded as the final submission merely because no placeholder marker is
+left. Page 2 now contains the original planning board and PO-identified
+submission-day board. Both show global, unfiltered counts, not Sprint 3
+velocity. Page 3 uses two new PO-captured PNGs with actual browser address
+bars: S03 movie details and the S13 incorrect-credentials error. Historical
+viewport previews remain preserved but are not the page-3 submission images.
 
-The exact topic and five student IDs were supplied by the PO and are filled.
-Supply the actual submitter, genuine final board and browser-chrome images,
-participant record, C02 log/minimum audit and the outstanding final-head
-non-contributor C03 review. The C03 reconciliation itself is already merged.
-Record
-actual capture dates, URLs, exact tested candidate, DB revision/provider and
-error trigger in a tracked evidence file. Preserve original image pixels;
-never fabricate a historical board or add browser chrome. Update the asset
-manifest and document links when adding real replacements. Re-run the
-structural check and inspect every rendered page after changes.
+The exact topic, five student IDs, roles and actual submitter are filled from
+the PO's supplied facts. [Supplied-capture provenance](supplied-captures.md)
+records hashes, visible URLs/message, limitations and a read-only local
+API/SQLite cross-check of the pictured movie against the 255-film TMDb revision.
+Exact browser capture times and the running process's SHA were not supplied;
+clipboard-file times and the workspace head are not substituted for them.
+The PO/SM must still verify instructor access to the private Project board.
+Preserve the original pixels; never draw browser chrome or relabel a historic
+capture as a later candidate. Reconfirm applicability if executable code changes.
+
+Participant session details, C02 log/minimum audit and the outstanding
+final-head non-contributor C03 review remain unrecorded. The C03 reconciliation
+itself is already merged. No source edit or image can substitute for those
+human outcomes. Re-run the structural check and inspect every rendered page
+after changes. The latest capture/layout checks are recorded separately in
+[capture-validation.json](capture-validation.json), not in the historical
+follow-up results.
 
 Before final export, obtain a substantive independent teammate review,
 resolve findings, receive approval and merge this documentation PR into
@@ -139,8 +145,9 @@ The 202-path original audit remains historical. The current checker explicitly
 reports the intentional `.github/workflows/scrum-check.yml` difference, while
 all other 201 historical paths (including product and tests) must still match.
 The review job and its real non-author approval requirement are unchanged.
-At inspection PR #188 had no submitted reviews; automation cannot supply an
-independent teammate approval. The UI/design conflict resolution is not itself
+The initial inspection found no submitted reviews; a later @kietxuan approval
+covers an earlier head and Kiet contributes follow-up changes. Neither supplies
+substantive non-contributor approval of the final head. The UI/design conflict resolution is not itself
 a merge of the dossier into main or a final PDF/LMS completion claim.
 
 The PO-authorized Task #189 remains a useful draft/tooling delivery boundary

@@ -32,8 +32,10 @@ for title in [
     assert title in all_text, f"Missing required section {title}"
 for message in ["Email or password is incorrect", "This email is already registered"]:
     assert message in all_text, f"Exact Story message missing: {message}"
-assert len(doc[1].get_images()) >= 1, "Planning board image absent"
-assert len(doc[2].get_images()) >= 2, "Application/error draft previews absent"
+assert len(doc[1].get_images()) >= 2, "Planning and submission-day board images required"
+assert len(doc[2].get_images()) >= 2, "P0 and error browser captures required"
+assert "Nguyen Xuan Kiet" in doc[0].get_text(), "Submitter missing from cover"
+assert "INVALID_CREDENTIALS" in doc[2].get_text(), "Page 3 error caption missing"
 output = args.pdf.parent / (args.pdf.stem + "-inspection")
 output.mkdir(exist_ok=True, parents=True)
 report = {
