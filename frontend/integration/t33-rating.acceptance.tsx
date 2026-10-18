@@ -123,6 +123,8 @@ it("real UI saves, rolls back, retries, reloads and isolates account ratings wit
   await screen.findByText("Your saved rating: 5/5");
   fireEvent.click(screen.getByRole("link", { name: "Return to catalogue" }));
   await screen.findByRole("heading", { name: "Find your next movie" });
+  fireEvent.click(await screen.findByRole("button", { name: "Sign out" }));
+  await screen.findByRole("link", { name: "Sign in" });
   fireEvent.click(screen.getByRole("link", { name: "Sign in" }));
   await signIn("t33-b@example.com");
   app.unmount();

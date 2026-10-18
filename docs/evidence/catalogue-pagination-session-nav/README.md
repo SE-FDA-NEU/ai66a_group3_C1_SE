@@ -4,6 +4,9 @@ Collected 2026-10-19 (Asia/Saigon) on branch
 `feature/catalogue-pagination-session-nav`. This is new Task evidence; it
 does not replace the recorded Sprint 3/M3 acceptance artifacts.
 
+Tracking: [Task #193](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/193)
+and [draft PR #194](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/194).
+
 ## Automated checks
 
 - Backend: `python -m pytest backend/tests -q --disable-warnings --maxfail=10`:
@@ -13,6 +16,8 @@ does not replace the recorded Sprint 3/M3 acceptance artifacts.
 - Frontend: `npm --prefix frontend test -- --reporter=dot`: 223 passed.
 - Frontend lint: `npm --prefix frontend run lint`: passed.
 - Frontend build: `npm --prefix frontend run build`: passed.
+- Current T16 filter integration and T33 rating integration: each passed after
+  updating their journeys for server-side filtering and alphabetical Home.
 - Existing S04/S13 browser acceptance: 10 cases reported pass, 1 configured
   live smoke skipped on each of two runs. The Windows runner did not exit
   after test execution on either run; it was interrupted during server
