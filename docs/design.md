@@ -1,19 +1,22 @@
 # Sprint 3 design and contract reconciliation
 
-This document was reconciled with the local working tree on 2026-10-13. Every
-table and endpoint is marked as implemented or as committed Sprint 3 scope
-with implementation pending; no tested SHA or review approval is implied.
+Reconciled for the M3 dossier on 2026-10-18 against merged application source
+and the T25/C04/T28 evidence. Documentation base:
+`f9774cbe7248c29915086d29bf2b9f99c2aa528a`. Implemented behaviour is distinct
+from full Story acceptance; the six P0 and separate P1 S06/S09 remain
+`partly works`. Exact executed snapshots, later merges and remaining human
+gates are recorded in [ui.md](ui.md) and the [C05 audit](evidence/s3-c05-ui/README.md).
 Request and response shapes are in
 [api.md](api.md), UI state is in [ui.md](ui.md), and ownership/persistence is
 in [architecture.md](architecture.md).
 
 Sprint 3 decision update, 2026-10-06: TMDb is the required catalogue source for
 development, staging and demos. The existing importer is reused; operational
-readiness and verification are planned under
+readiness and verification are recorded under
 [#128](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/128) and
 [#135](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/135).
 Historical M2 seed screenshots/test results below remain M2 evidence, not a
-claim that the Sprint 3 live import or acceptance has passed. See the tracked
+substitute for the separate Sprint 3 live import and acceptance records. See the tracked
 [TMDb Sprint 3 runbook](tmdb-sprint3-runbook.md).
 
 ## 1. Architecture
@@ -26,14 +29,14 @@ The diagram is historical M2 evidence and its importer label reflects the old
 optional setup. The updated Sprint 3 source requirement is recorded in the
 component table and ADR-1 below; topology and runtime read boundaries are unchanged.
 
-The browser talks only to the backend API. The backend is the only component that reads or writes accounts and sessions. The TMDb importer is a separate command that never runs during a browser request, so movie pages read the local database and never call TMDb.
+The browser talks only to the backend API. The backend is the only component that reads or writes accounts and sessions. The TMDb importer is a separate command that never runs during a browser request, so movie metadata pages read the local database and never call the TMDb metadata API. The optional detail backdrop loads from the public allow-listed image CDN without credentials.
 
 | Component | Technology | Responsibility |
 |---|---|---|
 | Browser frontend | React, TypeScript, Vite, React Router | Renders the public catalogue, movie detail, explanation, registration and sign-in pages, and the signed-in pages. Calls the backend through relative `/api` paths. |
 | Backend API | Python 3.12, FastAPI, Pydantic | Validates input, resolves the session cookie to an account, applies the business rules, and returns DTOs and error envelopes. |
-| SQLite database | SQLite, SQLAlchemy, Alembic | Stores accounts, sessions, and the movie catalogue. The backend turns on `PRAGMA foreign_keys` for every connection, so foreign keys are enforced. |
-| TMDb importer | Python command, httpx | Required catalogue preparation for Sprint 3 dev/staging/demo. Fetches genres and one page of popular movies, writes a new revision, and activates it only after every write succeeds. |
+| SQLite database | SQLite, SQLAlchemy, Alembic | Stores accounts, sessions, preferences, ratings and the movie catalogue. The backend turns on `PRAGMA foreign_keys` for every connection, so foreign keys are enforced. |
+| TMDb importer | Python command, httpx | Required catalogue preparation for Sprint 3 dev/staging/demo. Fetches genres and a bounded 1–15 popular pages (default one), writes a new revision, and activates it only after every write succeeds. Media-only enrichment remains a separate command. |
 | TMDb API | External service | Source of movie and genre data for the importer only. |
 
 In development, Vite listens on port 5173 and proxies `/api` to the backend on `http://127.0.0.1:8000`, so the browser sees one origin. The backend does not serve the built frontend in M2, so the application runs as two processes. The session cookie is named `ams_session`; it is opaque, `HttpOnly` and `SameSite=Lax`.
@@ -81,8 +84,8 @@ The ERD in `docs/images/erd.png` is the M2 baseline. It shows the seven M2 table
 
 Genre preferences are stored in `user_genre_preferences` (S3-T01), and current
 account/movie ratings are stored in `user_movie_ratings` (S3-T30). The rating
-HTTP API is implemented under T31 and the reset backend under T35; their UI
-work remains pending. Rating-adjusted ranking (Story #22 / S05b) is planned
+HTTP API is implemented under T31 and the reset backend under T35; the rating widget is implemented under T33/T34 while the reset UI
+remains pending. Rating-adjusted ranking (Story #22 / S05b) is planned
 Sprint 4 rather than Sprint 3.
 
 A trailing `?` marks a column that allows NULL. Every other column is NOT NULL.
@@ -132,8 +135,8 @@ cascading deletes, and a strict integer database check from 1 through 5.
 Preference validation and account-scoped replacement are implemented under
 T02. T30 implements account-scoped rating storage/repository operations, T31
 implements the protected rating API, and T35 implements the reset backend.
-Rating/reset UI, search, and similarity remain incomplete until their
-respective tasks pass.
+Rating UI is implemented under T33 with T34 browser acceptance. Reset UI,
+search and similarity remain incomplete; rating-adjusted ranking remains Sprint 4.
 
 Committed Sprint 3 delivery is narrower than that historical rule list:
 BR1-BR4 use saved genres and local popularity, BR7 stores an optional 1-5
@@ -164,7 +167,7 @@ Conventions:
 | S04 | `GET /api/movies?limit=10` | Public | `limit` 1 to 10, default 10 | `200` with `data.movies` and `meta`; catalogue entries without popularity may be included and sort last when popularity ordering is used | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE` | Implemented in M2; public catalogue route |
 | S09 / T19 | `GET /api/movies/popular?limit=10` | Public | `limit` 1 to 10, default 10 | `200` with `data.movies` and `meta`; only finite-popularity movies are eligible | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | Implemented in Sprint 3 (S3-T19); dedicated popular route |
 | S03 | `GET /api/movies/{movieId}` | Public | Internal movie ID | `200` with `data.movie` | `404 MOVIE_NOT_FOUND`, `503 CATALOGUE_UNAVAILABLE` | Implemented in M2 |
-| S02, S04 | `GET /api/me/recommendations?limit=10` | Signed in | `limit` 1 to 10, default 10 | `200` with the popular list, `mode` `popular`, `personalised` `false` | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE` | Implemented in M2 (popular list only) |
+| S02, S04 | `GET /api/me/recommendations?limit=10` | Signed in | `limit` 1 to 10, default 10 | `200` with `data.movies`, `mode`, `personalised`, `noMatch`, and matching-genre reasons | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | Implemented Sprint 3 (T08); popular cold start, personalised and no-match variants |
 | S01 | `GET /api/genres` | Signed in | None | `200` with the local canonical genre list | `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | Implemented in Sprint 3 (S3-T01) |
 | S01 | `GET /api/me/preferences` | Signed in | None | `200` with the saved genres | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | Implemented in Sprint 3 (S3-T01) |
 | S01 | `PUT /api/me/preferences` | Signed in, same-origin | `genreIds`: 1 to 5 distinct genre IDs | `200` with the saved genres after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 GENRE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | Implemented in Sprint 3 (S3-T02) |
@@ -176,7 +179,8 @@ All six P0 Stories appear in the table: S01 (genres and preferences), S02 and
 S04 (recommendations and the public catalogue), S03 (movie detail), S12
 (register) and S13 (sign-in, sign-out, current account). S01 backend storage,
 reads, and atomic preference replacement are implemented under T01/T02; its
-frontend and complete Story acceptance remain pending. S09/T19 is listed
+frontend is implemented under T04/T05 and verified under T22/T25, while
+complete Story acceptance retains the human/DoD gates in the M3 dossier. S09/T19 is listed
 separately as the implemented dedicated public popular route. The recommendation
 endpoint supports popular cold-start results and genre-based personalised
 results implemented under S3-T08. The `/recommendations` page consumes this
@@ -300,13 +304,13 @@ Options considered:
 2. The backend calls TMDb on each catalogue request. Page content and test results would depend on a live service whose popularity values change between runs.
 3. The backend reads only the local database, and a separate command fills it, either from a fixed local dataset or from TMDb.
 
-Decision. Option 3 remains the runtime boundary. From Sprint 3, the server-side importer is mandatory catalogue preparation: configure a private Read Access Token, migrate a fresh database and import TMDb before dev/staging/demo acceptance. Active revision provider and movie source must be `tmdb`, with source IDs, counts and fetch/import timestamps verified by a separate manual smoke. The importer activates a revision only after every write succeeds; failed imports preserve the previous valid catalogue and do not fall back to seed. Required setup/failure checks must be completed under T29/C04; this document does not claim that acceptance has passed.
+Decision. Option 3 remains the runtime boundary. From Sprint 3, the server-side importer is mandatory catalogue preparation: configure a private Read Access Token, migrate a fresh database and import TMDb before dev/staging/demo acceptance. Active revision provider and movie source must be `tmdb`, with source IDs, counts and fetch/import timestamps verified by a separate manual smoke. The importer activates a revision only after every write succeeds; failed imports preserve the previous valid catalogue and do not fall back to seed. Required setup/failure checks have recorded T29/C04 results, linked in §11. Those executable results do not resolve every Story human/DoD gate.
 
 Rationale. TMDb supplies the application catalogue, while local reads keep user requests independent of provider availability. Synthetic provider fixtures, boundary mocks and isolated test databases keep automated AC tests deterministic without live tokens/network. Credentials remain server-side.
 
 Consequence. The M2 fixed dataset is only historical/test/labelled offline support, not Sprint 3 acceptance data. A missing token or failed import leaves a new demo environment unready. On an existing environment the valid previous snapshot remains readable; the failed attempt cannot be reported as successful readiness evidence. `/api/genres`, recommendations, the `/api/movies` public catalogue, the `/api/movies/popular` dedicated finite-popularity subset, and details read SQLite; source provenance stays in operator evidence, not new public secret/source-ID DTO fields. Media T26–T28 remain stretch and do not block unchanged S03 criteria.
 
-Verification. T29 and C04 must link successful fresh-database import, credential/error guidance, rollback/idempotence checks and final-candidate live smoke outside CI. Existing M2 tests/evidence do not imply these checks have passed. The [runbook](tmdb-sprint3-runbook.md) contains the required commands and provenance checklist.
+Verification. [T29](evidence/t29-tmdb-live-smoke.md) records successful import/reimport provenance and synthetic rollback/error checks; [C04](evidence/s3-c04-clean-clone.md) records an independently installed clean clone, live import and runtime/restart journey. Existing M2 evidence is retained solely as history. The [runbook](tmdb-sprint3-runbook.md) contains the required commands and provenance checklist.
 
 ### ADR-2: How the server recognises a signed-in account
 
@@ -388,8 +392,8 @@ existence before deleting the current account's old rows. It flushes and
 prepares the sorted DTO before committing once. Insert/commit failures roll
 back both deletion and insertion; no post-commit database query is required to
 build a success response. [T02 evidence](evidence/s3-t02-atomic-preferences.md)
-records focused validation/security/rollback tests. T03 and the later UI
-acceptance tasks still own broader persistence and complete S01 verification.
+records focused validation/security/rollback tests. Broader persistence and UI verification is recorded under T03/T22/T25;
+full S01 sign-off remains separate from these functional passes.
 
 ### ADR-4: Sprint 3 recommendation inputs
 
@@ -403,6 +407,55 @@ stored by S05a but do not alter recommendation order in Sprint 3.
 Rating-adjusted ranking belongs to Story #22 / S05b and is planned Sprint 4.
 
 ## 8. UI-driven design changes with repository evidence
+
+### Preference persistence and recommendation generation (M3 reconciliation)
+
+The picker and immediate post-save recommendation flow required durable,
+account-owned selections instead of M2's popular-only landing. Migration
+`9d2f5a1c3b84` adds `user_genre_preferences`, uniquely keyed by
+`(user_id, genre_id)`. `GET /api/genres`, `GET /api/me/preferences` and atomic
+`PUT /api/me/preferences` supply canonical options, restored selections and
+committed saves. The session alone supplies the owner. The API rejects
+invalid/unknown IDs before replacing rows and rolls back on failure.
+
+Only successful preference commit calls `invalidateRecommendations()` and
+opens `/recommendations`. `AuthContext` increments the recommendation version;
+`RecommendationsPage` keys its snapshot by user, recommendation version and
+retry version, then checks the active request generation before accepting
+success/error/401. That prevents a delayed pre-save popular result or prior
+account response from replacing current personalised data. The ready list
+preserves `mode`, `personalised`, `noMatch` and `reason.matchedGenres`.
+S06's transient genre filter never writes preferences or changes server order.
+
+Evidence: [T22](evidence/s3-t22-preferences-acceptance/README.md),
+[latest T22 run](evidence/s3-m3-p0-handoff/latest/checks/t22-live.txt),
+[T25 S04/S13 race/ownership results](evidence/s3-m3-p0-handoff/latest/checks/s04-s13-synthetic.txt),
+`AuthContext.tsx`, `PreferencesPage.tsx`, `RecommendationsPage.tsx` and
+`RecommendationFilter.tsx`. The corresponding explanation and wireframes are
+in [ui.md §4](ui.md#4-what-changed-since-m2), updated in this same change.
+
+### Implemented rating UI and reset boundary
+
+T33's `MovieRating` is mounted on public detail. Guests resolve sign-in status
+but make no private rating GET/PUT; the CTA opens `/login`. The authenticated
+widget is keyed by `(user.id, movieId)` and separates committed rating from
+draft selection. Unrated text is `Not rated yet`, committed text is
+`Your saved rating: N/5`, and success text is `Rating saved.`. Saving disables
+duplicate submission and shows `Saving...` / `Saving your rating...`.
+
+A service-error save renders exactly
+`Your rating was not confirmed as saved. Service is temporarily unavailable Please retry.`
+and `Retry save`, retaining the prior committed value and draft. This replaces
+the historical draft copy `Rating was not saved. Try again.`. Old account/movie
+responses are discarded; protected 401 uses central recovery. [T34](evidence/s3-t34-rating-acceptance/README.md)
+and [C04 restart replay](evidence/s3-c04-final/live/results.json) record the
+implemented behaviour. T25 retains a first-run T33 bridge logout failure and
+passing reruns; its cause is not claimed resolved.
+
+`POST /api/me/profile/reset` implements the confirmed atomic backend boundary.
+The frontend `/profile` is still a guarded placeholder and sends no reset POST.
+The reset backend contract remains available for future UI reuse; no completed
+reset screen, search or similarity UI is claimed.
 
 ### Stale response isolation
 
@@ -462,82 +515,64 @@ Evidence: migration `4bde7d96c1c2`, `MovieDetailDto`,
 
 ## 9. Backdrop reconciliation
 
-T26 / #129 implements nullable TEXT `catalog_movies.backdrop_path`, the
-`c6f8a2d4e901` migration, a transaction-owned repository setter and focused
-fresh/populated migration/storage tests. It stores paths only, not image data.
-The existing core upsert does not erase a media path, and a failed caller
-transaction rolls a media write back without changing account/catalogue data.
+The shipped T26/T27/T37 chain adds nullable TEXT `catalog_movies.backdrop_path`
+with migration `c6f8a2d4e901`, bounded TMDb media import/enrichment and safe
+nullable `backdropUrl` on detail. The database stores paths, not image bytes;
+the backend constructs an allow-listed HTTPS CDN URL. Core upserts preserve
+media when absent/invalid; explicit null clears it. A failed multi-movie
+enrichment transaction rolls back every write. Identity, catalogue revision,
+recommendation order, preferences and ratings remain unchanged.
 
-T27 adds TMDb mapping, bounded media-only enrichment and a safe nullable
-`backdropUrl` in the details response on top of that storage. Visible fallback
-UI remains separate S3-T37 work, accepted end-to-end under #131. The
-public DTOs were unchanged by T26 alone. The
-historical ERD image is not an updated-field claim. See the consumer
-[handoff contract](backdrop-storage-contract.md) and
-[T26 verification record](evidence/s3-t26-backdrop-storage.md), plus the
-[T27 operator runbook](backdrop-import-runbook.md).
+`MovieBackdropHero` uses a permanent gradient/contrast layer, handles omitted,
+null or broken image URLs, and rejects obsolete image events after movie
+navigation. Text and return navigation remain usable with no image. The public
+DTO changed additively in T27; T26 alone did not alter it.
 
-## 10. D1 contract publication and consumer handoff
+Evidence: [storage contract](backdrop-storage-contract.md),
+[T27 runbook](backdrop-import-runbook.md),
+[T28/#131 independent executable acceptance](evidence/s3-t28-backdrop-acceptance/README.md),
+[T37 UI evidence](evidence/s3-t37-backdrop-ui/README.md), and
+[C04 final live 1280px/375px CDN checks](evidence/s3-c04-final/backdrop-live/results.json).
+M2 architecture/ERD images above remain explicitly historical and omit the
+additions documented in this file.
 
-The initial contract milestone is prepared in this local working tree. D1 is
-not considered published or reviewed until the documentation change has a real
-review record. Once reviewed, implementation consumers may use it without
-waiting for the final reconciliation gate.
+## 10. Initial contract publication and final handoff
 
-Initial consumers/dependencies:
+The initial #134 contract milestone is merged via
+[PR #144](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/144), head
+`6c6dd7880e4af1a1dd30d5a11068bc84a3b07e9d`, with actual
+[formal approval](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/144#pullrequestreview-5466721572).
+It is no longer an unpublished local proposal. The API/schema contracts in
+[api.md](api.md) govern preference, recommendation, popular, rating and reset
+consumers. Older revision dates in API prose describe publication history,
+not current Story acceptance or absence of the implemented filter/rating UI.
 
-- [#103](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/103)
-- [#106](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/106)
-- [#108](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/108)
-- [#112](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/112)
-- [#128](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/128)
-- [T30 #137](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/137)
-- [T31 #138](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/138)
-- [T32 #140](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/140)
-- [T33 #139](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/139)
-- [T34 #141](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/141)
-- [T35 #142](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/142)
-
-Consumer ownership/handoff:
-
-- Shared recommendation cards/client/container integration:
-  [S3-T10 #112](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/112).
-- No-match error, retry, and request-race handling:
-  [S3-T11 #113](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/113).
-- Cold-start transitions after preference save:
-  [S3-T13 #115](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/115).
-- TMDb import/setup:
-  [#128](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/128).
-- Public popular-list consumers: use the dedicated S09/T19
-  `GET /api/movies/popular` contract, not the existing S04 catalogue route.
-- API/data contract:
-  [#134](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/134).
-- Clean-clone/offline CI:
-  [#135](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/135).
-- M3 UI dossier coordination: the UI-driven explanation in `docs/ui.md` and
-  this design update must appear together in the same reviewed change for
-  [S3-C05 #136](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/136).
-
-These links assign handoff only. They do not imply completion, review approval,
-test evidence, or a tested SHA.
+The consumer allocation remains T10 #112 (shared cards/client/container),
+T11 #113 (retry/no-match/races), T13 #115 (committed-save/cold-start
+transitions), T29 #128 (import), C04 #135 (setup/isolation), T30–T34
+(rating storage/API/security/UI), T35 #142 (reset backend), and
+C05 #136 (dossier/wireframes/PDF). This same C05 change reconciles §8/§9 with
+[ui.md](ui.md). **Final #134 independent reconciliation/review is still open**;
+initial approval does not close the entire Chore.
 
 ## 11. Final reconciliation gate
 
-| Gate | Current status | Evidence needed before completion |
+| Gate | Observed state and evidence | Remaining boundary |
 |---|---|---|
-| Initial API/database/UI contract | Prepared locally; review/publication pending | Reviewed D1 contract link |
-| Preferences and personalised recommendation implementation | Backend storage/reads/replacement implemented under T01/T02; genre/popularity endpoint under T08; card/client integration under T10; no-match/retry/race UI implemented locally under T11; current-list filtering merged under T15; broader acceptance remains separate | Reviewed/merged implementation, executable tests, and consumer verification; see T02/T08/T11/T15 evidence |
-| Rating storage/API/UI protection | Storage/repository implemented under T30 and API under T31; UI pending | T30 [#137](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/137) and T31 [#138](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/138) are merged. T32 [#140](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/140), T33 [#139](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/139), and T34 [#141](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/141) retain independent verification/UI scope. |
-| Rating storage and repository | Implemented under T30 | T30 [#137](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/137) is merged with migration/repository tests. |
-| Rating API | Implemented under T31; independent verification pending | T31 [#138](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/138) ships `backend/tests/test_ratings_api.py`; T32 [#140](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/140) owns dedicated persistence/rollback/isolation verification. |
-| Rating UI and acceptance | Pending | T33 [#139](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/139) widget/saved state and T34 [#141](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/141) auth/account-switch verification. |
-| Authenticated reset backend | Implemented under T35; UI pending | [T35 #142](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/142); `backend/tests/test_profile_reset_api.py` covers confirmation, authentication, origin, isolation, rollback, preservation, and cold-start behaviour. Post-merge local verification on `05ee98232a96a10321d0e925c7e059d90c45d7c0` passed; hosted CI and independent review still require PR evidence. |
-| UI-driven design reconciliation | Documented locally; #136 coordination/review pending | Same reviewed change containing `docs/ui.md` and `docs/design.md` |
-| Backdrop storage #129 | T26 storage/migration and focused tests implemented; review/merge remain separate | [Storage handoff](backdrop-storage-contract.md) and [actual verification](evidence/s3-t26-backdrop-storage.md) |
-| Backdrop import/API/UI and full acceptance | Pending under #130, S3-T37 and #131; not claimed by T26 | Reviewed implementation, real image/fallback browser evidence and independent acceptance |
-| Final implementation reconciliation | Pending | Compare these contracts with merged implementation and verification evidence |
-| Final evidence | Pending | Reviewed contract links, actual implementation evidence, final test results, and real tested SHA |
+| Initial #134 contracts | PR #144 merged with formal reviews | Final #134 reconciliation/sign-off still open |
+| Preferences, personalised/cold-start/no-match UI | Implemented; [T25 AC matrix](evidence/s3-m3-p0-handoff/README.md#complete-p0-ac-to-evidence-matrix) reuses T22/T12/S04 evidence | All six P0 remain partly works pending human session details/final DoD |
+| Rating storage/API/UI/security | Implemented T30–T34; [T34](evidence/s3-t34-rating-acceptance/README.md), [C04 restart](evidence/s3-c04-final/live/results.json) | Ratings do not affect Sprint 3 ranking; T33 first-run logout intermittency retained |
+| Reset backend | T35 implemented with atomic confirmation/auth/origin/isolation/rollback checks | `/profile` remains a protected placeholder; reset UI pending |
+| TMDb source / clean clone | #128 and #135 closed; [T29](evidence/t29-tmdb-live-smoke.md), [C04](evidence/s3-c04-clean-clone.md); PR #185 merged at `0c4273ab792becb060fefd5e7341e755ed28d0a5` | Executed C04 SHA `05dda34900fd0fa80cfff323b353a8d4c220a4d8` and 20-movie source stay distinct from T25's 255-movie source |
+| T25 final handoff | #127 closed; PR #184 merged at `4ff81ab30df8cf448c3796f748b9451496e403c5`; [manifest](evidence/s3-m3-p0-handoff/verification.json) | Executed snapshot `05a78c1f503c10f6f5047655acb3800b21966e99` is unpublished; fingerprints and final-head checks establish correspondence, not an invented executed merge SHA |
+| Later formal approvals | Actual @hoang3003 approvals on final T25/C04 heads; [GitHub audit](evidence/s3-c05-ui/github-state.json) | Review bodies say `ok`; no detailed reproduction or dossier approval is inferred |
+| Backdrop chain | #129/#130/#179/#131 shipped; [T28](evidence/s3-t28-backdrop-acceptance/README.md), separate live CDN evidence above | Optional images never gate unchanged S03 fields/return/fallback |
+| UI/design explanation | Same C05 change updates both documents and flow | Independent dossier review/approval/merge still required |
+| C02 #133 log/evidence milestone | Missing; `sprint-log.md` ends at Sprint 2; [C01](sprint3-backlog-refinement.md) is supporting inventory only | Real Sprint 3 log, metrics, Review/minimum audit and final board needed |
+| PDF and LMS | Draft source prepared in [ui.md](ui.md) | Missing cover fields/address-bar assets, merged export, actual deadline, submission and receipt |
 
-Do not replace a `Pending` status with completion until the named repository
-evidence exists. This local contract update is not a reviewed publication and
-does not manufacture implementation results or a SHA.
+All 202 files in the T25 recorded executable manifest match the C05 merged
+base after CRLF→LF normalization only. [C05 verification](evidence/s3-c05-ui/verification.json)
+records that read-only comparison. It is not a new full live acceptance run.
+Do not turn a functional pass, issue closure, old approval or future promise
+into a completed human/release/submission gate.

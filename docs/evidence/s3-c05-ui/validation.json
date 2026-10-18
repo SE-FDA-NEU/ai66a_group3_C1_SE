@@ -1,0 +1,55 @@
+{
+  "scope": "Actual local documentation checks; not a fresh Story acceptance run or human approval",
+  "workingTree": "Uncommitted dossier source over merged base f9774cbe7248c29915086d29bf2b9f99c2aa528a at validation time",
+  "sourceHashes": {
+    "docs/ui.md": "4801c0df88034334253bf1ba31f43172d55b2a178e2faf7cc04ac6c6e60e7539",
+    "docs/design.md": "4fd076228c9a4be09782399a8c7ce9989d41441028bd0f4856930012ae1e0ad0",
+    "docs/screen-flow.puml": "7b8e0d6ddce968882438f2c419cd6febc6edfbcf43eb053c46522eaf3cc5f99e",
+    "docs/images/ui/screen-flow.svg": "18b9abf7dc0d43168dc5747c8a470c2713237be0bfe2dc6c157f3939fc381b94",
+    "scripts/render-m3.py": "971f17c2ff1c99b66030fc96e356eb9cf10db80497ff3f66d30a7307b629c75b",
+    "scripts/export-m3.mjs": "0f73348ab22ee2c64dc8a0ddd913cc35382b7ec8fafdd72f161b2df3aa9f22cb",
+    "scripts/inspect-m3-pdf.py": "9f943ddd7b5321ed9accad05b2384153fc0ee43639fe9233054ba5f4cf9a53e3",
+    "scripts/verify-m3-dossier.py": "cc035a41e5ab15f0b95cb790335ad0d36c59de16141f898182a30b0f2c147c52"
+  },
+  "commands": [
+    {
+      "command": "python scripts/verify-m3-dossier.py",
+      "exitCode": 0,
+      "output": "{\n  \"result\": \"PASS\",\n  \"requiredSections\": 4,\n  \"p0Stories\": 6,\n  \"apiErrorCases\": 4,\n  \"wireframes\": 10,\n  \"unalteredEvidenceCopies\": 8,\n  \"matchingRecordedExecutableFiles\": 202,\n  \"humanRequiredMarkers\": 9,\n  \"scope\": \"Structure, local links and source correspondence only; not Story acceptance or release approval.\"\n}"
+    },
+    {
+      "command": "node scripts/verify-s3-c01-docs.mjs",
+      "exitCode": 0,
+      "output": "{\n  \"result\": \"PASS\",\n  \"checks\": [\n    \"README lists all six P0 entry points, current dates, roles and BR1 rejection before historical roles\",\n    \"43 unique work items, owner/reviewer fields and actual open/closed totals are consistent\",\n    \"Hard-dependency graph is acyclic; T08 prerequisites and backdrop UI/verifier direction are preserved\",\n    \"All 27 complete multiline P0 AC have implementation/verification mapping; unknown sprint metrics are not fabricated\",\n    \"Five contribution receipts and both original, unedited PNG hashes are present\",\n    \"Issue mutation receipts and final API audit preserve state/assignee/27 AC/points; no unresolved local codes or self-review metadata\",\n    \"Local documentation and image links resolve\"\n  ],\n  \"limitation\": \"Does not prove private board membership, original capacity, final human sign-off or hosted CI\"\n}"
+    },
+    {
+      "command": "python -m ruff check scripts/render-m3.py scripts/inspect-m3-pdf.py scripts/verify-m3-dossier.py",
+      "exitCode": 0,
+      "output": "All checks passed!"
+    },
+    {
+      "command": "node --check scripts/export-m3.mjs",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "output": ""
+    }
+  ],
+  "pdf": {
+    "mode": "draft; not a submission",
+    "sourceSha256": "4801c0df88034334253bf1ba31f43172d55b2a178e2faf7cc04ac6c6e60e7539",
+    "pdfSha256": "c8adc5aeda054413c5bd46a9b01d36eec730af2bfa13a8a4bfc0ec9abf91e789",
+    "pages": 19,
+    "requiredFirstThreePages": "PASS via inspect-m3-pdf.py",
+    "outOfBoundsText": 0,
+    "visualInspection": "All-page contact sheet and cover/pages 2/3/sign-in/empty/error-table/final human steps inspected; wireframe text readable. Full-height data/error viewport previews too small for final normal-page screenshot assessment; both require final address-bar replacement.",
+    "finalExport": "Not performed; --final correctly refused the non-main/dirty draft checkout."
+  },
+  "iterationFailures": [
+    "Chromium launch blocked by macOS sandbox process registration; elevated headless printing succeeded.",
+    "Standalone diagram screenshot timed out; replaced by successful browser PDF/vector-to-PNG rendering."
+  ]
+}

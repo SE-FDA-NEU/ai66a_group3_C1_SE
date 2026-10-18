@@ -1,0 +1,69 @@
+{
+  "assets": [
+    {
+      "path": "docs/images/ui/planning-board.png",
+      "source": "docs/images/sprint3/planning-board.png",
+      "sha256": "c380a05371877bc76cebce407e2f9a89eed66e8703f9c2a4f8712bed087f7ad7",
+      "transformation": "none; byte-for-byte copy",
+      "browserAddressBar": false,
+      "kind": "original PO-supplied board image"
+    },
+    {
+      "path": "docs/images/ui/live-catalogue-viewport.png",
+      "source": "docs/evidence/s3-m3-p0-handoff/latest/live/live-first-screen.png",
+      "sha256": "f70bcd1b4e982aa50290ae0a15812b44e48ebc4fcbbea28ca34bc7f7d1851d52",
+      "transformation": "none; byte-for-byte copy",
+      "browserAddressBar": false,
+      "kind": "browser viewport capture; not submission-ready address-bar evidence"
+    },
+    {
+      "path": "docs/images/ui/live-preferences-correction-viewport.png",
+      "source": "docs/evidence/s3-m3-p0-handoff/latest/live/live-mobile-corrective-message.png",
+      "sha256": "284f0757a005e6a7d225700811fe513be625ee34f3e1a39f35a7b28df6f5bf57",
+      "transformation": "none; byte-for-byte copy",
+      "browserAddressBar": false,
+      "kind": "browser viewport capture; not submission-ready address-bar evidence"
+    },
+    {
+      "path": "docs/images/ui/live-personalised-viewport.png",
+      "source": "docs/evidence/s3-m3-p0-handoff/latest/live/live-personalised-mobile.png",
+      "sha256": "4230b62bc9becce4e2b51534a705ebf4cfe2d4ba084d034620fe4e1bb3d1d1fd",
+      "transformation": "none; byte-for-byte copy",
+      "browserAddressBar": false,
+      "kind": "browser viewport capture; not submission-ready address-bar evidence"
+    },
+    {
+      "path": "docs/images/ui/recommendations-error-historical-viewport.png",
+      "source": "docs/evidence/s3-m3-p0-handoff/synthetic/recommendation-error.png",
+      "sha256": "b333b63170b575fca45e64bd5af6a50085e5e8ad9278fdf8c679c7ed64bd6499",
+      "transformation": "none; byte-for-byte copy",
+      "browserAddressBar": false,
+      "kind": "browser viewport capture; not submission-ready address-bar evidence"
+    },
+    {
+      "path": "docs/images/ui/recommendations-empty-historical-viewport.png",
+      "source": "docs/evidence/s3-m3-p0-handoff/synthetic/recommendation-empty.png",
+      "sha256": "f2c07eb7d323baf75f5b20804dfa58c3d36f56fd6457c7f1f4a32c35db689ab7",
+      "transformation": "none; byte-for-byte copy",
+      "browserAddressBar": false,
+      "kind": "browser viewport capture; not submission-ready address-bar evidence"
+    },
+    {
+      "path": "docs/images/ui/recommendations-loading-historical-viewport.png",
+      "source": "docs/evidence/s3-m3-p0-handoff/synthetic/recommendation-loading.png",
+      "sha256": "c2a8dfa888fe5bf5aedbb21ef7b195062a066a28b8a9f9080d6a4c9fcd38f7bd",
+      "transformation": "none; byte-for-byte copy",
+      "browserAddressBar": false,
+      "kind": "browser viewport capture; not submission-ready address-bar evidence"
+    },
+    {
+      "path": "docs/images/ui/detail-backdrop-live-viewport.png",
+      "source": "docs/evidence/s3-c04-final/backdrop-live/live-1280.png",
+      "sha256": "cb4e60244a2ebb31c62013b14d93f9511ceb5f3e25993bb4c21e5d4c505c3c62",
+      "transformation": "none; byte-for-byte copy",
+      "browserAddressBar": false,
+      "kind": "browser viewport capture; not submission-ready address-bar evidence"
+    }
+  ],
+  "authoredWireframes": "SVG files are labelled schematics, not screenshots or test results."
+}

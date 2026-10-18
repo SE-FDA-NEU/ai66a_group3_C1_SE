@@ -1,0 +1,26 @@
+{
+  "recordKind": "Documentation source-correspondence audit; not new application acceptance",
+  "recordedAt": "2026-10-18T19:49:03.940442+07:00",
+  "documentationBase": "f9774cbe7248c29915086d29bf2b9f99c2aa528a",
+  "acceptedManifest": "docs/evidence/s3-m3-p0-handoff/latest/source-manifest.json",
+  "originalExecutedSnapshot": "05a78c1f503c10f6f5047655acb3800b21966e99",
+  "originalSnapshotPublished": false,
+  "publicApplicationBase": "0c4273ab792becb060fefd5e7341e755ed28d0a5",
+  "recordedExecutableTreeSha256": "2985bd56d5ff942f87e8e7f31a96f98fcb1689f9ad681c233203a0cd91f20ccf",
+  "normalization": "CRLF -> LF only",
+  "recordedFilesCompared": 202,
+  "differences": [],
+  "result": "PASS",
+  "scope": "All 202 pre-existing manifest paths match. New C01 and C05 documentation tools are outside that historical manifest. No new live TMDb acceptance claimed.",
+  "reviewBoundary": "Prerequisite merges/approvals observed; current dossier review, approval, merge, final PDF and LMS remain pending.",
+  "missing": [
+    "Five student IDs, exact assigned topic and submitter",
+    "Submission-day board capture and instructor access confirmation",
+    "Two final-candidate browser-chrome captures with actual address bars",
+    "C02 Sprint 3 log/evidence milestone and repository-minimum audit",
+    "Final C03 contract reconciliation/sign-off",
+    "Participant actual session date/version/revision/per-journey outcomes",
+    "Real substantive dossier review and approval",
+    "Merged-main final export/comparison; actual LMS deadline, submission and receipt"
+  ]
+}
