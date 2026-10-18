@@ -2,7 +2,7 @@
 
 Refs #136; coordinates the UI/design reconciliation milestone in #134 and consumes #127/#128/#131/#135. C02 #133's Sprint 3 log/evidence milestone is still missing.
 
-This draft does not close #136: final assets, substantive independent dossier review, merge, merged PDF export and LMS receipt are not complete. The current linkage workflow requires a closing keyword and will remain unsatisfied until closure is truthful. Do not add a closing keyword merely to make that check green.
+This draft leaves #136 open: final assets, substantive independent dossier review, merge, merged PDF export and LMS receipt are not complete. The current linkage workflow requires a closing keyword and will remain unsatisfied until closure is truthful. Do not add a closing keyword merely to make that check green.
 
 ## What changed
 
@@ -24,6 +24,8 @@ python scripts/inspect-m3-pdf.py frontend/test-results/m3-dossier/Team03_M3.draf
 ```
 
 Local results: dossier structure/links/copy hashes/202-source correspondence PASS; existing C01 validator PASS; changed Python helpers Ruff PASS; JS syntax PASS. A 19-page draft builds; pages 1–3 contain the required cover/board/application slots; PDF inspection finds no out-of-bounds text. Wireframes and representative text pages were visually inspected. The existing page-3 viewport previews are too small for final normal-scale screenshot assessment and lack browser chrome; final replacements must be reinspected. Full application acceptance is reused, not reported as rerun for this docs-only change. Initial sandbox Chromium launch and diagram screenshot attempts failed; PDF export was corrected to use headless printing and vector-to-PNG rendering, and the repeat passed.
+
+Hosted check history (initial head): push CI passed; first PR Node job reported 235 passes / 1 failure at the unchanged `movie-detail-rating.test.tsx:75` fetch-count timing assertion. The same five-test file passes locally. The actual rerun passed on that same head; the original failure is retained in `docs/evidence/s3-c05-ui/hosted-checks.md`, and the final head requires its own checks.
 
 ## Preview and limitations
 

@@ -15,6 +15,9 @@ T25/C04 files are retained unchanged; their then-pending reviews have later
 formal approvals linked in the dossier. Review bodies saying `ok` do not
 establish a detailed reproduction report or approve this new dossier.
 
+[Hosted-check history](hosted-checks.md) preserves the initial PR unit-test
+failure, passing branch build and targeted replay without changing product/tests.
+
 [validation.json](validation.json) records the actual local structural/source,
 syntax/lint and PDF layout checks, including draft limitations.
 
