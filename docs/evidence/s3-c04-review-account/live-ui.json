@@ -1,0 +1,17 @@
+{
+  "result": "PASS",
+  "testedAtUtc": "2026-10-18T15:26:59.299Z",
+  "candidate": "326aadf3ee32342c4e91297ee9e885663eccf565",
+  "mode": "real browser, API and newly TMDb-imported database; no mocked responses or seed",
+  "ports": "8019/5193 used only by the verifier to leave existing 8000/5173 servers untouched",
+  "browser": "155.0.4283.62",
+  "checks": [
+    "Home -> Sign in using documented account; incorrect credentials show clear error",
+    "Cold start -> Enter preferences -> zero-selection BR1 message -> save 3 genres -> personalised recommendations",
+    "Visible movie card -> real detail -> rating 4/5 committed -> return -> sign out",
+    "Both owned backend/frontend processes restarted on same imported database; new browser session restores 3 genres and rating 4/5",
+    "Re-running account CLI preserves session, preferences, rating and catalogue; runtime TMDb API requests: zero"
+  ],
+  "moviePath": "/movies/d393a616-e9f7-4feb-92bc-88f25596ea9e",
+  "unexpectedProviderRequests": 0
+}

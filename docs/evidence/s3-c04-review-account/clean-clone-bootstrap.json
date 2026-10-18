@@ -1,0 +1,26 @@
+{
+  "result": "PASS",
+  "testedAtUtc": "2026-10-18T15:23:05.828508+00:00",
+  "candidate": "326aadf3ee32342c4e91297ee9e885663eccf565",
+  "cloneWorkingTree": "",
+  "mode": "fresh clone; new locked dependencies; real TMDb import into data/app.db; no seed or copied database",
+  "reviewAccountBeforeImport": "refused safely",
+  "reviewAccountFirstRun": "created",
+  "reviewAccountRepeat": "already_exists",
+  "catalogue": {
+    "provider": "tmdb",
+    "active_revision": "475e63af-5e28-4819-ae0d-b442743353e2",
+    "inserted": "20",
+    "updated": "0",
+    "rejected": "0",
+    "movies": "20",
+    "associated_genres": "13",
+    "finite_popularity_movies": "20",
+    "source_fetched_at": "2026-10-18T15:22:59.950566Z",
+    "imported_at": "2026-10-18T15:23:04.306270Z"
+  },
+  "users": 1,
+  "requestedPopularPages": 1,
+  "earlierAttempt": "13-page import timed out and was rolled back; repeated the documented default one-page import, never a seed fallback",
+  "credentialHandling": "private token supplied only to importer child; blank in clone .env and runtime; never printed or committed"
+}

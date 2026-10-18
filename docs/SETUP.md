@@ -15,6 +15,17 @@ browser/process-restart journey passed for that earlier candidate. Its original
 documentation follow-up did not change executable code. See the [clean-clone record](evidence/s3-c04-clean-clone.md)
 for the source fingerprint, provenance, screenshots, CI links and independent-review gate.
 
+Current review-account follow-up tested by: Codex, Sprint 3, 2026-10-18,
+Windows PowerShell, Python 3.12.6 / Node.js 24.19.0 / Edge 155.0.4283.62,
+committed application/test candidate
+`326aadf3ee32342c4e91297ee9e885663eccf565`. A new clone with new locked
+dependencies imported real TMDb data, created the documented account in the
+same `data/app.db`, and passed real-browser login/BR1/preferences/details/rating
+and process-restart checks. The existing 255-film development database also
+passed idempotent account verification without changes. See the
+[current follow-up evidence](evidence/s3-c04-review-account.md), including the
+initial provider timeout and the successful documented default import.
+
 ## Prerequisites
 
 | Tool | Version | Check (macOS/Linux) | Check (Windows PowerShell) |
@@ -99,7 +110,7 @@ python -m app.cli.create_review_account --confirm-local-demo
 ### Windows PowerShell
 
 ```powershell
-git clone https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE.git
+git clone -c core.longpaths=true https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE.git
 cd ai66a_group3_C1_SE
 
 Copy-Item .env.example .env
@@ -117,6 +128,11 @@ npm.cmd --prefix frontend ci
 .\.venv\Scripts\python.exe -m app.cli.import_tmdb_catalogue
 .\.venv\Scripts\python.exe -m app.cli.create_review_account --confirm-local-demo
 ```
+
+The Windows clone command saves `core.longpaths=true` in this clone only;
+some historical image paths are long. For an existing Windows clone in a
+deep directory, use `git config core.longpaths true` if Git reports spurious
+changes or cannot read those paths. No global Git setting is required.
 
 To use a larger catalogue, run `python -m app.cli.import_tmdb_catalogue --pages 13`
 instead of the default import command (roughly 260 movies; 1–15 pages allowed).
