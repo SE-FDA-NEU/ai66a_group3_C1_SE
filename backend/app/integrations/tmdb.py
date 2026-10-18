@@ -55,6 +55,10 @@ class TmdbClient:
                 "TMDb import requires TMDB_READ_ACCESS_TOKEN in the root .env "
                 "or server environment"
             )
+        if http_client is None and os.getenv("TMDB_NETWORK_DISABLED") == "1":
+            raise TmdbConfigurationError(
+                "TMDb network access is disabled for offline checks"
+            )
 
         self._headers = {
             "Authorization": f"Bearer {normalized_token}",

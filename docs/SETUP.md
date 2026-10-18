@@ -6,16 +6,29 @@ network access to TMDb. Automated checks use synthetic fixtures/mocks and no
 live token/provider network. The decision is in [design.md](design.md); manual
 smoke/provenance and verification ownership are in the [runbook](tmdb-sprint3-runbook.md).
 
+Tested by: Codex, Sprint 3, 2026-10-18, Windows PowerShell,
+Python 3.12.10 / Node.js 24.15.0, base SHA
+`86a758eb2468f3e23357b69adf3c3183e5110a40` plus uncommitted changes on
+`chore/s3-c04-clean-clone-ci-135`; [clean-clone results and remaining review checks](evidence/s3-c04-clean-clone.md).
+
 ## Prerequisites
 
 | Tool | Version | Check (macOS/Linux) | Check (Windows PowerShell) |
 |---|---|---|---|
 | Git | Any recent version | `git --version` | `git --version` |
-| Python | 3.12 | `python3.12 --version` | `py -3.12 --version` |
+| Python | 3.12 | `python3.12 --version` | `py -3.12 --version` or the full path below |
 | Node.js | 24 | `node --version` | `node --version` |
-| npm | Installed with Node.js | `npm --version` | `npm --version` |
+| npm | Installed with Node.js | `npm --version` | `npm.cmd --version` |
 
 Backend dependencies are pinned in `backend/requirements.lock.txt` and frontend dependencies in `frontend/package-lock.json`.
+On Windows PowerShell, `npm.cmd` avoids execution-policy restrictions on
+`npm.ps1`. The Windows commands below call the virtual-environment Python
+directly, so `Activate.ps1` is not required. The commands require Python 3.12;
+another Python version is not a substitute for the final clean-clone check.
+If `py -3.12` reports no suitable runtime even though Python 3.12 is installed,
+locate its `python.exe` (for example, with `Get-Command -All python.exe`), verify
+`& "<full-path-to-python.exe>" --version` reports 3.12, and use that full path
+instead of `py -3.12` for the virtual-environment creation command below.
 
 ## Environment file
 
@@ -32,6 +45,17 @@ configured `.env`. Only the server importer reads the token; never put it in
 frontend variables, logs, screenshots, Git or group messages. Tests use a blank
 token and isolated test configuration. A teammate consuming an already-imported
 backend does not need a token. `.env` is ignored by Git.
+
+For an instructor on a new machine, the instructor or staging operator signs in
+to their own TMDb account, opens **Settings → API**, requests API access if
+needed, and copies the **API Read Access Token** into their private root `.env`.
+TMDb documents this in its [API authentication guide](https://developer.themoviedb.org/v4/docs/authentication-application)
+and [API key FAQ](https://developer.themoviedb.org/docs/faq). This is the Bearer
+read token, not the v3 API key. The machine must be able to reach
+`https://api.themoviedb.org` over HTTPS during import. If the instructor cannot
+obtain a token or reach TMDb, an operator can prepare a private staging backend
+with an accepted imported catalogue for review; do not share a team token or
+claim that a token-free clean clone has completed the live-import check.
 
 ## Steps
 
@@ -72,15 +96,14 @@ Copy-Item .env.example .env
 New-Item -ItemType Directory -Force data
 
 py -3.12 -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-python -m pip install -r backend/requirements.lock.txt
-python -m pip install -e "./backend[dev]" --no-deps
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+.\.venv\Scripts\python.exe -m pip install -r backend/requirements.lock.txt
+.\.venv\Scripts\python.exe -m pip install -e "./backend[dev]" --no-deps
 
-npm --prefix frontend ci
+npm.cmd --prefix frontend ci
 
-python -m alembic -c backend/alembic.ini upgrade head
-python -m app.cli.import_tmdb_catalogue
+.\.venv\Scripts\python.exe -m alembic -c backend/alembic.ini upgrade head
+.\.venv\Scripts\python.exe -m app.cli.import_tmdb_catalogue
 ```
 
 To use a larger catalogue, run `python -m app.cli.import_tmdb_catalogue --pages 13`
@@ -120,7 +143,12 @@ fetch/import timestamps and movie/genre/finite-popularity counts using the
 The catalogue must support the committed flows, including ten distinct
 finite-popularity movies for #31. Live smoke is outside CI. Missing-token or
 failed import exits nonzero and preserves any previous valid snapshot; it
-must not fall back to seed. T29 owns any missing guidance/checks.
+must not fall back to seed.
+
+Keep the command output and the read-only SQL/API results described in the
+runbook as sanitized local evidence. A fresh database with a failed import has
+no accepted catalogue. On an existing database, the importer preserves the
+previous valid catalogue; verify the active revision before reporting readiness.
 
 ## Historical M2 seed / offline support
 
@@ -147,7 +175,9 @@ Running it again prints the same revision and the same counts.
 
 ## Start the application
 
-Use two terminals, both opened in the repository root. The backend terminal needs the virtual environment active (`source .venv/bin/activate` or `.\.venv\Scripts\Activate.ps1`).
+Use two terminals, both opened in the repository root. On macOS/Linux activate
+the virtual environment with `source .venv/bin/activate`. On Windows PowerShell,
+replace `python` in backend commands with `.\.venv\Scripts\python.exe`.
 
 Terminal 1, backend:
 
@@ -173,15 +203,29 @@ Open `http://localhost:5173/`. The existing home page reads its cards from the
 imported SQLite catalogue, and each valid card has a "View details" link. Live
 titles/popularity can change. The Northstar Protocol/Orbit of Us screenshot in
 [design.md](design.md#4-walking-skeleton) is historical M2 seed evidence, not
-the expected Sprint 3 TMDb catalogue. New Sprint 3 routes still require their
-own implementation and acceptance evidence.
+the expected Sprint 3 TMDb catalogue. Use the live P0 journey below to verify
+the current routes on the imported catalogue.
+
+## Disposable test account and P0 journey
+
+Use a new local database and a disposable email address you control. In the
+browser, open **Create account** (`/register`), enter that address and a unique
+password of at least eight characters, then sign in at `/login`. Keep the
+password private and do not publish it as a demo credential. From the visible
+home navigation, open **My preferences**, save genre choices, open **My
+recommendations**, view a movie's details and use its return link. Refresh and
+restart both servers, sign in again, and confirm the saved preferences and any
+ratings you entered remain. Use a separate account to check that personal data
+does not appear for another user. The account is disposable with the local
+database; for instructor review, create a new account during the session or
+arrange private credentials for a staging-only account.
 
 ## Verify
 
 With the virtual environment active:
 
 ```bash
-python -m pytest backend/tests -v
+python backend/scripts/run_isolated_tests.py -v
 python -m ruff check backend
 npm --prefix frontend test
 npm --prefix frontend run lint
@@ -220,12 +264,18 @@ It deletes the temporary database/profile and never touches the configured
 development database. Pass `--browser <absolute-path>` if Chrome/Chromium/Edge
 cannot be detected. See [T34 evidence](evidence/s3-t34-rating-acceptance/README.md).
 
-Historical results on commit `4bfae7c`: 100 backend tests passed and 2 skipped,
-and 41 frontend tests passed across 5 files. These are not current-candidate
-results. For automated verification use a separate test database with migrations
-applied (`test_health` reads its migration table), a blank token and synthetic
-provider fixtures/mocks. No live import is part of CI; manual live smoke remains
-required separately for dev/staging/demo acceptance.
+The backend command creates and migrates a temporary SQLite database, clears the
+token, disables real TMDb requests, runs pytest, and removes the database. It
+ignores the developer's `DATABASE_URL` and token from the root `.env`. Provider
+tests inject synthetic clients or HTTP mocks; CI never runs a live import. The
+T16, T33, S04, T28 and T34 acceptance runners also use disposable databases
+and blank tokens. Manual live smoke remains separate for dev/staging/demo.
+
+For the S04 real-browser suite, first install Playwright Chromium from the
+`frontend` directory with `npx playwright install chromium` (on Windows use
+`npx.cmd`).
+If Google Chrome is already installed locally, set `S04_BROWSER_CHANNEL=chrome`
+to use it instead. CI uses the Playwright Chromium installation.
 
 ## Troubleshooting
 
@@ -257,6 +307,28 @@ Configure `TMDB_READ_ACCESS_TOKEN` privately in the root `.env` or server
 environment and retry the bounded import. Record authentication/network/provider
 failures as failures, keep existing valid data, and follow the runbook. Do not
 run the seed as a workaround for Sprint 3 acceptance.
+
+For an authentication failure, confirm the value is the API Read Access Token
+and that no stale process environment variable overrides `.env`. For a timeout
+or connection failure, check HTTPS/DNS access to `api.themoviedb.org`, then
+retry. Do not paste the token into a diagnostic command or issue.
+
+On Windows, `Resolve-DnsName api.themoviedb.org` and
+`Test-NetConnection api.themoviedb.org -Port 443` distinguish name resolution
+from HTTPS reachability without using a token. If the hostname resolves to
+`127.0.0.1` or `::1`, check the local DNS filter, VPN, security software or
+network DNS settings. Restore normal DNS resolution or use another permitted
+network, then confirm port 443 connects before retrying the import. Do not pin
+a TMDb CDN IP in the application or commit a token to work around this failure.
+
+### `pydantic_core._pydantic_core` is missing in a Python 3.12 environment
+
+Check `.venv\Scripts\python.exe --version` and the files under
+`.venv\Lib\site-packages\pydantic_core`. A `cp314` binary in a Python 3.12
+environment means packages from another Python version were reused. Create a
+fresh Python 3.12 virtual environment and repeat the locked install and
+editable backend install above. Reinstalling only `pydantic_core` may leave
+other compiled packages incompatible.
 
 ### `No module named 'app'` when running the bootstrap command
 

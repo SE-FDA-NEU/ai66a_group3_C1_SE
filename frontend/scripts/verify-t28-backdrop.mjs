@@ -78,12 +78,28 @@ function start(command, values, cwd, env) {
 
 async function stopChildren() {
   for (const child of children.reverse()) {
-    if (child.exitCode !== null || !child.pid) continue;
+    if (!child.pid || child.exitCode !== null || child.signalCode !== null) continue;
     if (process.platform === "win32") {
-      await new Promise((done) => {
-        const killer = spawn("taskkill", ["/PID", String(child.pid), "/T", "/F"], { windowsHide: true, stdio: "ignore" });
-        killer.once("error", done); killer.once("close", done);
+      const code = await new Promise((done, fail) => {
+        const killer = spawn("taskkill", ["/PID", String(child.pid), "/T", "/F"], {
+          windowsHide: true, stdio: "ignore",
+        });
+        killer.once("error", fail);
+        killer.once("close", done);
       });
+      if (code !== 0 && child.exitCode === null && child.signalCode === null) {
+        child.kill("SIGTERM");
+      }
+      if (child.exitCode === null && child.signalCode === null) {
+        await Promise.race([new Promise((done) => child.once("close", done)), sleep(5000)]);
+      }
+      if (child.exitCode === null && child.signalCode === null) {
+        child.kill("SIGKILL");
+        await Promise.race([new Promise((done) => child.once("close", done)), sleep(5000)]);
+      }
+      if (child.exitCode === null && child.signalCode === null) {
+        throw new Error(`Temporary server ${child.pid} did not stop`);
+      }
     } else {
       child.kill("SIGTERM");
       await Promise.race([new Promise((done) => child.once("close", done)), sleep(2000)]);
