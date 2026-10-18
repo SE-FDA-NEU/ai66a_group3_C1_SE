@@ -3,7 +3,8 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 
 // Execute the real inline Actions code, not a second copy of its parsing logic.
-const workflow = readFileSync(new URL('../.github/workflows/scrum-check.yml', import.meta.url), 'utf8');
+const workflow = readFileSync(new URL('../.github/workflows/scrum-check.yml', import.meta.url), 'utf8')
+  .replace(/\r\n/g, '\n');
 const linkageJob = workflow.split('  linkage:')[1].split('  no_self_merge:')[0];
 const match = linkageJob.match(/          script: \|\n((?:^ {12}.*\n|^\n)*)/m);
 assert(match, 'The issue-reference step must contain an inline script');

@@ -21,6 +21,23 @@ failure, passing branch build and targeted replay without changing product/tests
 [validation.json](validation.json) records the actual local structural/source,
 syntax/lint and PDF layout checks, including draft limitations.
 
+The original records above describe their original candidate. The later
+[follow-up](follow-up.md) reconciles merged C03 PR #187, inserts the topic/IDs
+supplied by the PO, and records new checks in
+[follow-up-validation.json](follow-up-validation.json). It does not rewrite
+historical results or claim a final submission.
+
+## Task and submission boundary
+
+PR #188 closes child [Task #189](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/189)
+only after its draft/source/tooling changes pass CI and actual independent
+review and are merged. It continues to reference parent
+[#136](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/136), which stays
+open for the remaining captures, human/C02 evidence, final merged PDF and LMS
+receipt. This avoids falsely closing a post-merge submission obligation just
+to satisfy the issue-linkage check. The PO must verify #189's Sprint 3 Project
+iteration; private-board membership is not assumed from the issue body.
+
 ## Build the review draft
 
 Use the repository's locked frontend dependencies and installed Playwright
@@ -28,7 +45,7 @@ Chromium. Documentation-only Python tools are pinned separately:
 
 ```sh
 python -m pip install -r scripts/m3-pdf-requirements.txt
-python scripts/verify-m3-dossier.py
+python -X utf8=0 scripts/verify-m3-dossier.py
 node scripts/export-m3.mjs
 python scripts/inspect-m3-pdf.py frontend/test-results/m3-dossier/Team03_M3.draft.pdf
 ```
@@ -62,8 +79,11 @@ The full-height catalogue preview is small at normal page scale; use a
 readable final browser-chrome capture with enough P0 content visible to
 identify the running data. Readability of final replacements needs reinspection.
 
-Supply the cover details, genuine final board and browser-chrome images,
-participant record, C02 log/minimum audit and C03 final reconciliation. Record
+The exact topic and five student IDs were supplied by the PO and are filled.
+Supply the actual submitter, genuine final board and browser-chrome images,
+participant record, C02 log/minimum audit and the outstanding final-head
+non-contributor C03 review. The C03 reconciliation itself is already merged.
+Record
 actual capture dates, URLs, exact tested candidate, DB revision/provider and
 error trigger in a tracked evidence file. Preserve original image pixels;
 never fabricate a historical board or add browser chrome. Update the asset
@@ -122,3 +142,8 @@ The review job and its real non-author approval requirement are unchanged.
 At inspection PR #188 had no submitted reviews; automation cannot supply an
 independent teammate approval. The UI/design conflict resolution is not itself
 a merge of the dossier into main or a final PDF/LMS completion claim.
+
+The PO-authorized Task #189 remains a useful draft/tooling delivery boundary
+even though the concurrent metadata parser now also accepts non-closing
+references. This follow-up preserves that parser and its regression tests;
+it does not replace or weaken the approval job.

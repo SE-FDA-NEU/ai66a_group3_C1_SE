@@ -23,9 +23,9 @@ At initial dossier head `8d3a4a1dbd7c582cd5aa5bf4e495fa3e8e9c6e11`:
   failure remains recorded above; the underlying timing cause is not proved
   fixed. The final documentation head still needs its own hosted checks.
 
-The PR remains a draft requiring a real substantive non-contributor review,
+At that recorded stage, the PR was a draft requiring a real substantive non-contributor review,
 approval, completion of missing human assets/evidence and a later merge.
-The PR description uses a reference rather than a closing instruction because
+The initial PR description used a reference rather than a closing instruction because
 #136 still includes final export/LMS requirements. An initial negated closing
 phrase was removed after discovering that the linkage workflow matched it.
 A green linkage check from that initial text is not issue-completion evidence;
@@ -35,3 +35,19 @@ After removing the ambiguous closing phrase, [issue-linkage](https://github.com/
 and [independent-review](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/39130046056/job/117683175713)
 checks fail for the stated workflow reasons. The reviewability check passes.
 Do not manufacture issue completion or teammate approval to satisfy these gates.
+
+## Follow-up after C03 merge
+
+The PO authorized child Task #189, whose scope ends at reviewed draft/source/
+tooling merge. The follow-up PR description can close #189 and reference #136;
+the parent still includes final merged export and LMS/receipt requirements.
+This corrects linkage without relaxing the workflow or prematurely closing
+the parent. It does not supply a teammate approval. The follow-up candidate
+must receive its own hosted checks and substantive non-contributor review;
+the initial runs above are not relabelled as results for that candidate.
+
+Concurrent commit `b1529d5` has already made explicit non-closing references
+valid and added six actual-parser regression tests. That change and its
+historical result record are retained. The authorized child Task #189 still
+defines the reviewed draft/tooling milestone; parent #136 remains the final
+submission obligation.

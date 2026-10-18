@@ -8,7 +8,7 @@ Markdown is authoritative; if this PDF differs from the repository, use the repo
 | Field | Recorded value |
 |---|---|
 | Product / team | AI Movie Recommendation System / Team 03, AI66A Group 3 C1 |
-| Assigned topic | [HUMAN REQUIRED: confirm the instructor's exact assigned-topic wording] |
+| Assigned topic | AI Movie Recommendation System |
 | Product Owner | Nguyen Xuan Kiet — `@kietxuan` |
 | Sprint 3 Scrum Master | Vu Quoc Huy — `@vu-huzy` |
 | Sprint 3 | 05–18 October 2026; PO-confirmed dates, Asia/Ho_Chi_Minh |
@@ -19,20 +19,18 @@ Markdown is authoritative; if this PDF differs from the repository, use the repo
 
 | Member (README spelling) | GitHub | Student ID |
 |---|---|---|
-| Nguyen Xuan Kiet | `@kietxuan` | [HUMAN REQUIRED: student ID] |
-| Tran Minh Hoang | `@hoang3003` | [HUMAN REQUIRED: student ID] |
-| Tran Tuan Anh | `@anotify-vie` | [HUMAN REQUIRED: student ID] |
-| Vu Quoc Huy | `@vu-huzy` | [HUMAN REQUIRED: student ID] |
-| Nguyen Tuan Anh | `@NguyenTuanAnh0608` | [HUMAN REQUIRED: student ID] |
+| Nguyen Xuan Kiet | `@kietxuan` | 11247306 |
+| Tran Minh Hoang | `@hoang3003` | 11247292 |
+| Tran Tuan Anh | `@anotify-vie` | 11247264 |
+| Vu Quoc Huy | `@vu-huzy` | 11247301 |
+| Nguyen Tuan Anh | `@NguyenTuanAnh0608` | 11247260 |
 
-Names, roles and links: [README](../README.md). IDs, exact topic and submitter
-are absent from the inspected tracked Markdown and must be supplied by the team.
-The dossier owner is not automatically the LMS submitter.
+Names, roles and links: [README](../README.md). The PO supplied the exact topic
+and five student IDs on 2026-10-18. The actual LMS submitter is still
+unconfirmed; the dossier owner is not automatically the submitter.
 
-Original dossier base: merged `main` at
-`f9774cbe7248c29915086d29bf2b9f99c2aa528a` (PR #186).
-Conflict reconciliation integrates C03 PR #187 from merged main
-`bf18ab860fc3e486b57fc3b5ccac4db94c283995` (the exact merge SHA is recorded in the follow-up evidence).
+Documentation base: merged `main` at
+`bf18ab860fc3e486b57fc3b5ccac4db94c283995` (C03 PR #187).
 This document has no independent review, approval, merge or LMS receipt yet.
 
 <!-- pdf:page -->
@@ -64,29 +62,29 @@ must verify that the submitted board link opens for the instructor.
 
 ### Submission page 3 — Running P0 UI and visible error
 
-**Real local database data — viewport preview; address-bar asset still required.**
+**Real database data — preview only; final address-bar capture required.**
 
 ![Real TMDb-imported local catalogue, original T25 viewport capture](images/ui/live-catalogue-viewport.png)
 
-T25 latest live run: `/`, accepted 255-movie TMDb snapshot, local FastAPI/SQLite;
-[source report](evidence/s3-m3-p0-handoff/latest/live/results.json). This is a
-real reused capture, with no browser chrome. It does not satisfy the address-bar requirement.
+Preview: `/`, accepted 255-movie TMDb snapshot, local FastAPI/SQLite.
+[Original live report](evidence/s3-m3-p0-handoff/latest/live/results.json).
+This unchanged viewport capture has no browser address bar.
 
-**Visible API error — historical synthetic viewport preview; replacement required.**
+**Visible API error — historical preview; final address-bar capture required.**
 
 ![Historical real UI capture of a synthetic database-service error](images/ui/recommendations-error-historical-viewport.png)
 
-`/recommendations`: `SERVICE_UNAVAILABLE`; exact text is recorded in
-[the original capture transcript](evidence/s3-m3-p0-handoff/synthetic/actual-error-message.txt).
-This is the historical T25 synthetic run over application base
-`86a758eb2468f3e23357b69adf3c3183e5110a40`, not a new live failure or final-candidate
-browser-chrome capture. The magenta privacy mask is already in the source file.
+Preview: `/recommendations`, `SERVICE_UNAVAILABLE`.
+[Original error transcript](evidence/s3-m3-p0-handoff/synthetic/actual-error-message.txt).
+The synthetic capture used application base
+`86a758eb2468f3e23357b69adf3c3183e5110a40`; its privacy mask is original.
+It is not a final-candidate capture and has no browser address bar.
 
-[HUMAN REQUIRED: replace BOTH preview images on this page with unaltered
-OS/browser-chrome captures on the final tested candidate, each including the
-actual browser address bar. Capture a running P0 screen reading the accepted
-TMDb-imported local DB and a real visible user-facing API error; record URL,
-SHA, date, trigger and provenance. Never draw or paste an address bar.]
+[HUMAN REQUIRED: replace BOTH previews with genuine final-candidate browser
+captures showing the actual address bar: one P0 screen reading accepted TMDb
+data, one visible API error. Record URL, SHA, date, error trigger and provenance.
+Use a disposable test environment for the error; never damage the shared
+database or draw/paste browser chrome. Reinspect readability at normal PDF scale.]
 
 <!-- pdf:page -->
 
@@ -117,13 +115,13 @@ not a new Story acceptance result. No partial Story is labelled `works`.
   executed SHA as the later merged SHA.
 - The [original verification manifest](evidence/s3-m3-p0-handoff/verification.json)
   pins executable digest `2985bd56d5ff942f87e8e7f31a96f98fcb1689f9ad681c233203a0cd91f20ccf`.
-  All 202 recorded file hashes match this dossier's merged base after CRLF→LF
-  normalization; [comparison and audit](evidence/s3-c05-ui/verification.json).
-  This proves source correspondence, not a newly executed full acceptance run
-  of the future merged documentation SHA. The conflict/linkage follow-up changes
-  only the recorded Scrum hygiene workflow: 201 historical paths still match;
-  that metadata-only workflow difference is explicitly reported and regression
-  tested, not claimed identical to the old executable manifest.
+  The original 202-path comparison remains historical after CRLF→LF
+  normalization; [original audit](evidence/s3-c05-ui/verification.json).
+  Concurrent follow-up `b1529d5` intentionally changed only the Scrum metadata
+  workflow: 201 historical files still match, including all product/tests;
+  the one workflow difference is reported and tested by six parser cases.
+  [Concurrent follow-up evidence](evidence/s3-c05-ui/conflict-linkage-follow-up.json).
+  This is source correspondence, not a new full product acceptance run.
 - [T29 live import](evidence/t29-tmdb-live-smoke.md) is the required provider
   foundation. T25's latest live snapshot is provider `tmdb`, revision
   `34b442f2-f5a8-4317-9f2f-468e6ec06a20`: 255 distinct movies/source IDs,
@@ -148,6 +146,15 @@ PRs #144/#184/#185/#186, final heads, formal reviews and checks observed on
 and [C04](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/185#pullrequestreview-5562668940).
 Their review bodies say `ok`; they are not detailed reproduction reports.
 Historical handoff files are preserved, including their then-pending review notes.
+
+C03 was subsequently merged through
+[PR #187](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/187), final head
+`95ab003f2123ae9c8d2d7f603d0f6cc7c5829be8`, merge `bf18ab8`.
+Its current architecture/ERD show nine application tables and the public image
+CDN boundary; the historical M2 diagrams are separate `*-m2` assets.
+The observed @kietxuan approval covered the earlier `9e444ad` head, not the
+later follow-up they authored. A non-contributor's final-head review remains
+to be recorded. See the [C05 follow-up record](evidence/s3-c05-ui/follow-up.md).
 
 T33's first bridge run failed at logout (`/login` versus `/`); a standalone rerun
 and five repetitions passed. The cause remains unproved. Keep the first failure
@@ -412,7 +419,7 @@ unchanged Story AC. Error envelope details: [api.md](api.md).
 | `INVALID_CREDENTIALS` (401, login) | BR18; S13 AC2: unknown email and wrong password use the same non-disclosing response. | `Email or password is incorrect` |
 | `EMAIL_ALREADY_REGISTERED` (409, registration) | BR16; S12 AC2: case-insensitive email uniqueness; create no second account. | `This email is already registered` |
 | `MOVIE_NOT_FOUND` (404, detail) | BR6; S03 AC2: an unknown opaque ID must never show another film. | Heading: `Movie not found`. Paragraph: `That movie is not available in the active catalogue.` |
-| `SERVICE_UNAVAILABLE` (503, recommendations) | Technical failure under S02 AC4/AC5; BR8 requires preserving committed current-account preferences. Retry must not rewrite preferences or turn failure into empty/no-match data. | Heading: `Recommendations are unavailable`. Paragraph: `Service is temporarily unavailable Choose Retry to load your recommendations again.` |
+| `SERVICE_UNAVAILABLE` (503, recommendations) | S02 AC4/AC5 and BR8 current-account persistence: this is a technical failure, not a new Business Rule. Preserve saved preferences and offer retry; do not show an empty/no-match result. | Heading: `Recommendations are unavailable`. Paragraph: `Service is temporarily unavailable Choose Retry to load your recommendations again.` |
 
 Exact Story messages above are preserved without extra punctuation in the
 rendered message. Login recovery is editing the form and Sign in; duplicate
@@ -498,18 +505,15 @@ there is no completed reset flow, search or similarity UI claim.
 ### Contract and wrap-up handoffs
 
 The source of truth is #134's [approved initial PR #144](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/144)
-and [HTTP DTO/error contracts](api.md), reconciled here against shipped source
-and T25/C04/T28 evidence. Initial
-[formal approval](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/144#pullrequestreview-5466721572)
-is real; C03 reconciliation is now merged through
-[PR #187](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/187), including
-the current API, architecture/ERD and UI-state corrections; issue #134 is closed.
-The recorded approval is on `9e444adf491eff5214c4ac5c0bd316792393da8d`,
-before the later `95ab003f2123ae9c8d2d7f603d0f6cc7c5829be8` follow-up;
-no approval of that later head is invented. This dossier retains
-those implemented semantics and adds the instructor-required presentation.
-The new dossier still requires its own substantive independent review; the
-C03 review must not be represented as approval of this later dossier.
+and the merged [C03 reconciliation PR #187](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/187).
+The [HTTP DTO/error contracts](api.md), current nine-table diagrams and safe
+CDN/local-read boundary are retained from that main. #134 is closed; its
+final-head non-contributor review remains unrecorded at this follow-up.
+This same C05 change adds the matching preference-persistence/UI rationale to
+[design.md §8](design.md#8-ui-driven-design-changes-with-repository-evidence).
+[Task #189](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/189) covers
+only the reviewed draft/source/tooling milestone; parent #136 remains open for
+the remaining assets, final merged export and real submission.
 
 C02 [#133](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/133) is open.
 [sprint-log.md](sprint-log.md) currently stops at Sprint 2. The merged
@@ -531,7 +535,8 @@ retrospective, handoff or submission receipt.
    per-journey outcomes in [human-validation.md](evidence/s3-m3-p0-handoff/human-validation.md).
    PO confirmation that the trial occurred is not an all-AC pass. Resolve the
    T33 intermittency if it recurs on the final candidate.
-3. Confirm the #134 reconciliation/review record for merged PR #187; #133 owner
+3. Record a non-contributing teammate's review of merged C03 head `95ab003`;
+   C03's merge/closure is already recorded and is not repeated. The #133 owner
    supplies the actual Sprint 3 log/evidence milestone and repository-minimum
    audit. Do not award points for partial Stories or count Tasks as points.
 4. Capture both final-candidate application images with the browser address
@@ -539,12 +544,13 @@ retrospective, handoff or submission receipt.
 5. A real non-contributing teammate uses Review changes, leaves a substantive
    comment on this dossier PR, reproduces relevant checks, and approves after
    findings are resolved. No review has been generated on their behalf.
-6. Merge the documentation PR. From a clean checkout of that merged `main`,
+6. PR #188 closes only draft/tooling Task #189 after actual review/CI/merge.
+   Keep parent #136 open. From a clean checkout of the completed merged `main`,
    verify executable correspondence and required evidence/assets, then export
    `Team03_M3.pdf`. Recheck pages 1–3, all text/images/links and agreement with
    that exact merged SHA. A draft PDF exported now is not final submission.
 7. Confirm the actual LMS deadline in the course, submit before it, and save
-   the genuine receipt. No authorized LMS session/deadline/receipt is available
+   the genuine receipt before closing #136. No authorized LMS session/deadline/receipt is available
    here. Finally C02 records actual Review/submission outcomes and SM handoff.
 
 Draft build and final-release conditions:

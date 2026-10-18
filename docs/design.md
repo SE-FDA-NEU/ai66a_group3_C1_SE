@@ -1,7 +1,7 @@
 # Sprint 3 design and contract reconciliation
 
 This document was reconciled on 2026-10-18 against Sprint 3 `main` SHA
-`f9774cbe7248c29915086d29bf2b9f99c2aa528a`. Tables, endpoints, modules, and
+`bf18ab860fc3e486b57fc3b5ccac4db94c283995`. Tables, endpoints, modules, and
 evidence below reflect that source. Profile/reset UI, rating-adjusted ranking,
 and NLP product scope remain explicitly unfinished.
 Request and response shapes are in
@@ -10,11 +10,11 @@ in [architecture.md](architecture.md).
 
 Sprint 3 decision update, 2026-10-06: TMDb is the required catalogue source for
 development, staging and demos. The existing importer is reused; operational
-readiness and verification are planned under
+readiness and verification are recorded under
 [#128](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/128) and
 [#135](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/135).
 Historical M2 seed screenshots/test results below remain M2 evidence, not a
-claim that the Sprint 3 live import or acceptance has passed. See the tracked
+substitute for the separate Sprint 3 live-import/acceptance records. See the tracked
 [TMDb Sprint 3 runbook](tmdb-sprint3-runbook.md).
 
 ## 1. Architecture
@@ -583,6 +583,11 @@ is on `9e444adf491eff5214c4ac5c0bd316792393da8d`, before the later
 `95ab003f2123ae9c8d2d7f603d0f6cc7c5829be8` follow-up. This does not fabricate
 a review of that later head or of the C05 dossier. C05 updates `docs/ui.md`
 and this design explanation together and still needs its own real review.
+[Task #189](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/189) covers
+only the reviewed dossier draft/source and export-tooling milestone.
+Parent #136 remains open for actual final assets, human/C02 evidence, final
+merged PDF export and LMS submission/receipt. The
+[C05 follow-up](evidence/s3-c05-ui/follow-up.md) records the boundary.
 
 Initial consumers/dependencies:
 

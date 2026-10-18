@@ -77,7 +77,9 @@ for index, page in enumerate(doc):
         output / f"page-{index + 1:02}.png"
     )
 assert not report["outOfBoundsText"], report["outOfBoundsText"]
-(output / "inspection.json").write_text(json.dumps(report, indent=2) + "\n")
+(output / "inspection.json").write_text(
+    json.dumps(report, indent=2) + "\n", encoding="utf-8"
+)
 print(
     json.dumps(
         {

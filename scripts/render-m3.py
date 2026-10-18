@@ -59,7 +59,7 @@ a { color: #124e91; overflow-wrap: anywhere; text-decoration: underline; }
 code { font: 8.5pt/1.35 Menlo, monospace; overflow-wrap: anywhere; }
 table { width: 100%; border-collapse: collapse; margin: 4mm 0; table-layout: auto; font-size: 8.5pt; }
 th, td { border: 1px solid #cbd5e1; padding: 2mm; text-align: left; vertical-align: top; overflow-wrap: anywhere; }
-th { background: #e8eef6; }
+th { background: #e8eef6; overflow-wrap: normal; word-break: normal; }
 thead { display: table-header-group; }
 tr, img, h2, h3 { break-inside: avoid; }
 h2, h3 { break-after: avoid; }
@@ -71,7 +71,7 @@ img[src$=".svg"] { width: 100%; max-height: 174mm; object-fit: contain; }
 .sheet-1 { font-size: 9.5pt; }
 .sheet-2 img { max-height: 98mm; object-fit: contain; }
 .sheet-3 { font-size: 9pt; line-height: 1.3; }
-.sheet-3 img { max-height: 61mm; object-fit: contain; }
+.sheet-3 img { max-height: 82mm; object-fit: contain; }
 .sheet-3 h3 { font-size: 13pt; }
 .sheet-3 p { margin: 2mm 0; }
 """

@@ -1,49 +1,51 @@
 ## Linked issue
 
-Refs #136; coordinates the UI/design reconciliation milestone in #134 and consumes #127/#128/#131/#135. C02 #133's Sprint 3 log/evidence milestone is still missing.
+Closes #189
+Refs #136, #134, #127, #128, #131, #135 and #133.
 
-This draft leaves #136 open: final assets, substantive independent dossier review, merge, merged PDF export and LMS receipt are not complete. The linkage follow-up now accepts explicit references and issue-prefixed titles, checks the referenced issues on GitHub, and preserves the independent-approval requirement. No premature issue-closing instruction is needed.
+Task #189 covers the reviewed M3 dossier draft/source and export-tooling milestone only. Parent C05 #136 stays open for the actual submitter, final board/application captures, completed human/C02 evidence, merged final PDF, LMS submission and receipt. This PR does not claim submission readiness.
 
 ## What changed
 
-Conflict follow-up: merge current `main` (C03 PR #187), preserving its current architecture/ERD/API contracts alongside the four-section dossier. Fix the linkage check to accept `Refs #136` or a `[#136]` title, without requiring unfinished issue closure. Actual teammate approval is still required; no review bypass is introduced.
+Reconcile the four-section M3 dossier with merged C03 main `bf18ab860fc3e486b57fc3b5ccac4db94c283995`, preserving the current nine-table ERD, separate historical M2 diagrams, nullable backdrop/CDN/local-read boundary, rating/reset contracts and bounded TMDb import. Keep six evidence-linked P0 rows, ten wireframes, four actual API error cases and the corresponding UI-driven design change in the same PR.
 
-Replace stale Sprint 3 UI draft notes with the instructor's four-section M3 dossier: six evidence-linked P0 rows, separate P1 S06/S09 results, ten labelled wireframes (including all four recommendation states), four actual API-error mappings, and a matching design reconciliation. All eight Story statuses remain `partly works`; the accepted T25 evidence and its open human gates are preserved.
+Fill the exact topic and five student IDs supplied by the PO. Keep the actual submitter and genuine final capture/session/submission gaps explicit. Preserve all eight authentic evidence copies. Improve draft page-3 image sizing without manufacturing address bars or claiming the previews meet submission requirements.
 
-Add an updated M1 flow, unchanged copies of eight authentic evidence images, prerequisite GitHub/source-correspondence audits, and reproducible Markdown-to-PDF tooling. All 202 recorded T25 executable hashes match the original merged documentation base. After integrating C03 PR #187, 201 current historical paths still match; the deliberate Scrum hygiene metadata-linkage change is reported separately and has six regression cases. No product/test source changed. Actual later T25/C04 approvals and merges are linked without turning their `ok` review bodies into reproduction reports.
+Read JSON/SVG as explicit UTF-8, normalize parser-test newlines on Windows, add token-free C05 documentation CI, and record follow-up validation separately from the historical T25/C04/C05 evidence. All 201 product/test and other unchanged historical paths still match. The one intentional Scrum metadata-workflow difference introduced by concurrent commit `b1529d5` is reported explicitly, with all six parser regression tests retained.
 
-## Validation
+## How to test
 
-From the repository root after the documented setup:
+After normal setup, install the pinned documentation-only dependencies:
 
 ```sh
-python scripts/verify-m3-dossier.py
-node --test scripts/scrum-linkage.test.mjs
+python -m pip install -r scripts/m3-pdf-requirements.txt
+python -X utf8=0 scripts/verify-m3-dossier.py
 node scripts/verify-s3-c01-docs.mjs
 python -m ruff check scripts/render-m3.py scripts/inspect-m3-pdf.py scripts/verify-m3-dossier.py
-python -m pip install -r scripts/m3-pdf-requirements.txt
+node --check scripts/export-m3.mjs
+node --test scripts/scrum-linkage.test.mjs
 node scripts/export-m3.mjs
 python scripts/inspect-m3-pdf.py frontend/test-results/m3-dossier/Team03_M3.draft.pdf
 ```
 
-Local results: dossier structure/links/copy hashes/202-source correspondence PASS; existing C01 validator PASS; changed Python helpers Ruff PASS; JS syntax PASS. A 19-page draft builds; pages 1–3 contain the required cover/board/application slots; PDF inspection finds no out-of-bounds text. Wireframes and representative text pages were visually inspected. The existing page-3 viewport previews are too small for final normal-scale screenshot assessment and lack browser chrome; final replacements must be reinspected. Full application acceptance is reused, not reported as rerun for this docs-only change. Initial sandbox Chromium launch and diagram screenshot attempts failed; PDF export was corrected to use headless printing and vector-to-PNG rendering, and the repeat passed.
+On Windows, set `M3_PYTHON` to the intended Python environment and `M3_BROWSER_PATH` if using an installed Chromium/Edge. The README explains isolated-target dependencies and `PYTHONPATH`.
 
-Hosted check history (initial head): push CI passed; first PR Node job reported 235 passes / 1 failure at the unchanged `movie-detail-rating.test.tsx:75` fetch-count timing assertion. The same five-test file passes locally. The actual rerun passed on that same head; the original failure is retained in `docs/evidence/s3-c05-ui/hosted-checks.md`, and the final head requires its own checks.
+## Evidence and current boundaries
 
-## Preview and limitations
+- Dossier: `docs/ui.md`; images/wireframes: `docs/images/ui/`.
+- Follow-up and actual local results: `docs/evidence/s3-c05-ui/follow-up.md` and `follow-up-validation.json`.
+- Initial hosted failure/rerun history is retained in `hosted-checks.md`; it is not relabelled as this candidate's CI.
+- Local source/structure checks, UTF-8-disabled verifier, helper lint and JavaScript syntax pass. Draft PDF builds to 19 pages; required first three pages and text bounds pass.
+- No new full application acceptance run is claimed for these docs-only changes. Current hosted checks must pass on the pushed follow-up head.
+- Remaining human work: actual submitter, final submission-day board, two final-candidate address-bar images, Trang's actual session details, final-head non-contributor C03 review, C02 Sprint 3 log/minimum audit, substantive C05 review, final export and LMS receipt.
+- Story statuses remain `partly works` pending the real AC/DoD gates; no Story points or submission outcomes are invented.
 
-- Dossier: [docs/ui.md](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/docs/s3-c05-ui-dossier/docs/ui.md).
-- Flow and assets: `docs/images/ui/`; original-copy hashes in `asset-manifest.json`.
-- Build/release instructions: `docs/evidence/s3-c05-ui/README.md`.
-- PDF is a local ignored `Team03_M3.draft.pdf`, explicitly watermarked; final `Team03_M3.pdf` must be exported from the completed merged main.
-- Missing cover values: five student IDs, exact assigned topic and actual submitter.
-- Missing evidence: actual submission-day board; two final-candidate browser-chrome captures with real address bars; participant session details/per-journey outcomes; review of this integrated dossier; C02 Sprint 3 log/minimum audit. C03 PR #187 is merged and #134 is closed; its recorded approval predates its last follow-up and does not approve this PR.
-- Final human steps: substantive independent dossier review/approval, merge, final export/comparison with merged main, actual LMS deadline/submission/receipt. No such completion is asserted.
+## Reviewer
 
-## Reviewer focus
+A non-contributing teammate (for example Huy or Nguyen Tuan Anh) should use **Review changes**, leave a substantive question/finding, inspect the C03/C05 reconciliation and PDF, resolve findings and approve the final head. Kiet contributes this follow-up and must not provide its independent approval.
 
-A teammate who did not author these changes should check the evidence boundary and exact source SHAs, all P0 rows/P1 separation, API error copy against the current components, wireframe/flow accuracy, same-PR design explanation, and PDF pagination. Record a substantive finding/question using Review changes, resolve it and then approve the final head. Do not treat this checklist or an AI audit as the actual review.
+This PR remains a draft until the team deliberately reviews the draft/tooling milestone. Merging that milestone does not close parent #136.
 
 ## Author declaration
 
-AI assistance: OpenAI Codex inspected local/GitHub evidence, authored the dossier, wireframes, design reconciliation and export utilities, and executed the documented checks. No teammate review, historical image, acceptance outcome or LMS receipt was generated on anyone's behalf.
+AI assistance: OpenAI Codex helped reconcile documentation, create the PO-authorized child Task, fix UTF-8 handling and add documentation checks, render/inspect the draft and record the real results. Contributors must review and explain the changes. No human acceptance result, browser chrome, approval or submission receipt was invented.

@@ -57,7 +57,7 @@ for doc in [
         assert (doc.parent / file).exists(), (
             f"Broken link in {doc.relative_to(ROOT)}: {target}"
         )
-manifest = json.loads((ROOT / "docs/images/ui/asset-manifest.json").read_text())
+manifest = json.loads((ROOT / "docs/images/ui/asset-manifest.json").read_text(encoding="utf-8"))
 for asset in manifest["assets"]:
     a, b = ROOT / asset["path"], ROOT / asset["source"]
     assert a.read_bytes() == b.read_bytes(), f"Altered evidence copy: {a}"
@@ -67,14 +67,14 @@ wireframes = ["home", "login", "register", "preferences", "movie-detail", "popul
 ]
 for name in wireframes:
     path = ROOT / "docs/images/ui" / (name + ".svg")
-    svg = path.read_text()
+    svg = path.read_text(encoding="utf-8")
     ElementTree.fromstring(svg)
     assert "The user comes here to " in svg
     assert "API calls" in svg and "/api/" in svg
     assert "NOT A SCREENSHOT" in svg
     assert f"images/ui/{name}.svg" in text
 accepted = json.loads(
-    (ROOT / "docs/evidence/s3-m3-p0-handoff/latest/source-manifest.json").read_text()
+    (ROOT / "docs/evidence/s3-m3-p0-handoff/latest/source-manifest.json").read_text(encoding="utf-8")
 )
 intentional_ci_changes = []
 for name, digest in accepted["files"].items():
@@ -91,6 +91,19 @@ for name, digest in accepted["files"].items():
     assert actual == digest, (
         f"Application/evidence source changed; re-evaluate acceptance: {name}"
     )
+design = (ROOT / "docs/design.md").read_text(encoding="utf-8")
+erd = (ROOT / "docs/images/erd.puml").read_text(encoding="utf-8")
+assert len(re.findall(r'^entity "', erd, re.MULTILINE)) == 9
+assert "user_genre_preferences" in erd and "user_movie_ratings" in erd
+assert "backdrop_path" in erd and "c6f8a2d4e901" in erd
+assert "The ERD in `docs/images/erd.png` is the M2 baseline" not in design
+assert "images/erd-m2.png" in design and "images/architecture-m2.png" in design
+assert "Preference persistence and recommendation generation" in design
+assert "| Assigned topic | AI Movie Recommendation System |" in text
+for student_id in ["11247306", "11247292", "11247264", "11247301", "11247260"]:
+    assert f"| {student_id} |" in text
+assert "HUMAN REQUIRED: student ID" not in text
+assert "/issues/189" in text and "/pull/187" in text
 # This intentionally does not convert placeholders or a draft into acceptance.
 print(
     json.dumps(
@@ -104,6 +117,8 @@ print(
             "matchingRecordedExecutableFiles": len(accepted["files"])
             - len(intentional_ci_changes),
             "intentionalCiChanges": intentional_ci_changes,
+            "currentErdTables": 9,
+            "poSuppliedStudentIds": 5,
             "humanRequiredMarkers": text.count("HUMAN REQUIRED"),
             "scope": "Structure, local links and source correspondence only; not Story acceptance or release approval.",
         },
