@@ -37,7 +37,8 @@ class CloseoutConsistencyTests(unittest.TestCase):
             "**Committed Story Points: 24.**",
             "**Completed Story Points: 30**",
             "**Velocity:** 30 Story Points.",
-            "**Closure rule:** do not close #133",
+            "**Closure record:** #133 is closed.",
+            "**PO-reported submission:**",
         ):
             self.assertIn(marker, sprint)
         self.assertNotIn("Definition-of-Done item", sprint)

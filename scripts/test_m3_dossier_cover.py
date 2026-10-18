@@ -1,7 +1,9 @@
 """Regression checks: accept the real cover and reject incomplete submissions."""
 
+import re
 import unittest
 from pathlib import Path
+from urllib.parse import unquote
 
 from m3_dossier_cover import validate_cover
 
@@ -40,6 +42,44 @@ class CoverValidationTests(unittest.TestCase):
         cover, body = self.text.split("<!-- pdf:page -->", 1)
         with self.assertRaises(AssertionError):
             validate_cover("<!-- pdf:page -->" + body + cover)
+
+    def test_three_front_pages_are_separate_groups_with_the_right_images(self) -> None:
+        groups = re.findall(
+            r'<section class="m3-front-page ([^"]+)" style="([^"]+)">([\s\S]*?)</section>',
+            self.text,
+        )
+        self.assertEqual([item[0] for item in groups], ["m3-cover", "m3-board-page", "m3-app-page"])
+        for _, style, _ in groups:
+            self.assertIn("break-after: page", style)
+            self.assertIn("page-break-after: always", style)
+        self.assertNotIn("![", groups[0][2])
+        for group, expected in [
+            (groups[1][2], ["planning-board.png", "submission-board.png"]),
+            (groups[2][2], ["p0-movie-detail-browser.png", "login-error-browser.png"]),
+        ]:
+            images = re.findall(r'!\[[^\]]*\]\(images/ui/([^)]*)\)', group)
+            self.assertEqual(images, expected)
+        self.assertGreater(self.text.index("## 1. P0 Stories and status"), self.text.rfind("</section>"))
+
+    def test_pdf_text_links_are_portable_github_urls(self) -> None:
+        links = re.findall(r'(?<!!)\[[^\]]*\]\(([^)]+)\)', self.text)
+        self.assertTrue(links)
+        prefix = "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/"
+        for target in links:
+            with self.subTest(target=target):
+                self.assertTrue(target.startswith("https://github.com/"))
+                self.assertNotIn("C:/", target)
+                self.assertNotIn("file:", target)
+                if target.startswith(prefix):
+                    relative = unquote(target[len(prefix):].split("#")[0])
+                    self.assertTrue((ROOT / relative).is_file())
+
+    def test_current_publication_status_does_not_claim_a_fabricated_receipt(self) -> None:
+        self.assertNotIn("is open.", self.text.split("### Contract and wrap-up handoffs", 1)[1])
+        self.assertIn("PO stated in chat", self.text)
+        self.assertIn("have not been supplied", self.text)
+        self.assertIn("**before merge**", self.text)
+        self.assertNotIn("To do: from a clean checkout", self.text)
 
 
 if __name__ == "__main__":
