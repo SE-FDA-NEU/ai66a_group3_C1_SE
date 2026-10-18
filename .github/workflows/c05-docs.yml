@@ -2,7 +2,7 @@ name: Sprint 3 C05 dossier documentation
 
 on:
   push:
-    branches: ["docs/s3-c05-ui-dossier", "133-sprint-3-wrap-up"]
+    branches: ["docs/s3-c05-ui-dossier", "133-sprint-3-wrap-up", "docs/s3-ui-submission-followup-133"]
     paths:
       - "docs/ui.md"
       - "docs/design.md"
@@ -39,7 +39,7 @@ jobs:
   s3-c05-docs:
     # The frozen M3 source manifest is a C05 gate, not a permanent gate on
     # later Sprint 4/5 application or design changes from other branches.
-    if: github.event_name != 'pull_request' || github.head_ref == 'docs/s3-c05-ui-dossier' || github.head_ref == '133-sprint-3-wrap-up'
+    if: github.event_name != 'pull_request' || github.head_ref == 'docs/s3-c05-ui-dossier' || github.head_ref == '133-sprint-3-wrap-up' || github.head_ref == 'docs/s3-ui-submission-followup-133'
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:

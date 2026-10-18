@@ -65,14 +65,23 @@ must still be investigated.
 
 ## Remaining closure boundary
 
+**Historical PR #191 instruction below.** The PR subsequently merged at
+`778a693` and #133 closed on 2026-10-19 (+07:00). The PO has now reported that
+the assignment was submitted; no PDF hash, LMS timestamp/receipt or replacement
+upload was supplied for independent verification. The missing historical
+meeting/handoff details are not filled by inference. See the current
+[Sprint log closure record](../sprint-log.md) and
+[dossier publication record](../ui.md#publication-review-and-submission-record).
+
 The PO explicitly chose to retain `Closes #133` on PR #191 and **wait to merge**
 until the actual remaining C02 requirements are supplied: Sprint Review
 feedback, SM handoff, board-access check, final candidate designation and LMS
 submission receipt, plus actual independent review. A retrospective is optional
 in M3; if held, record the real action and owner. The PDF stays outside Git.
 
-This reconciliation does not close #133 or merge the PR, and does not claim
-that all of those administrative/submission requirements have happened.
+That earlier reconciliation itself did not merge or close the PR/Issue. The
+later GitHub merge/closure is recorded above and does not prove all missing
+administrative/submission records exist.
 
 ## Actual reconciliation checks
 

@@ -453,7 +453,7 @@ non-contributor to write; that gate stays open.
 | [#33 / S11](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/33) reset profile UI | Open; the authenticated reset backend (#142) shipped, the profile reset UI did not | Not recorded; team decision required |
 | P0 acceptance | Six P0 accepted as `works` by the PO against checked AC and existing verification; not unfinished Story delivery | Completed; detailed participant notes remain an audit limitation |
 | Unaided-participant session | A participant ("Trang") was confirmed second-hand by the PO; session date, version and per-journey outcomes are not recorded | Not recorded |
-| [#133 / S3-C02](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/133) | Open until this log is reviewed and merged and the items under the closure rule are recorded | This wrap-up |
+| [#133 / S3-C02](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/133) | Closed by merged PR #191 at `778a693`; historical missing meeting/handoff fields are not inferred from closure | Closed; post-submission source corrections tracked with Refs #133 |
 
 No Sprint 3 issue carries the `carried-over` label. Applying it to the rows above
 is a team decision and is not done here.
@@ -512,17 +512,24 @@ Master are Nguyen Xuan Kiet and Tran Tuan Anh; the choice is a team decision.
   `05a78c1f503c10f6f5047655acb3800b21966e99`
   ([handoff](evidence/s3-m3-p0-handoff/README.md)). Do not relabel either as the
   merged head.
-- **Submission receipt:** Not recorded. The PDF `Team03_M3.pdf` is prepared
-  manually by the PO and kept outside Git; no LMS receipt exists in the
-  repository.
+- **PO-reported submission:** On 2026-10-19 the PO confirmed in chat that the
+  assignment had been submitted. The submitted PDF, its hash, LMS timestamp and
+  genuine receipt were not supplied, so exact source/PDF correspondence and
+  deadline compliance are not independently verified. Keep PDF/receipt handling
+  manual and outside Git. Source corrections after this report do not prove a
+  replacement upload.
 - **Documentation PR:** [PR #191](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/191)
   contains this wrap-up, together with the PO-confirmed commitment and acceptance,
   dossier-verifier corrections and status updates to `docs/ui.md`
   (merged PR #188, closed #136, the C03 final-head approval and the latest C04
   results from PR #190).
 
-**Closure rule:** do not close #133 until the PO or the team has recorded the
-actual Sprint Review feedback, the retrospective action and its owner if held, the next
-Scrum Master, the Project-board link check, the final tested SHA and the LMS
-submission receipt, and a member other than the author has reviewed and merged
-this log.
+**Closure record:** #133 is closed. PR #191 merged at
+`778a69306b3915ec6f0407975d6f130264e887a0` on 2026-10-19 00:09:44 +07:00,
+and the Issue closed one second later. The earlier instruction to wait for the
+remaining records is historical, not a claim that they were all supplied.
+The PO has since reported submission; unavailable Review feedback, optional
+retrospective outcomes, next-SM handoff, board-access check and LMS receipt are
+not manufactured. The current follow-up must receive substantive review from
+a non-contributor before merge; approval or submission is not generated on
+another person's behalf.
