@@ -1,10 +1,101 @@
 # S3-C04 clean-clone and offline verification record
 
-Tested by: Codex, 2026-10-18 (Sprint 3), Windows PowerShell, Python 3.12.10,
-Node.js 24.15.0.
-Base SHA: `86a758eb2468f3e23357b69adf3c3183e5110a40`.
-Candidate state: uncommitted changes on `chore/s3-c04-clean-clone-ci-135`.
-There is no final candidate SHA until these changes are committed, as requested.
+Latest tested by: Codex on the requested C04 review follow-up, 2026-10-18
+(Sprint 3), Windows PowerShell, Python 3.12.6, Node.js 24.19.0 / npm 11.17.0,
+Microsoft Edge 155.0.4283.62. This is executable verification, not teammate approval.
+
+Tested committed application **and verification-code** SHA:
+[`05dda34900fd0fa80cfff323b353a8d4c220a4d8`](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/05dda34900fd0fa80cfff323b353a8d4c220a4d8).
+Its base `86a758eb2468f3e23357b69adf3c3183e5110a40` already includes shipped
+T26/T27/T37 and [T28 / #131 acceptance](s3-t28-backdrop-acceptance/README.md).
+The review follow-up changes documentation/screenshots/evidence only; it does
+not alter application, migration, test, runner, lockfile or CI executable code.
+
+The normalized UTF-8/LF executable-source SHA-256 is
+`8ac82a4ed16a3a80692dc1341032c0d8ff971f79d4d26b893678e2f57f5c8ac5`.
+The [live report](s3-c04-final/live/results.json) records its exact file manifest,
+commit, clean working tree, browser, provenance and actual assertions. This
+identifies what was tested without placing a future/self-referential commit
+hash in its own file. The PR records the final documentation commit and checks.
+
+**Setup and functional verification passed. Independent teammate review,
+approval and merge remain required before closing #135.**
+
+## Latest committed-candidate clean clone and complete UI replay
+
+A new local `git clone --no-hardlinks` of the committed candidate was created
+in a separate Windows path containing Vietnamese characters. No `.env`, DB,
+venv or `node_modules` was copied from an existing checkout. Python 3.12 created
+a new venv; the locked backend install, editable install, `pip check` and
+`npm.cmd --prefix frontend ci` all passed. The clone's ignored `.env` contains
+only the example database setting and a **blank** token. A private configured
+token was supplied only to the live importer child process, never copied to a
+file, printed or supplied to browser/runtime acceptance.
+
+| Verification | Actual result |
+|---|---|
+| Fresh migration | All migrations applied; exactly one head, `c6f8a2d4e901`. No seed command. |
+| Missing token before import | Exit 1 with actionable configuration guidance; 0 revisions and 0 movies. |
+| Real bounded import | Exit 0; provider `tmdb`; revision `6988eeeb-79e0-41ad-ab7a-5248f06a0659`; 20 inserted, 0 updated/rejected; 20 movies, 13 associated genres, 20 finite-popularity movies. |
+| Read-only provenance | 20 distinct source IDs, 20 TMDb rows, 20 fetch timestamps. Fetched `2026-10-18T08:18:02.966596Z`; imported `2026-10-18T08:18:04.026754Z`. CLI sample source IDs: `969681`, `1291595`, `1148365`. The live report's sorted SQL sample is labelled separately. |
+| Actual browser journey | Home → Sign in → Create an account → Create account → Sign in → popular cold start → Enter preferences → save 3 genres → personalised recommendations → View details → save rating 4 → Back to recommendations → Sign out. No feature-URL shortcuts or mocked API responses. |
+| Actual restart | Both owned FastAPI and Vite processes were terminated and started again on the same DB, without migration/import/seed between starts. A new browser context signed in as A: all 3 selections were checked and the same movie showed `Your saved rating: 4/5` without another write. |
+| Second account | B was registered through visible links, had 0 preferences and popular cold start, and saw `Not rated yet` on the same movie. The disposable DB held 2 users, 3 preference rows and 1 rating. |
+| Missing token after import | Exit 1; a logical snapshot of **all nine application tables** was identical before/after, including the revision, catalogue, users, sessions, preferences and rating. |
+| Offline backend runner | New locked Python environment; inherited fake token was cleared; 419 passed, 1 inherited skip. Ruff passed. The runner creates/migrates/removes its own test DB, not the live-imported clone DB. |
+| Frontend | 236 tests / 20 files passed; ESLint, TypeScript/Vite build and 3 runner-cleanup tests passed. |
+| S04/S13 synthetic browser | `S04_BROWSER_CHANNEL=msedge`, blank token, `TMDB_NETWORK_DISABLED=1`: 10 passed, 1 intentional opt-in live skip; disposable DB removed. |
+| T28 synthetic | 18 real-browser/API/DB cases passed using the new clone's dependencies; `temporary_database_removed=true`. |
+| T28 manual live image | 2 cases passed at 1280px and 375px against a read-only backup of the clone's imported DB. Actual public CDN images loaded, the source DB hash stayed unchanged and the temporary DB was removed; [machine-readable report](s3-c04-final/backdrop-live/results.json). |
+| Production dependency audit | `npm.cmd --prefix frontend audit --omit=dev`: 0 vulnerabilities. Full audit retains the existing high-severity transitive dev-only `source-map-js` advisory; lockfiles were not changed by this follow-up. |
+
+The browser replay used a local Playwright utility with real clicks, the real
+FastAPI API and the freshly imported SQLite DB. Reproduce it manually using
+the numbered [setup journey](../SETUP.md#disposable-test-account-and-p0-journey).
+It is not evidence that an unfamiliar human or the instructor used the app.
+Runtime acceptance used a blank token and disabled TMDb API networking; public
+image-CDN requests are separate from API metadata requests.
+
+Real, sanitized browser captures:
+
+- [Personalised list](s3-c04-final/live/01-live-recommendations.png).
+- [Rating confirmed before restart](s3-c04-final/live/02-live-rating-saved.png).
+- [Saved rating restored after actual restart](s3-c04-final/live/03-live-after-restart.png).
+- [Account B remains unrated](s3-c04-final/live/04-live-account-b.png).
+- [Actual live backdrop, desktop](s3-c04-final/backdrop-live/live-1280.png)
+  and [375px](s3-c04-final/backdrop-live/live-375.png).
+
+These are page captures, not address-bar screenshots for the C05 submission PDF.
+They prove the labelled UI states, not completion of every parent Story.
+Early rating captures may precede image loading; actual image-load acceptance
+comes from the separately labelled T28 live report, not those rating captures.
+
+An initial **utility** run used an exact link name without the visible arrow
+in `Enter preferences →` and timed out. The local selector was corrected; the
+sole generated account from that failed probe was removed only from the
+disposable clone DB, and the complete replay passed. No product code was changed
+to obtain a pass. The user's existing `.env` and 255-movie development database
+were not modified or reseeded.
+
+## Hosted CI for the committed executable candidate
+
+All 11 technical checks on `05dda34900fd0fa80cfff323b353a8d4c220a4d8` passed:
+[Python/Node/secrets](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/39109933393),
+[S04 and Windows/Linux cleanup](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/39109933409),
+[T16](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/39109933381),
+[T33](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/39109933413),
+[T34](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/39109933450),
+and [T28](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/39109933387).
+The follow-up documentation commit must also pass hosted checks. Technical
+success does not establish independent approval; the Scrum review gate remains
+separate. Use `Closes #135` in the completed PR description, not only `Refs #135`.
+
+## Earlier preparation history (not the latest candidate result)
+
+The original preparation below ran with Python 3.12.10 / Node.js 24.15.0 on
+base `86a758eb2468f3e23357b69adf3c3183e5110a40` plus then-uncommitted changes.
+Its DNS failures and later successes are retained as history, not relabelled
+as a run of the final committed candidate.
 
 ## Fresh environment
 
@@ -110,13 +201,15 @@ Git setting was changed.
 
 ## Remaining review checks
 
-The final committed candidate SHA, remote GitHub Actions and PR review remain
-pending because this candidate is intentionally uncommitted. The instructor's
-independent token setup on a different machine has not been observed; the
-procedure is in [SETUP.md](../SETUP.md). The full live-catalogue browser path
-from a recommendation card through movie detail, rating, return navigation and
-restart/sign-in still needs one manual walkthrough; current evidence combines
-T22 live-browser navigation, a separate live-database API restart check and
-T34 synthetic browser rating acceptance. Repeat affected checks if a later
-migration, importer setting or application change alters this candidate. Do not
-attach a token, `.env`, database file or real provider payload.
+The latest replay above resolves the earlier uncommitted-candidate and missing
+detail/rating/restart walkthrough gaps. Obtain a substantive independent
+teammate review and approval, verify checks on the final PR head, and merge
+before closing #135. A later executable, migration or configuration change
+requires affected checks to be repeated on its actual candidate.
+
+Instructor token setup on another machine has **not** been observed. The
+documented path is the instructor/operator's own private token, or a privately
+prepared staging backend if local provisioning is unavailable. Confirm the
+chosen arrangement before review; never distribute a team token or claim an
+unperformed instructor-machine check. No token, `.env`, DB/dump or live
+provider payload is part of this evidence.

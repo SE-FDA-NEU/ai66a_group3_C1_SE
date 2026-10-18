@@ -7,9 +7,13 @@ live token/provider network. The decision is in [design.md](design.md); manual
 smoke/provenance and verification ownership are in the [runbook](tmdb-sprint3-runbook.md).
 
 Tested by: Codex, Sprint 3, 2026-10-18, Windows PowerShell,
-Python 3.12.10 / Node.js 24.15.0, base SHA
-`86a758eb2468f3e23357b69adf3c3183e5110a40` plus uncommitted changes on
-`chore/s3-c04-clean-clone-ci-135`; [clean-clone results and remaining review checks](evidence/s3-c04-clean-clone.md).
+Python 3.12.6 / Node.js 24.19.0 / Microsoft Edge 155.0.4283.62, committed
+application and verification-code SHA
+`05dda34900fd0fa80cfff323b353a8d4c220a4d8`.
+A fresh clone with new locked dependencies, a new TMDb database and an actual
+browser/process-restart journey passed. The follow-up changes only documentation
+and evidence, not executable code. See the [clean-clone record](evidence/s3-c04-clean-clone.md)
+for the source fingerprint, provenance, screenshots, CI links and independent-review gate.
 
 ## Prerequisites
 
@@ -94,6 +98,7 @@ cd ai66a_group3_C1_SE
 
 Copy-Item .env.example .env
 New-Item -ItemType Directory -Force data
+$env:PYTHONUTF8 = "1"
 
 py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install --upgrade pip
@@ -177,7 +182,8 @@ Running it again prints the same revision and the same counts.
 
 Use two terminals, both opened in the repository root. On macOS/Linux activate
 the virtual environment with `source .venv/bin/activate`. On Windows PowerShell,
-replace `python` in backend commands with `.\.venv\Scripts\python.exe`.
+replace `python` in backend commands with `.\.venv\Scripts\python.exe`, use
+`npm.cmd` for frontend commands, and set `$env:PYTHONUTF8 = "1"` in each terminal.
 
 Terminal 1, backend:
 
@@ -208,17 +214,42 @@ the current routes on the imported catalogue.
 
 ## Disposable test account and P0 journey
 
-Use a new local database and a disposable email address you control. In the
-browser, open **Create account** (`/register`), enter that address and a unique
-password of at least eight characters, then sign in at `/login`. Keep the
-password private and do not publish it as a demo credential. From the visible
-home navigation, open **My preferences**, save genre choices, open **My
-recommendations**, view a movie's details and use its return link. Refresh and
-restart both servers, sign in again, and confirm the saved preferences and any
-ratings you entered remain. Use a separate account to check that personal data
-does not appear for another user. The account is disposable with the local
-database; for instructor review, create a new account during the session or
-arrange private credentials for a staging-only account.
+Use the newly imported local database and a disposable email address you control.
+Keep the password private; no shared password is required or published.
+
+1. Open only `http://localhost:5173/`. Select **Sign in**, then **Create an
+   account** on the login page. Enter the disposable email and a unique password
+   of at least eight characters; select **Create account**.
+2. Registration returns to login. Sign in with the same account. The application
+   opens recommendations; a new account sees **Popular** / **Not personalised**.
+3. Select **Enter preferences →**. Select one to five genres and choose **Save
+   preferences**. Expect **Recommended for you** and matching movie cards.
+   From the home page the equivalent entry is **Start**; from recommendations
+   use **Change my genres**. There is no **My preferences** control.
+4. Open **View details** on a recommendation card. Confirm the movie title,
+   genres and overview; missing optional fields use **Information unavailable**.
+5. Select `4 / 5` under **Your rating (1 to 5)** and choose **Save rating**.
+   Wait for **Your saved rating: 4/5** and **Rating saved.**; a selected draft
+   alone is not proof of persistence.
+6. Use **Back to recommendations**, then **Change my genres**. Confirm the saved
+   selections remain checked; use **Back to recommendations** to return.
+7. Select **Sign out**, which returns to the public home page. Stop the backend
+   and frontend with Ctrl+C in their own terminals. Start both again using the
+   commands above, on the **same database**. Do not reseed, reimport or reset it.
+8. In a fresh browser session, open the home page, select **Sign in**, and sign
+   in as the same account. Use **Change my genres** to confirm restored choices;
+   return to recommendations and open the same movie. Its saved rating must
+   still be `4/5` without another save.
+9. Return to recommendations and sign out. Register/sign in as a second account
+   through the same visible links. It has no saved genres and sees the popular
+   cold start. Use **Browse the catalogue** and **View details** for the same
+   movie: it shows **Not rated yet**, not the first account's rating.
+
+Normal journeys use visible links rather than typed feature URLs. These accounts
+are disposable with the local test database. For instructor review, create a
+new account during the session or arrange private staging-only credentials.
+The [latest live evidence](evidence/s3-c04-final/live/results.json) records an
+actual process restart and a fresh browser context, not merely a page reload.
 
 ## Verify
 

@@ -277,7 +277,7 @@ Confirm that Alembic has exactly one migration head:
 Expected head:
 
 ```text
-b7e4c2d91f30 (head)
+c6f8a2d4e901 (head)
 ```
 
 
