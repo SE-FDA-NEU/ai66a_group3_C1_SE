@@ -1,13 +1,13 @@
 # Sprint 3 architecture and persistence contract
 
-Contract revision: `S3-DRAFT`, reconciled with the current runtime on
-2026-10-12 (through S3-T08 recommendation integration, S3-T30/T31 rating
-storage/API, and the S3-T35 reset backend).
+Contract revision: `S3-FINAL`, reconciled on 2026-10-18 against Sprint 3
+`main` SHA `f9774cbe7248c29915086d29bf2b9f99c2aa528a`.
 
-The HTTP contract is in [api.md](api.md). This document describes the backend
-that is present in the repository and separately labels committed Sprint 3
-contracts whose API or UI implementation is pending. Committed target routes
-are required Sprint scope, but are not runtime or test evidence.
+The HTTP contract is in [api.md](api.md). This document describes the final
+Sprint 3 runtime and separately identifies genuinely unfinished scope. The
+profile/reset UI, rating-adjusted ranking, and NLP product remain unfinished;
+implemented rating, recommendation, preference, and backdrop work is not
+labelled pending.
 
 ## 1. Runtime evidence
 
@@ -44,10 +44,17 @@ implemented under T30, the protected rating API under T31, and the atomic
 authenticated reset backend under T35. T33 adds the separate typed rating client
 and account/movie-keyed widget on public details, using the existing AuthProvider
 and protected rating API. Public details remain accessible during session checks
-or private rating failures. Profile-reset UI remains separate work. Rating/reset
-session isolation supports Story
-#45 / S13.
+or private rating failures. T34 supplies browser/API/database acceptance for the
+rating UI and its stale-response protection. Profile/reset UI remains separate
+work. Rating/reset session isolation supports Story #45 / S13.
 Rating-adjusted ranking remains Story #22 / S05b planned for Sprint 4.
+
+The Sprint 3 backdrop chain is also complete: T26 stores nullable
+`backdrop_path`; T27 imports/maps it and returns nullable `backdropUrl`; T37
+renders the responsive detail hero with safe fallback; and T28/#131 verifies
+storage, importer, API, UI, rollback, account preservation, and live public-CDN
+delivery. Trailer work remains Sprint 4 and provider availability remains an
+optional Sprint 5 concern.
 
 ## 2. Selected stack
 
@@ -70,13 +77,16 @@ opaque `HttpOnly` session cookie and never stores a bearer token.
 
 PlantUML source: [architecture.puml](images/architecture.puml).
 
-This diagram preserves the historical M2 optional-import label; from Sprint 3
-the same importer is required catalogue preparation under the updated decision.
+This is the current Sprint 3 diagram. The preserved historical M2 versions are
+[architecture-m2.png](images/architecture-m2.png) and
+[architecture-m2.puml](images/architecture-m2.puml).
 
 The catalogue flow is:
 
 ```text
-TMDb -> server-side import -> backend -> local SQLite -> API -> frontend
+TMDb metadata API -> required server-side importer -> local SQLite
+local SQLite -> backend API -> browser frontend
+browser frontend -> public TMDb image CDN (backdrop bytes only)
 ```
 
 The runtime boundaries are:
@@ -85,17 +95,22 @@ The runtime boundaries are:
 2. Backend API.
 3. SQLite database.
 4. Server-side TMDb importer; required catalogue preparation from Sprint 3.
+5. Public TMDb image CDN; browser delivery of allowlisted backdrop bytes only.
 
 | Component | Responsibility | Must not do |
 |---|---|---|
-| Browser frontend | Render auth, catalogue, dedicated popular-list, and recommendation experiences; call the matching API contract. | Receive TMDb credentials, issue provider calls, or use `/api/movies` as evidence for `/api/movies/popular`. |
-| Backend API | Validate input, resolve the session account, read the active catalogue, and return stable DTOs/errors. | Trust a client-supplied `user_id`. |
-| SQLite database | Persist users, sessions, catalogue revisions, the active revision, movies, genres, and movie/genre links. | Select an account independently of the authenticated session. |
+| Browser frontend | Render auth, catalogue, preferences, recommendations, ratings, and movie-detail backdrops; call the matching application API contract. | Receive TMDb credentials, call the TMDb metadata API, or use `/api/movies` as evidence for `/api/movies/popular`. The only provider-origin browser request is an allowlisted public backdrop URL returned by the detail API. |
+| Backend API | Validate input, resolve the session account, read the active catalogue, and return stable DTOs/errors. | Trust a client-supplied `user_id` or call the TMDb metadata API while serving a page request. |
+| SQLite database | Persist all nine application tables, including account preferences/ratings and nullable movie backdrop paths. | Select an account independently of the authenticated session. |
 | TMDb importer | Required Sprint 3 dev/staging/demo catalogue preparation: fetch bounded provider data, validate it and write one atomic revision. | Run in the browser, expose credentials or silently fall back to seed on failure. |
+| Public image CDN | Return backdrop image bytes for the reviewed HTTPS `w780` URL. | Receive the TMDb API token or act as a metadata API. |
 
-The API never proxies a browser request to TMDb. Genres, recommendations,
-public catalogue movies, dedicated popular movies, and movie details all read
-the active local SQLite revision. `catalog_movies.id` is the public opaque
+The application APIs never proxy a browser request to TMDb. Genres,
+recommendations, public catalogue movies, dedicated popular movies, movie
+details, preferences, and ratings all read local SQLite. The detail DTO may
+contain a server-built public image-CDN URL derived from validated local
+`backdrop_path`; loading those image bytes is not a TMDb metadata API call and
+does not expose the server token. `catalog_movies.id` is the public opaque
 identity; `(source, source_id)` remains provider provenance and is not exposed
 as the public ID.
 
@@ -123,8 +138,9 @@ frontend must use the latter when rendering the Sprint 3 public popular list.
 
 PlantUML source: [erd.puml](images/erd.puml).
 
-The ERD image is the M2 baseline and shows exactly the seven tables created by
-the M2 Alembic migrations:
+The current ERD shows all nine application tables at the Sprint 3 migration
+head. `alembic_version` is migration infrastructure and is intentionally not
+counted:
 
 - `users`
 - `auth_sessions`
@@ -133,6 +149,8 @@ the M2 Alembic migrations:
 - `catalog_movies`
 - `genres`
 - `movie_genres`
+- `user_genre_preferences`
+- `user_movie_ratings`
 
 `auth_sessions` stores `token_digest`, `created_at`, `expires_at`, and nullable
 `revoked_at`. `catalogue_revisions` stores the inserted, updated, and rejected
@@ -141,8 +159,10 @@ the active revision. S3-T01 migration `9d2f5a1c3b84` added
 `user_genre_preferences`; S3-T30 migration `b7e4c2d91f30` added
 `user_movie_ratings`. S3-T26 migration `c6f8a2d4e901` extends that revision with
 nullable `catalog_movies.backdrop_path` and is the single current head. The ERD
-image is a historical baseline, not proof of the new field; the table contract
-and migrations are authoritative. No import-run table has been migrated.
+shows both account relations, the unique `(user_id, movie_id)` rating pair, the
+strict integer `1..5` rating check, and nullable backdrop storage. No import-run
+table has been migrated. The preserved seven-table M2 baseline is available as
+[erd-m2.png](images/erd-m2.png) with [PlantUML source](images/erd-m2.puml).
 
 ### Sprint 3 personalisation storage
 
@@ -156,8 +176,8 @@ Both application-owned tables are implemented:
 | `user_movie_ratings` | `id` VARCHAR(36), `user_id` VARCHAR(36), `movie_id` VARCHAR(36), `rating` INTEGER, `created_at` DATETIME, `updated_at` DATETIME | Primary key `id`; unique `(user_id, movie_id)`; FK `user_id -> users.id` ON DELETE CASCADE; FK `movie_id -> catalog_movies.id` ON DELETE CASCADE; CHECK `typeof(rating) = 'integer' AND rating BETWEEN 1 AND 5` | One current rating per user/movie; deleting its account or catalogue movie removes the owned rating. |
 
 The T30 repository also enforces a strict integer before persistence. The
-pending API must retain request validation because the SQLite check is defence
-in depth and does not define the public JSON contract.
+implemented T31 API retains request validation because the SQLite check is
+defence in depth and does not define the public JSON contract.
 The stable internal movie ID lets a rating continue to identify the same
 provider movie across importer updates that preserve that ID.
 
@@ -218,23 +238,30 @@ recommendations. Sprint 3 adds the dedicated S09/T19 public popular route,
 preferences, and the implemented T08 genre/popularity-only personalised
 recommendations. T30 adds account-owned rating storage and repository support.
 T31 adds the protected rating API, and T35 adds the authenticated atomic reset
-backend. Rating and reset UI remain separate capabilities and Story #33 / S11
-is not complete from backend-only evidence.
+backend. T33/T34 deliver and verify the account/movie-keyed rating UI. The
+profile/reset UI remains absent, so Story #33 / S11 is not complete from the
+backend-only T35 evidence.
 
 Rating-adjusted recommendation ranking is not part of Sprint 3. It belongs to
 Story #22 / S05b and is planned Sprint 4 behaviour.
 
 ## 8. Backdrop reconciliation
 
-S3-T26 / #129 adds nullable TEXT `CatalogMovie.backdrop_path` through migration
-`c6f8a2d4e901`, extending the rating head `b7e4c2d91f30`. The internal repository
-helper updates only this path and leaves commit/rollback to its caller.
-Existing core reimports preserve a stored path; explicit null clearing is a
-separate media write. IDs, the active catalogue and account data are preserved.
+The complete Sprint 3 chain is:
 
-T26 does not implement TMDb mapping, `backdropUrl`, or visible UI. Those remain
-#130 and the Sprint 3 UI task, with full acceptance under #131. Public movie
-DTOs and runtime network behaviour are unchanged. See the
-[storage handoff](backdrop-storage-contract.md) and
-[actual T26 evidence](evidence/s3-t26-backdrop-storage.md); storage completion
-must not be described as completion of the whole backdrop feature.
+1. T26/#129 adds nullable TEXT `CatalogMovie.backdrop_path` through migration
+   `c6f8a2d4e901`, the single current head, plus transaction-owned storage.
+2. T27/#130 maps validated TMDb paths during bounded core import or media-only
+   enrichment and builds nullable, allowlisted `backdropUrl` values for the
+   public detail DTO. Application endpoints still read SQLite only.
+3. T37/#179 renders the movie-detail hero. Null, omitted, unsafe, or failed
+   images retain the permanent gradient/overlay and readable title.
+4. T28/#131 verifies migrations, rollback, stable IDs, account preservation,
+   API shape, stale movie/account responses, responsive fallback, and a live
+   public-CDN image without metadata calls or credentials.
+
+The browser may download the returned public image directly from
+`image.tmdb.org`; this is distinct from calling the TMDb metadata API. See the
+[storage handoff](backdrop-storage-contract.md), [enrichment runbook](backdrop-import-runbook.md),
+[T37 UI evidence](evidence/s3-t37-backdrop-ui/README.md), and
+[T28 acceptance](evidence/s3-t28-backdrop-acceptance/README.md).

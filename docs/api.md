@@ -1,14 +1,12 @@
 # Sprint 3 HTTP API contract
 
-Contract revision: `S3-DRAFT`, reconciled with the current M2/Sprint 3 runtime on
-2026-10-11 (through S3-T08 recommendation integration).
+Contract revision: `S3-FINAL`, reconciled on 2026-10-18 against Sprint 3
+`main` SHA `f9774cbe7248c29915086d29bf2b9f99c2aa528a`.
 
-This document inventories the implemented M2 HTTP boundary and defines the
-committed Sprint 3 contracts needed by implementation consumers. Every route
-is labelled with its implemented milestone/task or `Committed Sprint 3 contract;
-implementation pending`. A committed contract is required Sprint scope, but
-is not an availability or test-evidence claim until its implementation and
-verification evidence exist.
+This document inventories the implemented M2 and Sprint 3 HTTP boundary. Every
+route is labelled with its delivered milestone/task. Genuinely unfinished
+product scope, including profile/reset UI, rating-adjusted ranking, and NLP
+product endpoints, is called out separately and is not represented as complete.
 
 Architecture and persistence rules are in
 [architecture.md](architecture.md).
@@ -54,7 +52,8 @@ Architecture and persistence rules are in
 }
 ```
 
-Validation errors may add a safe `fields` object. It must not echo a password,
+The current backend returns only `code`, `message`, and `requestId` in the error
+object; it does not add a `fields` object. Errors must not echo a password,
 cookie, credential, SQL text, or stack trace.
 
 Every error response includes a generated `requestId` so a client can correlate
@@ -64,21 +63,21 @@ safe envelope.
 
 ## 2. Endpoint inventory and delivery status
 
-`Implemented in M2` means a callable route and its supporting behaviour exist
-in the repository. `Committed Sprint 3 contract; implementation pending`
-means consumers may build against the frozen contract, but the route is not
-yet available in the current repository.
+`Implemented in M2` and `Implemented in Sprint 3` both mean the callable route
+and supporting behaviour exist at the reconciled SHA. The only intentionally
+incomplete UI boundary in this inventory is profile reset; its backend route is
+implemented and its UI is still absent.
 
 | Story | Method | Endpoint | Access | Input | Success | Representative errors | Delivery status |
 |---|---|---|---|---|---|---|---|
 | Infrastructure | `GET` | `/health` | Public | None | `200` health and database/migration state | `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
-| S12 | `POST` | `/api/auth/register` | Public | `RegisterRequest` | `201 RegisterResponse` | `400 VALIDATION_ERROR`, `409 EMAIL_ALREADY_REGISTERED` | `Implemented in M2` |
-| S13 | `POST` | `/api/auth/login` | Public, same-origin write | `LoginRequest` | `200 AuthResponse` and opaque cookie | `400 VALIDATION_ERROR`, `401 INVALID_CREDENTIALS`, `403 ORIGIN_NOT_ALLOWED` | `Implemented in M2` |
+| S12 | `POST` | `/api/auth/register` | Public | `RegisterRequest` | `201 RegisterResponse` | `400 VALIDATION_ERROR`, `409 EMAIL_ALREADY_REGISTERED`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
+| S13 | `POST` | `/api/auth/login` | Public, same-origin write | `LoginRequest` | `200 AuthResponse` and opaque cookie | `400 VALIDATION_ERROR`, `401 INVALID_CREDENTIALS`, `403 ORIGIN_NOT_ALLOWED`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 | S13 | `POST` | `/api/auth/logout` | Cookie optional; idempotent same-origin write | None | `204`, session invalidated and cookie cleared | `403 ORIGIN_NOT_ALLOWED`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 | S13 | `GET` | `/api/auth/me` | Authenticated | None | `200 AuthResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 | S02, S04 | `GET` | `/api/me/recommendations?limit=10` | Authenticated | Optional integer `limit`, 1-10 | `200 RecommendationResponse` in personalised, no-match, or cold-start state | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T08)` |
 | S04 | `GET` | `/api/movies?limit=10` | Public | Optional integer `limit`, 1-10, default 10 | `200 MovieListResponse`; catalogue entries without popularity may be included and sort last when popularity ordering is used | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2`; public catalogue route |
-| S09 / T19 | `GET` | `/api/movies/popular?limit=10` | Public | Optional integer `limit`, 1-10, default 10 | `200 MovieListResponse`; only movies with valid popularity | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in M3`; dedicated popular-movie route |
+| S09 / T19 | `GET` | `/api/movies/popular?limit=10` | Public | Optional integer `limit`, 1-10, default 10 | `200 MovieListResponse`; only movies with valid popularity | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T19)`; dedicated popular-movie route |
 | S03 | `GET` | `/api/movies/{movieId}` | Public | Opaque `movieId` | `200 MovieDetailResponse` | `404 MOVIE_NOT_FOUND`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 | S01 | `GET` | `/api/genres` | Authenticated | None | `200 GenreListResponse` | `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T01)` |
 | S01 | `GET` | `/api/me/preferences` | Authenticated | None | `200 PreferenceResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T01)` |
@@ -90,13 +89,15 @@ yet available in the current repository.
 S3-T01 added the `user_genre_preferences` table and the two read routes
 `GET /api/genres` and `GET /api/me/preferences`. S3-T02 implements validated,
 atomic preference replacement through `PUT /api/me/preferences`. The dedicated
-`GET /api/movies/popular` route is implemented in M3 under T19. T30 implements
+`GET /api/movies/popular` route is implemented in Sprint 3 under T19. T30 implements
 rating storage, T31 [#138](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/138)
 implements rating reads/writes, and T35
 [#142](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/142)
 implements the backend reset boundary. S3-T08 implements the genre/popularity
-personalised recommendation baseline. The reset UI, genre filtering, similar
-movies, and search remain outside this contract update.
+personalised recommendation baseline. The T15/T16 current-list genre filter,
+T33/T34 rating UI, and T26/T27/T37/T28 backdrop chain are also implemented.
+Profile/reset UI, rating-adjusted ranking, similar movies, search, and NLP
+product behaviour remain outside the delivered Sprint 3 boundary.
 
 
 ## 3. Shared DTOs
@@ -250,13 +251,13 @@ session, clears the cookie, and returns `204 No Content`. The UI then opens
 The same-origin check runs before revocation, so a rejected browser request
 cannot terminate the current session.
 
-## 6. Committed Sprint 3: genres and account preferences
+## 6. Sprint 3 genres and account preferences
 
-The following contracts are committed Sprint 3 scope, not optional future
-work. S3-T01 implements the account-owned preference migration and the read
-routes `GET /api/genres` and `GET /api/me/preferences`. S3-T02 implements
-preference replacement through `PUT /api/me/preferences`. Personalised
-recommendations remain pending.
+S3-T01 implements the account-owned preference migration and the read routes
+`GET /api/genres` and `GET /api/me/preferences`. S3-T02 implements preference
+replacement through `PUT /api/me/preferences`. S3-T08 implements the
+personalised, cold-start, and no-match recommendation states described in
+section 7.
 
 Sprint 3 data-source decision (2026-10-06): development/staging/demo catalogue
 must be imported from TMDb into SQLite and verified under T29/C04 in the
@@ -268,9 +269,9 @@ Public IDs/DTOs remain unchanged. Operator provenance uses database source IDs
 and timestamps, not tokens or new public source-ID fields. Synthetic fixtures
 and provider-boundary mocks remain the automated-test path; mandatory live
 import/provenance smoke runs separately outside CI. Preference storage/reads
-are implemented under T01 and replacement under T02; personalised
-recommendation behaviour remains pending.
-The dedicated public popular movie route is implemented in M3 under T19. The existing
+are implemented under T01, replacement under T02, and personalised
+recommendation behaviour under T08.
+The dedicated public popular movie route is implemented in Sprint 3 under T19. The existing
 `/api/movies` route is the public catalogue route and is a separate contract.
 
 All three routes require a valid, unexpired, unrevoked session. The account is
@@ -477,12 +478,11 @@ is required while the session remains valid. If the catalogue and preferences
 are unchanged, the successful body matches the pre-failure body. Recovery does
 not promise an identical list if the catalogue or preferences have changed.
 
-T09 verifies this API boundary. T10 (#112) owns the typed client/cards, T11
-(#113) owns Error/Retry UI and stale-request protection, and T12 (#114) owns the
-integrated Story #18 acceptance. Clients must replace their error state only
-after a successful current-account response; T09 does not claim that this UI
-is already implemented. Rating-adjusted ranking remains a Sprint 4 extension
-under Story #22 and does not change the error envelope.
+T09 verifies this API boundary. T10 (#112) implements the typed client/cards,
+T11 (#113) implements Error/Retry UI and stale-request protection, and T12
+(#114) supplies integrated Story #18 acceptance evidence. Clients replace an
+error only after a successful current-account response. Rating-adjusted ranking
+remains a Sprint 4 extension under Story #22 and does not change the envelope.
 
 ## 8. S03/S04 catalogue and S09/T19 popular movie reads
 
@@ -540,7 +540,7 @@ endpoint.
 An empty active catalogue returns `200` with `movies: []`; the UI shows
 guidance and never invents movies.
 
-### `GET /api/movies/popular?limit=10` (implementation in M3)
+### `GET /api/movies/popular?limit=10` (implemented in Sprint 3)
 
 This is the dedicated public popular-movie endpoint introduced for S09/T19.
 `limit` defaults to 10 and accepts an integer from 1 through 10. It returns only
@@ -608,7 +608,8 @@ Success (`200`):
       "overview": null,
       "popularityScore": 90.0,
       "voteAverage": 7.2,
-      "voteCount": 1200
+      "voteCount": 1200,
+      "backdropUrl": "https://image.tmdb.org/t/p/w780/example.jpg"
     }
   },
   "meta": {
@@ -624,9 +625,11 @@ Success (`200`):
 | Database read failure | `503 SERVICE_UNAVAILABLE` | `Service is temporarily unavailable` |
 
 A missing year or overview remains JSON `null`; the UI displays
-`Information unavailable` for that field. Storage failure is never translated
-to a false 404. Movie detail remains public; a guest opening it must not cause
-the frontend to call a private rating endpoint.
+`Information unavailable` for that field. `backdropUrl` is either a server-built
+allowlisted `https://image.tmdb.org/t/p/w780/<file>` URL or JSON `null`; raw
+provider paths and tokens are never returned. Storage failure is never
+translated to a false 404. Movie detail remains public; a guest opening it
+does not cause the frontend to call a private rating endpoint.
 
 ## 9. Sprint 3 rating contract (implemented under S3-T31)
 
@@ -784,15 +787,18 @@ codes.
 ## 12. Scope boundary
 
 The dedicated public popular movie endpoint (`GET /api/movies/popular`)
-is implemented in M3 under T19, reusing the shared deterministic
+is implemented in Sprint 3 under T19, reusing the shared deterministic
 popularity/title/ID ranker.
 
 The preference storage and reads are implemented under S3-T01, preference
 replacement under S3-T02, rating storage under S3-T30, rating reads/writes
 under S3-T31, and the profile-reset backend under S3-T35. The account rating
-widget and typed client are implemented under S3-T33 (#139). Reset UI and
-NLP endpoints remain separate work. The backend reset evidence must not be
-used to close Story #33 / S11 UI acceptance.
+widget and typed client are implemented under S3-T33 (#139) and independently
+exercised under T34 (#141). The backdrop chain is complete in Sprint 3: T26
+adds nullable storage, T27 maps/imports it and exposes the safe detail DTO,
+T37 renders resilient UI, and T28/#131 verifies the storage-to-browser path.
+Reset UI, rating-adjusted ranking, and NLP endpoints remain separate work. The
+backend reset evidence must not be used to close Story #33 / S11 UI acceptance.
 
 The T33 widget checks the existing session on valid public movie details without
 blocking public content. Guests do not issue private rating reads/writes, and a
@@ -810,5 +816,5 @@ implemented dedicated popular movie endpoint.
 
 Automated tests must use synthetic SQLite fixtures or provider mocks and run
 offline without a TMDb token. Live TMDb catalogue import is a separate
-server-side development/staging/M3 acceptance step; the token must never
+server-side development/staging/Sprint 3 acceptance step; the token must never
 appear in DTOs, frontend assets, logs, fixtures, or documentation evidence.
