@@ -1,4 +1,4 @@
-import type { Genre, MovieSummary } from "./movies.ts";
+import type { Genre, MovieSummary, PageMeta } from "./movies.ts";
 import { fallbackErrorMessage, NETWORK_FAILURE_MESSAGE } from "./requestFailure.ts";
 
 export type RecommendationMovie = MovieSummary & {
@@ -16,6 +16,7 @@ export type RecommendationResult = {
 
 type RecommendationResponse = {
   data: RecommendationResult;
+  meta: PageMeta;
 };
 
 type ApiErrorResponse = {
@@ -77,4 +78,35 @@ export async function getRecommendations(
 
   const body = (await response.json()) as RecommendationResponse;
   return body.data;
+}
+
+export async function getRecommendationPage(
+  page: number,
+  genreId?: number,
+  revision?: string,
+  signal?: AbortSignal,
+): Promise<RecommendationResponse> {
+  const params = new URLSearchParams({ limit: "10" });
+  if (page !== 1) params.set("page", String(page));
+  if (genreId !== undefined) params.set("genreId", String(genreId));
+  if (revision) params.set("catalogueRevision", revision);
+  let response: Response;
+  try {
+    response = await fetch(`/api/me/recommendations?${params}`, {
+      credentials: "include",
+      signal,
+    });
+  } catch (error) {
+    if (signal?.aborted) throw error;
+    throw new RecommendationApiError(NETWORK_FAILURE_MESSAGE, 0);
+  }
+  if (!response.ok) throw await readError(response);
+  const body = (await response.json()) as RecommendationResponse;
+  const received = body.meta as Partial<PageMeta> | undefined;
+  return { ...body, meta: {
+    count: body.data.movies.length, limit: 10, page,
+    total: body.data.movies.length, totalPages: body.data.movies.length ? 1 : 0,
+    unfilteredTotal: body.data.movies.length, catalogueRevision: "",
+    ...received,
+  } };
 }

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import type { Genre, MovieSummary } from "../api/movies.ts";
 import { formatPopularityScore, POPULARITY_LABEL } from "../formatPopularity.ts";
 import { movieDetailReturnState } from "../navigation/movieDetailReturn.ts";
+import type { ListViewContext } from "../navigation/listViewState.ts";
 
 const INFORMATION_UNAVAILABLE = "Information unavailable";
 
@@ -10,9 +11,10 @@ type MovieCardProps = {
   movie: MovieSummary;
   matchedGenres?: Genre[];
   returnTo?: string;
+  returnContext?: ListViewContext;
 };
 
-function MovieCard({ movie, matchedGenres, returnTo }: MovieCardProps) {
+function MovieCard({ movie, matchedGenres, returnTo, returnContext }: MovieCardProps) {
   return (
     <article className="movie-card">
       <div>
@@ -38,7 +40,7 @@ function MovieCard({ movie, matchedGenres, returnTo }: MovieCardProps) {
       <Link
         className="movie-card__link"
         to={`/movies/${encodeURIComponent(movie.id)}`}
-        state={returnTo ? movieDetailReturnState(returnTo) : undefined}
+        state={returnTo ? movieDetailReturnState(returnTo, returnContext) : undefined}
         aria-label={`View details for ${movie.title}`}
       >
         View details

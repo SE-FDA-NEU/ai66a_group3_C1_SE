@@ -172,9 +172,22 @@ def _expanded_expected_response(
                 "reason": expected["reason"],
             }
         )
+    saved_ids = set(case["savedGenreIds"])
+    base_count = sum(
+        bool(saved_ids.intersection(row["genreIds"]))
+        for row in candidates.values()
+    ) if saved_ids else 0
+    if not base_count:
+        base_count = sum(row["popularityScore"] is not None for row in candidates.values())
+    expected_meta = case["expectedResponse"]["meta"] | {
+        "page": 1,
+        "total": base_count,
+        "totalPages": (base_count + 9) // 10,
+        "unfilteredTotal": base_count,
+    }
     return {
         "data": case["expectedResponse"]["data"] | {"movies": movies},
-        "meta": case["expectedResponse"]["meta"],
+        "meta": expected_meta,
     }
 
 
@@ -267,6 +280,10 @@ def test_personalised_missing_popularity_is_preserved_and_not_invented(
     assert body["meta"] == {
         "count": 3,
         "limit": 10,
+        "page": 1,
+        "total": 3,
+        "totalPages": 1,
+        "unfilteredTotal": 3,
         "catalogueRevision": revision_id,
     }
     assert all(
@@ -382,6 +399,10 @@ def test_no_match_with_no_usable_popular_alternative_is_a_valid_empty_success(
         "meta": {
             "count": 0,
             "limit": 10,
+            "page": 1,
+            "total": 0,
+            "totalPages": 0,
+            "unfilteredTotal": 0,
             "catalogueRevision": revision.id,
         },
     }
@@ -681,7 +702,9 @@ def test_t09_active_empty_catalogue_is_cold_start_success_not_a_source_error(
             "personalised": False,
             "noMatch": False,
         },
-        "meta": {"count": 0, "limit": 2, "catalogueRevision": revision.id},
+        "meta": {"count": 0, "limit": 2, "page": 1, "total": 0,
+                 "totalPages": 0, "unfilteredTotal": 0,
+                 "catalogueRevision": revision.id},
     }
     assert _committed_preference_rows(database_session) == []
 

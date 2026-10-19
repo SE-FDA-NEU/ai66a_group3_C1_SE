@@ -84,7 +84,7 @@ function MovieDetailPage() {
           <p className="muted">
             That movie is not available in the active catalogue.
           </p>
-          <Link className="button-link" to={returnDestination.to}>
+          <Link className="button-link" to={returnDestination.to} state={returnDestination.state}>
             {returnDestination.label}
           </Link>
         </section>
@@ -106,6 +106,7 @@ function MovieDetailPage() {
             <Link
               className="button-link button-secondary"
               to={returnDestination.to}
+              state={returnDestination.state}
             >
               {returnDestination.label}
             </Link>
@@ -122,7 +123,8 @@ function MovieDetailPage() {
   return (
     <main className="page">
       <article className="movie-detail">
-        <Link className="text-link movie-detail__return" to={returnDestination.to}>
+        <Link className="text-link movie-detail__return" to={returnDestination.to}
+          state={returnDestination.state}>
           <span aria-hidden="true">&larr; </span>
           {returnDestination.label}
         </Link>

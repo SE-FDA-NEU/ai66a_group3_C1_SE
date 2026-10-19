@@ -75,9 +75,9 @@ implemented and its UI is still absent.
 | S13 | `POST` | `/api/auth/login` | Public, same-origin write | `LoginRequest` | `200 AuthResponse` and opaque cookie | `400 VALIDATION_ERROR`, `401 INVALID_CREDENTIALS`, `403 ORIGIN_NOT_ALLOWED`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 | S13 | `POST` | `/api/auth/logout` | Cookie optional; idempotent same-origin write | None | `204`, session invalidated and cookie cleared | `403 ORIGIN_NOT_ALLOWED`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 | S13 | `GET` | `/api/auth/me` | Authenticated | None | `200 AuthResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
-| S02, S04 | `GET` | `/api/me/recommendations?limit=10` | Authenticated | Optional integer `limit`, 1-10 | `200 RecommendationResponse` in personalised, no-match, or cold-start state | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T08)` |
-| S04 | `GET` | `/api/movies?limit=10` | Public | Optional integer `limit`, 1-10, default 10 | `200 MovieListResponse`; catalogue entries without popularity may be included and sort last when popularity ordering is used | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2`; public catalogue route |
-| S09 / T19 | `GET` | `/api/movies/popular?limit=10` | Public | Optional integer `limit`, 1-10, default 10 | `200 MovieListResponse`; only movies with valid popularity | `400 VALIDATION_ERROR`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T19)`; dedicated popular-movie route |
+| S02, S04, S06 | `GET` | `/api/me/recommendations` | Authenticated | `page` 1-10000, `limit` 1-10, optional `genreId`, `catalogueRevision` | `200 RecommendationResponse`; whole-set mode/filter and page totals | `400 VALIDATION_ERROR`/`GENRE_NOT_FOUND`, `401 AUTHENTICATION_REQUIRED`, `409 CATALOGUE_CHANGED`, `503 CATALOGUE_UNAVAILABLE`/`SERVICE_UNAVAILABLE` | Sprint 3 route; post-M3 pagination amendment |
+| S04 | `GET` | `/api/movies` | Public | `page` 1-10000, `limit` 1-10, optional `catalogueRevision` | `200 MovieListResponse`; all active movies in alphabetical order | `400 VALIDATION_ERROR`, `409 CATALOGUE_CHANGED`, `503 CATALOGUE_UNAVAILABLE`/`SERVICE_UNAVAILABLE` | M2 route; post-M3 pagination amendment |
+| S09 / T19 | `GET` | `/api/movies/popular` | Public | `page` 1-10000, `limit` 1-10, optional `catalogueRevision` | `200 MovieListResponse`; finite-popularity ranking across pages | `400 VALIDATION_ERROR`, `409 CATALOGUE_CHANGED`, `503 CATALOGUE_UNAVAILABLE`/`SERVICE_UNAVAILABLE` | Sprint 3 route; post-M3 pagination amendment |
 | S03 | `GET` | `/api/movies/{movieId}` | Public | Opaque `movieId` | `200 MovieDetailResponse` | `404 MOVIE_NOT_FOUND`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 | S01 | `GET` | `/api/genres` | Authenticated | None | `200 GenreListResponse` | `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T01)` |
 | S01 | `GET` | `/api/me/preferences` | Authenticated | None | `200 PreferenceResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T01)` |
@@ -94,7 +94,7 @@ rating storage, T31 [#138](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issu
 implements rating reads/writes, and T35
 [#142](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/142)
 implements the backend reset boundary. S3-T08 implements the genre/popularity
-personalised recommendation baseline. The T15/T16 current-list genre filter,
+personalised recommendation baseline. The T15/T16 Sprint 3 current-list genre filter,
 T33/T34 rating UI, and T26/T27/T37/T28 backdrop chain are also implemented.
 Profile/reset UI, rating-adjusted ranking, similar movies, search, and NLP
 product behaviour remain outside the delivered Sprint 3 boundary.
@@ -353,9 +353,13 @@ it must not reuse another account's cached response.
 
 ## 7. Recommendation contract: Sprint 3 genre/popularity baseline
 
-### `GET /api/me/recommendations?limit=10`
+### `GET /api/me/recommendations?page=1&limit=10&genreId=28`
 
-`limit` defaults to 10 and accepts an integer from 1 through 10. The account is
+`page` defaults to 1 and accepts a positive integer through 10000. `limit`
+defaults to 10 and accepts an integer from 1 through 10. Optional `genreId`
+must be an integer from 1 through 2147483647 and an existing canonical genre ID;
+an out-of-range ID returns `400 VALIDATION_ERROR`. A valid genre with no matches returns
+a successful filtered-empty page. The account is
 resolved only from the authenticated session.
 
 The route reads only the authenticated account's saved genres and the active
@@ -388,6 +392,10 @@ Response shape:
   "meta": {
     "count": 1,
     "limit": 10,
+    "page": 1,
+    "total": 1,
+    "totalPages": 1,
+    "unfilteredTotal": 1,
     "catalogueRevision": "revision-example"
   }
 }
@@ -430,6 +438,10 @@ does not rename or move those fields.
   "meta": {
     "count": 1,
     "limit": 10,
+    "page": 1,
+    "total": 1,
+    "totalPages": 1,
+    "unfilteredTotal": 1,
     "catalogueRevision": "revision-example"
   }
 }
@@ -446,7 +458,11 @@ The three valid state combinations are:
 Sprint 3 ranking uses only the current account's saved genres and local
 `popularityScore`: candidates must share at least one selected genre, then use
 the existing popularity-descending, title-ascending, ID-ascending order. The
-response contains at most ten distinct opaque movie IDs. Rating-adjusted
+response page contains at most ten distinct opaque movie IDs. The complete
+eligible set is ranked and deduplicated before applying the optional view
+genre and slicing into pages. `unfilteredTotal` counts the base mode before
+the view filter; `total` counts after it. A zero view-filter total preserves
+the base mode and does not trigger popular alternatives. Rating-adjusted
 ranking is explicitly outside Sprint 3; it belongs to Story #22, S05b, and is
 planned Sprint 4 behaviour. Saving a rating in Sprint 3 must not change this
 ordering.
@@ -486,13 +502,34 @@ remains a Sprint 4 extension under Story #22 and does not change the envelope.
 
 ## 8. S03/S04 catalogue and S09/T19 popular movie reads
 
-### `GET /api/movies?limit=10`
+### Post-M3 shared pagination amendment (2026-10-19)
+
+All three list routes accept `page` (default 1, integer 1-10000), `limit`
+(default 10, integer 1-10) and an optional opaque `catalogueRevision`. Public
+routes ignore account identity. A subsequent request supplying a revision that
+no longer equals the active revision receives `409 CATALOGUE_CHANGED` in the
+standard error envelope. The client clears old results and fetches page 1 of
+the new revision. Recommendation requests also accept optional integer
+`genreId` (integer 1 through 2147483647); an unknown ID returns
+`400 GENRE_NOT_FOUND`, while an out-of-range ID returns `400 VALIDATION_ERROR`.
+
+Each success `meta` contains `count` for the returned page, `page`, `limit`,
+`total` after a view filter and before slicing, `totalPages=ceil(total/limit)`
+(zero when total is zero), `unfilteredTotal` for the base mode before a view
+filter, and `catalogueRevision`. Public routes have `unfilteredTotal=total`.
+An out-of-range page is a `200` response with an empty `data.movies`, unchanged
+mode, and accurate totals. For 255 eligible movies at limit 10, page 26 has 5
+movies and page 27 has none while `totalPages` remains 26. The UI normalizes
+that URL to page 26; zero-result URLs normalize to page 1. A list request only
+reads local SQLite and never fetches TMDb metadata.
+
+### `GET /api/movies?page=1&limit=10`
 
 This is the implemented public catalogue endpoint for S04. `limit` defaults to
 10 and accepts an integer from 1 through 10. Results read only the active local
-catalogue; the endpoint never contacts TMDb. Movies without a valid popularity
-value may still be returned. When popularity ordering is used, those entries
-appear after movies with finite popularity.
+catalogue; the endpoint never contacts TMDb. Every active movie is eligible,
+including one without popularity. Ordering is SQLite `lower(title)` ascending,
+then original title ascending, then internal movie ID ascending.
 
 Success (`200`):
 
@@ -521,15 +558,16 @@ Success (`200`):
   "meta": {
     "count": 2,
     "limit": 10,
+    "page": 1,
+    "total": 2,
+    "totalPages": 1,
+    "unfilteredTotal": 2,
     "catalogueRevision": "revision-example"
   }
 }
 ```
 
-Sort order is finite popularity descending, missing/null popularity last,
-title A-Z for ties, and internal movie ID as the final deterministic
-tie-breaker. This endpoint must not be treated as the dedicated popular-movie
-endpoint.
+This alphabetical endpoint is separate from the finite-popularity ranking.
 
 | Condition | Status/code | Public message |
 |---|---|---|
@@ -540,7 +578,7 @@ endpoint.
 An empty active catalogue returns `200` with `movies: []`; the UI shows
 guidance and never invents movies.
 
-### `GET /api/movies/popular?limit=10` (implemented in Sprint 3)
+### `GET /api/movies/popular?page=1&limit=10` (Sprint 3 route, paginated post-M3)
 
 This is the dedicated public popular-movie endpoint introduced for S09/T19.
 `limit` defaults to 10 and accepts an integer from 1 through 10. It returns only
@@ -573,6 +611,10 @@ Success (`200`):
   "meta": {
     "count": 1,
     "limit": 10,
+    "page": 1,
+    "total": 1,
+    "totalPages": 1,
+    "unfilteredTotal": 1,
     "catalogueRevision": "revision-example"
   }
 }

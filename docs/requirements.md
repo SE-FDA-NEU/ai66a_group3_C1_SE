@@ -168,19 +168,21 @@ history.
 As a signed-in viewer with selected genres, I want personalised
 recommendations with clear reasons so that I can narrow down what to watch.
 
-- Given my current account has valid genres and matching movies, when
-  recommendations are requested, then up to 10 distinct movies are shown and
-  each matches at least one selected genre.
+- Given my account has 25 distinct matching movies, when I browse recommendations,
+  then pages of 10, 10 and 5 expose all 25 without repeats; the complete set
+  is ranked before slicing and each movie shares a saved genre.
 - Given results are displayed, when I view a movie card, then it shows title,
   genres, and a reason naming at least one matching selected genre.
-- Given no movie matches selected genres, when recommendations are requested,
-  then a no-match message, up to 10 popular alternatives, and actions to
-  change preferences or retry are shown.
+- Given no movie matches selected genres in the complete base set, when
+  recommendations are requested, then a no-match message, paginated popular
+  alternatives, and actions to change preferences or retry are shown.
 - Given the recommendation source fails, when recommendations are requested,
   then an error and retry action are shown and current-account preferences stay
   unchanged.
 - Given I retry after a source failure, when the request succeeds, then
   recommendation results are displayed.
+- Given I return from a movie detail, when the result context is still valid,
+  then the recommendation page and view genre are restored.
 
 ### S03 View movie details before deciding (P0, 3 points)
 
@@ -197,16 +199,27 @@ decide whether to watch it.
   remain visible.
 - Given I am signed in and viewing details, when I return to the list, then my
   account preferences are preserved.
+- Given I open details from page 2 of a catalogue, popular, or recommendation
+  list with a genre view filter, when I return and the list context is still
+  valid, then the same page and filter are restored. If the catalogue revision,
+  account, or recommendation preferences changed, the list starts at page 1
+  without carrying a stale recommendation filter into the new context.
 
 ### S04 Explore movies without preferences (P0, 5 points)
 
-As a newly signed-in viewer, I want guidance and popular movies to explore so
-that I am not stuck before entering preferences.
+As a viewer without preferences, I want to browse the public catalogue and
+receive popular guidance after signing in so that I can choose immediately.
+
+- Given I am signed out and the active catalogue contains 25 movies, when I
+  open Home, then all 25 are reachable alphabetically across pages of 10, 10
+  and 5 without signing in.
 
 - Given my newly signed-in account has no preferences and fallback data holds
   Movie A with popularity 90, Movie B with 80, and Movie C with 80, when I
   open recommendations, then A appears first, B and C follow in title order,
-  at most 10 movies are shown, and they are marked not personalised.
+  at most 10 movies appear per page, and they are marked not personalised.
+- Given more than 10 usable fallback movies, when I select Next, then the next
+  globally ranked movies appear without repeating page 1.
 - Given I am viewing the fallback list, when I select Enter preferences, then
   I am taken to genre selection.
 - Given popular-movie data is empty, when I open recommendations with an
@@ -247,22 +260,29 @@ to use my feedback so that they become more relevant.
 - Given an Action candidate has popularity 90 and Comedy has 80, when my
   account rates an Action movie 3, then Action stays above Comedy because 3 is
   neutral.
-- Given ratings affect ranking, when recommendations are generated, then at
-  most 10 different movies are returned and BR2 is still satisfied.
+- Given ratings affect ranking, when recommendations are generated, then all
+  eligible movies are ranked before pages of at most 10 distinct movies are
+  sliced and BR2 is still satisfied.
 - Given a rating signal cannot be applied, when recommendations are generated,
   then the system returns a valid preference-based result and no false success.
 
 ### S06 Filter recommendations by genre (P1, 3 points)
 
-As a signed-in viewer choosing a movie, I want to filter recommendations by
-genre so that I can focus on what I want to watch now.
+As a signed-in viewer choosing a movie, I want to filter the complete current
+recommendation result set by genre before pagination.
 
 - Given a list has exactly 2 Action and 3 Comedy movies, when I select Action,
   then exactly the 2 Action movies and no Comedy movie are shown.
-- Given a selected genre has no movie in the list, when I apply the filter,
-  then no results are shown with a clear way to remove it.
-- Given a filter is active, when I remove it, then the original list returns
-  and account preferences are unchanged.
+- Given 35 base recommendations with 12 Action matches beyond the unfiltered
+  first page, when I select Action, then two filtered pages contain 10 and 2
+  movies in the original ranking order.
+- Given a valid selected genre has no movie in the complete base set, when I
+  apply the filter, then a filtered-empty message and clear action appear;
+  the base recommendation mode does not change.
+- Given a filter is active, when I remove it, then page 1 of the complete
+  unfiltered result returns; saved preferences and ratings are unchanged.
+- Given I return from details or use browser Back, then the page and genre
+  restore for the same valid account/result context.
 
 ### S07 Find content-similar movies from the details page (P1, 5 points)
 
@@ -309,12 +329,14 @@ browsing a long list.
 As an undecided viewer, I want to browse popular movies so that I can start
 choosing without signing in or setting preferences.
 
-- Given the catalogue has at least 10 movies with popularity values, when I
-  open the list, then the 10 highest-ranked movies are displayed.
+- Given 25 active movies with finite popularity, when I open Popular, then all
+  25 are reachable in globally ranked pages of 10, 10 and 5.
 - Given two movies have popularity 95 and 80, when the list is displayed, then
   the movie with 95 appears first.
 - Given no popularity data is available, when I open the list, then the system
   shows "Popular movies are not available yet".
+- Given I am signed out, when I browse Popular, then the list remains public;
+  a confirmed session updates shared navigation with account and Sign out.
 
 ### S10 Learn how recommendations are personalised (P2, 3 points)
 
@@ -376,6 +398,11 @@ access saved preferences and ratings.
 - Given Account A has saved preferences or ratings, when Account B signs in,
   then Account B cannot view, update, reset, or receive recommendations from
   Account A's personalisation data.
+- Given I load Home or Popular directly, when session verification is pending,
+  then the header shows a checking state; after success it shows my account,
+  My recommendations and Sign out, while a 401 shows Sign in/Create account.
+- Given session verification fails due to network or service error, then public
+  lists remain usable and the header offers Retry without claiming sign-out.
 
 ## 5. Business rules
 
@@ -386,14 +413,14 @@ numbers or an exact expected value.
 |---|---|---|---|---|
 | BR1 | A signed-in viewer selects 1 to 5 favourite genres for their account. | Action, Comedy, Drama (3) is accepted. A sixth is refused; 0 is refused. | S01 | /preferences |
 | BR2 | A personal recommendation matches at least one genre selected by the current account. | With Action selected, an Action/Thriller movie may appear; a Documentary-only movie may not. | S02, S05b | /recommendations |
-| BR3 | A recommendation list has no duplicates and at most 10 movies. | 12 matching records, including duplicate ID 44, produce no duplicate and no more than 10 items. | S02, S05b | /recommendations |
-| BR4 | No match shows a message, up to 10 popular alternatives, and edit/retry actions. | 0 Documentary matches and 7 popular movies show those 7, not an empty list. | S02, S04 | /recommendations |
-| BR5 | Popular movies sort by popularity descending, then title A-Z for ties, with at most 10 items. | A=90, B=80, C=80 returns A, B, C when B precedes C alphabetically. | S04, S09 | /, /recommendations, /popular |
+| BR3 | Recommendation pages contain at most 10 distinct movies; complete-set ranking and deduplication precede slicing. | 25 candidates produce pages of 10, 10 and 5. | S02, S05b | /recommendations |
+| BR4 | Zero complete saved-genre matches produce a no-match message and paginated popular alternatives; a zero view-filter result remains filtered-empty. | 35 base matches but 0 Horror view matches do not trigger fallback. | S02, S04 | /recommendations |
+| BR5 | Finite-popularity popular and fallback sets rank globally by popularity descending, title ascending, ID ascending, with at most 10 per page. | 25 candidates produce 3 pages. | S04, S09 | /recommendations, /popular |
 | BR6 | A movie ID opens only its own details; an unknown ID opens no other movie. | ID 42 opens movie 42; ID 999 shows "Movie not found". | S03 | /movies/:movieId |
 | BR7 | A rating is a whole integer from 1 to 5; invalid input does not replace a saved rating. | 4 is accepted; 4.5, 0, and 6 are rejected. | S05a | /movies/:movieId |
 | BR8 | Preferences and ratings belong only to their authenticated account and persist after a later sign-in. | Account A saves 3 genres and 2 ratings, signs out, then sees 3 and 2 after sign-in; B sees 0 and 0. | S01, S05a, S05b, S11, S13 | protected routes |
 | BR9 | Ratings 4-5 are positive, 1-2 negative, and 3 neutral ranking signals. | With Action and Comedy at 80, an Action 5 puts Action first; 1 puts it below Comedy. | S05b | /recommendations |
-| BR10 | A genre filter changes only the current list, not saved preferences. | A 2-Action/3-Comedy list shows exactly 2 under Action; removing filter restores 5. | S06 | /recommendations |
+| BR10 | A view genre filters the complete recommendation base before pagination, preserving ranking/mode and never writing preferences or ratings. Change and clear reset to page 1. | 12 Action matches among 35 candidates produce pages of 10 and 2. | S06 | /recommendations |
 | BR11 | Similar movies exclude the source, share a genre, and number at most 5. | Source M10 is excluded; up to 5 other eligible movies may appear. | S07 | /movies/:movieId |
 | BR12 | Title search needs at least 2 characters, is case-insensitive, and returns at most 10 matches. | "a" is rejected; "in" and "IN" match alike; 14 matches return at most 10. | S08 | /search |
 | BR13 | The explanation has exactly 3 steps and says popular movies need no preferences. | It lists sign in, choose genres, then receive recommendations with optional ratings. | S10 | /about-recommendations |
@@ -403,6 +430,8 @@ numbers or an exact expected value.
 | BR17 | A password has at least 8 characters and is stored only as a cryptographic hash. | "movie123" is accepted; "movie7" is rejected; no API response returns password or hash. | S12 | /register |
 | BR18 | A personal-data action needs a valid authenticated session and accesses only that account's data. | An unsigned /preferences request goes to /login; B cannot read or write A's ratings. | S13 | /login, protected routes |
 | BR19 | Sign-out invalidates the current session without deleting account data. | After sign-out, /profile goes to /login; signing into the same account restores its data. | S13 | authenticated navigation |
+| BR20 | Home lists all active movies by SQLite `lower(title)`, original title and internal ID ascending, regardless of popularity. | Alpha/5 precedes Zulu/95; missing popularity remains on Home. | S04 | / |
+| BR21 | List requests use positive pages and limit 1-10; totals cover the whole eligible set and stale revisions return 409. | 255 candidates yield 26 pages; an old revision returns `CATALOGUE_CHANGED`. | S02, S04, S09 | /, /popular, /recommendations |
 
 ## 6. Screens and flow
 

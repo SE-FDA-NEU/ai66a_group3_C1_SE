@@ -1,0 +1,80 @@
+{
+  "observedRequestCount": 194,
+  "observedHosts": {
+    "127.0.0.1:5173": 194
+  },
+  "applicationApiRequests": [
+    {
+      "host": "127.0.0.1:5173",
+      "path": "/api/auth/login",
+      "method": "POST"
+    },
+    {
+      "host": "127.0.0.1:5173",
+      "path": "/api/me/recommendations?limit=10",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1:5173",
+      "path": "/api/me/recommendations?limit=10",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1:5173",
+      "path": "/api/auth/me",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1:5173",
+      "path": "/api/movies?limit=10&page=2",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1:5173",
+      "path": "/api/movies?limit=10&page=2",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1:5173",
+      "path": "/api/auth/me",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1:5173",
+      "path": "/api/movies/popular?limit=10&page=2",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1:5173",
+      "path": "/api/movies/popular?limit=10&page=2",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1:5173",
+      "path": "/api/auth/me",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1:5173",
+      "path": "/api/me/recommendations?limit=10&page=2&genreId=28",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1:5173",
+      "path": "/api/me/recommendations?limit=10&page=2&genreId=28",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1:5173",
+      "path": "/api/genres",
+      "method": "GET"
+    },
+    {
+      "host": "127.0.0.1:5173",
+      "path": "/api/genres",
+      "method": "GET"
+    }
+  ],
+  "tmdbMetadataRequests": 0,
+  "note": "Recorded by Playwright from browser request events; paths exclude cookies, bodies and credentials."
+}

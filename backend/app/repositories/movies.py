@@ -6,7 +6,7 @@ from collections.abc import Iterable
 from datetime import datetime
 from math import isfinite
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.catalogue.backdrops import backdrop_url
@@ -19,7 +19,6 @@ from app.db.models import (
     new_opaque_id,
     utc_now,
 )
-from app.recommendations.ranker import popularity_title_id_ordering
 from app.schemas.movies import GenreDto, MovieDetailDto, MovieSummaryDto
 
 ACTIVE_CATALOGUE_STATE_ID = 1
@@ -234,11 +233,22 @@ def replace_movie_genres(
     return [genres_by_id[genre_id] for genre_id in unique_genre_ids]
 
 
-def list_active_movies(session: Session, *, limit: int) -> list[CatalogMovie]:
-    """Return only movies in the active revision in deterministic popular order."""
+def count_active_movies(session: Session) -> int:
+    return session.scalar(
+        select(func.count(CatalogMovie.id)).join(
+            CatalogueState,
+            CatalogueState.active_revision_id == CatalogMovie.catalogue_revision_id,
+        ).where(CatalogueState.id == ACTIVE_CATALOGUE_STATE_ID)
+    ) or 0
+
+
+def list_active_movies(session: Session, *, limit: int, page: int = 1) -> list[CatalogMovie]:
+    """Return a page of the active catalogue in SQLite case-insensitive title order."""
 
     if not 1 <= limit <= 10:
         raise ValueError("limit must be an integer from 1 to 10")
+    if page < 1:
+        raise ValueError("page must be positive")
 
     statement = (
         select(CatalogMovie)
@@ -248,8 +258,9 @@ def list_active_movies(session: Session, *, limit: int) -> list[CatalogMovie]:
         )
         .where(CatalogueState.id == ACTIVE_CATALOGUE_STATE_ID)
         .options(selectinload(CatalogMovie.genres))
-        .order_by(*popularity_title_id_ordering())
+        .order_by(func.lower(CatalogMovie.title), CatalogMovie.title, CatalogMovie.id)
         .limit(limit)
+        .offset((page - 1) * limit)
     )
     return list(session.scalars(statement).unique())
 

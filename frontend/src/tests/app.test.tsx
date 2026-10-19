@@ -336,8 +336,8 @@ describe("T10 route guards and stale account state", () => {
     },
   );
 
-  it.each(["/", "/movies/1", "/login", "/register"])(
-    "does not check the session on public route %s",
+  it.each(["/", "/popular", "/movies/1", "/login", "/register"])(
+    "uses the appropriate session check on public route %s",
     async (path) => {
       window.history.pushState({}, "", path);
       const fetchSpy = vi
@@ -347,7 +347,11 @@ describe("T10 route guards and stale account state", () => {
       render(<App />);
 
       await waitFor(() => expect(window.location.pathname).toBe(path));
-      expect(fetchSpy).not.toHaveBeenCalledWith("/api/auth/me", expect.anything());
+      if (path === "/" || path === "/popular") {
+        await waitFor(() => expect(fetchSpy).toHaveBeenCalledWith("/api/auth/me", expect.anything()));
+      } else {
+        expect(fetchSpy).not.toHaveBeenCalledWith("/api/auth/me", expect.anything());
+      }
     },
   );
 

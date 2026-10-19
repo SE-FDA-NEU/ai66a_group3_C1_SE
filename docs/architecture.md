@@ -9,6 +9,15 @@ profile/reset UI, rating-adjusted ranking, and NLP product remain unfinished;
 implemented rating, recommendation, preference, and backdrop work is not
 labelled pending.
 
+Post-M3 amendment (2026-10-19): the three movie-list routes count and slice
+their complete eligible active-revision sets in SQLite. Home orders all active
+movies by `lower(title)`, original title and internal ID; Popular and
+recommendation fallback use finite popularity. Personal mode is selected from
+the complete saved-genre match set before an optional view genre is applied.
+The browser stores page and view genre in the list URL and sends the last
+accepted catalogue revision on subsequent requests. Shared navigation uses
+the existing AuthProvider for direct public-route session checks and sign-out.
+
 ## 1. Runtime evidence
 
 The repository contains a FastAPI backend with these implemented areas:

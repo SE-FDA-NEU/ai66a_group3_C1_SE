@@ -103,7 +103,7 @@ python -m pip install -e "./backend[dev]" --no-deps
 npm --prefix frontend ci
 
 python -m alembic -c backend/alembic.ini upgrade head
-python -m app.cli.import_tmdb_catalogue
+python -m app.cli.import_tmdb_catalogue --pages 15
 python -m app.cli.create_review_account --confirm-local-demo
 ```
 
@@ -125,7 +125,7 @@ py -3.12 -m venv .venv
 npm.cmd --prefix frontend ci
 
 .\.venv\Scripts\python.exe -m alembic -c backend/alembic.ini upgrade head
-.\.venv\Scripts\python.exe -m app.cli.import_tmdb_catalogue
+.\.venv\Scripts\python.exe -m app.cli.import_tmdb_catalogue --pages 15
 .\.venv\Scripts\python.exe -m app.cli.create_review_account --confirm-local-demo
 ```
 
@@ -134,11 +134,11 @@ some historical image paths are long. For an existing Windows clone in a
 deep directory, use `git config core.longpaths true` if Git reports spurious
 changes or cannot read those paths. No global Git setting is required.
 
-To use a larger catalogue, run `python -m app.cli.import_tmdb_catalogue --pages 13`
-instead of the default import command (roughly 260 movies; 1–15 pages allowed).
-Back up an existing database first. Reuse `--pages 13` on subsequent refreshes;
+For the standard review catalogue, run `python -m app.cli.import_tmdb_catalogue --pages 15`
+as shown above (up to 300 raw movies; 1–15 pages allowed).
+Back up an existing database first. Reuse `--pages 15` on subsequent refreshes;
 omitting it returns to a one-page active snapshot. Accounts, preferences and
-ratings are retained, and runtime list limits remain unchanged. See the
+ratings are retained, and each UI page remains limited to ten movies. See the
 [TMDb runbook](tmdb-sprint3-runbook.md) for the bounded import contract.
 
 To add backdrops to an already imported active TMDb catalogue without changing
@@ -173,7 +173,11 @@ imported_at=<UTC timestamp>
 sample_source_ids=<up to three TMDb source IDs>
 ```
 
-Before accepting the environment, verify provider/source=tmdb, source IDs,
+Before accepting the environment, verify 200-300 distinct active TMDb movies
+under `catalogue_state.active_revision_id`. Import exit code 0 alone does not
+prove this range; investigate any shortfall before claiming readiness. The
+unfiltered Home endpoint's `meta.total` must equal this active count. Verify
+provider/source=tmdb, distinct source IDs,
 fetch/import timestamps and movie/genre/finite-popularity counts using the
 [manual smoke](tmdb-sprint3-runbook.md#3-mandatory-manual-live-smoke-and-provenance).
 The catalogue must support the committed flows, including ten distinct

@@ -6,6 +6,7 @@ import {
   fireEvent,
   render,
   screen,
+  waitFor,
 } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
 import App from "../App.tsx";
@@ -72,7 +73,7 @@ it("public content stays visible while session checking waits without private re
   render(<App />);
   await screen.findByText("Public overview");
   expect(screen.getByText("Checking sign-in status...")).toBeInTheDocument();
-  expect(fetch).toHaveBeenCalledTimes(2);
+  await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
   await act(async () => {
     session.resolve(json({}, 401));
   });

@@ -10,9 +10,10 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.db.database import SessionLocal, engine
-from app.db.models import User
+from app.db.models import Genre, User
 from app.recommendations.service import build_account_recommendations
 from app.repositories.movies import (
+    count_active_movies,
     get_active_catalogue_revision,
     get_active_movie_by_id,
     list_active_movies,
@@ -27,7 +28,10 @@ from app.repositories.preferences import (
 )
 from app.repositories.profile import reset_user_personalisation
 from app.repositories.ratings import get_user_movie_rating, set_user_movie_rating
-from app.repositories.recommendations import list_popular_recommendation_movies
+from app.repositories.recommendations import (
+    count_popular_recommendation_movies,
+    list_popular_recommendation_movies,
+)
 from app.repositories.users import create_user, get_user_by_email, to_user_dto
 from app.schemas.auth import (
     AuthData,
@@ -107,7 +111,13 @@ async def authentication_required_handler(
 
 
 @app.exception_handler(RequestValidationError)
-async def validation_error_handler(_request: Request, _exc: RequestValidationError):
+async def validation_error_handler(_request: Request, exc: RequestValidationError):
+    if any(error.get("loc") == ("query", "genreId") for error in exc.errors()):
+        return _error(
+            "VALIDATION_ERROR",
+            "genreId must be an integer from 1 to 2147483647",
+            400,
+        )
     return _error("VALIDATION_ERROR", "Please correct the highlighted fields", 400)
 
 
@@ -157,6 +167,40 @@ def _error(code: str, message: str, status_code: int) -> JSONResponse:
             }
         },
     )
+
+
+def _page_meta(*, count: int, limit: int, page: int, total: int,
+               unfiltered_total: int, revision_id: str) -> dict:
+    return {
+        "count": count,
+        "limit": limit,
+        "page": page,
+        "total": total,
+        "totalPages": (total + limit - 1) // limit,
+        "unfilteredTotal": unfiltered_total,
+        "catalogueRevision": revision_id,
+    }
+
+
+def _revision_error(expected: str | None, actual: str) -> JSONResponse | None:
+    if expected is not None and expected != actual:
+        return _error("CATALOGUE_CHANGED", "Movie catalogue changed; reload page 1", 409)
+    return None
+
+
+def _begin_catalogue_snapshot(session: Session) -> None:
+    """Keep revision, count, mode and page on one SQLite read snapshot.
+
+    Python's sqlite3 legacy transaction mode does not start a database
+    transaction for SELECT. Explicit BEGIN prevents an import from changing
+    the active revision between the separate list queries. Test fixtures may
+    already have an open DBAPI transaction, which is safe to reuse.
+    """
+    connection = session.connection()
+    if connection.dialect.name == "sqlite":
+        dbapi_connection = connection.connection.driver_connection
+        if not dbapi_connection.in_transaction:
+            connection.exec_driver_sql("BEGIN")
 
 
 def _secure_cookie(request: Request) -> bool:
@@ -296,8 +340,12 @@ def logout(
 def recommendations(
     request: Request,
     limit: int = Query(default=10, ge=1, le=10),
+    page: int = Query(default=1, ge=1, le=10000),
+    genre_id: int | None = Query(default=None, alias="genreId", ge=1, le=2147483647),
+    catalogue_revision: str | None = Query(default=None, alias="catalogueRevision"),
     database_session: Session = Depends(get_db),  # noqa: B008
 ):
+    _begin_catalogue_snapshot(database_session)
     user = resolve_session(
         database_session,
         request.cookies.get(SESSION_COOKIE),
@@ -319,10 +367,17 @@ def recommendations(
             503,
         )
 
+    if error := _revision_error(catalogue_revision, revision.id):
+        return error
+    if genre_id is not None and database_session.get(Genre, genre_id) is None:
+        return _error("GENRE_NOT_FOUND", "Genre not found", 400)
+
     result = build_account_recommendations(
         database_session,
         user_id=user.id,
         limit=limit,
+        page=page,
+        genre_id=genre_id,
     )
 
     return {
@@ -332,11 +387,9 @@ def recommendations(
             "personalised": result.personalised,
             "noMatch": result.no_match,
         },
-        "meta": {
-            "count": len(result.movies),
-            "limit": limit,
-            "catalogueRevision": revision.id,
-        },
+        "meta": _page_meta(count=len(result.movies), limit=limit, page=page,
+                           total=result.total, unfiltered_total=result.unfiltered_total,
+                           revision_id=revision.id),
     }
 
 @app.get("/api/genres", response_model=GenreListResponse, status_code=200)
@@ -516,24 +569,28 @@ def put_rating(
 @app.get("/api/movies", response_model=MovieListResponse, status_code=200)
 def list_movies(
     limit: int = Query(default=10, ge=1, le=10),
+    page: int = Query(default=1, ge=1, le=10000),
+    catalogue_revision: str | None = Query(default=None, alias="catalogueRevision"),
     database_session: Session = Depends(get_db),  # noqa: B008
 ):
+    _begin_catalogue_snapshot(database_session)
     revision = get_active_catalogue_revision(database_session)
     if revision is None:
         return _error(
             "CATALOGUE_UNAVAILABLE", "Movie catalogue is unavailable", 503
         )
 
-    movies = list_active_movies(database_session, limit=limit)
+    if error := _revision_error(catalogue_revision, revision.id):
+        return error
+
+    total = count_active_movies(database_session)
+    movies = list_active_movies(database_session, limit=limit, page=page)
     return {
         "data": {
             "movies": [to_movie_summary_dto(movie).model_dump() for movie in movies]
         },
-        "meta": {
-            "count": len(movies),
-            "limit": limit,
-            "catalogueRevision": revision.id,
-        },
+        "meta": _page_meta(count=len(movies), limit=limit, page=page,
+                           total=total, unfiltered_total=total, revision_id=revision.id),
     }
 
 @app.get(
@@ -543,8 +600,11 @@ def list_movies(
 )
 def list_popular_movies(
     limit: int = Query(default=10, ge=1, le=10),
+    page: int = Query(default=1, ge=1, le=10000),
+    catalogue_revision: str | None = Query(default=None, alias="catalogueRevision"),
     database_session: Session = Depends(get_db),  # noqa: B008
 ):
+    _begin_catalogue_snapshot(database_session)
     revision = get_active_catalogue_revision(database_session)
 
     if revision is None:
@@ -554,9 +614,14 @@ def list_popular_movies(
             503,
         )
 
+    if error := _revision_error(catalogue_revision, revision.id):
+        return error
+
+    total = count_popular_recommendation_movies(database_session)
     movies = list_popular_recommendation_movies(
         database_session,
         limit=limit,
+        page=page,
     )
 
     return {
@@ -566,11 +631,8 @@ def list_popular_movies(
                 for movie in movies
             ]
         },
-        "meta": {
-            "count": len(movies),
-            "limit": limit,
-            "catalogueRevision": revision.id,
-        },
+        "meta": _page_meta(count=len(movies), limit=limit, page=page,
+                           total=total, unfiltered_total=total, revision_id=revision.id),
     }
 
 @app.get("/api/movies/{movie_id}", response_model=MovieDetailResponse, status_code=200)

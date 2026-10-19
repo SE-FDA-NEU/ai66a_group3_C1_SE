@@ -41,6 +41,16 @@ function movieListResponse(movies = popularMovies) {
   };
 }
 
+function mockGuestMovies(popular: () => Promise<Response>, home?: () => Promise<Response>) {
+  return vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+    const url = String(input);
+    if (url === "/api/auth/me") return jsonResponse({ error: { code: "AUTHENTICATION_REQUIRED" } }, 401);
+    if (url.startsWith("/api/movies/popular?")) return popular();
+    if (url.startsWith("/api/movies?")) return home?.() ?? jsonResponse(movieListResponse([]));
+    return Promise.reject(new Error(`Unexpected request: ${url}`));
+  });
+}
+
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
@@ -51,19 +61,16 @@ describe("S3-T20 public popular-movie page", () => {
   it("opens for a guest, shows loading and renders ten movies in API order", async () => {
     window.history.pushState({}, "", "/popular");
     let resolveRequest: (response: Response) => void = () => undefined;
-    const fetchMock = vi.spyOn(globalThis, "fetch").mockReturnValue(
-      new Promise((resolve) => {
+    const fetchMock = mockGuestMovies(() => new Promise((resolve) => {
         resolveRequest = resolve;
-      }),
-    );
+      }));
 
     render(<App />);
 
-    expect(screen.getByRole("status")).toHaveTextContent("Loading popular movies...");
+    expect(screen.getByText("Loading popular movies...")).toBeInTheDocument();
     expect(window.location.pathname).toBe("/popular");
-    expect(fetchMock).toHaveBeenCalledOnce();
-    expect(fetchMock).toHaveBeenCalledWith("/api/movies/popular?limit=10");
-    expect(fetchMock).not.toHaveBeenCalledWith("/api/auth/me", expect.anything());
+    expect(fetchMock).toHaveBeenCalledWith("/api/movies/popular?limit=10", expect.anything());
+    expect(fetchMock).toHaveBeenCalledWith("/api/auth/me", expect.anything());
 
     resolveRequest(
       new Response(JSON.stringify(movieListResponse()), {
@@ -81,10 +88,9 @@ describe("S3-T20 public popular-movie page", () => {
   });
 
   it("is reachable from the public catalogue navigation", async () => {
-    const fetchMock = vi
-      .spyOn(globalThis, "fetch")
-      .mockImplementationOnce(() => jsonResponse(movieListResponse([])))
-      .mockImplementationOnce(() => jsonResponse(movieListResponse(popularMovies.slice(0, 1))));
+    const fetchMock = mockGuestMovies(
+      () => jsonResponse(movieListResponse(popularMovies.slice(0, 1))),
+      () => jsonResponse(movieListResponse([])));
 
     render(<App />);
 
@@ -92,14 +98,12 @@ describe("S3-T20 public popular-movie page", () => {
 
     expect(window.location.pathname).toBe("/popular");
     expect(await screen.findByText("Popular Movie 1")).toBeInTheDocument();
-    expect(fetchMock).toHaveBeenNthCalledWith(2, "/api/movies/popular?limit=10");
+    expect(fetchMock).toHaveBeenCalledWith("/api/movies/popular?limit=10", expect.anything());
   });
 
   it("shows the exact empty-state message", async () => {
     window.history.pushState({}, "", "/popular");
-    vi.spyOn(globalThis, "fetch").mockImplementationOnce(() =>
-      jsonResponse(movieListResponse([])),
-    );
+    mockGuestMovies(() => jsonResponse(movieListResponse([])));
 
     render(<App />);
 
@@ -115,10 +119,10 @@ describe("S3-T20 public popular-movie page", () => {
 
   it("retries after an unavailable response", async () => {
     window.history.pushState({}, "", "/popular");
-    const fetchMock = vi
-      .spyOn(globalThis, "fetch")
-      .mockImplementationOnce(() =>
-        jsonResponse(
+    let attempt = 0;
+    const fetchMock = mockGuestMovies(() => {
+      attempt += 1;
+      return attempt === 1 ? jsonResponse(
           {
             error: {
               code: "CATALOGUE_UNAVAILABLE",
@@ -126,11 +130,8 @@ describe("S3-T20 public popular-movie page", () => {
             },
           },
           503,
-        ),
-      )
-      .mockImplementationOnce(() =>
-        jsonResponse(movieListResponse(popularMovies.slice(0, 1))),
-      );
+        ) : jsonResponse(movieListResponse(popularMovies.slice(0, 1)));
+    });
 
     render(<App />);
 
@@ -140,18 +141,18 @@ describe("S3-T20 public popular-movie page", () => {
     fireEvent.click(screen.getByRole("button", { name: "Retry" }));
 
     expect(await screen.findByText("Popular Movie 1")).toBeInTheDocument();
-    expect(fetchMock).toHaveBeenCalledTimes(2);
-    expect(fetchMock).toHaveBeenNthCalledWith(2, "/api/movies/popular?limit=10");
+    expect(attempt).toBe(2);
+    expect(fetchMock).toHaveBeenCalledWith("/api/movies/popular?limit=10", expect.anything());
   });
 
   it("opens the selected movie detail using its internal id", async () => {
     window.history.pushState({}, "", "/popular");
     const selectedMovie = popularMovies[2];
-    const fetchMock = vi
-      .spyOn(globalThis, "fetch")
-      .mockImplementationOnce(() => jsonResponse(movieListResponse([selectedMovie])))
-      .mockImplementationOnce(() =>
-        jsonResponse({
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+      const url = String(input);
+      if (url === "/api/auth/me") return jsonResponse({ error: { code: "AUTHENTICATION_REQUIRED" } }, 401);
+      if (url.startsWith("/api/movies/popular?")) return jsonResponse(movieListResponse([selectedMovie]));
+      if (url === `/api/movies/${selectedMovie.id}`) return jsonResponse({
           data: {
             movie: {
               ...selectedMovie,
@@ -161,8 +162,9 @@ describe("S3-T20 public popular-movie page", () => {
             },
           },
           meta: { catalogueRevision: "revision-test" },
-        }),
-      );
+        });
+      return Promise.reject(new Error(`Unexpected request: ${url}`));
+    });
 
     render(<App />);
 
@@ -174,7 +176,7 @@ describe("S3-T20 public popular-movie page", () => {
 
     expect(window.location.pathname).toBe(`/movies/${selectedMovie.id}`);
     expect(await screen.findByText("Popular movie detail.")).toBeInTheDocument();
-    expect(fetchMock).toHaveBeenNthCalledWith(2, `/api/movies/${selectedMovie.id}`);
+    expect(fetchMock).toHaveBeenCalledWith(`/api/movies/${selectedMovie.id}`);
   });
 
   it("does not overwrite preferences when a signed-in viewer opens the page", async () => {

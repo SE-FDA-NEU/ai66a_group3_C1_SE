@@ -82,6 +82,7 @@ function RecommendationAccountHarness({
     signOut: async () => {},
     handleUnauthorized: onUnauthorized,
     recommendationVersion: 0,
+    recommendationScope: "test-scope",
     invalidateRecommendations: vi.fn(),
   };
 
@@ -92,7 +93,7 @@ function RecommendationAccountHarness({
   );
 }
 
-function renderRecommendations(recommendations: () => Promise<Response>) {
+function renderRecommendations(recommendations: (url: string) => Promise<Response>) {
   window.history.pushState({}, "", "/recommendations");
   const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
     const url = String(input);
@@ -104,7 +105,7 @@ function renderRecommendations(recommendations: () => Promise<Response>) {
       return jsonResponse({ data: { genres: [action, drama] } });
     }
     if (url.startsWith("/api/me/recommendations")) {
-      return recommendations();
+      return recommendations(url);
     }
     return Promise.reject(new Error(`Unexpected request: ${url}`));
   });
@@ -312,26 +313,24 @@ describe("T11 no-match, retry, and request-race states", () => {
     expect(screen.queryByText(/Matches your genres/)).not.toBeInTheDocument();
   });
 
-  it("filters and clears a non-empty no-match alternatives snapshot", async () => {
-    renderRecommendations(() =>
-      jsonResponse(
-        popularBody(
-          [
-            { ...movie("movie-a", "Action alternative", 90, []), genres: [action] },
-            { ...movie("movie-b", "Drama alternative", 80, []), genres: [drama] },
-          ],
-          true,
-        ),
-      ),
-    );
+  it("filters complete popular alternatives through the API and clears the view", async () => {
+    const actionMovie = { ...movie("movie-a", "Action alternative", 90, []), genres: [action] };
+    const dramaMovie = { ...movie("movie-b", "Drama alternative", 80, []), genres: [drama] };
+    const fetchMock = renderRecommendations((url) => {
+      const filtered = url.includes("genreId=28");
+      return jsonResponse({ ...popularBody(filtered ? [actionMovie] : [actionMovie, dramaMovie], true),
+        meta: { count: filtered ? 1 : 2, limit: 10, page: 1,
+          total: filtered ? 1 : 2, totalPages: 1, unfilteredTotal: 2,
+          catalogueRevision: "revision" } });
+    });
 
     const filter = await screen.findByRole("combobox", { name: "Filter by genre" });
     await waitFor(() => expect(filter).toBeEnabled());
     fireEvent.change(filter, { target: { value: String(action.id) } });
 
-    expect(screen.getByText("Action alternative")).toBeInTheDocument();
+    expect(await screen.findByText("Action alternative")).toBeInTheDocument();
     expect(screen.queryByText("Drama alternative")).not.toBeInTheDocument();
-    expect(screen.getByText("Showing 1 of 2 movies")).toBeInTheDocument();
+    expect(screen.getByText("Showing 1-1 of 1 matches (2 recommendations before filtering)")).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { name: "No movies matched your favourite genres." }),
     ).toBeInTheDocument();
@@ -339,43 +338,38 @@ describe("T11 no-match, retry, and request-race states", () => {
     expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Clear filter" }));
-    expect(screen.getByText("Action alternative")).toBeInTheDocument();
-    expect(screen.getByText("Drama alternative")).toBeInTheDocument();
-    expect(screen.getByText("Showing 2 of 2 movies")).toBeInTheDocument();
+    expect(await screen.findByText("Drama alternative")).toBeInTheDocument();
+    expect(screen.getByText("Showing 1-2 of 2 movies")).toBeInTheDocument();
+    expect(fetchMock.mock.calls.filter(([url]) => String(url).startsWith("/api/me/recommendations"))).toHaveLength(3);
   });
 
-  it("resets a no-match filter when Retry accepts a new snapshot", async () => {
+  it("retries the same filtered query and keeps its view genre", async () => {
     let attempt = 0;
-    renderRecommendations(() => {
+    renderRecommendations((url) => {
       attempt += 1;
-      return jsonResponse(
-        popularBody(
-          attempt === 1
-            ? [
-                { ...movie("old-action", "Old Action", 90, []), genres: [action] },
-                { ...movie("old-drama", "Old Drama", 80, []), genres: [drama] },
-              ]
-            : [
-                { ...movie("new-action", "New Action", 95, []), genres: [action] },
-                { ...movie("new-drama", "New Drama", 85, []), genres: [drama] },
-              ],
-          true,
-        ),
-      );
+      const filtered = url.includes("genreId=28");
+      const oldAction = { ...movie("old-action", "Old Action", 90, []), genres: [action] };
+      const oldDrama = { ...movie("old-drama", "Old Drama", 80, []), genres: [drama] };
+      const newAction = { ...movie("new-action", "New Action", 95, []), genres: [action] };
+      return jsonResponse({ ...popularBody(filtered ? [attempt > 2 ? newAction : oldAction] : [oldAction, oldDrama], true),
+        meta: { count: filtered ? 1 : 2, limit: 10, page: 1, total: filtered ? 1 : 2,
+          totalPages: 1, unfilteredTotal: 2, catalogueRevision: "revision" } });
     });
 
     const filter = await screen.findByRole("combobox", { name: "Filter by genre" });
     await waitFor(() => expect(filter).toBeEnabled());
     fireEvent.change(filter, { target: { value: String(action.id) } });
+    await waitFor(() => expect(screen.getByRole("combobox", { name: "Filter by genre" })).toHaveValue("28"));
+    expect(await screen.findByText("Old Action")).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText("Showing 1-1 of 1 matches (2 recommendations before filtering)")).toBeInTheDocument());
     expect(screen.queryByText("Old Drama")).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Retry" }));
 
     expect(await screen.findByText("New Action")).toBeInTheDocument();
-    expect(screen.getByText("New Drama")).toBeInTheDocument();
     expect(screen.queryByText("Old Action")).not.toBeInTheDocument();
-    expect(screen.getByRole("combobox", { name: "Filter by genre" })).toHaveValue("");
-    expect(screen.getByText("Showing 2 of 2 movies")).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole("combobox", { name: "Filter by genre" })).toHaveValue("28"));
+    expect(screen.getByText("Showing 1-1 of 1 matches (2 recommendations before filtering)")).toBeInTheDocument();
   });
 
   it("keeps no-match guidance and actions when no popular alternative exists", async () => {
@@ -538,6 +532,7 @@ describe("T11 no-match, retry, and request-race states", () => {
       signOut: async () => {},
       handleUnauthorized: vi.fn(),
       recommendationVersion: 0,
+      recommendationScope: "test-scope",
       invalidateRecommendations: vi.fn(),
     };
 

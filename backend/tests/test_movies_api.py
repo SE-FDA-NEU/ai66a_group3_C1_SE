@@ -84,6 +84,10 @@ def test_list_movies_defaults_to_ten_deterministic_items(
     assert body["meta"] == {
         "count": 10,
         "limit": 10,
+        "page": 1,
+        "total": 12,
+        "totalPages": 2,
+        "unfilteredTotal": 12,
         "catalogueRevision": body["meta"]["catalogueRevision"],
     }
     assert body["data"]["movies"][0]["genres"] == [{"id": 28, "name": "Action"}]

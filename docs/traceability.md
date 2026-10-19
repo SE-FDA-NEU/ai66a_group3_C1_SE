@@ -23,14 +23,14 @@ are the original implementation crosswalk; Open / Backlog is not a current test 
 
 | Route | Purpose | Access | Priority | Feature | Story issue(s) | Relevant rules | PR | Status |
 |---|---|---|---|---|---|---|---|---|
-| / | Start public discovery; reach account access, popular browsing, search, and the explanation. | G | P0 | F1, F4, F9, F10, F11, F13, F14 | #17 S01, #20 S04 | BR1, BR5 | — | Open / Backlog |
+| / | Browse every active movie alphabetically across pages; reach account access, popular browsing, search, and the explanation. | G | P0 | F1, F4, F9, F10, F11, F13, F14 | #17 S01, #20 S04 | BR1, BR20, BR21 | — | Post-M3 amendment in progress |
 | /register | Create a new account with a unique email and secure password. | G | P0 | F13 | #44 S12 | BR16, BR17 | — | Open / Backlog |
 | /login | Sign in to an existing account; authenticated navigation provides sign-out. | G | P0 | F14 | #45 S13 | BR18, BR19 | [Five-AC browser/API/DB evidence](evidence/s3-t23-authentication/README.md) | partly works — local AC verified; final SHA, independent review/merge and DoD pending |
 | /preferences | Select, save, and revisit 1 to 5 favourite genres for the current account. | U | P0 | F1 | #17 S01 | BR1, BR8, BR18 | — | Open / Backlog |
-| /recommendations | Show personal movies, no-match alternatives, fallback, rating-informed ranking, and the current-list genre filter. | U | P0 and P1 | F2, F4, F6, F7 | #18 S02, #20 S04, #22 S05b, #23 S06 | BR2, BR3, BR4, BR5, BR8, BR9, BR10, BR18 | — | Open / Backlog |
+| /recommendations | Show paginated personal movies, no-match alternatives, fallback, future rating-informed ranking, and a whole-set view genre filter. | U | P0 and P1 | F2, F4, F6, F7 | #18 S02, #20 S04, #22 S05b, #23 S06 | BR2, BR3, BR4, BR5, BR8, BR9, BR10, BR18, BR21 | — | Post-M3 amendment in progress |
 | /movies/:movieId | View public movie details, rate when signed in, and find text-ranked similar movies. | G; rating U | P0 details; P1 additions | F3, F5, F6, F8 | #19 S03, #21 S05a, #22 S05b, #24 S07 | BR6, BR7, BR8, BR9, BR11, BR15, BR18 | — | Open / Backlog |
 | /search | Search catalogue title or description text and open a selected result. | G | P1 | F9 | #30 S08 | BR12, BR15 | — | Open / Backlog |
-| /popular | Browse a ranked popular-movie list independently of personal recommendations. | G | P1 | F10 | #31 S09 | BR5 | — | Open / Backlog |
+| /popular | Browse every finite-popularity movie in global rank order across pages. | G | P1 | F10 | #31 S09 | BR5, BR21 | — | Post-M3 amendment in progress |
 | /about-recommendations | Explain the 3-step account, genre, and optional-rating model. | G | P2 | F11 | #32 S10 | BR13 | — | Open / Backlog |
 | /profile | Confirm and reset the current account's saved genres and ratings. | U | P2 | F12 | #33 S11 | BR8, BR14, BR18 | — | Open / Backlog |
 
@@ -67,7 +67,7 @@ not claimed to be direct survey findings unless persona evidence says so.
 |---|---|---|---|---|---|
 | Frequent Explorer | Restore favourite genres after a later visit | F1, F14 | BR1, BR8, BR18, BR19 | /login, /preferences | #17, #45 |
 | Frequent Explorer | Receive a small relevant list with a reason | F2 | BR2, BR3, BR4 | /recommendations | #18 |
-| Frequent Explorer | Filter the current list by genre | F7 | BR10 | /recommendations | #23 |
+| Frequent Explorer | Filter the complete recommendation result by genre | F7 | BR10, BR21 | /recommendations | #23 |
 | Frequent Explorer | Open details and explore text-ranked similar movies | F3, F8 | BR6, BR11, BR15 | /movies/:movieId | #19, #24 |
 | Frequent Explorer | Optionally rate a movie to affect later recommendations | F5, F6 | BR7, BR8, BR9 | /movies/:movieId, /recommendations | #21, #22 |
 | Occasional Undecided Viewer | Browse popular movies before providing data | F10 | BR5 | /popular | #31 |

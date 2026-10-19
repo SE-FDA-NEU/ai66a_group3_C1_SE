@@ -58,6 +58,7 @@ function mount(state: AuthState = A, movieId = "movie-a", strict = false) {
       signOut: vi.fn(),
       handleUnauthorized: unauthorized,
       recommendationVersion: 0,
+      recommendationScope: "test-scope",
       invalidateRecommendations: vi.fn(),
     };
     const content = (
