@@ -7,6 +7,7 @@ import App from "../App.tsx";
 import { AuthProvider } from "../auth/AuthContext.tsx";
 import RequireAuth from "../auth/RequireAuth.tsx";
 import { useAuth } from "../auth/authState.ts";
+import MovieDetailPage from "../pages/MovieDetailPage.tsx";
 import RecommendationsPage from "../pages/RecommendationsPage.tsx";
 
 function json(body: unknown, status = 200) {
@@ -34,6 +35,7 @@ function Controls() {
   return <>
     <button type="button" onClick={() => void auth.signIn("b@example.com", "movie123")}>Switch account</button>
     <button type="button" onClick={() => navigate("/preferences")}>Open preferences</button>
+    <button type="button" onClick={() => navigate("/recommendations?source=t34#results")}>Add source context</button>
     <button type="button" onClick={() => {
       auth.invalidateRecommendations(); navigate("/recommendations");
     }}>Save new preferences</button>
@@ -45,6 +47,7 @@ function renderRecommendationsWithControls() {
   return render(<BrowserRouter><AuthProvider><Controls /><Routes>
     <Route path="/recommendations" element={<RequireAuth><RecommendationsPage /></RequireAuth>} />
     <Route path="/preferences" element={<p>Preferences screen</p>} />
+    <Route path="/movies/:movieId" element={<MovieDetailPage />} />
   </Routes></AuthProvider></BrowserRouter>);
 }
 
@@ -119,6 +122,37 @@ it("browser Back cannot restore an old filter after preferences change", async (
   await waitFor(() => expect(window.location.search).toBe("?page=1"));
   expect(requests.slice(afterSave).every(url => !url.includes("genreId=28") &&
     !url.includes("page=2"))).toBe(true);
+});
+
+it("keeps a detail navigation when only the recommendation source and hash change", async () => {
+  const requests: string[] = [];
+  vi.spyOn(globalThis, "fetch").mockImplementation(input => {
+    const url = String(input);
+    if (url === "/api/auth/me") return json({ data: { user: { id: "a", email: "a@example.com" } } });
+    if (url === "/api/genres") return json({ data: { genres: [action] } });
+    if (url.startsWith("/api/me/recommendations?")) {
+      requests.push(url);
+      return json(recommendations([movie("Source Movie", "source-1")], 1, 1));
+    }
+    if (url === "/api/movies/source-1") return json({ data: { movie: {
+      ...movie("Source Movie", "source-1"), overview: "Source detail",
+      voteAverage: null, voteCount: null, backdropUrl: null } } });
+    if (url === "/api/me/ratings/source-1")
+      return json({ data: { movieId: "source-1", rating: null } });
+    throw new Error(`Unexpected request ${url}`);
+  });
+  window.history.pushState({}, "", "/recommendations");
+  renderRecommendationsWithControls();
+  expect(await screen.findByText("Source Movie")).toBeInTheDocument();
+  await waitFor(() => expect(window.history.state.usr?.listViewContext?.catalogueRevision)
+    .toBe("rev-a"));
+  const beforeSource = requests.length;
+  fireEvent.click(screen.getByRole("button", { name: "Add source context" }));
+  await waitFor(() => expect(window.location.search).toBe("?source=t34"));
+  fireEvent.click(screen.getByRole("link", { name: "View details for Source Movie" }));
+  expect(await screen.findByText("Source detail")).toBeInTheDocument();
+  await waitFor(() => expect(window.location.pathname).toBe("/movies/source-1"));
+  expect(requests).toHaveLength(beforeSource);
 });
 
 it("returns from details with the old revision and resets a changed catalogue", async () => {

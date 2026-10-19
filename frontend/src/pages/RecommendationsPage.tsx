@@ -115,11 +115,12 @@ export default function RecommendationsPage() {
         code: error instanceof RecommendationApiError ? error.code : undefined });
     });
     return () => controller.abort();
-    // A successful request stamps storedContext; that stamp must not repeat the request.
+    // Only page, genre, account, revision conflict or retry changes the result.
+    // Source/hash navigation and a successful context stamp must not repeat the request.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, recommendationScope, recommendationVersion, staleContext,
     handleUnauthorized, page, genreId, retry, key, navigate,
-    location.pathname, location.search, location.hash, context]);
+    location.pathname, context]);
 
   function changeGenre(next?: number) {
     const params = new URLSearchParams(location.search);

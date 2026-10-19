@@ -64,10 +64,10 @@ export default function PublicMovieList({ kind }: { kind: "catalogue" | "popular
       setLoad({ key, status: "error", message: error instanceof Error ? error.message : "Something went wrong" });
     });
     return () => controller.abort();
-    // A successful request stamps location.state; that stamp must not repeat the request.
+    // Only the list kind, page or retry changes the result. A successful context
+    // stamp and unrelated query/hash navigation must not repeat the request.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [kind, page, retry, key, navigate, location.pathname, location.search,
-    location.hash, route]);
+  }, [kind, page, retry, key, navigate, location.pathname, route]);
 
   const popular = kind === "popular";
   return <main className="page catalogue-page">
