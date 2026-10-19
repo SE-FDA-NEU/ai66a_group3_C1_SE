@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getRecommendationPage, RecommendationApiError,
   type RecommendationResult } from "../api/recommendations.ts";
@@ -38,11 +38,14 @@ export default function RecommendationsPage() {
   const [retry, setRetry] = useState(0);
   const [load, setLoad] = useState<Load | null>(null);
   const storedContext = readListViewState(location.state, "/recommendations");
-  const staleContext = storedContext !== null &&
-    (storedContext.accountId !== userId ||
-      storedContext.recommendationScope !== recommendationScope);
+  const [lastContext, setLastContext] = useState<ListViewContext | null>(storedContext);
+  const activeContext = storedContext ?? lastContext;
+  const hasStoredContext = activeContext !== null;
+  const staleContext = activeContext !== null &&
+    (activeContext.accountId !== userId ||
+      activeContext.recommendationScope !== recommendationScope);
   const revision = useRef<string | undefined>(
-    staleContext ? undefined : storedContext?.catalogueRevision);
+    staleContext ? undefined : activeContext?.catalogueRevision);
   const key = `${userId}:${recommendationScope}:${recommendationVersion}:${page}:${genreId ?? ""}:${retry}`;
   const current = load?.key === key ? load : null;
 
@@ -64,7 +67,7 @@ export default function RecommendationsPage() {
   }, [location.pathname, location.search, navigate, page, rawGenre, genreId,
     staleContext, context]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!userId) return;
     if (staleContext) {
       revision.current = undefined;
@@ -73,20 +76,24 @@ export default function RecommendationsPage() {
       return;
     }
     if (!storedContext) {
+      const stampedContext = activeContext ?? context(revision.current);
+      if (!activeContext) setLastContext(stampedContext);
       navigate({ pathname: location.pathname, search: location.search,
-        hash: location.hash }, { replace: true, state: listViewState(context(revision.current)) });
+        hash: location.hash }, { replace: true,
+          state: listViewState(stampedContext) });
     }
-  }, [userId, staleContext, storedContext, context, navigate,
+  }, [userId, staleContext, storedContext, activeContext, context, navigate,
     location.pathname, location.search, location.hash]);
 
   useEffect(() => {
-    if (!userId || staleContext) return;
+    if (!userId || staleContext || !hasStoredContext) return;
     const controller = new AbortController();
-    const requestedRevision = storedContext?.catalogueRevision ?? revision.current;
+    const requestedRevision = activeContext?.catalogueRevision ?? revision.current;
     getRecommendationPage(page, genreId, requestedRevision, controller.signal).then(body => {
       if (controller.signal.aborted) return;
       revision.current = body.meta.catalogueRevision;
       const acceptedContext = context(body.meta.catalogueRevision);
+      setLastContext(acceptedContext);
       if (page > body.meta.totalPages && page !== 1) {
         navigate({ pathname: location.pathname, search: pageSearch(location.search,
           Math.max(1, body.meta.totalPages)) },
@@ -118,7 +125,7 @@ export default function RecommendationsPage() {
     // Only page, genre, account, revision conflict or retry changes the result.
     // Source/hash navigation and a successful context stamp must not repeat the request.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId, recommendationScope, recommendationVersion, staleContext,
+  }, [userId, recommendationScope, recommendationVersion, staleContext, hasStoredContext,
     handleUnauthorized, page, genreId, retry, key, navigate,
     location.pathname, context]);
 

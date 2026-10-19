@@ -462,6 +462,7 @@ describe("S3-T13 cold-start to personalised transition", () => {
         name: "",
         }),
     ).toHaveTextContent("Loading recommendations...");
+    await waitFor(() => expect(recommendationCalls).toBe(1));
 
     // Simulate committed preference save invalidating the old snapshot.
     view.rerender(
@@ -478,6 +479,7 @@ describe("S3-T13 cold-start to personalised transition", () => {
         </MemoryRouter>,
     );
 
+    await waitFor(() => expect(recommendationCalls).toBe(2));
     expect(
         await screen.findByRole("heading", {
         name: "Recommended for you",
