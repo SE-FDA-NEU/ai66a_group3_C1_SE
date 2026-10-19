@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { listMoviePage, MovieApiError, type MovieSummary, type PageMeta } from "../api/movies.ts";
 import { currentReturnPath } from "../navigation/movieDetailReturn.ts";
@@ -16,6 +16,7 @@ type Load = { key: string } & (
 
 export default function PublicMovieList({ kind }: { kind: "catalogue" | "popular" }) {
   const location = useLocation();
+  const latestLocation = useRef(location);
   const navigate = useNavigate();
   const page = readPage(location.search);
   const [retry, setRetry] = useState(0);
@@ -25,6 +26,8 @@ export default function PublicMovieList({ kind }: { kind: "catalogue" | "popular
     readListViewState(location.state, route)?.catalogueRevision);
   const key = `${kind}:${page}:${retry}`;
   const current = load?.key === key ? load : null;
+
+  useLayoutEffect(() => { latestLocation.current = location; }, [location]);
 
   useEffect(() => {
     const raw = new URLSearchParams(location.search).get("page");
@@ -39,24 +42,29 @@ export default function PublicMovieList({ kind }: { kind: "catalogue" | "popular
       revision.current;
     listMoviePage(kind, page, requestedRevision, controller.signal).then(body => {
       if (controller.signal.aborted) return;
+      const currentLocation = latestLocation.current;
+      if (currentLocation.pathname !== route || readPage(currentLocation.search) !== page) return;
       revision.current = body.meta.catalogueRevision;
       const context: ListViewContext = { route, catalogueRevision: body.meta.catalogueRevision };
       if (page > body.meta.totalPages && page !== 1) {
-        navigate({ pathname: location.pathname, search: pageSearch(location.search,
-          Math.max(1, body.meta.totalPages)) },
+        navigate({ pathname: currentLocation.pathname, search: pageSearch(currentLocation.search,
+          Math.max(1, body.meta.totalPages)), hash: currentLocation.hash },
           { replace: true, state: listViewState(context) });
         return;
       }
-      setLoad({ key, status: "ready", movies: body.data.movies, meta: body.meta });
-      if (!sameListViewContext(readListViewState(location.state, route), context)) {
-        navigate({ pathname: location.pathname, search: location.search,
-          hash: location.hash }, { replace: true, state: listViewState(context) });
+      if (!sameListViewContext(readListViewState(currentLocation.state, route), context)) {
+        navigate({ pathname: currentLocation.pathname, search: currentLocation.search,
+          hash: currentLocation.hash }, { replace: true, state: listViewState(context) });
       }
+      setLoad({ key, status: "ready", movies: body.data.movies, meta: body.meta });
     }).catch(error => {
       if (controller.signal.aborted) return;
+      const currentLocation = latestLocation.current;
+      if (currentLocation.pathname !== route || readPage(currentLocation.search) !== page) return;
       if (error instanceof MovieApiError && error.code === "CATALOGUE_CHANGED") {
         revision.current = undefined;
-        navigate({ pathname: location.pathname, search: pageSearch(location.search, 1) },
+        navigate({ pathname: currentLocation.pathname,
+          search: pageSearch(currentLocation.search, 1), hash: currentLocation.hash },
           { replace: true });
         if (page === 1) setRetry(value => value + 1);
         return;

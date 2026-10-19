@@ -1,12 +1,13 @@
 // @vitest-environment jsdom
 import "@testing-library/jest-dom/vitest";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { BrowserRouter, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { afterEach, expect, it, vi } from "vitest";
 import App from "../App.tsx";
 import { AuthProvider } from "../auth/AuthContext.tsx";
 import RequireAuth from "../auth/RequireAuth.tsx";
 import { useAuth } from "../auth/authState.ts";
+import PublicMovieList from "../components/PublicMovieList.tsx";
 import MovieDetailPage from "../pages/MovieDetailPage.tsx";
 import RecommendationsPage from "../pages/RecommendationsPage.tsx";
 
@@ -49,6 +50,19 @@ function renderRecommendationsWithControls() {
     <Route path="/preferences" element={<p>Preferences screen</p>} />
     <Route path="/movies/:movieId" element={<MovieDetailPage />} />
   </Routes></AuthProvider></BrowserRouter>);
+}
+
+function AddSourceContext() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  return <button type="button" onClick={() => navigate({ pathname: location.pathname,
+    search: "?page=2&source=shared", hash: "#results" })}>Share current page</button>;
+}
+
+function delayedResponse() {
+  let resolve!: (response: Response) => void;
+  const pending = new Promise<Response>(done => { resolve = done; });
+  return { pending, resolve };
 }
 
 afterEach(() => {
@@ -153,6 +167,70 @@ it("keeps a detail navigation when only the recommendation source and hash chang
   expect(await screen.findByText("Source detail")).toBeInTheDocument();
   await waitFor(() => expect(window.location.pathname).toBe("/movies/source-1"));
   expect(requests).toHaveLength(beforeSource);
+});
+
+it.each([
+  ["/", "catalogue"], ["/popular", "popular"],
+] as const)("preserves the new URL when a pending %s response stamps revision", async (route, kind) => {
+  const delayed = delayedResponse();
+  const requests: string[] = [];
+  vi.spyOn(globalThis, "fetch").mockImplementation(input => {
+    const url = String(input);
+    if (url === "/api/auth/me") return json({ error: { code: "AUTHENTICATION_REQUIRED" } }, 401);
+    if (url.startsWith(kind === "popular" ? "/api/movies/popular?" : "/api/movies?")) {
+      requests.push(url);
+      return delayed.pending;
+    }
+    throw new Error(`Unexpected request ${url}`);
+  });
+  window.history.pushState({}, "", `${route}?page=2`);
+  render(<BrowserRouter><AuthProvider><AddSourceContext /><Routes>
+    <Route path={route} element={<PublicMovieList kind={kind} />} />
+  </Routes></AuthProvider></BrowserRouter>);
+  await waitFor(() => expect(requests).toHaveLength(1));
+  fireEvent.click(screen.getByRole("button", { name: "Share current page" }));
+  await waitFor(() => expect(window.location.href).toContain("?page=2&source=shared#results"));
+  await act(async () => delayed.resolve(new Response(JSON.stringify({
+    data: { movies: [movie("Delayed public movie", "delayed-public")] },
+    meta: { count: 1, limit: 10, page: 2, total: 12, totalPages: 2,
+      unfilteredTotal: 12, catalogueRevision: "rev-delayed" },
+  }), { status: 200, headers: { "Content-Type": "application/json" } })));
+  expect(await screen.findByText("Delayed public movie")).toBeInTheDocument();
+  expect(window.location.pathname).toBe(route);
+  expect(window.location.search).toBe("?page=2&source=shared");
+  expect(window.location.hash).toBe("#results");
+  expect(window.history.state.usr?.listViewContext?.catalogueRevision).toBe("rev-delayed");
+  expect(requests).toHaveLength(1);
+});
+
+it("preserves the new URL when a pending recommendation response stamps revision", async () => {
+  const delayed = delayedResponse();
+  const requests: string[] = [];
+  vi.spyOn(globalThis, "fetch").mockImplementation(input => {
+    const url = String(input);
+    if (url === "/api/auth/me") return json({ data: { user: { id: "a", email: "a@example.com" } } });
+    if (url === "/api/genres") return json({ data: { genres: [action] } });
+    if (url.startsWith("/api/me/recommendations?")) {
+      requests.push(url);
+      return delayed.pending;
+    }
+    throw new Error(`Unexpected request ${url}`);
+  });
+  window.history.pushState({}, "", "/recommendations?page=2");
+  render(<BrowserRouter><AuthProvider><AddSourceContext /><Routes>
+    <Route path="/recommendations" element={<RequireAuth><RecommendationsPage /></RequireAuth>} />
+  </Routes></AuthProvider></BrowserRouter>);
+  await waitFor(() => expect(requests).toHaveLength(1));
+  fireEvent.click(screen.getByRole("button", { name: "Share current page" }));
+  await waitFor(() => expect(window.location.href).toContain("?page=2&source=shared#results"));
+  await act(async () => delayed.resolve(new Response(JSON.stringify(
+    recommendations([movie("Delayed recommendation", "delayed-rec")], 2, 12, "rev-delayed")),
+  { status: 200, headers: { "Content-Type": "application/json" } })));
+  expect(await screen.findByText("Delayed recommendation")).toBeInTheDocument();
+  expect(window.location.search).toBe("?page=2&source=shared");
+  expect(window.location.hash).toBe("#results");
+  expect(window.history.state.usr?.listViewContext?.catalogueRevision).toBe("rev-delayed");
+  expect(requests).toHaveLength(1);
 });
 
 it("returns from details with the old revision and resets a changed catalogue", async () => {

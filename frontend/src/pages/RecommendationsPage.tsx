@@ -28,6 +28,7 @@ type Load = { key: string } & (
 
 export default function RecommendationsPage() {
   const location = useLocation();
+  const latestLocation = useRef(location);
   const navigate = useNavigate();
   const auth = useAuth();
   const { handleUnauthorized, recommendationScope, recommendationVersion } = auth;
@@ -48,6 +49,8 @@ export default function RecommendationsPage() {
     staleContext ? undefined : activeContext?.catalogueRevision);
   const key = `${userId}:${recommendationScope}:${recommendationVersion}:${page}:${genreId ?? ""}:${retry}`;
   const current = load?.key === key ? load : null;
+
+  useLayoutEffect(() => { latestLocation.current = location; }, [location]);
 
   const context = useCallback((catalogueRevision?: string): ListViewContext => {
     return { route: "/recommendations", accountId: userId ?? "",
@@ -91,29 +94,37 @@ export default function RecommendationsPage() {
     const requestedRevision = activeContext?.catalogueRevision ?? revision.current;
     getRecommendationPage(page, genreId, requestedRevision, controller.signal).then(body => {
       if (controller.signal.aborted) return;
+      const currentLocation = latestLocation.current;
+      if (currentLocation.pathname !== "/recommendations" ||
+        readPage(currentLocation.search) !== page || readGenreId(currentLocation.search) !== genreId) return;
       revision.current = body.meta.catalogueRevision;
       const acceptedContext = context(body.meta.catalogueRevision);
       setLastContext(acceptedContext);
       if (page > body.meta.totalPages && page !== 1) {
-        navigate({ pathname: location.pathname, search: pageSearch(location.search,
-          Math.max(1, body.meta.totalPages)) },
+        navigate({ pathname: currentLocation.pathname, search: pageSearch(currentLocation.search,
+          Math.max(1, body.meta.totalPages)), hash: currentLocation.hash },
           { replace: true, state: listViewState(acceptedContext) });
         return;
       }
-      setLoad({ key, status: "ready", result: body.data, meta: body.meta });
-      if (!sameListViewContext(storedContext, acceptedContext)) {
-        navigate({ pathname: location.pathname, search: location.search,
-          hash: location.hash }, { replace: true,
+      if (!sameListViewContext(readListViewState(currentLocation.state, "/recommendations"),
+        acceptedContext)) {
+        navigate({ pathname: currentLocation.pathname, search: currentLocation.search,
+          hash: currentLocation.hash }, { replace: true,
           state: listViewState(acceptedContext) });
       }
+      setLoad({ key, status: "ready", result: body.data, meta: body.meta });
     }).catch(error => {
       if (controller.signal.aborted) return;
+      const currentLocation = latestLocation.current;
+      if (currentLocation.pathname !== "/recommendations" ||
+        readPage(currentLocation.search) !== page || readGenreId(currentLocation.search) !== genreId) return;
       if (error instanceof RecommendationApiError && error.status === 401) {
         handleUnauthorized(); return;
       }
       if (error instanceof RecommendationApiError && error.code === "CATALOGUE_CHANGED") {
         revision.current = undefined;
-        navigate({ pathname: location.pathname, search: pageSearch(location.search, 1) },
+        navigate({ pathname: currentLocation.pathname,
+          search: pageSearch(currentLocation.search, 1), hash: currentLocation.hash },
           { replace: true, state: listViewState(context(undefined)) });
         if (page === 1) setRetry(value => value + 1);
         return;
