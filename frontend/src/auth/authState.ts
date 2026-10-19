@@ -17,6 +17,8 @@ export type AuthContextValue = AuthState & {
   // Call when a protected API answers 401: drops the account so guards redirect.
   handleUnauthorized: () => void;
   recommendationVersion: number;
+  // Opaque navigation scope; changes with account or recommendation data.
+  recommendationScope: string;
   invalidateRecommendations: () => void;
 };
 

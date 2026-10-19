@@ -199,6 +199,11 @@ decide whether to watch it.
   remain visible.
 - Given I am signed in and viewing details, when I return to the list, then my
   account preferences are preserved.
+- Given I open details from page 2 of a catalogue, popular, or recommendation
+  list with a genre view filter, when I return and the list context is still
+  valid, then the same page and filter are restored. If the catalogue revision,
+  account, or recommendation preferences changed, the list starts at page 1
+  without carrying a stale recommendation filter into the new context.
 
 ### S04 Explore movies without preferences (P0, 5 points)
 

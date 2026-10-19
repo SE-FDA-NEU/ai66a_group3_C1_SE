@@ -75,7 +75,7 @@ Back up an existing database first. Accounts, preferences and ratings are not
 deleted; retained movies preserve internal IDs. Movies outside the new snapshot
 remain stored but are not active runtime candidates. Reuse the chosen page
 budget on future imports: omitting it activates only the one-page snapshot.
-Runtime/API limits remain unchanged (at most ten movies per list). Keep any
+Runtime/API limits remain unchanged (at most ten movies per page). Keep any
 further page/request budget change explicit and reviewed.
 Success prints a safe provenance summary: `provider`, `active_revision`,
 `inserted`, `updated`, `rejected`, `movies`, `associated_genres`,

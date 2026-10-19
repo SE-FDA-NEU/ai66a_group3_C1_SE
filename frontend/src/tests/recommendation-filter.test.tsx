@@ -18,7 +18,8 @@ const meta: PageMeta = { count: 1, limit: 10, page: 1, total: 35,
   totalPages: 4, unfilteredTotal: 35, catalogueRevision: "revision" };
 const auth: AuthContextValue = { status: "authenticated", user: { id: "one", email: "one@example.com" },
   refresh: vi.fn(), signIn: vi.fn(), signOut: vi.fn(), handleUnauthorized: vi.fn(),
-  recommendationVersion: 0, invalidateRecommendations: vi.fn() };
+  recommendationVersion: 0, recommendationScope: "test-scope",
+  invalidateRecommendations: vi.fn() };
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status,

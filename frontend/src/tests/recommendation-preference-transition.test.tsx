@@ -445,6 +445,7 @@ describe("S3-T13 cold-start to personalised transition", () => {
         signOut: async () => {},
         handleUnauthorized: vi.fn(),
         recommendationVersion: 0,
+        recommendationScope: "old-scope",
         invalidateRecommendations: vi.fn(),
     };
 
@@ -469,6 +470,7 @@ describe("S3-T13 cold-start to personalised transition", () => {
             value={{
             ...baseAuth,
             recommendationVersion: 1,
+            recommendationScope: "new-scope",
             }}
         >
             <RecommendationsPage />

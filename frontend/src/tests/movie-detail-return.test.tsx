@@ -101,7 +101,11 @@ describe("S3-T17 movie-detail return context", () => {
     );
 
     expect(window.location.pathname).toBe("/movies/movie-a");
-    expect(window.history.state.usr).toEqual({ returnTo: "/recommendations" });
+    expect(window.history.state.usr).toMatchObject({
+      returnTo: "/recommendations",
+      listViewContext: { route: "/recommendations", accountId: "account-a",
+        recommendationScope: expect.any(String) },
+    });
     expect(
       await screen.findByText("A recommendation worth considering."),
     ).toBeInTheDocument();
@@ -181,8 +185,10 @@ describe("S3-T17 movie-detail return context", () => {
     );
 
     expect(window.location.pathname).toBe("/movies/movie-a");
-    expect(window.history.state.usr).toEqual({
+    expect(window.history.state.usr).toMatchObject({
       returnTo: "/recommendations?source=no-match#alternatives",
+      listViewContext: { route: "/recommendations", accountId: "account-a",
+        recommendationScope: expect.any(String) },
     });
     expect(
       await screen.findByRole("link", { name: "Back to recommendations" }),

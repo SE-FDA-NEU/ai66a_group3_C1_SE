@@ -1,5 +1,14 @@
 import type { PageMeta } from "../api/movies.ts";
 
+export const MAX_GENRE_ID = 2147483647;
+
+export function readGenreId(search: string): number | undefined {
+  const raw = new URLSearchParams(search).get("genreId");
+  if (!raw || !/^[1-9]\d*$/.test(raw)) return undefined;
+  const value = Number(raw);
+  return Number.isSafeInteger(value) && value <= MAX_GENRE_ID ? value : undefined;
+}
+
 export function readPage(search: string): number {
   const raw = new URLSearchParams(search).get("page");
   if (raw === null) return 1;

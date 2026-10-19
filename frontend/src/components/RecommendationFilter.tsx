@@ -4,6 +4,7 @@ import { listGenres, PreferenceApiError } from "../api/preferences.ts";
 import type { RecommendationResult } from "../api/recommendations.ts";
 import { useAuth } from "../auth/authState.ts";
 import { resultSummary } from "../navigation/listPage.ts";
+import type { ListViewContext, ListViewState } from "../navigation/listViewState.ts";
 import MovieGrid from "./MovieGrid.tsx";
 import PageControls from "./PageControls.tsx";
 
@@ -14,10 +15,12 @@ type Props = {
   onGenreChange: (genreId?: number) => void;
   ariaLabel: string;
   returnTo?: string;
+  returnContext?: ListViewContext;
+  navigationState?: ListViewState;
 };
 
 export default function RecommendationFilter({ snapshot, meta, genreId, onGenreChange,
-  ariaLabel, returnTo }: Props) {
+  ariaLabel, returnTo, returnContext, navigationState }: Props) {
   const { handleUnauthorized } = useAuth();
   const selectId = useId();
   const [genres, setGenres] = useState<Genre[]>([]);
@@ -67,7 +70,8 @@ export default function RecommendationFilter({ snapshot, meta, genreId, onGenreC
         <button type="button" onClick={() => onGenreChange(undefined)}>Show all movies</button>
       </div> : snapshot.movies.length > 0 ?
       <MovieGrid ariaLabel={ariaLabel} movies={snapshot.movies}
-        showReasons={snapshot.personalised} returnTo={returnTo} /> : null}
-    <PageControls meta={meta} />
+        showReasons={snapshot.personalised} returnTo={returnTo}
+        returnContext={returnContext} /> : null}
+    <PageControls meta={meta} state={navigationState} />
   </div>;
 }

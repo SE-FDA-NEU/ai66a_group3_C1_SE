@@ -134,3 +134,29 @@ def test_recommendation_filter_uses_all_candidates_before_page_slice(client):
     assert out_of_range["data"]["personalised"]
     assert out_of_range["meta"]["total"] == 35
     assert http.get("/api/me/recommendations", params={"genreId": 999}).status_code == 400
+
+
+@pytest.mark.parametrize("genre_id", ["0", "abc", "2147483648", "9223372036854775808"])
+def test_recommendation_genre_id_rejects_invalid_or_overflowing_values(client, genre_id):
+    http, session = client
+    seed(session, 1)
+    assert http.post("/api/auth/login", json={
+        "email": "pagination@example.com", "password": "movie123"
+    }).status_code == 200
+    response = http.get("/api/me/recommendations", params={"genreId": genre_id})
+    assert response.status_code == 400
+    error = response.json()["error"]
+    assert error["code"] == "VALIDATION_ERROR"
+    assert error["message"] == "genreId must be an integer from 1 to 2147483647"
+    assert error["requestId"].startswith("req_")
+
+
+def test_largest_allowed_genre_id_is_checked_as_unknown_without_overflow(client):
+    http, session = client
+    seed(session, 1)
+    assert http.post("/api/auth/login", json={
+        "email": "pagination@example.com", "password": "movie123"
+    }).status_code == 200
+    response = http.get("/api/me/recommendations", params={"genreId": "2147483647"})
+    assert response.status_code == 400
+    assert response.json()["error"]["code"] == "GENRE_NOT_FOUND"

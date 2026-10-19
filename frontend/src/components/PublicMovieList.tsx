@@ -3,6 +3,8 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { listMoviePage, MovieApiError, type MovieSummary, type PageMeta } from "../api/movies.ts";
 import { currentReturnPath } from "../navigation/movieDetailReturn.ts";
 import { pageSearch, readPage, resultSummary } from "../navigation/listPage.ts";
+import { listViewState, readListViewState, sameListViewContext,
+  type ListViewContext } from "../navigation/listViewState.ts";
 import MovieGrid from "./MovieGrid.tsx";
 import PageControls from "./PageControls.tsx";
 import SessionNavigation from "./SessionNavigation.tsx";
@@ -18,7 +20,9 @@ export default function PublicMovieList({ kind }: { kind: "catalogue" | "popular
   const page = readPage(location.search);
   const [retry, setRetry] = useState(0);
   const [load, setLoad] = useState<Load | null>(null);
-  const revision = useRef<string | undefined>(undefined);
+  const route = kind === "popular" ? "/popular" : "/";
+  const revision = useRef<string | undefined>(
+    readListViewState(location.state, route)?.catalogueRevision);
   const key = `${kind}:${page}:${retry}`;
   const current = load?.key === key ? load : null;
 
@@ -31,27 +35,39 @@ export default function PublicMovieList({ kind }: { kind: "catalogue" | "popular
 
   useEffect(() => {
     const controller = new AbortController();
-    listMoviePage(kind, page, revision.current, controller.signal).then(body => {
+    const requestedRevision = readListViewState(location.state, route)?.catalogueRevision ??
+      revision.current;
+    listMoviePage(kind, page, requestedRevision, controller.signal).then(body => {
       if (controller.signal.aborted) return;
       revision.current = body.meta.catalogueRevision;
+      const context: ListViewContext = { route, catalogueRevision: body.meta.catalogueRevision };
       if (page > body.meta.totalPages && page !== 1) {
         navigate({ pathname: location.pathname, search: pageSearch(location.search,
-          Math.max(1, body.meta.totalPages)) }, { replace: true });
+          Math.max(1, body.meta.totalPages)) },
+          { replace: true, state: listViewState(context) });
         return;
       }
       setLoad({ key, status: "ready", movies: body.data.movies, meta: body.meta });
+      if (!sameListViewContext(readListViewState(location.state, route), context)) {
+        navigate({ pathname: location.pathname, search: location.search,
+          hash: location.hash }, { replace: true, state: listViewState(context) });
+      }
     }).catch(error => {
       if (controller.signal.aborted) return;
       if (error instanceof MovieApiError && error.code === "CATALOGUE_CHANGED") {
         revision.current = undefined;
-        navigate({ pathname: location.pathname, search: pageSearch(location.search, 1) }, { replace: true });
+        navigate({ pathname: location.pathname, search: pageSearch(location.search, 1) },
+          { replace: true });
         if (page === 1) setRetry(value => value + 1);
         return;
       }
       setLoad({ key, status: "error", message: error instanceof Error ? error.message : "Something went wrong" });
     });
     return () => controller.abort();
-  }, [kind, page, retry, key, navigate, location.pathname, location.search]);
+    // A successful request stamps location.state; that stamp must not repeat the request.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [kind, page, retry, key, navigate, location.pathname, location.search,
+    location.hash, route]);
 
   const popular = kind === "popular";
   return <main className="page catalogue-page">
@@ -81,8 +97,11 @@ export default function PublicMovieList({ kind }: { kind: "catalogue" | "popular
         {!popular ? <p className="muted">The active catalogue does not contain any movies yet.</p> : null}
       </section> : <>
         <p className="muted">{resultSummary(current.meta)}</p>
-        <MovieGrid ariaLabel={popular ? "Popular movies" : "Movie catalogue"} movies={current.movies} returnTo={currentReturnPath(location)} />
-        <PageControls meta={current.meta} />
+        <MovieGrid ariaLabel={popular ? "Popular movies" : "Movie catalogue"}
+          movies={current.movies} returnTo={currentReturnPath(location)}
+          returnContext={{ route, catalogueRevision: current.meta.catalogueRevision }} />
+        <PageControls meta={current.meta} state={listViewState({ route,
+          catalogueRevision: current.meta.catalogueRevision })} />
       </>}
   </main>;
 }

@@ -111,7 +111,13 @@ async def authentication_required_handler(
 
 
 @app.exception_handler(RequestValidationError)
-async def validation_error_handler(_request: Request, _exc: RequestValidationError):
+async def validation_error_handler(_request: Request, exc: RequestValidationError):
+    if any(error.get("loc") == ("query", "genreId") for error in exc.errors()):
+        return _error(
+            "VALIDATION_ERROR",
+            "genreId must be an integer from 1 to 2147483647",
+            400,
+        )
     return _error("VALIDATION_ERROR", "Please correct the highlighted fields", 400)
 
 
@@ -335,7 +341,7 @@ def recommendations(
     request: Request,
     limit: int = Query(default=10, ge=1, le=10),
     page: int = Query(default=1, ge=1, le=10000),
-    genre_id: int | None = Query(default=None, alias="genreId", ge=1),
+    genre_id: int | None = Query(default=None, alias="genreId", ge=1, le=2147483647),
     catalogue_revision: str | None = Query(default=None, alias="catalogueRevision"),
     database_session: Session = Depends(get_db),  # noqa: B008
 ):

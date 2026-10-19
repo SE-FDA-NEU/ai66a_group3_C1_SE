@@ -357,7 +357,8 @@ it must not reuse another account's cached response.
 
 `page` defaults to 1 and accepts a positive integer through 10000. `limit`
 defaults to 10 and accepts an integer from 1 through 10. Optional `genreId`
-must be an existing canonical genre ID; a valid genre with no matches returns
+must be an integer from 1 through 2147483647 and an existing canonical genre ID;
+an out-of-range ID returns `400 VALIDATION_ERROR`. A valid genre with no matches returns
 a successful filtered-empty page. The account is
 resolved only from the authenticated session.
 
@@ -509,7 +510,8 @@ routes ignore account identity. A subsequent request supplying a revision that
 no longer equals the active revision receives `409 CATALOGUE_CHANGED` in the
 standard error envelope. The client clears old results and fetches page 1 of
 the new revision. Recommendation requests also accept optional integer
-`genreId`; an unknown ID returns `400 GENRE_NOT_FOUND`.
+`genreId` (integer 1 through 2147483647); an unknown ID returns
+`400 GENRE_NOT_FOUND`, while an out-of-range ID returns `400 VALIDATION_ERROR`.
 
 Each success `meta` contains `count` for the returned page, `page`, `limit`,
 `total` after a view filter and before slicing, `totalPages=ceil(total/limit)`

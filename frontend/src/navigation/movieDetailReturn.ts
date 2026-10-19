@@ -1,10 +1,15 @@
+import { listViewState, readListViewState, type ListViewContext,
+  type ListViewState } from "./listViewState.ts";
+
 export type MovieDetailReturnState = {
   returnTo: string;
+  listViewContext?: ListViewContext;
 };
 
 export type MovieDetailReturnDestination = {
   label: string;
   to: string;
+  state?: ListViewState;
 };
 
 const DEFAULT_RETURN: MovieDetailReturnDestination = {
@@ -26,8 +31,11 @@ export function currentReturnPath(location: {
   return `${location.pathname}${location.search}${location.hash}`;
 }
 
-export function movieDetailReturnState(returnTo: string): MovieDetailReturnState {
-  return { returnTo };
+export function movieDetailReturnState(
+  returnTo: string,
+  context?: ListViewContext,
+): MovieDetailReturnState {
+  return { returnTo, ...(context ? { listViewContext: context } : {}) };
 }
 
 export function resolveMovieDetailReturn(
@@ -55,9 +63,11 @@ export function resolveMovieDetailReturn(
       return DEFAULT_RETURN;
     }
 
+    const context = readListViewState(state, parsed.pathname as ListViewContext["route"]);
     return {
       label,
       to: `${parsed.pathname}${parsed.search}${parsed.hash}`,
+      ...(context ? { state: listViewState(context) } : {}),
     };
   } catch {
     return DEFAULT_RETURN;

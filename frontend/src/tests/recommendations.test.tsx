@@ -82,6 +82,7 @@ function RecommendationAccountHarness({
     signOut: async () => {},
     handleUnauthorized: onUnauthorized,
     recommendationVersion: 0,
+    recommendationScope: "test-scope",
     invalidateRecommendations: vi.fn(),
   };
 
@@ -531,6 +532,7 @@ describe("T11 no-match, retry, and request-race states", () => {
       signOut: async () => {},
       handleUnauthorized: vi.fn(),
       recommendationVersion: 0,
+      recommendationScope: "test-scope",
       invalidateRecommendations: vi.fn(),
     };
 
