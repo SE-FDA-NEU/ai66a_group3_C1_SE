@@ -141,7 +141,7 @@ test("S13 AC1/AC4/AC5: real login, save, logout/replay, switch, delayed A respon
   await saveGenre(page, "Action");
   await expect(titles(page)).toHaveText(actionTitles);
   await page.locator(`a[href="/movies/${movie}"]`).click();
-  await page.getByLabel("Your rating (1 to 5)").selectOption("5");
+  await page.getByRole("radio", { name: "5 stars", exact: true }).check();
   await page.getByRole("button", { name: "Save rating", exact: true }).click();
   await expect(page.getByText("Your saved rating: 5/5", { exact: true })).toBeVisible();
   const savedA = databaseRows();
@@ -191,7 +191,7 @@ test("S13 AC1/AC4/AC5: real login, save, logout/replay, switch, delayed A respon
   expect(await page.locator(`a[href="/movies/${movie}"]`).count()).toBe(0);
   await page.goto(`/movies/${movie}`);
   await expect(page.getByText("Not rated yet", { exact: true })).toBeVisible();
-  await page.getByLabel("Your rating (1 to 5)").selectOption("2");
+  await page.getByRole("radio", { name: "2 stars", exact: true }).check();
   await page.getByRole("button", { name: "Save rating", exact: true }).click();
   await expect(page.getByText("Your saved rating: 2/5", { exact: true })).toBeVisible();
   await page.goto("/recommendations");
@@ -235,7 +235,7 @@ test("S13 live TMDb environment smoke (separate from synthetic acceptance)", asy
   const detail = page.locator(`article.movie-card a[href="/movies/${publicMovie.id}"]`);
   const href = (await detail.getAttribute("href"))!;
   await detail.click();
-  await page.getByLabel("Your rating (1 to 5)").selectOption("4");
+  await page.getByRole("radio", { name: "4 stars", exact: true }).check();
   await page.getByRole("button", { name: "Save rating", exact: true }).click();
   await expect(page.getByText("Your saved rating: 4/5", { exact: true })).toBeVisible();
   expect(await (await page.request.get("/api/me/recommendations")).json()).toEqual(ranked);
