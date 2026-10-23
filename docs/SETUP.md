@@ -442,3 +442,33 @@ The command ran outside the virtual environment, or the backend package is not i
 python -m pip install -e "./backend[dev]" --no-deps
 ```
 
+## T11 early branch: reset/write verification (pending C03)
+
+This branch changes transaction coordination, not database schema or the TMDb
+catalogue. No new migration, import, package or `.env` field is required for T11.
+Keep the existing `DATABASE_URL` and accepted imported catalogue. Do not reset
+the real review account or reseed its database merely to test this task.
+
+Reset, preference replacement and rating writes use a request-local SQLite
+`BEGIN IMMEDIATE` reservation before decision reads. The configured busy timeout
+is 5 seconds and the existing journal mode is preserved. During writer
+contention another account may queue; a bounded failure returns the existing
+safe 503 error, without partial reset or invented success. Do not automatically
+retry a destructive request after an ambiguous client timeout.
+
+Offline verification creates its own migrated file databases and synthetic A/B
+accounts, needs no running server or TMDb token, and exercises DELETE/WAL plus
+a competing writer in a separate process:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest backend/tests/test_profile_reset_concurrency.py backend/tests/test_account_write_transactions.py backend/tests/test_profile_reset_api.py -v
+.\.venv\Scripts\python.exe backend/scripts/run_isolated_tests.py -q
+.\.venv\Scripts\python.exe -m ruff check backend
+```
+
+See [reset/concurrency contract](reset-concurrency-contract.md) and
+[actual evidence](evidence/s4-t11-reset-concurrency.md). T11 does not implement a
+new Profile screen; #207/#208/#209/#210 own the remaining summary/UI/watchlist
+and browser acceptance. Reconcile C03 #217 and obtain independent review before
+merging this early branch. Final C05 root-pytest setup remains its own task.
+
