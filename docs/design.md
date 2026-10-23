@@ -669,3 +669,23 @@ submission assets. The T25 matrix still reports all eight Stories as
 `partly works`; C03 contract publication is not new Story acceptance.
 Current C05 review/merge/PDF/LMS steps remain pending. Exact executed T25/C04
 snapshots and later real prerequisite approvals are linked in the dossier.
+
+### Sprint 4 T11 preview — reset/concurrent-write amendment
+
+This early implementation is PO-authorized but not C03-approved or merge-ready.
+The existing reset repository still deletes only the current account's genres
+and ratings in the route-owned transaction. A shared DB dependency now applies
+`BEGIN IMMEDIATE` before auth/read-modify-write decisions in reset, preferences
+and rating writes, with explicit 5-second SQLite busy timeout and cleanup on
+validation/auth/error/commit exits. Successful acknowledgements remain after
+commit; no automatic mutation replay is introduced. GETs do not acquire that
+writer reservation, and runtime journal mode is not changed.
+
+The existing reset DTO, error envelope, authentication/origin checks and exact
+success-copy contract are preserved. Confirmation/cancel UI, profile-summary API,
+generation invalidation and actual watchlist preservation are still delivered
+by their respective #207/#208/#209/#210 owners, not claimed here. Both controlled
+save/reset commit orders and rollback/isolation are tested on real migrated
+temporary SQLite connections. See [contract](reset-concurrency-contract.md) and
+[evidence](evidence/s4-t11-reset-concurrency.md). Reconcile C03 and obtain an
+independent final-diff review before merging.

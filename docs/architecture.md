@@ -274,3 +274,26 @@ The browser may download the returned public image directly from
 [storage handoff](backdrop-storage-contract.md), [enrichment runbook](backdrop-import-runbook.md),
 [T37 UI evidence](evidence/s3-t37-backdrop-ui/README.md), and
 [T28 acceptance](evidence/s3-t28-backdrop-acceptance/README.md).
+
+## 9. T11 account-write boundary — early proposal pending C03
+
+The T11 branch introduces `backend/app/db/account_writes.py` and a shared runtime
+engine factory. Existing SQLite journal mode and foreign-key enforcement remain;
+the busy timeout is explicitly 5000ms. Reset, preference replacement and rating
+save reserve the DB writer before auth/decision reads; no process-local mutex or
+new storage service is added. They use one request-local Session and one route
+commit, with dependency rollback on every uncommitted exit. Read routes keep
+their existing read-snapshot policy, not an IMMEDIATE write reservation.
+
+SQLite has one file-wide writer, so different-account writes may queue, but a
+reset cannot target or absorb another account's rows. Both serial reset/save
+orders, mid-delete/commit rollback and a separate-process competing writer are
+tested on migrated temporary file databases. Runtime does not force WAL; tests
+exercise DELETE and WAL without touching a real application database.
+
+No migration, provider request, index rebuild or new Profile/Watchlist UI is
+introduced. Future watchlist/profile consumers reuse the reviewed policy and
+retain their assigned acceptance. See the
+[T11 proposal](reset-concurrency-contract.md) and
+[actual evidence](evidence/s4-t11-reset-concurrency.md). This early implementation
+must be reconciled after C03 #217 and independently reviewed before merge.
