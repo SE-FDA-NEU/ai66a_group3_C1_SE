@@ -7,7 +7,11 @@ from datetime import UTC, datetime
 from typing import Self
 
 import pytest
-from app.catalogue.tmdb_import import TmdbBackdropEnrichmentResult, TmdbImportResult
+from app.catalogue.tmdb_import import (
+    TmdbBackdropEnrichmentResult,
+    TmdbImportResult,
+    TmdbPosterEnrichmentResult,
+)
 from app.cli import import_tmdb_catalogue as command
 
 
@@ -94,8 +98,10 @@ def test_invalid_page_budget_exits_before_client_or_database(monkeypatch, pages)
     assert error.value.code == 2
 
 
-def test_enrichment_cli_prints_bounded_safe_counts(monkeypatch, capsys):
-    result = TmdbBackdropEnrichmentResult(
+@pytest.mark.parametrize("media", ["backdrops", "posters"])
+def test_enrichment_cli_prints_bounded_safe_counts(monkeypatch, capsys, media):
+    result_type = TmdbPosterEnrichmentResult if media == "posters" else TmdbBackdropEnrichmentResult
+    result = result_type(
         eligible_movie_count=255,
         fetched_movie_count=2,
         updated_movie_count=1,
@@ -112,11 +118,11 @@ def test_enrichment_cli_prints_bounded_safe_counts(monkeypatch, capsys):
         received.append(limit)
         return result
 
-    monkeypatch.setattr(command, "enrich_tmdb_backdrops", enrich)
-    assert command.main(["--enrich-backdrops", "--limit", "2"]) == 0
+    monkeypatch.setattr(command, f"enrich_tmdb_{media}", enrich)
+    assert command.main([f"--enrich-{media}", "--limit", "2"]) == 0
     assert received == [2]
     assert capsys.readouterr().out == (
-        "TMDb backdrop enrichment complete\n"
+        f"TMDb {media[:-1]} enrichment complete\n"
         "eligible=255\n"
         "fetched=2\n"
         "remaining=253\n"
@@ -133,6 +139,10 @@ def test_enrichment_cli_prints_bounded_safe_counts(monkeypatch, capsys):
     ["--enrich-backdrops", "--limit", "301"],
     ["--enrich-backdrops", "--pages", "1"],
     ["--limit", "2"],
+    ["--enrich-posters", "--limit", "0"],
+    ["--enrich-posters", "--limit", "301"],
+    ["--enrich-posters", "--pages", "15"],
+    ["--enrich-posters", "--enrich-backdrops"],
 ])
 def test_enrichment_cli_rejects_invalid_or_mixed_budgets_before_io(monkeypatch, arguments):
     def forbidden(*_args, **_kwargs):

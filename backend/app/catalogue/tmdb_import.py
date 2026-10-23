@@ -12,6 +12,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.catalogue.backdrops import valid_backdrop_path
+from app.catalogue.posters import valid_poster_path
 from app.db.models import CatalogMovie, utc_now
 from app.integrations.tmdb import (
     DEFAULT_POPULAR_PAGES,
@@ -26,6 +27,7 @@ from app.repositories.movies import (
     get_movie_by_source_id,
     replace_movie_genres,
     set_movie_backdrop_path,
+    set_movie_poster_path,
     upsert_catalogue_movie,
     upsert_genre,
 )
@@ -74,6 +76,11 @@ class TmdbBackdropEnrichmentResult:
 
 
 @dataclass(frozen=True)
+class TmdbPosterEnrichmentResult(TmdbBackdropEnrichmentResult):
+    """The same safe counts for an explicitly poster-only update."""
+
+
+@dataclass(frozen=True)
 class _PreparedMovie:
     source_id: str
     title: str
@@ -86,6 +93,8 @@ class _PreparedMovie:
     source_fetched_at: datetime
     backdrop_fetched: bool
     backdrop_path: str | None
+    poster_fetched: bool
+    poster_path: str | None
 
 
 class _RejectedMovie(ValueError):
@@ -156,6 +165,10 @@ def import_tmdb_catalogue(
         if prepared_movie.backdrop_fetched:
             set_movie_backdrop_path(
                 session, movie_id=movie.id, backdrop_path=prepared_movie.backdrop_path
+            )
+        if prepared_movie.poster_fetched:
+            set_movie_poster_path(
+                session, movie_id=movie.id, poster_path=prepared_movie.poster_path
             )
         if existing_movie is None:
             inserted_movie_count += 1
@@ -243,6 +256,48 @@ def enrich_tmdb_backdrops(
     )
 
 
+def enrich_tmdb_posters(
+    session: Session, *, client: TmdbCatalogueGateway, limit: int = MAX_ENRICHMENT_MOVIES
+) -> TmdbPosterEnrichmentResult:
+    """Bounded poster-only backfill; caller atomically commits or rolls back.
+
+    This never activates a new revision or touches overview/genres/popularity,
+    user data, backdrop paths or NLP text/config revision inputs.
+    """
+    if type(limit) is not int or not 1 <= limit <= MAX_ENRICHMENT_MOVIES:
+        raise ValueError(f"limit must be an integer from 1 to {MAX_ENRICHMENT_MOVIES}")
+    revision = get_active_catalogue_revision(session)
+    if revision is None or revision.provider != TMDB_SOURCE:
+        raise ValueError("an active TMDb catalogue is required for poster enrichment")
+    active = (CatalogMovie.catalogue_revision_id == revision.id, CatalogMovie.source == TMDB_SOURCE)
+    eligible = session.scalar(select(func.count()).select_from(CatalogMovie).where(*active))
+    movies = list(session.scalars(select(CatalogMovie).where(*active)
+                                  .order_by(CatalogMovie.source_id).limit(limit)))
+    updated = cleared = unchanged = missing = invalid = 0
+    for movie in movies:
+        if not movie.source_id.isdecimal() or int(movie.source_id) <= 0:
+            raise ValueError("active TMDb catalogue contains an invalid source ID")
+        details = client.fetch_movie_details(int(movie.source_id))
+        if "poster_path" not in details:
+            missing += 1
+            continue
+        path = details["poster_path"]
+        if path is not None and not valid_poster_path(path):
+            invalid += 1
+            continue
+        if movie.poster_path == path:
+            unchanged += 1
+            continue
+        set_movie_poster_path(session, movie_id=movie.id, poster_path=path)
+        updated += 1
+        cleared += path is None
+    return TmdbPosterEnrichmentResult(
+        eligible_movie_count=eligible or 0, fetched_movie_count=len(movies),
+        updated_movie_count=updated, cleared_movie_count=cleared,
+        unchanged_movie_count=unchanged, missing_movie_count=missing, invalid_movie_count=invalid,
+    )
+
+
 def _prepare_genres(raw_genres: list[Mapping[str, Any]]) -> dict[int, str]:
     genres_by_id: dict[int, str] = {}
     for raw_genre in raw_genres:
@@ -314,6 +369,12 @@ def _prepare_movie(
     if backdrop_path is not None and not valid_backdrop_path(backdrop_path):
         backdrop_fetched = False
         backdrop_path = None
+    poster_media = raw_movie if "poster_path" in raw_movie else details
+    poster_fetched = poster_media is not None and "poster_path" in poster_media
+    poster_path = poster_media["poster_path"] if poster_fetched else None
+    if poster_path is not None and not valid_poster_path(poster_path):
+        poster_fetched = False
+        poster_path = None
     return _PreparedMovie(
         source_id=str(movie_id),
         title=title,
@@ -326,6 +387,8 @@ def _prepare_movie(
         source_fetched_at=source_fetched_at,
         backdrop_fetched=backdrop_fetched,
         backdrop_path=backdrop_path,
+        poster_fetched=poster_fetched,
+        poster_path=poster_path,
     )
 
 

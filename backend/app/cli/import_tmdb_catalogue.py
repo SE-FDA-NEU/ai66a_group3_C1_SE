@@ -11,6 +11,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from app.catalogue.tmdb_import import (
     MAX_ENRICHMENT_MOVIES,
     enrich_tmdb_backdrops,
+    enrich_tmdb_posters,
     import_tmdb_catalogue,
 )
 from app.db.database import SessionLocal
@@ -33,10 +34,15 @@ def main(argv: list[str] | None = None) -> int:
         default=None,
         help="Popular pages to import (default: 1; 13 usually yields about 260 movies).",
     )
-    parser.add_argument(
+    enrichment = parser.add_mutually_exclusive_group()
+    enrichment.add_argument(
         "--enrich-backdrops",
         action="store_true",
         help="Update backdrop paths on existing active TMDb movies only.",
+    )
+    enrichment.add_argument(
+        "--enrich-posters", action="store_true",
+        help="Update poster paths only, preserving the active catalogue and account data.",
     )
     parser.add_argument(
         "--limit",
@@ -46,10 +52,11 @@ def main(argv: list[str] | None = None) -> int:
         help="Maximum movie-detail requests in enrichment mode (default: 300).",
     )
     args = parser.parse_args(argv)
-    if args.enrich_backdrops and args.pages is not None:
-        parser.error("--pages cannot be combined with --enrich-backdrops")
-    if not args.enrich_backdrops and args.limit is not None:
-        parser.error("--limit requires --enrich-backdrops")
+    media_only = args.enrich_backdrops or args.enrich_posters
+    if media_only and args.pages is not None:
+        parser.error("--pages cannot be combined with media-only enrichment")
+    if not media_only and args.limit is not None:
+        parser.error("--limit requires --enrich-backdrops or --enrich-posters")
 
     try:
         client = TmdbClient.from_environment()
@@ -59,8 +66,9 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         with client, SessionLocal() as session, session.begin():
-            if args.enrich_backdrops:
-                result = enrich_tmdb_backdrops(
+            if media_only:
+                enrich = enrich_tmdb_posters if args.enrich_posters else enrich_tmdb_backdrops
+                result = enrich(
                     session,
                     client=client,
                     limit=args.limit or MAX_ENRICHMENT_MOVIES,
@@ -79,8 +87,8 @@ def main(argv: list[str] | None = None) -> int:
         sys.stderr.write("TMDb catalogue import failed: catalogue validation failed\n")
         return 1
 
-    if args.enrich_backdrops:
-        print("TMDb backdrop enrichment complete")
+    if media_only:
+        print("TMDb poster enrichment complete" if args.enrich_posters else "TMDb backdrop enrichment complete")
         print(f"eligible={result.eligible_movie_count}")
         print(f"fetched={result.fetched_movie_count}")
         print(f"remaining={result.eligible_movie_count - result.fetched_movie_count}")
