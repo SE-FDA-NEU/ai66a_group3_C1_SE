@@ -860,3 +860,25 @@ Automated tests must use synthetic SQLite fixtures or provider mocks and run
 offline without a TMDb token. Live TMDb catalogue import is a separate
 server-side development/staging/Sprint 3 acceptance step; the token must never
 appear in DTOs, frontend assets, logs, fixtures, or documentation evidence.
+
+## Sprint 4 T11 implementation proposal — pending C03 #217
+
+The early T11 branch keeps the reset request `{confirm:true}` and response
+`{data:{reset:true}}` unchanged. Reset/preferences/rating mutations reserve the
+SQLite writer before session/decision reads with `BEGIN IMMEDIATE`, using the
+same request-local Session. Route commit precedes success; an uncommitted exit
+rolls back. The runtime busy timeout is explicitly 5 seconds; unavailable writer
+or persistence failure retains the safe 503 envelope, not fake success.
+Public/protected GETs do not take an IMMEDIATE writer reservation. Existing
+auth/origin/validation rules are retained; no new message field is introduced.
+
+A committed save before reset is cleared; a deliberate committed save afterwards
+is new data. Reset leaves users/sessions/catalogue/index/media/other accounts and
+future watchlists intact. This is a transaction-boundary amendment, not delivered
+Profile/Watchlist UI or a new summary endpoint. Exact UI success remains
+`Your personalisation profile was reset` and belongs to #208 after known commit.
+
+See [reset/concurrency contract](reset-concurrency-contract.md) and
+[executed evidence](evidence/s4-t11-reset-concurrency.md). C03 reconciliation and
+independent review are required before merging; this note does not relabel the
+historical S3 contract as an already approved S4 contract.
