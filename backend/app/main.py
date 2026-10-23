@@ -9,6 +9,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
+from app.db.account_writes import begin_account_write
 from app.db.database import SessionLocal, engine
 from app.db.models import Genre, User
 from app.recommendations.service import build_account_recommendations
@@ -138,6 +139,30 @@ def get_db() -> Generator[Session, None, None]:
         yield database_session
     finally:
         database_session.close()
+
+
+def get_account_write_db(
+    database_session: Session = Depends(get_db),  # noqa: B008
+) -> Generator[Session, None, None]:
+    """Reserve before reads and release on every non-committed request exit."""
+    try:
+        begin_account_write(database_session)
+        yield database_session
+    finally:
+        # Also covers validation/auth/unknown-movie exits and acquisition errors.
+        # Successful handlers already committed; rollback is then a no-op.
+        database_session.rollback()
+
+
+def current_account_write_user(
+    request: Request,
+    database_session: Session = Depends(get_account_write_db),  # noqa: B008
+) -> User:
+    """Rating writes keep auth-before-payload validation under the reservation."""
+    user = resolve_session(database_session, request.cookies.get(SESSION_COOKIE))
+    if user is None:
+        raise AuthenticationRequiredError
+    return user
 
 
 def current_session_user(
@@ -445,7 +470,7 @@ def get_preferences(
 def put_preferences(
     payload: PreferenceRequest,
     request: Request,
-    database_session: Session = Depends(get_db),  # noqa: B008
+    database_session: Session = Depends(get_account_write_db),  # noqa: B008
 ):
     try:
         user = resolve_session(database_session, request.cookies.get(SESSION_COOKIE))
@@ -475,7 +500,7 @@ def put_preferences(
 def reset_profile(
     payload: ProfileResetRequest,
     request: Request,
-    database_session: Session = Depends(get_db),  # noqa: B008
+    database_session: Session = Depends(get_account_write_db),  # noqa: B008
 ):
     try:
         user = resolve_session(
@@ -541,8 +566,8 @@ def get_rating(
 def put_rating(
     movie_id: str,
     payload: RatingRequest,
-    user: User = Depends(current_session_user),  # noqa: B008
-    database_session: Session = Depends(get_db),  # noqa: B008
+    user: User = Depends(current_account_write_user),  # noqa: B008
+    database_session: Session = Depends(get_account_write_db),  # noqa: B008
 ):
     movie = get_active_movie_by_id(database_session, movie_id=movie_id)
     if movie is None:
