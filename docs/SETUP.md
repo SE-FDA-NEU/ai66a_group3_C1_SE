@@ -145,6 +145,42 @@ To add backdrops to an already imported active TMDb catalogue without changing
 its revision or accounts, use the bounded
 [backdrop enrichment command](backdrop-import-runbook.md#bounded-enrichment-for-an-existing-active-catalogue).
 
+### Sprint 4 T01 preview: posters and themes (pending C03 review)
+
+The T01 branch adds nullable poster storage. Before starting this branch, back
+up valuable SQLite data consistently and apply `alembic upgrade head` as above.
+The proposed head is `d8a4e6f20195` (parent `c6f8a2d4e901`); reconcile it with
+the current Alembic head after C03 and any concurrent migrations merge.
+
+Fresh `--pages 15` imports now also retain valid TMDb `poster_path` fields in
+the existing catalogue import. For an **existing** accepted catalogue, do not
+re-import or shrink its snapshot just to obtain posters. With the same root
+`.env`, run this optional, bounded **poster-only** backfill from the repo root:
+
+```powershell
+.\.venv\Scripts\python.exe -m app.cli.import_tmdb_catalogue --enrich-posters --limit 300
+```
+
+POSIX equivalent: `python -m app.cli.import_tmdb_catalogue --enrich-posters --limit 300`.
+This needs the server-side TMDb token. It visits at most 300 existing active
+TMDb movies, atomically updates poster paths and preserves catalogue revision,
+movie IDs, overview, popularity, genres, backdrops and account-owned data.
+Provider failure rolls back the entire pass; missing/invalid paths retain their
+old value, while an explicit provider `null` clears the poster. Repeating a small
+limit visits the same deterministic prefix, not the next batch; use 300 for this
+200–300-movie catalogue. No image files are stored in SQLite.
+
+Runtime pages use local API data and public image-CDN URLs; no metadata request
+or token is sent from the browser. A missing or failed poster shows a labelled
+fallback. Dark is the default theme; the header toggle persists only the theme
+choice (`cineai-theme`), not credentials. Rating stars select an integer draft;
+**Save rating** still performs the existing server-confirmed write.
+
+Detailed handoff, test commands and merge caveats:
+[T01 UI contract proposal](s4-t01-ui-contract.md) and
+[local evidence](evidence/s4-t01-ui.md). This is not an approval of C03 or a claim
+that unimplemented Watchlist/Search/Profile/Similar/trailer features exist.
+
 All commands and both application processes must use the **same**
 `DATABASE_URL` from root `.env` (normally `sqlite:///./data/app.db`). On an
 existing checkout with a successful TMDb import, keep its configured URL and
@@ -392,10 +428,11 @@ The response is `503` with the code `SERVICE_UNAVAILABLE`. Apply migrations:
 python -m alembic -c backend/alembic.ini upgrade head
 ```
 
-Then open `/health` again. `migrationVersion` should be `c6f8a2d4e901`.
+Then open `/health` again. On the T01 branch, `migrationVersion` should be
+`d8a4e6f20195` (subject to migration reconciliation before merge).
 
-This is the Sprint 3 head through T26 nullable backdrop storage, extending T30
-rating storage. Existing checkouts must apply the upgrade before restarting
+This extends the Sprint 3 head `c6f8a2d4e901` with nullable poster storage.
+Existing checkouts must apply the upgrade before restarting
 the application with the new model. No dependency reinstall, token or catalogue
 reimport is needed for this storage-only upgrade; preserve the existing `.env`
 and back up valuable data consistently first. Existing backdrop values remain
