@@ -7,7 +7,6 @@ import { listViewState, readListViewState, sameListViewContext,
   type ListViewContext } from "../navigation/listViewState.ts";
 import MovieGrid from "./MovieGrid.tsx";
 import PageControls from "./PageControls.tsx";
-import SessionNavigation from "./SessionNavigation.tsx";
 
 type Load = { key: string } & (
   | { status: "ready"; movies: MovieSummary[]; meta: PageMeta }
@@ -89,10 +88,7 @@ export default function PublicMovieList({ kind }: { kind: "catalogue" | "popular
       <nav className="catalogue-actions" aria-label="Public navigation">
         {popular ? <Link className="button-link button-secondary" to="/">Movie catalogue</Link> : <>
           <Link className="button-link" to="/preferences" aria-describedby="start-hint">Start</Link>
-          <Link className="button-link button-secondary" to="/popular">Popular movies</Link>
-          <Link className="button-link button-secondary" to="/about-recommendations">How recommendations work</Link>
         </>}
-        <SessionNavigation />
       </nav>
     </header>
     {!current ? <p className="status-panel" role="status">{popular ? "Loading popular movies..." : "Loading movies..."}</p> :
@@ -104,7 +100,9 @@ export default function PublicMovieList({ kind }: { kind: "catalogue" | "popular
         <h2>{popular ? "Popular movies are not available yet" : "No movies available"}</h2>
         {!popular ? <p className="muted">The active catalogue does not contain any movies yet.</p> : null}
       </section> : <>
-        <p className="muted">{resultSummary(current.meta)}</p>
+        <div className="catalogue-summary"><h2>{popular ? "The popularity list" : "Explore the catalogue"}</h2>
+          <p className="muted">{resultSummary(current.meta)}</p>
+          <span className="order-badge">{popular ? "Popularity · highest first" : "Title · A–Z"}</span></div>
         <MovieGrid ariaLabel={popular ? "Popular movies" : "Movie catalogue"}
           movies={current.movies} returnTo={currentReturnPath(location)}
           returnContext={{ route, catalogueRevision: current.meta.catalogueRevision }} />
