@@ -9,11 +9,13 @@ import MovieDetailPage from "./pages/MovieDetailPage.tsx";
 import PopularMoviesPage from "./pages/PopularMoviesPage.tsx";
 import RegisterPage from "./pages/RegisterPage.tsx";
 import { PROTECTED_ROUTES } from "./protectedRoutes.tsx";
+import AppFrame from "./components/AppFrame.tsx";
+import { ThemeProvider } from "./theme.tsx";
 
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
+      <ThemeProvider><AuthProvider><AppFrame>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route
@@ -29,7 +31,7 @@ function App() {
           ))}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </AuthProvider>
+      </AppFrame></AuthProvider></ThemeProvider>
     </BrowserRouter>
   );
 }

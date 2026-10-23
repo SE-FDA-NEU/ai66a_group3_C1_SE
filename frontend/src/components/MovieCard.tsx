@@ -4,6 +4,7 @@ import type { Genre, MovieSummary } from "../api/movies.ts";
 import { formatPopularityScore, POPULARITY_LABEL } from "../formatPopularity.ts";
 import { movieDetailReturnState } from "../navigation/movieDetailReturn.ts";
 import type { ListViewContext } from "../navigation/listViewState.ts";
+import MoviePoster from "./MoviePoster.tsx";
 
 const INFORMATION_UNAVAILABLE = "Information unavailable";
 
@@ -17,7 +18,8 @@ type MovieCardProps = {
 function MovieCard({ movie, matchedGenres, returnTo, returnContext }: MovieCardProps) {
   return (
     <article className="movie-card">
-      <div>
+      <MoviePoster movieId={movie.id} title={movie.title} posterUrl={movie.posterUrl} />
+      <div className="movie-card__body">
         <p className="movie-year">
           {movie.releaseYear ?? INFORMATION_UNAVAILABLE}
         </p>
