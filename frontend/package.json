@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "test": "vitest run",
+    "test:t01:ui": "node scripts/run-s04-e2e.mjs --config playwright.t01.config.ts",
     "test:t16:integration": "vitest run --config vitest.t16.config.ts",
     "test:t33:integration": "vitest run --config vitest.t33.config.ts",
     "test:t28:acceptance": "node scripts/verify-t28-backdrop.mjs",
