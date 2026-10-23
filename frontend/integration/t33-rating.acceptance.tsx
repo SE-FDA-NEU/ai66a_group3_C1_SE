@@ -26,8 +26,9 @@ type DatabaseState = {
   integrity: string;
 };
 const state = async () => (await bridge.call("state")) as DatabaseState;
-const picker = () =>
-  screen.getByRole("combobox", { name: "Your rating (1 to 5)" });
+const choose = (value: number) => fireEvent.click(
+  screen.getByRole("radio", { name: `${value} ${value === 1 ? "star" : "stars"}` }),
+);
 
 it("real UI saves, rolls back, retries, reloads and isolates account ratings without changing preferences or ranking", async () => {
   const baseline = await state();
@@ -85,7 +86,7 @@ it("real UI saves, rolls back, retries, reloads and isolates account ratings wit
     method: "GET",
   });
   async function save(value: number, button = "Save rating") {
-    fireEvent.change(picker(), { target: { value: String(value) } });
+    choose(value);
     fireEvent.click(screen.getByRole("button", { name: button }));
     await screen.findByText(`Your saved rating: ${value}/5`);
   }
@@ -94,10 +95,10 @@ it("real UI saves, rolls back, retries, reloads and isolates account ratings wit
     ["t33-a@example.com", bridge.metadata.movieId, 3],
   ]);
   await bridge.call("fail_next_save");
-  fireEvent.change(picker(), { target: { value: "5" } });
+  choose(5);
   fireEvent.click(screen.getByRole("button", { name: "Save rating" }));
   await screen.findByRole("alert");
-  expect(picker()).toHaveValue("5");
+  expect(screen.getByRole("radio", { name: "5 stars" })).toBeChecked();
   expect(screen.getByText("Your saved rating: 3/5")).toBeInTheDocument();
   expect((await state()).ratings).toEqual([
     ["t33-a@example.com", bridge.metadata.movieId, 3],
@@ -159,7 +160,7 @@ it("real UI saves, rolls back, retries, reloads and isolates account ratings wit
   render(<App />);
   await screen.findByRole("link", { name: "Sign in to rate this movie" });
   expect(
-    screen.queryByRole("combobox", { name: "Your rating (1 to 5)" }),
+    screen.queryByRole("group", { name: "Your rating (1 to 5)" }),
   ).not.toBeInTheDocument();
   expect(calls.slice(afterLogout).some(({ url }) => url.startsWith("/api/me/ratings/"))).toBe(false);
   fireEvent.click(screen.getByRole("link", { name: "Sign in to rate this movie" }));

@@ -8,6 +8,7 @@ import {
   type RatingValue,
 } from "../api/ratings.ts";
 import { useAuth } from "../auth/authState.ts";
+import StarRating from "./StarRating.tsx";
 
 type RatingLoad =
   | { status: "loading" }
@@ -17,7 +18,6 @@ type RatingLoad =
 function AccountMovieRating({ movieId }: { movieId: string }) {
   const { handleUnauthorized } = useAuth();
   const navigate = useNavigate();
-  const selectId = useId();
   const [load, setLoad] = useState<RatingLoad>({ status: "loading" });
   const [committed, setCommitted] = useState<RatingValue | null>(null);
   const [draft, setDraft] = useState<RatingValue | null>(null);
@@ -145,25 +145,11 @@ function AccountMovieRating({ movieId }: { movieId: string }) {
           void handleSave();
         }}
       >
-        <label htmlFor={selectId}>Your rating (1 to 5)</label>
-        <select
-          id={selectId}
-          value={draft ?? ""}
-          disabled={saving}
-          onChange={(event) => {
-            const value = Number(event.target.value);
-            setDraft(isRatingValue(value) ? value : null);
+        <StarRating value={draft} disabled={saving} onChange={(value) => {
+            setDraft(value);
             setSaved(false);
             setSaveError("");
-          }}
-        >
-          <option value="">Choose a rating</option>
-          {[1, 2, 3, 4, 5].map((value) => (
-            <option key={value} value={value}>
-              {value} / 5
-            </option>
-          ))}
-        </select>
+          }} />
         <button
           type="submit"
           disabled={
