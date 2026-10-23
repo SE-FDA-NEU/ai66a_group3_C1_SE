@@ -170,6 +170,7 @@ def _expanded_expected_response(
                 "genres": [genres[genre_id] for genre_id in candidate["genreIds"]],
                 "popularityScore": candidate["popularityScore"],
                 "reason": expected["reason"],
+                "posterUrl": None,
             }
         )
     saved_ids = set(case["savedGenreIds"])

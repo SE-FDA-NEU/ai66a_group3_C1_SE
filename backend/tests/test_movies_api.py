@@ -224,6 +224,7 @@ def test_movie_detail_has_exact_safe_backdrop_shape_and_never_fetches_tmdb(
             "voteAverage": None,
             "voteCount": None,
             "backdropUrl": "https://image.tmdb.org/t/p/w780/sample-backdrop.jpg",
+            "posterUrl": None,
         }},
         "meta": {"catalogueRevision": response.json()["meta"]["catalogueRevision"]},
     }
