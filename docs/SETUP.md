@@ -442,7 +442,7 @@ The command ran outside the virtual environment, or the backend package is not i
 python -m pip install -e "./backend[dev]" --no-deps
 ```
 
-## T11 early branch: reset/write verification (pending C03)
+## T11 candidate: reset/write verification (C03 reconciled)
 
 This branch changes transaction coordination, not database schema or the TMDb
 catalogue. No new migration, import, package or `.env` field is required for T11.
@@ -469,6 +469,8 @@ a competing writer in a separate process:
 See [reset/concurrency contract](reset-concurrency-contract.md) and
 [actual evidence](evidence/s4-t11-reset-concurrency.md). T11 does not implement a
 new Profile screen; #207/#208/#209/#210 own the remaining summary/UI/watchlist
-and browser acceptance. Reconcile C03 #217 and obtain independent review before
-merging this early branch. Final C05 root-pytest setup remains its own task.
+and browser acceptance. Merged C03 #217 section 13.4 / architecture section 9.1
+are incorporated without changing those contracts. Obtain independent review
+and passing required checks before merging. Final C05 root-pytest setup remains
+its own task, not an additional T11 dependency.
 

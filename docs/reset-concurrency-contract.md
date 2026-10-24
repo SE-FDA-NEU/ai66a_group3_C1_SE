@@ -1,13 +1,16 @@
-# S4-T11 reset and concurrent account writes — implementation proposal
+# S4-T11 reset and concurrent account writes — reconciled implementation
 
 Refs [T11 #206](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/206),
 parent [S11 #33](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/33).
 Date: 2026-10-24 (Asia/Saigon). Base: main
 `3078a9c6fd3dff1f0b8576bc7411f469c7a98fdf`.
 
-The PO authorized early implementation before C03 #217 merges. **This is not an
-approved C03 contract or permission to merge.** Reconcile the final C03 decisions,
-rerun affected checks and obtain independent non-coauthor review before merging.
+The PO authorized early implementation before C03 #217 merged. C03 is now merged
+through PR #222 at main `37c2f66`, incorporated into this candidate. Its API
+section 13.4 and architecture section 9.1 specify the same reservation-before-auth,
+5-second timeout, commit/rollback and reset-preservation policy implemented here.
+There is no competing reset API or new schema. **Independent non-coauthor review
+and required checks on the final pushed head remain merge conditions.**
 The owner is @kietxuan; the planned independent reviewer is @anotify-vie.
 
 ## 1. Existing HTTP boundary, unchanged
@@ -205,13 +208,15 @@ migration is required. Reconcile C05's root pytest discovery when it exists;
 these S11 tests are not the complete six-P0 M4 matrix or per-member evidence.
 
 See [actual evidence](evidence/s4-t11-reset-concurrency.md). Independent
-@anotify-vie review and C03 reconciliation remain pending, not manufactured.
+@anotify-vie review remains pending and is not manufactured.
 
 ## 6. Before merge
 
-- C03 #217 merged and actual contracts reconciled (scope, timeout, helper reuse).
-- Rebase onto the accepted main candidate; resolve shared main/database/docs
-  edits without importing unrelated T01 changes or weakening auth/error checks.
+- C03 #217 merged and actual contracts reconciled (scope, timeout, helper reuse):
+  complete at main `37c2f66`. Shared API/architecture/design retain the reviewed
+  C03 text; this file records implementation-specific detail and downstream use.
+- Main is merged without rewriting the original T11 commits or importing T01.
+  Recheck any later main/database changes before merge; preserve auth/errors.
 - Repeat focused/full regression and record tested code SHA or source digest.
 - Independent non-coauthor rerun and substantive GitHub Review changes approval.
 - Use `Refs #206` while early/pending; only complete accepted work uses Closes.

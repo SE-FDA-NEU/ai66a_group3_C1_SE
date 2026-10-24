@@ -1,14 +1,16 @@
-# S4-T11 local evidence — early implementation, not final approval
+# S4-T11 local evidence — C03 reconciled, independent approval pending
 
 Refs [#206](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/206), parent
 [S11 #33](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/33).
 Date: 2026-10-24 (Asia/Saigon). Implementation base:
 `3078a9c6fd3dff1f0b8576bc7411f469c7a98fdf`.
 
-PO authorized early implementation and push, but no merge before C03 #217 is
-merged/reconciled. Planned independent reviewer: @anotify-vie. Independent
-review, final GitHub CI, complete S11 UI/watchlist acceptance and C03 approval
-are **pending**, not claimed by this author-assisted local evidence.
+PO authorized early implementation and push before C03. The original executions
+below predate the C03 merge; the post-merge reconciliation is recorded separately.
+Planned independent reviewer: @anotify-vie. Independent review, required checks on
+the final pushed head and complete S11 UI/watchlist acceptance are **pending**,
+not claimed by this author-assisted local evidence. Future S11 UI/watchlist
+acceptance belongs to its assigned tasks and does not block T11's backend scope.
 
 ## Baseline and real RED/GREEN
 
@@ -119,3 +121,42 @@ UI cancel/no-request, exact rendered success copy, summary, ambiguous-timeout
 reconciliation, generation invalidation, later login and real watchlist
 preservation are explicitly handed to #207/#208/#209/#210. See the
 [contract and downstream handoff](../reset-concurrency-contract.md).
+
+## Post-C03 reconciliation and repeated verification — 2026-10-24
+
+Merged C03 PR #222 is main `37c2f66`. This candidate incorporates that main
+into the existing T11 history (`433d727`), preserving the reviewed C03 API,
+architecture and design **byte-for-byte** rather than retaining parallel early
+T11 proposal sections. Their reset/write policy already matches the implemented
+reservation-before-auth, five-second timeout, journal-mode preservation, sole
+route commit, rollback and safe 503 behaviour. Implementation detail remains in
+the dedicated reset contract and this evidence.
+
+The executable `backend/` and `frontend/` content is unchanged from
+`433d727c5af6ba8e49c5336714966f975e1431d7`. The following were actually rerun on
+that source plus merged C03 documents, not inferred from historical results:
+
+| Repeated command/check | Observed result |
+|---|---|
+| Focused concurrency / boundary / reset API pytest suites | 76 passed; 11.04s |
+| New concurrency / boundary suites, two additional consecutive runs | 48 passed each; 4.75s / 4.31s |
+| Full isolated backend suite | 495 passed, 1 skipped; 143.28s |
+| Frontend unit regression | 232 passed, 22 files; 7.23s |
+| S04/S13 browser acceptance | 10 passed, separate live-provider mode skipped; 20.5s |
+| T16 / T33 database integration | 1 passed each; 4.80s / 5.88s |
+| T28 offline browser/media verification | 18 passed cases; temporary database removed |
+| C03 document verifier | PASS; 192 local paths, 35 planned P0 IDs, 10 feature oracles |
+| C03 LF/CRLF portability regression | PASS; all seven normalized hashes identical |
+| Backend/scripts Ruff; frontend lint/build | PASS; 57 frontend modules transformed |
+| Alembic heads | Single existing `c6f8a2d4e901`; no T11 migration |
+
+Frontend unit/lint commands exclude only generated `test-results/**` and
+`playwright-report/**`, as in the original T11 evidence; no production source or
+test assertion was removed. The old Starlette/httpx deprecation warning remains.
+All databases/accounts in these tests are disposable synthetic fixtures; no
+live TMDb request, real profile reset, re-import, `.env` change or T01 executable
+is included in this branch. User-owned untracked `tmp/` remains untouched.
+
+Required CI on the final pushed candidate and substantive non-coauthor review
+remain pending. The later profile/watchlist/browser tasks remain assigned;
+these passing backend checks do not close Story #33 or certify full M4 coverage.

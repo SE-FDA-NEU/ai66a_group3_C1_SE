@@ -1,7 +1,13 @@
-# Sprint 3 HTTP API contract
+# HTTP API contract: Sprint 3 implementation and Sprint 4 design
 
 Contract revision: `S3-FINAL`, reconciled on 2026-10-18 against Sprint 3
 `main` SHA `f9774cbe7248c29915086d29bf2b9f99c2aa528a`.
+
+Sprint 4 C03 proposal (2026-10-24): section 13 specifies future routes and
+additive fields for [#217](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/217).
+It is a design contract, **not evidence that these routes or fields are live**.
+Sections 1–12 remain the implemented Sprint 3/post-M3 baseline until the
+respective feature owners implement and verify the section 13 changes.
 
 This document inventories the implemented M2 and Sprint 3 HTTP boundary. Every
 route is labelled with its delivered milestone/task. Genuinely unfinished
@@ -861,24 +867,221 @@ offline without a TMDb token. Live TMDb catalogue import is a separate
 server-side development/staging/Sprint 3 acceptance step; the token must never
 appear in DTOs, frontend assets, logs, fixtures, or documentation evidence.
 
-## Sprint 4 T11 implementation proposal — pending C03 #217
+## 13. Sprint 4 C03 implementation contract (planned, not delivered)
 
-The early T11 branch keeps the reset request `{confirm:true}` and response
-`{data:{reset:true}}` unchanged. Reset/preferences/rating mutations reserve the
-SQLite writer before session/decision reads with `BEGIN IMMEDIATE`, using the
-same request-local Session. Route commit precedes success; an uncommitted exit
-rolls back. The runtime busy timeout is explicitly 5 seconds; unavailable writer
-or persistence failure retains the safe 503 envelope, not fake success.
-Public/protected GETs do not take an IMMEDIATE writer reservation. Existing
-auth/origin/validation rules are retained; no new message field is introduced.
+This section freezes the consumer contract for [#217](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/217).
+It extends, rather than replaces, the Sprint 3 routes above. Feature owners
+must update delivery status with their own tested evidence. All new endpoints
+use the section 1 `{data}` success and `{error:{code,message,requestId}}`
+failure envelopes, opaque internal movie IDs, and the active local SQLite
+catalogue. A database fault is never a valid empty result. No endpoint invokes
+the TMDb metadata API while serving a request.
 
-A committed save before reset is cleared; a deliberate committed save afterwards
-is new data. Reset leaves users/sessions/catalogue/index/media/other accounts and
-future watchlists intact. This is a transaction-boundary amendment, not delivered
-Profile/Watchlist UI or a new summary endpoint. Exact UI success remains
-`Your personalisation profile was reset` and belongs to #208 after known commit.
+| Owner | Method and route | Access | Success | Errors in addition to the established envelope |
+|---|---|---|---|---|
+| T02/T03 | `GET /api/me/recommendations` | Session | Existing paged DTO plus optional personal score fields below | Existing 400/401/409/503; rating read degradation is explicit |
+| T06/T07/T08 | `GET /api/movies/{movieId}/similar` | Public | `{data:{movies: MovieSummaryDto[]}}`, at most five | 404 `MOVIE_NOT_FOUND`; 503 `INDEX_UNAVAILABLE`/`CATALOGUE_UNAVAILABLE`/`SERVICE_UNAVAILABLE` |
+| T06/T09/T10 | `GET /api/movies/search?q=<text>` | Public | `{data:{movies: MovieSummaryDto[]}}`, at most ten | 400 `VALIDATION_ERROR`; 503 `INDEX_UNAVAILABLE`/`CATALOGUE_UNAVAILABLE`/`SERVICE_UNAVAILABLE` |
+| T11/T12 | `GET /api/me/profile` | Session | Profile summary below | 401 `AUTHENTICATION_REQUIRED`; 503 `SERVICE_UNAVAILABLE` |
+| T12 | `GET /api/me/watchlist?page=1&limit=10&catalogueRevision=<revision>` | Session | Paged watchlist below | 400/401/409 `CATALOGUE_CHANGED`/503 |
+| T12 | `GET /api/me/watchlist/{movieId}` | Session | Membership status below | 401/404 `MOVIE_NOT_FOUND`/503 |
+| T12 | `PUT /api/me/watchlist/{movieId}` | Session, same-origin write | 200 committed membership status | 401/403 `ORIGIN_NOT_ALLOWED`/404/503 |
+| T12 | `DELETE /api/me/watchlist/{movieId}` | Session, same-origin write | 200 `{data:{movieId,inWatchlist:false}}` after commit | 401/403/404/503 |
 
-See [reset/concurrency contract](reset-concurrency-contract.md) and
-[executed evidence](evidence/s4-t11-reset-concurrency.md). C03 reconciliation and
-independent review are required before merging; this note does not relabel the
-historical S3 contract as an already approved S4 contract.
+Register the static `/api/movies/search` route **before**
+`/api/movies/{movieId}`; the literal word `search` must not be interpreted
+as a movie ID. The two existing rating routes and
+`POST /api/me/profile/reset` keep their section 9/10 request, response, error,
+authentication and transaction contracts. No duplicate ratings or reset API
+is introduced. On writes the existing same-origin Fetch Metadata/`Origin`
+middleware must also cover watchlist PUT/DELETE; requests cannot select a user
+by body, query, header or path.
+
+### 13.1 Recommendation score transparency
+
+Only `mode="personalised"` movie entries may add these fields; public
+`MovieSummaryDto`, Popular, cold-start and no-match alternatives do not expose
+private ranking or a synthetic `Your rating`:
+
+```json
+{
+  "popularityScore": 80.0,
+  "ratingAdjustment": 1,
+  "adjustedScore": 81.0,
+  "basis": "rating_signals",
+  "reason": {"matchedGenres": [{"id": 28, "name": "Action"}]}
+}
+```
+
+`popularityScore` is the raw TMDb value and never changes. For each
+current-account rated movie that shares at least one canonical genre with an
+eligible candidate, add exactly one sign: 1/2 → -1, 3 → 0, 4/5 → +1. The
+candidate's own rating follows that same shared-genre rule; the account's
+saved genres still select the eligible set. Updating a stored rating replaces its sign. A rated
+movie with two shared genres contributes once. If raw popularity is finite,
+`adjustedScore = popularityScore + ratingAdjustment`. Null popularity stays
+null in both fields; it is never converted to zero. Finite adjusted scores rank
+descending with title then internal ID ties; null-score candidates remain
+after finite candidates in title/ID order. This preserves the current ranking
+when adjustment is zero. Rank/deduplicate the full eligible set, then apply
+the view genre to that base set, then slice pages of at most ten. Existing
+`meta.count/total/unfilteredTotal/totalPages/catalogueRevision` and mode
+selection retain their section 7/8 meaning.
+
+`basis` is `rating_signals` only when a successful rating read supplies a
+nonzero adjustment, `baseline` when it successfully supplies no effective
+signal, and `rating_unavailable` only when a rating-only read fails while
+catalogue/preferences remain safely readable. In that degraded state every
+adjustment is 0, finite `adjustedScore` equals raw popularity, and the UI
+states that personal rating signals are temporarily unavailable. It must not
+claim an account has no ratings. A failed core catalogue/preference read
+remains its actual 503; a bad session remains 401. `Your rating` is read
+separately from `GET /api/me/ratings/{movieId}`; a related movie's signal
+never manufactures a saved rating on the candidate.
+
+Deterministic oracle: Action/Comedy candidates A and B each have raw 80.
+With one +1 related rating for A, A=81 and B=80; with one -1 related rating
+for A, A=79 and B=80. Both still display raw popularity 80; title/ID breaks
+equal adjusted scores. Neutral/no signal keeps the Sprint 3 order. Public
+Popular and both popular recommendation fallbacks keep raw finite-popularity
+ordering and no personal fields.
+
+### 13.2 Shared NLP search and similar reads
+
+The versioned overview index and source/candidate mapping are owned by T06;
+see [architecture.md](architecture.md#9-sprint-4-c03-runtime-and-storage-contract-planned).
+`INDEX_UNAVAILABLE` means the shared index is absent, stale for the active
+catalogue text/config revision, corrupt, or cannot be read. A changed overview
+for the same `catalogueRevision` changes the corpus digest and makes the
+index stale; a poster/backdrop-only update does not. It is not equivalent to
+a movie with missing overview. An explicit empty-vocabulary, successfully
+built index is ready and yields zero cosine scores.
+Its public message is `Search index is temporarily unavailable`; it keeps
+the standard generated `requestId` and exposes no artifact path or stack
+trace.
+
+`GET /api/movies/{movieId}/similar` first checks the source exists in the
+active catalogue (404 otherwise). Candidates must share at least one genre,
+exclude the source, and be unique. With a usable source vector, candidates
+with usable vectors sort by cosine descending, finite popularity descending,
+title ascending, ID ascending; cosine zero remains usable. Missing-text
+candidates follow, ordered by popularity/title/ID. If the source has no usable
+vector, all eligible candidates use the shared popularity/title/ID fallback.
+Return at most five; no eligible candidates is `200 {data:{movies:[]}}`.
+A failed index is 503 even if a source overview is absent.
+
+`GET /api/movies/search?q=<text>` trims the query and requires at least two
+Unicode characters after trimming. Title search is a literal,
+case-insensitive substring: escape SQL `%`, `_` and the escape character;
+never interpret the query as a pattern. Any title matches take precedence;
+sort them by title then ID and return at most ten. Only with zero title
+matches does the shared index transform the query and return strictly
+positive-cosine overview matches by cosine descending, title then ID.
+Zero cosine and unrelated popular films are excluded. No match is
+`200 {data:{movies:[]}}` and the UI displays `No movies found`.
+The text route must distinguish 503 index failure from this valid empty result.
+For the title-only branch, a usable local catalogue can answer without an
+index; the description branch requires a ready index.
+
+Named deterministic fixtures: a `ZEBRA` query finds the title
+`Zebra Case` before any overview fallback; `astronaut rescue moon` with
+no title hit gives positive cosine for `Moon Rescue` ahead of
+`City Robot`; an unrelated `volcano jazz galaxy` query yields no
+positive result. Keep the positive relative-order fixture separate from
+the all-zero exclusion fixture. For Similar, usable text with cosine 0
+still precedes a missing-text candidate, and a missing source vector
+triggers the full popularity fallback.
+
+### 13.3 Poster media on existing DTOs
+
+T01 adds `posterUrl: string | null` to `MovieSummaryDto` and
+`MovieDetailDto` and a nullable local `poster_path` column. The server
+builds an HTTPS `image.tmdb.org/t/p/w500/<validated file>` URL from that
+path; it never sends the raw path, token, or arbitrary provider URL. Null,
+invalid path and failed image load all render the same accessible poster
+fallback, while title, overview and existing `backdropUrl` remain available.
+The importer stores the path without altering stable IDs or a valid active
+catalogue on failed import. A public response never gains rating or
+watchlist membership as a side effect of media work.
+
+### 13.4 Profile and watchlist
+
+`GET /api/me/profile` returns only the session account and committed
+summary, for example:
+
+```json
+{"data":{"genres":[{"id":28,"name":"Action"}],"ratingCount":2,"watchlistCount":1}}
+```
+
+Counts are nonnegative integers for current rows. This read does not mutate
+preferences, ratings or watchlist. The UI uses the existing
+`POST /api/me/profile/reset` confirmation contract. Cancel sends no request.
+Show `Your personalisation profile was reset` only after a known committed
+`200 {data:{reset:true}}`. An ambiguous timeout triggers fresh profile,
+preferences and rating reads; it does not automatically repeat reset or show
+success/failure as certain. Writes committed before reset are cleared;
+deliberate later writes are retained by transaction order. Reset never
+deletes watchlist memberships.
+
+The T11 writer-reservation amendment retains the existing reset request
+`{confirm:true}`, response `{data:{reset:true}}`, auth/origin checks and safe
+error envelope. Reset, preference PUT and rating PUT reserve the SQLite
+writer with `BEGIN IMMEDIATE` before session/decision reads and acknowledge
+only after commit. A busy writer or persistence failure returns the existing
+`503 SERVICE_UNAVAILABLE`; no automatic mutation replay or new message field
+is introduced. GET routes remain read-only. The exact transaction and
+rollback handoff is in [architecture.md](architecture.md#91-rating-reads-transactions-and-reset-order).
+
+Watchlist uses one row per `(user_id,movie_id)` with immutable `addedAt`
+set by the first successful PUT. Repeated PUT is 200 and returns the original
+time for that membership. After DELETE, a later PUT creates a new membership
+with a new time. Repeated DELETE for an active nonmember is 200 with the same
+absence acknowledgement; neither DELETE response includes an `addedAt`.
+GET/PUT membership status:
+
+```json
+{"data":{"movieId":"opaque-internal-id","inWatchlist":true,"addedAt":"2026-10-24T09:00:00Z"}}
+```
+
+DELETE success, including a repeated DELETE for a known active movie:
+
+```json
+{"data":{"movieId":"opaque-internal-id","inWatchlist":false}}
+```
+
+An active movie outside the watchlist has `inWatchlist:false,addedAt:null`
+on GET; unknown
+active-catalogue ID is 404. `WatchlistMovieDto` is exactly
+`MovieSummaryDto` plus `addedAt: UTC ISO-8601 string`.
+`GET /api/me/watchlist` returns
+`{data:{movies:WatchlistMovieDto[]},meta:{count,limit,page,total,totalPages,unfilteredTotal,catalogueRevision}}`.
+It sorts membership by `addedAt` descending, then internal movie ID
+ascending, before slicing. Default page/limit are 1/10; valid bounds are
+page 1–10000 and limit 1–10, matching section 8. Out-of-range pages are 200
+empty with correct totals; `catalogueRevision` mismatch is
+`409 CATALOGUE_CHANGED`. Membership does not change Popular, personalised
+ranking, or raw popularity. Only active catalogue movie IDs are addressable;
+membership for stable IDs survives catalogue refresh, while removal of a
+movie follows its database foreign-key lifecycle. See the storage ownership
+and ordering contract in [architecture.md](architecture.md#9-sprint-4-c03-runtime-and-storage-contract-planned).
+
+### 13.5 Sprint 4 authentication navigation amendment
+
+The backend auth DTO/cookie/error contract in section 5 is unchanged. Its
+Sprint 3 statement that a normal login opens `/recommendations` is
+historical UI behaviour; the Sprint 4 T01 handoff supersedes that navigation
+once its UI is integrated. A normal successful login from Home or directly
+from `/login` opens Home `/` with authenticated navigation and does not
+automatically open, save or change preferences/recommendations. Start and
+Preferences are explicit actions. A guest selecting Start reaches
+`/preferences` through sign-in or registration and returns there after
+successful login. The sole exception to Home landing is an explicit,
+validated internal protected-route return destination; an absent, external
+or unsafe destination falls back to Home. The single navbar
+`My recommendations` link opens the existing recommendation flow, including
+its cold-start state when no genres are saved.
+
+The corresponding first S13 acceptance criterion is replaced locally in
+[requirements.md](requirements.md#s13-sign-in-and-sign-out-securely-p0-5-points).
+The GitHub Story #45 AC must be reconciled before merge so the old
+`always /recommendations` and new Home outcomes are not both accepted.
