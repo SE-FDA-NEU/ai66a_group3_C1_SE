@@ -360,7 +360,6 @@ def logout(
 @app.get(
     "/api/me/recommendations",
     response_model=RecommendationResponse,
-    response_model_exclude_unset=True,
     status_code=200,
 )
 def recommendations(
@@ -408,7 +407,7 @@ def recommendations(
 
     return {
         "data": {
-            "movies": [movie.model_dump(exclude_unset=True) for movie in result.movies],
+            "movies": [movie.model_dump() for movie in result.movies],
             "mode": result.mode,
             "personalised": result.personalised,
             "noMatch": result.no_match,

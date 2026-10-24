@@ -5,7 +5,7 @@ from collections.abc import Iterable
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
-from app.db.models import CatalogMovie, CatalogueState, MovieGenre, UserMovieRating
+from app.db.models import CatalogMovie, CatalogueState, MovieGenre
 from app.recommendations.ranker import popularity_title_id_ordering
 from app.repositories.movies import ACTIVE_CATALOGUE_STATE_ID
 
@@ -121,47 +121,6 @@ def list_genre_matched_movies(
         .order_by(*popularity_title_id_ordering()).limit(limit)
         .offset((page - 1) * limit))
     return list(session.scalars(statement).unique())
-
-
-def list_all_genre_matched_movies(
-    session: Session, *, genre_ids: Iterable[int]
-) -> list[CatalogMovie]:
-    """Materialise the full eligible set before personal ranking and paging."""
-
-    selected_genre_ids = set(genre_ids)
-    if not selected_genre_ids:
-        return []
-    shares_selected = (
-        select(MovieGenre.movie_id)
-        .where(
-            MovieGenre.movie_id == CatalogMovie.id,
-            MovieGenre.genre_id.in_(selected_genre_ids),
-        )
-        .exists()
-    )
-    statement = (
-        select(CatalogMovie)
-        .join(
-            CatalogueState,
-            CatalogueState.active_revision_id == CatalogMovie.catalogue_revision_id,
-        )
-        .where(CatalogueState.id == ACTIVE_CATALOGUE_STATE_ID, shares_selected)
-        .options(selectinload(CatalogMovie.genres))
-    )
-    return list(session.scalars(statement).unique())
-
-
-def list_user_rating_genres(
-    session: Session, *, user_id: str
-) -> list[tuple[str, int, int]]:
-    """Read current-account rating and canonical genres without joining candidates."""
-
-    statement = (
-        select(UserMovieRating.movie_id, UserMovieRating.rating, MovieGenre.genre_id)
-        .join(MovieGenre, MovieGenre.movie_id == UserMovieRating.movie_id)
-        .where(UserMovieRating.user_id == user_id)
-    )
-    return [(movie_id, rating, genre_id) for movie_id, rating, genre_id in session.execute(statement)]
 
 
 def count_genre_matched_movies(

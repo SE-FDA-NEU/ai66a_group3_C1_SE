@@ -48,27 +48,6 @@ it("renders server page and complete-set totals without slicing it in the browse
   expect(screen.getByText("Action One")).toBeInTheDocument();
 });
 
-it("shows adjusted and raw score separately on personal cards", async () => {
-  vi.spyOn(globalThis, "fetch").mockResolvedValue(json({ data: { genres: [action] } }));
-  mount({ snapshot: { ...result, movies: [{ ...movies[0], popularityScore: 80,
-    ratingAdjustment: 1, adjustedScore: 81, basis: "rating_signals" }] } });
-  expect(await screen.findByText("Personal adjusted score")).toBeInTheDocument();
-  expect(screen.getByText("TMDb popularity")).toBeInTheDocument();
-  expect(screen.getByText("81")).toBeInTheDocument();
-  expect(screen.getByText("80")).toBeInTheDocument();
-  expect(screen.getByText("Related rating signals: +1")).toBeInTheDocument();
-  expect(screen.queryByText(/Your rating/)).not.toBeInTheDocument();
-});
-
-it("labels rating-only failure without claiming there are no ratings", async () => {
-  vi.spyOn(globalThis, "fetch").mockResolvedValue(json({ data: { genres: [action] } }));
-  mount({ snapshot: { ...result, movies: [{ ...movies[0], popularityScore: 80,
-    ratingAdjustment: 0, adjustedScore: 80, basis: "rating_unavailable" }] } });
-  expect(await screen.findByText(/Personal rating signals are temporarily unavailable/))
-    .toBeInTheDocument();
-  expect(screen.queryByText(/No ratings/)).not.toBeInTheDocument();
-});
-
 it("renders a true filtered-empty response and a clear action", async () => {
   vi.spyOn(globalThis, "fetch").mockResolvedValue(json({ data: { genres: [action, horror] } }));
   const onGenreChange = vi.fn();

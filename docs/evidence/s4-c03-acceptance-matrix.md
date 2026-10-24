@@ -163,23 +163,6 @@ acceptance for the 35 planned P0 cases.
 |---|---|
 | `docs/api.md` | `23ce959fc94c13bf2dd27f81721dbffd687e16895f85abdb00ab52c8c2474afe` |
 
-### #22 consumer documentation after C03 merge
-
-The historical C03 and T01 hashes above remain evidence of their own
-captures. The local #22 ranking candidate adds implementation and
-author-test links to four contract documents; their current normalized-LF
-hashes follow so the read-only verifier remains usable after downstream
-documentation evolves. The [#22 author evidence](s4-t03-rating-ranking.md)
-records its executable checks. These hash updates do not claim C03 was
-rerun, re-reviewed or re-approved.
-
-| File | SHA-256 after UTF-8 LF normalization |
-|---|---|
-| `docs/api.md` | `50ce83fcb46abfc3068d69dece5b4f14b8c2550e4984e70b4c1ddcd15dcca08a` |
-| `docs/architecture.md` | `bdffc53969557a2a7dcfd5ea98439a9662c2ccf87f4441a080463972c19f6ab0` |
-| `docs/design.md` | `59d13f832e2c31340a5e527d343391e03d032774d9907ec9677929fa91273058` |
-| `docs/testing.md` | `9d48b53a8f38a9b9db73b8c691e2f74ad51f798d04aba67f7a9dfa10333a8476` |
-
 ## Review and acceptance status
 
 The author-side mapping and local checks are complete. **Independent

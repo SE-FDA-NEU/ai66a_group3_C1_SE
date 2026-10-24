@@ -175,11 +175,6 @@ def _expanded_expected_response(
                 "popularityScore": candidate["popularityScore"],
                 "reason": expected["reason"],
                 "posterUrl": None,
-                **({
-                    "ratingAdjustment": 0,
-                    "adjustedScore": candidate["popularityScore"],
-                    "basis": "baseline",
-                } if case["expectedResponse"]["data"]["mode"] == "personalised" else {}),
             }
         )
     saved_ids = set(case["savedGenreIds"])
@@ -719,11 +714,10 @@ def test_t09_active_empty_catalogue_is_cold_start_success_not_a_source_error(
     assert _committed_preference_rows(database_session) == []
 
 
-@pytest.mark.parametrize(("rating", "sign"), [(1, -1), (5, 1)])
-def test_t09_saved_ratings_change_only_current_account_scores_not_preferences(
+@pytest.mark.parametrize("rating", [1, 5])
+def test_t09_saved_ratings_do_not_change_sprint3_ranking_or_preferences(
     database_session: Session,
     rating: int,
-    sign: int,
 ) -> None:
     _seed_small_catalogue(database_session)
     account_a, _ = _sign_in("t09-rating-a@example.com")
@@ -745,17 +739,6 @@ def test_t09_saved_ratings_change_only_current_account_scores_not_preferences(
     after_a = account_a.get("/api/me/recommendations")
     after_b = account_b.get("/api/me/recommendations")
     assert after_a.status_code == after_b.status_code == 200
-    before_cards = baseline_a.json()["data"]["movies"]
-    after_cards = after_a.json()["data"]["movies"]
-    assert [movie["id"] for movie in after_cards] == [movie["id"] for movie in before_cards]
-    assert [movie["popularityScore"] for movie in after_cards] == [
-        movie["popularityScore"] for movie in before_cards
-    ]
-    assert all(movie["ratingAdjustment"] == sign for movie in after_cards)
-    assert all(movie["basis"] == "rating_signals" for movie in after_cards)
-    assert [movie["adjustedScore"] for movie in after_cards] == [
-        movie["popularityScore"] + sign if movie["popularityScore"] is not None else None
-        for movie in before_cards
-    ]
+    assert after_a.json() == baseline_a.json()
     assert after_b.json() == baseline_b.json()
     assert _committed_preference_rows(database_session) == rows_before

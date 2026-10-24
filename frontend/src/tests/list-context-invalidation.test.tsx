@@ -40,9 +40,6 @@ function Controls() {
     <button type="button" onClick={() => {
       auth.invalidateRecommendations(); navigate("/recommendations");
     }}>Save new preferences</button>
-    <button type="button" onClick={() =>
-      auth.invalidateRecommendations({ preserveNavigation: true })
-    }>Refresh after rating</button>
     <button type="button" onClick={() => navigate(-1)}>Browser Back</button>
   </>;
 }
@@ -170,12 +167,6 @@ it("keeps a detail navigation when only the recommendation source and hash chang
   expect(await screen.findByText("Source detail")).toBeInTheDocument();
   await waitFor(() => expect(window.location.pathname).toBe("/movies/source-1"));
   expect(requests).toHaveLength(beforeSource);
-  fireEvent.click(screen.getByRole("button", { name: "Refresh after rating" }));
-  fireEvent.click(screen.getByRole("link", { name: "Back to recommendations" }));
-  await waitFor(() => expect(window.location.pathname).toBe("/recommendations"));
-  expect(window.location.search).toBe("?source=t34");
-  expect(window.location.hash).toBe("#results");
-  await waitFor(() => expect(requests).toHaveLength(beforeSource + 1));
 });
 
 it.each([

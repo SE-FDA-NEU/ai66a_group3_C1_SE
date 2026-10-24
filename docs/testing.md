@@ -170,11 +170,6 @@ The [C03 acceptance matrix](evidence/s4-c03-acceptance-matrix.md) maps
 the supplied requirements to exact contract sections and records the
 reproducible local document checks.
 
-Downstream #22 author-run rating/ranking evidence is in
-[the local S4-T03 check](evidence/s4-t03-rating-ranking.md). Its RED/GREEN
-and regression results apply only to that executable candidate; they do
-not retroactively turn every planned C03 P0 case into an executed test.
-
 The final dossier needs at least one actual bug with fix/PR/guarding test,
 or a clearly labelled intentional **business-rule mutation** with the failing
 assertion output and restored green rerun. C04 #218 owns final compilation

@@ -5,9 +5,6 @@ export type RecommendationMovie = MovieSummary & {
   reason: {
     matchedGenres: Genre[];
   };
-  ratingAdjustment?: number;
-  adjustedScore?: number | null;
-  basis?: "baseline" | "rating_signals" | "rating_unavailable";
 };
 
 export type RecommendationResult = {

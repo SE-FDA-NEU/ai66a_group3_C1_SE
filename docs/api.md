@@ -913,17 +913,6 @@ by body, query, header or path.
 
 ### 13.1 Recommendation score transparency
 
-The #22 implementation candidate uses the existing
-`GET /api/me/recommendations` route and `ams_session` identity. It reads the
-complete active, saved-genre-eligible set and only the current account's
-rating/genre rows, computes one sign per related rated movie, sorts by
-adjusted score/title/ID, applies the optional view genre to that ordered
-base set, then slices the requested page. The existing 401, 409 and core
-503 paths remain distinct from the rating-only degradation described below.
-No schema migration or provider call is needed for this ranking change.
-Author-run evidence and remaining review gates are in
-[the #22 local check](evidence/s4-t03-rating-ranking.md).
-
 Only `mode="personalised"` movie entries may add these fields; public
 `MovieSummaryDto`, Popular, cold-start and no-match alternatives do not expose
 private ranking or a synthetic `Your rating`:

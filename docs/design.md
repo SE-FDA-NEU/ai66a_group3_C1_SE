@@ -779,16 +779,6 @@ and never imply that the account has no ratings. Public/cold-start/no-match
 cards have no adjusted-score badge. Recommendation reasons say which saved
 genres matched; they must not invent AI confidence percentages.
 
-The #22 candidate wires this distinction through
-`frontend/src/api/recommendations.ts`, `MovieGrid` and `MovieCard`:
-personalised cards show raw `TMDb popularity`, `Personal adjusted score`
-and a truthful signal/baseline/unavailable label; public and Popular cards
-receive no private ranking props. Focused React evidence is recorded in
-[the local #22 check](evidence/s4-t03-rating-ranking.md); browser
-acceptance and independent review are separate pending gates.
-After a confirmed rating save, `MovieRating` invalidates this account's
-recommendation request generation; a failed or unconfirmed save does not.
-
 Search accepts a trimmed query of at least two characters; keyboard Enter
 submits and a labelled search control works without mouse. It shows title
 matches first under the server contract, or positive overview matches when

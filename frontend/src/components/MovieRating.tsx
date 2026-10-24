@@ -16,7 +16,7 @@ type RatingLoad =
   | { status: "error"; message: string };
 
 function AccountMovieRating({ movieId }: { movieId: string }) {
-  const { handleUnauthorized, invalidateRecommendations } = useAuth();
+  const { handleUnauthorized } = useAuth();
   const navigate = useNavigate();
   const [load, setLoad] = useState<RatingLoad>({ status: "loading" });
   const [committed, setCommitted] = useState<RatingValue | null>(null);
@@ -90,7 +90,6 @@ function AccountMovieRating({ movieId }: { movieId: string }) {
       setCommitted(rating);
       setDraft(rating);
       setSaved(true);
-      invalidateRecommendations({ preserveNavigation: true });
     } catch (error: unknown) {
       if (!current()) return;
       if (error instanceof RatingApiError && error.status === 401) {

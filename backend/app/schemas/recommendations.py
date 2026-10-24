@@ -17,9 +17,6 @@ class RecommendationMovieDto(MovieSummaryDto):
     """A public movie card plus its account-specific explanation."""
 
     reason: RecommendationReason
-    ratingAdjustment: int | None = None
-    adjustedScore: float | None = None
-    basis: Literal["baseline", "rating_signals", "rating_unavailable"] | None = None
 
 
 class RecommendationData(BaseModel):
