@@ -6,8 +6,11 @@ This candidate implements the rating-sign portion of Story S05b/#22 on the
 existing protected recommendation route. The source specification was the
 user-supplied 2026-10-24 issue excerpt, the merged C03 contract and existing
 S3 code. Live issue pages were unavailable from this environment, so no
-later issue edit is claimed checked. The work is local only: no commit,
-push, PR, issue closure or independent review is claimed here.
+later issue edit is claimed checked. The original author run preceded commits
+`35903ea18e8c67f25ffeb2099fd5a3aebb06cb44` (executable and tests) and
+`c82998d9144bcb668dea17840d1693326cca77f1` (contracts and evidence).
+The acceptance-test corrections below are local working files after those
+commits. No PR approval, issue closure or independent review is claimed here.
 
 The runtime reuses the TMDb-imported **local** SQLite catalogue, existing
 ratings/preferences/session tables and established route. Tests seed
@@ -56,12 +59,13 @@ The GREEN rerun of the same parametrized test reported:
 5 passed, 528 deselected, 1 warning in 2.79s
 ```
 
-The full post-implementation executable has no commit SHA because the user
-has authorized local edits only. The base SHA above plus the working-tree
-file digests recorded below identify what was tested. A later commit SHA
-must be added by the author before external review; this report does not
-invent one. RED/GREEN is feature TDD evidence. No mutation/effectiveness
-result is claimed; #200 may audit that separately.
+The RED/GREEN run preceded the commits above. A later read-only check compared
+all 12 executable normalized hashes below against the committed candidate:
+12 matched, 0 mismatched at `c82998d`. The focused backend test was rerun on
+that commit: `12 passed, 528 deselected, 1 warning in 4.71s`, exit 0. The
+current acceptance-test corrections have no commit SHA yet. RED/GREEN is
+feature TDD evidence. No mutation/effectiveness result is claimed; #200 may
+audit that separately.
 
 ## Acceptance observations
 
@@ -121,9 +125,10 @@ only Git's LF-to-CRLF conversion warning for `docs/testing.md`.
 ### Exact working-tree executable snapshot
 
 These are SHA-256 digests of UTF-8 file text after CRLF/CR → LF normalization.
-They identify the author-tested candidate on base HEAD `53f761d` until an
-actual implementation commit exists. Documentation digests are separately
-checked by `scripts/verify_s4_c03_contract.py`.
+They identify the original author-tested candidate on base HEAD `53f761d`;
+all 12 still matched the implementation commit `35903ea` at the follow-up
+check. Documentation digests are separately checked by
+`scripts/verify_s4_c03_contract.py`.
 
 | File | Normalized-LF SHA-256 |
 |---|---|
@@ -152,6 +157,64 @@ its correction buffer; no PO approval is fabricated here.
 
 Story S05b's five criteria have corresponding author-run observations above.
 Independent substantive review by a non-coauthor, live issue comparison,
-browser acceptance where required, a post-commit tested SHA, CI and merge
-remain open. These cannot be completed by this local-only run. #200 is a
-later audit, not a prerequisite for the RED/GREEN sequence above.
+browser acceptance where required, CI and merge remain open. The two commit
+SHAs above identify the submitted implementation and documentation; the
+follow-up acceptance-test correction needs its own SHA if committed. #200 is
+a later audit, not a prerequisite for the RED/GREEN sequence above.
+
+## Local response to failing acceptance checks
+
+A 2026-10-24 CI screenshot showed S04, T33 and T34 failing on both push and
+pull-request events, plus `Someone else must review`. GitHub logs were
+inaccessible from this local environment. The exact CI failure lines were not
+available; the local reproductions and repairs below identify the failures
+observed on the same source. No CI pass is claimed for these corrections.
+
+The T33 integration test initially failed because its Sprint 3 oracle compared
+the entire before/after recommendation response. The observed response had
+`adjustedScore` 99 instead of 98 and `basis=rating_signals` after rating 5.
+The revised test checks unchanged raw popularity and the new score/basis
+relationship. After the final UI correction, local
+`npm.cmd --prefix frontend run test:t33:integration` returned `1 passed`
+in 7.14s, exit 0.
+
+The S04 browser test initially expected seven `.movie-reason` elements for
+seven personalised cards; the new UI correctly rendered fourteen because it
+also shows a rating-signal line. The revised test distinguishes both lines.
+With the locally installed Edge channel, the full
+`npm.cmd --prefix frontend run test:s04:e2e` command returned exit 0:
+`10 passed, 1 skipped (23.1s)`, with
+`s04_temporary_database_removed=true`. The skipped case is a separate live
+TMDb environment smoke; the ten synthetic browser/API cases passed. The
+default Playwright Chromium binary was absent locally; CI installs it
+separately. An earlier sandboxed Windows run stalled during teardown; the
+final unrestricted local run exited normally. The exact CI rerun after these
+corrections remains pending.
+
+T34 also contained an old before/after order invariant; the revised verifier
+compares browser order with the new API order, confirms raw popularity is
+unchanged, and checks a related +1 signal after rating 5. A local T34 browser
+run then reached a separate real failure: after rating save, the detail back
+link targeted `/recommendations?source=t34#results`, but the app reset it to
+`/recommendations?page=1`. The rating save rotated the navigation scope,
+which is appropriate for account/preference changes but discarded the safe
+return query and fragment. The UI correction now advances the recommendation
+data version while retaining navigation scope for a confirmed rating save.
+The account/preference invalidation path still rotates scope.
+
+The final Windows PowerShell/Edge 155 T34 run used a migrated temporary SQLite
+database and exited 0 with `result=PASS`,
+`candidate_source_sha256=37588da47de212051567d8363f15c2a8a63097e7389471d4c2fb5bf0ac6df951`.
+The run reported guest protection, save/failure/retry, account isolation,
+delayed-response isolation, revoked/expired session handling, return context,
+recommendation cache isolation, and `database_integrity=ok` as PASS. Its
+[real browser screenshot](s4-22-rating-adjusted-recommendations.png) shows
+TMDb popularity 110/95, personal adjusted scores 111/96 and a +1 related
+rating signal on the synthetic accepted catalogue. The PNG is 21,571 bytes;
+SHA-256 `f56a66384bede83578bf38487d5f212db3c6e51ead6da0f14b7cda5ed914ebac`.
+This is isolated synthetic browser evidence, not a live TMDb catalogue run.
+
+After the correction, frontend unit tests returned `278 passed` in 22.68s;
+frontend lint/build, Ruff and Python compilation of the verifier passed.
+The S04, T33 and T34 workflow runs on the new uncommitted candidate, and the
+independent approval gate, remain pending on GitHub.

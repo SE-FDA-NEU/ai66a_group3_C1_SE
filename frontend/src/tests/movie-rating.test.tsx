@@ -162,6 +162,7 @@ it.each([1, 3, 5])(
     ).toBeInTheDocument();
     expect(screen.getByText("Rating saved.")).toBeInTheDocument();
     expect(view.invalidateRecommendations).toHaveBeenCalledTimes(1);
+    expect(view.invalidateRecommendations).toHaveBeenCalledWith({ preserveNavigation: true });
   },
 );
 
@@ -186,6 +187,7 @@ it("preserves committed 3 and draft 5 after failure, then retries the same PUT",
   fireEvent.click(screen.getByRole("button", { name: "Retry save" }));
   await screen.findByText("Your saved rating: 5/5");
   expect(view.invalidateRecommendations).toHaveBeenCalledTimes(1);
+  expect(view.invalidateRecommendations).toHaveBeenCalledWith({ preserveNavigation: true });
   const puts = fetch.mock.calls.filter(
     ([, options]) => options?.method === "PUT",
   );

@@ -90,7 +90,7 @@ function AccountMovieRating({ movieId }: { movieId: string }) {
       setCommitted(rating);
       setDraft(rating);
       setSaved(true);
-      invalidateRecommendations();
+      invalidateRecommendations({ preserveNavigation: true });
     } catch (error: unknown) {
       if (!current()) return;
       if (error instanceof RatingApiError && error.status === 401) {

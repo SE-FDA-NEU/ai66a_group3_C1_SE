@@ -25,12 +25,26 @@ type DatabaseState = {
   ratings: [string, string, number][];
   integrity: string;
 };
+type RecommendationResult = {
+  status: number;
+  body: {
+    data: {
+      movies: {
+        id: string;
+        popularityScore: number | null;
+        ratingAdjustment: number;
+        adjustedScore: number | null;
+        basis: "baseline" | "rating_signals" | "rating_unavailable";
+      }[];
+    };
+  };
+};
 const state = async () => (await bridge.call("state")) as DatabaseState;
 const choose = (value: number) => fireEvent.click(
   screen.getByRole("radio", { name: `${value} ${value === 1 ? "star" : "stars"}` }),
 );
 
-it("real UI saves, rolls back, retries, reloads and isolates account ratings without changing preferences or ranking", async () => {
+it("real UI saves, updates personal scores, rolls back, retries, reloads and isolates account ratings without changing preferences", async () => {
   const baseline = await state();
   expect(baseline.preferences).toHaveLength(3);
   expect(baseline.ratings).toEqual([]);
@@ -87,7 +101,11 @@ it("real UI saves, rolls back, retries, reloads and isolates account ratings wit
   const beforeRanking = await bridge.call("request", {
     url: "/api/me/recommendations?limit=10",
     method: "GET",
-  });
+  }) as RecommendationResult;
+  expect(beforeRanking.status).toBe(200);
+  expect(beforeRanking.body.data.movies.every((movie) =>
+    movie.ratingAdjustment === 0 && movie.basis === "baseline"
+  )).toBe(true);
   async function save(value: number, button = "Save rating") {
     choose(value);
     fireEvent.click(screen.getByRole("button", { name: button }));
@@ -114,8 +132,19 @@ it("real UI saves, rolls back, retries, reloads and isolates account ratings wit
   const afterRanking = await bridge.call("request", {
     url: "/api/me/recommendations?limit=10",
     method: "GET",
-  });
-  expect(afterRanking).toEqual(beforeRanking);
+  }) as RecommendationResult;
+  expect(afterRanking.status).toBe(200);
+  const beforeById = new Map(beforeRanking.body.data.movies.map((movie) => [movie.id, movie]));
+  expect(beforeById.size).toBeGreaterThan(0);
+  expect(afterRanking.body.data.movies.some((movie) => movie.ratingAdjustment > 0)).toBe(true);
+  for (const movie of afterRanking.body.data.movies) {
+    const before = beforeById.get(movie.id);
+    if (before) expect(movie.popularityScore).toBe(before.popularityScore);
+    expect(movie.adjustedScore).toBe(
+      movie.popularityScore === null ? null : movie.popularityScore + movie.ratingAdjustment,
+    );
+    expect(movie.basis).toBe(movie.ratingAdjustment > 0 ? "rating_signals" : "baseline");
+  }
   fireEvent.click(
     screen.getByRole("link", { name: "Back to recommendations" }),
   );

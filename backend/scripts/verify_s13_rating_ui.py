@@ -92,10 +92,10 @@ def prepare_account(
     return user_id
 
 
-def recommendation_ids(client: httpx.Client) -> list[str]:
+def recommendation_movies(client: httpx.Client) -> list[dict[str, object]]:
     response = client.get("/api/me/recommendations?limit=10")
     assert response.status_code == 200, response.text
-    return [movie["id"] for movie in response.json()["data"]["movies"]]
+    return response.json()["data"]["movies"]
 
 
 def database_snapshot(database_path: Path) -> dict[str, object]:
@@ -613,7 +613,8 @@ def main() -> int:
                 email=ACCOUNT_B_EMAIL,
                 genre_ids=ACCOUNT_B_GENRES,
             )
-            recommendations_before_rating = recommendation_ids(account_a_api)
+            before_rating_movies = recommendation_movies(account_a_api)
+            recommendations_before_rating = [movie["id"] for movie in before_rating_movies]
             assert recommendations_before_rating
             assert database_snapshot(database_path)["ratings"] == []
 
@@ -722,10 +723,37 @@ def main() -> int:
                     ),
                     "preserved recommendation context",
                 )
-                assert returned["cards"] == a_recommendations["cards"]
                 assert account_preferences(database_path, account_a_id) == ACCOUNT_A_GENRES
-                recommendations_after_rating = recommendation_ids(account_a_api)
-                assert recommendations_after_rating == recommendations_before_rating
+                after_rating_movies = recommendation_movies(account_a_api)
+                recommendations_after_rating = [movie["id"] for movie in after_rating_movies]
+                expected_titles = [movie["title"] for movie in after_rating_movies]
+                returned = page.wait_for(
+                    lambda state: state["cards"] == expected_titles,
+                    "rating-adjusted recommendation order",
+                )
+                raw_scores_before = {
+                    movie["id"]: movie["popularityScore"]
+                    for movie in before_rating_movies
+                }
+                assert all(
+                    movie["popularityScore"] == raw_scores_before[movie["id"]]
+                    for movie in after_rating_movies
+                    if movie["id"] in raw_scores_before
+                )
+                assert any(
+                    movie["ratingAdjustment"] == 1
+                    and movie["basis"] == "rating_signals"
+                    and movie["adjustedScore"] == movie["popularityScore"] + 1
+                    for movie in after_rating_movies
+                    if movie["popularityScore"] is not None
+                )
+                page.call(
+                    "Runtime.evaluate",
+                    {"expression": "document.querySelector('.movie-card__body')?.scrollIntoView()"},
+                )
+                page.screenshot(
+                    evidence_dir / "t34-03b-rating-adjusted-recommendations.png"
+                )
                 record_requests(browser_requests, "guest-and-account-a", returned)
 
                 # The same browser switches to B. B gets B's recommendation

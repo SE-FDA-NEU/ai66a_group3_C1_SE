@@ -105,8 +105,13 @@ async function assertCards(page: Page, titles: string[], personalised = false) {
   const hrefs = await cards(page).getByRole("link").evaluateAll((links) => links.map((link) => link.getAttribute("href")));
   expect(hrefs).toEqual(titles.map((title) => `/movies/${fixture.movies.find((row: { title: string }) => row.title === title).id}`));
   expect(new Set(hrefs).size).toBe(titles.length);
-  await expect(page.locator(".movie-reason")).toHaveCount(personalised ? titles.length : 0);
-  if (personalised) await expect(page.locator(".movie-reason")).toHaveText(titles.map(() => "Matches your genres: Action"));
+  const reasons = page.locator(".movie-reason");
+  await expect(reasons).toHaveCount(personalised ? titles.length * 2 : 0);
+  if (personalised) {
+    await expect(reasons.filter({ hasText: "No effective rating adjustment." })).toHaveCount(titles.length);
+    await expect(reasons.filter({ hasText: "Matches your genres: Action" })).toHaveCount(titles.length);
+    await expect(cards(page).getByText("Personal adjusted score")).toHaveCount(titles.length);
+  }
 }
 
 async function saveGenre(page: Page, genre: string) {
