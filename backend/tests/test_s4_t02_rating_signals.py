@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import json
 from collections.abc import Iterator
+from pathlib import Path
 
 import pytest
 from app.db.database import Base
-from app.db.models import CatalogMovie, User, UserMovieRating
+from app.db.models import CatalogMovie, CatalogueState, User, UserMovieRating
 from app.recommendations.signals import (
     adjustment_for_candidate,
     load_account_genre_signals,
@@ -23,6 +25,7 @@ from sqlalchemy.orm import Session
 
 ACCOUNT_A = "10000000-0000-0000-0000-000000000001"
 ACCOUNT_B = "10000000-0000-0000-0000-000000000002"
+ORACLE_PATH = Path(__file__).parent / "fixtures" / "s4_t02_ranking_handoff.json"
 
 
 @pytest.fixture
@@ -132,7 +135,7 @@ def test_s4_t02_account_isolation_and_no_ratings_baseline(
     assert adjustment_for_candidate(a, genre_ids=[3]) == 0
 
 
-def test_s4_t02_ignores_ratings_from_inactive_catalogue(
+def test_s4_t02_keeps_saved_rating_history_when_source_leaves_active_catalogue(
     seeded_session: tuple[Session, dict[str, str]],
 ) -> None:
     session, ids = seeded_session
@@ -141,8 +144,105 @@ def test_s4_t02_ignores_ratings_from_inactive_catalogue(
         load_account_genre_signals(session, user_id=ACCOUNT_A), genre_ids=[1]
     ) == 1
     replacement = create_catalogue_revision(session, provider="synthetic-test")
+    candidate = upsert_catalogue_movie(
+        session,
+        catalogue_revision_id=replacement.id,
+        source="synthetic-test",
+        source_id="new-action-candidate",
+        title="New Action Candidate",
+        popularity_score=80.0,
+    )
+    replace_movie_genres(session, movie=candidate, genre_ids=[1])
     activate_catalogue_revision(session, revision_id=replacement.id)
     session.commit()
+    assert session.scalar(select(UserMovieRating.rating).where(
+        UserMovieRating.user_id == ACCOUNT_A,
+        UserMovieRating.movie_id == ids["Action Signal"],
+    )) == 5
+    assert candidate.catalogue_revision_id == replacement.id
+    assert session.scalar(select(CatalogueState.active_revision_id)) == replacement.id
     assert adjustment_for_candidate(
         load_account_genre_signals(session, user_id=ACCOUNT_A), genre_ids=[1]
-    ) == 0
+    ) == 1
+
+
+def test_s4_t02_90_80_neutral_handoff(
+    seeded_session: tuple[Session, dict[str, str]],
+) -> None:
+    session, ids = seeded_session
+    fixture = json.loads(ORACLE_PATH.read_text(encoding="utf-8"))["neutral90_80"]
+    action = session.get(CatalogMovie, ids["Action Candidate"])
+    comedy = session.get(CatalogMovie, ids["Comedy Candidate"])
+    source = session.get(CatalogMovie, ids["Action Signal"])
+    assert action is not None and comedy is not None and source is not None
+    for movie, row in zip((action, comedy), fixture["candidates"], strict=True):
+        movie.title = row["title"]
+        movie.popularity_score = row["popularityScore"]
+    source.title = fixture["ratedSource"]["title"]
+    source.popularity_score = fixture["ratedSource"]["popularityScore"]
+    session.commit()
+    save_rating(
+        session, account=ACCOUNT_A, movie_id=source.id,
+        value=fixture["ratedSource"]["rating"],
+    )
+
+    signals = load_account_genre_signals(session, user_id=ACCOUNT_A)
+    assert adjustment_for_candidate(signals, genre_ids=[1]) == 0
+    assert adjustment_for_candidate(signals, genre_ids=[2]) == 0
+    assert [action.popularity_score, comedy.popularity_score] == [90, 80]
+    assert fixture["expectedAdjustments"] == {
+        action.title: 0, comedy.title: 0, source.title: 0,
+    }
+    assert fixture["expectedOrderedTitles"] == [
+        action.title, comedy.title, source.title,
+    ]
+
+
+def test_s4_t02_whole_set_handoff_oracle_is_explicit() -> None:
+    fixture = json.loads(ORACLE_PATH.read_text(encoding="utf-8"))["wholeSet25"]
+    candidates = fixture["candidates"]
+    titles = [row["title"] for row in candidates]
+    pages = fixture["expectedAfterPages"]
+    meta = fixture["expectedPageMeta"]
+    target = next(row for row in candidates if row["title"] == "Target")
+    source = fixture["ratedSource"]
+    signals = {genre_id: {source["sourceId"]: 1}
+               for genre_id in source["genreIds"]}
+
+    assert len(titles) == len(set(titles)) == meta["total"] == 25
+    assert fixture["selectedGenreIds"] == [1]
+    assert source["rating"] == 5 and source["genreIds"] == [2]
+    assert target["popularityScore"] == 90.5
+    assert adjustment_for_candidate(signals, genre_ids=target["genreIds"]) == 1
+    assert all(
+        adjustment_for_candidate(signals, genre_ids=row["genreIds"]) == 0
+        for row in candidates if row is not target
+    )
+    assert fixture["expectedAdjustment"] == {"Target": 1, "otherCandidates": 0}
+    assert "Target" not in fixture["expectedBeforePage1"]
+    assert fixture["expectedBeforePage1"][-1] == "Action 10"
+    assert pages[0][-1] == "Target"
+    before = sorted(candidates, key=lambda row: (-row["popularityScore"], row["title"]))
+    after = sorted(candidates, key=lambda row: (
+        -(row["popularityScore"] + adjustment_for_candidate(
+            signals, genre_ids=row["genreIds"]
+        )), row["title"],
+    ))
+    assert before[10]["title"] == "Target"
+    assert after[9]["title"] == "Target"
+    assert [row["title"] for row in before[:fixture["limit"]]] == fixture[
+        "expectedBeforePage1"
+    ]
+    assert [
+        [row["title"] for row in after[index:index + fixture["limit"]]]
+        for index in range(0, len(after), fixture["limit"])
+    ] == pages
+    assert [len(page) for page in pages] == meta["pageLengths"] == [10, 10, 5]
+    assert meta["totalPages"] == 3 and meta["unfilteredTotal"] == 25
+    assert len([title for page in pages for title in page]) == 25
+    assert {title for page in pages for title in page} == set(titles)
+    assert fixture["expectedGenre2View"] == {
+        "titles": ["Target"], "total": 1, "totalPages": 1,
+        "unfilteredTotal": 25,
+    }
+    assert [row["title"] for row in after if 2 in row["genreIds"]] == ["Target"]

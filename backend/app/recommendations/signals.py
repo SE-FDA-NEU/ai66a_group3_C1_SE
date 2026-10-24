@@ -5,27 +5,18 @@ from collections.abc import Iterable
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.db.models import CatalogMovie, CatalogueState, MovieGenre, UserMovieRating
-from app.repositories.movies import ACTIVE_CATALOGUE_STATE_ID
+from app.db.models import MovieGenre, UserMovieRating
 
 GenreSignals = dict[int, dict[str, int]]
 
 
 def load_account_genre_signals(session: Session, *, user_id: str) -> GenreSignals:
-    """Read current account's saved ratings in the active local catalogue."""
+    """Read the account's saved rating history and canonical movie genres."""
 
     statement = (
         select(UserMovieRating.movie_id, UserMovieRating.rating, MovieGenre.genre_id)
-        .join(CatalogMovie, CatalogMovie.id == UserMovieRating.movie_id)
-        .join(
-            CatalogueState,
-            CatalogueState.active_revision_id == CatalogMovie.catalogue_revision_id,
-        )
         .join(MovieGenre, MovieGenre.movie_id == UserMovieRating.movie_id)
-        .where(
-            UserMovieRating.user_id == user_id,
-            CatalogueState.id == ACTIVE_CATALOGUE_STATE_ID,
-        )
+        .where(UserMovieRating.user_id == user_id)
     )
     signals: GenreSignals = {}
     for movie_id, rating, genre_id in session.execute(statement):
