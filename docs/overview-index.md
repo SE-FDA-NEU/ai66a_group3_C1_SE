@@ -21,7 +21,11 @@ $env:PYTHONPATH = 'backend'
 
 The default artifact is `data/overview-tfidf-v1.json` under the repository
 root. Set `NLP_INDEX_PATH` or pass `--path <file>` to put it beside a persistent
-database volume. The file is generated locally and ignored by Git. The command
+database volume. The CLI and `load_active_index(session)` use the same resolver:
+an explicit path takes precedence, then `NLP_INDEX_PATH`, then the project
+default. The environment is read when the function runs, so a process started
+with `NLP_INDEX_PATH` reads the artifact built at that path. The file is
+generated locally and ignored by Git. The command
 is offline and requires no TMDb token. `check` exits 0 and prints `ready=true`
 plus revision, fingerprints and counts when usable; it exits 1 if the active
 catalogue or artifact is absent, stale, corrupt or unreadable. Run `rebuild`
@@ -43,7 +47,12 @@ does not refit them.
 normalizedOverview]` for every active movie, ordered by opaque ID. Null and
 empty text normalize to the same value. This detects direct overview edits
 under the same catalogue revision and added/removed movie IDs. Media-only
-updates leave the digest unchanged. `configFingerprint` hashes the explicit
+updates leave the digest unchanged. Moving the same IDs and normalized text to
+a new catalogue revision also leaves the fitted index ready: the manifest's
+`catalogueRevision` records where it was built, while readiness uses the text
+and configuration fingerprints plus the ID mapping. The loaded index exposes
+the current active revision and the build revision separately.
+`configFingerprint` hashes the explicit
 `overview-tfidf-v1` rules: NFKC, casefold, Unicode word tokens, fixed English
 stop words, term frequency, smoothed IDF and cosine. Changing implementation
 semantics requires updating that model version/config before rebuilding.
@@ -68,7 +77,8 @@ Run the focused tests with synthetic catalogue rows and temporary local database
 ```
 
 The tests cover restart/load, opaque mapping, query transform, empty corpus,
-text/config and ID invalidation, media-only reuse, checksum damage and failed
+text/config and ID invalidation, media-only and same-corpus revision reuse,
+the shared environment path in a fresh process, checksum damage and failed
 atomic replacement. The full migrated backend suite is a separate regression
 check via `backend/scripts/run_isolated_tests.py -q`. Story #24 Similar and
 #30 Search HTTP/UI criteria remain for their

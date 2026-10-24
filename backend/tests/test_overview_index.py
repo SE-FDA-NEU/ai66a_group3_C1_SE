@@ -118,6 +118,41 @@ def test_text_and_mapping_changes_stale_but_media_does_not(catalogue, monkeypatc
         load_active_index(session, path)
 
 
+def test_new_catalogue_revision_with_same_text_reuses_fitted_index(
+    catalogue, monkeypatch,
+):
+    engine, _, path = catalogue
+    with Session(engine) as session:
+        first = rebuild_active_index(session, path)
+    original_bytes = path.read_bytes()
+    with Session(engine) as session, session.begin():
+        revision = create_catalogue_revision(session, provider="synthetic")
+        new_revision_id = revision.id
+        for movie_id in first.movie_ids:
+            movie = session.get(CatalogMovie, movie_id)
+            movie.catalogue_revision_id = new_revision_id
+            movie.poster_path = "/new-poster.jpg"
+        activate_catalogue_revision(session, revision_id=new_revision_id)
+    with Session(engine) as session:
+        current = index_module.active_corpus(session)
+        assert current.digest == first.corpus_digest
+        assert index_module.config_fingerprint() == first.config_fingerprint
+        loaded = load_active_index(session, path)
+    assert loaded.catalogue_revision == new_revision_id
+    assert loaded.built_catalogue_revision == first.catalogue_revision
+    assert loaded.movie_ids == first.movie_ids
+
+    def unexpected_fit(_snapshot):
+        raise AssertionError("same corpus/config must reuse fitted index")
+
+    with monkeypatch.context() as patcher:
+        patcher.setattr(index_module, "_fit", unexpected_fit)
+        with Session(engine) as session:
+            rebuilt = rebuild_active_index(session, path)
+    assert rebuilt.catalogue_revision == new_revision_id
+    assert path.read_bytes() == original_bytes
+
+
 def test_config_change_and_corrupt_artifact_are_unavailable(catalogue, monkeypatch):
     engine, _, path = catalogue
     with Session(engine) as session:
@@ -208,6 +243,7 @@ def test_rebuild_command_on_clean_migrated_synthetic_database(tmp_path):
     environment.update({
         "DATABASE_URL": f"sqlite:///{database.as_posix()}",
         "PYTHONPATH": str(root / "backend"),
+        "NLP_INDEX_PATH": str(path),
         "TMDB_READ_ACCESS_TOKEN": "",
         "TMDB_NETWORK_DISABLED": "1",
     })
@@ -227,10 +263,7 @@ def test_rebuild_command_on_clean_migrated_synthetic_database(tmp_path):
                 overview="Astronaut rescue moon",
             ))
             activate_catalogue_revision(session, revision_id=revision.id)
-        command = [
-            sys.executable, "-m", "app.cli.rebuild_overview_index",
-            "--path", str(path),
-        ]
+        command = [sys.executable, "-m", "app.cli.rebuild_overview_index"]
         built = subprocess.run(
             [*command, "rebuild"], cwd=root, env=environment,
             capture_output=True, text=True, check=False,
@@ -244,5 +277,17 @@ def test_rebuild_command_on_clean_migrated_synthetic_database(tmp_path):
         )
         assert checked.returncode == 0, checked.stderr
         assert "ready=true" in checked.stdout
+        loader = subprocess.run(
+            [sys.executable, "-c", (
+                "from app.db.database import SessionLocal; "
+                "from app.recommendations.overview_index import load_active_index; "
+                "session = SessionLocal(); "
+                "print(load_active_index(session).movie_ids[0]); session.close()"
+            )],
+            cwd=root, env=environment, capture_output=True, text=True,
+            check=False,
+        )
+        assert loader.returncode == 0, loader.stderr
+        assert loader.stdout.strip() == "opaque-migrated"
     finally:
         engine.dispose()

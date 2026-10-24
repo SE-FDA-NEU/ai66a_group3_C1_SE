@@ -49,6 +49,15 @@ class IndexUnavailable(Exception):
     """The artifact is absent, stale, corrupt, or cannot be read safely."""
 
 
+def resolve_index_path(path: Path | None = None) -> Path:
+    """Use one artifact location for CLI rebuilds and runtime consumers."""
+
+    if path is not None:
+        return path
+    configured = os.environ.get("NLP_INDEX_PATH")
+    return Path(configured) if configured and configured.strip() else DEFAULT_INDEX_PATH
+
+
 def _canonical(value: object) -> bytes:
     return json.dumps(
         value, ensure_ascii=False, sort_keys=True, separators=(",", ":"),
@@ -136,6 +145,7 @@ def cosine_similarity(first: Mapping[str, float], second: Mapping[str, float]) -
 @dataclass(frozen=True)
 class OverviewIndex:
     catalogue_revision: str
+    built_catalogue_revision: str
     corpus_digest: str
     config_fingerprint: str
     document_count: int
@@ -195,8 +205,10 @@ def _validated_index(raw: object, snapshot: CorpusSnapshot) -> OverviewIndex:
         raise IndexUnavailable("artifact checksum mismatch")
     if payload.get("artifactVersion") != ARTIFACT_VERSION:
         raise IndexUnavailable("unsupported artifact version")
-    if (payload.get("catalogueRevision") != snapshot.catalogue_revision
-            or payload.get("corpusDigest") != snapshot.digest
+    built_revision = payload.get("catalogueRevision")
+    if not isinstance(built_revision, str) or not built_revision:
+        raise IndexUnavailable("invalid catalogue provenance")
+    if (payload.get("corpusDigest") != snapshot.digest
             or payload.get("configFingerprint") != config_fingerprint()):
         raise IndexUnavailable("index is stale")
     ids = payload.get("movieIds")
@@ -224,6 +236,7 @@ def _validated_index(raw: object, snapshot: CorpusSnapshot) -> OverviewIndex:
         raise IndexUnavailable("invalid document count")
     return OverviewIndex(
         catalogue_revision=snapshot.catalogue_revision,
+        built_catalogue_revision=built_revision,
         corpus_digest=snapshot.digest,
         config_fingerprint=config_fingerprint(),
         document_count=count,
@@ -234,43 +247,45 @@ def _validated_index(raw: object, snapshot: CorpusSnapshot) -> OverviewIndex:
     )
 
 
-def load_active_index(session: Session, path: Path = DEFAULT_INDEX_PATH) -> OverviewIndex:
+def load_active_index(session: Session, path: Path | None = None) -> OverviewIndex:
     """Check live text/config/IDs and checksum before returning the fitted state."""
 
     snapshot = active_corpus(session)
+    artifact_path = resolve_index_path(path)
     try:
         raw = json.loads(
-            path.read_text(encoding="utf-8"), parse_constant=_reject_nonfinite
+            artifact_path.read_text(encoding="utf-8"), parse_constant=_reject_nonfinite
         )
         return _validated_index(raw, snapshot)
     except (OSError, UnicodeError, ValueError, TypeError, OverflowError) as exc:
         raise IndexUnavailable("index artifact cannot be read") from exc
 
 
-def rebuild_active_index(session: Session, path: Path = DEFAULT_INDEX_PATH) -> OverviewIndex:
+def rebuild_active_index(session: Session, path: Path | None = None) -> OverviewIndex:
     """Fit once for the current key, then atomically replace the JSON artifact."""
 
+    artifact_path = resolve_index_path(path)
     snapshot = active_corpus(session)
     try:
-        return load_active_index(session, path)
+        return load_active_index(session, artifact_path)
     except IndexUnavailable:
         pass
     payload = _fit(snapshot)
     raw = {**payload, "checksum": _digest(payload)}
     _validated_index(raw, snapshot)
-    path.parent.mkdir(parents=True, exist_ok=True)
+    artifact_path.parent.mkdir(parents=True, exist_ok=True)
     temporary: Path | None = None
     try:
         with tempfile.NamedTemporaryFile(
-            mode="wb", prefix=f".{path.name}.", suffix=".tmp",
-            dir=path.parent, delete=False,
+            mode="wb", prefix=f".{artifact_path.name}.", suffix=".tmp",
+            dir=artifact_path.parent, delete=False,
         ) as output:
             temporary = Path(output.name)
             output.write(_canonical(raw))
             output.flush()
             os.fsync(output.fileno())
-        os.replace(temporary, path)
+        os.replace(temporary, artifact_path)
     finally:
         if temporary is not None:
             temporary.unlink(missing_ok=True)
-    return load_active_index(session, path)
+    return load_active_index(session, artifact_path)

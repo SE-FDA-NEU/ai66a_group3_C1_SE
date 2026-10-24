@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import os
 import sys
 from pathlib import Path
 
@@ -11,7 +10,6 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from app.db.database import SessionLocal
 from app.recommendations.overview_index import (
-    DEFAULT_INDEX_PATH,
     IndexUnavailable,
     load_active_index,
     rebuild_active_index,
@@ -23,7 +21,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("action", choices=("rebuild", "check"))
     parser.add_argument(
         "--path", type=Path,
-        default=Path(os.environ.get("NLP_INDEX_PATH", DEFAULT_INDEX_PATH)),
+        default=None,
         help="JSON artifact path (default: NLP_INDEX_PATH or project data directory)",
     )
     args = parser.parse_args(argv)
