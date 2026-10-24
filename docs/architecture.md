@@ -326,7 +326,16 @@ private rating data. The concrete DTO/oracles are in
 [api.md](api.md#131-recommendation-score-transparency).
 
 The existing rating PUT, preference PUT and reset POST each commit or roll
-back atomically. Use SQLite's serialized writer transaction order as the
+back atomically. The T11 integration handoff reserves the SQLite writer
+with `BEGIN IMMEDIATE` on one request-local Session before authentication
+and read/modify/write decisions for these three mutations. It uses a
+5-second SQLite busy timeout; a reservation/persistence failure retains
+the safe 503 envelope, and no mutation is retried automatically. Public
+and protected GETs remain read-only and do not reserve the writer. The
+runtime does not force WAL or add a process-local mutex; migrated temporary
+DB tests cover both DELETE and WAL journal modes and a separate-process
+competing writer.
+Use SQLite's serialized writer transaction order as the
 linearization order for concurrent save/reset: a write committed before reset
 is removed; a deliberate write committed after reset survives. Lock/BEGIN
 the write transaction before evaluating and changing the account rows;
@@ -354,19 +363,40 @@ strip outer whitespace, Unicode word tokens, the spike's fixed English
 stop-word set, no stemming/translation/synonym expansion, term frequency
 `count/tokenCount`, IDF `ln((1+N)/(1+documentFrequency))+1`, and cosine
 similarity. Query and candidate text use the same normalizer/tokenizer,
-vocabulary and IDF state; no per-request fitting. The artifact manifest
-records active `catalogueRevision`, this config version and stop-word
-checksum, vocabulary/IDF, an ordered internal-movie-ID mapping, and an
-artifact checksum. Fit exactly once per manifest revision. Empty or null
+vocabulary and IDF state; no per-request fitting. The readiness key has
+**two independent fingerprints**:
+
+1. `corpusDigest` (also called `textRevision`): SHA-256 over a canonical
+   UTF-8 serialization of `[internalMovieId, normalizedOverview]` for
+   every active movie, sorted by internal ID. Use an unambiguous encoding
+   such as JSON with fixed separators; null/empty overview normalizes to
+   the same empty text used by the transform. The ID mapping is included,
+   so text, addition and removal affect the digest.
+2. `configFingerprint`: SHA-256 over the explicit
+   `overview-tfidf-v1` normalization/tokenizer/stop-word list, TF/IDF
+   formula and vector/cosine configuration. A config change cannot reuse
+   an old fitted transform even if the catalogue text is unchanged.
+
+The artifact manifest records both fingerprints, active
+`catalogueRevision` as provenance, vocabulary/IDF, an ordered
+internal-movie-ID mapping and an **artifact checksum** for file integrity.
+The artifact checksum does not prove that the artifact still matches
+SQLite text. Readiness compares current database `corpusDigest` and
+current `configFingerprint` with the manifest before an NLP read; a
+direct overview edit under the same catalogue revision must be detected
+as stale. A poster/backdrop-only edit leaves the text digest unchanged
+and must not require rebuilding the text index, even if media metadata
+changes. Fit once per readiness key. Empty or null
 overviews map to no usable vector. An all-empty corpus is a valid manifest
 with empty vocabulary and zero similarity, not an exception or fabricated
 match.
 
 Build to temporary artifact files, validate mapping/cardinality/checksum,
 then atomically replace the ready manifest. A partial build cannot mark the
-index ready. A new catalogue/config revision invalidates old readiness and
-requires an explicit rebuild before NLP fallback requests; stale, corrupt
-and absent artifacts produce `503 INDEX_UNAVAILABLE`. A missing source
+index ready. A changed text/config fingerprint invalidates readiness and
+requires an explicit rebuild before NLP fallback requests; a media-only
+change does not. Stale, corrupt and absent artifacts produce
+`503 INDEX_UNAVAILABLE`. A missing source
 overview with a **ready** index is a distinct, valid popularity fallback.
 The index must not hold private ratings or preferences, and its rebuild must
 not block the last valid catalogue from serving non-NLP routes. C05 #219
@@ -383,4 +413,6 @@ derive `user_id` solely from `ams_session`; same-origin protection extends
 to watchlist writes. A forged identity field is rejected/ignored without
 retargeting another account. Repeated PUT preserves original `added_at`;
 DELETE removes only the current account's row and both operations acknowledge
-only after commit. Reset deliberately does not touch this table.
+only after commit. GET/PUT status uses `inWatchlist`; DELETE acknowledges a
+known active movie with `200 {data:{movieId,inWatchlist:false}}`, including a
+repeat request. Reset deliberately does not touch this table.

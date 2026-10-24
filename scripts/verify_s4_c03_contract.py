@@ -13,6 +13,7 @@ CONTRACT_FILES = (
     Path("docs/api.md"),
     Path("docs/architecture.md"),
     Path("docs/design.md"),
+    Path("docs/requirements.md"),
     Path("docs/testing.md"),
 )
 EVIDENCE = Path("docs/evidence/s4-c03-local-contract-check.md")
@@ -32,6 +33,12 @@ SECTION = re.compile(r"^## (\d+)\. (.+)$", re.MULTILINE)
 
 def fail(message: str) -> None:
     raise ValueError(message)
+
+
+def normalized_lf_bytes(path: Path) -> bytes:
+    """Hash text, independent of LF/CRLF checkout conversion."""
+    content = path.read_bytes().decode("utf-8")
+    return content.replace("\r\n", "\n").replace("\r", "\n").encode("utf-8")
 
 
 def check_links(path: Path, content: str) -> int:
@@ -54,7 +61,7 @@ def main() -> int:
         if not path.is_file():
             fail(f"missing document: {path.relative_to(ROOT)}")
 
-    texts = {path: path.read_text(encoding="utf-8") for path in files}
+    texts = {path: normalized_lf_bytes(path).decode("utf-8") for path in files}
     for path, content in texts.items():
         if not content.endswith("\n"):
             fail(f"{path.relative_to(ROOT)}: missing final newline")
@@ -92,17 +99,22 @@ def main() -> int:
         if needle not in texts[ROOT / rel]:
             fail(f"{rel}: missing C03 section")
 
-    candidate_files = (*CONTRACT_FILES, Path("scripts/verify_s4_c03_contract.py"))
+    candidate_files = (
+        *CONTRACT_FILES,
+        Path("scripts/verify_s4_c03_contract.py"),
+        Path("scripts/test_s4_c03_contract_line_endings.py"),
+    )
     digests = {
-        rel: sha256((ROOT / rel).read_bytes()).hexdigest()
+        rel: sha256(normalized_lf_bytes(ROOT / rel)).hexdigest()
         for rel in candidate_files
     }
     matrix = texts[ROOT / MATRIX]
     for rel, digest in digests.items():
         if f"| `{rel.as_posix()}` | `{digest}` |" not in matrix:
-            fail(f"{MATRIX}: missing or stale SHA-256 for {rel}")
+            fail(f"{MATRIX}: missing or stale normalized-LF SHA-256 for {rel}")
 
     print("S4-C03 local document structure: PASS")
+    print("Hash convention: SHA-256 of UTF-8 text after CRLF/CR -> LF")
     print("Document final newlines/trailing whitespace: PASS")
     print(f"Local link targets: {link_count} checked, 0 missing")
     print("Testing sections: " + ", ".join(number for number, _ in sections))
@@ -114,7 +126,7 @@ def main() -> int:
     )
     print(f"S4 feature oracle IDs: {len(feature_ids)} unique")
     for rel, digest in digests.items():
-        print(f"sha256 {rel.as_posix()} {digest}")
+        print(f"sha256-lf {rel.as_posix()} {digest}")
     return 0
 
 

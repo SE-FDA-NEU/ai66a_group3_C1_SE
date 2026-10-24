@@ -886,7 +886,7 @@ the TMDb metadata API while serving a request.
 | T12 | `GET /api/me/watchlist?page=1&limit=10&catalogueRevision=<revision>` | Session | Paged watchlist below | 400/401/409 `CATALOGUE_CHANGED`/503 |
 | T12 | `GET /api/me/watchlist/{movieId}` | Session | Membership status below | 401/404 `MOVIE_NOT_FOUND`/503 |
 | T12 | `PUT /api/me/watchlist/{movieId}` | Session, same-origin write | 200 committed membership status | 401/403 `ORIGIN_NOT_ALLOWED`/404/503 |
-| T12 | `DELETE /api/me/watchlist/{movieId}` | Session, same-origin write | 204 after commit, no body | 401/403/404/503 |
+| T12 | `DELETE /api/me/watchlist/{movieId}` | Session, same-origin write | 200 `{data:{movieId,inWatchlist:false}}` after commit | 401/403/404/503 |
 
 Register the static `/api/movies/search` route **before**
 `/api/movies/{movieId}`; the literal word `search` must not be interpreted
@@ -951,7 +951,9 @@ ordering and no personal fields.
 The versioned overview index and source/candidate mapping are owned by T06;
 see [architecture.md](architecture.md#9-sprint-4-c03-runtime-and-storage-contract-planned).
 `INDEX_UNAVAILABLE` means the shared index is absent, stale for the active
-catalogue/config revision, corrupt, or cannot be read. It is not equivalent to
+catalogue text/config revision, corrupt, or cannot be read. A changed overview
+for the same `catalogueRevision` changes the corpus digest and makes the
+index stale; a poster/backdrop-only update does not. It is not equivalent to
 a movie with missing overview. An explicit empty-vocabulary, successfully
 built index is ready and yields zero cosine scores.
 Its public message is `Search index is temporarily unavailable`; it keeps
@@ -1021,16 +1023,34 @@ success/failure as certain. Writes committed before reset are cleared;
 deliberate later writes are retained by transaction order. Reset never
 deletes watchlist memberships.
 
+The T11 writer-reservation amendment retains the existing reset request
+`{confirm:true}`, response `{data:{reset:true}}`, auth/origin checks and safe
+error envelope. Reset, preference PUT and rating PUT reserve the SQLite
+writer with `BEGIN IMMEDIATE` before session/decision reads and acknowledge
+only after commit. A busy writer or persistence failure returns the existing
+`503 SERVICE_UNAVAILABLE`; no automatic mutation replay or new message field
+is introduced. GET routes remain read-only. The exact transaction and
+rollback handoff is in [architecture.md](architecture.md#91-rating-reads-transactions-and-reset-order).
+
 Watchlist uses one row per `(user_id,movie_id)` with immutable `addedAt`
 set by the first successful PUT. Repeated PUT is 200 and returns the original
 time for that membership. After DELETE, a later PUT creates a new membership
-with a new time; repeated DELETE for an active nonmember is 204. Status:
+with a new time. Repeated DELETE for an active nonmember is 200 with the same
+absence acknowledgement; neither DELETE response includes an `addedAt`.
+GET/PUT membership status:
 
 ```json
-{"data":{"movieId":"opaque-internal-id","saved":true,"addedAt":"2026-10-24T09:00:00Z"}}
+{"data":{"movieId":"opaque-internal-id","inWatchlist":true,"addedAt":"2026-10-24T09:00:00Z"}}
 ```
 
-An active unrated/unsaved movie has `saved:false,addedAt:null`; unknown
+DELETE success, including a repeated DELETE for a known active movie:
+
+```json
+{"data":{"movieId":"opaque-internal-id","inWatchlist":false}}
+```
+
+An active movie outside the watchlist has `inWatchlist:false,addedAt:null`
+on GET; unknown
 active-catalogue ID is 404. `WatchlistMovieDto` is exactly
 `MovieSummaryDto` plus `addedAt: UTC ISO-8601 string`.
 `GET /api/me/watchlist` returns
@@ -1044,3 +1064,24 @@ ranking, or raw popularity. Only active catalogue movie IDs are addressable;
 membership for stable IDs survives catalogue refresh, while removal of a
 movie follows its database foreign-key lifecycle. See the storage ownership
 and ordering contract in [architecture.md](architecture.md#9-sprint-4-c03-runtime-and-storage-contract-planned).
+
+### 13.5 Sprint 4 authentication navigation amendment
+
+The backend auth DTO/cookie/error contract in section 5 is unchanged. Its
+Sprint 3 statement that a normal login opens `/recommendations` is
+historical UI behaviour; the Sprint 4 T01 handoff supersedes that navigation
+once its UI is integrated. A normal successful login from Home or directly
+from `/login` opens Home `/` with authenticated navigation and does not
+automatically open, save or change preferences/recommendations. Start and
+Preferences are explicit actions. A guest selecting Start reaches
+`/preferences` through sign-in or registration and returns there after
+successful login. The sole exception to Home landing is an explicit,
+validated internal protected-route return destination; an absent, external
+or unsafe destination falls back to Home. The single navbar
+`My recommendations` link opens the existing recommendation flow, including
+its cold-start state when no genres are saved.
+
+The corresponding first S13 acceptance criterion is replaced locally in
+[requirements.md](requirements.md#s13-sign-in-and-sign-out-securely-p0-5-points).
+The GitHub Story #45 AC must be reconciled before merge so the old
+`always /recommendations` and new Home outcomes are not both accepted.

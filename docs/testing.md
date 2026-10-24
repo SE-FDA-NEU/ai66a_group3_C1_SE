@@ -66,7 +66,7 @@ actual 503 envelope rather than a business-rule refusal.
 | TC-P0-S12-003 | S12 #44 | Password length 9 | 201, no password/hash in response ([route](../backend/app/main.py), [passwords](../backend/app/security/passwords.py)). | Boundary above 8 |
 | TC-P0-S12-004 | S12 #44 | Existing email with case/whitespace variation | 409 `EMAIL_ALREADY_REGISTERED`, exact `This email is already registered`; one user row ([users repo](../backend/app/repositories/users.py), [route](../backend/app/main.py)). | Business refusal |
 | TC-P0-S12-005 | S12 #44 | Invalid email or injected commit fault | Invalid input 400; persistence failure 503; neither exposes secret or creates partial account ([route](../backend/app/main.py)). | Validation/infrastructure |
-| TC-P0-S13-001 | S13 #45 | Login valid A then GET `/api/auth/me` | 200 safe A DTO; opaque HttpOnly same-origin cookie, no token in body ([route](../backend/app/main.py), [sessions](../backend/app/security/sessions.py)). | Normal |
+| TC-P0-S13-001 | S13 #45 | Login valid A then GET `/api/auth/me` | 200 safe A DTO; opaque HttpOnly same-origin cookie, no token in body ([route](../backend/app/main.py), [sessions](../backend/app/security/sessions.py)). Browser companion `TC-S4-AUTH-001` verifies the amended Home landing. | Normal |
 | TC-P0-S13-002 | S13 #45 | Wrong password and unknown email | Both 401 `INVALID_CREDENTIALS`, exact `Email or password is incorrect` ([route](../backend/app/main.py)). | Auth refusal |
 | TC-P0-S13-003 | S13 #45 | Logout A, replay old cookie, login A again | Logout 204; replay gets 401; new session accesses persisted A preferences/ratings ([route](../backend/app/main.py), [sessions](../backend/app/security/sessions.py)). | Session lifecycle |
 | TC-P0-S13-004 | S13 #45 | Missing/expired/revoked cookie on protected reads/writes | Each 401; no personal rows leak or change ([route](../backend/app/main.py), [sessions](../backend/app/security/sessions.py)). | Session boundary |
@@ -88,12 +88,13 @@ the six-P0 floor:
 | TC-S4-RANK-001 | #197/#198 | Two Action/Comedy candidates each raw 80: +1 related rating yields 81/80, -1 yields 79/80; raw values stay 80; title/ID tie is deterministic; a rated film with two shared genres contributes once. |
 | TC-S4-RANK-002 | #197/#198 | Neutral/no signals preserve Sprint 3 order; null popularity remains null; rating-only failure exposes truthful `rating_unavailable`; 401/core 503 are never disguised as fallback. |
 | TC-S4-RANK-003 | #198 | Rank 25 eligible movies before genre view filter/page; public Popular and cold-start/no-match have no personal boosts or fields. |
-| TC-S4-NLP-001 | T06 | Build once for active revision/config, rebuild on change, and fail stale/corrupt/missing artifact with 503; explicit empty vocabulary is ready and yields zero cosine. |
+| TC-S4-NLP-001 | T06 | Build once per `corpusDigest` + `configFingerprint`; changing normalized overview while keeping `catalogueRevision` fixed makes the index stale (503 until rebuild). A config-only change also stales it; a poster/backdrop-only change keeps text index ready without rebuild. Corrupt/missing artifact is 503; explicit empty vocabulary is ready and yields zero cosine. |
 | TC-S4-SIM-001 | T07/T08 | Shared-genre only, source excluded, unique max five; usable zero-cosine text before missing text; source missing vector triggers all-popularity fallback; unknown ID is 404. |
 | TC-S4-SEARCH-001 | T09/T10 | Static search route, trimmed length 1 rejected, literal `%`/`_` and `ZEBRA` title search, title priority, max ten; `Moon Rescue` precedes `City Robot` in positive overview fixture; separate all-zero fixture returns none. |
-| TC-S4-RESET-001 | #206/#207 | Real DB rollback after first delete and at commit; A/B isolation, ordered save/reset interleaving, timeout reread, watchlist preserved and later-login persistence. |
-| TC-S4-WATCH-001 | #207 | Unique membership, immutable `addedAt`, idempotent PUT/DELETE, list order/paging/revision/CSRF/401/404 and reset preservation. |
+| TC-S4-RESET-001 | #206/#207 | Real migrated DB rollback after first delete and at commit; A/B isolation, both ordered save/reset commit sequences, separate-process writer contention in DELETE and WAL modes, timeout reread, watchlist preserved and later-login persistence. |
+| TC-S4-WATCH-001 | #207 | Unique membership, immutable `addedAt`, GET/PUT `inWatchlist`, and repeated DELETE `200 {data:{movieId,inWatchlist:false}}`; list order/paging/revision/CSRF/401/404 and reset preservation. |
 | TC-S4-UI-001 | #195/#208 | Five integer draft/hover/keyboard/explicit-save semantics, null poster fallback, both themes, 320px layout and account/movie stale-response protection. |
+| TC-S4-AUTH-001 | T01 / Story #45 | Browser check: normal Home/direct login -> Home with authenticated header and no automatic preference/recommendation read or save; guest Start -> login/register -> Preferences; single navbar My recommendations -> cold-start without genres; unsafe return destination -> Home. |
 
 These rows define expected checks; no feature or browser result is claimed.
 
@@ -133,6 +134,13 @@ output, with command, environment, candidate SHA, passed/failed/skipped count
 and date. A `TestClient` pass does not establish React rendering, keyboard
 behaviour, both themes or navigation. Browser/API/database evidence for those
 states is collected by the relevant feature owner and reconciled by #218.
+
+Contract publication has separate read-only structure and line-ending
+checks: `python scripts/verify_s4_c03_contract.py` and
+`python scripts/test_s4_c03_contract_line_endings.py`. Both use UTF-8
+text hashed after CRLF/CR -> LF normalization. They check this document
+and its traceability on independent LF/CRLF exports; neither is a substitute
+for future production P0 pytest or browser acceptance.
 
 Genuine feature TDD for #197/#198 means a rule test failed **before**
 production implementation, then passed after the implementation; keep dated

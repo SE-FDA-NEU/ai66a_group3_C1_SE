@@ -686,20 +686,30 @@ percentages or interaction logic from the ZIP is accepted as production code.
 
 ### 12.1 Visual tokens and shared component interfaces
 
-T01 owns the compact CineAI shell and tokens. Dark is the initial theme;
-light/dark choice is stored **only in browser-local theme preference**, never
-in account/API fields. Theme choice has no effect on auth, list ordering or
-request identity. These semantic roles are the contract; implementers may
-tune accessible values during T01 review without changing their meaning.
+T01 owns the compact CineAI shell and tokens. The T01 branch
+`feature/s4-t01-cinematic-ui` supplies the integration names below;
+they are a handoff from that branch, not components already present in this
+C03 checkout. Dark is the initial theme; light/dark choice is stored
+**only in browser-local theme preference**, never in account/API fields.
+Theme choice has no effect on auth, list ordering or request identity.
+Use T01's existing names when integrating, instead of creating a second
+token or component system from the earlier visual-reference labels.
 
 | Role | Dark reference | Light reference | Use |
 |---|---|---|---|
-| `--canvas` / `--surface` | `#11131b` / `#1d1f28` | `#f7f6fb` / `#ffffff` | Page and elevated cards |
-| `--text` / `--muted` | `#e2e1ee` / `#cbc3d7` | `#201b2d` / `#524b60` | Primary and secondary readable text |
-| `--accent` / `--accent-text` | `#d0bcff` / `#23005c` | `#6d3bd7` / `#ffffff` | Actions, selected state, visible focus |
-| `--border` / `--error` | `#494454` / `#ffb4ab` | `#c9c3d3` / `#9b1c26` | Dividers and errors |
+| `--page-bg` / `--surface` | `#10111b` / `#191b29` | `#f6f4fb` / `#ffffff` | Page and elevated cards |
+| `--text` / `--muted` | `#f5f2ff` / `#b7b4ca` | `#211b34` / `#625a76` | Primary and secondary readable text |
+| `--primary` / `--primary-hover` | `#7650db` / `#6540c8` | `#6d3bc8` / `#5629a4` | Primary action and hover |
+| `--accent` / `--focus` | `#ad8aff` / `#c8adff` | `#6532ba` / `#6532ba` | Link/accent and visible keyboard focus |
+| `--border` / `--error` | `#39374f` / `#ffb4ae` | `#cfc7df` / `#a32135` | Dividers and errors |
 | Typography | Syne display; Plus Jakarta Sans body, with local sans-serif fallback | Same | 16px minimum body target; headings scale responsively |
 | Shape/spacing | 4/8/16/24/40px rhythm; 8/12/16px radii | Same | Clear focus, card and form structure |
+
+The old C03 label `--canvas` maps to T01 `--page-bg`. T01 has no
+`--accent-text` token: primary buttons use `--primary` and explicit
+white text. `--accent` is for links/accents, not a substitute for the
+primary button token. Values above describe the T01 branch's CSS and
+remain subject to both-theme accessibility review.
 
 Verify WCAG AA contrast for actual text/control combinations in **both**
 themes, visible keyboard focus, reduced-motion support and image-independent
@@ -712,14 +722,15 @@ backdrop remains a separate detail hero with text overlay/fallback.
 
 | Interface | Inputs | Owner-facing behaviour |
 |---|---|---|
-| `AppShell` / `SessionNavigation` | auth state, active route, theme | Guest/signed-in links reflect `/api/auth/me`; logout clears account state; no fake profile identity. |
-| `MovieCard` | public summary, optional recommendation reason/score, explicit caller actions | Title/details work with null poster/popularity; no personal badge on public cards. |
+| `ThemeProvider` / `ThemeToggle` (T01) | browser-local `cineai-theme` | Apply dark/light CSS token set; never persist theme to account/API. |
+| `AppFrame` / `SessionNavigation` (T01) | auth state, active route, theme | One navbar `My recommendations` link; no duplicate account-area link; guest/signed-in state reflects `/api/auth/me`. |
+| `MovieCard` (T01) | public summary, optional recommendation reason/score, explicit caller actions | Uses `MoviePoster`; title/details work with null poster/popularity; no personal badge on public cards. |
 | `MovieBackdropHero` | detail title, nullable `backdropUrl` | Keep title readable on null, unsafe URL and image load failure. |
-| `Poster` | nullable `posterUrl`, movie title | Safe image or labelled fallback; late old image events cannot replace current movie. |
-| `MovieRating` | current account/movie key, committed value, pending/error | GET/PUT existing protected API; five integer stars and explicit save. |
-| `WatchlistControl` | current account/movie key, membership status, pending/error | GET status then idempotent PUT/DELETE; guest action leads to login. |
+| `MoviePoster` (T01) | `movieId`, `title`, nullable `posterUrl`, optional `eager` | Safe image or labelled fallback; movie/URL key prevents stale image events. |
+| `MovieRating` with `StarRating` (T01) | account/movie key; `StarRating(value,onChange,disabled)` | Radio stars change draft; `MovieRating` owns existing GET/PUT, committed value and explicit Save. |
+| Watchlist feature control (planned T12) | account/movie key, `inWatchlist`, pending/error | Integrate with T01 shell without inventing a second shared component until T12 exports one. |
 | `PageControls` | API `meta`, current URL state | Ten per page by default, only API totals, revision-aware navigation. |
-| `ProviderSlot` | static label and `deferred` state only | If shown, use muted non-clickable text `Availability information is not yet available`; no provider logo/link/badge implying a live VN offer before S5. |
+| Provider slot (planned style only) | static label and deferred state | No `ProviderSlot` export exists in T01. If shown, use muted non-clickable text `Availability information is not yet available`; no live VN offer claim before S5. |
 
 Feature owners own the actual API/state integration for their pages. Shared
 shell/CSS/router/schema changes use T01/route/migration ownership; the
@@ -729,6 +740,22 @@ HTML. Existing `frontend/src/components/`, `pages/`,
 interfaces to extend.
 
 ### 12.2 State, ordering and truthful labels
+
+The T01 Home is a compact cinematic catalogue hero; omit the visible
+`Choose Start…` instruction. A normal successful sign-in from Home or a
+direct `/login` visit opens Home with authenticated navigation and does
+not auto-open or save preferences/recommendations. Start and Preferences
+are deliberate actions. A signed-out Start action attempts
+`/preferences`, goes through login or a registration detour, and returns
+to Preferences after successful authentication. A signed-out explicit
+`My recommendations` request may return to that protected route; without
+saved genres it uses the existing cold-start list. `My recommendations`
+appears once in the fixed navbar. T01's `signInReturnTo` accepts only
+validated internal protected destinations; absent, external, malformed or
+unsafe paths open Home. This replaces the earlier automatic
+`/recommendations` login landing in the local
+[S13 AC](requirements.md#s13-sign-in-and-sign-out-securely-p0-5-points);
+GitHub Story #45 needs the same AC replacement before merge.
 
 Home shows active-catalogue movies in current alphabetical API order;
 Popular shows finite-popularity results only. Recommendations preserve

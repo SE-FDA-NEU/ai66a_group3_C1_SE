@@ -1,5 +1,11 @@
 # S4-C03 local contract check — 2026-10-24
 
+Historical author-side snapshot recorded **before** local commits
+`bdc4ac2` and `932a952`. Its raw-file check and 157.94s backend run
+remain historical observations, not verification of the corrected candidate.
+Use the [current acceptance matrix](s4-c03-acceptance-matrix.md) for
+normalized-LF hashes, LF/CRLF export results and review status.
+
 This is local author evidence for the proposed [C03 contract](../api.md#13-sprint-4-c03-implementation-contract-planned-not-delivered).
 The source candidate was working-tree base
 `3078a9c6fd3dff1f0b8576bc7411f469c7a98fdf` plus uncommitted
