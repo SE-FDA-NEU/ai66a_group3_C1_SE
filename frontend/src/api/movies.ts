@@ -9,6 +9,8 @@ export type MovieSummary = {
   releaseYear: number | null;
   genres: Genre[];
   popularityScore: number | null;
+  // Additive rollout: older backend responses may omit this image field.
+  posterUrl?: string | null;
 };
 
 export type MovieDetail = MovieSummary & {

@@ -145,6 +145,56 @@ To add backdrops to an already imported active TMDb catalogue without changing
 its revision or accounts, use the bounded
 [backdrop enrichment command](backdrop-import-runbook.md#bounded-enrichment-for-an-existing-active-catalogue).
 
+### Sprint 4 T01 candidate: posters and themes (C03 reconciled)
+
+The T01 branch adds nullable poster storage. Before starting this branch, back
+up valuable SQLite data consistently and apply `alembic upgrade head` as above.
+The single head is `d8a4e6f20195` (parent `c6f8a2d4e901`). Merged C03 PR #222
+adds contracts/tests only, with no competing migration. Recheck the migration
+chain if a later schema PR merges before this candidate.
+
+Fresh `--pages 15` imports now also retain valid TMDb `poster_path` fields in
+the existing catalogue import. For an **existing** accepted catalogue, do not
+re-import or shrink its snapshot just to obtain posters. With the same root
+`.env`, run this optional, bounded **poster-only** backfill from the repo root:
+
+```powershell
+.\.venv\Scripts\python.exe -m app.cli.import_tmdb_catalogue --enrich-posters --limit 300
+```
+
+POSIX equivalent: `python -m app.cli.import_tmdb_catalogue --enrich-posters --limit 300`.
+This needs the server-side TMDb token. It visits at most 300 existing active
+TMDb movies, atomically updates poster paths and preserves catalogue revision,
+movie IDs, overview, popularity, genres, backdrops and account-owned data.
+Provider failure rolls back the entire pass; missing/invalid paths retain their
+old value, while an explicit provider `null` clears the poster. Repeating a small
+limit visits the same deterministic prefix, not the next batch; use 300 for this
+200–300-movie catalogue. No image files are stored in SQLite.
+
+Runtime pages use local API data and public image-CDN URLs; no metadata request
+or token is sent from the browser. A missing or failed poster shows a labelled
+fallback. Dark is the default theme; the header toggle persists only the theme
+choice (`cineai-theme`), not credentials. Rating stars select an integer draft;
+**Save rating** still performs the existing server-confirmed write.
+
+Detailed handoff, test commands and merge caveats:
+[reconciled T01 UI handoff](s4-t01-ui-contract.md) and
+[local evidence](evidence/s4-t01-ui.md). This is not a claim
+that unimplemented Watchlist/Search/Profile/Similar/trailer features exist.
+
+Home now has a compact Start / Explore Catalogue hero and a persistent
+**My recommendations** navbar entry. Ordinary sign-in from Home or direct
+`/login` returns to Home; it does not automatically open or save preferences.
+Choose **Start** or **Preferences** when ready to select 1–5 genres. A guest
+Start attempt signs in first and then returns to Preferences, including when
+registration is needed. Only a confirmed **Save preferences** opens personalised
+results. **My recommendations** is a separate explicit action; without saved
+genres it retains the existing **Popular / Not personalised** guidance.
+Safe protected-route page/filter/hash intent is retained through sign-in; unsafe
+or absent destinations fall back to Home. Session, password and API rules are
+unchanged. This PO-authorized S13 landing amendment matches merged C03 section
+13.5; the live Story #45 AC must carry the same noncontradictory rule.
+
 All commands and both application processes must use the **same**
 `DATABASE_URL` from root `.env` (normally `sqlite:///./data/app.db`). On an
 existing checkout with a successful TMDb import, keep its configured URL and
@@ -278,8 +328,9 @@ does not run at application startup and must never be used on a public or
 production deployment. Rotate/remove the demo account before such deployment.
 
 The instructor can start at `/`, choose **Sign in**, and use this account.
-If it already has saved preferences, it may open personalised results rather
-than cold start; that is persistence, not failed setup. Do not clear existing
+After sign-in, Home stays open. Choose **My recommendations** to view results.
+If the account already has saved preferences, those results may be personalised
+rather than cold start; that is persistence, not failed setup. Do not clear existing
 personal data merely to reproduce the new-account screenshot.
 
 ### Full P0 and persistence journey
@@ -293,7 +344,8 @@ database. Keep any personal/service passwords private.
    account** on the login page. Enter the disposable email and a unique password
    of at least eight characters; select **Create account**.
 2. Registration returns to login. Sign in with the same account. The application
-   opens recommendations; a new account sees **Popular** / **Not personalised**.
+   opens Home. Choose **My recommendations**; a new account sees **Popular** /
+   **Not personalised**. No genres are chosen or saved automatically.
 3. Select **Enter preferences →**. Select one to five genres and choose **Save
    preferences**. Expect **Recommended for you** and matching movie cards.
    From the home page the equivalent entry is **Start**; from recommendations
@@ -309,7 +361,7 @@ database. Keep any personal/service passwords private.
    and frontend with Ctrl+C in their own terminals. Start both again using the
    commands above, on the **same database**. Do not reseed, reimport or reset it.
 8. In a fresh browser session, open the home page, select **Sign in**, and sign
-   in as the same account. Use **Change my genres** to confirm restored choices;
+   in as the same account. From Home choose **Preferences** to confirm restored choices;
    return to recommendations and open the same movie. Its saved rating must
    still be `4/5` without another save.
 9. Return to recommendations and sign out. Register/sign in as a second account
@@ -392,10 +444,11 @@ The response is `503` with the code `SERVICE_UNAVAILABLE`. Apply migrations:
 python -m alembic -c backend/alembic.ini upgrade head
 ```
 
-Then open `/health` again. `migrationVersion` should be `c6f8a2d4e901`.
+Then open `/health` again. On the T01 branch, `migrationVersion` should be
+`d8a4e6f20195`. C03 does not introduce another migration head.
 
-This is the Sprint 3 head through T26 nullable backdrop storage, extending T30
-rating storage. Existing checkouts must apply the upgrade before restarting
+This extends the Sprint 3 head `c6f8a2d4e901` with nullable poster storage.
+Existing checkouts must apply the upgrade before restarting
 the application with the new model. No dependency reinstall, token or catalogue
 reimport is needed for this storage-only upgrade; preserve the existing `.env`
 and back up valuable data consistently first. Existing backdrop values remain

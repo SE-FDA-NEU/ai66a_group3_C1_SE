@@ -10,6 +10,7 @@ from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.catalogue.backdrops import backdrop_url
+from app.catalogue.posters import poster_url
 from app.db.models import (
     CatalogMovie,
     CatalogueRevision,
@@ -184,6 +185,20 @@ def set_movie_backdrop_path(
     return movie
 
 
+def set_movie_poster_path(
+    session: Session, *, movie_id: str, poster_path: str | None
+) -> CatalogMovie:
+    """Set media in the caller's transaction, without changing text/revision."""
+    if poster_path is not None and not isinstance(poster_path, str):
+        raise ValueError("poster_path must be a string or None")
+    movie = session.get(CatalogMovie, movie_id)
+    if movie is None:
+        raise ValueError("catalogue movie does not exist")
+    movie.poster_path = poster_path
+    session.flush()
+    return movie
+
+
 def upsert_genre(session: Session, *, genre_id: int, name: str) -> Genre:
     """Create or refresh a provider genre without duplicating its numeric ID."""
 
@@ -292,6 +307,7 @@ def to_movie_summary_dto(movie: CatalogMovie) -> MovieSummaryDto:
         releaseYear=movie.release_year,
         genres=[GenreDto(id=genre.id, name=genre.name) for genre in movie.genres],
         popularityScore=movie.popularity_score,
+        posterUrl=poster_url(movie.poster_path),
     )
 
 
@@ -308,6 +324,7 @@ def to_movie_detail_dto(movie: CatalogMovie) -> MovieDetailDto:
         voteAverage=movie.vote_average,
         voteCount=movie.vote_count,
         backdropUrl=backdrop_url(movie.backdrop_path),
+        posterUrl=poster_url(movie.poster_path),
     )
 
 

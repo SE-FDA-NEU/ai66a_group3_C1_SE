@@ -1,0 +1,146 @@
+# S4-T01 UI and poster handoff — reconciled with merged C03
+
+Refs [#195](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/195).
+Built early with PO authorization on 2026-10-24 against main
+`3078a9c6fd3dff1f0b8576bc7411f469c7a98fdf`. C03
+[#217](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/217) subsequently
+merged through PR #222 at main `37c2f66`. This candidate incorporates that main
+and reconciles the approved contract without rewriting the original T01 commits.
+**Independent final-diff review and required CI remain merge conditions.**
+
+## Delivered scope and preserved boundaries
+
+Existing React/TypeScript Home, Popular, register/sign-in, Preferences,
+Recommendations, details and the exact three-step explanation share a compact
+cinematic violet style inspired by the supplied CineAI ZIP. No ZIP scripts,
+mock statistics, hard-coded movie artwork or fake success actions are copied.
+Home remains A–Z; Popular remains finite popularity descending with existing
+tie-breakers; recommendations keep the current algorithm. Filtering still
+applies to the whole result set before pagination. Existing request-generation,
+account/movie guards and safe detail-return context are retained.
+
+No live Search/Similar/Profile/Watchlist/trailer/provider functionality is added
+here, and no dead navigation link advertises it. Owners #205/#203/#208/#207/#215
+integrate those features later using this UI. #199 owns rating-based ranking
+and score explanations; T01 does not change the rating API or ranking formula.
+
+## Reusable frontend contract
+
+### PO-authorized Home/navigation amendment (2026-10-24)
+
+The Home hero replaces the old visible "Choose Start to pick up to 5 favourite
+genres" paragraph with compact discovery copy and Start / Explore Catalogue
+actions. The latter is a local, keyboard-focusable catalogue anchor, not a new
+sort, TMDb request or separate recommendation shelf. Home keeps title/ID order
+and its existing page totals/revision/detail-return semantics.
+
+My recommendations is one persistent active-state link in the shared navbar,
+visible to guests and members. The account region does not duplicate it. Guest,
+checking, authenticated, error/retry and sign-out states retain the backend
+session as their authority. No unfinished Search/Profile/Watchlist feature is
+advertised by a non-functional link.
+
+Default sign-in from Home or direct /login lands on Home. Authentication alone
+does not fetch, select or save personalisation. Explicit Start/Preferences
+opens the real picker; a guest signs in first and returns to /preferences.
+Explicit My recommendations returns to /recommendations; an account without
+genres retains the existing Popular / Not personalised guidance, without
+forcing the picker. Saving valid genres still waits for the real successful
+server response before opening recommendations.
+
+RequireAuth carries only an explicit internal destination in router state.
+Sign-in and registration preserve that intent, including safe page/filter/hash,
+without carrying old-account result/cache state. The allowlist is the existing
+protected routes (/preferences, /recommendations, /profile); external, malformed,
+auth-loop or absent destinations fall back to Home. This is a navigation hint,
+never authentication or permission to read another account's data.
+
+The picker retains dynamic catalogue-backed checkboxes, restored account
+selections, its 1–5 limit/counter, validation, pending/retry and request identity.
+Styling follows the ZIP's violet card/chip treatment, not hard-coded genres,
+invented AI percentages or pixel-identical copied HTML/scripts.
+
+This authorized amendment supersedes the old unconditional sign-in landing in
+S13; it does not change password/session APIs or S01's Start label. The live
+Story #45 currently contains both the new Home AC and old unconditional
+/recommendations AC. PO must replace the obsolete AC (not retain contradictory
+checked claims) before T01 merge. The local C03 and T01 requirements now agree.
+Historical M3 submissions,
+screenshots/diagrams and evidence retain their original tested scope rather
+than being rewritten as newly executed Sprint 4 evidence.
+
+| Component / file | Consumer responsibility and invariant |
+|---|---|
+| `AppFrame` | Shared brand/navigation/session UI, skip link and footer. Session writes remain in AuthProvider. Public lists restore the session; existing protected/rating boundaries retain ownership of initial checks. Static explanation starts no API request. No second header per page. |
+| `ThemeProvider` / `ThemeToggle` | Dark default; only `dark`/`light`; local key `cineai-theme`. Inline pre-paint bootstrap and provider use the same key. Blocked/corrupt storage is safe. Toggling changes tokens, never keys/remounts, auth, URL, draft, filter or page. |
+| `MoviePoster` | `{movieId,title,posterUrl?,eager?}`; strict w500 HTTPS CDN URL only; width/height 500/750 and fixed 2:3 region; lazy list images, eager detail poster; labelled missing/error fallback; failure state resets on movie or URL change. |
+| `StarRating` | Controlled integer `RatingValue|null`; five native labelled radios, Arrow/Space/touch; selection/hover/focus never writes. Consumer owns explicit Save, pending/error/retry and committed value. Existing `MovieRating` keeps account/movie isolation. |
+| `ConfirmDialog` | Consumer controls `open`, pending and real mutation. Label/description, focus trap, initial safe Cancel focus, Escape cancel when idle, restore trigger. Pending blocks duplicate/cancel actions. No reset API is wired by T01. |
+| `ExternalTrailerLink` | Example primitive only: validated YouTube watch URL or unavailable text; new tab with noopener/noreferrer; no iframe/autoplay/fake player. #215 owns real backend selection and live integration. |
+| `ProviderBadges` | Example primitive only: deduplicated non-clickable provider names. Future provider task owns region, missing data and JustWatch attribution before mounting it. |
+
+The new header keeps existing product naming within the page copy; CineAI is a
+visual wordmark, not a claim about new AI capabilities. `TMDb popularity`, saved
+`Your rating`, and future `Ranking score for you` must remain distinct. Only
+existing real data appears. There is no score 0 or half-star input.
+
+## Design tokens and accessibility
+
+`index.css` owns semantic `--page-bg`, `--surface`, `--surface-raised`, `--text`,
+`--muted`, `--border`, `--control-border`, `--accent`, `--primary`, `--focus`, `--error`, `--success`
+and `--star` tokens in both themes. New feature UIs should reuse these variables
+and common card/action/status/dialog classes instead of fixed dark-only colors.
+System font fallbacks work offline; no new external font dependency is required.
+
+Poster grid adapts to 375px/tablet/desktop, header/actions wrap, title text wraps,
+minimum action targets are 44px, star targets 48px. Keyboard focus is visible;
+errors have readable text, not color alone. Reduced-motion disables transitions.
+Backdrop retains its dark overlay even in light theme so its title stays legible.
+Browser and unit evidence is linked below; these checks are not a full WCAG
+certification or a substitute for the final C04 accessibility audit.
+
+## Poster persistence / reconciled API
+
+Migration `d8a4e6f20195` follows `c6f8a2d4e901`; adds only nullable Text
+`catalog_movies.poster_path`, no binary media. Fresh and populated upgrades are
+tested. Never run a downgrade against valuable data just to try this branch.
+Rebase the migration parent against the actual merged head before merge if
+other owners add migrations concurrently. Future watchlist/NLP data stays owned
+by its tasks; this migration must not recreate their tables or reset accounts.
+
+Summaries, recommendations and detail responses add nullable `posterUrl`.
+Backend builds `https://image.tmdb.org/t/p/w500/<filename>` from a validated flat
+path (1–128 alphanumeric/underscore/hyphen characters + jpg/jpeg/png/webp).
+Frontend validates the same allowlist. Existing backdrop remains w780/detail-only.
+No token, source/provider ID or raw path is added to the browser DTO.
+
+Normal bounded TMDb imports retain the available poster field without adding
+one details call per card. `--enrich-posters --limit 300` is a separate bounded,
+atomic media-only pass for the current active TMDb catalogue. It preserves its
+revision, IDs, overview, popularity, genres, backdrops, preferences and ratings.
+Missing/invalid poster fields retain the old value; explicit null clears it;
+provider failure rolls back all writes. Repeating a small limit processes the
+same sorted prefix, not an implicit next page. Runtime API reads are local-only;
+the browser can fetch public image bytes, not TMDb metadata.
+
+Poster-only changes do not change NLP corpus/config/revision inputs. T01 does
+not implement or certify the future index invalidation system (#201/C03).
+CDN failure is local image fallback, not catalogue failure.
+
+## Reconciliation and review checklist
+
+- [x] C03 #217 merged; compare DTO nullability/size, theme key, header ownership,
+  radio save semantics, common components and future feature boundaries.
+- [x] Merged C03 adds no migration; the single T01 head is `d8a4e6f20195`,
+  following `c6f8a2d4e901`. Fresh/populated upgrade tests cover this chain.
+- Future C05 root `tests/` / default-pytest M4 infrastructure remains owned by
+  #219 and is not a new T01 dependency. Current
+  backend suite plus browser/unit tests are not proof of all six P0 M4 cases or
+  per-member authored-pytest requirements.
+- [ ] If a future Content-Security-Policy disallows inline scripts, include an
+  approved hash/nonce for the pre-paint theme bootstrap; do not silently break it.
+- [ ] Independent final-diff review by Hoàng / another non-author using GitHub
+  Review changes, with substantive feedback, then rerun CI.
+- [ ] Only after reconciliation/review may PO decide this issue is merge-ready.
+
+Commands and actual local results: [T01 evidence](evidence/s4-t01-ui.md).

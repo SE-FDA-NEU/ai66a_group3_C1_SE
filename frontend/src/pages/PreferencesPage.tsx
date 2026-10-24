@@ -189,7 +189,7 @@ function PreferencesPage() {
             Browse the catalogue
           </Link>
         </nav>
-        <p className="eyebrow">AI Movie Recommendation System</p>
+        <p className="eyebrow">Your taste, your choice</p>
         <h1 id="preferences-title">Movie Preferences</h1>
         <p className="muted" id="genre-selection-help">
           Choose 1 to 5 favourite genres from the active movie catalogue, then
@@ -249,7 +249,8 @@ function PreferencesPage() {
                         handleGenreChange(genre.id, event.currentTarget.checked)
                       }
                     />
-                    <span>{genre.name}</span>
+                    <span className="genre-option__name">{genre.name}</span>
+                    <span className="genre-option__state" aria-hidden="true">{selectedIds.has(genre.id) ? "✓" : "+"}</span>
                   </label>
                 ))}
               </div>

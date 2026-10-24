@@ -1,8 +1,9 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { ApiError, register } from "../api/auth.ts";
+import { signInReturnState } from "../navigation/signInReturn.ts";
 
 type FieldErrors = Partial<Record<"email" | "password", string>>;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -18,6 +19,7 @@ function validateRegistration(email: string, password: string): FieldErrors {
 
 function RegisterPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
@@ -36,7 +38,7 @@ function RegisterPage() {
     setIsSubmitting(true);
     try {
       await register(email.trim(), password);
-      navigate("/login", { replace: true });
+      navigate("/login", { replace: true, state: signInReturnState(location.state) });
     } catch (error) {
       if (error instanceof ApiError && error.code === "EMAIL_ALREADY_REGISTERED") {
         setRequestError("This email is already registered");
@@ -90,7 +92,7 @@ function RegisterPage() {
           </button>
         </form>
 
-        <p className="auth-footer">Already have an account? <Link to="/login">Sign in</Link></p>
+        <p className="auth-footer">Already have an account? <Link to="/login" state={signInReturnState(location.state)}>Sign in</Link></p>
       </section>
     </main>
   );

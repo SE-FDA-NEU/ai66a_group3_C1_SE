@@ -189,6 +189,7 @@ class CatalogMovie(Base):
     release_year: Mapped[int | None] = mapped_column(Integer, nullable=True)
     overview: Mapped[str | None] = mapped_column(Text, nullable=True)
     backdrop_path: Mapped[str | None] = mapped_column(Text, nullable=True)
+    poster_path: Mapped[str | None] = mapped_column(Text, nullable=True)
     popularity_score: Mapped[float | None] = mapped_column(Float, nullable=True)
     vote_average: Mapped[float | None] = mapped_column(Float, nullable=True)
     vote_count: Mapped[int | None] = mapped_column(Integer, nullable=True)

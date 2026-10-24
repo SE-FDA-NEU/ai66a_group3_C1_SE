@@ -3,11 +3,17 @@
 Contract revision: `S3-FINAL`, reconciled on 2026-10-18 against Sprint 3
 `main` SHA `f9774cbe7248c29915086d29bf2b9f99c2aa528a`.
 
-Sprint 4 C03 proposal (2026-10-24): section 13 specifies future routes and
+Sprint 4 C03 contract (merged in PR #222, main `37c2f66`, 2026-10-24):
+section 13 specifies future routes and
 additive fields for [#217](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/217).
 It is a design contract, **not evidence that these routes or fields are live**.
 Sections 1–12 remain the implemented Sprint 3/post-M3 baseline until the
 respective feature owners implement and verify the section 13 changes.
+
+T01's reconciled candidate implements the nullable `posterUrl` additions below
+and the Home-first/explicit-intent navigation in section 13.5. It does not
+implement the planned ranking, NLP, profile, watchlist or trailer features.
+The auth DTOs, cookies, errors, ranking and pagination remain unchanged.
 
 This document inventories the implemented M2 and Sprint 3 HTTP boundary. Every
 route is labelled with its delivered milestone/task. Genuinely unfinished
@@ -130,6 +136,7 @@ title: string
 releaseYear: number | null
 genres: GenreDto[]
 popularityScore: number | null
+posterUrl: string | null
 ```
 
 ### `MovieDetailDto`
@@ -144,12 +151,18 @@ popularityScore: number | null
 voteAverage: number | null
 voteCount: number | null
 backdropUrl: string | null
+posterUrl: string | null
 ```
 
 The public movie `id` is the stable internal ID. A TMDb source ID is not part
 of a public DTO. `backdropUrl` is a server-built HTTPS image URL from a
 validated local TMDb path, or JSON `null` when absent or invalid. It appears
-only on details; list and recommendation DTOs do not gain media fields.
+only on details. T01 adds `posterUrl` to summaries, recommendations and details:
+either `https://image.tmdb.org/t/p/w500/<validated-filename>` or JSON `null`.
+No raw `poster_path`, binary image, provider token or per-card detail fetch is
+exposed. Only one flat jpg/jpeg/png/webp filename is allowed; arbitrary hosts,
+queries and nested paths are rejected. Lists still rank/filter/page exactly as
+before. See [reconciled T01 handoff](s4-t01-ui-contract.md).
 
 ### Sprint 3 recommendation and account DTOs
 
@@ -657,7 +670,8 @@ Success (`200`):
       "popularityScore": 90.0,
       "voteAverage": 7.2,
       "voteCount": 1200,
-      "backdropUrl": "https://image.tmdb.org/t/p/w780/example.jpg"
+      "backdropUrl": "https://image.tmdb.org/t/p/w780/example.jpg",
+      "posterUrl": null
     }
   },
   "meta": {

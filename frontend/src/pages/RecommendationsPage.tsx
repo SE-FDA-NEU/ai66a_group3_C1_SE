@@ -6,7 +6,6 @@ import type { PageMeta } from "../api/movies.ts";
 import { useAuth } from "../auth/authState.ts";
 import RecommendationFilter from "../components/RecommendationFilter.tsx";
 import RecommendationGuidance from "../components/RecommendationGuidance.tsx";
-import SessionNavigation from "../components/SessionNavigation.tsx";
 import { currentReturnPath } from "../navigation/movieDetailReturn.ts";
 import { pageSearch, readGenreId, readPage } from "../navigation/listPage.ts";
 import { listViewState, readListViewState, sameListViewContext,
@@ -157,7 +156,6 @@ export default function RecommendationsPage() {
   return <main className="page">
     <header className="topbar">
       <div><p className="eyebrow">AI Movie Recommendation System</p><h1>Recommendations</h1></div>
-      <SessionNavigation currentPage="recommendations" />
     </header>
     <nav className="page-nav" aria-label="Recommendation navigation">
       <Link className="text-link" to="/preferences">Change my genres</Link>

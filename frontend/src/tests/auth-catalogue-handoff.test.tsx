@@ -189,7 +189,7 @@ afterEach(() => {
 });
 
 describe("T20 integrated auth-to-catalogue handoff", () => {
-  it("registers, signs in, lands on recommendations, opens a detail, signs out and loses access", async () => {
+  it("registers, signs in to Home, explicitly opens recommendations, signs out and loses access", async () => {
     const { requests } = installFakeServer();
     window.history.pushState({}, "", "/register");
     const first = render(<App />);
@@ -205,7 +205,12 @@ describe("T20 integrated auth-to-catalogue handoff", () => {
     type("Password", "movie123");
     fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
 
-    // The signed-in account reaches the real recommendation landing page.
+    // Registration/login alone does not start personalisation.
+    await screen.findByRole("heading", { name: "Find your next movie" });
+    expect(window.location.pathname).toBe("/");
+    expect(requests).not.toContain("GET /api/me/recommendations?limit=10");
+    fireEvent.click(screen.getByRole("link", { name: "My recommendations" }));
+    // The account explicitly requests the recommendation page.
     expect(
       await screen.findByRole("heading", { name: "Recommendations" }),
     ).toBeInTheDocument();

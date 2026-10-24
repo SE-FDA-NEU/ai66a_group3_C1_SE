@@ -148,6 +148,21 @@ for links and whitespace but is not self-hashed.
 | `scripts/verify_s4_c03_contract.py` | `4484c9cad834fcf88ce9d91cbfe31b7a89d797ff666c0e73b794e5e7ae2e6142` |
 | `scripts/test_s4_c03_contract_line_endings.py` | `86fb7656efa33f1582d23d8b5c8a17737569a5fee006363e1926b4e69ea8f918` |
 
+### T01 consumer reconciliation after C03 merge
+
+The table above is the immutable C03 correction capture. T01 incorporates
+merged main `37c2f66` and implements its nullable poster DTO and section 13.5
+navigation without implementing other planned features. Only `docs/api.md`
+changes among the seven hashed files; its current normalized-LF hash follows.
+The other six hashes remain exactly those in the capture table. New executed
+consumer checks belong to [T01 evidence](s4-t01-ui.md), not the historical C03
+baseline run. This amendment does not claim independent review or feature
+acceptance for the 35 planned P0 cases.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/api.md` | `23ce959fc94c13bf2dd27f81721dbffd687e16895f85abdb00ab52c8c2474afe` |
+
 ## Review and acceptance status
 
 The author-side mapping and local checks are complete. **Independent

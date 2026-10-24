@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/authState.ts";
 
-export default function SessionNavigation({ currentPage }: { currentPage?: "recommendations" }) {
+export default function SessionNavigation({ currentPage, showRecommendationsLink = true }: {
+  currentPage?: "recommendations";
+  showRecommendationsLink?: boolean;
+}) {
   const auth = useAuth();
   const { status, refresh } = auth;
   const navigate = useNavigate();
@@ -36,7 +39,7 @@ export default function SessionNavigation({ currentPage }: { currentPage?: "reco
     </> : null}
     {auth.status === "authenticated" ? <>
       <span className="muted">{auth.user.email}</span>
-      {currentPage !== "recommendations" ? <Link className="button-link button-secondary" to="/recommendations">My recommendations</Link> : null}
+      {showRecommendationsLink && currentPage !== "recommendations" ? <Link className="button-link button-secondary" to="/recommendations">My recommendations</Link> : null}
       <button type="button" className="button-secondary" disabled={busy} onClick={() => void signOut()}>{busy ? "Signing out..." : "Sign out"}</button>
     </> : null}
     {error ? <span role="alert">{error}</span> : null}

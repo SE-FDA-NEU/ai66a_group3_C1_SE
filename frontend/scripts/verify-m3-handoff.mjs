@@ -186,8 +186,11 @@ c=sqlite3.connect(sys.argv[1]); r=c.execute('SELECT password_hash FROM users WHE
   await page.getByLabel("Email", { exact: true }).fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
   report.stage = "cold-start sign in";
-  const coldResponse = response("/api/me/recommendations");
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page).toHaveURL(`${ui}/`);
+  check("Direct sign-in lands on Home without forcing genre selection");
+  const coldResponse = response("/api/me/recommendations");
+  await page.getByRole("link", { name: "My recommendations", exact: true }).click();
   const cold = await (await coldResponse).json();
   assert.equal(cold.data.personalised, false); assert.equal(cold.data.noMatch, false);
   assert.deepEqual(cold.data.movies.map(m => m.id), oracle);

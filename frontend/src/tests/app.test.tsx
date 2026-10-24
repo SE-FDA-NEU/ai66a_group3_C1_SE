@@ -45,7 +45,7 @@ describe("S13 authentication UI", () => {
     expect(screen.getByLabelText("Password")).toBeInTheDocument();
   });
 
-  it("opens recommendations after a successful login", async () => {
+  it("opens Home after a successful login without an explicit protected destination", async () => {
     window.history.pushState({}, "", "/login");
 
     const fetchMock = vi
@@ -61,8 +61,8 @@ describe("S13 authentication UI", () => {
           });
         }
 
-        if (path === "/api/me/recommendations?limit=10") {
-          return emptyRecommendations();
+        if (path === "/api/movies?limit=10") {
+          return jsonResponse({ data: { movies: [] }, meta: { count: 0, limit: 10 } });
         }
 
         throw new Error(`Unexpected request: ${path}`);
@@ -79,9 +79,10 @@ describe("S13 authentication UI", () => {
     fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
 
     expect(
-      await screen.findByRole("heading", { name: "Recommendations" }),
+      await screen.findByRole("heading", { name: "Find your next movie" }),
     ).toBeInTheDocument();
-    expect(window.location.pathname).toBe("/recommendations");
+    expect(window.location.pathname).toBe("/");
+    expect(fetchMock.mock.calls.some(([input]) => String(input).startsWith("/api/me/"))).toBe(false);
 
     expect(fetchMock).toHaveBeenCalledWith(
       "/api/auth/login",

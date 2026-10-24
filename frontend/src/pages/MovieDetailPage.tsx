@@ -6,6 +6,7 @@ import { formatPopularityScore, POPULARITY_LABEL } from "../formatPopularity.ts"
 import { resolveMovieDetailReturn } from "../navigation/movieDetailReturn.ts";
 import MovieBackdropHero from "../components/MovieBackdropHero.tsx";
 import MovieRating from "../components/MovieRating.tsx";
+import MoviePoster from "../components/MoviePoster.tsx";
 
 const INFORMATION_UNAVAILABLE = "Information unavailable";
 
@@ -135,6 +136,9 @@ function MovieDetailPage() {
         />
 
         <div className="movie-detail__body">
+          <div className="movie-detail__poster"><MoviePoster movieId={movie.id} title={movie.title}
+            posterUrl={movie.posterUrl} eager /></div>
+          <div className="movie-detail__information">
           <dl className="movie-detail__facts">
             <div>
               <dt>Year</dt>
@@ -159,6 +163,7 @@ function MovieDetailPage() {
             <p>{movie.overview ?? INFORMATION_UNAVAILABLE}</p>
           </section>
           <MovieRating movieId={movie.id} />
+          </div>
         </div>
       </article>
     </main>

@@ -117,7 +117,7 @@ it("unmounts the previous private widget while a new movie is loading", async ()
   });
   render(<App />);
   await screen.findByText("Your saved rating: 3/5");
-  fireEvent.change(screen.getByRole("combobox"), { target: { value: "5" } });
+  fireEvent.click(screen.getByRole("radio", { name: "5 stars" }));
   fireEvent.click(screen.getByRole("button", { name: "Save rating" }));
   await act(async () => {
     window.history.pushState({}, "", "/movies/movie-b");
