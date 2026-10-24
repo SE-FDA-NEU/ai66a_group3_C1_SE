@@ -24,6 +24,15 @@ async function screenshot(page: Page, name: string) {
   await mkdir(directory, { recursive: true });
   await page.screenshot({ path: path.join(directory, `${name}.png`), fullPage: true });
 }
+async function settlePublicPosters(page: Page) {
+  // Full-page screenshots must not capture lazy images before the browser has
+  // scrolled them into view. Do not replace images or fabricate loaded states.
+  for (const poster of await page.locator("article.movie-card img").all())
+    await poster.scrollIntoViewIfNeeded();
+  await expect.poll(() => page.locator("article.movie-card img").evaluateAll(images =>
+    images.every(img => (img as HTMLImageElement).complete)), { timeout: 30_000 }).toBe(true);
+  await page.evaluate(() => window.scrollTo(0, 0));
+}
 
 test.beforeEach(async ({ page, request }) => {
   if (live) return;
@@ -222,6 +231,118 @@ test("blocked browser storage still renders and switches theme", async ({ browse
   } finally { await context.close(); }
 });
 
+test("reference auth layouts stay concise, responsive and fully functional in both themes", async ({ page }) => {
+  test.skip(live, "Layout and synthetic form checks use the isolated fixture");
+  for (const width of [1440, 375]) {
+    await page.setViewportSize({ width, height: 1000 });
+    for (const route of ["/login", "/register"]) {
+      await page.goto(route);
+      for (const theme of ["dark", "light"]) {
+        if (await page.locator("html").getAttribute("data-theme") !== theme)
+          await page.getByRole("button", { name: `Switch to ${theme} theme` }).click();
+        await expect(page.locator(".auth-card")).toBeVisible();
+        if (width === 1440) {
+          await expect(page.locator(".auth-art")).toBeVisible();
+          const art = (await page.locator(".auth-art").boundingBox())!;
+          const form = (await page.locator(".auth-card").boundingBox())!;
+          expect(form.x).toBeGreaterThanOrEqual(art.x + art.width - 1);
+        } else await expect(page.locator(".auth-art")).not.toBeVisible();
+        await expect(page.getByLabel("Email", { exact: true })).toBeVisible();
+        await expect(page.getByLabel("Password", { exact: true })).toBeVisible();
+        expect(await page.locator("main").innerText()).not.toMatch(/99\.4|Google|Apple|Forgot password|Neural engine/);
+        await noOverflow(page);
+        if (width === 1440 || theme === "light")
+          await screenshot(page, `onboarding-${route.slice(1)}-${width}-${theme}-fixture`);
+      }
+    }
+  }
+});
+
+test("centered action feedback reflects real login/save/logout acknowledgements without blocking the page", async ({ page, request }) => {
+  test.skip(live, "Never creates accounts in the imported developer database");
+  const email = `feedback-${crypto.randomUUID()}@example.test`;
+  const password = "feedback-synthetic-only";
+  expect((await request.post("/api/auth/register", { data: { email, password } })).status()).toBe(201);
+  await page.goto("/");
+  await page.getByRole("link", { name: "My recommendations", exact: true }).click();
+  await expect(page).toHaveURL(/\/login$/);
+  const feedback = page.getByTestId("action-feedback");
+  await expect(feedback).toContainText("Sign in to continue");
+  const box = (await feedback.boundingBox())!;
+  const viewport = page.viewportSize()!;
+  expect(Math.abs(box.x + box.width / 2 - viewport.width / 2)).toBeLessThanOrEqual(1);
+  expect(Math.abs(box.y + box.height / 2 - viewport.height / 2)).toBeLessThanOrEqual(1);
+  expect(await feedback.evaluate(node => getComputedStyle(node).pointerEvents)).toBe("none");
+  await page.keyboard.press("Escape"); await expect(feedback).toHaveCount(0);
+  await page.getByLabel("Email", { exact: true }).fill(email);
+  await page.getByLabel("Password", { exact: true }).fill("wrong-password");
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page.getByRole("alert")).toContainText("Email or password is incorrect");
+  await expect(feedback).toContainText("Sign-in not confirmed");
+  // Click/fill the real form while the non-modal feedback is still visible.
+  await page.getByLabel("Password", { exact: true }).fill(password);
+  let release!: () => void;
+  const held = new Promise<void>(resolve => { release = resolve; });
+  await page.route("**/api/auth/login", async route => {
+    // Delay dispatch, then send the unchanged real browser request. Using an
+    // HTTP replay would lose Chromium's Fetch Metadata and test another client.
+    await held; await route.continue();
+  });
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  try {
+    await expect(feedback).toContainText("Signing you in");
+    await expect(feedback).not.toContainText("You're signed in");
+    await expect(page.getByRole("button", { name: "Signing in...", exact: true })).toBeDisabled();
+  } finally { release(); }
+  await expect(page).toHaveURL(/\/recommendations$/);
+  await expect(feedback).toContainText("You're signed in");
+  await page.getByRole("link", { name: "Preferences", exact: true }).click();
+  await page.getByRole("checkbox", { name: "Action", exact: true }).check();
+  await page.getByRole("button", { name: "Save preferences", exact: true }).click();
+  await expect(feedback).toContainText("Your taste is saved");
+  await page.goto(`/movies/${fixtureMovie}`);
+  await page.getByRole("radio", { name: "5 stars", exact: true }).check();
+  await page.getByRole("button", { name: "Save rating", exact: true }).click();
+  await expect(page.getByText("Your saved rating: 5/5", { exact: true })).toBeVisible();
+  await expect(feedback).toContainText("Rating saved");
+  await screenshot(page, "onboarding-rating-feedback-fixture");
+  await page.getByRole("button", { name: "Sign out", exact: true }).click();
+  await expect(feedback).toContainText("You're signed out");
+  await expect(page.getByRole("link", { name: "Sign in", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Dismiss notification", exact: true }).click();
+  await expect(feedback).toHaveCount(0);
+});
+
+test("genre cards expose descriptions, native keyboard state and no implicit writes", async ({ page, request }) => {
+  test.skip(live, "Synthetic account and preferences are isolated");
+  const email = `genres-${crypto.randomUUID()}@example.test`;
+  const password = "genres-synthetic-only";
+  expect((await request.post("/api/auth/register", { data: { email, password } })).status()).toBe(201);
+  let writes = 0;
+  page.on("request", r => { if (r.method() === "PUT" && r.url().includes("/preferences")) writes++; });
+  await page.goto("/login");
+  await page.getByLabel("Email", { exact: true }).fill(email);
+  await page.getByLabel("Password", { exact: true }).fill(password);
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page).toHaveURL("/");
+  await page.getByRole("link", { name: "Preferences", exact: true }).click();
+  await page.keyboard.press("Escape");
+  await expect(page.locator(".preferences-slogan")).toHaveText("Tell Us What You Love to Watch");
+  const action = page.getByRole("checkbox", { name: "Action", exact: true });
+  await action.focus(); await page.keyboard.press("Space");
+  await expect(action).toBeChecked();
+  await expect(page.getByText("1 of 5 selected", { exact: true })).toBeVisible();
+  expect(await action.getAttribute("aria-describedby")).toBeTruthy();
+  await expect(page.locator(".genre-option__description").first()).not.toBeEmpty();
+  expect(writes).toBe(0);
+  await screenshot(page, "onboarding-preferences-1440-dark-fixture");
+  await page.setViewportSize({ width: 375, height: 900 });
+  await page.getByRole("button", { name: "Switch to light theme" }).click();
+  await noOverflow(page);
+  await screenshot(page, "onboarding-preferences-375-light-fixture");
+  expect(writes).toBe(0);
+});
+
 test("read-only imported TMDb catalogue screenshots, real poster loading and themes", async ({ page }) => {
   test.skip(!live, "Requires an explicitly provided, separately running imported-DB preview");
   test.setTimeout(90_000);
@@ -237,6 +358,7 @@ test("read-only imported TMDb catalogue screenshots, real poster loading and the
   const firstPoster = page.locator("article.movie-card img").first();
   await expect(firstPoster).toBeVisible();
   await expect.poll(() => firstPoster.evaluate((img: HTMLImageElement) => img.naturalWidth), { timeout: 30_000 }).toBeGreaterThan(0);
+  await settlePublicPosters(page);
   await screenshot(page, "t01-home-dark");
   await page.getByRole("button", { name: "Switch to light theme" }).click();
   await screenshot(page, "t01-home-light");
@@ -248,6 +370,21 @@ test("read-only imported TMDb catalogue screenshots, real poster loading and the
   await noOverflow(page);
   await screenshot(page, "t01-details-mobile-dark");
   await page.goto("/popular");
+  const popular = await (await page.request.get("/api/movies/popular?limit=10")).json();
+  const spotlight = page.getByRole("region", { name: "Most popular movie spotlight" });
+  await expect(spotlight.getByRole("heading", { level: 2 })).toHaveText(popular.data.movies[0].title);
+  await expect(spotlight.locator("img").last()).toBeVisible();
+  await expect.poll(() => spotlight.locator("img").last().evaluate((img: HTMLImageElement) => img.naturalWidth), { timeout: 30_000 }).toBeGreaterThan(0);
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await settlePublicPosters(page);
+  await screenshot(page, "onboarding-popular-1440-dark-imported");
+  await page.getByRole("button", { name: "Switch to light theme" }).click();
+  await screenshot(page, "onboarding-popular-1440-light-imported");
+  await page.setViewportSize({ width: 375, height: 900 });
+  await screenshot(page, "onboarding-popular-375-light-imported");
+  await page.getByRole("button", { name: "Next", exact: true }).click();
+  await expect(page.locator("article.movie-card").first()).toBeVisible();
+  await expect(spotlight).toHaveCount(0);
   await noOverflow(page);
   expect(errors).toEqual([]);
 });

@@ -144,3 +144,21 @@ CDN failure is local image fallback, not catalogue failure.
 - [ ] Only after reconciliation/review may PO decide this issue is merge-ready.
 
 Commands and actual local results: [T01 evidence](evidence/s4-t01-ui.md).
+
+## Post-merge onboarding/discovery polish
+
+The follow-up after PR #220 reuses these contracts: two-column auth presentation,
+genre descriptions/cards, a real-poster Home hero and a Popular page-one #1
+spotlight. It changes no API DTO, database schema, ranking, result totals or genre
+selection rule. Featured details use the existing list-return state. Decorative
+auth artwork is CSS, not a screenshot of another app or a new remote dependency.
+
+`ActionFeedback` / `useFeedback` provide shared, centered, non-modal notifications.
+Use `announce` for a new action, then `update` its returned ID only after the real
+result. Stale IDs cannot overwrite newer actions; component cleanup dismisses
+only its own pending ID. Keep detailed errors inline, preserve drafts and never
+declare server success from a timer or local toggle. Do not add feedback state
+to auth authority, API query keys or ranking inputs.
+
+Actual checks, screenshots and review limits:
+[onboarding/discovery follow-up evidence](evidence/s4-t01-onboarding-polish.md).
