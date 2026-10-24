@@ -68,7 +68,7 @@ it("offers a compact hero and one persistent recommendations navbar entry withou
   open();
   await screen.findByText("Alpha");
   expect(screen.queryByText(/Choose Start to pick up to 5/)).not.toBeInTheDocument();
-  expect(screen.getByText("Explore the movie catalogue and discover recommendations based on your preferences.")).toBeVisible();
+  expect(screen.getByText("Less scrolling. More great films.")).toBeVisible();
   expect(screen.getByRole("link", { name: "Start" })).toHaveAttribute("href", "/preferences");
   expect(screen.getByRole("link", { name: "Explore Catalogue" })).toHaveAttribute("href", "#catalogue-shelf");
   expect(screen.getByRole("region", { name: "Catalogue results" })).toHaveAttribute("id", "catalogue-shelf");

@@ -7,6 +7,8 @@ import { listViewState, readListViewState, sameListViewContext,
   type ListViewContext } from "../navigation/listViewState.ts";
 import MovieGrid from "./MovieGrid.tsx";
 import PageControls from "./PageControls.tsx";
+import MoviePoster from "./MoviePoster.tsx";
+import PopularSpotlight from "./PopularSpotlight.tsx";
 
 type Load = { key: string } & (
   | { status: "ready"; movies: MovieSummary[]; meta: PageMeta }
@@ -79,19 +81,30 @@ export default function PublicMovieList({ kind }: { kind: "catalogue" | "popular
   const popular = kind === "popular";
   return <main className="page catalogue-page">
     <header className={`catalogue-header${popular ? "" : " catalogue-hero"}`}>
-      <div>
-        <p className="eyebrow">AI Movie Recommendation System</p>
-        <h1>{popular ? "Popular movies" : "Find your next movie"}</h1>
-        <p className="muted">{popular ? "Browse the highest-ranked movies in the active catalogue." : "Explore the movie catalogue and discover recommendations based on your preferences."}</p>
+      <div className="catalogue-header__copy">
+        <p className="eyebrow">{popular ? "The popularity collection" : "Your next movie night"}</p>
+        <h1>{popular ? "Popular movies" : <>Find your <br /><span>next movie</span></>}</h1>
+        <p className="muted">{popular ? "The films leading this catalogue, ranked by TMDb popularity." : "Less scrolling. More great films."}</p>
         {!popular ? <span className="sr-only" id="start-hint">Choose your favourite genres for personalised recommendations.</span> : null}
-      </div>
       <nav className="catalogue-actions" aria-label="Public navigation">
         {popular ? <Link className="button-link button-secondary" to="/">Movie catalogue</Link> : <>
           <Link className="button-link" to="/preferences" aria-describedby="start-hint">Start</Link>
           <a className="button-link button-secondary" href="#catalogue-shelf">Explore Catalogue</a>
         </>}
       </nav>
+      {!popular ? <p className="catalogue-hero__footnote">{current?.status === "ready" ? `${current.meta.total} movies to explore` : "A world of stories"}<span aria-hidden="true"> · </span> Your taste, your choice</p> : null}
+      </div>
+      {!popular ? <div className="catalogue-hero__visual" aria-hidden="true">
+        <span className="catalogue-hero__orbit" />
+        {current?.status === "ready" && current.movies.length ? current.movies.slice(0, 3).map(movie =>
+          <div className="hero-poster" key={movie.id}><MoviePoster movieId={movie.id} title={movie.title} posterUrl={movie.posterUrl} eager /></div>) :
+          <div className="hero-empty-art"><span>✦</span><span>THE NEXT SCENE<br />IS YOURS.</span></div>}
+        <span className="catalogue-hero__visual-label">THE CINEAI COLLECTION</span>
+      </div> : null}
     </header>
+    {popular && page === 1 && current?.status === "ready" && current.movies[0] ?
+      <PopularSpotlight movie={current.movies[0]} returnTo={currentReturnPath(location)}
+        returnContext={{ route, catalogueRevision: current.meta.catalogueRevision }} /> : null}
     <section id="catalogue-shelf" className="catalogue-shelf" aria-label={popular ? "Popular movie results" : "Catalogue results"} tabIndex={-1}>
     {!current ? <p className="status-panel" role="status">{popular ? "Loading popular movies..." : "Loading movies..."}</p> :
       current.status === "error" ? <section className="status-panel" role="alert">

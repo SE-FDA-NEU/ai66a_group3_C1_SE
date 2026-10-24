@@ -9,6 +9,8 @@ import {
   savePreferences,
 } from "../api/preferences.ts";
 import { useAuth } from "../auth/authState.ts";
+import { useFeedback } from "../feedback.ts";
+import { genrePresentation } from "../genrePresentation.ts";
 
 const MAX_GENRES = 5;
 const LIMIT_MESSAGE =
@@ -22,6 +24,8 @@ function PreferencesPage() {
     invalidateRecommendations,
   } = useAuth();
   const navigate = useNavigate();
+  const feedback = useFeedback();
+  const pendingNotice = useRef<number | null>(null);
 
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
@@ -45,8 +49,9 @@ function PreferencesPage() {
       saveRequestIdRef.current += 1;
       saveControllerRef.current?.abort();
       saveControllerRef.current = null;
+      if (pendingNotice.current !== null) feedback.dismiss(pendingNotice.current);
     };
-  }, []);
+  }, [feedback]);
   useEffect(() => {
     const controller = new AbortController();
 
@@ -122,6 +127,7 @@ function PreferencesPage() {
 
     if (selectedIds.size < 1 || selectedIds.size > MAX_GENRES) {
       setSaveError(SELECTION_REQUIRED_MESSAGE);
+      feedback.announce({ kind: "error", title: "Choose your favourites first", message: "Select between 1 and 5 genres." });
       return;
     }
 
@@ -139,6 +145,8 @@ function PreferencesPage() {
 
     setSaveError("");
     setIsSaving(true);
+    const notice = feedback.announce({ kind: "pending", title: "Saving your preferences…" });
+    pendingNotice.current = notice;
 
     try {
       await savePreferences(
@@ -148,10 +156,14 @@ function PreferencesPage() {
 
       if (!isCurrentRequest()) return;
 
+      feedback.update(notice, { kind: "success", title: "Your taste is saved", message: "Explore recommendations based on your saved genres." });
+      pendingNotice.current = null;
       invalidateRecommendations();
       navigate("/recommendations");
     } catch (error: unknown) {
       if (!isCurrentRequest()) return;
+      feedback.update(notice, { kind: "error", title: "Save not confirmed", message: "Your selections are kept. Please try again." });
+      pendingNotice.current = null;
 
       if (
         error instanceof PreferenceApiError &&
@@ -176,7 +188,7 @@ function PreferencesPage() {
     }
   }
   return (
-    <main className="page page--centered">
+    <main className="page preferences-page">
       <section
         className="content-card preferences-card"
         aria-labelledby="preferences-title"
@@ -189,13 +201,25 @@ function PreferencesPage() {
             Browse the catalogue
           </Link>
         </nav>
-        <p className="eyebrow">Your taste, your choice</p>
+        <header className="preferences-intro">
         <h1 id="preferences-title">Movie Preferences</h1>
+        <p className="preferences-slogan">Tell Us What You <br /><span>Love to Watch</span></p>
         <p className="muted" id="genre-selection-help">
-          Choose 1 to 5 favourite genres from the active movie catalogue, then
-          choose Save preferences. Once you have 5, clear one to pick a
-          different genre.
+          Choose 1 to 5 favourite genres. We'll take it from there.
         </p>
+        </header>
+
+        {!isLoading && !error ? <div className="preference-toolbar">
+          <div className="preference-toolbar__summary">
+            <span className="preference-toolbar__symbol" aria-hidden="true">✦</span>
+            <div><p id="genre-selection-count" className="selection-count" aria-live="polite">
+              {selectedIds.size} of {MAX_GENRES} selected
+            </p><p className="field-hint">Clear one selection to make room for another.</p></div>
+          </div>
+          <div className="preference-actions"><button type="button" onClick={() => void handleSave()} disabled={isSaving}>
+            {isSaving ? "Saving..." : "Save preferences"}<span aria-hidden="true"> →</span>
+          </button></div>
+        </div> : null}
 
         {isLoading ? (
           <p className="preference-status" role="status">
@@ -235,22 +259,25 @@ function PreferencesPage() {
             }
           >
             <legend>Favourite genres</legend>
-            <p id="genre-selection-count" className="selection-count" aria-live="polite">
-              {selectedIds.size} of {MAX_GENRES} selected
-            </p>
             {genres.length > 0 ? (
               <div className="genre-options">
                 {genres.map((genre) => (
                   <label className="genre-option" key={genre.id}>
                     <input
                       type="checkbox"
+                      aria-label={genre.name}
+                      aria-describedby={`genre-description-${genre.id}`}
                       checked={selectedIds.has(genre.id)}
                       onChange={(event) =>
                         handleGenreChange(genre.id, event.currentTarget.checked)
                       }
                     />
-                    <span className="genre-option__name">{genre.name}</span>
+                    <span className="genre-option__symbol" aria-hidden="true">{genrePresentation(genre.id, genre.name).symbol}</span>
                     <span className="genre-option__state" aria-hidden="true">{selectedIds.has(genre.id) ? "✓" : "+"}</span>
+                    <span className="genre-option__name">{genre.name}</span>
+                    <span className="genre-option__description" id={`genre-description-${genre.id}`}>
+                      {genrePresentation(genre.id, genre.name).description}
+                    </span>
                   </label>
                 ))}
               </div>
@@ -310,17 +337,6 @@ function PreferencesPage() {
           >
             {saveError}
           </p>
-        ) : null}
-        {!isLoading && !error ? (
-          <div className="preference-actions">
-            <button
-              type="button"
-              onClick={() => void handleSave()}
-              disabled={isSaving}
-            >
-              {isSaving ? "Saving..." : "Save preferences"}
-            </button>
-          </div>
         ) : null}
       </section>
     </main>
