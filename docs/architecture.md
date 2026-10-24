@@ -325,6 +325,16 @@ real status. Public Popular and cold-start/no-match fallback never access
 private rating data. The concrete DTO/oracles are in
 [api.md](api.md#131-recommendation-score-transparency).
 
+For the #22 candidate, the service materialises the full active eligible
+set with canonical genres before page slicing. A separate account-scoped
+rating/genre read builds per-genre maps keyed by rated movie ID; each
+candidate merges those maps by ID before summing signs, so two shared
+genres never count the same rating twice. Only the rating query's
+`SQLAlchemyError` is a safe baseline degradation. An upstream auth,
+catalogue, preference or eligible-movie read error keeps its 401/503
+response. The query and serializer are read-only, and raw catalogue
+popularity is never rewritten. See [local #22 evidence](evidence/s4-t03-rating-ranking.md).
+
 The existing rating PUT, preference PUT and reset POST each commit or roll
 back atomically. The T11 integration handoff reserves the SQLite writer
 with `BEGIN IMMEDIATE` on one request-local Session before authentication
