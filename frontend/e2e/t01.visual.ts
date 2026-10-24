@@ -34,11 +34,126 @@ async function settlePublicPosters(page: Page) {
   await page.evaluate(() => window.scrollTo(0, 0));
 }
 
+async function expectActionButton(link: ReturnType<Page["getByRole"]>) {
+  await expect(link).toBeVisible();
+  const style = await link.evaluate(node => {
+    const css = getComputedStyle(node);
+    return { tag: node.tagName, decoration: css.textDecorationLine,
+      height: node.getBoundingClientRect().height, radius: parseFloat(css.borderRadius),
+      border: parseFloat(css.borderTopWidth) };
+  });
+  expect(style.tag).toBe("A");
+  expect(style.decoration).toBe("none");
+  expect(style.height).toBeGreaterThanOrEqual(44);
+  expect(style.radius).toBeGreaterThan(0);
+  expect(style.border).toBeGreaterThan(0);
+}
+
 test.beforeEach(async ({ page, request }) => {
   if (live) return;
   expect((await request.post(`${controls}/scenario/ranked`)).ok()).toBe(true);
   // Deterministic offline image failure checks, not fabricated TMDb screenshots.
   await page.route("https://image.tmdb.org/**", route => route.abort());
+});
+
+test("Home title sort precedes paging and button links preserve detail return in both themes", async ({ page, request }) => {
+  test.skip(live, "Fixture regression uses its own migrated catalogue");
+  const ascending = [];
+  const initial = await (await request.get("/api/movies?limit=10")).json();
+  for (let index = 1; index <= initial.meta.totalPages; index++) {
+    const body = await (await request.get(`/api/movies?limit=10&page=${index}`)).json();
+    ascending.push(...body.data.movies.map((movie: { title: string }) => movie.title));
+  }
+  expect(ascending.length).toBeGreaterThan(10);
+  for (const theme of ["dark", "light"]) {
+    for (const width of [1440, 375]) {
+      await page.setViewportSize({ width, height: 1000 });
+      await page.goto("/?page=2&source=t01#catalogue-shelf");
+      await expect(page.locator("article.movie-card").first()).toBeVisible();
+      if (await page.locator("html").getAttribute("data-theme") !== theme)
+        await page.getByRole("button", { name: `Switch to ${theme} theme` }).click();
+      await page.getByLabel("Sort by title", { exact: true }).selectOption("title_desc");
+      await expect(page).toHaveURL(/sort=title_desc/);
+      await expect(page.getByText(`Showing 1-10 of ${ascending.length} movies`, { exact: true })).toBeVisible();
+      expect(new URL(page.url()).searchParams.get("page")).toBe("1");
+      const titles = page.locator("article.movie-card h2");
+      await expect(titles).toHaveText([...ascending].reverse().slice(0, 10));
+      const detail = page.locator("article.movie-card").first().getByRole("link");
+      await expectActionButton(detail);
+      await detail.focus(); await expect(detail).toBeFocused();
+      await page.keyboard.press("Tab"); await page.keyboard.press("Shift+Tab");
+      await expect(detail).toBeFocused();
+      expect(await detail.evaluate(node => getComputedStyle(node).outlineStyle)).not.toBe("none");
+      await noOverflow(page);
+      await screenshot(page, `buttons-sort-home-${width}-${theme}-fixture`);
+      await page.getByRole("button", { name: "Next", exact: true }).click();
+      await expect(titles).toHaveText([...ascending].reverse().slice(10));
+      await page.reload();
+      await expect(page.getByLabel("Sort by title")).toHaveValue("title_desc");
+      await expect(titles).toHaveText([...ascending].reverse().slice(10));
+      await page.locator("article.movie-card").first().getByRole("link").focus();
+      await page.keyboard.press("Enter");
+      const back = page.getByRole("link", { name: "Return to catalogue", exact: true });
+      await expectActionButton(back);
+      await screenshot(page, `buttons-return-details-${width}-${theme}-fixture`);
+      await noOverflow(page);
+      await back.click();
+      await expect(page.getByLabel("Sort by title")).toHaveValue("title_desc");
+      await expect(titles).toHaveText([...ascending].reverse().slice(10));
+      expect(new URL(page.url()).searchParams.get("source")).toBe("t01");
+      expect(new URL(page.url()).hash).toBe("#catalogue-shelf");
+    }
+  }
+  await page.goto("/popular");
+  await expect(page.locator("article.movie-card").first()).toBeVisible();
+  await expect(page.getByLabel("Sort by title")).toHaveCount(0);
+});
+
+test("personal navigation actions use shared buttons without changing saved genres", async ({ page, request }) => {
+  test.skip(live, "Synthetic account never writes to an imported database");
+  const email = `buttons-${crypto.randomUUID()}@example.test`;
+  const password = "buttons-synthetic-only";
+  expect((await request.post("/api/auth/register", { data: { email, password } })).status()).toBe(201);
+  await page.goto("/login");
+  await expectActionButton(page.getByRole("link", { name: "Create an account", exact: true }));
+  await page.getByLabel("Email", { exact: true }).fill(email);
+  await page.getByLabel("Password", { exact: true }).fill(password);
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page).toHaveURL("/");
+  await page.getByRole("link", { name: "Preferences", exact: true }).click();
+  const action = page.getByRole("checkbox", { name: "Action", exact: true });
+  await action.check();
+  await page.getByRole("button", { name: "Save preferences", exact: true }).click();
+  await expect(page).toHaveURL(/\/recommendations/);
+  await page.keyboard.press("Escape");
+  let writes = 0;
+  page.on("request", request => {
+    if (request.method() === "PUT" && request.url().includes("/preferences")) writes++;
+  });
+  for (const theme of ["dark", "light"]) {
+    if (await page.locator("html").getAttribute("data-theme") !== theme)
+      await page.getByRole("button", { name: `Switch to ${theme} theme` }).click();
+    for (const width of [1440, 375]) {
+      await page.setViewportSize({ width, height: 1000 });
+      const change = page.getByRole("link", { name: "Change my genres", exact: true });
+      await expectActionButton(change);
+      await expectActionButton(page.getByRole("link", { name: "Browse the catalogue", exact: true }));
+      await screenshot(page, `buttons-recommendations-${width}-${theme}-fixture`);
+      await change.click();
+      await expect(action).toBeChecked();
+      const back = page.getByRole("link", { name: "Back to recommendations", exact: true });
+      await expectActionButton(back);
+      await noOverflow(page);
+      await back.click();
+      await expect(page.locator("article.movie-card").first()).toBeVisible();
+      await page.locator("article.movie-card").first().getByRole("link").click();
+      const returnLink = page.getByRole("link", { name: "Back to recommendations", exact: true });
+      await expectActionButton(returnLink);
+      await returnLink.click();
+      await expect(page.locator("article.movie-card").first()).toBeVisible();
+    }
+  }
+  expect(writes).toBe(0);
 });
 
 test("existing public pages, both themes and 375/768/1440 layouts", async ({ page }) => {
@@ -395,5 +510,42 @@ test("read-only imported TMDb catalogue screenshots, real poster loading and the
   await expect(page.locator("article.movie-card").first()).toBeVisible();
   await expect(spotlight).toHaveCount(0);
   await noOverflow(page);
+  expect(errors).toEqual([]);
+
+  const ascending: string[] = [];
+  const descending: string[] = [];
+  const initial = await (await page.request.get("/api/movies?limit=10")).json();
+  expect(initial.meta.total).toBeGreaterThanOrEqual(200);
+  expect(initial.meta.total).toBeLessThanOrEqual(300);
+  for (let index = 1; index <= initial.meta.totalPages; index++) {
+    for (const [sort, target] of [["title_asc", ascending], ["title_desc", descending]] as const) {
+      const result = await page.request.get(`/api/movies?limit=10&page=${index}&sort=${sort}&catalogueRevision=${initial.meta.catalogueRevision}`);
+      expect(result.status()).toBe(200);
+      const body = await result.json();
+      expect(body.meta.total).toBe(initial.meta.total);
+      target.push(...body.data.movies.map((movie: { title: string }) => movie.title));
+    }
+  }
+  expect(descending).toEqual([...ascending].reverse());
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto("/");
+  await page.getByLabel("Sort by title").selectOption("title_desc");
+  await expect(page.locator("article.movie-card h2")).toHaveText(descending.slice(0, 10));
+  if (await page.locator("html").getAttribute("data-theme") !== "dark")
+    await page.getByRole("button", { name: "Switch to dark theme" }).click();
+  await settlePublicPosters(page);
+  await screenshot(page, "buttons-sort-home-1440-dark-imported");
+  await page.setViewportSize({ width: 375, height: 1000 });
+  if (await page.locator("html").getAttribute("data-theme") !== "light")
+    await page.getByRole("button", { name: "Switch to light theme" }).click();
+  await screenshot(page, "buttons-sort-home-375-light-imported");
+  await noOverflow(page);
+  await page.locator("article.movie-card").first().getByRole("link").click();
+  const back = page.getByRole("link", { name: "Return to catalogue", exact: true });
+  await expectActionButton(back);
+  await screenshot(page, "buttons-return-details-375-light-imported");
+  await back.click();
+  await expect(page.getByLabel("Sort by title")).toHaveValue("title_desc");
+  await expect(page.locator("article.movie-card h2")).toHaveText(descending.slice(0, 10));
   expect(errors).toEqual([]);
 });

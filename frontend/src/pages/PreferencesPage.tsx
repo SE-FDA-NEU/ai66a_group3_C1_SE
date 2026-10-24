@@ -194,10 +194,10 @@ function PreferencesPage() {
         aria-labelledby="preferences-title"
       >
         <nav className="page-nav" aria-label="Preference navigation">
-          <Link className="text-link" to="/recommendations">
+          <Link className="button-link button-secondary" to="/recommendations">
             Back to recommendations
           </Link>
-          <Link className="text-link" to="/">
+          <Link className="button-link button-secondary" to="/">
             Browse the catalogue
           </Link>
         </nav>
@@ -245,7 +245,7 @@ function PreferencesPage() {
             <p className="muted">
               The active catalogue does not contain any genres yet.
             </p>
-            <Link className="text-link" to="/">
+            <Link className="button-link button-secondary" to="/">
               Return to catalogue
             </Link>
           </div>

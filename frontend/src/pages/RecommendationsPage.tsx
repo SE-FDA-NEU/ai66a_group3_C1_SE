@@ -16,7 +16,7 @@ export function RecommendationState({ status }: { status: "loading" | "empty" })
   return <div className="recommendation-empty-state" role="status">
     <h3>No recommendations available yet.</h3>
     <p>Enter your preferences to get personalised recommendations.</p>
-    <Link className="text-link" to="/preferences">Enter preferences &rarr;</Link>
+    <Link className="button-link button-secondary" to="/preferences">Enter preferences &rarr;</Link>
   </div>;
 }
 
@@ -158,8 +158,8 @@ export default function RecommendationsPage() {
       <div><p className="eyebrow">AI Movie Recommendation System</p><h1>Recommendations</h1></div>
     </header>
     <nav className="page-nav" aria-label="Recommendation navigation">
-      <Link className="text-link" to="/preferences">Change my genres</Link>
-      <Link className="text-link" to="/">Browse the catalogue</Link>
+      <Link className="button-link button-secondary" to="/preferences">Change my genres</Link>
+      <Link className="button-link button-secondary" to="/">Browse the catalogue</Link>
     </nav>
     <section className="content-card recommendations-card" aria-labelledby="recommendations-title">
       <div className="section-heading"><p className="eyebrow">Your next watch</p>

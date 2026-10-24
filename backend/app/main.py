@@ -14,6 +14,7 @@ from app.db.database import SessionLocal, engine
 from app.db.models import Genre, User
 from app.recommendations.service import build_account_recommendations
 from app.repositories.movies import (
+    CatalogueSort,
     count_active_movies,
     get_active_catalogue_revision,
     get_active_movie_by_id,
@@ -595,6 +596,7 @@ def put_rating(
 def list_movies(
     limit: int = Query(default=10, ge=1, le=10),
     page: int = Query(default=1, ge=1, le=10000),
+    sort: CatalogueSort = "title_asc",
     catalogue_revision: str | None = Query(default=None, alias="catalogueRevision"),
     database_session: Session = Depends(get_db),  # noqa: B008
 ):
@@ -609,7 +611,7 @@ def list_movies(
         return error
 
     total = count_active_movies(database_session)
-    movies = list_active_movies(database_session, limit=limit, page=page)
+    movies = list_active_movies(database_session, limit=limit, page=page, sort=sort)
     return {
         "data": {
             "movies": [to_movie_summary_dto(movie).model_dump() for movie in movies]

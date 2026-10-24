@@ -8,6 +8,7 @@ from app.main import app, get_db
 from app.repositories.movies import (
     activate_catalogue_revision,
     create_catalogue_revision,
+    list_active_movies,
     replace_movie_genres,
     upsert_catalogue_movie,
     upsert_genre,
@@ -160,3 +161,81 @@ def test_largest_allowed_genre_id_is_checked_as_unknown_without_overflow(client)
     response = http.get("/api/me/recommendations", params={"genreId": "2147483647"})
     assert response.status_code == 400
     assert response.json()["error"]["code"] == "GENRE_NOT_FOUND"
+
+
+@pytest.mark.parametrize("count", [0, 1, 10, 11, 25, 255])
+def test_home_title_desc_sorts_the_whole_catalogue_before_paging(client, count):
+    http, session = client
+    revision = seed(session, count)
+    collected = []
+    for page in range(1, max(1, (count + 9) // 10) + 1):
+        response = http.get("/api/movies", params={
+            "sort": "title_desc", "page": page, "catalogueRevision": revision,
+        })
+        assert response.status_code == 200
+        body = response.json()
+        collected.extend(body["data"]["movies"])
+        assert body["meta"]["total"] == body["meta"]["unfilteredTotal"] == count
+        assert body["meta"]["totalPages"] == (count + 9) // 10
+        assert body["meta"]["page"] == page
+        assert body["meta"]["count"] == len(body["data"]["movies"])
+        assert body["meta"]["catalogueRevision"] == revision
+    assert [movie["title"] for movie in collected] == [
+        f"Movie {index:03d}" for index in reversed(range(count))
+    ]
+    assert len({movie["id"] for movie in collected}) == count
+
+
+def test_home_sort_does_not_change_popular_order_or_revision_validation(client):
+    http, session = client
+    revision = seed(session, 25)
+    popular = http.get("/api/movies/popular").json()
+    descending = http.get("/api/movies", params={"sort": "title_desc"}).json()
+    ascending = http.get("/api/movies", params={"sort": "title_asc"}).json()
+    assert descending["data"]["movies"][0]["title"] == "Movie 024"
+    assert ascending == http.get("/api/movies").json()
+    assert http.get("/api/movies/popular").json() == popular
+    replacement = create_catalogue_revision(session, provider="test")
+    activate_catalogue_revision(session, revision_id=replacement.id)
+    session.commit()
+    stale = http.get("/api/movies", params={
+        "sort": "title_desc", "catalogueRevision": revision,
+    })
+    assert stale.status_code == 409
+    assert stale.json()["error"]["code"] == "CATALOGUE_CHANGED"
+
+
+def test_home_sort_has_deterministic_case_and_duplicate_title_ties(client):
+    http, session = client
+    revision = create_catalogue_revision(session, provider="test")
+    for index, title in enumerate(("alpha", "Alpha", "Zulu", "Alpha"), start=1):
+        movie = upsert_catalogue_movie(
+            session, catalogue_revision_id=revision.id, source="test",
+            source_id=str(index), title=title, popularity_score=None,
+        )
+        movie.id = f"00000000-0000-0000-0000-{index:012d}"
+    activate_catalogue_revision(session, revision_id=revision.id)
+    session.commit()
+    rows = http.get("/api/movies", params={"sort": "title_desc"}).json()["data"]["movies"]
+    assert [row["title"] for row in rows] == ["Zulu", "alpha", "Alpha", "Alpha"]
+    assert [row["id"] for row in rows[-2:]] == [
+        "00000000-0000-0000-0000-000000000002",
+        "00000000-0000-0000-0000-000000000004",
+    ]
+    assert all(row["popularityScore"] is None for row in rows)
+
+
+@pytest.mark.parametrize("sort", ["title", "popularity", "TITLE_DESC", "", "title_desc; DROP TABLE catalog_movies"])
+def test_home_sort_rejects_unsupported_values_without_changing_data(client, sort):
+    http, session = client
+    seed(session, 1)
+    response = http.get("/api/movies", params={"sort": sort})
+    assert response.status_code == 400
+    assert response.json()["error"]["code"] == "VALIDATION_ERROR"
+    assert http.get("/api/movies").json()["meta"]["total"] == 1
+
+
+def test_home_repository_rejects_an_unknown_sort(client):
+    _, session = client
+    with pytest.raises(ValueError, match="sort"):
+        list_active_movies(session, limit=10, sort="unknown")

@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Iterable
 from datetime import datetime
 from math import isfinite
+from typing import Literal
 
 from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session, selectinload
@@ -23,6 +24,7 @@ from app.db.models import (
 from app.schemas.movies import GenreDto, MovieDetailDto, MovieSummaryDto
 
 ACTIVE_CATALOGUE_STATE_ID = 1
+CatalogueSort = Literal["title_asc", "title_desc"]
 
 
 def create_catalogue_revision(
@@ -257,13 +259,23 @@ def count_active_movies(session: Session) -> int:
     ) or 0
 
 
-def list_active_movies(session: Session, *, limit: int, page: int = 1) -> list[CatalogMovie]:
-    """Return a page of the active catalogue in SQLite case-insensitive title order."""
+def list_active_movies(
+    session: Session, *, limit: int, page: int = 1, sort: CatalogueSort = "title_asc"
+) -> list[CatalogMovie]:
+    """Sort the entire active catalogue by title, then return a stable page."""
 
     if not 1 <= limit <= 10:
         raise ValueError("limit must be an integer from 1 to 10")
     if page < 1:
         raise ValueError("page must be positive")
+    if sort not in ("title_asc", "title_desc"):
+        raise ValueError("sort must be title_asc or title_desc")
+
+    title_order = (
+        (func.lower(CatalogMovie.title).desc(), CatalogMovie.title.desc())
+        if sort == "title_desc"
+        else (func.lower(CatalogMovie.title).asc(), CatalogMovie.title.asc())
+    )
 
     statement = (
         select(CatalogMovie)
@@ -273,7 +285,7 @@ def list_active_movies(session: Session, *, limit: int, page: int = 1) -> list[C
         )
         .where(CatalogueState.id == ACTIVE_CATALOGUE_STATE_ID)
         .options(selectinload(CatalogMovie.genres))
-        .order_by(func.lower(CatalogMovie.title), CatalogMovie.title, CatalogMovie.id)
+        .order_by(*title_order, CatalogMovie.id)
         .limit(limit)
         .offset((page - 1) * limit)
     )

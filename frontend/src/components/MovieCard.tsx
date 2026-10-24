@@ -40,7 +40,7 @@ function MovieCard({ movie, matchedGenres, returnTo, returnContext }: MovieCardP
         ) : null}
       </div>
       <Link
-        className="movie-card__link"
+        className="button-link button-secondary movie-card__link"
         to={`/movies/${encodeURIComponent(movie.id)}`}
         state={returnTo ? movieDetailReturnState(returnTo, returnContext) : undefined}
         aria-label={`View details for ${movie.title}`}

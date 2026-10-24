@@ -73,7 +73,7 @@ p { line-height: 1.65; }
 .auth-form label { font-size: .85rem; font-weight: 700; margin-top: .45rem; }
 .auth-form input { width: 100%; }
 .auth-form button { margin-top: .5rem; }
-.auth-footer { margin: 1.5rem 0 0; text-align: center; font-size: .875rem; color: var(--muted); }
+.auth-footer { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: .65rem; margin: 1.5rem 0 0; text-align: center; font-size: .875rem; color: var(--muted); }
 .auth-footer a { font-weight: 700; }
 .form-error { margin: .35rem 0; color: var(--error); line-height: 1.6; }
 .field-hint { margin: .2rem 0; font-size: .8rem; }
@@ -93,6 +93,9 @@ p { line-height: 1.65; }
 .catalogue-summary h2 { margin: 0; }
 .catalogue-summary p { font-size: .8rem; margin: 0; }
 .order-badge { margin-left: auto; padding: .5rem .75rem; border: 1px solid var(--border); border-radius: 99px; color: var(--muted); font-size: .72rem; }
+.catalogue-sort { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; margin-left: auto; }
+.catalogue-sort label { color: var(--muted); font-size: .8rem; font-weight: 700; }
+.catalogue-sort select { min-width: 8rem; font-size: .85rem; }
 .movie-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1.1rem; }
 .movie-card { min-width: 0; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--border); border-radius: 15px; background: var(--surface); transition: border-color 150ms ease, transform 150ms ease; }
 .movie-card:hover { border-color: var(--accent); transform: translateY(-3px); }
@@ -100,7 +103,7 @@ p { line-height: 1.65; }
 .movie-card h2 { margin: .35rem 0 .6rem; font-size: 1rem; line-height: 1.35; letter-spacing: -.02em; }
 .movie-card .muted { margin: 0; font-size: .76rem; line-height: 1.6; }
 .movie-year { margin: 0; color: var(--muted); font-size: .7rem; font-weight: 700; letter-spacing: .06em; }
-.movie-card__link { display: flex; align-items: center; min-height: 44px; padding: .6rem 1rem .85rem; font-size: .8rem; font-weight: 700; }
+.movie-card__link { display: flex; margin: .35rem 1rem 1rem; padding: .65rem .75rem; font-size: .8rem; text-align: center; }
 .movie-popularity { display: flex; flex-wrap: wrap; gap: .25rem .5rem; margin: .8rem 0 0; font-size: .72rem; }
 .movie-popularity dt { font-weight: 700; }
 .movie-popularity dd { margin: 0; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
@@ -115,7 +118,6 @@ p { line-height: 1.65; }
 .topbar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1rem; }
 .topbar h1 { margin-bottom: .5rem; }
 .page-nav { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1.25rem; margin: 0 0 1.5rem; font-size: .85rem; }
-.text-link { display: inline-flex; align-items: center; min-height: 44px; font-weight: 700; }
 .recommendations-card { padding: 1.75rem; }
 .section-heading h2 { margin: 0; }
 .recommendation-mode { margin: .5rem 0 0; font-size: .85rem; }
@@ -214,10 +216,11 @@ p { line-height: 1.65; }
   .catalogue-summary { gap: .5rem; }
   .catalogue-summary h2 { flex-basis: 100%; }
   .order-badge { margin-left: 0; }
+  .catalogue-sort { margin-left: 0; width: 100%; }
   .movie-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
   .movie-card__body { padding: .75rem .65rem .4rem; }
   .movie-card h2 { font-size: .9rem; }
-  .movie-card__link { padding-inline: .65rem; }
+  .movie-card__link { margin-inline: .65rem; padding-inline: .5rem; }
   .movie-detail__hero { min-height: 250px; margin: .5rem .75rem 0; }
   .movie-detail__hero-content { padding: 1.25rem; }
   .movie-detail__return { margin-inline: .75rem; }

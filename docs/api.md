@@ -88,7 +88,7 @@ implemented and its UI is still absent.
 | S13 | `POST` | `/api/auth/logout` | Cookie optional; idempotent same-origin write | None | `204`, session invalidated and cookie cleared | `403 ORIGIN_NOT_ALLOWED`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 | S13 | `GET` | `/api/auth/me` | Authenticated | None | `200 AuthResponse` | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 | S02, S04, S06 | `GET` | `/api/me/recommendations` | Authenticated | `page` 1-10000, `limit` 1-10, optional `genreId`, `catalogueRevision` | `200 RecommendationResponse`; whole-set mode/filter and page totals | `400 VALIDATION_ERROR`/`GENRE_NOT_FOUND`, `401 AUTHENTICATION_REQUIRED`, `409 CATALOGUE_CHANGED`, `503 CATALOGUE_UNAVAILABLE`/`SERVICE_UNAVAILABLE` | Sprint 3 route; post-M3 pagination amendment |
-| S04 | `GET` | `/api/movies` | Public | `page` 1-10000, `limit` 1-10, optional `catalogueRevision` | `200 MovieListResponse`; all active movies in alphabetical order | `400 VALIDATION_ERROR`, `409 CATALOGUE_CHANGED`, `503 CATALOGUE_UNAVAILABLE`/`SERVICE_UNAVAILABLE` | M2 route; post-M3 pagination amendment |
+| S04 | `GET` | `/api/movies` | Public | `page` 1-10000, `limit` 1-10, optional `catalogueRevision`, `sort` = `title_asc` (default) or `title_desc` | `200 MovieListResponse`; all active movies in selected title order before paging | `400 VALIDATION_ERROR`, `409 CATALOGUE_CHANGED`, `503 CATALOGUE_UNAVAILABLE`/`SERVICE_UNAVAILABLE` | M2 route; post-M3 pagination and T01 title-sort amendments |
 | S09 / T19 | `GET` | `/api/movies/popular` | Public | `page` 1-10000, `limit` 1-10, optional `catalogueRevision` | `200 MovieListResponse`; finite-popularity ranking across pages | `400 VALIDATION_ERROR`, `409 CATALOGUE_CHANGED`, `503 CATALOGUE_UNAVAILABLE`/`SERVICE_UNAVAILABLE` | Sprint 3 route; post-M3 pagination amendment |
 | S03 | `GET` | `/api/movies/{movieId}` | Public | Opaque `movieId` | `200 MovieDetailResponse` | `404 MOVIE_NOT_FOUND`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in M2` |
 | S01 | `GET` | `/api/genres` | Authenticated | None | `200 GenreListResponse` | `401 AUTHENTICATION_REQUIRED`, `503 CATALOGUE_UNAVAILABLE`, `503 SERVICE_UNAVAILABLE` | `Implemented in Sprint 3 (S3-T01)` |
@@ -542,13 +542,18 @@ movies and page 27 has none while `totalPages` remains 26. The UI normalizes
 that URL to page 26; zero-result URLs normalize to page 1. A list request only
 reads local SQLite and never fetches TMDb metadata.
 
-### `GET /api/movies?page=1&limit=10`
+### `GET /api/movies?page=1&limit=10&sort=title_asc`
 
 This is the implemented public catalogue endpoint for S04. `limit` defaults to
 10 and accepts an integer from 1 through 10. Results read only the active local
 catalogue; the endpoint never contacts TMDb. Every active movie is eligible,
-including one without popularity. Ordering is SQLite `lower(title)` ascending,
-then original title ascending, then internal movie ID ascending.
+including one without popularity. The optional `sort` is `title_asc` (default,
+A–Z) or `title_desc` (Z–A); other values return `400 VALIDATION_ERROR`.
+SQLite sorts the **complete active catalogue before LIMIT/OFFSET** by
+`lower(title)`, then original title, both in the selected direction; the final
+internal movie ID tie-breaker stays ascending in either direction.
+Omitting `sort` retains the previous A–Z response. This Home-only option changes
+neither the DTO/totals/revision checks nor Popular/recommendation ordering.
 
 Success (`200`):
 

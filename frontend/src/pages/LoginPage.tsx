@@ -90,7 +90,7 @@ function LoginPage() {
           </button>
         </form>
         <p className="auth-footer">
-          Need an account? <Link to="/register" state={signInReturnState(location.state)}>Create an account</Link>
+          Need an account? <Link className="button-link button-secondary" to="/register" state={signInReturnState(location.state)}>Create an account</Link>
         </p>
     </AuthLayout>
   );

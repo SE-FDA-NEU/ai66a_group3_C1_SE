@@ -165,6 +165,23 @@ acceptance for the 35 planned P0 cases.
 
 ## Review and acceptance status
 
+### Later T01 button/title-sort consumer amendment (2026-10-24)
+
+The PO requested button-styled action links and an optional descending Home
+title order. The API, architecture and UI design now describe the same allowlist,
+whole-catalogue-before-paging ordering and URL/request boundaries. This additive
+capture leaves the earlier C03 hashes and historical results intact; it does not
+claim renewed independent C03 approval. Executed consumer results and their
+limits are in [T01 button/title-sort evidence](s4-t01-buttons-title-sort.md).
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/api.md` | `84f5333e9fa247bd5c40b243a8faf78fa455187f8984459b6c651d8be7679274` |
+| `docs/architecture.md` | `f69178f7c5e4fb8483be61f2569ee219a346febae8e136135d3fd07efc74725e` |
+| `docs/design.md` | `bd7c2ab8bfec0c3d2e32846800c57bc80732c9e5674d4a92d4e3613ad5323609` |
+
+### Historical C03 review status
+
 The author-side mapping and local checks are complete. **Independent
 substantive review has not occurred for this corrected candidate.** A
 non-coauthor reviewer would need

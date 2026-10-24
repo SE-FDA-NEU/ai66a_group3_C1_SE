@@ -116,7 +116,7 @@ function RegisterPage() {
           </button>
         </form>
 
-        <p className="auth-footer">Already have an account? <Link to="/login" state={signInReturnState(location.state)}>Sign in</Link></p>
+        <p className="auth-footer">Already have an account? <Link className="button-link button-secondary" to="/login" state={signInReturnState(location.state)}>Sign in</Link></p>
     </AuthLayout>
   );
 }

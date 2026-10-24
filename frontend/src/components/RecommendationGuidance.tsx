@@ -18,7 +18,7 @@ function RecommendationGuidance({
         <p>
           Add your favourite genres to get personalised recommendations.
         </p>
-        <Link className="text-link" to="/preferences">
+        <Link className="button-link button-secondary" to="/preferences">
           Enter preferences &rarr;
         </Link>
       </div>
@@ -36,7 +36,7 @@ function RecommendationGuidance({
         </p>
 
         <div className="recommendation-actions">
-          <Link className="text-link" to="/preferences">
+          <Link className="button-link button-secondary" to="/preferences">
             Edit preferences
           </Link>
 
@@ -54,7 +54,7 @@ function RecommendationGuidance({
     <div className="recommendation-empty-state" role="status">
       <h3>No recommendations available yet.</h3>
       <p>No movies are currently available for this recommendation list.</p>
-      <Link className="text-link" to="/preferences">
+      <Link className="button-link button-secondary" to="/preferences">
         Enter preferences &rarr;
       </Link>
     </div>
