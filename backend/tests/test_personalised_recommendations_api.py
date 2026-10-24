@@ -51,7 +51,11 @@ def database_session() -> Iterator[Session]:
     session = sessionmaker(bind=engine, autoflush=False, autocommit=False)()
 
     def override_get_db() -> Iterator[Session]:
-        yield session
+        try:
+            yield session
+        finally:
+            # Match production: read snapshots end with the request, not the test.
+            session.rollback()
 
     app.dependency_overrides[get_db] = override_get_db
     try:
