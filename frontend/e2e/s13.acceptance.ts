@@ -62,18 +62,28 @@ async function register(request: APIRequestContext) {
   return email;
 }
 
-async function login(page: Page, email: string) {
+async function login(page: Page, email: string, destination = "/") {
   await expect(page).toHaveURL(/\/login$/);
   await page.getByLabel("Email", { exact: true }).fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
   const session = page.waitForResponse(r => r.url().endsWith("/api/auth/login"));
-  const recommendations = page.waitForResponse(r => new URL(r.url()).pathname === "/api/me/recommendations");
+  const privateRequests: string[] = [];
+  const track = (r: import("@playwright/test").Request) => {
+    if (new URL(r.url()).pathname.startsWith("/api/me/")) privateRequests.push(r.url());
+  };
+  page.on("request", track);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   expect((await session).status()).toBe(200);
+  await expect(page).toHaveURL(destination);
+  await expect(page.getByText(email, { exact: false })).toBeVisible();
+  page.off("request", track);
+  if (destination === "/") expect(privateRequests).toEqual([]);
+  expect((await page.request.get("/api/auth/me")).status()).toBe(200);
+  // Authentication itself no longer requests recommendations. The user does.
+  const recommendations = page.waitForResponse(r => new URL(r.url()).pathname === "/api/me/recommendations");
+  await page.getByRole("link", { name: "My recommendations", exact: true }).click();
   expect((await recommendations).status()).toBe(200);
   await expect(page).toHaveURL(/\/recommendations$/);
-  await expect(page.getByText(email, { exact: false })).toBeVisible();
-  expect((await page.request.get("/api/auth/me")).status()).toBe(200);
 }
 
 async function saveGenre(page: Page, genre: string) {
@@ -169,7 +179,7 @@ test("S13 AC1/AC4/AC5: real login, save, logout/replay, switch, delayed A respon
   await expect(page).toHaveURL(/\/login$/);
   page.off("request", track);
   expect(afterLogout).toEqual([]);
-  await login(page, b);
+  await login(page, b, "/preferences");
   await page.getByRole("link", { name: "Change my genres", exact: true }).click();
   await expect(page.getByRole("checkbox", { name: "Action", exact: true })).not.toBeChecked();
   await page.getByRole("checkbox", { name: "Comedy", exact: true }).check();
@@ -224,7 +234,7 @@ test("S13 live TMDb environment smoke (separate from synthetic acceptance)", asy
   await page.goto("/");
   await page.getByRole("link", { name: "Start", exact: true }).click();
   await expect(page).toHaveURL(/\/login$/);
-  await login(page, a);
+  await login(page, a, "/preferences");
   await page.getByRole("link", { name: "Change my genres", exact: true }).click();
   await page.getByRole("checkbox", { name: publicMovie.genres[0].name, exact: true }).check();
   await page.getByRole("button", { name: "Save preferences", exact: true }).click();

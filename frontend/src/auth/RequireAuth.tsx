@@ -1,10 +1,11 @@
 import { Fragment, useEffect, type ReactNode } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useLocation } from "react-router-dom";
 
 import { useAuth } from "./authState.ts";
 
 function RequireAuth({ children }: { children: ReactNode }) {
   const auth = useAuth();
+  const location = useLocation();
   const needsCheck = auth.status === "unknown";
   const { refresh } = auth;
 
@@ -15,7 +16,10 @@ function RequireAuth({ children }: { children: ReactNode }) {
   }, [needsCheck, refresh]);
 
   if (auth.status === "unauthenticated") {
-    return <Navigate to={auth.justSignedOut ? "/" : "/login"} replace />;
+    return <Navigate to={auth.justSignedOut ? "/" : "/login"} replace
+      state={auth.justSignedOut ? undefined : {
+        signInReturnTo: `${location.pathname}${location.search}${location.hash}`,
+      }} />;
   }
 
   if (auth.status === "error") {

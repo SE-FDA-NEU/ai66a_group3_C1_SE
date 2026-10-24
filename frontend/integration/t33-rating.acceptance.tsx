@@ -72,6 +72,9 @@ it("real UI saves, rolls back, retries, reloads and isolates account ratings wit
       target: { value: "movie123" },
     });
     fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
+    await screen.findByRole("heading", { name: "Find your next movie" });
+    expect(window.location.pathname).toBe("/");
+    fireEvent.click(screen.getByRole("link", { name: "My recommendations" }));
     await screen.findByRole("heading", { name: "Recommendations" });
   }
   await signIn("t33-a@example.com");

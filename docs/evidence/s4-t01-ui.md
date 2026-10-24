@@ -121,7 +121,7 @@ $env:PYTHONUTF8 = "1"
 
 In a second terminal: `npm.cmd --prefix frontend ci`, then
 `npm.cmd --prefix frontend run dev`. Open the Vite URL and test Home/Popular,
-theme reload, sign-in → Preferences → Recommendations → details, star selection
+theme reload, sign-in → Home → Start → Preferences → Recommendations → details, star selection
 without saving, explicit Save, reload and detail return. A fresh clone instead
 follows `docs/SETUP.md` and its real `--pages 15` TMDb import. Do not change to a
 synthetic/demo database to create the review account.
@@ -156,3 +156,88 @@ Remove-Item Env:T01_SCREENSHOT_DIR
 
 Remaining merge conditions are explicit in the
 [contract handoff](../s4-t01-ui-contract.md#reconciliation-and-review-checklist).
+
+## PO-authorized Home and intentional-personalisation follow-up — 2026-10-24
+
+This follow-up is one additional commit on the existing T01 PR, based on
+`3153028cbb057ce233da90f7467197e817cfeca2`; the previous ten commits are not
+rewritten. It replaces the old visible Start paragraph with a compact cinematic
+hero, Start / Explore Catalogue actions and one persistent My recommendations
+navbar entry. Ordinary login lands on Home without requesting personalisation;
+an explicit guest Start returns to Preferences after login/registration. The
+picker keeps the real 1–5 rule, restored saved selections and explicit server
+save. Default landing and protected-route intent are separately tested.
+
+The existing poster/backdrop pipeline, star component and rating API, auth/session
+provider, backend application/schema and recommendation/filter/pagination logic
+are unchanged by this follow-up. Test/verifier entry steps were updated to make
+the now-explicit navigation, retaining their ranking, failure and isolation
+assertions rather than dropping or skipping old cases.
+
+### Executed follow-up checks
+
+| Check | Actual result |
+|---|---|
+| Focused onboarding/auth/preferences unit suites | 62 passed |
+| Full frontend unit regression on final source | 276 passed, 26 files; 21.80s |
+| Full isolated backend regression on final source | 479 passed, 1 skipped, 1 existing deprecation warning; 142.66s |
+| T01 fixture browser | 6 passed, 1 separate imported-mode skip; 16.1s |
+| S04/S13 real browser regression | 10 passed, 1 separate live-mode skip; 22.8s |
+| T16 DB integration | 1 passed; 5.03s |
+| T33 DB integration | 1 passed; 6.14s |
+| T28 offline browser/media regression | 18 cases passed, temporary database removed |
+| T34 real browser rating/auth/failure/race verifier | PASS; guest/save/retry/A-B isolation/delayed account+movie/revoked+expired session/return context assertions retained |
+| Imported-catalogue read-only browser | 1 passed, 6 fixture-mode skips; 14.0s |
+| S04 runner / M3 verifier lifecycle suites | 3 / 11 passed |
+| Frontend ESLint / TypeScript production build / backend Ruff | Passed; build transformed 64 modules |
+
+The browser fixture report pins the visual test source SHA-256 as
+`372e512dfb96aa64736eb9083b527e3fdfa376dd5bf633e1b929757c09be907c`.
+T34's final executed candidate/source digest is
+`3cdc59bbceb09b63cd73d64616b6a44348918b88eeb32a83bc13ccdd78afe927`.
+Reports identify the base SHA plus modified working tree, not a nonexistent
+already-committed follow-up SHA. Local full reports remain in ignored
+`frontend/test-results`; no credential-bearing traces or database files are
+uploaded.
+
+Initial local checks caught TypeScript query-option/regex-lint mistakes in new
+tests and old verifier assumptions about the automatic login landing/dropdown.
+These were corrected before the final passing runs. The new registration browser
+case also needed to wait for the actual registration screen before filling its
+same-labelled email field; no application validation was weakened. T34 now reads
+the selected native star radio and shared-header identity, and waits for the
+Recommendations heading instead of mistaking Home cards during route transition
+for ranked results. These changes retain the original exact saved/draft/account
+expectations; they are not new product rules.
+
+### Actual screenshots and data safety
+
+The existing QA copy contains **255 active TMDb movies / 255 poster paths**.
+It was reopened with SQLite `mode=ro&uri=true`, disabled provider networking and
+no usable TMDb token. The live browser refreshed Home dark/light and details
+light/mobile screenshots, loaded actual public CDN artwork, and made no account
+writes. The QA SQLite SHA-256 before/after was identical. The real development
+database and root `.env` were not modified, no import/enrichment was repeated,
+and the two owned preview processes were stopped after capture.
+
+- [Updated Home — dark, real TMDb copy](../images/sprint4/t01/t01-home-dark.png)
+- [Updated Home — light, same real copy](../images/sprint4/t01/t01-home-light.png)
+- [Home — dark, explicitly synthetic offline fixture](../images/sprint4/t01/t01-home-followup-dark-fixture.png)
+- [Home — light, explicitly synthetic offline fixture](../images/sprint4/t01/t01-home-followup-light-fixture.png)
+- [Home — 375px authenticated light fixture](../images/sprint4/t01/t01-home-followup-mobile-light-fixture.png)
+- [Preferences — 375px dark fixture, one selected genre](../images/sprint4/t01/t01-preferences-followup-mobile-dark-fixture.png)
+
+The offline fixture intentionally blocks image networking and demonstrates poster
+fallback; it is not presented as imported-TMDb data. Synthetic emails shown there
+are disposable test identities, not real accounts. The real-catalogue captures
+show guest state and do not expose account credentials. Screenshots are real
+browser captures, not edited reference images.
+
+### Remaining coordination, not waived
+
+C03 #217 and independent final review/CI remain pending. Story #45 currently
+contains both Home-after-login and the obsolete unconditional Recommendations
+landing AC. Replace the obsolete AC with the reviewed explicit-intent rule before
+merge; requirements.md and this proposal already reflect the PO's new request.
+Historical M3 evidence is not rewritten or falsely reaccepted. No new Story,
+watchlist/search/reset/trailer feature or Story Points are claimed here.

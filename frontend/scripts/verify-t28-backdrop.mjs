@@ -280,6 +280,8 @@ async function synthetic() {
       await run.page.getByLabel("Email", { exact: true }).fill(`t28-${user}@example.test`);
       await run.page.getByLabel("Password", { exact: true }).fill("t28-synthetic-password");
       await run.page.getByRole("button", { name: "Sign in", exact: true }).click();
+      await expect(run.page).toHaveURL(UI + "/");
+      await run.page.getByRole("link", { name: "My recommendations", exact: true }).click();
       await expect(run.page.getByRole("heading", { name: "Recommendations", exact: true })).toBeVisible();
     }
     try {
@@ -308,6 +310,9 @@ async function synthetic() {
       await run.page.getByLabel("Email", { exact: true }).fill("t28-a@example.test");
       await run.page.getByLabel("Password", { exact: true }).fill("t28-synthetic-password");
       await run.page.getByRole("button", { name: "Sign in", exact: true }).click();
+      await expect(run.page).toHaveURL(UI + "/");
+      await run.page.getByRole("link", { name: "My recommendations", exact: true }).click();
+      await expect(run.page.getByRole("heading", { name: "Recommendations", exact: true })).toBeVisible();
       await api("/__t28/hold", { path: `/api/me/ratings/${ids.a}` });
       await open(run.page, "a"); await gateCaptured(`/api/me/ratings/${ids.a}`);
       await run.page.getByRole("link", { name: "Back to recommendations", exact: true }).click();
@@ -327,6 +332,8 @@ async function synthetic() {
       await run.page.getByLabel("Email", { exact: true }).fill("t28-a@example.test");
       await run.page.getByLabel("Password", { exact: true }).fill("t28-synthetic-password");
       await run.page.getByRole("button", { name: "Sign in", exact: true }).click();
+      await expect(run.page).toHaveURL(UI + "/");
+      await run.page.getByRole("link", { name: "My recommendations", exact: true }).click();
       await expect(run.page.locator("article.movie-card")).toHaveCount(3);
       const before = await run.page.locator("article.movie-card h2").allTextContents();
       assert.deepEqual(before, [title.a, title.b, title.c]);

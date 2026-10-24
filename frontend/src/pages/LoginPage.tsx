@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../auth/authState.ts";
+import { signInDestination, signInReturnState } from "../navigation/signInReturn.ts";
 
 const INVALID_CREDENTIALS_MESSAGE = "Email or password is incorrect";
 
 function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { signIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,6 +18,7 @@ function LoginPage() {
   async function handleSubmit(
   event: React.SyntheticEvent<HTMLFormElement, SubmitEvent>) {
   event.preventDefault();
+    if (isSubmitting) return;
     setError("");
 
     if (!email.trim() || !password) {
@@ -27,7 +30,7 @@ function LoginPage() {
 
     try {
       await signIn(email, password);
-      navigate("/recommendations", { replace: true });
+      navigate(signInDestination(location.state), { replace: true });
     } catch (error) {
       if (error instanceof Error && error.message) {
         setError(error.message);
@@ -44,7 +47,7 @@ function LoginPage() {
       <section className="auth-card" aria-labelledby="login-title">
         <p className="eyebrow">AI Movie Recommendation System</p>
         <h1 id="login-title">Sign in</h1>
-        <p className="muted">Sign in to view your movie recommendations.</p>
+        <p className="muted">Sign in to keep your movie preferences and ratings. Choose when to personalise your experience.</p>
 
         <form className="auth-form" onSubmit={handleSubmit} noValidate>
           <label htmlFor="email">Email</label>
@@ -78,7 +81,7 @@ function LoginPage() {
           </button>
         </form>
         <p className="auth-footer">
-          Need an account? <Link to="/register">Create an account</Link>
+          Need an account? <Link to="/register" state={signInReturnState(location.state)}>Create an account</Link>
         </p>
       </section>
     </main>

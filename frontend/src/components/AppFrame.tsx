@@ -22,12 +22,13 @@ export default function AppFrame({ children }: { children: ReactNode }) {
         <nav className="primary-nav" aria-label="Main navigation">
           <NavLink to="/" end>Home</NavLink>
           <NavLink to="/popular">Popular movies</NavLink>
+          <NavLink to="/recommendations">My recommendations</NavLink>
           <NavLink to="/preferences">Preferences</NavLink>
           <NavLink to="/about-recommendations">How recommendations work</NavLink>
         </nav>
         <div className="app-header__account">
           <ThemeToggle />
-          {showSession ? <SessionNavigation currentPage={pathname === "/recommendations" ? "recommendations" : undefined} /> : null}
+          {showSession ? <SessionNavigation showRecommendationsLink={false} /> : null}
         </div>
       </div>
     </header>

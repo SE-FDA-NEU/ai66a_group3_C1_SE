@@ -385,8 +385,15 @@ and ratings for later visits.
 As a registered viewer, I want to sign in and sign out so that only I can
 access saved preferences and ratings.
 
-- Given I enter a registered email and correct password, when I sign in, then
-  an authenticated session is created and /recommendations opens.
+- Given I sign in from Home or directly from /login with valid credentials,
+  when authentication succeeds, then an authenticated session is created and
+  Home opens with authenticated navigation, without automatically opening
+  preferences or recommendations or changing saved genres/ratings.
+- Given I explicitly request Start, Preferences or My recommendations while
+  signed out, when I successfully sign in, then I return to the requested
+  internal protected route. Start returns to /preferences; a recommendation
+  page/filter/hash is retained. A registration detour preserves this intent;
+  absent, external or unsafe return destinations instead open Home.
 - Given I enter an unregistered email or wrong password, when I sign in, then
   "Email or password is incorrect" is shown without revealing which field
   failed.

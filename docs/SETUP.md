@@ -181,6 +181,18 @@ Detailed handoff, test commands and merge caveats:
 [local evidence](evidence/s4-t01-ui.md). This is not an approval of C03 or a claim
 that unimplemented Watchlist/Search/Profile/Similar/trailer features exist.
 
+Home now has a compact Start / Explore Catalogue hero and a persistent
+**My recommendations** navbar entry. Ordinary sign-in from Home or direct
+`/login` returns to Home; it does not automatically open or save preferences.
+Choose **Start** or **Preferences** when ready to select 1–5 genres. A guest
+Start attempt signs in first and then returns to Preferences, including when
+registration is needed. Only a confirmed **Save preferences** opens personalised
+results. **My recommendations** is a separate explicit action; without saved
+genres it retains the existing **Popular / Not personalised** guidance.
+Safe protected-route page/filter/hash intent is retained through sign-in; unsafe
+or absent destinations fall back to Home. Session, password and API rules are
+unchanged. This PO-authorized S13 landing amendment still needs C03 reconciliation.
+
 All commands and both application processes must use the **same**
 `DATABASE_URL` from root `.env` (normally `sqlite:///./data/app.db`). On an
 existing checkout with a successful TMDb import, keep its configured URL and
@@ -314,8 +326,9 @@ does not run at application startup and must never be used on a public or
 production deployment. Rotate/remove the demo account before such deployment.
 
 The instructor can start at `/`, choose **Sign in**, and use this account.
-If it already has saved preferences, it may open personalised results rather
-than cold start; that is persistence, not failed setup. Do not clear existing
+After sign-in, Home stays open. Choose **My recommendations** to view results.
+If the account already has saved preferences, those results may be personalised
+rather than cold start; that is persistence, not failed setup. Do not clear existing
 personal data merely to reproduce the new-account screenshot.
 
 ### Full P0 and persistence journey
@@ -329,7 +342,8 @@ database. Keep any personal/service passwords private.
    account** on the login page. Enter the disposable email and a unique password
    of at least eight characters; select **Create account**.
 2. Registration returns to login. Sign in with the same account. The application
-   opens recommendations; a new account sees **Popular** / **Not personalised**.
+   opens Home. Choose **My recommendations**; a new account sees **Popular** /
+   **Not personalised**. No genres are chosen or saved automatically.
 3. Select **Enter preferences →**. Select one to five genres and choose **Save
    preferences**. Expect **Recommended for you** and matching movie cards.
    From the home page the equivalent entry is **Start**; from recommendations
@@ -345,7 +359,7 @@ database. Keep any personal/service passwords private.
    and frontend with Ctrl+C in their own terminals. Start both again using the
    commands above, on the **same database**. Do not reseed, reimport or reset it.
 8. In a fresh browser session, open the home page, select **Sign in**, and sign
-   in as the same account. Use **Change my genres** to confirm restored choices;
+   in as the same account. From Home choose **Preferences** to confirm restored choices;
    return to recommendations and open the same movie. Its saved rating must
    still be `4/5` without another save.
 9. Return to recommendations and sign out. Register/sign in as a second account

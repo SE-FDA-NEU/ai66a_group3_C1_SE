@@ -78,19 +78,21 @@ export default function PublicMovieList({ kind }: { kind: "catalogue" | "popular
 
   const popular = kind === "popular";
   return <main className="page catalogue-page">
-    <header className="catalogue-header">
+    <header className={`catalogue-header${popular ? "" : " catalogue-hero"}`}>
       <div>
         <p className="eyebrow">AI Movie Recommendation System</p>
         <h1>{popular ? "Popular movies" : "Find your next movie"}</h1>
-        <p className="muted">{popular ? "Browse the highest-ranked movies in the active catalogue." : "Browse the public local movie catalogue."}</p>
-        {!popular ? <p className="muted" id="start-hint">Choose Start to pick up to 5 favourite genres and get recommendations saved to your account.</p> : null}
+        <p className="muted">{popular ? "Browse the highest-ranked movies in the active catalogue." : "Explore the movie catalogue and discover recommendations based on your preferences."}</p>
+        {!popular ? <span className="sr-only" id="start-hint">Choose your favourite genres for personalised recommendations.</span> : null}
       </div>
       <nav className="catalogue-actions" aria-label="Public navigation">
         {popular ? <Link className="button-link button-secondary" to="/">Movie catalogue</Link> : <>
           <Link className="button-link" to="/preferences" aria-describedby="start-hint">Start</Link>
+          <a className="button-link button-secondary" href="#catalogue-shelf">Explore Catalogue</a>
         </>}
       </nav>
     </header>
+    <section id="catalogue-shelf" className="catalogue-shelf" aria-label={popular ? "Popular movie results" : "Catalogue results"} tabIndex={-1}>
     {!current ? <p className="status-panel" role="status">{popular ? "Loading popular movies..." : "Loading movies..."}</p> :
       current.status === "error" ? <section className="status-panel" role="alert">
         <h2>{popular ? "Popular movies are unavailable" : "Movies are unavailable"}</h2>
@@ -109,5 +111,6 @@ export default function PublicMovieList({ kind }: { kind: "catalogue" | "popular
         <PageControls meta={current.meta} state={listViewState({ route,
           catalogueRevision: current.meta.catalogueRevision })} />
       </>}
+    </section>
   </main>;
 }

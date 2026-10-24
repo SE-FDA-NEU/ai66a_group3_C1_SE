@@ -24,6 +24,48 @@ and score explanations; T01 does not change the rating API or ranking formula.
 
 ## Reusable frontend contract
 
+### PO-authorized Home/navigation amendment (2026-10-24)
+
+The Home hero replaces the old visible "Choose Start to pick up to 5 favourite
+genres" paragraph with compact discovery copy and Start / Explore Catalogue
+actions. The latter is a local, keyboard-focusable catalogue anchor, not a new
+sort, TMDb request or separate recommendation shelf. Home keeps title/ID order
+and its existing page totals/revision/detail-return semantics.
+
+My recommendations is one persistent active-state link in the shared navbar,
+visible to guests and members. The account region does not duplicate it. Guest,
+checking, authenticated, error/retry and sign-out states retain the backend
+session as their authority. No unfinished Search/Profile/Watchlist feature is
+advertised by a non-functional link.
+
+Default sign-in from Home or direct /login lands on Home. Authentication alone
+does not fetch, select or save personalisation. Explicit Start/Preferences
+opens the real picker; a guest signs in first and returns to /preferences.
+Explicit My recommendations returns to /recommendations; an account without
+genres retains the existing Popular / Not personalised guidance, without
+forcing the picker. Saving valid genres still waits for the real successful
+server response before opening recommendations.
+
+RequireAuth carries only an explicit internal destination in router state.
+Sign-in and registration preserve that intent, including safe page/filter/hash,
+without carrying old-account result/cache state. The allowlist is the existing
+protected routes (/preferences, /recommendations, /profile); external, malformed,
+auth-loop or absent destinations fall back to Home. This is a navigation hint,
+never authentication or permission to read another account's data.
+
+The picker retains dynamic catalogue-backed checkboxes, restored account
+selections, its 1–5 limit/counter, validation, pending/retry and request identity.
+Styling follows the ZIP's violet card/chip treatment, not hard-coded genres,
+invented AI percentages or pixel-identical copied HTML/scripts.
+
+This authorized amendment supersedes the old unconditional sign-in landing in
+S13; it does not change password/session APIs or S01's Start label. The live
+Story #45 currently contains both the new Home AC and old unconditional
+/recommendations AC. PO must replace the obsolete AC (not retain contradictory
+checked claims) and reconcile #217 before merge. Historical M3 submissions,
+screenshots/diagrams and evidence retain their original tested scope rather
+than being rewritten as newly executed Sprint 4 evidence.
+
 | Component / file | Consumer responsibility and invariant |
 |---|---|
 | `AppFrame` | Shared brand/navigation/session UI, skip link and footer. Session writes remain in AuthProvider. Public lists restore the session; existing protected/rating boundaries retain ownership of initial checks. Static explanation starts no API request. No second header per page. |

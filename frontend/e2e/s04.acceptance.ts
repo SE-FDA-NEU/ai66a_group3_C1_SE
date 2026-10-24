@@ -67,8 +67,10 @@ async function signIn(page: Page, request: APIRequestContext) {
   await page.goto("/login");
   await page.getByLabel("Email", { exact: true }).fill(credentials.email);
   await page.getByLabel("Password", { exact: true }).fill(credentials.password);
-  const response = recommendationResponse(page);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page).toHaveURL("/");
+  const response = recommendationResponse(page);
+  await page.getByRole("link", { name: "My recommendations", exact: true }).click();
   await expect(page).toHaveURL(/\/recommendations$/);
   const result = await response;
   const preferences = await page.request.get("/api/me/preferences");

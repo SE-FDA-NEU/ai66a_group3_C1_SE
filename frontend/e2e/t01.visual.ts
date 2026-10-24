@@ -73,8 +73,9 @@ test("native star keyboard draft, save and theme preserve real state", async ({ 
   await page.getByLabel("Email", { exact: true }).fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
-  await expect(page).toHaveURL(/\/recommendations/);
-  await page.getByRole("link", { name: "Change my genres", exact: true }).click();
+  await expect(page).toHaveURL("/");
+  await page.getByRole("link", { name: "Start", exact: true }).click();
+  await expect(page).toHaveURL(/\/preferences$/);
   await page.getByRole("checkbox", { name: "Action", exact: true }).check();
   await page.getByRole("button", { name: "Switch to light theme" }).click();
   await expect(page.getByRole("checkbox", { name: "Action", exact: true })).toBeChecked();
@@ -112,6 +113,82 @@ test("native star keyboard draft, save and theme preserve real state", async ({ 
   }
   await page.reload();
   await expect(page.getByText("Your saved rating: 4/5", { exact: true })).toBeVisible();
+});
+
+test("Home hero and navbar leave personalisation entirely user initiated", async ({ page, request }) => {
+  test.skip(live, "Synthetic authentication is isolated from the imported catalogue");
+  const email = `home-${crypto.randomUUID()}@example.test`;
+  const password = "home-synthetic-only";
+  expect((await request.post("/api/auth/register", { data: { email, password } })).status()).toBe(201);
+  const personalRequests: string[] = [];
+  page.on("request", r => {
+    if (new URL(r.url()).pathname.startsWith("/api/me/")) personalRequests.push(`${r.method()} ${new URL(r.url()).pathname}`);
+  });
+  await page.goto("/");
+  await expect(page.locator("article.movie-card").first()).toBeVisible();
+  await expect(page.getByText(/Choose Start to pick up to 5/)).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "My recommendations", exact: true })).toHaveCount(1);
+  await screenshot(page, "t01-home-followup-dark-fixture");
+  await page.getByRole("button", { name: "Switch to light theme" }).click();
+  await screenshot(page, "t01-home-followup-light-fixture");
+  await page.setViewportSize({ width: 375, height: 900 });
+  await noOverflow(page);
+  await page.getByRole("link", { name: "Explore Catalogue", exact: true }).click();
+  await expect(page).toHaveURL(/#catalogue-shelf$/);
+  await expect(page.getByRole("region", { name: "Catalogue results" })).toBeFocused();
+  expect(personalRequests).toEqual([]);
+  await page.getByRole("link", { name: "Sign in", exact: true }).click();
+  await page.getByLabel("Email", { exact: true }).fill(email);
+  await page.getByLabel("Password", { exact: true }).fill(password);
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page).toHaveURL("/");
+  await expect(page.getByText(email, { exact: true })).toBeVisible();
+  expect(personalRequests).toEqual([]);
+  await noOverflow(page);
+  await screenshot(page, "t01-home-followup-mobile-light-fixture");
+  await page.getByRole("link", { name: "My recommendations", exact: true }).click();
+  await expect(page).toHaveURL(/\/recommendations$/);
+  await expect(page.getByText("Not personalised", { exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "My recommendations", exact: true })).toHaveAttribute("aria-current", "page");
+  expect(personalRequests.filter(r => r.startsWith("PUT "))).toEqual([]);
+  await page.getByRole("link", { name: "Preferences", exact: true }).click();
+  await expect(page.getByRole("checkbox", { name: "Action", exact: true })).not.toBeChecked();
+  await page.getByRole("checkbox", { name: "Action", exact: true }).check();
+  await page.getByRole("button", { name: "Switch to dark theme" }).click();
+  await expect(page.getByText("1 of 5 selected", { exact: true })).toBeVisible();
+  await noOverflow(page);
+  await screenshot(page, "t01-preferences-followup-mobile-dark-fixture");
+  expect(personalRequests.filter(r => r.startsWith("PUT "))).toEqual([]);
+  await page.getByRole("button", { name: "Save preferences", exact: true }).click();
+  await expect(page).toHaveURL(/\/recommendations$/);
+  await expect(page.getByRole("heading", { name: "Recommended for you", exact: true })).toBeVisible();
+  expect(personalRequests.filter(r => r === "PUT /api/me/preferences")).toHaveLength(1);
+});
+
+test("guest Start survives the registration detour and opens real Preferences after sign-in", async ({ page }) => {
+  test.skip(live, "Synthetic registration never writes into the imported developer database");
+  const email = `start-${crypto.randomUUID()}@example.test`;
+  const password = "start-synthetic-only";
+  const privateRequests: string[] = [];
+  page.on("request", r => { if (new URL(r.url()).pathname.startsWith("/api/me/")) privateRequests.push(r.url()); });
+  await page.goto("/");
+  await page.getByRole("link", { name: "Start", exact: true }).click();
+  await expect(page).toHaveURL(/\/login$/);
+  expect(privateRequests).toEqual([]);
+  await page.getByRole("link", { name: "Create an account", exact: true }).click();
+  await expect(page).toHaveURL(/\/register$/);
+  await expect(page.getByRole("heading", { name: "Create your account", exact: true })).toBeVisible();
+  await page.getByLabel("Email", { exact: true }).fill(email);
+  await page.getByLabel("Password", { exact: true }).fill(password);
+  await page.getByRole("button", { name: "Create account", exact: true }).click();
+  await expect(page).toHaveURL(/\/login$/);
+  expect(privateRequests).toEqual([]);
+  await page.getByLabel("Email", { exact: true }).fill(email);
+  await page.getByLabel("Password", { exact: true }).fill(password);
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page).toHaveURL(/\/preferences$/);
+  await expect(page.getByRole("checkbox", { name: "Action", exact: true })).toBeVisible();
+  await expect(page.getByText("0 of 5 selected", { exact: true })).toBeVisible();
 });
 
 test("theme toggle preserves a real paginated URL and its ordered results", async ({ page }) => {
