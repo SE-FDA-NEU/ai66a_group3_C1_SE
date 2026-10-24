@@ -289,3 +289,35 @@ untracked `tmp/` remain untouched.
 Independent non-coauthor review, required checks on the final pushed head and
 the conflicting live Story #45 AC still need resolution before acceptance.
 This does not claim full M4 root-pytest coverage or later-feature delivery.
+
+## CI-discovered T28 transition race and guarding check
+
+The first pushed reconciliation (`f19a87b`) passed local checks, but GitHub
+[backdrop acceptance job 120833895843](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/40080843281/job/120833895843)
+failed in `UI-ranking-after-media-only-update`: it read `[]` instead of the
+exact Alpha/Beta/Gamma order. Home and Recommendations both contain three cards;
+the old unscoped card-count wait could accept Home before route completion,
+then take an immediate title snapshot during unmount. This is a verifier race,
+not evidence of a changed ranking algorithm or broken backdrop importer.
+
+The verifier now waits for the Recommendations URL and heading, then uses
+Playwright's retrying exact ordered title assertion before taking each snapshot
+(initial entry, reload and detail return). It retains the exact A90/B80/C80,
+saved-preferences, own-rating and changed-media assertions. A controlled real
+recommendation-response gate proves the destination is initially pending with
+zero cards, then releases it before checking the complete expected order. The
+test-only loopback server permits that one additional read path in synthetic
+mode; controls remain forbidden in live mode and absent from production startup.
+The first gate attempt returned 400 because the path was not yet allowlisted;
+that setup mistake is recorded, not counted as feature RED evidence.
+
+After the allowlist correction, the complete T28 browser/media suite passed
+**three consecutive runs: 18 passed / 0 failed each**, with temporary database
+cleanup confirmed each time. Frontend ESLint, test-server Ruff and whitespace
+checks passed. No production code, wait budget, ranking expectation or failed
+case was weakened/skipped. The final summary also counts PASS/FAIL separately
+instead of incorrectly calling a failed case a passed case.
+
+This follow-up changes only the verifier, its test server and this evidence.
+The prior full backend/frontend/combined application results remain applicable
+to the unchanged production source; final-head GitHub checks are still required.

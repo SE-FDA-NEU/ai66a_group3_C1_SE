@@ -205,6 +205,15 @@ async function catalogue(page) {
   await page.goto(UI);
   await expect(page.getByRole("link", { name: "View details for Backdrop Alpha", exact: true })).toBeVisible();
 }
+async function recommendationTitles(page, expected) {
+  // Home has the same number of cards. Its count is not evidence that the
+  // protected route/request has finished; reading during unmount can yield [].
+  await expect(page).toHaveURL(UI + "/recommendations");
+  await expect(page.getByRole("heading", { name: "Recommendations", exact: true })).toBeVisible();
+  const titles = page.locator("article.movie-card h2");
+  await expect(titles).toHaveText(expected);
+  return titles.allTextContents();
+}
 async function open(page, key) {
   await page.getByRole("link", { name: `View details for ${title[key]}`, exact: true }).click();
 }
@@ -333,26 +342,30 @@ async function synthetic() {
       await run.page.getByLabel("Password", { exact: true }).fill("t28-synthetic-password");
       await run.page.getByRole("button", { name: "Sign in", exact: true }).click();
       await expect(run.page).toHaveURL(UI + "/");
+      // Force the real recommendation response to remain pending. Empty
+      // destination cards must not be mistaken for completed ranked results.
+      await api("/__t28/hold", { path: "/api/me/recommendations" });
       await run.page.getByRole("link", { name: "My recommendations", exact: true }).click();
-      await expect(run.page.locator("article.movie-card")).toHaveCount(3);
-      const before = await run.page.locator("article.movie-card h2").allTextContents();
+      await gateCaptured("/api/me/recommendations");
+      await expect(run.page.getByRole("heading", { name: "Recommendations", exact: true })).toBeVisible();
+      await expect(run.page.locator("article.movie-card")).toHaveCount(0);
+      await api("/__t28/release", {});
+      const before = await recommendationTitles(run.page, [title.a, title.b, title.c]);
       assert.deepEqual(before, [title.a, title.b, title.c]);
       const preferences = await (await run.page.context().request.get(UI + "/api/me/preferences")).json();
       const audit = await api("/__t28/enrich/valid", {});
       assert(audit.rankingPreserved && audit.nonMediaRowsPreserved);
       await run.page.reload();
-      await expect(run.page.locator("article.movie-card")).toHaveCount(3);
-      assert.deepEqual(await run.page.locator("article.movie-card h2").allTextContents(), before);
+      assert.deepEqual(await recommendationTitles(run.page, before), before);
       assert.deepEqual(await (await run.page.context().request.get(UI + "/api/me/preferences")).json(), preferences);
       await open(run.page, "a");
       const actual = await assertHero(run.page, title.a, true);
       assert(actual.imageSrc.endsWith("/t28-enriched-101.jpg"));
       await expect(run.page.getByText("Your saved rating: 5/5", { exact: true })).toBeVisible();
       await run.page.getByRole("link", { name: "Back to recommendations", exact: true }).click();
-      await expect(run.page.locator("article.movie-card")).toHaveCount(3);
-      assert.deepEqual(await run.page.locator("article.movie-card h2").allTextContents(), before);
+      assert.deepEqual(await recommendationTitles(run.page, before), before);
       return { before, after: before, unchangedPreferences: true, ownRating: 5, newMediaVisible: true };
-    } finally { await run.close(); }
+    } finally { await api("/__t28/release", {}); await run.close(); }
   });
   for (const scenario of ["valid", "valid", "missing", "invalid", "failure", "clear"]) {
     await caseRun(`media-audit-${scenario}-${report.cases.length}`, "All non-media rows and account ranking preserved", async () => {
@@ -474,6 +487,8 @@ try {
   const output = JSON.stringify(report, null, 2) + "\n";
   assert(!/eyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+|ghp_[A-Za-z0-9]{36}/.test(output), "Credential-shaped value in evidence");
   await writeFile(path.join(evidence, "results.json"), output);
-  console.log(`T28 ${report.mode}: ${report.result}; ${report.cases.length} passed cases; temporary_database_removed=${report.temporaryDatabaseRemoved}`);
+  const passed = report.cases.filter(item => item.result === "PASS").length;
+  const failed = report.cases.filter(item => item.result === "FAIL").length;
+  console.log(`T28 ${report.mode}: ${report.result}; ${passed} passed cases; ${failed} failed cases; temporary_database_removed=${report.temporaryDatabaseRemoved}`);
   if (report.error) console.error(report.error);
 }
