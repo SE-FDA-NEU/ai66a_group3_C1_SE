@@ -1,7 +1,11 @@
-# Sprint 3 architecture and persistence contract
+# Architecture and persistence: Sprint 3 runtime and Sprint 4 design
 
 Contract revision: `S3-FINAL`, reconciled on 2026-10-18 against Sprint 3
 `main` SHA `f9774cbe7248c29915086d29bf2b9f99c2aa528a`.
+
+The Sprint 4 C03 design amendment is section 9. It specifies planned
+boundaries for [#217](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/217);
+the Sprint 3 runtime and migration head below remain the implemented state.
 
 The HTTP contract is in [api.md](api.md). This document describes the final
 Sprint 3 runtime and separately identifies genuinely unfinished scope. The
@@ -274,3 +278,109 @@ The browser may download the returned public image directly from
 [storage handoff](backdrop-storage-contract.md), [enrichment runbook](backdrop-import-runbook.md),
 [T37 UI evidence](evidence/s3-t37-backdrop-ui/README.md), and
 [T28 acceptance](evidence/s3-t28-backdrop-acceptance/README.md).
+
+## 9. Sprint 4 C03 runtime and storage contract (planned)
+
+The selected stack remains React/Vite, FastAPI, SQLAlchemy/Alembic and local
+SQLite. The **mandatory** development/staging/demo movie source is a bounded
+server-side TMDb import with provenance and a preserved previous valid
+revision on failure. No live metadata call occurs in a page request. CI uses
+synthetic provider fixtures, an isolated migrated SQLite database, no token
+and no network. The M2 seed is not acceptable live-catalogue evidence.
+
+| Concern | Planned owner and module boundary | Invariant |
+|---|---|---|
+| HTTP route registry and DTO/error shape | T03/T07/T09/T11/T12 coordinate `backend/app/main.py` and `backend/app/schemas/` with C03 contract owner | Static search route before dynamic movie route; session-derived identity; one registry writer at a time. |
+| Rating signal and whole-set ranking | T02/T03 extend `backend/app/recommendations/` and `backend/app/repositories/recommendations.py` | Reuse S3 rating repository; one sign per rated movie; rank before view filter/page; public/fallback ranker unchanged. |
+| Shared text index | T06 owns `backend/app/recommendations/` index builder and persistence; T07/T08/T09/T10 consume its versioned interface | One fit per revision/config, shared query/candidate transforms and atomic ID mapping; never fit per request. |
+| Profile/reset | T11/T12 reuse `backend/app/repositories/profile.py`, `preferences.py`, `ratings.py` and existing reset route | One session account, serialized write order, single transaction, rollback on failure; no duplicate reset table/API. |
+| Watchlist | T12 owns a new model/repository/schema and coordinated migration | Unique account/movie membership; added-at timestamp; reset leaves it alone. |
+| Poster | T01 coordinates nullable `catalog_movies.poster_path` migration, TMDb import mapping and safe DTO builder | Keep backdrop path and stable movie ID; no token, raw path or arbitrary image origin in public DTO. |
+| UI shell and CSS | T01 owns shared `frontend/src` shell/tokens/card interfaces | Feature owners use those interfaces; route/CSS/schema conflicts are queued through the relevant owner. |
+| Root pytest infrastructure | C05 #219 owns root `tests/` fixtures and direct command after C03 | No running server, developer DB, provider token or live network. |
+
+The existing Alembic head is `c6f8a2d4e901`. Migration ownership is
+coordinated by the existing database maintainer: append new revisions after
+that head in one agreed sequence; never edit an applied migration. T01's
+poster column is nullable TEXT with no fabricated placeholder path. T12's
+`user_movie_watchlist` table has `id` as opaque internal UUID, `user_id`
+and `movie_id` foreign keys to existing tables, UTC `added_at`, unique
+`(user_id,movie_id)`, user-delete cascade and movie-delete cascade. An
+unchanged provider movie keeps its stable internal ID on import, preserving
+membership. The active-catalogue join controls what an API can show. Index
+artefacts are rebuildable derivatives, not account data and not a replacement
+for the SQLite catalogue.
+
+### 9.1 Rating reads, transactions and reset order
+
+The rating service reads only current-account rows, joins canonical movie
+genres, de-duplicates rated movie IDs and emits one sign per rated movie
+(1/2=-1, 3=0, 4/5=+1) for each eligible candidate sharing any genre.
+Eligibility remains saved-genre matching. Finite adjusted scores sort before
+null scores, then title and internal ID; the complete result is ranked before
+view filtering and paging. Raw popularity is never overwritten. A failure
+limited to rating reads may return baseline order with explicit
+`basis=rating_unavailable`; catalogue/preference/session errors retain their
+real status. Public Popular and cold-start/no-match fallback never access
+private rating data. The concrete DTO/oracles are in
+[api.md](api.md#131-recommendation-score-transparency).
+
+The existing rating PUT, preference PUT and reset POST each commit or roll
+back atomically. Use SQLite's serialized writer transaction order as the
+linearization order for concurrent save/reset: a write committed before reset
+is removed; a deliberate write committed after reset survives. Lock/BEGIN
+the write transaction before evaluating and changing the account rows;
+do not perform a stale read outside it and later apply a reset based on that
+read. The reset transaction removes only this account's preference and
+rating rows, commits once, and returns success only after commit. Inject a
+failure after the first delete and at commit to verify rollback of both row
+sets in a real temporary DB. Account B, sessions, catalogue, index, poster
+and watchlist rows must be unchanged.
+
+A lost reset acknowledgement is ambiguous: the browser rereads
+`GET /api/me/profile`, `GET /api/me/preferences` and affected ratings to
+reconcile; it cannot infer commit from a timeout. It does not automatically
+repeat the destructive request. On known success, invalidate only the current
+account's profile/preference/rating/recommendation request generations;
+abort or ignore stale responses and preserve auth. A later reload/login must
+observe the persisted state.
+
+### 9.2 Versioned overview index and startup
+
+T06 builds one TF-IDF corpus from the active SQLite catalogue's overview text.
+The starting text/config revision is `overview-tfidf-v1`, matching the
+accepted [NLP spike](spike-nlp-text-similarity.md): Unicode NFKC, `casefold()`,
+strip outer whitespace, Unicode word tokens, the spike's fixed English
+stop-word set, no stemming/translation/synonym expansion, term frequency
+`count/tokenCount`, IDF `ln((1+N)/(1+documentFrequency))+1`, and cosine
+similarity. Query and candidate text use the same normalizer/tokenizer,
+vocabulary and IDF state; no per-request fitting. The artifact manifest
+records active `catalogueRevision`, this config version and stop-word
+checksum, vocabulary/IDF, an ordered internal-movie-ID mapping, and an
+artifact checksum. Fit exactly once per manifest revision. Empty or null
+overviews map to no usable vector. An all-empty corpus is a valid manifest
+with empty vocabulary and zero similarity, not an exception or fabricated
+match.
+
+Build to temporary artifact files, validate mapping/cardinality/checksum,
+then atomically replace the ready manifest. A partial build cannot mark the
+index ready. A new catalogue/config revision invalidates old readiness and
+requires an explicit rebuild before NLP fallback requests; stale, corrupt
+and absent artifacts produce `503 INDEX_UNAVAILABLE`. A missing source
+overview with a **ready** index is a distinct, valid popularity fallback.
+The index must not hold private ratings or preferences, and its rebuild must
+not block the last valid catalogue from serving non-NLP routes. C05 #219
+owns startup/build/recovery integration after this contract is reviewed.
+
+### 9.3 Media and account isolation
+
+Poster import stores only validated local provider paths. The API constructs
+allowlisted HTTPS CDN URLs, and browser image failures use a non-image
+fallback. Neither poster nor backdrop changes catalogue identity, personal
+ranking or auth. Public movie and search/similar DTOs contain no watchlist
+membership or account rating. Watchlist GET/PUT/DELETE and profile summary
+derive `user_id` solely from `ams_session`; same-origin protection extends
+to watchlist writes. A forged identity field is rejected/ignored without
+retargeting another account. Repeated PUT preserves original `added_at`;
+DELETE removes only the current account's row and both operations acknowledge
+only after commit. Reset deliberately does not touch this table.

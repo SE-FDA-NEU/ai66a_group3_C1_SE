@@ -1,9 +1,11 @@
-# Sprint 3 design and contract reconciliation
+# Design contract: Sprint 3 evidence and Sprint 4 proposal
 
 This document was reconciled on 2026-10-18 against Sprint 3 `main` SHA
 `bf18ab860fc3e486b57fc3b5ccac4db94c283995`. Tables, endpoints, modules, and
 evidence below reflect that source. Profile/reset UI, rating-adjusted ranking,
 and NLP product scope remain explicitly unfinished.
+Section 12 is the proposed Sprint 4 C03 design contract dated 2026-10-24;
+it does not represent implemented or independently reviewed behaviour.
 Request and response shapes are in
 [api.md](api.md), UI state is in [ui.md](ui.md), and ownership/persistence is
 in [architecture.md](architecture.md).
@@ -669,3 +671,138 @@ submission assets. The T25 matrix still reports all eight Stories as
 `partly works`; C03 contract publication is not new Story acceptance.
 Current C05 review/merge/PDF/LMS steps remain pending. Exact executed T25/C04
 snapshots and later real prerequisite approvals are linked in the dossier.
+
+## 12. Sprint 4 C03 UI and interaction contract (planned)
+
+This is the design handoff for [#217](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/217).
+The PO-provided `stitch_cinematic_ai_movie_discovery_platform.zip` is a
+**visual reference only**. Reviewed examples include
+`cineai_home_movie_catalogue/screen.png`,
+`cineai_movie_details_interstellar/screen.png` and
+`nocturne_cinema/DESIGN.md`. The ZIP is supplied outside this repository;
+T01 #195 author and reviewer need the actual ZIP/screenshots from the PO,
+not only this description. No HTML, fabricated movie rows, calculated match
+percentages or interaction logic from the ZIP is accepted as production code.
+
+### 12.1 Visual tokens and shared component interfaces
+
+T01 owns the compact CineAI shell and tokens. Dark is the initial theme;
+light/dark choice is stored **only in browser-local theme preference**, never
+in account/API fields. Theme choice has no effect on auth, list ordering or
+request identity. These semantic roles are the contract; implementers may
+tune accessible values during T01 review without changing their meaning.
+
+| Role | Dark reference | Light reference | Use |
+|---|---|---|---|
+| `--canvas` / `--surface` | `#11131b` / `#1d1f28` | `#f7f6fb` / `#ffffff` | Page and elevated cards |
+| `--text` / `--muted` | `#e2e1ee` / `#cbc3d7` | `#201b2d` / `#524b60` | Primary and secondary readable text |
+| `--accent` / `--accent-text` | `#d0bcff` / `#23005c` | `#6d3bd7` / `#ffffff` | Actions, selected state, visible focus |
+| `--border` / `--error` | `#494454` / `#ffb4ab` | `#c9c3d3` / `#9b1c26` | Dividers and errors |
+| Typography | Syne display; Plus Jakarta Sans body, with local sans-serif fallback | Same | 16px minimum body target; headings scale responsively |
+| Shape/spacing | 4/8/16/24/40px rhythm; 8/12/16px radii | Same | Clear focus, card and form structure |
+
+Verify WCAG AA contrast for actual text/control combinations in **both**
+themes, visible keyboard focus, reduced-motion support and image-independent
+readability. At <768px use a single-column content flow and wrapped or
+scrollable navigation without clipping; 768–1279px uses a flexible 2–3 card
+grid; ≥1280px may use a wider grid. At 320px no horizontal page overflow,
+overlapping controls or hidden primary action is acceptable. Do not require
+hover to discover an action. Posters keep a 2:3 media box; the existing
+backdrop remains a separate detail hero with text overlay/fallback.
+
+| Interface | Inputs | Owner-facing behaviour |
+|---|---|---|
+| `AppShell` / `SessionNavigation` | auth state, active route, theme | Guest/signed-in links reflect `/api/auth/me`; logout clears account state; no fake profile identity. |
+| `MovieCard` | public summary, optional recommendation reason/score, explicit caller actions | Title/details work with null poster/popularity; no personal badge on public cards. |
+| `MovieBackdropHero` | detail title, nullable `backdropUrl` | Keep title readable on null, unsafe URL and image load failure. |
+| `Poster` | nullable `posterUrl`, movie title | Safe image or labelled fallback; late old image events cannot replace current movie. |
+| `MovieRating` | current account/movie key, committed value, pending/error | GET/PUT existing protected API; five integer stars and explicit save. |
+| `WatchlistControl` | current account/movie key, membership status, pending/error | GET status then idempotent PUT/DELETE; guest action leads to login. |
+| `PageControls` | API `meta`, current URL state | Ten per page by default, only API totals, revision-aware navigation. |
+| `ProviderSlot` | static label and `deferred` state only | If shown, use muted non-clickable text `Availability information is not yet available`; no provider logo/link/badge implying a live VN offer before S5. |
+
+Feature owners own the actual API/state integration for their pages. Shared
+shell/CSS/router/schema changes use T01/route/migration ownership; the
+contract is not permission to replace existing React components with ZIP
+HTML. Existing `frontend/src/components/`, `pages/`,
+`navigation/listViewState.ts` and `auth/AuthContext.tsx` are the current
+interfaces to extend.
+
+### 12.2 State, ordering and truthful labels
+
+Home shows active-catalogue movies in current alphabetical API order;
+Popular shows finite-popularity results only. Recommendations preserve
+saved-genre eligibility, whole-set ranking before optional view filter and
+ten-item paging. URL retains page, filter and accepted catalogue revision;
+detail return restores a safe internal list context. A 409 revision mismatch
+clears old cards and restarts at page 1. Account/movie/query generations
+prevent late old responses, including stale 401, from replacing newer state.
+Loading, empty, recoverable error and retry are separate states. A 503 must
+never render as a valid empty list.
+
+In either theme, `TMDb popularity` labels raw `popularityScore`;
+`Your rating` labels only this account's committed 1–5 rating (or
+`Not rated yet` after a successful read); `Personal adjusted score`
+labels only the personalised candidate's `adjustedScore` and its
+`basis`. A related rated film may change rank without making the
+candidate appear rated. Null popularity/score displays
+`Information unavailable`, not 0 or NaN. If rating signals cannot be
+read but the allowed baseline response succeeds, disclose that limitation
+and never imply that the account has no ratings. Public/cold-start/no-match
+cards have no adjusted-score badge. Recommendation reasons say which saved
+genres matched; they must not invent AI confidence percentages.
+
+Search accepts a trimmed query of at least two characters; keyboard Enter
+submits and a labelled search control works without mouse. It shows title
+matches first under the server contract, or positive overview matches when
+no titles match. It distinguishes `No movies found`, invalid query, index
+error and loading/retry. Query generation rejects delayed previous results.
+Similar cards remain on the public detail page, exclude the source, and do
+not require auth. Unknown source retains the established 404/detail return
+behaviour. The public explanation keeps exactly the three steps in
+[recommendation-explanation.md](recommendation-explanation.md); no fourth
+step or invented NLP claim is added.
+
+### 12.3 Five-star, profile and watchlist interactions
+
+The rating control has five labelled buttons/radio options with values
+1–5. Hover and focus may preview a value; pointer leave/blur restores the
+draft/committed display. Click or keyboard arrows/Space/Enter changes only
+the **draft** integer. `Save rating` explicitly sends one existing PUT;
+pending prevents duplicate submission. Only a validated committed
+acknowledgement updates `Your rating` and shows success. A failed write
+preserves the last committed value and the draft for retry. A failed initial
+GET is `unavailable`, not `Not rated yet`. Account switch, logout or movie
+change resets the private widget and invalidates old responses. The ZIP's
+`Rate (AI Learn)` prompt is not a persistence acknowledgement.
+
+`/profile` is guarded. It displays the server summary of saved genres,
+rating count and watchlist count. Reset requires an explicit confirm/cancel
+dialog; cancel sends no POST. After confirmed known success, show exactly
+`Your personalisation profile was reset`, keep auth and watchlist, invalidate
+only this account's private caches and show cold-start after refresh. On
+ambiguous timeout show a reconciliation state and reread profile/preferences/
+ratings; do not show definite success or issue an automatic second reset.
+Real errors preserve previous displayed committed state until refreshed.
+Reload/later login must reflect server persistence.
+
+`/watchlist` is guarded and uses the account list API with page controls,
+added-time ordering, active-catalogue revision and empty/error/retry states.
+The detail control has clear `Add to watchlist` / `Remove from watchlist`
+labels, pending state and retry; it changes only after a committed
+acknowledgement. Repeated actions are idempotent, account changes remove old
+private status immediately, and reset leaves membership intact. Watchlist
+never alters ranking or raw popularity. Feature owners and #213 verify the
+working behaviour; this design section is no implementation evidence.
+
+### 12.4 Reference-only exclusions
+
+The ZIP's fixed titles/posters, 15,000+ movies, real-time TMDb syncing,
+match percentages, neural/vector claims, IMDb/director/runtime facts, 4K or
+full-film playback, clickable VN provider badges, fake account avatar and
+production company claims are sample content. Only imported local catalogue
+data and approved application API fields may appear as factual product data.
+VN provider slots may be styled as non-clickable placeholders for S5, with
+no live availability claim. Trailer support is only admitted through
+T19/T20 if those tasks are accepted; no full film, autoplay or invented
+provider link enters this C03 contract.
