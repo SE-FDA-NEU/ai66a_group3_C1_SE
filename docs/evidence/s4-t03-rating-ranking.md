@@ -202,7 +202,7 @@ return query and fragment. The UI correction now advances the recommendation
 data version while retaining navigation scope for a confirmed rating save.
 The account/preference invalidation path still rotates scope.
 
-The final Windows PowerShell/Edge 155 T34 run used a migrated temporary SQLite
+The earlier Windows PowerShell/Edge 155 T34 run used a migrated temporary SQLite
 database and exited 0 with `result=PASS`,
 `candidate_source_sha256=37588da47de212051567d8363f15c2a8a63097e7389471d4c2fb5bf0ac6df951`.
 The run reported guest protection, save/failure/retry, account isolation,
@@ -214,7 +214,18 @@ rating signal on the synthetic accepted catalogue. The PNG is 21,571 bytes;
 SHA-256 `f56a66384bede83578bf38487d5f212db3c6e51ead6da0f14b7cda5ed914ebac`.
 This is isolated synthetic browser evidence, not a live TMDb catalogue run.
 
-After the correction, frontend unit tests returned `278 passed` in 22.68s;
+After that correction, frontend unit tests returned `278 passed` in 22.68s;
 frontend lint/build, Ruff and Python compilation of the verifier passed.
-The S04, T33 and T34 workflow runs on the new uncommitted candidate, and the
-independent approval gate, remain pending on GitHub.
+Those fixes were committed at `19203e6`. The subsequent PR #223 T34 job
+`40088543625/120856315281` still failed while waiting for the first unrated
+detail page: the last browser state was the recommendations URL
+`/recommendations?source=t34#results` with the Amber Velocity link visible.
+The verifier had accepted the old card DOM immediately after a manual
+`pushState`/`popstate`, before React Router committed the new list context.
+It now waits for the matching URL and stamped `listViewContext` before clicking.
+The revised full T34 check on 2026-10-24 18:13:39 +07:00 used Chrome 155 and
+temporary migrated SQLite, exited 0 with `result=PASS` and
+`database_integrity=ok`, and reported
+`candidate_source_sha256=a9aa65aacfbfc45b922b1152a31e852b10df5796e144fe8dbba96bb4d87b71f7`.
+Ruff and `git diff --check` passed. This latest verifier change is local and
+uncommitted; a hosted rerun and independent approval remain pending.

@@ -289,6 +289,7 @@ class RatingBrowser(BrowserPage):
               path: location.pathname,
               search: location.search,
               hash: location.hash,
+              historyContext: history.state?.usr?.listViewContext || null,
               mainText: document.querySelector('main')?.innerText || '',
               headerText: document.querySelector('.app-header')?.innerText || '',
               headings: [...document.querySelectorAll('h1, h2, h3')]
@@ -649,7 +650,17 @@ def main() -> int:
                 assert a_recommendations["cards"][0] == MOVIE_A_TITLE
                 assert account_rating(database_path, account_a_id, MOVIE_A) is None
                 page.spa_navigate("/recommendations?source=t34#results")
-                page.wait_for(lambda state: bool(state["cards"]), "A context list")
+                page.wait_for(
+                    lambda state: (
+                        state["path"] == "/recommendations"
+                        and state["search"] == "?source=t34"
+                        and state["hash"] == "#results"
+                        and bool(state["cards"])
+                        and isinstance(state["historyContext"], dict)
+                        and state["historyContext"].get("route") == "/recommendations"
+                    ),
+                    "A context list with committed router state",
+                )
                 page.click_aria(f"View details for {MOVIE_A_TITLE}")
                 unrated = page.wait_for(
                     lambda state: (
