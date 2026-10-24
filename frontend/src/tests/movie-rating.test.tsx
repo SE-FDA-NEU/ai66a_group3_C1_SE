@@ -50,6 +50,7 @@ function deferred() {
 function mount(state: AuthState = A, movieId = "movie-a", strict = false) {
   const unauthorized = vi.fn();
   const refresh = vi.fn().mockResolvedValue(undefined);
+  const invalidateRecommendations = vi.fn();
   const view = (next: AuthState, movie: string) => {
     const auth: AuthContextValue = {
       ...next,
@@ -59,7 +60,7 @@ function mount(state: AuthState = A, movieId = "movie-a", strict = false) {
       handleUnauthorized: unauthorized,
       recommendationVersion: 0,
       recommendationScope: "test-scope",
-      invalidateRecommendations: vi.fn(),
+      invalidateRecommendations,
     };
     const content = (
       <MemoryRouter initialEntries={["/movies/test"]}>
@@ -81,6 +82,7 @@ function mount(state: AuthState = A, movieId = "movie-a", strict = false) {
     ...rendered,
     unauthorized,
     refresh,
+    invalidateRecommendations,
     change: (next: AuthState, movie = movieId) =>
       rendered.rerender(view(next, movie)),
   };
@@ -141,7 +143,7 @@ it.each([1, 3, 5])(
       .spyOn(globalThis, "fetch")
       .mockResolvedValueOnce(json(null))
       .mockReturnValueOnce(put.promise);
-    mount();
+    const view = mount();
     await ready();
     choose(value);
     const button = screen.getByRole("button", { name: "Save rating" });
@@ -149,6 +151,7 @@ it.each([1, 3, 5])(
     fireEvent.click(button);
     expect(screen.getByText("Not rated yet")).toBeInTheDocument();
     expect(screen.queryByText("Rating saved.")).not.toBeInTheDocument();
+    expect(view.invalidateRecommendations).not.toHaveBeenCalled();
     expect(screen.getByRole("radio", { name: "1 star" })).toBeDisabled();
     expect(fetch).toHaveBeenCalledTimes(2);
     await act(async () => {
@@ -158,6 +161,7 @@ it.each([1, 3, 5])(
       screen.getByText(`Your saved rating: ${value}/5`),
     ).toBeInTheDocument();
     expect(screen.getByText("Rating saved.")).toBeInTheDocument();
+    expect(view.invalidateRecommendations).toHaveBeenCalledTimes(1);
   },
 );
 
@@ -167,7 +171,7 @@ it("preserves committed 3 and draft 5 after failure, then retries the same PUT",
     .mockResolvedValueOnce(json(3))
     .mockResolvedValueOnce(failure())
     .mockResolvedValueOnce(json(5));
-  mount();
+  const view = mount();
   await ready();
   choose(5);
   expect(screen.getByText("Your saved rating: 3/5")).toBeInTheDocument();
@@ -178,8 +182,10 @@ it("preserves committed 3 and draft 5 after failure, then retries the same PUT",
   expect(screen.getByRole("radio", { name: "5 stars" })).toBeChecked();
   expect(screen.getByText("Your saved rating: 3/5")).toBeInTheDocument();
   expect(screen.queryByText("Rating saved.")).not.toBeInTheDocument();
+  expect(view.invalidateRecommendations).not.toHaveBeenCalled();
   fireEvent.click(screen.getByRole("button", { name: "Retry save" }));
   await screen.findByText("Your saved rating: 5/5");
+  expect(view.invalidateRecommendations).toHaveBeenCalledTimes(1);
   const puts = fetch.mock.calls.filter(
     ([, options]) => options?.method === "PUT",
   );
