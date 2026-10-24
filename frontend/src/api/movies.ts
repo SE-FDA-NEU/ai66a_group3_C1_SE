@@ -21,6 +21,8 @@ export type MovieDetail = MovieSummary & {
   backdropUrl?: string | null;
 };
 
+export type CatalogueSort = "title_asc" | "title_desc";
+
 export type PageMeta = {
   count: number;
   limit: number;
@@ -96,10 +98,12 @@ export async function listMoviePage(
   page: number,
   revision?: string,
   signal?: AbortSignal,
+  sort: CatalogueSort = "title_asc",
 ): Promise<MovieListResponse> {
   const params = new URLSearchParams({ limit: "10" });
   if (page !== 1) params.set("page", String(page));
   if (revision) params.set("catalogueRevision", revision);
+  if (kind === "catalogue" && sort === "title_desc") params.set("sort", sort);
   const path = kind === "popular" ? "/api/movies/popular" : "/api/movies";
   const response = await fetch(`${path}?${params}`, { signal });
   if (!response.ok) throw await readError(response);

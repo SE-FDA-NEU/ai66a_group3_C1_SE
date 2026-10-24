@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { ApiError, register } from "../api/auth.ts";
 import { signInReturnState } from "../navigation/signInReturn.ts";
+import AuthLayout from "../components/AuthLayout.tsx";
+import { useFeedback } from "../feedback.ts";
 
 type FieldErrors = Partial<Record<"email" | "password", string>>;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -20,6 +22,16 @@ function validateRegistration(email: string, password: string): FieldErrors {
 function RegisterPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const feedback = useFeedback();
+  const mounted = useRef(false);
+  const pendingNotice = useRef<number | null>(null);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      if (pendingNotice.current !== null) feedback.dismiss(pendingNotice.current);
+    };
+  }, [feedback]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
@@ -33,29 +45,39 @@ function RegisterPage() {
     const errors = validateRegistration(email, password);
     setFieldErrors(errors);
     setRequestError("");
-    if (Object.keys(errors).length > 0) return;
+    if (Object.keys(errors).length > 0) {
+      feedback.announce({ kind: "error", title: "Check your details", message: "Please correct the highlighted fields." });
+      return;
+    }
 
     setIsSubmitting(true);
+    const notice = feedback.announce({ kind: "pending", title: "Creating your account…" });
+    pendingNotice.current = notice;
     try {
       await register(email.trim(), password);
+      if (!mounted.current) return;
+      feedback.update(notice, { kind: "success", title: "Account created", message: "You're ready to sign in." });
+      pendingNotice.current = null;
       navigate("/login", { replace: true, state: signInReturnState(location.state) });
     } catch (error) {
+      if (!mounted.current) return;
+      feedback.update(notice, { kind: "error", title: "Account creation not confirmed", message: "Check the form before trying again." });
+      pendingNotice.current = null;
       if (error instanceof ApiError && error.code === "EMAIL_ALREADY_REGISTERED") {
         setRequestError("This email is already registered");
       } else {
         setRequestError("Service is temporarily unavailable");
       }
     } finally {
-      setIsSubmitting(false);
+      if (mounted.current) setIsSubmitting(false);
     }
   }
 
   return (
-    <main className="page page--centered registration-page">
-      <section className="auth-card" aria-labelledby="register-title">
-        <p className="eyebrow">AI Movie Recommendation System</p>
+    <AuthLayout mode="register">
+        <p className="eyebrow">Your next chapter</p>
         <h1 id="register-title">Create your account</h1>
-        <p className="muted">Save your movie preferences and get recommendations made for you.</p>
+        <p className="muted">A place for your preferences and ratings.</p>
 
         {requestError ? <p className="form-error" role="alert">{requestError}</p> : null}
 
@@ -66,6 +88,7 @@ function RegisterPage() {
             name="email"
             type="email"
             autoComplete="email"
+            placeholder="you@example.com"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             aria-invalid={Boolean(fieldErrors.email)}
@@ -79,6 +102,7 @@ function RegisterPage() {
             name="password"
             type="password"
             autoComplete="new-password"
+            placeholder="At least 8 characters"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             aria-invalid={Boolean(fieldErrors.password)}
@@ -92,9 +116,8 @@ function RegisterPage() {
           </button>
         </form>
 
-        <p className="auth-footer">Already have an account? <Link to="/login" state={signInReturnState(location.state)}>Sign in</Link></p>
-      </section>
-    </main>
+        <p className="auth-footer">Already have an account? <Link className="button-link button-secondary" to="/login" state={signInReturnState(location.state)}>Sign in</Link></p>
+    </AuthLayout>
   );
 }
 

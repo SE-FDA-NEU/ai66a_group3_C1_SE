@@ -11,11 +11,12 @@ import RegisterPage from "./pages/RegisterPage.tsx";
 import { PROTECTED_ROUTES } from "./protectedRoutes.tsx";
 import AppFrame from "./components/AppFrame.tsx";
 import { ThemeProvider } from "./theme.tsx";
+import ActionFeedback from "./components/ActionFeedback.tsx";
 
 function App() {
   return (
     <BrowserRouter>
-      <ThemeProvider><AuthProvider><AppFrame>
+      <ThemeProvider><ActionFeedback><AuthProvider><AppFrame>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route
@@ -31,7 +32,7 @@ function App() {
           ))}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </AppFrame></AuthProvider></ThemeProvider>
+      </AppFrame></AuthProvider></ActionFeedback></ThemeProvider>
     </BrowserRouter>
   );
 }

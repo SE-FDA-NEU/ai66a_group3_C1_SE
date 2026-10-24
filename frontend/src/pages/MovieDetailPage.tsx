@@ -124,7 +124,7 @@ function MovieDetailPage() {
   return (
     <main className="page">
       <article className="movie-detail">
-        <Link className="text-link movie-detail__return" to={returnDestination.to}
+        <Link className="button-link button-secondary movie-detail__return" to={returnDestination.to}
           state={returnDestination.state}>
           <span aria-hidden="true">&larr; </span>
           {returnDestination.label}

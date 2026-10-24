@@ -5,11 +5,14 @@ export type User = {
   email: string;
 };
 
-type AuthResponse = {
-  data: {
-    user: User;
-  };
-};
+async function readUser(response: Response): Promise<User> {
+  const body = await response.json();
+  if (!body?.data?.user || typeof body.data.user.id !== "string" || !body.data.user.id ||
+      typeof body.data.user.email !== "string" || !body.data.user.email) {
+    throw new ApiError("The account response could not be confirmed. Please try again.", 0);
+  }
+  return body.data.user;
+}
 
 type ApiErrorResponse = {
   error?: {
@@ -62,8 +65,7 @@ export async function login(email: string, password: string): Promise<User> {
     throw await readError(response);
   }
 
-  const body = (await response.json()) as AuthResponse;
-  return body.data.user;
+  return readUser(response);
 }
 
 export async function register(email: string, password: string): Promise<User> {
@@ -77,8 +79,7 @@ export async function register(email: string, password: string): Promise<User> {
     throw await readError(response);
   }
 
-  const body = (await response.json()) as AuthResponse;
-  return body.data.user;
+  return readUser(response);
 }
 
 export async function getCurrentUser(): Promise<User> {
@@ -98,12 +99,7 @@ export async function getCurrentUser(): Promise<User> {
     throw await readError(response);
   }
 
-  const body = (await response.json()) as AuthResponse;
-  if (!body?.data?.user || typeof body.data.user.id !== "string" ||
-      typeof body.data.user.email !== "string") {
-    throw new ApiError("Unable to check your session", 0);
-  }
-  return body.data.user;
+  return readUser(response);
 }
 
 export async function logout(): Promise<void> {

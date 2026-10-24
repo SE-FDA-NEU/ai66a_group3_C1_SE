@@ -21,9 +21,9 @@ substitute for the separate Sprint 3 live-import/acceptance records. See the tra
 
 Post-M3 amendment (2026-10-19): Home, Popular and Recommendations use
 database-backed pages of at most ten. Their page controls use API totals;
-Home orders every active movie alphabetically, Popular ranks every eligible
+Home orders every active movie by title (A–Z default, optional Z–A), Popular ranks every eligible
 finite-popularity movie, and recommendation view filters apply to the complete
-selected base mode before slicing. Page and view genre live in the URL, while
+selected base mode before slicing. Page, Home sort and view genre live in the URL, while
 the existing AuthProvider owns session identity and shared navigation. These
 current rules supersede the Sprint 3 single-page UI descriptions below without
 changing recorded Sprint 3 acceptance evidence.
@@ -757,7 +757,12 @@ unsafe paths open Home. This replaces the earlier automatic
 [S13 AC](requirements.md#s13-sign-in-and-sign-out-securely-p0-5-points);
 GitHub Story #45 needs the same AC replacement before merge.
 
-Home shows active-catalogue movies in current alphabetical API order;
+Home shows active-catalogue movies in API title order, with a labelled A–Z/Z–A
+selector. Both directions sort the complete catalogue before paging. Changing
+sort resets page 1; URL sort survives pagination, reload, retry and detail return.
+Navigation actions (View details, Return to catalogue, Change my genres,
+Back to recommendations and equivalent CTAs) use shared button styling while
+remaining real links, with their routes and return state intact.
 Popular shows finite-popularity results only. Recommendations preserve
 saved-genre eligibility, whole-set ranking before optional view filter and
 ten-item paging. URL retains page, filter and accepted catalogue revision;

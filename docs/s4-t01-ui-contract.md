@@ -14,7 +14,7 @@ Existing React/TypeScript Home, Popular, register/sign-in, Preferences,
 Recommendations, details and the exact three-step explanation share a compact
 cinematic violet style inspired by the supplied CineAI ZIP. No ZIP scripts,
 mock statistics, hard-coded movie artwork or fake success actions are copied.
-Home remains A–Z; Popular remains finite popularity descending with existing
+Home defaults to A–Z and offers the PO-authorized Z–A title sort; Popular remains finite popularity descending with existing
 tie-breakers; recommendations keep the current algorithm. Filtering still
 applies to the whole result set before pagination. Existing request-generation,
 account/movie guards and safe detail-return context are retained.
@@ -31,7 +31,8 @@ and score explanations; T01 does not change the rating API or ranking formula.
 The Home hero replaces the old visible "Choose Start to pick up to 5 favourite
 genres" paragraph with compact discovery copy and Start / Explore Catalogue
 actions. The latter is a local, keyboard-focusable catalogue anchor, not a new
-sort, TMDb request or separate recommendation shelf. Home keeps title/ID order
+sort, TMDb request or separate recommendation shelf. The later title-sort amendment
+below adds a separate labelled selector. Home keeps deterministic title/ID order
 and its existing page totals/revision/detail-return semantics.
 
 My recommendations is one persistent active-state link in the shared navbar,
@@ -144,3 +145,42 @@ CDN failure is local image fallback, not catalogue failure.
 - [ ] Only after reconciliation/review may PO decide this issue is merge-ready.
 
 Commands and actual local results: [T01 evidence](evidence/s4-t01-ui.md).
+
+## Post-merge onboarding/discovery polish
+
+### PO-authorized action buttons and Home title sort (2026-10-24)
+
+Navigation CTAs use `button-link button-secondary` (including the shared
+MovieCard View details, detail returns, preferences/recommendation actions and
+auth cross-links). They remain semantic links with unchanged labels, routes,
+safe return state and native open-in-new-tab behaviour. Footer attribution
+links are not globally converted into buttons. Shared hover/focus, both themes,
+wrapping and a minimum 44px touch target apply.
+
+Home alone gains a labelled Sort by title control: A–Z by default or Z–A.
+The API allowlists `title_asc`/`title_desc`, sorts all active rows before
+paging and keeps the ID ascending for exact-title ties. Omitted sort preserves
+the previous API request. Popular and recommendation ranking are unchanged.
+Sort is URL-backed, resets page 1 on change, remains part of request identity,
+and survives pagination/reload/retry/revision recovery/details return.
+Page controls retain the current hash. No migration or TMDb import is needed.
+
+This later amendment extends the presentation-only follow-up described below.
+New checks are recorded separately in
+[button/title-sort evidence](evidence/s4-t01-buttons-title-sort.md).
+
+The follow-up after PR #220 reuses these contracts: two-column auth presentation,
+genre descriptions/cards, a real-poster Home hero and a Popular page-one #1
+spotlight. It changes no API DTO, database schema, ranking, result totals or genre
+selection rule. Featured details use the existing list-return state. Decorative
+auth artwork is CSS, not a screenshot of another app or a new remote dependency.
+
+`ActionFeedback` / `useFeedback` provide shared, centered, non-modal notifications.
+Use `announce` for a new action, then `update` its returned ID only after the real
+result. Stale IDs cannot overwrite newer actions; component cleanup dismisses
+only its own pending ID. Keep detailed errors inline, preserve drafts and never
+declare server success from a timer or local toggle. Do not add feedback state
+to auth authority, API query keys or ranking inputs.
+
+Actual checks, screenshots and review limits:
+[onboarding/discovery follow-up evidence](evidence/s4-t01-onboarding-polish.md).

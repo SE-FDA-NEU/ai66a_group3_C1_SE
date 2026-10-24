@@ -1,6 +1,10 @@
-import type { PageMeta } from "../api/movies.ts";
+import type { CatalogueSort, PageMeta } from "../api/movies.ts";
 
 export const MAX_GENRE_ID = 2147483647;
+
+export function readCatalogueSort(search: string): CatalogueSort {
+  return new URLSearchParams(search).get("sort") === "title_desc" ? "title_desc" : "title_asc";
+}
 
 export function readGenreId(search: string): number | undefined {
   const raw = new URLSearchParams(search).get("genreId");

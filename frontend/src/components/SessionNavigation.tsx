@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/authState.ts";
+import { useFeedback } from "../feedback.ts";
 
 export default function SessionNavigation({ currentPage, showRecommendationsLink = true }: {
   currentPage?: "recommendations";
   showRecommendationsLink?: boolean;
 }) {
   const auth = useAuth();
+  const feedback = useFeedback();
   const { status, refresh } = auth;
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
@@ -34,8 +36,8 @@ export default function SessionNavigation({ currentPage, showRecommendationsLink
       <span role="status">Checking session...</span> : null}
     {auth.status === "error" ? <span role="alert">Unable to check your session. <button type="button" onClick={() => void auth.refresh()}>Retry</button></span> : null}
     {auth.status === "unauthenticated" ? <>
-      <Link className="button-link" to="/login">Sign in</Link>
-      <Link className="button-link button-secondary" to="/register">Create account</Link>
+      <Link className="button-link" to="/login" onClick={() => feedback.announce({ kind: "info", title: "Welcome back", message: "Sign in with your email and password." })}>Sign in</Link>
+      <Link className="button-link button-secondary" to="/register" onClick={() => feedback.announce({ kind: "info", title: "Start your movie collection", message: "Create an account to save your taste." })}>Create account</Link>
     </> : null}
     {auth.status === "authenticated" ? <>
       <span className="muted">{auth.user.email}</span>

@@ -15,12 +15,19 @@ labelled pending.
 
 Post-M3 amendment (2026-10-19): the three movie-list routes count and slice
 their complete eligible active-revision sets in SQLite. Home orders all active
-movies by `lower(title)`, original title and internal ID; Popular and
+movies by `lower(title)` and original title (A–Z by default; optional
+`sort=title_desc` reverses both), then internal ID ascending; Popular and
 recommendation fallback use finite popularity. Personal mode is selected from
 the complete saved-genre match set before an optional view genre is applied.
-The browser stores page and view genre in the list URL and sends the last
+The browser stores page, Home title sort and view genre in the list URL and sends the last
 accepted catalogue revision on subsequent requests. Shared navigation uses
 the existing AuthProvider for direct public-route session checks and sign-out.
+
+T01 title-sort amendment (2026-10-24): sort is part of the Home request identity.
+Changing it returns to page 1; pagination, retry and safe detail return retain
+it and the URL hash. Old-sort success, failure and revision responses cannot
+replace the selected view. Sorting still happens in SQLite before paging,
+without a migration, metadata fetch or change to other list algorithms.
 
 ## 1. Runtime evidence
 

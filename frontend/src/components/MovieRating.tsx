@@ -9,6 +9,7 @@ import {
 } from "../api/ratings.ts";
 import { useAuth } from "../auth/authState.ts";
 import StarRating from "./StarRating.tsx";
+import { useFeedback } from "../feedback.ts";
 
 type RatingLoad =
   | { status: "loading" }
@@ -17,6 +18,8 @@ type RatingLoad =
 
 function AccountMovieRating({ movieId }: { movieId: string }) {
   const { handleUnauthorized } = useAuth();
+  const feedback = useFeedback();
+  const pendingNotice = useRef<number | null>(null);
   const navigate = useNavigate();
   const [load, setLoad] = useState<RatingLoad>({ status: "loading" });
   const [committed, setCommitted] = useState<RatingValue | null>(null);
@@ -36,8 +39,9 @@ function AccountMovieRating({ movieId }: { movieId: string }) {
       mounted.current = false;
       generation.current += 1;
       saveController.current?.abort();
+      if (pendingNotice.current !== null) feedback.dismiss(pendingNotice.current);
     };
-  }, []);
+  }, [feedback]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -84,14 +88,20 @@ function AccountMovieRating({ movieId }: { movieId: string }) {
     setSaving(true);
     setSaveError("");
     setSaved(false);
+    const notice = feedback.announce({ kind: "pending", title: "Saving your rating…" });
+    pendingNotice.current = notice;
     try {
       const { rating } = await saveRating(movieId, draft, controller.signal);
       if (!current()) return;
       setCommitted(rating);
       setDraft(rating);
       setSaved(true);
+      feedback.update(notice, { kind: "success", title: "Rating saved", message: `${rating}/5 saved to your account.` });
+      pendingNotice.current = null;
     } catch (error: unknown) {
       if (!current()) return;
+      feedback.update(notice, { kind: "error", title: "Rating save not confirmed", message: "Your selection is kept. Please retry." });
+      pendingNotice.current = null;
       if (error instanceof RatingApiError && error.status === 401) {
         handleUnauthorized();
         navigate("/login", { replace: true });
@@ -176,6 +186,7 @@ function AccountMovieRating({ movieId }: { movieId: string }) {
 
 export default function MovieRating({ movieId }: { movieId: string }) {
   const auth = useAuth();
+  const feedback = useFeedback();
   const { refresh } = auth;
   const needsCheck = auth.status === "unknown";
   const titleId = useId();
@@ -193,7 +204,9 @@ export default function MovieRating({ movieId }: { movieId: string }) {
       ) : auth.status === "unauthenticated" ? (
         <>
           <p className="muted">Sign in to save a rating to your account.</p>
-          <Link className="button-link" to="/login">
+          <Link className="button-link" to="/login" onClick={() => feedback.announce({
+            kind: "info", title: "Sign in to rate a movie", message: "Ratings are saved to your account.",
+          })}>
             Sign in to rate this movie
           </Link>
         </>

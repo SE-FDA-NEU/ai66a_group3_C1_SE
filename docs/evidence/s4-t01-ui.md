@@ -1,5 +1,9 @@
 # S4-T01 local verification — early branch, not final approval
 
+Later post-merge UI polish is recorded separately in
+[onboarding/discovery evidence](s4-t01-onboarding-polish.md); the historical runs
+below are not relabelled as checks of that newer candidate.
+
 Refs [#195](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/195).
 Date: 2026-10-24 (Asia/Saigon). Base main:
 `3078a9c6fd3dff1f0b8576bc7411f469c7a98fdf`.

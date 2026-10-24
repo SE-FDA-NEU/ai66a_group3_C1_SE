@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../auth/authState.ts";
 import { signInDestination, signInReturnState } from "../navigation/signInReturn.ts";
+import AuthLayout from "../components/AuthLayout.tsx";
+import { useFeedback } from "../feedback.ts";
 
 const INVALID_CREDENTIALS_MESSAGE = "Email or password is incorrect";
 
@@ -10,6 +12,9 @@ function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { signIn } = useAuth();
+  const feedback = useFeedback();
+  const mounted = useRef(false);
+  useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -23,6 +28,7 @@ function LoginPage() {
 
     if (!email.trim() || !password) {
       setError("Email and password are required");
+      feedback.announce({ kind: "error", title: "A couple of details are missing", message: "Enter your email and password." });
       return;
     }
 
@@ -30,24 +36,25 @@ function LoginPage() {
 
     try {
       await signIn(email, password);
+      if (!mounted.current) return;
       navigate(signInDestination(location.state), { replace: true });
     } catch (error) {
+      if (!mounted.current) return;
       if (error instanceof Error && error.message) {
         setError(error.message);
       } else {
         setError(INVALID_CREDENTIALS_MESSAGE);
       }
     } finally {
-      setIsSubmitting(false);
+      if (mounted.current) setIsSubmitting(false);
     }
   }
 
   return (
-    <main className="page page--centered">
-      <section className="auth-card" aria-labelledby="login-title">
-        <p className="eyebrow">AI Movie Recommendation System</p>
+    <AuthLayout mode="sign-in">
+        <p className="eyebrow">Welcome back</p>
         <h1 id="login-title">Sign in</h1>
-        <p className="muted">Sign in to keep your movie preferences and ratings. Choose when to personalise your experience.</p>
+        <p className="muted">Your taste. Right where you left it.</p>
 
         <form className="auth-form" onSubmit={handleSubmit} noValidate>
           <label htmlFor="email">Email</label>
@@ -56,6 +63,7 @@ function LoginPage() {
             name="email"
             type="email"
             autoComplete="email"
+            placeholder="you@example.com"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
           />
@@ -66,6 +74,7 @@ function LoginPage() {
             name="password"
             type="password"
             autoComplete="current-password"
+            placeholder="Your password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
           />
@@ -81,10 +90,9 @@ function LoginPage() {
           </button>
         </form>
         <p className="auth-footer">
-          Need an account? <Link to="/register" state={signInReturnState(location.state)}>Create an account</Link>
+          Need an account? <Link className="button-link button-secondary" to="/register" state={signInReturnState(location.state)}>Create an account</Link>
         </p>
-      </section>
-    </main>
+    </AuthLayout>
   );
 }
 

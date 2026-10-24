@@ -71,7 +71,8 @@ function popularityOf(container: HTMLElement) {
 }
 
 function cardTitled(title: string) {
-  return screen.getByRole("heading", { name: title }).closest("article")!;
+  return screen.getAllByRole("article").find(card =>
+    within(card).queryByRole("heading", { name: title }))!;
 }
 
 afterEach(() => {
@@ -140,7 +141,7 @@ describe("S3-T36 popularity on shared movie cards", () => {
 
     render(<App />);
 
-    await screen.findByText("High");
+    await within(await screen.findByRole("region", { name: "Popular movies" })).findByText("High");
     const cards = screen.getAllByRole("article");
     expect(
       cards.map((card) => within(card).getByRole("heading").textContent),
@@ -159,7 +160,7 @@ describe("S3-T36 popularity on shared movie cards", () => {
 
     render(<App />);
 
-    await screen.findByText("Zeta");
+    await within(await screen.findByRole("region", { name: "Popular movies" })).findByText("Zeta");
     expect(
       screen
         .getAllByRole("article")

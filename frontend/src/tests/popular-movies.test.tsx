@@ -97,7 +97,7 @@ describe("S3-T20 public popular-movie page", () => {
     fireEvent.click(await screen.findByRole("link", { name: "Popular movies" }));
 
     expect(window.location.pathname).toBe("/popular");
-    expect(await screen.findByText("Popular Movie 1")).toBeInTheDocument();
+    expect(await screen.findByRole("link", { name: "View details for Popular Movie 1" })).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledWith("/api/movies/popular?limit=10", expect.anything());
   });
 
@@ -140,7 +140,7 @@ describe("S3-T20 public popular-movie page", () => {
     );
     fireEvent.click(screen.getByRole("button", { name: "Retry" }));
 
-    expect(await screen.findByText("Popular Movie 1")).toBeInTheDocument();
+    expect(await screen.findByRole("link", { name: "View details for Popular Movie 1" })).toBeInTheDocument();
     expect(attempt).toBe(2);
     expect(fetchMock).toHaveBeenCalledWith("/api/movies/popular?limit=10", expect.anything());
   });
@@ -236,7 +236,7 @@ describe("S3-T20 public popular-movie page", () => {
     window.history.pushState({}, "", "/popular");
     fireEvent.popState(window);
 
-    expect(await screen.findByText("Popular Movie 1")).toBeInTheDocument();
+    expect(await screen.findByRole("link", { name: "View details for Popular Movie 1" })).toBeInTheDocument();
     expect(savedGenreIds).toEqual([18, 28]);
     expect(requests).toEqual([
       { method: "GET", url: "/api/auth/me" },

@@ -10,7 +10,7 @@ export default function PageControls({ meta, state }: { meta: PageMeta; state?: 
   const start = Math.max(1, Math.min(meta.page - 2, meta.totalPages - 4));
   const end = Math.min(meta.totalPages, start + 4);
   const go = (page: number) => navigate({ pathname: location.pathname,
-    search: pageSearch(location.search, page) }, { state });
+    search: pageSearch(location.search, page), hash: location.hash }, { state });
   return <nav className="page-controls" aria-label="Movie pages">
     <button type="button" disabled={meta.page <= 1} onClick={() => go(meta.page - 1)}>Previous</button>
     {Array.from({ length: end - start + 1 }, (_, index) => start + index).map(page =>
