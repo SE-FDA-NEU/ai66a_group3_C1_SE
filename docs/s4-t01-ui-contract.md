@@ -1,10 +1,12 @@
-# S4-T01 UI and poster handoff — proposal, not approved C03
+# S4-T01 UI and poster handoff — reconciled with merged C03
 
 Refs [#195](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/195).
 Built early with PO authorization on 2026-10-24 against main
-`3078a9c6fd3dff1f0b8576bc7411f469c7a98fdf`. **Do not merge until C03
-[#217](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/217) is merged,
-this proposal is reconciled, and an independent teammate reviews the final diff.**
+`3078a9c6fd3dff1f0b8576bc7411f469c7a98fdf`. C03
+[#217](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/217) subsequently
+merged through PR #222 at main `37c2f66`. This candidate incorporates that main
+and reconciles the approved contract without rewriting the original T01 commits.
+**Independent final-diff review and required CI remain merge conditions.**
 
 ## Delivered scope and preserved boundaries
 
@@ -62,7 +64,8 @@ This authorized amendment supersedes the old unconditional sign-in landing in
 S13; it does not change password/session APIs or S01's Start label. The live
 Story #45 currently contains both the new Home AC and old unconditional
 /recommendations AC. PO must replace the obsolete AC (not retain contradictory
-checked claims) and reconcile #217 before merge. Historical M3 submissions,
+checked claims) before T01 merge. The local C03 and T01 requirements now agree.
+Historical M3 submissions,
 screenshots/diagrams and evidence retain their original tested scope rather
 than being rewritten as newly executed Sprint 4 evidence.
 
@@ -96,7 +99,7 @@ Backdrop retains its dark overlay even in light theme so its title stays legible
 Browser and unit evidence is linked below; these checks are not a full WCAG
 certification or a substitute for the final C04 accessibility audit.
 
-## Poster persistence / API proposal
+## Poster persistence / reconciled API
 
 Migration `d8a4e6f20195` follows `c6f8a2d4e901`; adds only nullable Text
 `catalog_movies.poster_path`, no binary media. Fresh and populated upgrades are
@@ -126,10 +129,12 @@ CDN failure is local image fallback, not catalogue failure.
 
 ## Reconciliation and review checklist
 
-- [ ] C03 #217 merged; compare DTO nullability/size, theme key, header ownership,
+- [x] C03 #217 merged; compare DTO nullability/size, theme key, header ownership,
   radio save semantics, common components and future feature boundaries.
-- [ ] Resolve any concurrent Alembic head and rerun fresh/populated upgrade tests.
-- [ ] C05 root `tests/` / default-pytest M4 infrastructure reconciled. Current
+- [x] Merged C03 adds no migration; the single T01 head is `d8a4e6f20195`,
+  following `c6f8a2d4e901`. Fresh/populated upgrade tests cover this chain.
+- Future C05 root `tests/` / default-pytest M4 infrastructure remains owned by
+  #219 and is not a new T01 dependency. Current
   backend suite plus browser/unit tests are not proof of all six P0 M4 cases or
   per-member authored-pytest requirements.
 - [ ] If a future Content-Security-Policy disallows inline scripts, include an

@@ -385,6 +385,11 @@ and ratings for later visits.
 As a registered viewer, I want to sign in and sign out so that only I can
 access saved preferences and ratings.
 
+Sprint 4 navigation amendment for T01/C03: the first acceptance criterion
+below replaces the earlier automatic `/recommendations` landing. The Sprint 3
+implementation/evidence remains historical; Story #45 on GitHub must carry
+the same replacement before this amendment is accepted there.
+
 - Given I sign in from Home or directly from /login with valid credentials,
   when authentication succeeds, then an authenticated session is created and
   Home opens with authenticated navigation, without automatically opening

@@ -145,12 +145,13 @@ To add backdrops to an already imported active TMDb catalogue without changing
 its revision or accounts, use the bounded
 [backdrop enrichment command](backdrop-import-runbook.md#bounded-enrichment-for-an-existing-active-catalogue).
 
-### Sprint 4 T01 preview: posters and themes (pending C03 review)
+### Sprint 4 T01 candidate: posters and themes (C03 reconciled)
 
 The T01 branch adds nullable poster storage. Before starting this branch, back
 up valuable SQLite data consistently and apply `alembic upgrade head` as above.
-The proposed head is `d8a4e6f20195` (parent `c6f8a2d4e901`); reconcile it with
-the current Alembic head after C03 and any concurrent migrations merge.
+The single head is `d8a4e6f20195` (parent `c6f8a2d4e901`). Merged C03 PR #222
+adds contracts/tests only, with no competing migration. Recheck the migration
+chain if a later schema PR merges before this candidate.
 
 Fresh `--pages 15` imports now also retain valid TMDb `poster_path` fields in
 the existing catalogue import. For an **existing** accepted catalogue, do not
@@ -177,8 +178,8 @@ choice (`cineai-theme`), not credentials. Rating stars select an integer draft;
 **Save rating** still performs the existing server-confirmed write.
 
 Detailed handoff, test commands and merge caveats:
-[T01 UI contract proposal](s4-t01-ui-contract.md) and
-[local evidence](evidence/s4-t01-ui.md). This is not an approval of C03 or a claim
+[reconciled T01 UI handoff](s4-t01-ui-contract.md) and
+[local evidence](evidence/s4-t01-ui.md). This is not a claim
 that unimplemented Watchlist/Search/Profile/Similar/trailer features exist.
 
 Home now has a compact Start / Explore Catalogue hero and a persistent
@@ -191,7 +192,8 @@ results. **My recommendations** is a separate explicit action; without saved
 genres it retains the existing **Popular / Not personalised** guidance.
 Safe protected-route page/filter/hash intent is retained through sign-in; unsafe
 or absent destinations fall back to Home. Session, password and API rules are
-unchanged. This PO-authorized S13 landing amendment still needs C03 reconciliation.
+unchanged. This PO-authorized S13 landing amendment matches merged C03 section
+13.5; the live Story #45 AC must carry the same noncontradictory rule.
 
 All commands and both application processes must use the **same**
 `DATABASE_URL` from root `.env` (normally `sqlite:///./data/app.db`). On an
@@ -443,7 +445,7 @@ python -m alembic -c backend/alembic.ini upgrade head
 ```
 
 Then open `/health` again. On the T01 branch, `migrationVersion` should be
-`d8a4e6f20195` (subject to migration reconciliation before merge).
+`d8a4e6f20195`. C03 does not introduce another migration head.
 
 This extends the Sprint 3 head `c6f8a2d4e901` with nullable poster storage.
 Existing checkouts must apply the upgrade before restarting

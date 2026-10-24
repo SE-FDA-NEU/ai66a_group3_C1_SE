@@ -4,11 +4,12 @@ Refs [#195](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/195).
 Date: 2026-10-24 (Asia/Saigon). Base main:
 `3078a9c6fd3dff1f0b8576bc7411f469c7a98fdf`.
 
-PO explicitly permitted implementation/push before C03 is merged. C03 #217
-remains open. This evidence records local author-assisted checks, **not** an
+PO explicitly permitted implementation/push before C03 was merged. The original
+executions below predate its merge; the post-C03 reconciliation is recorded
+separately below. This evidence records local author-assisted checks, **not** an
 independent teammate approval, final CI status, complete M4 acceptance, submission
-receipt, or permission to merge. Final contract/migration reconciliation and a
-substantive independent GitHub Review changes are pending.
+receipt, or permission to merge. A substantive independent GitHub Review changes
+and required checks on the final pushed candidate remain pending.
 
 ## Executed checks
 
@@ -235,9 +236,56 @@ browser captures, not edited reference images.
 
 ### Remaining coordination, not waived
 
-C03 #217 and independent final review/CI remain pending. Story #45 currently
+C03 #217 was pending at that follow-up capture; it is now merged and incorporated
+in this candidate. Independent final review/CI remain pending. Story #45 currently
 contains both Home-after-login and the obsolete unconditional Recommendations
 landing AC. Replace the obsolete AC with the reviewed explicit-intent rule before
 merge; requirements.md and this proposal already reflect the PO's new request.
 Historical M3 evidence is not rewritten or falsely reaccepted. No new Story,
 watchlist/search/reset/trailer feature or Story Points are claimed here.
+
+## Post-C03 reconciliation and repeated verification — 2026-10-24
+
+C03 PR #222 is merged at main `37c2f66`. This reconciliation merges that
+accepted main into the existing T01 history (`73e86cf`), resolves the API and
+requirements conflicts, and retains all C03 ranking/NLP/profile/watchlist/test
+contracts. The executable `backend/` and `frontend/` content is unchanged from
+`73e86cfbec2e39aa02baf53ee18fed80354f331e`; these are new executions on the
+reconciled working candidate, not newly invented historical results.
+
+The API now distinguishes implemented T01 poster/navigation changes from
+future Sprint 4 capabilities. The original C03 hash capture is preserved;
+the consumer matrix adds the current normalized API hash. No dependency on
+future C05 root-pytest implementation is introduced into T01 closure.
+
+| Repeated command/check | Observed result |
+|---|---|
+| `python backend/scripts/run_isolated_tests.py -q` | 479 passed, 1 skipped, 1 existing deprecation warning; 166.16s |
+| `python -m pytest backend/tests/test_poster_pipeline.py -q` | 27 passed; 5.37s; includes fresh/populated migration/import preservation |
+| `npm --prefix frontend test` | 276 passed, 26 files; 30.80s |
+| `npm --prefix frontend run test:t01:ui` | 6 passed, separate imported-DB mode skipped; 19.5s |
+| `npm --prefix frontend run test:s04:e2e` | 10 passed, separate live-provider mode skipped; 21.1s |
+| `npm --prefix frontend run test:t16:integration` | 1 passed; 4.49s |
+| `npm --prefix frontend run test:t33:integration` | 1 passed; 6.83s |
+| `npm --prefix frontend run test:t28:acceptance` | 18 passed cases; temporary database removed |
+| Runner / M3 verifier lifecycle suites | 3 / 11 passed |
+| `python scripts/verify_s4_c03_contract.py` | PASS; 194 local paths checked, 35 planned P0 IDs, 10 feature oracles |
+| `python scripts/test_s4_c03_contract_line_endings.py` | LF and CRLF PASS; seven identical normalized hashes |
+| Backend/scripts Ruff; frontend lint/build | PASS; 64 frontend modules transformed |
+| `alembic -c backend/alembic.ini heads` | One head, `d8a4e6f20195`; C03 adds no migration |
+
+Initial restricted-sandbox attempts failed before meaningful execution because
+the sandbox denied temporary-directory access (and Vitest worker module files).
+They are environment failures, not feature RED evidence. The commands above
+were rerun successfully outside that sandbox using disposable databases.
+No production assertion, timeout or test was weakened to obtain these results.
+
+No live import, poster enrichment, real account mutation or new screenshot
+capture was performed in this reconciliation. Existing imported-catalogue
+screenshots remain evidence for the identical executable T01 source, not a
+claim of a second live run. Root `.env`, the real catalogue and user-owned
+untracked `tmp/` remain untouched.
+
+Independent non-coauthor review, required checks on the final pushed head and
+the conflicting live Story #45 AC still need resolution before acceptance.
+This does not claim full M4 root-pytest coverage or later-feature delivery.
