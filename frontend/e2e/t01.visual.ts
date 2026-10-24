@@ -273,6 +273,15 @@ test("centered action feedback reflects real login/save/logout acknowledgements 
   expect(Math.abs(box.x + box.width / 2 - viewport.width / 2)).toBeLessThanOrEqual(1);
   expect(Math.abs(box.y + box.height / 2 - viewport.height / 2)).toBeLessThanOrEqual(1);
   expect(await feedback.evaluate(node => getComputedStyle(node).pointerEvents)).toBe("none");
+  await page.setViewportSize({ width: 375, height: 900 });
+  const mobileBox = (await feedback.boundingBox())!;
+  const closeBox = (await feedback.getByRole("button", { name: "Dismiss notification" }).boundingBox())!;
+  expect(closeBox.width).toBeGreaterThanOrEqual(44);
+  expect(closeBox.height).toBeGreaterThanOrEqual(44);
+  expect(Math.abs(mobileBox.x + mobileBox.width / 2 - 375 / 2)).toBeLessThanOrEqual(1);
+  expect(Math.abs(mobileBox.y + mobileBox.height / 2 - 900 / 2)).toBeLessThanOrEqual(1);
+  await noOverflow(page);
+  await page.setViewportSize({ width: 1440, height: 1000 });
   await page.keyboard.press("Escape"); await expect(feedback).toHaveCount(0);
   await page.getByLabel("Email", { exact: true }).fill(email);
   await page.getByLabel("Password", { exact: true }).fill("wrong-password");

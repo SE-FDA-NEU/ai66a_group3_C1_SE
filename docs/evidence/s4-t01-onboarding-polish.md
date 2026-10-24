@@ -26,6 +26,7 @@ independent teammate review. CI and review of the pushed candidate remain separa
   and has a close button and Escape dismissal. Info/success dismiss after 4.5s;
   failure after 8s; pending is never converted to success by a timer. Focus/hover
   on its close control pauses dismissal. Detailed errors remain inline alerts.
+  The close control has a tested 44×44px minimum touch target, including mobile.
 - Old request completions/cleanup cannot replace a newer action's notification.
   Rating account/movie guards remain. Account and preference acknowledgements
   are validated; malformed or mismatched responses cannot trigger success.

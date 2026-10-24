@@ -325,7 +325,7 @@ p { line-height: 1.65; }
 .action-feedback__copy { flex: 1; min-width: 0; }
 .action-feedback__copy strong { display: block; font-size: .92rem; line-height: 1.5; }
 .action-feedback__copy p { margin: .25rem 0 0; font-size: .77rem; color: var(--muted); line-height: 1.6; }
-.action-feedback__close { flex-shrink: 0; min-width: 32px; min-height: 36px; padding: .3rem; background: transparent; color: var(--muted); font-size: 1.4rem; pointer-events: auto; }
+.action-feedback__close { flex-shrink: 0; min-width: 44px; min-height: 44px; padding: .3rem; background: transparent; color: var(--muted); font-size: 1.4rem; pointer-events: auto; }
 .action-feedback__close:hover:not(:disabled) { background: var(--surface-raised); color: var(--text); }
 .feedback-spinner { width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: feedback-spin .85s linear infinite; }
 @keyframes feedback-spin { to { transform: rotate(360deg); } }
