@@ -1025,6 +1025,16 @@ watchlist membership as a side effect of media work.
 
 ### 13.4 Profile and watchlist
 
+**S4-T12 implementation status (2026-10-25):** the profile summary and all four
+watchlist routes below are implemented on the local SQLite catalogue. The reset
+route keeps the section 10 request/response contract. Watchlist PUT and DELETE
+use the same SQLite writer reservation as reset/rating/preference writes and
+acknowledge only after commit. An unexpected query parameter, duplicate query
+key, account-selector header, or write body on the new watchlist routes returns
+`400 VALIDATION_ERROR` without mutation. Browser writes also require same
+origin. API consumers reread membership after a lost write response before
+displaying a saved/removed state.
+
 `GET /api/me/profile` returns only the session account and committed
 summary, for example:
 

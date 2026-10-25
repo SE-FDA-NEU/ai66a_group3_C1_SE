@@ -495,6 +495,40 @@ The command ran outside the virtual environment, or the backend package is not i
 python -m pip install -e "./backend[dev]" --no-deps
 ```
 
+## S4-T12 watchlist setup, backup and recovery
+
+Apply the single new Alembic head `e9b6f0a42c17` before starting a server with
+this code. On an existing SQLite database, stop writes and make a consistent
+backup using SQLite's online backup API (or copy the database plus any `-wal`
+and `-shm` files while writes are stopped), then run:
+
+```powershell
+.\.venv\Scripts\python.exe -m alembic -c backend/alembic.ini upgrade head
+.\.venv\Scripts\python.exe -m alembic -c backend/alembic.ini current
+```
+
+The migration adds `user_movie_watchlist` and indexes. It does not rewrite
+catalogue IDs, accounts, sessions, genres, ratings, posters or backdrops.
+Restore the backed-up database as a whole if recovery is required; do not
+downgrade a populated watchlist because the downgrade drops saved rows.
+After recovery, run `upgrade head` again if the backup predates this migration.
+Re-importing the same provider movie preserves its internal ID and membership.
+
+Offline verification uses synthetic temporary SQLite files and no TMDb token:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest backend/tests/test_s4_t12_watchlist.py backend/tests/test_s4_t12_watchlist_migration.py -q
+cd frontend
+npm.cmd test -- src/tests/watchlist.test.tsx
+npm.cmd run build
+```
+
+The protected `/watchlist` route and movie-detail Add/Remove action use the
+authenticated cookie. After an uncertain network result, read membership
+before repeating an action. A failed database read is an error, not an empty
+watchlist. Profile summary is `GET /api/me/profile`; reset remains
+`POST /api/me/profile/reset` with `{ "confirm": true }`.
+
 ## T11 candidate: reset/write verification (C03 reconciled)
 
 This branch changes transaction coordination, not database schema or the TMDb
