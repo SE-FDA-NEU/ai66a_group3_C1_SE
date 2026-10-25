@@ -1,4 +1,4 @@
-# HTTP API contract: Sprint 3 implementation and Sprint 4 design
+# HTTP API contract: Sprint 3 baseline and Sprint 4 extensions
 
 Contract revision: `S3-FINAL`, reconciled on 2026-10-18 against Sprint 3
 `main` SHA `f9774cbe7248c29915086d29bf2b9f99c2aa528a`.
@@ -10,6 +10,12 @@ It is a design contract, **not evidence that these routes or fields are live**.
 Sections 1–12 remain the implemented Sprint 3/post-M3 baseline until the
 respective feature owners implement and verify the section 13 changes.
 
+S4-T03 implements the section 13.1 rating-aware protected recommendation
+ranking on 2026-10-25, reusing S4-T02 (#197) signals and the finalized C03
+(#217) field names. See [ranking evidence](evidence/s4-t03-rating-ranking/README.md)
+for RED/GREEN and regression outputs. Other section 13 features retain their
+own delivery status; score presentation UI is separate from this backend task.
+
 T01's reconciled candidate implements the nullable `posterUrl` additions below
 and the Home-first/explicit-intent navigation in section 13.5. It does not
 implement the planned ranking, NLP, profile, watchlist or trailer features.
@@ -17,7 +23,7 @@ The auth DTOs, cookies, errors, ranking and pagination remain unchanged.
 
 This document inventories the implemented M2 and Sprint 3 HTTP boundary. Every
 route is labelled with its delivered milestone/task. Genuinely unfinished
-product scope, including profile/reset UI, rating-adjusted ranking, and NLP
+product scope, including profile/reset UI and NLP
 product endpoints, is called out separately and is not represented as complete.
 
 Architecture and persistence rules are in
@@ -381,9 +387,10 @@ an out-of-range ID returns `400 VALIDATION_ERROR`. A valid genre with no matches
 a successful filtered-empty page. The account is
 resolved only from the authenticated session.
 
-The route reads only the authenticated account's saved genres and the active
-local SQLite catalogue. It does not accept an account identifier, call TMDb,
-or use rating signals.
+The route reads the authenticated account's saved genres, current committed
+ratings and the active local SQLite catalogue. It does not accept an account
+identifier or call TMDb. S4-T03 extends only personalised ranking under section
+13.1; the Sprint 3 cold-start/no-match popularity baseline is unchanged.
 
 Response shape:
 
@@ -445,6 +452,9 @@ does not rename or move those fields.
         "releaseYear": 2025,
         "genres": [{ "id": 28, "name": "Action" }],
         "popularityScore": 90.0,
+        "ratingAdjustment": 0,
+        "adjustedScore": 90.0,
+        "basis": "baseline",
         "reason": {
           "matchedGenres": [{ "id": 28, "name": "Action" }]
         }
@@ -482,9 +492,9 @@ eligible set is ranked and deduplicated before applying the optional view
 genre and slicing into pages. `unfilteredTotal` counts the base mode before
 the view filter; `total` counts after it. A zero view-filter total preserves
 the base mode and does not trigger popular alternatives. Rating-adjusted
-ranking is explicitly outside Sprint 3; it belongs to Story #22, S05b, and is
-planned Sprint 4 behaviour. Saving a rating in Sprint 3 must not change this
-ordering.
+ranking was outside Sprint 3. S4-T03 now implements Story #22 / S05b's backend
+ranking extension in section 13.1. Neutral/no rating preserves this baseline;
+current committed non-neutral ratings may change personalised order.
 
 Missing, expired, or revoked sessions return `401 AUTHENTICATION_REQUIRED`
 before a private result is returned. Catalogue/database failures use the same
@@ -509,15 +519,15 @@ Recommendation reads do not clear, replace, or otherwise write either account's
 saved preferences. Retrying while the source still fails returns another error.
 After the source recovers, retrying the same endpoint, authenticated account,
 and `limit` reads the current catalogue normally; no login or preference rewrite
-is required while the session remains valid. If the catalogue and preferences
-are unchanged, the successful body matches the pre-failure body. Recovery does
-not promise an identical list if the catalogue or preferences have changed.
+is required while the session remains valid. If the catalogue, preferences and
+committed ratings are unchanged, the successful body matches the pre-failure
+body. Recovery does not promise an identical list if those inputs have changed.
 
 T09 verifies this API boundary. T10 (#112) implements the typed client/cards,
 T11 (#113) implements Error/Retry UI and stale-request protection, and T12
 (#114) supplies integrated Story #18 acceptance evidence. Clients replace an
 error only after a successful current-account response. Rating-adjusted ranking
-remains a Sprint 4 extension under Story #22 and does not change the envelope.
+is implemented under S4-T03 / Story #22 and does not change the envelope.
 
 ## 8. S03/S04 catalogue and S09/T19 popular movie reads
 
@@ -864,7 +874,7 @@ widget and typed client are implemented under S3-T33 (#139) and independently
 exercised under T34 (#141). The backdrop chain is complete in Sprint 3: T26
 adds nullable storage, T27 maps/imports it and exposes the safe detail DTO,
 T37 renders resilient UI, and T28/#131 verifies the storage-to-browser path.
-Reset UI, rating-adjusted ranking, and NLP endpoints remain separate work. The
+Reset UI, personal-score presentation UI, and NLP endpoints remain separate work. The
 backend reset evidence must not be used to close Story #33 / S11 UI acceptance.
 
 The T33 widget checks the existing session on valid public movie details without
@@ -876,7 +886,9 @@ and save success appears only after a validated acknowledgement. Failed reads
 and saves have separate retry actions. Account/movie changes or logout discard
 private widget state and ignore old responses, including stale `401` errors.
 The current protected `401` calls the central handler and navigates to login.
-Saving a rating does not rerank Sprint 3 recommendations or write preferences.
+Saving a rating never writes preferences. Subsequent personalised recommendation
+requests use the current committed rating under S4-T03; popular fallbacks retain
+their original order.
 
 Section 8 documents both the existing public catalogue endpoint and the
 implemented dedicated popular movie endpoint.
@@ -886,7 +898,9 @@ offline without a TMDb token. Live TMDb catalogue import is a separate
 server-side development/staging/Sprint 3 acceptance step; the token must never
 appear in DTOs, frontend assets, logs, fixtures, or documentation evidence.
 
-## 13. Sprint 4 C03 implementation contract (planned, not delivered)
+<a id="13-sprint-4-c03-implementation-contract-planned-not-delivered"></a>
+
+## 13. Sprint 4 C03 implementation contract (delivery status below)
 
 This section freezes the consumer contract for [#217](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/217).
 It extends, rather than replaces, the Sprint 3 routes above. Feature owners
@@ -917,6 +931,13 @@ middleware must also cover watchlist PUT/DELETE; requests cannot select a user
 by body, query, header or path.
 
 ### 13.1 Recommendation score transparency
+
+Backend delivery: S4-T03, verified with synthetic fixtures and an isolated real
+SQLite database; [evidence](evidence/s4-t03-rating-ranking/README.md). The protected
+personalised DTO requires `ratingAdjustment: integer`, `adjustedScore: number
+| null`, and `basis: "rating_signals" | "baseline" | "rating_unavailable"`.
+Popular recommendation entries omit all three fields. The public catalogue,
+detail and shared Search/Similar movie DTOs remain unchanged.
 
 Only `mode="personalised"` movie entries may add these fields; public
 `MovieSummaryDto`, Popular, cold-start and no-match alternatives do not expose
@@ -964,6 +985,15 @@ for A, A=79 and B=80. Both still display raw popularity 80; title/ID breaks
 equal adjusted scores. Neutral/no signal keeps the Sprint 3 order. Public
 Popular and both popular recommendation fallbacks keep raw finite-popularity
 ordering and no personal fields.
+
+Implementation reads the full genre-eligible set and its canonical genres
+before the optional rating query, computes each score once in the shared
+ranker, sorts, applies the view filter, and finally slices the requested page.
+Only a database exception from that rating query degrades to baseline; no core
+read or session validation is inside the fallback catch. No personal ranking
+cache is retained: reset, logout and account switch are observed through the
+existing authenticated-session ownership model on the next request. Query,
+header or body identity hints cannot retarget ranking to another account.
 
 ### 13.2 Shared NLP search and similar reads
 

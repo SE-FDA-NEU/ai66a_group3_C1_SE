@@ -195,3 +195,16 @@ behaviour. This evidence does not turn planned pytest cases or UI states
 into passes. The two earlier local commits are recorded above; no new commit
 or push was made during this correction. It claims no mutation, feature TDD
 event, new API/browser acceptance, reviewer approval or GitHub closure.
+
+### S4-T03 rating ranking consumer amendment (2026-10-25)
+
+S4-T03 implements the finalized section 13.1 ranking contract without
+renaming its private fields. Current API/design hashes follow; historical
+C03 captures above remain unchanged. Executed feature results and scope
+are in [T03 ranking evidence](s4-t03-rating-ranking/README.md). This capture
+does not claim independent review or completion of planned UI work.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/api.md` | `83aa4ea9a3598070888fef7bcfc43ef60912a393bdaf050a0c81261744233d3b` |
+| `docs/design.md` | `4293c9997a8af788535bb7e3109cdc57be001bfef5b5e5553a0a89bd58645738` |

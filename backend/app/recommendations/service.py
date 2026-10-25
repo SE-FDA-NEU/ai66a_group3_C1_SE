@@ -1,13 +1,16 @@
-"""Account-scoped orchestration for the Sprint 3 recommendation baseline."""
+"""Account-scoped recommendations extending the Sprint 3 baseline."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Literal
 
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.db.models import CatalogMovie
+from app.recommendations.ranker import rank_personalised_movies
+from app.recommendations.signals import load_account_genre_signals
 from app.repositories.movies import to_movie_summary_dto
 from app.repositories.preferences import list_user_preference_genres
 from app.repositories.recommendations import (
@@ -18,6 +21,7 @@ from app.repositories.recommendations import (
 )
 from app.schemas.movies import GenreDto
 from app.schemas.recommendations import (
+    PersonalisedRecommendationMovieDto,
     RecommendationMovieDto,
     RecommendationReason,
 )
@@ -46,8 +50,8 @@ def build_account_recommendations(
     This is read-only: a recommendation failure must not clear saved genres.
     Persistence exceptions intentionally propagate to the API's existing 503
     handler; only a successful query with zero matches triggers popular fallback.
-    Ratings remain a separate Sprint 4 ranking extension, not an error fallback
-    or an input to this Sprint 3 genre/popularity baseline.
+    Only the optional rating read may degrade to the valid baseline. Core
+    reads and authentication remain outside that narrow error boundary.
     """
 
     selected_genres = list_user_preference_genres(session, user_id=user_id)
@@ -66,15 +70,36 @@ def build_account_recommendations(
     matched_movies = list_genre_matched_movies(
         session,
         genre_ids=selected_ids,
-        limit=limit,
-        page=page,
-        view_genre_id=genre_id,
+        limit=None,
     )
+
+    # Catalogue/preferences/candidate genres have succeeded before attempting
+    # the optional read. No cached personal state survives this request.
+    ratings_available = True
+    try:
+        signals = load_account_genre_signals(session, user_id=user_id)
+    except SQLAlchemyError:
+        signals = {}
+        ratings_available = False
+    ranked = rank_personalised_movies(
+        matched_movies, signals=signals, ratings_available=ratings_available
+    )
+    if genre_id is not None:
+        ranked = [rank for rank in ranked
+                  if any(genre.id == genre_id for genre in rank.movie.genres)]
+    start = (page - 1) * limit
 
     return AccountRecommendationResult(
         movies=[
-            _to_recommendation_movie(movie, selected_genres=selected_genres)
-            for movie in matched_movies
+            PersonalisedRecommendationMovieDto(
+                **_to_recommendation_movie(
+                    rank.movie, selected_genres=selected_genres
+                ).model_dump(),
+                ratingAdjustment=rank.rating_adjustment,
+                adjustedScore=rank.adjusted_score,
+                basis=rank.basis,
+            )
+            for rank in ranked[start:start + limit]
         ],
         mode="personalised",
         personalised=True,

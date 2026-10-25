@@ -76,7 +76,7 @@ def list_genre_matched_movies(
     session: Session,
     *,
     genre_ids: Iterable[int],
-    limit: int,
+    limit: int | None,
     page: int = 1,
     view_genre_id: int | None = None,
 ) -> list[CatalogMovie]:
@@ -86,9 +86,11 @@ def list_genre_matched_movies(
     genres is one candidate, never several joined rows. The whole eligible set
     is ranked before ``limit`` is applied. A movie without a popularity score
     stays eligible and sorts after every finite score; no zero is invented.
+    ``limit=None`` supplies the complete eligible set to the personal ranker;
+    its caller must apply pagination only after rating adjustments and sorting.
     """
 
-    if not 1 <= limit <= 10:
+    if limit is not None and not 1 <= limit <= 10:
         raise ValueError("limit must be an integer from 1 to 10")
 
     selected_genre_ids = set(genre_ids)
@@ -117,9 +119,11 @@ def list_genre_matched_movies(
     )
     if view_genre_id is not None:
         statement = statement.where(_has_genre(view_genre_id))
-    statement = (statement.options(selectinload(CatalogMovie.genres))
-        .order_by(*popularity_title_id_ordering()).limit(limit)
-        .offset((page - 1) * limit))
+    statement = statement.options(selectinload(CatalogMovie.genres)).order_by(
+        *popularity_title_id_ordering()
+    )
+    if limit is not None:
+        statement = statement.limit(limit).offset((page - 1) * limit)
     return list(session.scalars(statement).unique())
 
 
