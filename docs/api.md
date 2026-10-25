@@ -1019,6 +1019,22 @@ vector, all eligible candidates use the shared popularity/title/ID fallback.
 Return at most five; no eligible candidates is `200 {data:{movies:[]}}`.
 A failed index is 503 even if a source overview is absent.
 
+T07 backend delivery ([#202](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/202)):
+the route is public and read-only, returns `{data:{movies: MovieSummaryDto[]}}`
+with no `meta`, and never calls TMDb or reads an account's genres or ratings.
+The order of checks is: no active catalogue is 503 `CATALOGUE_UNAVAILABLE`; an
+unknown or inactive-revision source is 404 `MOVIE_NOT_FOUND`; then
+`load_active_index` runs before any ranking, so an absent, stale or corrupt
+artifact is 503 `INDEX_UNAVAILABLE` and is never read as a missing overview.
+Candidates come from `list_genre_matched_movies` over the source's genres and
+are ranked by `rank_similar_movies` in
+`backend/app/recommendations/similar.py`; the source is excluded and IDs are
+de-duplicated before ranking. A source or candidate ID absent from the loaded
+index mapping is also `INDEX_UNAVAILABLE`. Cosine, popularity, title and ID
+ties use the shared `score_title_id_ordering` comparator. Focused synthetic
+API/DB checks are in `backend/tests/test_similar_movies_api.py`. The Similar
+widget and the five-criterion browser acceptance remain in T08.
+
 `GET /api/movies/search?q=<text>` trims the query and requires at least two
 Unicode characters after trimming. Title search is a literal,
 case-insensitive substring: escape SQL `%`, `_` and the escape character;
