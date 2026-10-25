@@ -13,6 +13,7 @@ from app.db.account_writes import begin_account_write
 from app.db.database import SessionLocal, engine
 from app.db.models import Genre, User, UserMovieRating
 from app.recommendations.overview_index import IndexUnavailable, load_active_index
+from app.recommendations.search import rank_description_matches
 from app.recommendations.service import build_account_recommendations
 from app.recommendations.similar import rank_similar_movies
 from app.repositories.movies import (
@@ -21,6 +22,8 @@ from app.repositories.movies import (
     get_active_catalogue_revision,
     get_active_movie_by_id,
     list_active_movies,
+    list_active_movies_for_text_search,
+    search_active_movie_titles,
     to_movie_detail_dto,
     to_movie_summary_dto,
 )
@@ -56,6 +59,7 @@ from app.schemas.auth import (
 from app.schemas.movies import (
     MovieDetailResponse,
     MovieListResponse,
+    MovieSearchResponse,
     MovieSimilarResponse,
 )
 from app.schemas.preferences import (
@@ -784,6 +788,34 @@ def list_popular_movies(
         "meta": _page_meta(count=len(movies), limit=limit, page=page,
                            total=total, unfiltered_total=total, revision_id=revision.id),
     }
+
+@app.get("/api/movies/search", response_model=MovieSearchResponse, status_code=200)
+def search_movies(
+    q: str | None = Query(default=None),
+    database_session: Session = Depends(get_db),  # noqa: B008
+):
+    query = (q or "").strip()
+    if len(query) < 2:
+        return _error("VALIDATION_ERROR", "Enter at least 2 characters", 400)
+
+    _begin_read_snapshot(database_session)
+    revision = get_active_catalogue_revision(database_session)
+    if revision is None:
+        return _error("CATALOGUE_UNAVAILABLE", "Movie catalogue is unavailable", 503)
+
+    movies = search_active_movie_titles(database_session, query=query)
+    if not movies:
+        try:
+            index = load_active_index(database_session)
+            candidates = list_active_movies_for_text_search(database_session)
+            movies = rank_description_matches(index, query=query, movies=candidates)
+        except IndexUnavailable:
+            return _error(
+                "INDEX_UNAVAILABLE", "Search index is temporarily unavailable", 503
+            )
+    return {"data": {"movies": [to_movie_summary_dto(movie).model_dump()
+                                for movie in movies]}}
+
 
 @app.get("/api/movies/{movie_id}", response_model=MovieDetailResponse, status_code=200)
 def get_movie(

@@ -21,6 +21,7 @@ from app.db.models import (
     new_opaque_id,
     utc_now,
 )
+from app.recommendations.overview_index import normalize_text
 from app.schemas.movies import GenreDto, MovieDetailDto, MovieSummaryDto
 
 ACTIVE_CATALOGUE_STATE_ID = 1
@@ -288,6 +289,54 @@ def list_active_movies(
         .order_by(*title_order, CatalogMovie.id)
         .limit(limit)
         .offset((page - 1) * limit)
+    )
+    return list(session.scalars(statement).unique())
+
+
+def search_active_movie_titles(session: Session, *, query: str) -> list[CatalogMovie]:
+    """Return at most ten literal title hits from the active catalogue."""
+
+    connection = session.connection()
+    if connection.dialect.name == "sqlite":
+        connection.connection.driver_connection.create_function(
+            "movie_title_casefold", 1, normalize_text, deterministic=True
+        )
+        title_key = func.movie_title_casefold(CatalogMovie.title)
+        query_key = normalize_text(query)
+    else:
+        title_key = func.lower(CatalogMovie.title)
+        query_key = query.lower()
+    escaped = (
+        query_key.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+    )
+    statement = (
+        select(CatalogMovie)
+        .join(
+            CatalogueState,
+            CatalogueState.active_revision_id == CatalogMovie.catalogue_revision_id,
+        )
+        .where(
+            CatalogueState.id == ACTIVE_CATALOGUE_STATE_ID,
+            title_key.like(f"%{escaped}%", escape="\\"),
+        )
+        .options(selectinload(CatalogMovie.genres))
+        .order_by(title_key, CatalogMovie.id)
+        .limit(10)
+    )
+    return list(session.scalars(statement).unique())
+
+
+def list_active_movies_for_text_search(session: Session) -> list[CatalogMovie]:
+    """Load active summary rows once for full-corpus similarity ranking."""
+
+    statement = (
+        select(CatalogMovie)
+        .join(
+            CatalogueState,
+            CatalogueState.active_revision_id == CatalogMovie.catalogue_revision_id,
+        )
+        .where(CatalogueState.id == ACTIVE_CATALOGUE_STATE_ID)
+        .options(selectinload(CatalogMovie.genres))
     )
     return list(session.scalars(statement).unique())
 

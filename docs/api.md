@@ -1048,6 +1048,21 @@ The text route must distinguish 503 index failure from this valid empty result.
 For the title-only branch, a usable local catalogue can answer without an
 index; the description branch requires a ready index.
 
+T09 backend delivery: `GET /api/movies/search?q=<text>` is public and returns
+`{data:{movies: MovieSummaryDto[]}}` with no paging metadata. It trims `q`;
+missing or fewer than two characters returns 400 `VALIDATION_ERROR` with
+`Enter at least 2 characters`. It first searches active-catalogue titles via
+literal escaped SQL LIKE with Unicode casefolding, ordered by folded title and
+opaque ID, and
+caps the result at ten. A title hit does not load the text index. Only
+when there are no title hits does it load the shared fitted index and return
+positive-cosine overview matches ordered by score, normalized title and ID.
+An empty or zero-score corpus returns an empty movie list. An absent, stale or
+corrupt artifact returns 503 `INDEX_UNAVAILABLE`; unavailable catalogue and
+database faults retain their separate 503 errors. Focused synthetic API/DB
+checks are in `backend/tests/test_movie_search_api.py`. Search UI and the full
+Story #30 browser acceptance remain in T10.
+
 Named deterministic fixtures: a `ZEBRA` query finds the title
 `Zebra Case` before any overview fallback; `astronaut rescue moon` with
 no title hit gives positive cosine for `Moon Rescue` ahead of

@@ -220,3 +220,15 @@ additive row set is not a new independent C03 approval.
 |---|---|
 | `docs/api.md` | `d3599751329010aee59f079406795fbb8fcb07e8d6d895fea625baba1e66643a` |
 | `docs/architecture.md` | `61a3019a5edbc8b0365aa247586ebe191786e95e7a991985502aa4e673b52ef8` |
+
+### S4-T09 Search API consumer amendment (2026-10-25)
+
+S4-T09 records the implemented title-first and positive-cosine Search API in
+section 13.2 of `docs/api.md`. The current normalized-LF hash for that changed
+contract file follows. The earlier C03, T01, T03 and T12 captures remain
+historical records. This amendment does not claim new independent C03 approval
+or completion of the separate Search UI and Story #30 browser acceptance.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/api.md` | `59cba03a1216fa7c9f082d3aae56ecf6aa0ad8d30f3d6a26fdd9cb6753d4c81d` |
