@@ -97,6 +97,9 @@ class User(Base):
         back_populates="user",
         cascade="all, delete-orphan",
     )
+    watchlist: Mapped[list[UserMovieWatchlist]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
 
 class UserGenrePreference(Base):
     """One favourite genre saved by one account.
@@ -210,6 +213,9 @@ class CatalogMovie(Base):
         back_populates="movie",
         cascade="all, delete-orphan",
     )
+    watchlist: Mapped[list[UserMovieWatchlist]] = relationship(
+        back_populates="movie", cascade="all, delete-orphan"
+    )
 
 
 class Genre(Base):
@@ -296,3 +302,26 @@ class UserMovieRating(Base):
     movie: Mapped[CatalogMovie] = relationship(
         back_populates="ratings",
     )
+
+
+class UserMovieWatchlist(Base):
+    """One saved local movie per account; the first add time is immutable."""
+
+    __tablename__ = "user_movie_watchlist"
+    __table_args__ = (
+        UniqueConstraint("user_id", "movie_id", name="uq_user_movie_watchlist_user_movie"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_opaque_id)
+    user_id: Mapped[str] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    movie_id: Mapped[str] = mapped_column(
+        ForeignKey("catalog_movies.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    added_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, default=utc_now
+    )
+
+    user: Mapped[User] = relationship(back_populates="watchlist")
+    movie: Mapped[CatalogMovie] = relationship(back_populates="watchlist")

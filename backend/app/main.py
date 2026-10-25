@@ -5,13 +5,13 @@ from uuid import uuid4
 from fastapi import Depends, FastAPI, Query, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from sqlalchemy import text
+from sqlalchemy import func, select, text
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.db.account_writes import begin_account_write
 from app.db.database import SessionLocal, engine
-from app.db.models import Genre, User
+from app.db.models import Genre, User, UserMovieRating
 from app.recommendations.service import build_account_recommendations
 from app.repositories.movies import (
     CatalogueSort,
@@ -35,6 +35,14 @@ from app.repositories.recommendations import (
     list_popular_recommendation_movies,
 )
 from app.repositories.users import create_user, get_user_by_email, to_user_dto
+from app.repositories.watchlist import (
+    add_movie,
+    count_user_movies,
+    list_user_movies,
+    membership,
+    remove_movie,
+    utc_iso,
+)
 from app.schemas.auth import (
     AuthData,
     AuthResponse,
@@ -53,9 +61,12 @@ from app.schemas.profile import (
     ProfileResetData,
     ProfileResetRequest,
     ProfileResetResponse,
+    ProfileSummaryData,
+    ProfileSummaryResponse,
 )
 from app.schemas.ratings import RatingData, RatingRequest, RatingResponse
 from app.schemas.recommendations import RecommendationResponse
+from app.schemas.watchlist import MembershipData, MembershipResponse, WatchlistResponse
 from app.security.origin import same_origin_write_allowed
 from app.security.passwords import normalize_email, verify_password
 from app.security.sessions import (
@@ -79,12 +90,15 @@ _SAME_ORIGIN_WRITES = frozenset(
     }
 )
 _RATING_WRITE_PREFIX = "/api/me/ratings/"
+_WATCHLIST_WRITE_PREFIX = "/api/me/watchlist/"
 
 
 def _requires_same_origin(request: Request) -> bool:
     path = request.url.path
     return (request.method, path) in _SAME_ORIGIN_WRITES or (
         request.method == "PUT" and path.startswith(_RATING_WRITE_PREFIX)
+    ) or (
+        request.method in {"PUT", "DELETE"} and path.startswith(_WATCHLIST_WRITE_PREFIX)
     )
 
 
@@ -212,6 +226,14 @@ def _revision_error(expected: str | None, actual: str) -> JSONResponse | None:
     if expected is not None and expected != actual:
         return _error("CATALOGUE_CHANGED", "Movie catalogue changed; reload page 1", 409)
     return None
+
+
+def _unexpected_selectors(request: Request, allowed: frozenset[str] = frozenset()) -> bool:
+    """Account-target fields are never accepted by current-account endpoints."""
+    return any(key not in allowed or len(request.query_params.getlist(key)) != 1
+               for key in request.query_params) or any(
+        key in request.headers for key in ("x-user-id", "x-account-id", "x-owner-id")
+    )
 
 
 def _begin_catalogue_snapshot(session: Session) -> None:
@@ -493,6 +515,24 @@ def put_preferences(
     return response
 
 
+@app.get("/api/me/profile", response_model=ProfileSummaryResponse)
+def get_profile(
+    request: Request,
+    user: User = Depends(current_session_user),  # noqa: B008
+    database_session: Session = Depends(get_db),  # noqa: B008
+):
+    if _unexpected_selectors(request):
+        return _error("VALIDATION_ERROR", "Please correct the highlighted fields", 400)
+    genres = list_user_preference_genres(database_session, user_id=user.id)
+    rating_count = database_session.scalar(select(func.count()).select_from(UserMovieRating).where(
+        UserMovieRating.user_id == user.id
+    )) or 0
+    return ProfileSummaryResponse(data=ProfileSummaryData(
+        genres=genres, ratingCount=rating_count,
+        watchlistCount=count_user_movies(database_session, user_id=user.id),
+    ))
+
+
 @app.post(
     "/api/me/profile/reset",
     response_model=ProfileResetResponse,
@@ -532,6 +572,81 @@ def reset_profile(
         )
 
     return response
+
+
+@app.get("/api/me/watchlist", response_model=WatchlistResponse)
+def get_watchlist(
+    request: Request,
+    page: int = Query(default=1, ge=1, le=10000),
+    limit: int = Query(default=10, ge=1, le=10),
+    catalogue_revision: str | None = Query(default=None, alias="catalogueRevision"),
+    user: User = Depends(current_session_user),  # noqa: B008
+    database_session: Session = Depends(get_db),  # noqa: B008
+):
+    if _unexpected_selectors(request, frozenset({"page", "limit", "catalogueRevision"})):
+        return _error("VALIDATION_ERROR", "Please correct the highlighted fields", 400)
+    _begin_catalogue_snapshot(database_session)
+    revision = get_active_catalogue_revision(database_session)
+    if revision is None:
+        return _error("CATALOGUE_UNAVAILABLE", "Movie catalogue is unavailable", 503)
+    if error := _revision_error(catalogue_revision, revision.id):
+        return error
+    total = count_user_movies(database_session, user_id=user.id, active_only=True)
+    rows = list_user_movies(database_session, user_id=user.id, page=page, limit=limit)
+    movies = [to_movie_summary_dto(movie).model_dump() | {"addedAt": utc_iso(row.added_at)}
+              for row, movie in rows]
+    return {"data": {"movies": movies}, "meta": _page_meta(
+        count=len(movies), limit=limit, page=page, total=total,
+        unfiltered_total=total, revision_id=revision.id,
+    )}
+
+
+@app.get("/api/me/watchlist/{movie_id}", response_model=MembershipResponse)
+def get_watchlist_membership(
+    movie_id: str,
+    request: Request,
+    user: User = Depends(current_session_user),  # noqa: B008
+    database_session: Session = Depends(get_db),  # noqa: B008
+):
+    if _unexpected_selectors(request):
+        return _error("VALIDATION_ERROR", "Please correct the highlighted fields", 400)
+    movie = get_active_movie_by_id(database_session, movie_id=movie_id)
+    if movie is None:
+        return _error("MOVIE_NOT_FOUND", "Movie not found", 404)
+    row = membership(database_session, user_id=user.id, movie_id=movie.id)
+    return MembershipResponse(data=MembershipData(
+        movieId=movie.id, inWatchlist=row is not None,
+        addedAt=utc_iso(row.added_at) if row is not None else None,
+    ))
+
+
+@app.put("/api/me/watchlist/{movie_id}", response_model=MembershipResponse)
+@app.delete("/api/me/watchlist/{movie_id}", response_model=MembershipResponse, response_model_exclude_none=True)
+async def write_watchlist_membership(
+    movie_id: str,
+    request: Request,
+    user: User = Depends(current_account_write_user),  # noqa: B008
+    database_session: Session = Depends(get_account_write_db),  # noqa: B008
+):
+    if _unexpected_selectors(request) or await request.body():
+        return _error("VALIDATION_ERROR", "Please correct the highlighted fields", 400)
+    movie = get_active_movie_by_id(database_session, movie_id=movie_id)
+    if movie is None:
+        return _error("MOVIE_NOT_FOUND", "Movie not found", 404)
+    try:
+        if request.method == "PUT":
+            row = add_movie(database_session, user_id=user.id, movie_id=movie.id)
+            result = MembershipResponse(data=MembershipData(
+                movieId=movie.id, inWatchlist=True, addedAt=utc_iso(row.added_at),
+            ))
+        else:
+            remove_movie(database_session, user_id=user.id, movie_id=movie.id)
+            result = {"data": {"movieId": movie.id, "inWatchlist": False}}
+        database_session.commit()
+    except SQLAlchemyError:
+        database_session.rollback()
+        return _error("SERVICE_UNAVAILABLE", "Service is temporarily unavailable", 503)
+    return result
 
 
 @app.get(

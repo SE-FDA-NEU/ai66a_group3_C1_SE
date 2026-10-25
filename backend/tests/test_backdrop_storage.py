@@ -199,8 +199,11 @@ def test_upgrade_preserves_every_row_identity_and_constraint(tmp_path: Path) -> 
         assert len(before["user_genre_preferences"]) == 3
         assert len(before["user_movie_ratings"]) == 2
         _alembic(url, "upgrade", "head")
-        assert _snapshot(engine) == before
-        assert _constraints(engine) == constraints
+        after = _snapshot(engine)
+        assert {table: after[table] for table in before} == before
+        assert after["user_movie_watchlist"] == []
+        after_constraints = _constraints(engine)
+        assert {table: after_constraints[table] for table in constraints} == constraints
         with engine.connect() as connection:
             assert connection.execute(text("PRAGMA foreign_key_check")).all() == []
             assert connection.execute(
@@ -362,7 +365,8 @@ def test_explicit_disposable_downgrade_preserves_non_backdrop_data(database) -> 
     assert "backdrop_path" not in {
         column["name"] for column in inspect(engine).get_columns("catalog_movies")
     }
-    assert _snapshot(engine) == before
+    after = _snapshot(engine)
+    assert {table: before[table] for table in after} == after
     assert _constraints(engine)["catalog_movies"]["unique"]
     _alembic(url, "upgrade", "head")
     assert _snapshot(engine) == before
