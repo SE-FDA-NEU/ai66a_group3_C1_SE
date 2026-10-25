@@ -32,8 +32,8 @@ On 2026-10-25, the checked-out HEAD was
 preceding merge commit `c73b2d0`; the merged T03 ranking changes are included
 in this recheck. Run `.\.venv\Scripts\python.exe scripts/s4_t12_fingerprint.py`
 from the repo root. The updated script compares the
-current backend/frontend source tree with the T12 base commit, including files
-from the merged main branch. It reported
+backend/frontend source tree with the T12 base commit, including files from the
+merged main branch. Before the real-catalogue visual test below was added, it reported
 `files=34 sha256=b2704f28708914c0da199435b2efe729ba3e83caedc4fc9059f51043e3168ecb`.
 
 The existing local SQLite database was backed up with SQLite's backup API,
@@ -84,6 +84,42 @@ catalogue, with null posters exercising the shared fallback:
 - [Guest detail](detail-guest-dark-1440.png), [saved detail](detail-saved-dark-1440.png), [empty state](watchlist-empty-dark-1440.png), [error state](watchlist-error-light-1440.png)
 - [Dark mobile](watchlist-dark-375.png), [dark tablet](watchlist-dark-768.png), [dark desktop](watchlist-dark-1440.png)
 - [Light mobile](watchlist-light-375.png), [light tablet](watchlist-light-768.png), [light desktop](watchlist-light-1440.png), [ten-card page](watchlist-grid-light-1440.png)
+
+### Real imported-catalogue screenshots
+
+The PR's primary screenshots use the local 15-page TMDb import: 290 active
+movies, all with a stored poster path at capture time. The acceptance harness
+copies that SQLite database to its own temporary directory, disables the TMDb
+token, and creates `watchlist-visual@example.test` only in the copy. It saves
+the ten most popular local movies, checks that all ten real CDN posters load,
+then captures the watchlist and exact-movie detail page. The original local
+database and its accounts are unchanged. Reproduce from the repo root with
+Chrome installed:
+
+```powershell
+$env:S13_TMDB_SMOKE = '1'
+$env:S13_TMDB_DATABASE = (Resolve-Path data/app.db).Path
+$env:T12_REAL_SCREENSHOT_DIR = (Resolve-Path docs/evidence/s4-t12-watchlist).Path
+$env:S04_BROWSER_CHANNEL = 'chrome'
+Push-Location frontend
+node scripts/run-s04-e2e.mjs --config playwright.t12-real.config.ts
+Pop-Location
+```
+
+Observed on 2026-10-25: 1 Playwright test passed, exit 0, and
+`s04_temporary_database_removed=true`. All ten list posters had a nonzero
+image width in Chrome. The capture ran at HEAD
+`b60a55885ad46d308643d901606f3d601c9cccc8` with the new visual test and
+config still in the working tree; its backend/frontend fingerprint was
+`files=36 sha256=611ac92fc2783b98c7ac24fa51068702147b69826ad76a28a3d936604d12e511`.
+The screenshots were inspected after capture:
+
+- [Real watchlist, dark desktop](watchlist-real-dark-1440.png): ten named movies with loaded posters and remove/detail controls.
+- [Real saved-movie detail, dark desktop](detail-real-dark-1440.png): the selected film's poster, title, return link, and saved state.
+- [Real watchlist, light mobile](watchlist-real-light-375.png): responsive header and movie cards with loaded posters.
+
+The earlier synthetic screenshots remain as evidence for null-poster fallback,
+empty/error states, pagination, focus, and both themes.
 
 This is author evidence at the committed source SHA above. Independent
 non-coauthor API/DB/browser review, reviewer identity, required CI, merge and
