@@ -254,7 +254,8 @@ def test_fresh_and_populated_upgrade_preserve_accounts_ratings_and_backdrops(tmp
         with engine.begin() as connection:
             connection.execute(text("UPDATE catalog_movies SET backdrop_path='/retained.jpg'"))
         before = _snapshot(engine)
-        _alembic(url, "upgrade", "head")
+        # Compare only the poster migration; T12 tests later additive storage.
+        _alembic(url, "upgrade", "d8a4e6f20195")
         assert _snapshot(engine) == before
         columns = {c["name"]: c for c in inspect(engine).get_columns("catalog_movies")}
         assert columns["poster_path"]["nullable"]

@@ -149,7 +149,7 @@ its revision or accounts, use the bounded
 
 The T01 branch adds nullable poster storage. Before starting this branch, back
 up valuable SQLite data consistently and apply `alembic upgrade head` as above.
-The single head is `d8a4e6f20195` (parent `c6f8a2d4e901`). Merged C03 PR #222
+At the T01 stage, the head was `d8a4e6f20195` (parent `c6f8a2d4e901`). Merged C03 PR #222
 adds contracts/tests only, with no competing migration. Recheck the migration
 chain if a later schema PR merges before this candidate.
 
@@ -287,7 +287,7 @@ npm --prefix frontend run dev
 Open `http://127.0.0.1:8000/health`. The response is:
 
 ```json
-{"status":"ok","database":"connected","migrationVersion":"c6f8a2d4e901"}
+{"status":"ok","database":"connected","migrationVersion":"e9b6f0a42c17"}
 ```
 
 Open `http://localhost:5173/`. The existing home page reads its cards from the
@@ -494,6 +494,40 @@ The command ran outside the virtual environment, or the backend package is not i
 ```bash
 python -m pip install -e "./backend[dev]" --no-deps
 ```
+
+## S4-T12 watchlist setup, backup and recovery
+
+Apply the single new Alembic head `e9b6f0a42c17` before starting a server with
+this code. On an existing SQLite database, stop writes and make a consistent
+backup using SQLite's online backup API (or copy the database plus any `-wal`
+and `-shm` files while writes are stopped), then run:
+
+```powershell
+.\.venv\Scripts\python.exe -m alembic -c backend/alembic.ini upgrade head
+.\.venv\Scripts\python.exe -m alembic -c backend/alembic.ini current
+```
+
+The migration adds `user_movie_watchlist` and indexes. It does not rewrite
+catalogue IDs, accounts, sessions, genres, ratings, posters or backdrops.
+Restore the backed-up database as a whole if recovery is required; do not
+downgrade a populated watchlist because the downgrade drops saved rows.
+After recovery, run `upgrade head` again if the backup predates this migration.
+Re-importing the same provider movie preserves its internal ID and membership.
+
+Offline verification uses synthetic temporary SQLite files and no TMDb token:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest backend/tests/test_s4_t12_watchlist.py backend/tests/test_s4_t12_watchlist_migration.py -q
+cd frontend
+npm.cmd test -- src/tests/watchlist.test.tsx
+npm.cmd run build
+```
+
+The protected `/watchlist` route and movie-detail Add/Remove action use the
+authenticated cookie. After an uncertain network result, read membership
+before repeating an action. A failed database read is an error, not an empty
+watchlist. Profile summary is `GET /api/me/profile`; reset remains
+`POST /api/me/profile/reset` with `{ "confirm": true }`.
 
 ## T11 candidate: reset/write verification (C03 reconciled)
 

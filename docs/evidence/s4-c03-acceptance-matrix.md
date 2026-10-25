@@ -208,3 +208,15 @@ does not claim independent review or completion of planned UI work.
 |---|---|
 | `docs/api.md` | `83aa4ea9a3598070888fef7bcfc43ef60912a393bdaf050a0c81261744233d3b` |
 | `docs/design.md` | `4293c9997a8af788535bb7e3109cdc57be001bfef5b5e5553a0a89bd58645738` |
+
+### S4-T12 profile/watchlist consumer amendment (2026-10-25)
+
+S4-T12 adds the implemented profile and watchlist API/storage descriptions.
+The current normalized-LF hashes for the two changed contract files follow.
+Earlier C03, T01 and T03 captures above remain historical records; this
+additive row set is not a new independent C03 approval.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/api.md` | `d3599751329010aee59f079406795fbb8fcb07e8d6d895fea625baba1e66643a` |
+| `docs/architecture.md` | `61a3019a5edbc8b0365aa247586ebe191786e95e7a991985502aa4e673b52ef8` |

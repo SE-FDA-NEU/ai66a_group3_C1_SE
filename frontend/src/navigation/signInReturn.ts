@@ -1,5 +1,5 @@
 const PROTECTED_DESTINATIONS = new Set([
-  "/preferences", "/recommendations", "/profile",
+  "/preferences", "/recommendations", "/profile", "/watchlist",
 ]);
 
 /** Only an explicit protected-route attempt may override the Home landing. */

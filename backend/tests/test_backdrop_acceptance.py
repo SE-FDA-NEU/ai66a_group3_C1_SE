@@ -31,7 +31,9 @@ def database(tmp_path):
     seed_database(path)
     before = snapshot(path)
     _alembic(f"sqlite:///{path.as_posix()}", "upgrade", "head")
-    assert snapshot(path) == before
+    after = snapshot(path)
+    assert {table: after[table] for table in before} == before
+    assert after["user_movie_watchlist"] == []
     return path
 
 

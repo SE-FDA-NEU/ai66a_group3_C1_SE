@@ -320,6 +320,16 @@ for the SQLite catalogue.
 
 ### 9.1 Rating reads, transactions and reset order
 
+S4-T12 delivers `user_movie_watchlist` in Alembic revision `e9b6f0a42c17`,
+following `d8a4e6f20195`. The `(user_id,movie_id)` unique constraint and both
+foreign keys are enforced by SQLite; `added_at` is assigned once on insert in
+UTC. Membership writes reserve the SQLite writer before reading the session
+or existing row. List reads join the active local catalogue, load genres in a
+batch, sort by `added_at DESC, movie_id ASC`, then page ten at a time. Reset
+deletes only preference and rating rows. Re-import retains memberships when
+the provider movie retains its internal ID. Deleting a catalogue movie
+cascades memberships; inactive rows are not listed by the API.
+
 The rating service reads only current-account rows, joins canonical movie
 genres, de-duplicates rated movie IDs and emits one sign per rated movie
 (1/2=-1, 3=0, 4/5=+1) for each eligible candidate sharing any genre.

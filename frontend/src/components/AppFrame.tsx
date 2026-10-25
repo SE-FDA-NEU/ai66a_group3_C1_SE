@@ -24,6 +24,7 @@ export default function AppFrame({ children }: { children: ReactNode }) {
           <NavLink to="/popular">Popular movies</NavLink>
           <NavLink to="/recommendations">My recommendations</NavLink>
           <NavLink to="/preferences">Preferences</NavLink>
+          <NavLink to="/watchlist">My watchlist</NavLink>
           <NavLink to="/about-recommendations">How recommendations work</NavLink>
         </nav>
         <div className="app-header__account">

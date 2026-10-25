@@ -23,6 +23,7 @@ function RequireAuth({ children }: { children: ReactNode }) {
     notifiedLocation.current = location.key;
     feedback.announce({ kind: "info", title: "Sign in to continue",
       message: location.pathname === "/preferences" ? "Your movie preferences belong to your account." :
+        location.pathname === "/watchlist" ? "Your watchlist belongs to your account." :
         "Sign in to see your own recommendations." });
   }, [auth, location.key, location.pathname, feedback]);
 

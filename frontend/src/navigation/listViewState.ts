@@ -1,5 +1,5 @@
 export type ListViewContext = {
-  route: "/" | "/popular" | "/recommendations";
+  route: "/" | "/popular" | "/recommendations" | "/watchlist";
   catalogueRevision?: string;
   accountId?: string;
   recommendationScope?: string;
@@ -21,6 +21,7 @@ export function readListViewState(
   if (context.catalogueRevision !== undefined &&
     (typeof context.catalogueRevision !== "string" || context.catalogueRevision.length > 128))
     return null;
+  if (route === "/watchlist" && typeof context.accountId !== "string") return null;
   if (route === "/recommendations" &&
     (typeof context.accountId !== "string" ||
       typeof context.recommendationScope !== "string")) return null;
