@@ -67,6 +67,14 @@ class MovieListResponse(BaseModel):
     meta: MovieListMeta
 
 
+class MovieSearchResponse(BaseModel):
+    """Unpaged public Search result, capped at ten movies."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    data: MovieListData
+
+
 class MovieDetailMeta(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 

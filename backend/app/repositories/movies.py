@@ -292,6 +292,46 @@ def list_active_movies(
     return list(session.scalars(statement).unique())
 
 
+def search_active_movie_titles(session: Session, *, query: str) -> list[CatalogMovie]:
+    """Return at most ten literal title hits from the active catalogue."""
+
+    escaped = (
+        query.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+    )
+    statement = (
+        select(CatalogMovie)
+        .join(
+            CatalogueState,
+            CatalogueState.active_revision_id == CatalogMovie.catalogue_revision_id,
+        )
+        .where(
+            CatalogueState.id == ACTIVE_CATALOGUE_STATE_ID,
+            func.lower(CatalogMovie.title).like(
+                f"%{escaped.lower()}%", escape="\\"
+            ),
+        )
+        .options(selectinload(CatalogMovie.genres))
+        .order_by(func.lower(CatalogMovie.title), CatalogMovie.id)
+        .limit(10)
+    )
+    return list(session.scalars(statement).unique())
+
+
+def list_active_movies_for_text_search(session: Session) -> list[CatalogMovie]:
+    """Load active summary rows once for full-corpus similarity ranking."""
+
+    statement = (
+        select(CatalogMovie)
+        .join(
+            CatalogueState,
+            CatalogueState.active_revision_id == CatalogMovie.catalogue_revision_id,
+        )
+        .where(CatalogueState.id == ACTIVE_CATALOGUE_STATE_ID)
+        .options(selectinload(CatalogMovie.genres))
+    )
+    return list(session.scalars(statement).unique())
+
+
 def get_active_movie_by_id(session: Session, *, movie_id: str) -> CatalogMovie | None:
     """Find an opaque internal movie ID only when it belongs to the active revision."""
 
