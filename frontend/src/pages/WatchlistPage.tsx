@@ -14,6 +14,7 @@ type Load = { key: string } & (
   | { kind: "ready"; result: WatchlistPage }
   | { kind: "error"; message: string }
 );
+type UnconfirmedRemoval = { movieId: string; noticeId: number };
 
 export default function WatchlistPage() {
   const auth = useAuth();
@@ -27,6 +28,8 @@ export default function WatchlistPage() {
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [writeError, setWriteError] = useState("");
   const pendingRef = useRef(false);
+  const pendingNotice = useRef<number | null>(null);
+  const unconfirmedRemoval = useRef<UnconfirmedRemoval | null>(null);
   const writeController = useRef<AbortController | null>(null);
   const generation = useRef(0);
   const revision = useRef<string | undefined>(undefined);
@@ -36,7 +39,9 @@ export default function WatchlistPage() {
   useEffect(() => () => {
     generation.current += 1;
     writeController.current?.abort();
-  }, []);
+    if (pendingNotice.current !== null) feedback.dismiss(pendingNotice.current);
+    if (unconfirmedRemoval.current !== null) feedback.dismiss(unconfirmedRemoval.current.noticeId);
+  }, [feedback]);
 
   useEffect(() => {
     const raw = new URLSearchParams(location.search).get("page");
@@ -59,6 +64,36 @@ export default function WatchlistPage() {
         return;
       }
       setLoad({ key, kind: "ready", result });
+      const unconfirmed = unconfirmedRemoval.current;
+      if (unconfirmed) {
+        // An empty list or this movie's presence is authoritative. On another
+        // page, ask for exact membership before resolving an ambiguous DELETE.
+        void (async () => {
+          let saved: boolean;
+          if (result.meta.total === 0) saved = false;
+          else if (result.data.movies.some(movie => movie.id === unconfirmed.movieId)) saved = true;
+          else {
+            try {
+              saved = (await getMembership(unconfirmed.movieId, controller.signal)).inWatchlist;
+            } catch (error) {
+              if (!controller.signal.aborted && error instanceof WatchlistApiError && error.status === 401) {
+                auth.handleUnauthorized();
+                navigate("/login", { replace: true });
+              }
+              return;
+            }
+          }
+          if (controller.signal.aborted || unconfirmedRemoval.current !== unconfirmed) return;
+          unconfirmedRemoval.current = null;
+          if (saved) {
+            setWriteError("Removal was not saved. Please retry.");
+            feedback.update(unconfirmed.noticeId, { kind: "error", title: "Removal not saved" });
+          } else {
+            setWriteError("");
+            feedback.update(unconfirmed.noticeId, { kind: "success", title: "Removed from watchlist" });
+          }
+        })();
+      }
     }).catch(error => {
       if (controller.signal.aborted) return;
       if (error instanceof WatchlistApiError && error.status === 401) {
@@ -81,6 +116,10 @@ export default function WatchlistPage() {
 
   async function remove(movieId: string) {
     if (pendingRef.current) return;
+    if (unconfirmedRemoval.current !== null) {
+      feedback.dismiss(unconfirmedRemoval.current.noticeId);
+      unconfirmedRemoval.current = null;
+    }
     pendingRef.current = true;
     const controller = new AbortController();
     writeController.current = controller;
@@ -89,15 +128,18 @@ export default function WatchlistPage() {
     setPendingId(movieId);
     setWriteError("");
     const notice = feedback.announce({ kind: "pending", title: "Removing from watchlist…" });
+    pendingNotice.current = notice;
     try {
       await setMembership(movieId, false, controller.signal);
       if (!currentRequest()) return;
       feedback.update(notice, { kind: "success", title: "Removed from watchlist" });
+      pendingNotice.current = null;
       setReload(value => value + 1);
     } catch (error) {
       if (!currentRequest()) return;
       if (error instanceof WatchlistApiError && error.status === 401) {
         feedback.dismiss(notice);
+        pendingNotice.current = null;
         auth.handleUnauthorized();
         navigate("/login", { replace: true });
         return;
@@ -107,20 +149,25 @@ export default function WatchlistPage() {
         if (!currentRequest()) return;
         if (!status.inWatchlist) {
           feedback.update(notice, { kind: "success", title: "Removed from watchlist" });
+          pendingNotice.current = null;
           setReload(value => value + 1);
         } else {
           setWriteError("Removal was not saved. Please retry.");
           feedback.update(notice, { kind: "error", title: "Removal not saved" });
+          pendingNotice.current = null;
         }
       } catch (readError) {
         if (!currentRequest()) return;
         if (readError instanceof WatchlistApiError && readError.status === 401) {
           feedback.dismiss(notice);
+          pendingNotice.current = null;
           auth.handleUnauthorized();
           navigate("/login", { replace: true });
         } else {
           setWriteError("Removal could not be confirmed. Refresh your watchlist before retrying.");
           feedback.update(notice, { kind: "error", title: "Removal not confirmed" });
+          unconfirmedRemoval.current = { movieId, noticeId: notice };
+          pendingNotice.current = null;
         }
       }
     } finally {

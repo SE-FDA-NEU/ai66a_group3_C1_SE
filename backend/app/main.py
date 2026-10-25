@@ -236,12 +236,12 @@ def _unexpected_selectors(request: Request, allowed: frozenset[str] = frozenset(
     )
 
 
-def _begin_catalogue_snapshot(session: Session) -> None:
-    """Keep revision, count, mode and page on one SQLite read snapshot.
+def _begin_read_snapshot(session: Session) -> None:
+    """Keep a multi-query response on one SQLite read snapshot.
 
     Python's sqlite3 legacy transaction mode does not start a database
-    transaction for SELECT. Explicit BEGIN prevents an import from changing
-    the active revision between the separate list queries. Test fixtures may
+    transaction for SELECT. Explicit BEGIN keeps resets and imports from
+    changing data between separate response queries. Test fixtures may
     already have an open DBAPI transaction, which is safe to reuse.
     """
     connection = session.connection()
@@ -393,7 +393,7 @@ def recommendations(
     catalogue_revision: str | None = Query(default=None, alias="catalogueRevision"),
     database_session: Session = Depends(get_db),  # noqa: B008
 ):
-    _begin_catalogue_snapshot(database_session)
+    _begin_read_snapshot(database_session)
     user = resolve_session(
         database_session,
         request.cookies.get(SESSION_COOKIE),
@@ -523,6 +523,7 @@ def get_profile(
 ):
     if _unexpected_selectors(request):
         return _error("VALIDATION_ERROR", "Please correct the highlighted fields", 400)
+    _begin_read_snapshot(database_session)
     genres = list_user_preference_genres(database_session, user_id=user.id)
     rating_count = database_session.scalar(select(func.count()).select_from(UserMovieRating).where(
         UserMovieRating.user_id == user.id
@@ -585,7 +586,7 @@ def get_watchlist(
 ):
     if _unexpected_selectors(request, frozenset({"page", "limit", "catalogueRevision"})):
         return _error("VALIDATION_ERROR", "Please correct the highlighted fields", 400)
-    _begin_catalogue_snapshot(database_session)
+    _begin_read_snapshot(database_session)
     revision = get_active_catalogue_revision(database_session)
     if revision is None:
         return _error("CATALOGUE_UNAVAILABLE", "Movie catalogue is unavailable", 503)
@@ -715,7 +716,7 @@ def list_movies(
     catalogue_revision: str | None = Query(default=None, alias="catalogueRevision"),
     database_session: Session = Depends(get_db),  # noqa: B008
 ):
-    _begin_catalogue_snapshot(database_session)
+    _begin_read_snapshot(database_session)
     revision = get_active_catalogue_revision(database_session)
     if revision is None:
         return _error(
@@ -746,7 +747,7 @@ def list_popular_movies(
     catalogue_revision: str | None = Query(default=None, alias="catalogueRevision"),
     database_session: Session = Depends(get_db),  # noqa: B008
 ):
-    _begin_catalogue_snapshot(database_session)
+    _begin_read_snapshot(database_session)
     revision = get_active_catalogue_revision(database_session)
 
     if revision is None:

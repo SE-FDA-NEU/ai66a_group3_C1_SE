@@ -170,3 +170,39 @@ def test_file_db_reset_failure_and_success_keep_both_watchlists(tmp_path):
         assert harness.personalisation("b") == ([18], [("movie-c", 3)])
         assert a.get("/api/me/profile").json()["data"]["watchlistCount"] == 1
         assert b.get("/api/me/profile").json()["data"]["watchlistCount"] == 1
+
+
+def test_profile_uses_one_snapshot_when_reset_commits_between_reads(tmp_path, monkeypatch):
+    """A committed reset between genre and count queries cannot mix versions."""
+    from app import main as main_module
+
+    template = migrate_template(tmp_path / "profile-template.db")
+    with ResetHarness(template, tmp_path / "profile-snapshot.db", journal="wal").installed() as harness:
+        reader = harness.client("a")
+        resetter = harness.client("a")
+        assert reader.put("/api/me/watchlist/movie-a", headers=HEADERS).status_code == 200
+        before = reader.get("/api/me/profile").json()["data"]
+        assert len(before["genres"]) == 3
+        assert before["ratingCount"] == 2
+        assert before["watchlistCount"] == 1
+
+        original = main_module.list_user_preference_genres
+        reset_done = False
+
+        def read_genres_then_reset(session, *, user_id):
+            nonlocal reset_done
+            genres = original(session, user_id=user_id)
+            if user_id == "a" and not reset_done:
+                reset_done = True
+                response = resetter.post("/api/me/profile/reset", json={"confirm": True}, headers=HEADERS)
+                assert response.status_code == 200, response.json()
+            return genres
+
+        monkeypatch.setattr(main_module, "list_user_preference_genres", read_genres_then_reset)
+        during = reader.get("/api/me/profile")
+        assert during.status_code == 200
+        assert reset_done
+        assert during.json()["data"] == before
+
+        after = reader.get("/api/me/profile").json()["data"]
+        assert after == {"genres": [], "ratingCount": 0, "watchlistCount": 1}
