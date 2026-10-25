@@ -8,6 +8,8 @@ import {
 } from "@testing-library/react";
 import { afterAll, beforeAll, expect, it, vi } from "vitest";
 import App from "../src/App.tsx";
+import type { PageMeta } from "../src/api/movies.ts";
+import type { RecommendationResult } from "../src/api/recommendations.ts";
 import { startRatingBridge } from "./pythonBridge.ts";
 
 let bridge: Awaited<ReturnType<typeof startRatingBridge>>;
@@ -30,7 +32,16 @@ const choose = (value: number) => fireEvent.click(
   screen.getByRole("radio", { name: `${value} ${value === 1 ? "star" : "stars"}` }),
 );
 
-it("real UI saves, rolls back, retries, reloads and isolates account ratings without changing preferences or ranking", async () => {
+async function readRanking() {
+  const response = await bridge.call("request", {
+    url: "/api/me/recommendations?limit=10",
+    method: "GET",
+  }) as { status: number; body: { data: RecommendationResult; meta: PageMeta } };
+  expect(response.status).toBe(200);
+  return response;
+}
+
+it("real UI saves, rolls back, retries, reloads and isolates committed rating signals without changing preferences or raw popularity", async () => {
   const baseline = await state();
   expect(baseline.preferences).toHaveLength(3);
   expect(baseline.ratings).toEqual([]);
@@ -84,9 +95,9 @@ it("real UI saves, rolls back, retries, reloads and isolates account ratings wit
     }),
   );
   await screen.findByText("Not rated yet");
-  const beforeRanking = await bridge.call("request", {
-    url: "/api/me/recommendations?limit=10",
-    method: "GET",
+  const beforeRanking = await readRanking();
+  expect(beforeRanking.body.data).toMatchObject({
+    mode: "personalised", personalised: true, noMatch: false,
   });
   async function save(value: number, button = "Save rating") {
     choose(value);
@@ -97,6 +108,7 @@ it("real UI saves, rolls back, retries, reloads and isolates account ratings wit
   expect((await state()).ratings).toEqual([
     ["t33-a@example.com", bridge.metadata.movieId, 3],
   ]);
+  expect(await readRanking()).toEqual(beforeRanking);
   await bridge.call("fail_next_save");
   choose(5);
   fireEvent.click(screen.getByRole("button", { name: "Save rating" }));
@@ -106,16 +118,40 @@ it("real UI saves, rolls back, retries, reloads and isolates account ratings wit
   expect((await state()).ratings).toEqual([
     ["t33-a@example.com", bridge.metadata.movieId, 3],
   ]);
+  expect(await readRanking()).toEqual(beforeRanking);
   fireEvent.click(screen.getByRole("button", { name: "Retry save" }));
   await screen.findByText("Your saved rating: 5/5");
   expect((await state()).ratings).toEqual([
     ["t33-a@example.com", bridge.metadata.movieId, 5],
   ]);
-  const afterRanking = await bridge.call("request", {
-    url: "/api/me/recommendations?limit=10",
-    method: "GET",
+  const afterRanking = await readRanking();
+  const ratedMovie = beforeRanking.body.data.movies.find(
+    (movie) => movie.id === bridge.metadata.movieId,
+  );
+  expect(ratedMovie).toBeDefined();
+  const ratedGenres = new Set(ratedMovie!.genres.map((genre) => genre.id));
+  // This fixture's popularity gaps exceed the single +1 signal, so the IDs,
+  // order, raw catalogue fields, reasons and page metadata all stay the same.
+  // Only candidates sharing the rated film's canonical genres gain one boost.
+  const expectedMovies = beforeRanking.body.data.movies.map((movie) => {
+    const related = movie.genres.some((genre) => ratedGenres.has(genre.id));
+    return {
+      ...movie,
+      ratingAdjustment: related ? 1 : 0,
+      adjustedScore: movie.popularityScore === null
+        ? null : movie.popularityScore + (related ? 1 : 0),
+      basis: related ? "rating_signals" : "baseline",
+    };
   });
-  expect(afterRanking).toEqual(beforeRanking);
+  expect(expectedMovies.some((movie) => movie.ratingAdjustment === 1)).toBe(true);
+  expect(expectedMovies.some((movie) => movie.ratingAdjustment === 0)).toBe(true);
+  expect(afterRanking).toEqual({
+    ...beforeRanking,
+    body: {
+      ...beforeRanking.body,
+      data: { ...beforeRanking.body.data, movies: expectedMovies },
+    },
+  });
   fireEvent.click(
     screen.getByRole("link", { name: "Back to recommendations" }),
   );
@@ -125,18 +161,23 @@ it("real UI saves, rolls back, retries, reloads and isolates account ratings wit
   window.history.pushState({}, "", detailPath);
   app = render(<App />);
   await screen.findByText("Your saved rating: 5/5");
+  expect(await readRanking()).toEqual(afterRanking);
   fireEvent.click(screen.getByRole("link", { name: "Return to catalogue" }));
   await screen.findByRole("heading", { name: "Find your next movie" });
   fireEvent.click(await screen.findByRole("button", { name: "Sign out" }));
   await screen.findByRole("link", { name: "Sign in" });
   fireEvent.click(screen.getByRole("link", { name: "Sign in" }));
   await signIn("t33-b@example.com");
+  const beforeRankingB = await readRanking();
   app.unmount();
   window.history.pushState({}, "", detailPath);
   app = render(<App />);
   await screen.findByText("Not rated yet");
   expect(screen.queryByText("Your saved rating: 5/5")).not.toBeInTheDocument();
   await save(2);
+  // B selected Drama; the rated Action/SF film is ineligible and shares no
+  // canonical genre with B's candidates, so B's ranking remains baseline.
+  expect(await readRanking()).toEqual(beforeRankingB);
   const final = await state();
   expect(final.ratings).toEqual([
     ["t33-a@example.com", bridge.metadata.movieId, 5],
@@ -170,6 +211,7 @@ it("real UI saves, rolls back, retries, reloads and isolates account ratings wit
   await signIn("t33-a@example.com");
   fireEvent.click(await screen.findByRole("link", { name: `View details for ${bridge.metadata.title}` }));
   await screen.findByText("Your saved rating: 5/5");
+  expect(await readRanking()).toEqual(afterRanking);
   expect((await state()).ratings).toEqual(final.ratings);
   expect((await state()).preferences).toEqual(baseline.preferences);
 });

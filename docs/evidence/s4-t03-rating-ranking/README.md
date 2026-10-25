@@ -57,13 +57,14 @@ The original GREEN source snapshot SHA-256 is preserved unchanged:
 `37ffa15c0a0d04f84ded08ebb10dfd109ce58c14cda68e792062aaa6e340d693`.
 The [original tested manifest](tested-source.sha256) contains 668 files.
 
-Evidence was subsequently consolidated into this folder. Application and test
-source did not change; the three tracked API/design/C03 documents only changed
+Evidence was subsequently consolidated into this folder. At that point,
+application and test source did not change; the three tracked API/design/C03 documents only changed
 links and their corresponding contract hashes. Therefore the historical tested
 manifest keeps their original hashes, while the [current manifest](source.sha256)
-records the source tree after those documentation edits.
+records the source tree after those documentation edits and the subsequent
+T33 integration-test correction documented below.
 
-Current source snapshot SHA-256: `d8bbba2d7de9d9cff110997947487123e6c5bb7fad76bf85f3fa267de1222ce4`.
+Current source snapshot SHA-256: `97ca3d43d349f138361a02baf6c9e79bd0b27efdeef93aaaf287e200cb58e0a4`.
 Verify the current manifest and file contents from repository root:
 
 ```sh
@@ -172,6 +173,43 @@ isolation checks. The original ranking RED assertion was not weakened.
 - `docs/api.md`, `docs/design.md`: delivery status and matching C03 semantics.
 - `docs/evidence/s4-c03-acceptance-matrix.md`: append current contract hashes,
   preserving historical captures; this report and linked logs preserve evidence.
+
+## CI follow-up: T33 integration expectations
+
+The push and pull-request `rating-acceptance` jobs on implementation commit
+`c4fda1a2bf798af8224d65aafb2ec8aa7384503d` both failed at the same legacy
+assertion: `expect(afterRanking).toEqual(beforeRanking)`. That Sprint 3 test
+expected ratings to be ignored, while S4-T03 correctly returned raw 98/84
+with adjusted 99/85, adjustment 1 and `basis=rating_signals` after a committed
+five-star rating. Failure job links:
+[PR run](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/40178441686/job/121124105900),
+[push run](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/40178425528/job/121124053803).
+The same failure was reproduced locally before editing the test.
+
+`frontend/integration/t33-rating.acceptance.tsx` now verifies the finalized S4
+contract through the same real UI/FastAPI/migrated SQLite journey:
+
+- A committed neutral 3 preserves the complete baseline response.
+- A failed save of 5 retains committed 3 and the complete baseline response.
+- A successful retry of 5 changes only the expected related-movie score fields;
+  raw popularity, catalogue fields, reasons, eligibility, fixture order, mode
+  flags and page metadata remain exactly as expected.
+- Reload and later login retain A's own enhanced ranking.
+- B's Drama candidates stay baseline despite A's Action rating and B rating
+  the genre-ineligible Action/SF film; A's response stays unchanged by B's save.
+- Existing rating ownership, stored-row, preference, rollback, retry, logout
+  and integrity assertions remain in place.
+
+This fixes the acceptance expectation rather than suppressing the workflow or
+removing checks. No production code or review policy was changed. The separate
+`Someone else must review` check remains outside this fix, as requested.
+
+Executed after the correction: `npm --prefix frontend run test:t33:integration`
+**1 passed**; `npm --prefix frontend test` **308 passed / 29 files**;
+`npm --prefix frontend run lint` and `npm --prefix frontend run build`
+**passed**, all exit 0. Original local failure and successful follow-up outputs
+are appended to [regression.log](regression.log). These are a separate CI-test
+compatibility follow-up; the original feature RED/GREEN evidence remains intact.
 
 ## Scope and remaining Story work
 

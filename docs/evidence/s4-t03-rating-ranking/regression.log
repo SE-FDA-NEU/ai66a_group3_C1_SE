@@ -1830,3 +1830,171 @@ Command: git diff --check
 Exit: 0
 
 
+
+===== T33 LOCAL REPRODUCTION BEFORE CI FIX =====
+Command: npm --prefix frontend run test:t33:integration
+Exit: 1
+Output SHA-256: 3316e3a6209d34f8c8bd55f4e0a02a50cc4aada8eaecd75e2709a2559a8bc0c0
+
+
+> frontend@0.0.0 test:t33:integration
+> vitest run --config vitest.t33.config.ts
+
+
+ RUN  v5.0.2 /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/frontend
+
+ ❯ integration/t33-rating.acceptance.tsx (1 test | 1 failed) 2100ms
+   × real UI saves, rolls back, retries, reloads and isolates account ratings without changing preferences or ranking 354ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  integration/t33-rating.acceptance.tsx > real UI saves, rolls back, retries, reloads and isolates account ratings without changing preferences or ranking
+AssertionError: expected { status: 200, body: { …(2) } } to deeply equal { status: 200, body: { …(2) } }
+
+- Expected
++ Received
+
+@@ -2,12 +2,12 @@
+    "body": {
+      "data": {
+        "mode": "personalised",
+        "movies": [
+          {
+-           "adjustedScore": 98,
+-           "basis": "baseline",
++           "adjustedScore": 99,
++           "basis": "rating_signals",
+            "genres": [
+              {
+                "id": 28,
+                "name": "Action",
+              },
+@@ -17,11 +17,11 @@
+              },
+            ],
+            "id": "a8a5631b-e87b-477a-ad70-c4b57aa22d74",
+            "popularityScore": 98,
+            "posterUrl": null,
+-           "ratingAdjustment": 0,
++           "ratingAdjustment": 1,
+            "reason": {
+              "matchedGenres": [
+                {
+                  "id": 28,
+                  "name": "Action",
+@@ -58,12 +58,12 @@
+            },
+            "releaseYear": 2021,
+            "title": "The Last Detour",
+          },
+          {
+-           "adjustedScore": 84,
+-           "basis": "baseline",
++           "adjustedScore": 85,
++           "basis": "rating_signals",
+            "genres": [
+              {
+                "id": 12,
+                "name": "Adventure",
+              },
+@@ -73,11 +73,11 @@
+              },
+            ],
+            "id": "6c4e87b5-72db-4321-88da-08c29d25e61a",
+            "popularityScore": 84,
+            "posterUrl": null,
+-           "ratingAdjustment": 0,
++           "ratingAdjustment": 1,
+            "reason": {
+              "matchedGenres": [
+                {
+                  "id": 28,
+                  "name": "Action",
+
+ ❯ integration/t33-rating.acceptance.tsx:118:24
+    116|     method: "GET",
+    117|   });
+    118|   expect(afterRanking).toEqual(beforeRanking);
+       |                        ^
+    119|   fireEvent.click(
+    120|     screen.getByRole("link", { name: "Back to recommendations" }),
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  16:03:24
+   Duration  2.97s (tests 73%, environment 16%, import 6%, transform 6%)
+
+
+===== T33 AFTER ALIGNING S4 RATING EXPECTATIONS =====
+Command: npm --prefix frontend run test:t33:integration
+Exit: 0
+Output SHA-256: 7905cc253a5bfa5e180c04ae534482a41595d6828dc930e0781e020f558dd7c1
+
+
+> frontend@0.0.0 test:t33:integration
+> vitest run --config vitest.t33.config.ts
+
+
+ RUN  v5.0.2 /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/frontend
+
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  16:04:39
+   Duration  2.98s (tests 75%, environment 15%, transform 5%, import 4%)
+
+
+===== FRONTEND REGRESSION AFTER T33 FIX =====
+Command: npm --prefix frontend test
+Exit: 0
+Output SHA-256: 3ca325e151c56fade428230a5a75aa6f825306bdf903aa5aaddf0dcac0c2cd32
+
+
+> frontend@0.0.0 test
+> vitest run
+
+
+ RUN  v5.0.2 /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/frontend
+
+
+ Test Files  29 passed (29)
+      Tests  308 passed (308)
+   Start at  16:05:08
+   Duration  12.21s (tests 43%, environment 42%, import 11%, transform 4%)
+
+    Isolate  29 workers spawned · ~389ms startup each (spawn + environment, per file)
+             at least ~5.26s faster with isolate: false — reuses workers across files instead of one per file
+
+
+===== FRONTEND LINT AFTER T33 FIX =====
+Command: npm --prefix frontend run lint
+Exit: 0
+Output SHA-256: 0d4695f4da2780a75fa8d28ae5fabe88093b7de3774417c514e2ecd90774e01f
+
+
+> frontend@0.0.0 lint
+> eslint .
+
+
+===== FRONTEND BUILD AFTER T33 FIX =====
+Command: npm --prefix frontend run build
+Exit: 0
+Output SHA-256: 6c6c10103390ceae91c41acecd37605502e030bf39f174dd9bb89c5ac7ccf760
+
+
+> frontend@0.0.0 build
+> tsc -b && vite build
+
+vite v8.3.1 building client environment for production...
+transforming...
+✓ 69 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.79 kB │ gzip:  0.42 kB
+dist/assets/index-DDeFCvjV.css   28.99 kB │ gzip:  6.70 kB
+dist/assets/index-QRTcxH1C.js   323.75 kB │ gzip: 98.89 kB
+
+✓ built in 155ms
