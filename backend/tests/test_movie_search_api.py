@@ -126,6 +126,20 @@ def test_title_ties_use_opaque_id_after_case_insensitive_title(search_client):
     ]
 
 
+def test_title_search_casefolds_unicode_without_needing_index(search_client):
+    http, session, path = search_client
+    city, coffee = seed_movies(session, [
+        ("Straße Nights", None), ("CAFÉ Film", None),
+    ])
+    assert not path.exists()
+    assert [movie["id"] for movie in http.get(
+        "/api/movies/search", params={"q": "STRASSE"}
+    ).json()["data"]["movies"]] == [city]
+    assert [movie["id"] for movie in http.get(
+        "/api/movies/search", params={"q": "café"}
+    ).json()["data"]["movies"]] == [coffee]
+
+
 def test_description_search_real_cosine_orders_two_positive_rows(search_client, monkeypatch):
     http, session, path = search_client
     moon, city, unrelated = seed_movies(session, [

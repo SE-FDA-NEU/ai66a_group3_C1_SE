@@ -21,6 +21,7 @@ from app.db.models import (
     new_opaque_id,
     utc_now,
 )
+from app.recommendations.overview_index import normalize_text
 from app.schemas.movies import GenreDto, MovieDetailDto, MovieSummaryDto
 
 ACTIVE_CATALOGUE_STATE_ID = 1
@@ -295,8 +296,18 @@ def list_active_movies(
 def search_active_movie_titles(session: Session, *, query: str) -> list[CatalogMovie]:
     """Return at most ten literal title hits from the active catalogue."""
 
+    connection = session.connection()
+    if connection.dialect.name == "sqlite":
+        connection.connection.driver_connection.create_function(
+            "movie_title_casefold", 1, normalize_text, deterministic=True
+        )
+        title_key = func.movie_title_casefold(CatalogMovie.title)
+        query_key = normalize_text(query)
+    else:
+        title_key = func.lower(CatalogMovie.title)
+        query_key = query.lower()
     escaped = (
-        query.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+        query_key.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
     )
     statement = (
         select(CatalogMovie)
@@ -306,12 +317,10 @@ def search_active_movie_titles(session: Session, *, query: str) -> list[CatalogM
         )
         .where(
             CatalogueState.id == ACTIVE_CATALOGUE_STATE_ID,
-            func.lower(CatalogMovie.title).like(
-                f"%{escaped.lower()}%", escape="\\"
-            ),
+            title_key.like(f"%{escaped}%", escape="\\"),
         )
         .options(selectinload(CatalogMovie.genres))
-        .order_by(func.lower(CatalogMovie.title), CatalogMovie.id)
+        .order_by(title_key, CatalogMovie.id)
         .limit(10)
     )
     return list(session.scalars(statement).unique())

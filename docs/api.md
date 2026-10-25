@@ -1036,7 +1036,8 @@ T09 backend delivery: `GET /api/movies/search?q=<text>` is public and returns
 `{data:{movies: MovieSummaryDto[]}}` with no paging metadata. It trims `q`;
 missing or fewer than two characters returns 400 `VALIDATION_ERROR` with
 `Enter at least 2 characters`. It first searches active-catalogue titles via
-literal escaped SQL LIKE, ordered by case-insensitive title and opaque ID, and
+literal escaped SQL LIKE with Unicode casefolding, ordered by folded title and
+opaque ID, and
 caps the result at ten. A title hit does not load the text index. Only
 when there are no title hits does it load the shared fitted index and return
 positive-cosine overview matches ordered by score, normalized title and ID.
