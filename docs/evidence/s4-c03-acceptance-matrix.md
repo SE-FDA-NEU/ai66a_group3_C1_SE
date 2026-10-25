@@ -232,3 +232,16 @@ or completion of the separate Search UI and Story #30 browser acceptance.
 | File | SHA-256 after UTF-8 LF normalization |
 |---|---|
 | `docs/api.md` | `59cba03a1216fa7c9f082d3aae56ecf6aa0ad8d30f3d6a26fdd9cb6753d4c81d` |
+
+### S4-T07 Similar API consumer amendment (2026-10-26)
+
+S4-T07 records the implemented public Similar API in section 13.2 of
+`docs/api.md`, merged with the earlier Search API record from S4-T09. The
+current normalized-LF hash for that changed contract file follows. The earlier
+C03, T01, T03, T09 and T12 captures remain historical records. This amendment
+does not claim new independent C03 approval or completion of the separate
+Similar UI and Story #24 browser acceptance.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/api.md` | `22f48e2e2b075115dc6816c1b6b0862024562984b091e6f3e385fa17552ad00a` |
