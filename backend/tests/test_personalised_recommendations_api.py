@@ -177,6 +177,12 @@ def _expanded_expected_response(
                 "posterUrl": None,
             }
         )
+        if case["expectedResponse"]["data"]["personalised"]:
+            movies[-1].update(
+                ratingAdjustment=0,
+                adjustedScore=candidate["popularityScore"],
+                basis="baseline",
+            )
     saved_ids = set(case["savedGenreIds"])
     base_count = sum(
         bool(saved_ids.intersection(row["genreIds"]))
@@ -715,7 +721,7 @@ def test_t09_active_empty_catalogue_is_cold_start_success_not_a_source_error(
 
 
 @pytest.mark.parametrize("rating", [1, 5])
-def test_t09_saved_ratings_do_not_change_sprint3_ranking_or_preferences(
+def test_t09_saved_ratings_adjust_scores_without_changing_preferences(
     database_session: Session,
     rating: int,
 ) -> None:
@@ -739,6 +745,16 @@ def test_t09_saved_ratings_do_not_change_sprint3_ranking_or_preferences(
     after_a = account_a.get("/api/me/recommendations")
     after_b = account_b.get("/api/me/recommendations")
     assert after_a.status_code == after_b.status_code == 200
-    assert after_a.json() == baseline_a.json()
+    before_movies = baseline_a.json()["data"]["movies"]
+    after_movies = after_a.json()["data"]["movies"]
+    assert [movie["id"] for movie in after_movies] == [movie["id"] for movie in before_movies]
+    sign = 1 if rating == 5 else -1
+    for before, after in zip(before_movies, after_movies, strict=True):
+        assert after["popularityScore"] == before["popularityScore"]
+        assert after["ratingAdjustment"] == sign
+        expected = (before["popularityScore"] + sign
+                    if before["popularityScore"] is not None else None)
+        assert after["adjustedScore"] == expected
+        assert after["basis"] == "rating_signals"
     assert after_b.json() == baseline_b.json()
     assert _committed_preference_rows(database_session) == rows_before

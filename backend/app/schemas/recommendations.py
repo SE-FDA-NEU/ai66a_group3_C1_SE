@@ -19,10 +19,18 @@ class RecommendationMovieDto(MovieSummaryDto):
     reason: RecommendationReason
 
 
+class PersonalisedRecommendationMovieDto(RecommendationMovieDto):
+    """C03 private ranking metadata; never part of a public movie DTO."""
+
+    ratingAdjustment: int
+    adjustedScore: float | None
+    basis: Literal["rating_signals", "baseline", "rating_unavailable"]
+
+
 class RecommendationData(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    movies: list[RecommendationMovieDto]
+    movies: list[PersonalisedRecommendationMovieDto | RecommendationMovieDto]
     mode: Literal["popular", "personalised"]
     personalised: bool
     noMatch: bool
