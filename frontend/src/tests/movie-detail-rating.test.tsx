@@ -51,6 +51,8 @@ it("restores a saved rating on a direct detail load without changing preferences
     if (path === "/api/auth/me") return json({ data: { user } });
     if (path === "/api/me/ratings/movie-a")
       return json({ data: { movieId: "movie-a", rating: 5 } });
+    if (path === "/api/me/watchlist/movie-a")
+      return json({ data: { movieId: "movie-a", inWatchlist: false, addedAt: null } });
     throw new Error(`Unexpected request: ${path}`);
   });
   render(<App />);
@@ -60,6 +62,7 @@ it("restores a saved rating on a direct detail load without changing preferences
     "/api/movies/movie-a",
     "/api/auth/me",
     "/api/me/ratings/movie-a",
+    "/api/me/watchlist/movie-a",
   ]);
 });
 
@@ -88,7 +91,8 @@ it("a failed session check has retry without hiding details or faking unrated", 
     .mockResolvedValueOnce(json({ data: { movie: movie() } }))
     .mockResolvedValueOnce(json({ error: { message: "Unavailable" } }, 503))
     .mockResolvedValueOnce(json({ data: { user } }))
-    .mockResolvedValueOnce(json({ data: { movieId: "movie-a", rating: 3 } }));
+    .mockResolvedValueOnce(json({ data: { movieId: "movie-a", rating: 3 } }))
+    .mockResolvedValueOnce(json({ data: { movieId: "movie-a", inWatchlist: false, addedAt: null } }));
   render(<App />);
   await screen.findByRole("button", { name: "Retry session check" });
   expect(screen.getByText("Public overview")).toBeInTheDocument();

@@ -7,6 +7,7 @@ import { resolveMovieDetailReturn } from "../navigation/movieDetailReturn.ts";
 import MovieBackdropHero from "../components/MovieBackdropHero.tsx";
 import MovieRating from "../components/MovieRating.tsx";
 import MoviePoster from "../components/MoviePoster.tsx";
+import MovieWatchlist from "../components/MovieWatchlist.tsx";
 
 const INFORMATION_UNAVAILABLE = "Information unavailable";
 
@@ -163,6 +164,7 @@ function MovieDetailPage() {
             <p>{movie.overview ?? INFORMATION_UNAVAILABLE}</p>
           </section>
           <MovieRating movieId={movie.id} />
+          <MovieWatchlist movieId={movie.id} />
           </div>
         </div>
       </article>

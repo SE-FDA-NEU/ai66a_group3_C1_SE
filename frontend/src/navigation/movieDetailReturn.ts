@@ -21,6 +21,7 @@ const SAFE_MOVIE_LIST_ROUTES = new Map([
   ["/", "Return to catalogue"],
   ["/popular", "Back to popular movies"],
   ["/recommendations", "Back to recommendations"],
+  ["/watchlist", "Back to watchlist"],
 ]);
 
 export function currentReturnPath(location: {

@@ -76,6 +76,14 @@ p { line-height: 1.65; }
 .auth-footer { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: .65rem; margin: 1.5rem 0 0; text-align: center; font-size: .875rem; color: var(--muted); }
 .auth-footer a { font-weight: 700; }
 .form-error { margin: .35rem 0; color: var(--error); line-height: 1.6; }
+.movie-watchlist { margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--border); }
+.movie-watchlist h2 { margin-bottom: .5rem; }
+.watchlist-detail-action > p { margin: .5rem 0 1rem; color: var(--muted); }
+.watchlist-header h1 { margin-bottom: .4rem; }
+.watchlist-card__actions { display: grid; gap: .5rem; margin: .25rem .75rem .85rem; }
+.watchlist-card__actions .button-link, .watchlist-card__actions button { width: 100%; min-width: 0; padding-inline: .5rem; text-align: center; }
+.watchlist-empty { text-align: center; }
+.watchlist-empty .button-link { margin-top: .5rem; }
 .field-hint { margin: .2rem 0; font-size: .8rem; }
 .catalogue-header { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 2rem; margin: 0 0 2rem; border: 1px solid var(--border); border-radius: 22px; background: radial-gradient(ellipse at 85% 15%, var(--hero-tint), transparent 70%), var(--surface); }
 .catalogue-header h1 { margin: 0; max-width: 17ch; }
