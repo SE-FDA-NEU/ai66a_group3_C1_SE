@@ -149,7 +149,7 @@ its revision or accounts, use the bounded
 
 The T01 branch adds nullable poster storage. Before starting this branch, back
 up valuable SQLite data consistently and apply `alembic upgrade head` as above.
-The single head is `d8a4e6f20195` (parent `c6f8a2d4e901`). Merged C03 PR #222
+At the T01 stage, the head was `d8a4e6f20195` (parent `c6f8a2d4e901`). Merged C03 PR #222
 adds contracts/tests only, with no competing migration. Recheck the migration
 chain if a later schema PR merges before this candidate.
 
@@ -287,7 +287,7 @@ npm --prefix frontend run dev
 Open `http://127.0.0.1:8000/health`. The response is:
 
 ```json
-{"status":"ok","database":"connected","migrationVersion":"c6f8a2d4e901"}
+{"status":"ok","database":"connected","migrationVersion":"e9b6f0a42c17"}
 ```
 
 Open `http://localhost:5173/`. The existing home page reads its cards from the
