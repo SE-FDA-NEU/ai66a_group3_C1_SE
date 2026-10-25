@@ -2,6 +2,9 @@ import type { Genre, MovieSummary, PageMeta } from "./movies.ts";
 import { fallbackErrorMessage, NETWORK_FAILURE_MESSAGE } from "./requestFailure.ts";
 
 export type RecommendationMovie = MovieSummary & {
+  ratingAdjustment?: number;
+  adjustedScore?: number | null;
+  basis?: "rating_signals" | "baseline" | "rating_unavailable";
   reason: {
     matchedGenres: Genre[];
   };

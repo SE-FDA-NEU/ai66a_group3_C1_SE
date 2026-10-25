@@ -1,0 +1,2000 @@
+===== BEGIN ORIGINAL s4-t03-ranking-focused.txt =====
+SHA-256: 918d99d672a5b46e0947f84c18535b3d3d67935a3f80664732a992c49409a56d
+Original bytes: 20666
+
+============================= test session starts ==============================
+platform darwin -- Python 3.12.4, pytest-9.1.1, pluggy-1.6.0 -- /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/backend
+configfile: pyproject.toml
+plugins: cov-7.1.0, anyio-4.15.1
+collecting ... collected 159 items
+
+backend/tests/test_rating_aware_recommendations.py::test_five_star_related_rating_reorders_80_80 PASSED [  0%]
+backend/tests/test_rating_aware_recommendations.py::test_signs_neutral_and_current_saved_value[1--1] PASSED [  1%]
+backend/tests/test_rating_aware_recommendations.py::test_signs_neutral_and_current_saved_value[2--1] PASSED [  1%]
+backend/tests/test_rating_aware_recommendations.py::test_signs_neutral_and_current_saved_value[3-0] PASSED [  2%]
+backend/tests/test_rating_aware_recommendations.py::test_signs_neutral_and_current_saved_value[4-1] PASSED [  3%]
+backend/tests/test_rating_aware_recommendations.py::test_neutral_90_80_handoff_keeps_baseline PASSED [  3%]
+backend/tests/test_rating_aware_recommendations.py::test_rank_whole_set_before_paging_and_view_filter PASSED [  4%]
+backend/tests/test_rating_aware_recommendations.py::test_overlap_once_null_popularity_and_deterministic_ties PASSED [  5%]
+backend/tests/test_rating_aware_recommendations.py::test_only_rating_query_failure_degrades[ratings] PASSED [  5%]
+backend/tests/test_rating_aware_recommendations.py::test_only_rating_query_failure_degrades[catalogue] PASSED [  6%]
+backend/tests/test_rating_aware_recommendations.py::test_only_rating_query_failure_degrades[preferences] PASSED [  6%]
+backend/tests/test_rating_aware_recommendations.py::test_only_rating_query_failure_degrades[candidates] PASSED [  7%]
+backend/tests/test_rating_aware_recommendations.py::test_only_rating_query_failure_degrades[auth] PASSED [  8%]
+backend/tests/test_rating_aware_recommendations.py::test_popular_fallbacks_keep_order_and_omit_private_scores[genres0] PASSED [  8%]
+backend/tests/test_rating_aware_recommendations.py::test_popular_fallbacks_keep_order_and_omit_private_scores[genres1] PASSED [  9%]
+backend/tests/test_rating_aware_recommendations.py::test_account_isolation_reset_logout_switch_and_no_retargeting PASSED [ 10%]
+backend/tests/test_rating_aware_recommendations.py::test_public_dtos_stay_free_of_private_fields PASSED [ 10%]
+backend/tests/test_personalised_recommendations_api.py::test_personalised_response_matches_the_reviewed_synthetic_oracle PASSED [ 11%]
+backend/tests/test_personalised_recommendations_api.py::test_popular_states_match_the_reviewed_synthetic_oracles[popularColdStart-False] PASSED [ 11%]
+backend/tests/test_personalised_recommendations_api.py::test_popular_states_match_the_reviewed_synthetic_oracles[popularNoMatch-True] PASSED [ 12%]
+backend/tests/test_personalised_recommendations_api.py::test_personalised_missing_popularity_is_preserved_and_not_invented PASSED [ 13%]
+backend/tests/test_personalised_recommendations_api.py::test_each_session_uses_only_its_account_preferences_despite_forged_identity PASSED [ 13%]
+backend/tests/test_personalised_recommendations_api.py::test_missing_invalid_expired_and_revoked_sessions_are_rejected[missing] PASSED [ 14%]
+backend/tests/test_personalised_recommendations_api.py::test_missing_invalid_expired_and_revoked_sessions_are_rejected[invalid] PASSED [ 15%]
+backend/tests/test_personalised_recommendations_api.py::test_missing_invalid_expired_and_revoked_sessions_are_rejected[expired] PASSED [ 15%]
+backend/tests/test_personalised_recommendations_api.py::test_missing_invalid_expired_and_revoked_sessions_are_rejected[revoked] PASSED [ 16%]
+backend/tests/test_personalised_recommendations_api.py::test_no_match_with_no_usable_popular_alternative_is_a_valid_empty_success PASSED [ 16%]
+backend/tests/test_personalised_recommendations_api.py::test_recommendations_read_only_local_sqlite_and_never_call_tmdb PASSED [ 17%]
+backend/tests/test_personalised_recommendations_api.py::test_t17_recommendation_detail_round_trip_preserves_database_preferences PASSED [ 18%]
+backend/tests/test_personalised_recommendations_api.py::test_t18_detail_is_public_and_saved_preferences_survive_a_fresh_session PASSED [ 18%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[catalogue-personalised] PASSED [ 19%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[catalogue-no_match] PASSED [ 20%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[catalogue-cold_start] PASSED [ 20%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[preferences-personalised] PASSED [ 21%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[preferences-no_match] PASSED [ 22%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[preferences-cold_start] PASSED [ 22%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[matching-personalised] PASSED [ 23%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[matching-no_match] PASSED [ 23%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[popular-no_match] PASSED [ 24%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[popular-cold_start] PASSED [ 25%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[movie_genres-personalised] PASSED [ 25%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[movie_genres-no_match] PASSED [ 26%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[movie_genres-cold_start] PASSED [ 27%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_missing_catalogue_preserves_preferences_and_recovers_after_activation PASSED [ 27%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_active_empty_catalogue_is_cold_start_success_not_a_source_error PASSED [ 28%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_saved_ratings_adjust_scores_without_changing_preferences[1] PASSED [ 28%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_saved_ratings_adjust_scores_without_changing_preferences[5] PASSED [ 29%]
+backend/tests/test_s4_t02_rating_signals.py::test_s4_t02_all_five_rating_values_keep_raw_80_80[1--1] PASSED [ 30%]
+backend/tests/test_s4_t02_rating_signals.py::test_s4_t02_all_five_rating_values_keep_raw_80_80[2--1] PASSED [ 30%]
+backend/tests/test_s4_t02_rating_signals.py::test_s4_t02_all_five_rating_values_keep_raw_80_80[3-0] PASSED [ 31%]
+backend/tests/test_s4_t02_rating_signals.py::test_s4_t02_all_five_rating_values_keep_raw_80_80[4-1] PASSED [ 32%]
+backend/tests/test_s4_t02_rating_signals.py::test_s4_t02_all_five_rating_values_keep_raw_80_80[5-1] PASSED [ 32%]
+backend/tests/test_s4_t02_rating_signals.py::test_s4_t02_shared_genres_count_once_and_latest_value_wins PASSED [ 33%]
+backend/tests/test_s4_t02_rating_signals.py::test_s4_t02_account_isolation_and_no_ratings_baseline PASSED [ 33%]
+backend/tests/test_s4_t02_rating_signals.py::test_s4_t02_keeps_saved_rating_history_when_source_leaves_active_catalogue PASSED [ 34%]
+backend/tests/test_s4_t02_rating_signals.py::test_s4_t02_90_80_neutral_handoff PASSED [ 35%]
+backend/tests/test_s4_t02_rating_signals.py::test_s4_t02_whole_set_handoff_oracle_is_explicit PASSED [ 35%]
+backend/tests/test_genre_matching.py::test_matches_the_t06_personalised_oracle PASSED [ 36%]
+backend/tests/test_genre_matching.py::test_every_result_shares_a_selected_genre_and_others_are_excluded PASSED [ 37%]
+backend/tests/test_genre_matching.py::test_movie_matching_several_selected_genres_appears_once PASSED [ 37%]
+backend/tests/test_genre_matching.py::test_missing_popularity_sorts_after_finite_scores_without_becoming_zero PASSED [ 38%]
+backend/tests/test_genre_matching.py::test_whole_eligible_set_is_ranked_before_the_limit_of_ten PASSED [ 38%]
+backend/tests/test_genre_matching.py::test_ties_use_title_then_internal_id PASSED [ 39%]
+backend/tests/test_genre_matching.py::test_only_the_active_revision_is_searched PASSED [ 40%]
+backend/tests/test_genre_matching.py::test_no_selected_genres_returns_nothing PASSED [ 40%]
+backend/tests/test_genre_matching.py::test_limit_outside_one_to_ten_is_rejected[0] PASSED [ 41%]
+backend/tests/test_genre_matching.py::test_limit_outside_one_to_ten_is_rejected[11] PASSED [ 42%]
+backend/tests/test_genre_matching.py::test_limit_outside_one_to_ten_is_rejected[-1] PASSED [ 42%]
+backend/tests/test_popular_recommendations.py::test_popular_recommendations_rank_by_popularity_then_title_then_id PASSED [ 43%]
+backend/tests/test_popular_recommendations.py::test_popular_recommendations_use_id_as_final_tie_breaker PASSED [ 44%]
+backend/tests/test_popular_recommendations.py::test_popular_recommendations_are_distinct_and_limited_to_ten PASSED [ 44%]
+backend/tests/test_popular_recommendations.py::test_no_usable_popularity_returns_empty_recommendations PASSED [ 45%]
+backend/tests/test_popular_recommendations.py::test_popular_recommendations_exclude_non_finite_database_values PASSED [ 45%]
+backend/tests/test_popular_recommendations.py::test_recommendations_require_authentication PASSED [ 46%]
+backend/tests/test_popular_recommendations.py::test_missing_active_catalogue_returns_catalogue_unavailable PASSED [ 47%]
+backend/tests/test_popular_recommendations.py::test_recommendation_database_failure_returns_service_unavailable PASSED [ 47%]
+backend/tests/test_recommendation_fixtures.py::test_fixture_is_explicitly_synthetic_offline_and_provider_neutral PASSED [ 48%]
+backend/tests/test_recommendation_fixtures.py::test_fixture_has_eleven_unique_candidates_and_one_controlled_duplicate PASSED [ 49%]
+backend/tests/test_recommendation_fixtures.py::test_personalised_oracle_is_ranked_distinct_limited_and_explained PASSED [ 49%]
+backend/tests/test_recommendation_fixtures.py::test_cold_start_and_no_match_oracles_use_controlled_popular_fallback PASSED [ 50%]
+backend/tests/test_recommendation_fixtures.py::test_fault_oracles_fix_status_code_message_and_request_id_shape PASSED [ 50%]
+backend/tests/test_ratings_api.py::test_unrated_movie_returns_an_explicit_null_not_zero PASSED [ 51%]
+backend/tests/test_ratings_api.py::test_get_returns_only_the_current_accounts_rating PASSED [ 52%]
+backend/tests/test_ratings_api.py::test_missing_expired_or_revoked_session_gets_401_and_nothing_changes[get-missing] PASSED [ 52%]
+backend/tests/test_ratings_api.py::test_missing_expired_or_revoked_session_gets_401_and_nothing_changes[get-invalid] PASSED [ 53%]
+backend/tests/test_ratings_api.py::test_missing_expired_or_revoked_session_gets_401_and_nothing_changes[get-expired] PASSED [ 54%]
+backend/tests/test_ratings_api.py::test_missing_expired_or_revoked_session_gets_401_and_nothing_changes[get-revoked] PASSED [ 54%]
+backend/tests/test_ratings_api.py::test_missing_expired_or_revoked_session_gets_401_and_nothing_changes[put-missing] PASSED [ 55%]
+backend/tests/test_ratings_api.py::test_missing_expired_or_revoked_session_gets_401_and_nothing_changes[put-invalid] PASSED [ 55%]
+backend/tests/test_ratings_api.py::test_missing_expired_or_revoked_session_gets_401_and_nothing_changes[put-expired] PASSED [ 56%]
+backend/tests/test_ratings_api.py::test_missing_expired_or_revoked_session_gets_401_and_nothing_changes[put-revoked] PASSED [ 57%]
+backend/tests/test_ratings_api.py::test_unauthenticated_invalid_payload_is_401_not_400[missing] PASSED [ 57%]
+backend/tests/test_ratings_api.py::test_unauthenticated_invalid_payload_is_401_not_400[invalid] PASSED [ 58%]
+backend/tests/test_ratings_api.py::test_unauthenticated_invalid_payload_is_401_not_400[expired] PASSED [ 59%]
+backend/tests/test_ratings_api.py::test_unauthenticated_invalid_payload_is_401_not_400[revoked] PASSED [ 59%]
+backend/tests/test_ratings_api.py::test_unknown_or_inactive_movie_is_404_and_creates_no_rating[00000000-0000-0000-0000-000000000000-get] PASSED [ 60%]
+backend/tests/test_ratings_api.py::test_unknown_or_inactive_movie_is_404_and_creates_no_rating[00000000-0000-0000-0000-000000000000-put] PASSED [ 61%]
+backend/tests/test_ratings_api.py::test_unknown_or_inactive_movie_is_404_and_creates_no_rating[retired-get] PASSED [ 61%]
+backend/tests/test_ratings_api.py::test_unknown_or_inactive_movie_is_404_and_creates_no_rating[retired-put] PASSED [ 62%]
+backend/tests/test_ratings_api.py::test_put_returns_the_committed_rating_for_every_valid_value[1] PASSED [ 62%]
+backend/tests/test_ratings_api.py::test_put_returns_the_committed_rating_for_every_valid_value[2] PASSED [ 63%]
+backend/tests/test_ratings_api.py::test_put_returns_the_committed_rating_for_every_valid_value[3] PASSED [ 64%]
+backend/tests/test_ratings_api.py::test_put_returns_the_committed_rating_for_every_valid_value[4] PASSED [ 64%]
+backend/tests/test_ratings_api.py::test_put_returns_the_committed_rating_for_every_valid_value[5] PASSED [ 65%]
+backend/tests/test_ratings_api.py::test_repeated_saves_update_one_row PASSED [ 66%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body0] PASSED [ 66%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body1] PASSED [ 67%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body2] PASSED [ 67%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body3] PASSED [ 68%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body4] PASSED [ 69%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body5] PASSED [ 69%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body6] PASSED [ 70%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body7] PASSED [ 71%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body8] PASSED [ 71%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body9] PASSED [ 72%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body10] PASSED [ 72%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body11] PASSED [ 73%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body12] PASSED [ 74%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body13] PASSED [ 74%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body14] PASSED [ 75%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[5_0] PASSED [ 76%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[5_1] PASSED [ 76%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[None] PASSED [ 77%]
+backend/tests/test_ratings_api.py::test_malformed_json_is_rejected_and_preserves_the_previous_rating[{] PASSED [ 77%]
+backend/tests/test_ratings_api.py::test_malformed_json_is_rejected_and_preserves_the_previous_rating[] PASSED [ 78%]
+backend/tests/test_ratings_api.py::test_malformed_json_is_rejected_and_preserves_the_previous_rating[not json] PASSED [ 79%]
+backend/tests/test_ratings_api.py::test_malformed_json_is_rejected_and_preserves_the_previous_rating[{"rating": 5] PASSED [ 79%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[{-missing] PASSED [ 80%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[{-invalid] PASSED [ 81%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[{-expired] PASSED [ 81%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[{-revoked] PASSED [ 82%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[not json-missing] PASSED [ 83%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[not json-invalid] PASSED [ 83%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[not json-expired] PASSED [ 84%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[not json-revoked] PASSED [ 84%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[{"rating": 5-missing] PASSED [ 85%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[{"rating": 5-invalid] PASSED [ 86%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[{"rating": 5-expired] PASSED [ 86%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[{"rating": 5-revoked] PASSED [ 87%]
+backend/tests/test_ratings_api.py::test_forged_identity_never_retargets_another_account PASSED [ 88%]
+backend/tests/test_ratings_api.py::test_cross_origin_put_is_rejected_before_any_write[headers0] PASSED [ 88%]
+backend/tests/test_ratings_api.py::test_cross_origin_put_is_rejected_before_any_write[headers1] PASSED [ 89%]
+backend/tests/test_ratings_api.py::test_cross_origin_put_is_rejected_before_any_write[headers2] PASSED [ 89%]
+backend/tests/test_ratings_api.py::test_cross_origin_put_is_rejected_before_any_write[headers3] PASSED [ 90%]
+backend/tests/test_ratings_api.py::test_same_origin_fetch_metadata_accepts_the_vite_proxy PASSED [ 91%]
+backend/tests/test_ratings_api.py::test_failed_save_rolls_back_and_preserves_the_previous_rating[write] PASSED [ 91%]
+backend/tests/test_ratings_api.py::test_failed_save_rolls_back_and_preserves_the_previous_rating[commit] PASSED [ 92%]
+backend/tests/test_rating_repository.py::test_two_accounts_can_rate_same_movie_independently PASSED [ 93%]
+backend/tests/test_rating_repository.py::test_updating_rating_preserves_exactly_one_current_row PASSED [ 93%]
+backend/tests/test_rating_repository.py::test_repository_reads_are_scoped_to_account PASSED [ 94%]
+backend/tests/test_rating_repository.py::test_unknown_movie_cannot_create_orphan_rating PASSED [ 94%]
+backend/tests/test_rating_repository.py::test_repository_rejects_invalid_rating_values[0-ValueError] PASSED [ 95%]
+backend/tests/test_rating_repository.py::test_repository_rejects_invalid_rating_values[6-ValueError] PASSED [ 96%]
+backend/tests/test_rating_repository.py::test_repository_rejects_invalid_rating_values[-1-ValueError] PASSED [ 96%]
+backend/tests/test_rating_repository.py::test_repository_rejects_invalid_rating_values[3.5-TypeError] PASSED [ 97%]
+backend/tests/test_rating_repository.py::test_repository_rejects_invalid_rating_values[5-TypeError] PASSED [ 98%]
+backend/tests/test_rating_repository.py::test_repository_rejects_invalid_rating_values[True-TypeError] PASSED [ 98%]
+backend/tests/test_rating_repository.py::test_repository_rejects_invalid_rating_values[None-TypeError] PASSED [ 99%]
+backend/tests/test_rating_repository.py::test_orm_created_schema_rejects_fractional_rating PASSED [100%]
+
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= 159 passed, 1 warning in 20.85s ========================
+
+===== END ORIGINAL s4-t03-ranking-focused.txt =====
+
+===== BEGIN ORIGINAL s4-t03-ranking-backend.txt =====
+SHA-256: 87a944062e2e94511420751a157e424a135aed6ec2951de228dd8f84ad0548dc
+Original bytes: 70057
+
+============================= test session starts ==============================
+platform darwin -- Python 3.12.4, pytest-9.1.1, pluggy-1.6.0 -- /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/backend
+configfile: pyproject.toml
+plugins: cov-7.1.0, anyio-4.15.1
+collecting ... collected 576 items
+
+backend/tests/test_account_migration.py::test_account_migration_creates_the_required_columns PASSED [  0%]
+backend/tests/test_account_migration.py::test_database_uniqueness_rejects_email_case_variants PASSED [  0%]
+backend/tests/test_account_write_transactions.py::test_TC_S11_runtime_engine_policy_keeps_foreign_keys_and_finite_timeout PASSED [  0%]
+backend/tests/test_account_write_transactions.py::test_TC_S11_reservation_is_real_and_caller_owns_commit_or_rollback PASSED [  0%]
+backend/tests/test_account_write_transactions.py::test_TC_S11_existing_database_transaction_is_rejected_not_silently_discarded PASSED [  0%]
+backend/tests/test_account_write_transactions.py::test_TC_S11_pending_orm_changes_are_rejected_not_expired_or_committed[new] PASSED [  1%]
+backend/tests/test_account_write_transactions.py::test_TC_S11_pending_orm_changes_are_rejected_not_expired_or_committed[dirty] PASSED [  1%]
+backend/tests/test_account_write_transactions.py::test_TC_S11_pending_orm_changes_are_rejected_not_expired_or_committed[deleted] PASSED [  1%]
+backend/tests/test_account_write_transactions.py::test_TC_S11_nested_transaction_is_not_mistaken_for_a_reservation PASSED [  1%]
+backend/tests/test_account_write_transactions.py::test_TC_S11_clean_legacy_read_cache_is_refreshed_after_acquiring_writer PASSED [  1%]
+backend/tests/test_auth_acceptance.py::test_independent_sessions_ignore_forged_identity_and_reset_only_owner PASSED [  1%]
+backend/tests/test_auth_acceptance.py::test_invalid_sessions_reject_every_private_read_and_write[missing] PASSED [  2%]
+backend/tests/test_auth_acceptance.py::test_invalid_sessions_reject_every_private_read_and_write[expired] PASSED [  2%]
+backend/tests/test_auth_acceptance.py::test_invalid_sessions_reject_every_private_read_and_write[revoked] PASSED [  2%]
+backend/tests/test_auth_acceptance.py::test_logout_cookie_replay_relogin_and_actual_backend_restart PASSED [  2%]
+backend/tests/test_auth_acceptance.py::test_reset_confirmation_origin_and_real_delete_failure_preserve_both_accounts PASSED [  2%]
+backend/tests/test_auth_catalogue_handoff.py::test_new_account_reaches_the_recommendation_landing_data PASSED [  2%]
+backend/tests/test_auth_catalogue_handoff.py::test_a_recommended_movie_opens_its_public_detail PASSED [  3%]
+backend/tests/test_auth_catalogue_handoff.py::test_logout_forbids_reusing_the_old_session_on_authenticated_api PASSED [  3%]
+backend/tests/test_auth_catalogue_handoff.py::test_signing_in_again_after_logout_creates_a_fresh_session PASSED [  3%]
+backend/tests/test_auth_catalogue_handoff.py::test_rating_write_requires_the_signed_in_account SKIPPED [  3%]
+backend/tests/test_auth_sessions.py::test_login_creates_opaque_cookie_and_me_resolves_server_user PASSED [  3%]
+backend/tests/test_auth_sessions.py::test_unknown_email_and_wrong_password_have_same_public_error PASSED [  3%]
+backend/tests/test_auth_sessions.py::test_logout_revokes_session_and_expired_or_invalid_cookie_is_unauthorized PASSED [  4%]
+backend/tests/test_auth_sessions.py::test_expired_session_is_unauthorized PASSED [  4%]
+backend/tests/test_auth_sessions.py::test_unknown_cookie_is_unauthorized PASSED [  4%]
+backend/tests/test_auth_sessions.py::test_missing_session_returns_safe_authentication_error PASSED [  4%]
+backend/tests/test_auth_sessions.py::test_client_user_id_cannot_override_the_session_account PASSED [  4%]
+backend/tests/test_auth_sessions.py::test_separate_clients_keep_account_identity_isolated PASSED [  5%]
+backend/tests/test_auth_sessions.py::test_cross_origin_login_is_rejected_before_session_creation PASSED [  5%]
+backend/tests/test_auth_sessions.py::test_same_origin_fetch_metadata_allows_the_vite_proxy PASSED [  5%]
+backend/tests/test_auth_sessions.py::test_cross_origin_logout_cannot_revoke_the_current_session PASSED [  5%]
+backend/tests/test_backdrop_acceptance.py::test_upgrade_enrichment_and_real_account_api_preserve_every_non_media_row PASSED [  5%]
+backend/tests/test_backdrop_acceptance.py::test_database_failure_rolls_back_first_successful_media_write PASSED [  5%]
+backend/tests/test_backdrop_acceptance.py::test_legacy_m2_fixture_has_nullable_media_after_real_migrations PASSED [  6%]
+backend/tests/test_backdrop_storage.py::test_fresh_migration_creates_nullable_backdrop_storage PASSED [  6%]
+backend/tests/test_backdrop_storage.py::test_upgrade_preserves_every_row_identity_and_constraint PASSED [  6%]
+backend/tests/test_backdrop_storage.py::test_revision_extends_the_current_chain_without_a_fork PASSED [  6%]
+backend/tests/test_backdrop_storage.py::test_path_update_clear_and_reads_preserve_core_fields PASSED [  6%]
+backend/tests/test_backdrop_storage.py::test_existing_core_reimport_preserves_a_saved_path PASSED [  6%]
+backend/tests/test_backdrop_storage.py::test_backdrop_write_never_commits_the_callers_transaction PASSED [  7%]
+backend/tests/test_backdrop_storage.py::test_unknown_movie_cannot_create_a_record PASSED [  7%]
+backend/tests/test_backdrop_storage.py::test_non_text_paths_do_not_mutate_existing_data[True] PASSED [  7%]
+backend/tests/test_backdrop_storage.py::test_non_text_paths_do_not_mutate_existing_data[42] PASSED [  7%]
+backend/tests/test_backdrop_storage.py::test_non_text_paths_do_not_mutate_existing_data[image] PASSED [  7%]
+backend/tests/test_backdrop_storage.py::test_non_text_paths_do_not_mutate_existing_data[invalid3] PASSED [  7%]
+backend/tests/test_backdrop_storage.py::test_populated_upgrade_is_idempotent PASSED [  8%]
+backend/tests/test_backdrop_storage.py::test_storage_exposes_only_valid_url_in_detail_dto PASSED [  8%]
+backend/tests/test_backdrop_storage.py::test_existing_uniqueness_and_foreign_keys_still_reject_invalid_rows PASSED [  8%]
+backend/tests/test_backdrop_storage.py::test_explicit_disposable_downgrade_preserves_non_backdrop_data PASSED [  8%]
+backend/tests/test_catalogue_migration.py::test_catalogue_migration_creates_the_required_tables PASSED [  8%]
+backend/tests/test_catalogue_pagination.py::test_public_pages_cover_the_complete_ranked_set[0] PASSED [  9%]
+backend/tests/test_catalogue_pagination.py::test_public_pages_cover_the_complete_ranked_set[1] PASSED [  9%]
+backend/tests/test_catalogue_pagination.py::test_public_pages_cover_the_complete_ranked_set[10] PASSED [  9%]
+backend/tests/test_catalogue_pagination.py::test_public_pages_cover_the_complete_ranked_set[11] PASSED [  9%]
+backend/tests/test_catalogue_pagination.py::test_public_pages_cover_the_complete_ranked_set[25] PASSED [  9%]
+backend/tests/test_catalogue_pagination.py::test_public_pages_cover_the_complete_ranked_set[255] PASSED [  9%]
+backend/tests/test_catalogue_pagination.py::test_home_alphabetical_popular_finite_and_revision_change PASSED [ 10%]
+backend/tests/test_catalogue_pagination.py::test_recommendation_filter_uses_all_candidates_before_page_slice PASSED [ 10%]
+backend/tests/test_catalogue_pagination.py::test_recommendation_genre_id_rejects_invalid_or_overflowing_values[0] PASSED [ 10%]
+backend/tests/test_catalogue_pagination.py::test_recommendation_genre_id_rejects_invalid_or_overflowing_values[abc] PASSED [ 10%]
+backend/tests/test_catalogue_pagination.py::test_recommendation_genre_id_rejects_invalid_or_overflowing_values[2147483648] PASSED [ 10%]
+backend/tests/test_catalogue_pagination.py::test_recommendation_genre_id_rejects_invalid_or_overflowing_values[9223372036854775808] PASSED [ 10%]
+backend/tests/test_catalogue_pagination.py::test_largest_allowed_genre_id_is_checked_as_unknown_without_overflow PASSED [ 11%]
+backend/tests/test_catalogue_pagination.py::test_home_title_desc_sorts_the_whole_catalogue_before_paging[0] PASSED [ 11%]
+backend/tests/test_catalogue_pagination.py::test_home_title_desc_sorts_the_whole_catalogue_before_paging[1] PASSED [ 11%]
+backend/tests/test_catalogue_pagination.py::test_home_title_desc_sorts_the_whole_catalogue_before_paging[10] PASSED [ 11%]
+backend/tests/test_catalogue_pagination.py::test_home_title_desc_sorts_the_whole_catalogue_before_paging[11] PASSED [ 11%]
+backend/tests/test_catalogue_pagination.py::test_home_title_desc_sorts_the_whole_catalogue_before_paging[25] PASSED [ 11%]
+backend/tests/test_catalogue_pagination.py::test_home_title_desc_sorts_the_whole_catalogue_before_paging[255] PASSED [ 12%]
+backend/tests/test_catalogue_pagination.py::test_home_sort_does_not_change_popular_order_or_revision_validation PASSED [ 12%]
+backend/tests/test_catalogue_pagination.py::test_home_sort_has_deterministic_case_and_duplicate_title_ties PASSED [ 12%]
+backend/tests/test_catalogue_pagination.py::test_home_sort_rejects_unsupported_values_without_changing_data[title] PASSED [ 12%]
+backend/tests/test_catalogue_pagination.py::test_home_sort_rejects_unsupported_values_without_changing_data[popularity] PASSED [ 12%]
+backend/tests/test_catalogue_pagination.py::test_home_sort_rejects_unsupported_values_without_changing_data[TITLE_DESC] PASSED [ 13%]
+backend/tests/test_catalogue_pagination.py::test_home_sort_rejects_unsupported_values_without_changing_data[] PASSED [ 13%]
+backend/tests/test_catalogue_pagination.py::test_home_sort_rejects_unsupported_values_without_changing_data[title_desc; DROP TABLE catalog_movies] PASSED [ 13%]
+backend/tests/test_catalogue_pagination.py::test_home_repository_rejects_an_unknown_sort PASSED [ 13%]
+backend/tests/test_filter_preference_preservation.py::test_real_api_supplies_exact_five_movie_snapshot_and_available_empty_genre PASSED [ 13%]
+backend/tests/test_filter_preference_preservation.py::test_read_flow_preserves_committed_rows_for_both_accounts_and_catalogue PASSED [ 13%]
+backend/tests/test_genre_matching.py::test_matches_the_t06_personalised_oracle PASSED [ 14%]
+backend/tests/test_genre_matching.py::test_every_result_shares_a_selected_genre_and_others_are_excluded PASSED [ 14%]
+backend/tests/test_genre_matching.py::test_movie_matching_several_selected_genres_appears_once PASSED [ 14%]
+backend/tests/test_genre_matching.py::test_missing_popularity_sorts_after_finite_scores_without_becoming_zero PASSED [ 14%]
+backend/tests/test_genre_matching.py::test_whole_eligible_set_is_ranked_before_the_limit_of_ten PASSED [ 14%]
+backend/tests/test_genre_matching.py::test_ties_use_title_then_internal_id PASSED [ 14%]
+backend/tests/test_genre_matching.py::test_only_the_active_revision_is_searched PASSED [ 15%]
+backend/tests/test_genre_matching.py::test_no_selected_genres_returns_nothing PASSED [ 15%]
+backend/tests/test_genre_matching.py::test_limit_outside_one_to_ten_is_rejected[0] PASSED [ 15%]
+backend/tests/test_genre_matching.py::test_limit_outside_one_to_ten_is_rejected[11] PASSED [ 15%]
+backend/tests/test_genre_matching.py::test_limit_outside_one_to_ten_is_rejected[-1] PASSED [ 15%]
+backend/tests/test_health.py::test_health_reads_database PASSED          [ 15%]
+backend/tests/test_m2_catalogue_bootstrap.py::test_bootstrap_command_migrates_and_seeds_an_empty_database PASSED [ 16%]
+backend/tests/test_m2_catalogue_bootstrap.py::test_second_bootstrap_run_is_idempotent PASSED [ 16%]
+backend/tests/test_m2_catalogue_bootstrap.py::test_seed_service_never_needs_a_network_connection PASSED [ 16%]
+backend/tests/test_movie_repository.py::test_reimport_preserves_the_internal_movie_id PASSED [ 16%]
+backend/tests/test_movie_repository.py::test_active_reads_exclude_movies_from_an_older_revision PASSED [ 16%]
+backend/tests/test_movie_repository.py::test_unknown_active_movie_id_returns_no_record PASSED [ 17%]
+backend/tests/test_movie_repository.py::test_missing_year_and_overview_remain_null PASSED [ 17%]
+backend/tests/test_movie_repository.py::test_replace_movie_genres_de_duplicates_the_relation PASSED [ 17%]
+backend/tests/test_movie_repository.py::test_no_catalogue_state_has_no_runtime_visible_movies PASSED [ 17%]
+backend/tests/test_movie_repository.py::test_active_movies_use_popularity_then_title_then_internal_id PASSED [ 17%]
+backend/tests/test_movies_api.py::test_list_movies_defaults_to_ten_deterministic_items PASSED [ 17%]
+backend/tests/test_movies_api.py::test_list_movies_limit_is_validated_between_one_and_ten PASSED [ 18%]
+backend/tests/test_movies_api.py::test_list_movies_without_active_catalogue_is_unavailable PASSED [ 18%]
+backend/tests/test_movies_api.py::test_list_movies_non_integer_limit_is_a_validation_error PASSED [ 18%]
+backend/tests/test_movies_api.py::test_list_movies_database_failure_is_service_unavailable_not_catalogue_error PASSED [ 18%]
+backend/tests/test_movies_api.py::test_list_movies_integrates_with_the_real_m2_seed_dataset PASSED [ 18%]
+backend/tests/test_movies_api.py::test_movie_detail_returns_genres_and_treats_missing_fields_as_null PASSED [ 18%]
+backend/tests/test_movies_api.py::test_movie_detail_has_exact_safe_backdrop_shape_and_never_fetches_tmdb PASSED [ 19%]
+backend/tests/test_movies_api.py::test_backdrop_builder_rejects_unsafe_or_missing_paths[/../x.jpg] PASSED [ 19%]
+backend/tests/test_movies_api.py::test_backdrop_builder_rejects_unsafe_or_missing_paths[//evil/x.jpg] PASSED [ 19%]
+backend/tests/test_movies_api.py::test_backdrop_builder_rejects_unsafe_or_missing_paths[https://evil/x.jpg] PASSED [ 19%]
+backend/tests/test_movies_api.py::test_backdrop_builder_rejects_unsafe_or_missing_paths[/x.jpg?token=secret] PASSED [ 19%]
+backend/tests/test_movies_api.py::test_backdrop_builder_rejects_unsafe_or_missing_paths[/%2e%2e.jpg] PASSED [ 19%]
+backend/tests/test_movies_api.py::test_backdrop_builder_rejects_unsafe_or_missing_paths[/x.svg] PASSED [ 20%]
+backend/tests/test_movies_api.py::test_backdrop_builder_rejects_unsafe_or_missing_paths[/x\\y.jpg] PASSED [ 20%]
+backend/tests/test_movies_api.py::test_backdrop_builder_rejects_unsafe_or_missing_paths[ /x.jpg] PASSED [ 20%]
+backend/tests/test_movies_api.py::test_backdrop_builder_rejects_unsafe_or_missing_paths[] PASSED [ 20%]
+backend/tests/test_movies_api.py::test_backdrop_builder_rejects_unsafe_or_missing_paths[None] PASSED [ 20%]
+backend/tests/test_movies_api.py::test_unknown_movie_id_returns_404 PASSED [ 21%]
+backend/tests/test_movies_api.py::test_movie_detail_without_active_catalogue_is_unavailable PASSED [ 21%]
+backend/tests/test_movies_api.py::test_movie_detail_database_failure_is_service_unavailable_not_not_found PASSED [ 21%]
+backend/tests/test_movies_api.py::test_popular_movies_returns_top_ten_using_shared_popularity_order PASSED [ 21%]
+backend/tests/test_movies_api.py::test_popular_movies_excludes_missing_popularity PASSED [ 21%]
+backend/tests/test_movies_api.py::test_popular_movies_with_no_usable_popularity_returns_empty_data PASSED [ 21%]
+backend/tests/test_movies_api.py::test_popular_movies_database_failure_returns_service_unavailable PASSED [ 22%]
+backend/tests/test_movies_api.py::test_popular_movies_without_active_catalogue_is_unavailable PASSED [ 22%]
+backend/tests/test_movies_api.py::test_popular_movies_respects_custom_limit PASSED [ 22%]
+backend/tests/test_movies_api.py::test_popular_movies_rejects_limit_above_ten PASSED [ 22%]
+backend/tests/test_nlp_spike.py::test_nlp_spike_fixture_is_deterministic_and_matches_the_decision PASSED [ 22%]
+backend/tests/test_nlp_spike.py::test_nlp_spike_excludes_source_wrong_genre_and_duplicate_candidates PASSED [ 22%]
+backend/tests/test_overview_index.py::test_rebuild_persists_one_shared_transform_and_opaque_rows PASSED [ 23%]
+backend/tests/test_overview_index.py::test_text_and_mapping_changes_stale_but_media_does_not PASSED [ 23%]
+backend/tests/test_overview_index.py::test_new_catalogue_revision_with_same_text_reuses_fitted_index PASSED [ 23%]
+backend/tests/test_overview_index.py::test_config_change_and_corrupt_artifact_are_unavailable PASSED [ 23%]
+backend/tests/test_overview_index.py::test_partial_build_failure_keeps_last_artifact_but_stale_text_stays_unready PASSED [ 23%]
+backend/tests/test_overview_index.py::test_all_empty_corpus_is_ready_and_cli_reuses_it PASSED [ 23%]
+backend/tests/test_overview_index.py::test_rebuild_command_on_clean_migrated_synthetic_database PASSED [ 24%]
+backend/tests/test_passwords.py::test_password_hash_is_argon2id_and_verifies PASSED [ 24%]
+backend/tests/test_passwords.py::test_invalid_hash_is_a_failed_verification PASSED [ 24%]
+backend/tests/test_passwords.py::test_email_normalization_is_shared_by_account_boundaries PASSED [ 24%]
+backend/tests/test_personalised_recommendations_api.py::test_personalised_response_matches_the_reviewed_synthetic_oracle PASSED [ 24%]
+backend/tests/test_personalised_recommendations_api.py::test_popular_states_match_the_reviewed_synthetic_oracles[popularColdStart-False] PASSED [ 25%]
+backend/tests/test_personalised_recommendations_api.py::test_popular_states_match_the_reviewed_synthetic_oracles[popularNoMatch-True] PASSED [ 25%]
+backend/tests/test_personalised_recommendations_api.py::test_personalised_missing_popularity_is_preserved_and_not_invented PASSED [ 25%]
+backend/tests/test_personalised_recommendations_api.py::test_each_session_uses_only_its_account_preferences_despite_forged_identity PASSED [ 25%]
+backend/tests/test_personalised_recommendations_api.py::test_missing_invalid_expired_and_revoked_sessions_are_rejected[missing] PASSED [ 25%]
+backend/tests/test_personalised_recommendations_api.py::test_missing_invalid_expired_and_revoked_sessions_are_rejected[invalid] PASSED [ 25%]
+backend/tests/test_personalised_recommendations_api.py::test_missing_invalid_expired_and_revoked_sessions_are_rejected[expired] PASSED [ 26%]
+backend/tests/test_personalised_recommendations_api.py::test_missing_invalid_expired_and_revoked_sessions_are_rejected[revoked] PASSED [ 26%]
+backend/tests/test_personalised_recommendations_api.py::test_no_match_with_no_usable_popular_alternative_is_a_valid_empty_success PASSED [ 26%]
+backend/tests/test_personalised_recommendations_api.py::test_recommendations_read_only_local_sqlite_and_never_call_tmdb PASSED [ 26%]
+backend/tests/test_personalised_recommendations_api.py::test_t17_recommendation_detail_round_trip_preserves_database_preferences PASSED [ 26%]
+backend/tests/test_personalised_recommendations_api.py::test_t18_detail_is_public_and_saved_preferences_survive_a_fresh_session PASSED [ 26%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[catalogue-personalised] PASSED [ 27%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[catalogue-no_match] PASSED [ 27%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[catalogue-cold_start] PASSED [ 27%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[preferences-personalised] PASSED [ 27%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[preferences-no_match] PASSED [ 27%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[preferences-cold_start] PASSED [ 27%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[matching-personalised] PASSED [ 28%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[matching-no_match] PASSED [ 28%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[popular-no_match] PASSED [ 28%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[popular-cold_start] PASSED [ 28%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[movie_genres-personalised] PASSED [ 28%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[movie_genres-no_match] PASSED [ 28%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[movie_genres-cold_start] PASSED [ 29%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_missing_catalogue_preserves_preferences_and_recovers_after_activation PASSED [ 29%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_active_empty_catalogue_is_cold_start_success_not_a_source_error PASSED [ 29%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_saved_ratings_adjust_scores_without_changing_preferences[1] PASSED [ 29%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_saved_ratings_adjust_scores_without_changing_preferences[5] PASSED [ 29%]
+backend/tests/test_popular_recommendations.py::test_popular_recommendations_rank_by_popularity_then_title_then_id PASSED [ 30%]
+backend/tests/test_popular_recommendations.py::test_popular_recommendations_use_id_as_final_tie_breaker PASSED [ 30%]
+backend/tests/test_popular_recommendations.py::test_popular_recommendations_are_distinct_and_limited_to_ten PASSED [ 30%]
+backend/tests/test_popular_recommendations.py::test_no_usable_popularity_returns_empty_recommendations PASSED [ 30%]
+backend/tests/test_popular_recommendations.py::test_popular_recommendations_exclude_non_finite_database_values PASSED [ 30%]
+backend/tests/test_popular_recommendations.py::test_recommendations_require_authentication PASSED [ 30%]
+backend/tests/test_popular_recommendations.py::test_missing_active_catalogue_returns_catalogue_unavailable PASSED [ 31%]
+backend/tests/test_popular_recommendations.py::test_recommendation_database_failure_returns_service_unavailable PASSED [ 31%]
+backend/tests/test_poster_pipeline.py::test_summary_projects_validated_poster_url PASSED [ 31%]
+backend/tests/test_poster_pipeline.py::test_detail_projects_validated_poster_url PASSED [ 31%]
+backend/tests/test_poster_pipeline.py::test_unsafe_missing_or_nested_paths_are_not_urls[None] PASSED [ 31%]
+backend/tests/test_poster_pipeline.py::test_unsafe_missing_or_nested_paths_are_not_urls[] PASSED [ 31%]
+backend/tests/test_poster_pipeline.py::test_unsafe_missing_or_nested_paths_are_not_urls[bad.jpg] PASSED [ 32%]
+backend/tests/test_poster_pipeline.py::test_unsafe_missing_or_nested_paths_are_not_urls[//evil.invalid/x.jpg] PASSED [ 32%]
+backend/tests/test_poster_pipeline.py::test_unsafe_missing_or_nested_paths_are_not_urls[/../x.jpg] PASSED [ 32%]
+backend/tests/test_poster_pipeline.py::test_unsafe_missing_or_nested_paths_are_not_urls[/nested/x.jpg] PASSED [ 32%]
+backend/tests/test_poster_pipeline.py::test_unsafe_missing_or_nested_paths_are_not_urls[/x.jpg?q=1] PASSED [ 32%]
+backend/tests/test_poster_pipeline.py::test_unsafe_missing_or_nested_paths_are_not_urls[https://evil.invalid/x.jpg] PASSED [ 32%]
+backend/tests/test_poster_pipeline.py::test_unsafe_missing_or_nested_paths_are_not_urls[1] PASSED [ 33%]
+backend/tests/test_poster_pipeline.py::test_only_the_reviewed_size_is_allowed PASSED [ 33%]
+backend/tests/test_poster_pipeline.py::test_import_projects_posters_without_per_movie_detail_calls PASSED [ 33%]
+backend/tests/test_poster_pipeline.py::test_enrichment_is_bounded_idempotent_and_preserves_all_core_text PASSED [ 33%]
+backend/tests/test_poster_pipeline.py::test_missing_or_invalid_metadata_preserves_previous_poster[payload0-missing_movie_count] PASSED [ 33%]
+backend/tests/test_poster_pipeline.py::test_missing_or_invalid_metadata_preserves_previous_poster[payload1-invalid_movie_count] PASSED [ 34%]
+backend/tests/test_poster_pipeline.py::test_known_null_clears_only_the_poster PASSED [ 34%]
+backend/tests/test_poster_pipeline.py::test_partial_provider_failure_rolls_back_every_poster PASSED [ 34%]
+backend/tests/test_poster_pipeline.py::test_database_failure_rolls_back_previously_written_posters PASSED [ 34%]
+backend/tests/test_poster_pipeline.py::test_backfill_preserves_accounts_ratings_preferences_backdrops_and_retired_movies PASSED [ 34%]
+backend/tests/test_poster_pipeline.py::test_bad_budget_is_rejected_before_provider_io[0] PASSED [ 34%]
+backend/tests/test_poster_pipeline.py::test_bad_budget_is_rejected_before_provider_io[301] PASSED [ 35%]
+backend/tests/test_poster_pipeline.py::test_bad_budget_is_rejected_before_provider_io[True] PASSED [ 35%]
+backend/tests/test_poster_pipeline.py::test_bad_budget_is_rejected_before_provider_io[1.5] PASSED [ 35%]
+backend/tests/test_poster_pipeline.py::test_reimport_missing_field_preserves_but_explicit_null_clears PASSED [ 35%]
+backend/tests/test_poster_pipeline.py::test_api_lists_and_detail_read_local_posters_without_provider PASSED [ 35%]
+backend/tests/test_poster_pipeline.py::test_fresh_and_populated_upgrade_preserve_accounts_ratings_and_backdrops PASSED [ 35%]
+backend/tests/test_preference_migration.py::test_migration_creates_the_account_owned_preference_table PASSED [ 36%]
+backend/tests/test_preference_migration.py::test_the_database_rejects_duplicate_and_orphan_preferences PASSED [ 36%]
+backend/tests/test_preference_migration.py::test_two_accounts_may_prefer_the_same_genre PASSED [ 36%]
+backend/tests/test_preference_migration.py::test_deleting_an_account_removes_only_its_own_preferences PASSED [ 36%]
+backend/tests/test_preference_migration.py::test_a_preferred_genre_cannot_be_deleted PASSED [ 36%]
+backend/tests/test_preference_migration.py::test_downgrade_drops_only_the_preference_table PASSED [ 36%]
+backend/tests/test_preferences_api.py::test_visitor_without_a_session_is_rejected[/api/genres] PASSED [ 37%]
+backend/tests/test_preferences_api.py::test_visitor_without_a_session_is_rejected[/api/me/preferences] PASSED [ 37%]
+backend/tests/test_preferences_api.py::test_revoked_session_is_rejected_before_any_read[/api/genres] PASSED [ 37%]
+backend/tests/test_preferences_api.py::test_revoked_session_is_rejected_before_any_read[/api/me/preferences] PASSED [ 37%]
+backend/tests/test_preferences_api.py::test_genres_lists_only_genres_used_by_the_active_catalogue PASSED [ 37%]
+backend/tests/test_preferences_api.py::test_genres_without_an_active_catalogue_is_unavailable PASSED [ 38%]
+backend/tests/test_preferences_api.py::test_new_account_gets_an_empty_list_and_no_guest_identity PASSED [ 38%]
+backend/tests/test_preferences_api.py::test_known_account_reads_only_its_own_saved_genres PASSED [ 38%]
+backend/tests/test_preferences_api.py::test_client_supplied_identity_never_selects_the_account PASSED [ 38%]
+backend/tests/test_preferences_api.py::test_put_accepts_one_and_five_and_returns_committed_sorted_genres[genre_ids0] PASSED [ 38%]
+backend/tests/test_preferences_api.py::test_put_accepts_one_and_five_and_returns_committed_sorted_genres[genre_ids1] PASSED [ 38%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload0] PASSED [ 39%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload1] PASSED [ 39%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload2] PASSED [ 39%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload3] PASSED [ 39%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload4] PASSED [ 39%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload5] PASSED [ 39%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload6] PASSED [ 40%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload7] PASSED [ 40%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload8] PASSED [ 40%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload9] PASSED [ 40%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload10] PASSED [ 40%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload11] PASSED [ 40%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload12] PASSED [ 41%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload13] PASSED [ 41%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload14] PASSED [ 41%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload15] PASSED [ 41%]
+backend/tests/test_preferences_api.py::test_missing_or_malformed_put_body_preserves_the_previous_selection[None] PASSED [ 41%]
+backend/tests/test_preferences_api.py::test_missing_or_malformed_put_body_preserves_the_previous_selection[{"genreIds":] PASSED [ 42%]
+backend/tests/test_preferences_api.py::test_missing_or_malformed_put_body_preserves_the_previous_selection[null] PASSED [ 42%]
+backend/tests/test_preferences_api.py::test_unknown_canonical_genre_is_rejected_before_deleting_preferences[genre_ids0] PASSED [ 42%]
+backend/tests/test_preferences_api.py::test_unknown_canonical_genre_is_rejected_before_deleting_preferences[genre_ids1] PASSED [ 42%]
+backend/tests/test_preferences_api.py::test_unknown_canonical_genre_is_rejected_before_deleting_preferences[genre_ids2] PASSED [ 42%]
+backend/tests/test_preferences_api.py::test_unknown_canonical_genre_is_rejected_before_deleting_preferences[genre_ids3] PASSED [ 42%]
+backend/tests/test_preferences_api.py::test_unknown_canonical_genre_is_rejected_before_deleting_preferences[genre_ids4] PASSED [ 43%]
+backend/tests/test_preferences_api.py::test_unknown_canonical_genre_is_rejected_before_deleting_preferences[genre_ids5] PASSED [ 43%]
+backend/tests/test_preferences_api.py::test_put_replaces_instead_of_appending_and_repeated_save_has_no_duplicates PASSED [ 43%]
+backend/tests/test_preferences_api.py::test_put_only_changes_the_session_account_despite_forged_query_and_header PASSED [ 43%]
+backend/tests/test_preferences_api.py::test_put_requires_a_valid_session_and_never_changes_preferences[missing] PASSED [ 43%]
+backend/tests/test_preferences_api.py::test_put_requires_a_valid_session_and_never_changes_preferences[invalid] PASSED [ 43%]
+backend/tests/test_preferences_api.py::test_put_requires_a_valid_session_and_never_changes_preferences[expired] PASSED [ 44%]
+backend/tests/test_preferences_api.py::test_put_requires_a_valid_session_and_never_changes_preferences[revoked] PASSED [ 44%]
+backend/tests/test_preferences_api.py::test_cross_origin_put_is_rejected_before_writes[headers0] PASSED [ 44%]
+backend/tests/test_preferences_api.py::test_cross_origin_put_is_rejected_before_writes[headers1] PASSED [ 44%]
+backend/tests/test_preferences_api.py::test_cross_origin_put_is_rejected_before_writes[headers2] PASSED [ 44%]
+backend/tests/test_preferences_api.py::test_cross_origin_put_is_rejected_before_writes[headers3] PASSED [ 44%]
+backend/tests/test_preferences_api.py::test_same_origin_fetch_metadata_accepts_the_vite_proxy PASSED [ 45%]
+backend/tests/test_preferences_api.py::test_failed_replacement_rolls_back_deletion_and_preserves_both_accounts[insert] PASSED [ 45%]
+backend/tests/test_preferences_api.py::test_failed_replacement_rolls_back_deletion_and_preserves_both_accounts[commit] PASSED [ 45%]
+backend/tests/test_preferences_api.py::test_put_and_get_use_only_local_canonical_genres_without_provider_access PASSED [ 45%]
+backend/tests/test_preferences_api.py::test_two_accounts_remain_isolated_and_a_restores_genres_after_later_login PASSED [ 45%]
+backend/tests/test_profile_reset_api.py::test_confirmed_reset_is_account_scoped_and_preserves_shared_state PASSED [ 46%]
+backend/tests/test_profile_reset_api.py::test_invalid_confirmation_causes_no_mutation[body0] PASSED [ 46%]
+backend/tests/test_profile_reset_api.py::test_invalid_confirmation_causes_no_mutation[body1] PASSED [ 46%]
+backend/tests/test_profile_reset_api.py::test_invalid_confirmation_causes_no_mutation[body2] PASSED [ 46%]
+backend/tests/test_profile_reset_api.py::test_invalid_confirmation_causes_no_mutation[body3] PASSED [ 46%]
+backend/tests/test_profile_reset_api.py::test_invalid_confirmation_causes_no_mutation[body4] PASSED [ 46%]
+backend/tests/test_profile_reset_api.py::test_invalid_confirmation_causes_no_mutation[body5] PASSED [ 47%]
+backend/tests/test_profile_reset_api.py::test_invalid_confirmation_causes_no_mutation[body6] PASSED [ 47%]
+backend/tests/test_profile_reset_api.py::test_invalid_confirmation_causes_no_mutation[body7] PASSED [ 47%]
+backend/tests/test_profile_reset_api.py::test_invalid_confirmation_causes_no_mutation[body8] PASSED [ 47%]
+backend/tests/test_profile_reset_api.py::test_invalid_confirmation_causes_no_mutation[body9] PASSED [ 47%]
+backend/tests/test_profile_reset_api.py::test_invalid_confirmation_causes_no_mutation[body10] PASSED [ 47%]
+backend/tests/test_profile_reset_api.py::test_invalid_confirmation_causes_no_mutation[True] PASSED [ 48%]
+backend/tests/test_profile_reset_api.py::test_invalid_confirmation_causes_no_mutation[None] PASSED [ 48%]
+backend/tests/test_profile_reset_api.py::test_malformed_confirmation_causes_no_mutation[{] PASSED [ 48%]
+backend/tests/test_profile_reset_api.py::test_malformed_confirmation_causes_no_mutation[] PASSED [ 48%]
+backend/tests/test_profile_reset_api.py::test_malformed_confirmation_causes_no_mutation[not json] PASSED [ 48%]
+backend/tests/test_profile_reset_api.py::test_invalid_session_cannot_reset_personalisation[missing] PASSED [ 48%]
+backend/tests/test_profile_reset_api.py::test_invalid_session_cannot_reset_personalisation[invalid] PASSED [ 49%]
+backend/tests/test_profile_reset_api.py::test_invalid_session_cannot_reset_personalisation[expired] PASSED [ 49%]
+backend/tests/test_profile_reset_api.py::test_invalid_session_cannot_reset_personalisation[revoked] PASSED [ 49%]
+backend/tests/test_profile_reset_api.py::test_forbidden_origin_causes_no_mutation[headers0] PASSED [ 49%]
+backend/tests/test_profile_reset_api.py::test_forbidden_origin_causes_no_mutation[headers1] PASSED [ 49%]
+backend/tests/test_profile_reset_api.py::test_forbidden_origin_causes_no_mutation[headers2] PASSED [ 50%]
+backend/tests/test_profile_reset_api.py::test_forbidden_origin_causes_no_mutation[headers3] PASSED [ 50%]
+backend/tests/test_profile_reset_api.py::test_failure_between_deletes_rolls_back_both_sets PASSED [ 50%]
+backend/tests/test_profile_reset_api.py::test_commit_failure_rolls_back_and_never_claims_success PASSED [ 50%]
+backend/tests/test_profile_reset_api.py::test_recommendations_use_cold_start_state_after_reset PASSED [ 50%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_write_reservation_precedes_auth_and_decision_reads[reset] PASSED [ 50%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_write_reservation_precedes_auth_and_decision_reads[preferences] PASSED [ 51%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_write_reservation_precedes_auth_and_decision_reads[rating] PASSED [ 51%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_A_three_genres_two_ratings_reset_preserves_B_and_shared_rows PASSED [ 51%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_both_controlled_commit_orders[delete-False-preferences] PASSED [ 51%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_both_controlled_commit_orders[delete-False-rating] PASSED [ 51%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_both_controlled_commit_orders[delete-True-preferences] PASSED [ 51%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_both_controlled_commit_orders[delete-True-rating] PASSED [ 52%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_both_controlled_commit_orders[wal-False-preferences] PASSED [ 52%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_both_controlled_commit_orders[wal-False-rating] PASSED [ 52%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_both_controlled_commit_orders[wal-True-preferences] PASSED [ 52%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_both_controlled_commit_orders[wal-True-rating] PASSED [ 52%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_other_account_write_waits_then_succeeds_independently[delete-preferences] PASSED [ 52%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_other_account_write_waits_then_succeeds_independently[delete-rating] PASSED [ 53%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_other_account_write_waits_then_succeeds_independently[wal-preferences] PASSED [ 53%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_other_account_write_waits_then_succeeds_independently[wal-rating] PASSED [ 53%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_competing_same_account_operations_are_atomic_and_unique[delete-rating] PASSED [ 53%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_competing_same_account_operations_are_atomic_and_unique[delete-reset] PASSED [ 53%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_competing_same_account_operations_are_atomic_and_unique[wal-rating] PASSED [ 53%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_competing_same_account_operations_are_atomic_and_unique[wal-reset] PASSED [ 54%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_failure_preserves_both_A_sets_and_B_then_allows_retry[second_delete] PASSED [ 54%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_failure_preserves_both_A_sets_and_B_then_allows_retry[commit] PASSED [ 54%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_failed_A_reset_does_not_absorb_a_concurrent_B_write[delete] PASSED [ 54%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_failed_A_reset_does_not_absorb_a_concurrent_B_write[wal] PASSED [ 54%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_invalid_confirmation_releases_reservation_without_mutation[payload0] PASSED [ 55%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_invalid_confirmation_releases_reservation_without_mutation[payload1] PASSED [ 55%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_invalid_confirmation_releases_reservation_without_mutation[payload2] PASSED [ 55%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_invalid_confirmation_releases_reservation_without_mutation[payload3] PASSED [ 55%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_invalid_confirmation_releases_reservation_without_mutation[payload4] PASSED [ 55%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_invalid_session_releases_reservation[missing] PASSED [ 55%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_invalid_session_releases_reservation[invalid] PASSED [ 56%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_invalid_session_releases_reservation[expired] PASSED [ 56%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_invalid_session_releases_reservation[revoked] PASSED [ 56%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_forged_account_selectors_never_reset_B PASSED [ 56%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_origin_refusal_never_acquires_writer_or_mutates PASSED [ 56%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_reset_changes_only_local_personalisation_not_catalogue_mode_rules PASSED [ 56%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_public_reads_do_not_reserve_writer_and_failed_writes_release_it PASSED [ 57%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_external_process_lock_has_bounded_failure_and_recovery[reset] PASSED [ 57%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_external_process_lock_has_bounded_failure_and_recovery[preferences] PASSED [ 57%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_external_process_lock_has_bounded_failure_and_recovery[rating] PASSED [ 57%]
+backend/tests/test_rating_aware_recommendations.py::test_five_star_related_rating_reorders_80_80 PASSED [ 57%]
+backend/tests/test_rating_aware_recommendations.py::test_signs_neutral_and_current_saved_value[1--1] PASSED [ 57%]
+backend/tests/test_rating_aware_recommendations.py::test_signs_neutral_and_current_saved_value[2--1] PASSED [ 58%]
+backend/tests/test_rating_aware_recommendations.py::test_signs_neutral_and_current_saved_value[3-0] PASSED [ 58%]
+backend/tests/test_rating_aware_recommendations.py::test_signs_neutral_and_current_saved_value[4-1] PASSED [ 58%]
+backend/tests/test_rating_aware_recommendations.py::test_neutral_90_80_handoff_keeps_baseline PASSED [ 58%]
+backend/tests/test_rating_aware_recommendations.py::test_rank_whole_set_before_paging_and_view_filter PASSED [ 58%]
+backend/tests/test_rating_aware_recommendations.py::test_overlap_once_null_popularity_and_deterministic_ties PASSED [ 59%]
+backend/tests/test_rating_aware_recommendations.py::test_only_rating_query_failure_degrades[ratings] PASSED [ 59%]
+backend/tests/test_rating_aware_recommendations.py::test_only_rating_query_failure_degrades[catalogue] PASSED [ 59%]
+backend/tests/test_rating_aware_recommendations.py::test_only_rating_query_failure_degrades[preferences] PASSED [ 59%]
+backend/tests/test_rating_aware_recommendations.py::test_only_rating_query_failure_degrades[candidates] PASSED [ 59%]
+backend/tests/test_rating_aware_recommendations.py::test_only_rating_query_failure_degrades[auth] PASSED [ 59%]
+backend/tests/test_rating_aware_recommendations.py::test_popular_fallbacks_keep_order_and_omit_private_scores[genres0] PASSED [ 60%]
+backend/tests/test_rating_aware_recommendations.py::test_popular_fallbacks_keep_order_and_omit_private_scores[genres1] PASSED [ 60%]
+backend/tests/test_rating_aware_recommendations.py::test_account_isolation_reset_logout_switch_and_no_retargeting PASSED [ 60%]
+backend/tests/test_rating_aware_recommendations.py::test_public_dtos_stay_free_of_private_fields PASSED [ 60%]
+backend/tests/test_rating_migration.py::test_migration_creates_account_owned_rating_table PASSED [ 60%]
+backend/tests/test_rating_migration.py::test_database_enforces_rating_range_and_foreign_keys PASSED [ 60%]
+backend/tests/test_rating_migration.py::test_two_accounts_can_rate_same_movie_independently PASSED [ 61%]
+backend/tests/test_rating_migration.py::test_database_rejects_duplicate_user_movie_pair PASSED [ 61%]
+backend/tests/test_rating_migration.py::test_upgrade_preserves_existing_account_preferences_and_catalogue_ids PASSED [ 61%]
+backend/tests/test_rating_repository.py::test_two_accounts_can_rate_same_movie_independently PASSED [ 61%]
+backend/tests/test_rating_repository.py::test_updating_rating_preserves_exactly_one_current_row PASSED [ 61%]
+backend/tests/test_rating_repository.py::test_repository_reads_are_scoped_to_account PASSED [ 61%]
+backend/tests/test_rating_repository.py::test_unknown_movie_cannot_create_orphan_rating PASSED [ 62%]
+backend/tests/test_rating_repository.py::test_repository_rejects_invalid_rating_values[0-ValueError] PASSED [ 62%]
+backend/tests/test_rating_repository.py::test_repository_rejects_invalid_rating_values[6-ValueError] PASSED [ 62%]
+backend/tests/test_rating_repository.py::test_repository_rejects_invalid_rating_values[-1-ValueError] PASSED [ 62%]
+backend/tests/test_rating_repository.py::test_repository_rejects_invalid_rating_values[3.5-TypeError] PASSED [ 62%]
+backend/tests/test_rating_repository.py::test_repository_rejects_invalid_rating_values[5-TypeError] PASSED [ 63%]
+backend/tests/test_rating_repository.py::test_repository_rejects_invalid_rating_values[True-TypeError] PASSED [ 63%]
+backend/tests/test_rating_repository.py::test_repository_rejects_invalid_rating_values[None-TypeError] PASSED [ 63%]
+backend/tests/test_rating_repository.py::test_orm_created_schema_rejects_fractional_rating PASSED [ 63%]
+backend/tests/test_ratings_api.py::test_unrated_movie_returns_an_explicit_null_not_zero PASSED [ 63%]
+backend/tests/test_ratings_api.py::test_get_returns_only_the_current_accounts_rating PASSED [ 63%]
+backend/tests/test_ratings_api.py::test_missing_expired_or_revoked_session_gets_401_and_nothing_changes[get-missing] PASSED [ 64%]
+backend/tests/test_ratings_api.py::test_missing_expired_or_revoked_session_gets_401_and_nothing_changes[get-invalid] PASSED [ 64%]
+backend/tests/test_ratings_api.py::test_missing_expired_or_revoked_session_gets_401_and_nothing_changes[get-expired] PASSED [ 64%]
+backend/tests/test_ratings_api.py::test_missing_expired_or_revoked_session_gets_401_and_nothing_changes[get-revoked] PASSED [ 64%]
+backend/tests/test_ratings_api.py::test_missing_expired_or_revoked_session_gets_401_and_nothing_changes[put-missing] PASSED [ 64%]
+backend/tests/test_ratings_api.py::test_missing_expired_or_revoked_session_gets_401_and_nothing_changes[put-invalid] PASSED [ 64%]
+backend/tests/test_ratings_api.py::test_missing_expired_or_revoked_session_gets_401_and_nothing_changes[put-expired] PASSED [ 65%]
+backend/tests/test_ratings_api.py::test_missing_expired_or_revoked_session_gets_401_and_nothing_changes[put-revoked] PASSED [ 65%]
+backend/tests/test_ratings_api.py::test_unauthenticated_invalid_payload_is_401_not_400[missing] PASSED [ 65%]
+backend/tests/test_ratings_api.py::test_unauthenticated_invalid_payload_is_401_not_400[invalid] PASSED [ 65%]
+backend/tests/test_ratings_api.py::test_unauthenticated_invalid_payload_is_401_not_400[expired] PASSED [ 65%]
+backend/tests/test_ratings_api.py::test_unauthenticated_invalid_payload_is_401_not_400[revoked] PASSED [ 65%]
+backend/tests/test_ratings_api.py::test_unknown_or_inactive_movie_is_404_and_creates_no_rating[00000000-0000-0000-0000-000000000000-get] PASSED [ 66%]
+backend/tests/test_ratings_api.py::test_unknown_or_inactive_movie_is_404_and_creates_no_rating[00000000-0000-0000-0000-000000000000-put] PASSED [ 66%]
+backend/tests/test_ratings_api.py::test_unknown_or_inactive_movie_is_404_and_creates_no_rating[retired-get] PASSED [ 66%]
+backend/tests/test_ratings_api.py::test_unknown_or_inactive_movie_is_404_and_creates_no_rating[retired-put] PASSED [ 66%]
+backend/tests/test_ratings_api.py::test_put_returns_the_committed_rating_for_every_valid_value[1] PASSED [ 66%]
+backend/tests/test_ratings_api.py::test_put_returns_the_committed_rating_for_every_valid_value[2] PASSED [ 67%]
+backend/tests/test_ratings_api.py::test_put_returns_the_committed_rating_for_every_valid_value[3] PASSED [ 67%]
+backend/tests/test_ratings_api.py::test_put_returns_the_committed_rating_for_every_valid_value[4] PASSED [ 67%]
+backend/tests/test_ratings_api.py::test_put_returns_the_committed_rating_for_every_valid_value[5] PASSED [ 67%]
+backend/tests/test_ratings_api.py::test_repeated_saves_update_one_row PASSED [ 67%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body0] PASSED [ 67%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body1] PASSED [ 68%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body2] PASSED [ 68%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body3] PASSED [ 68%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body4] PASSED [ 68%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body5] PASSED [ 68%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body6] PASSED [ 68%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body7] PASSED [ 69%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body8] PASSED [ 69%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body9] PASSED [ 69%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body10] PASSED [ 69%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body11] PASSED [ 69%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body12] PASSED [ 69%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body13] PASSED [ 70%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body14] PASSED [ 70%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[5_0] PASSED [ 70%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[5_1] PASSED [ 70%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[None] PASSED [ 70%]
+backend/tests/test_ratings_api.py::test_malformed_json_is_rejected_and_preserves_the_previous_rating[{] PASSED [ 71%]
+backend/tests/test_ratings_api.py::test_malformed_json_is_rejected_and_preserves_the_previous_rating[] PASSED [ 71%]
+backend/tests/test_ratings_api.py::test_malformed_json_is_rejected_and_preserves_the_previous_rating[not json] PASSED [ 71%]
+backend/tests/test_ratings_api.py::test_malformed_json_is_rejected_and_preserves_the_previous_rating[{"rating": 5] PASSED [ 71%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[{-missing] PASSED [ 71%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[{-invalid] PASSED [ 71%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[{-expired] PASSED [ 72%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[{-revoked] PASSED [ 72%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[not json-missing] PASSED [ 72%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[not json-invalid] PASSED [ 72%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[not json-expired] PASSED [ 72%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[not json-revoked] PASSED [ 72%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[{"rating": 5-missing] PASSED [ 73%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[{"rating": 5-invalid] PASSED [ 73%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[{"rating": 5-expired] PASSED [ 73%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[{"rating": 5-revoked] PASSED [ 73%]
+backend/tests/test_ratings_api.py::test_forged_identity_never_retargets_another_account PASSED [ 73%]
+backend/tests/test_ratings_api.py::test_cross_origin_put_is_rejected_before_any_write[headers0] PASSED [ 73%]
+backend/tests/test_ratings_api.py::test_cross_origin_put_is_rejected_before_any_write[headers1] PASSED [ 74%]
+backend/tests/test_ratings_api.py::test_cross_origin_put_is_rejected_before_any_write[headers2] PASSED [ 74%]
+backend/tests/test_ratings_api.py::test_cross_origin_put_is_rejected_before_any_write[headers3] PASSED [ 74%]
+backend/tests/test_ratings_api.py::test_same_origin_fetch_metadata_accepts_the_vite_proxy PASSED [ 74%]
+backend/tests/test_ratings_api.py::test_failed_save_rolls_back_and_preserves_the_previous_rating[write] PASSED [ 74%]
+backend/tests/test_ratings_api.py::test_failed_save_rolls_back_and_preserves_the_previous_rating[commit] PASSED [ 75%]
+backend/tests/test_ratings_api_verification.py::test_two_independent_sessions_do_not_share_ratings PASSED [ 75%]
+backend/tests/test_ratings_api_verification.py::test_saving_one_then_five_updates_exactly_one_row PASSED [ 75%]
+backend/tests/test_ratings_api_verification.py::test_logout_and_relogin_restores_latest_rating PASSED [ 75%]
+backend/tests/test_ratings_api_verification.py::test_invalid_payload_preserves_previous_rating[payload0] PASSED [ 75%]
+backend/tests/test_ratings_api_verification.py::test_invalid_payload_preserves_previous_rating[payload1] PASSED [ 75%]
+backend/tests/test_ratings_api_verification.py::test_invalid_payload_preserves_previous_rating[payload2] PASSED [ 76%]
+backend/tests/test_ratings_api_verification.py::test_invalid_payload_preserves_previous_rating[payload3] PASSED [ 76%]
+backend/tests/test_ratings_api_verification.py::test_invalid_payload_preserves_previous_rating[payload4] PASSED [ 76%]
+backend/tests/test_ratings_api_verification.py::test_invalid_payload_preserves_previous_rating[payload5] PASSED [ 76%]
+backend/tests/test_ratings_api_verification.py::test_invalid_payload_preserves_previous_rating[payload6] PASSED [ 76%]
+backend/tests/test_ratings_api_verification.py::test_invalid_payload_preserves_previous_rating[payload7] PASSED [ 76%]
+backend/tests/test_ratings_api_verification.py::test_unknown_movie_preserves_existing_rows PASSED [ 77%]
+backend/tests/test_ratings_api_verification.py::test_repository_failure_rolls_back_previous_rating PASSED [ 77%]
+backend/tests/test_ratings_api_verification.py::test_commit_failure_rolls_back_previous_rating PASSED [ 77%]
+backend/tests/test_ratings_api_verification.py::test_revoked_session_cannot_read_or_write PASSED [ 77%]
+backend/tests/test_ratings_api_verification.py::test_forged_identifiers_cannot_read_or_update_other_account PASSED [ 77%]
+backend/tests/test_ratings_api_verification.py::test_missing_session_cannot_read_or_write PASSED [ 77%]
+backend/tests/test_recommendation_explanation_content.py::test_recommendation_explanation_has_exactly_three_process_steps PASSED [ 78%]
+backend/tests/test_recommendation_explanation_content.py::test_recommendation_explanation_keeps_required_public_statements_outside_steps PASSED [ 78%]
+backend/tests/test_recommendation_explanation_content.py::test_recommendation_explanation_does_not_mislabel_future_text_similarity PASSED [ 78%]
+backend/tests/test_recommendation_fixtures.py::test_fixture_is_explicitly_synthetic_offline_and_provider_neutral PASSED [ 78%]
+backend/tests/test_recommendation_fixtures.py::test_fixture_has_eleven_unique_candidates_and_one_controlled_duplicate PASSED [ 78%]
+backend/tests/test_recommendation_fixtures.py::test_personalised_oracle_is_ranked_distinct_limited_and_explained PASSED [ 78%]
+backend/tests/test_recommendation_fixtures.py::test_cold_start_and_no_match_oracles_use_controlled_popular_fallback PASSED [ 79%]
+backend/tests/test_recommendation_fixtures.py::test_fault_oracles_fix_status_code_message_and_request_id_shape PASSED [ 79%]
+backend/tests/test_registration.py::test_register_creates_account_with_eight_char_password PASSED [ 79%]
+backend/tests/test_registration.py::test_register_rejects_seven_char_password PASSED [ 79%]
+backend/tests/test_registration.py::test_register_rejects_invalid_email_format PASSED [ 79%]
+backend/tests/test_registration.py::test_register_duplicate_email_conflicts_case_insensitively PASSED [ 80%]
+backend/tests/test_registration_verification.py::test_valid_registration_persists_a_hashed_normalized_account PASSED [ 80%]
+backend/tests/test_registration_verification.py::test_passwords_of_eight_or_more_characters_are_accepted[12345678] PASSED [ 80%]
+backend/tests/test_registration_verification.py::test_passwords_of_eight_or_more_characters_are_accepted[aaaaaaaa] PASSED [ 80%]
+backend/tests/test_registration_verification.py::test_passwords_of_eight_or_more_characters_are_accepted[p\xe4ssw\xf6rd] PASSED [ 80%]
+backend/tests/test_registration_verification.py::test_passwords_of_eight_or_more_characters_are_accepted[pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp] PASSED [ 80%]
+backend/tests/test_registration_verification.py::test_passwords_under_eight_characters_are_rejected_without_an_account[] PASSED [ 81%]
+backend/tests/test_registration_verification.py::test_passwords_under_eight_characters_are_rejected_without_an_account[1] PASSED [ 81%]
+backend/tests/test_registration_verification.py::test_passwords_under_eight_characters_are_rejected_without_an_account[movie12] PASSED [ 81%]
+backend/tests/test_registration_verification.py::test_passwords_under_eight_characters_are_rejected_without_an_account[       ] PASSED [ 81%]
+backend/tests/test_registration_verification.py::test_passwords_under_eight_characters_are_rejected_without_an_account[p\xe4ssw\xf6] PASSED [ 81%]
+backend/tests/test_registration_verification.py::test_invalid_emails_are_rejected_without_an_account[] PASSED [ 81%]
+backend/tests/test_registration_verification.py::test_invalid_emails_are_rejected_without_an_account[   ] PASSED [ 82%]
+backend/tests/test_registration_verification.py::test_invalid_emails_are_rejected_without_an_account[plainaddress] PASSED [ 82%]
+backend/tests/test_registration_verification.py::test_invalid_emails_are_rejected_without_an_account[@example.com] PASSED [ 82%]
+backend/tests/test_registration_verification.py::test_invalid_emails_are_rejected_without_an_account[user@] PASSED [ 82%]
+backend/tests/test_registration_verification.py::test_invalid_emails_are_rejected_without_an_account[user@example] PASSED [ 82%]
+backend/tests/test_registration_verification.py::test_invalid_emails_are_rejected_without_an_account[us er@example.com] PASSED [ 82%]
+backend/tests/test_registration_verification.py::test_invalid_emails_are_rejected_without_an_account[a@@b.com] PASSED [ 83%]
+backend/tests/test_registration_verification.py::test_missing_mistyped_or_extra_fields_are_rejected_without_an_account[payload0] PASSED [ 83%]
+backend/tests/test_registration_verification.py::test_missing_mistyped_or_extra_fields_are_rejected_without_an_account[payload1] PASSED [ 83%]
+backend/tests/test_registration_verification.py::test_missing_mistyped_or_extra_fields_are_rejected_without_an_account[payload2] PASSED [ 83%]
+backend/tests/test_registration_verification.py::test_missing_mistyped_or_extra_fields_are_rejected_without_an_account[payload3] PASSED [ 83%]
+backend/tests/test_registration_verification.py::test_missing_mistyped_or_extra_fields_are_rejected_without_an_account[payload4] PASSED [ 84%]
+backend/tests/test_registration_verification.py::test_missing_mistyped_or_extra_fields_are_rejected_without_an_account[payload5] PASSED [ 84%]
+backend/tests/test_registration_verification.py::test_validation_error_does_not_echo_the_submitted_password PASSED [ 84%]
+backend/tests/test_registration_verification.py::test_duplicate_email_is_rejected_case_and_whitespace_insensitively[viewer@example.com] PASSED [ 84%]
+backend/tests/test_registration_verification.py::test_duplicate_email_is_rejected_case_and_whitespace_insensitively[VIEWER@EXAMPLE.COM] PASSED [ 84%]
+backend/tests/test_registration_verification.py::test_duplicate_email_is_rejected_case_and_whitespace_insensitively[Viewer@Example.com] PASSED [ 84%]
+backend/tests/test_registration_verification.py::test_duplicate_email_is_rejected_case_and_whitespace_insensitively[  viewer@example.com  ] PASSED [ 85%]
+backend/tests/test_registration_verification.py::test_concurrent_duplicate_registrations_create_exactly_one_account PASSED [ 85%]
+backend/tests/test_registration_verification.py::test_registration_does_not_create_a_session PASSED [ 85%]
+backend/tests/test_restart_persistence.py::test_preferences_and_rating_survive_application_restart PASSED [ 85%]
+backend/tests/test_review_account_setup.py::test_create_public_demo_once_with_argon2id PASSED [ 85%]
+backend/tests/test_review_account_setup.py::test_rerun_preserves_identity_hash_preferences_rating_and_session PASSED [ 85%]
+backend/tests/test_review_account_setup.py::test_conflicting_password_is_never_reset PASSED [ 86%]
+backend/tests/test_review_account_setup.py::test_unsafe_database_targets_are_refused[sqlite:///:memory:] PASSED [ 86%]
+backend/tests/test_review_account_setup.py::test_unsafe_database_targets_are_refused[postgresql://localhost/review] PASSED [ 86%]
+backend/tests/test_review_account_setup.py::test_unsafe_database_targets_are_refused[sqlite:///./data/m3-review.db?uri=true] PASSED [ 86%]
+backend/tests/test_review_account_setup.py::test_missing_database_is_not_created PASSED [ 86%]
+backend/tests/test_review_account_setup.py::test_no_account_without_an_accepted_tmdb_catalogue[m2-seed] PASSED [ 86%]
+backend/tests/test_review_account_setup.py::test_no_account_without_an_accepted_tmdb_catalogue[None] PASSED [ 87%]
+backend/tests/test_review_account_setup.py::test_empty_catalogue_is_refused PASSED [ 87%]
+backend/tests/test_review_account_setup.py::test_non_tmdb_movies_are_refused_even_if_revision_claims_tmdb PASSED [ 87%]
+backend/tests/test_review_account_setup.py::test_catalogue_and_other_accounts_are_unchanged PASSED [ 87%]
+backend/tests/test_review_account_setup.py::test_cli_requires_explicit_opt_in_and_refuses_production PASSED [ 87%]
+backend/tests/test_review_account_setup.py::test_cli_is_offline_and_prints_no_password_or_token PASSED [ 88%]
+backend/tests/test_review_account_setup.py::test_documented_credentials_authenticate_through_real_login PASSED [ 88%]
+backend/tests/test_s4_t02_rating_signals.py::test_s4_t02_all_five_rating_values_keep_raw_80_80[1--1] PASSED [ 88%]
+backend/tests/test_s4_t02_rating_signals.py::test_s4_t02_all_five_rating_values_keep_raw_80_80[2--1] PASSED [ 88%]
+backend/tests/test_s4_t02_rating_signals.py::test_s4_t02_all_five_rating_values_keep_raw_80_80[3-0] PASSED [ 88%]
+backend/tests/test_s4_t02_rating_signals.py::test_s4_t02_all_five_rating_values_keep_raw_80_80[4-1] PASSED [ 88%]
+backend/tests/test_s4_t02_rating_signals.py::test_s4_t02_all_five_rating_values_keep_raw_80_80[5-1] PASSED [ 89%]
+backend/tests/test_s4_t02_rating_signals.py::test_s4_t02_shared_genres_count_once_and_latest_value_wins PASSED [ 89%]
+backend/tests/test_s4_t02_rating_signals.py::test_s4_t02_account_isolation_and_no_ratings_baseline PASSED [ 89%]
+backend/tests/test_s4_t02_rating_signals.py::test_s4_t02_keeps_saved_rating_history_when_source_leaves_active_catalogue PASSED [ 89%]
+backend/tests/test_s4_t02_rating_signals.py::test_s4_t02_90_80_neutral_handoff PASSED [ 89%]
+backend/tests/test_s4_t02_rating_signals.py::test_s4_t02_whole_set_handoff_oracle_is_explicit PASSED [ 89%]
+backend/tests/test_tmdb_import.py::test_missing_token_is_rejected_without_echoing_it PASSED [ 90%]
+backend/tests/test_tmdb_import.py::test_offline_guard_blocks_real_client_even_with_inherited_token PASSED [ 90%]
+backend/tests/test_tmdb_import.py::test_client_maps_provider_statuses_without_exposing_token[401-TmdbAuthenticationError-TMDb authentication failed] PASSED [ 90%]
+backend/tests/test_tmdb_import.py::test_client_maps_provider_statuses_without_exposing_token[429-TmdbRateLimitError-TMDb rate limit reached] PASSED [ 90%]
+backend/tests/test_tmdb_import.py::test_client_maps_timeout_without_exposing_token PASSED [ 90%]
+backend/tests/test_tmdb_import.py::test_client_maps_network_or_dns_failure_to_safe_guidance PASSED [ 90%]
+backend/tests/test_tmdb_import.py::test_provider_failure_keeps_previous_active_catalogue[failure0] PASSED [ 91%]
+backend/tests/test_tmdb_import.py::test_provider_failure_keeps_previous_active_catalogue[failure1] PASSED [ 91%]
+backend/tests/test_tmdb_import.py::test_provider_failure_keeps_previous_active_catalogue[failure2] PASSED [ 91%]
+backend/tests/test_tmdb_import.py::test_failure_on_a_fresh_database_creates_no_catalogue_data PASSED [ 91%]
+backend/tests/test_tmdb_import.py::test_provider_failure_preserves_tmdb_snapshot_and_existing_account PASSED [ 91%]
+backend/tests/test_tmdb_import.py::test_empty_usable_snapshot_keeps_previous_active_catalogue PASSED [ 92%]
+backend/tests/test_tmdb_import.py::test_successful_import_records_counts_and_maps_provider_fields PASSED [ 92%]
+backend/tests/test_tmdb_import.py::test_reimport_updates_existing_tmdb_movies_without_changing_internal_ids PASSED [ 92%]
+backend/tests/test_tmdb_import.py::test_core_import_maps_valid_null_and_missing_backdrops_without_changing_identity PASSED [ 92%]
+backend/tests/test_tmdb_import.py::test_enrichment_updates_only_media_and_preserves_catalogue_revision PASSED [ 92%]
+backend/tests/test_tmdb_import.py::test_enrichment_limit_and_failure_do_not_change_revision_or_partial_media PASSED [ 92%]
+backend/tests/test_tmdb_import.py::test_enrichment_invalid_path_preserves_previous_value PASSED [ 93%]
+backend/tests/test_tmdb_import.py::test_database_failure_rolls_back_candidate_and_preserves_existing_tmdb_data PASSED [ 93%]
+backend/tests/test_tmdb_import.py::test_public_movie_routes_do_not_trigger_network_or_import PASSED [ 93%]
+backend/tests/test_tmdb_import.py::test_multi_page_import_deduplicates_and_preserves_personal_data[13] PASSED [ 93%]
+backend/tests/test_tmdb_import.py::test_multi_page_import_deduplicates_and_preserves_personal_data[15] PASSED [ 93%]
+backend/tests/test_tmdb_import.py::test_invalid_import_budget_makes_no_provider_calls[0] PASSED [ 93%]
+backend/tests/test_tmdb_import.py::test_invalid_import_budget_makes_no_provider_calls[16] PASSED [ 94%]
+backend/tests/test_tmdb_import.py::test_invalid_import_budget_makes_no_provider_calls[-1] PASSED [ 94%]
+backend/tests/test_tmdb_import.py::test_invalid_import_budget_makes_no_provider_calls[True] PASSED [ 94%]
+backend/tests/test_tmdb_import.py::test_invalid_import_budget_makes_no_provider_calls[1.5] PASSED [ 94%]
+backend/tests/test_tmdb_import.py::test_invalid_import_budget_makes_no_provider_calls[13] PASSED [ 94%]
+backend/tests/test_tmdb_import.py::test_later_page_failure_preserves_previous_snapshot PASSED [ 94%]
+backend/tests/test_tmdb_import.py::test_client_passes_the_bounded_page_to_tmdb[1] PASSED [ 95%]
+backend/tests/test_tmdb_import.py::test_client_passes_the_bounded_page_to_tmdb[13] PASSED [ 95%]
+backend/tests/test_tmdb_import.py::test_client_passes_the_bounded_page_to_tmdb[15] PASSED [ 95%]
+backend/tests/test_tmdb_import.py::test_client_rejects_invalid_pages_without_http[0] PASSED [ 95%]
+backend/tests/test_tmdb_import.py::test_client_rejects_invalid_pages_without_http[16] PASSED [ 95%]
+backend/tests/test_tmdb_import.py::test_client_rejects_invalid_pages_without_http[True] PASSED [ 96%]
+backend/tests/test_tmdb_import.py::test_client_rejects_invalid_pages_without_http[1.5] PASSED [ 96%]
+backend/tests/test_tmdb_import.py::test_client_rejects_invalid_pages_without_http[13] PASSED [ 96%]
+backend/tests/test_tmdb_import_cli.py::test_blank_token_exits_nonzero_with_safe_actionable_guidance PASSED [ 96%]
+backend/tests/test_tmdb_import_cli.py::test_success_output_records_safe_provenance_counts[1] PASSED [ 96%]
+backend/tests/test_tmdb_import_cli.py::test_success_output_records_safe_provenance_counts[13] PASSED [ 96%]
+backend/tests/test_tmdb_import_cli.py::test_success_output_records_safe_provenance_counts[15] PASSED [ 97%]
+backend/tests/test_tmdb_import_cli.py::test_invalid_page_budget_exits_before_client_or_database[0] PASSED [ 97%]
+backend/tests/test_tmdb_import_cli.py::test_invalid_page_budget_exits_before_client_or_database[16] PASSED [ 97%]
+backend/tests/test_tmdb_import_cli.py::test_invalid_page_budget_exits_before_client_or_database[-1] PASSED [ 97%]
+backend/tests/test_tmdb_import_cli.py::test_invalid_page_budget_exits_before_client_or_database[1.5] PASSED [ 97%]
+backend/tests/test_tmdb_import_cli.py::test_invalid_page_budget_exits_before_client_or_database[many] PASSED [ 97%]
+backend/tests/test_tmdb_import_cli.py::test_enrichment_cli_prints_bounded_safe_counts[backdrops] PASSED [ 98%]
+backend/tests/test_tmdb_import_cli.py::test_enrichment_cli_prints_bounded_safe_counts[posters] PASSED [ 98%]
+backend/tests/test_tmdb_import_cli.py::test_enrichment_cli_rejects_invalid_or_mixed_budgets_before_io[arguments0] PASSED [ 98%]
+backend/tests/test_tmdb_import_cli.py::test_enrichment_cli_rejects_invalid_or_mixed_budgets_before_io[arguments1] PASSED [ 98%]
+backend/tests/test_tmdb_import_cli.py::test_enrichment_cli_rejects_invalid_or_mixed_budgets_before_io[arguments2] PASSED [ 98%]
+backend/tests/test_tmdb_import_cli.py::test_enrichment_cli_rejects_invalid_or_mixed_budgets_before_io[arguments3] PASSED [ 98%]
+backend/tests/test_tmdb_import_cli.py::test_enrichment_cli_rejects_invalid_or_mixed_budgets_before_io[arguments4] PASSED [ 99%]
+backend/tests/test_tmdb_import_cli.py::test_enrichment_cli_rejects_invalid_or_mixed_budgets_before_io[arguments5] PASSED [ 99%]
+backend/tests/test_tmdb_import_cli.py::test_enrichment_cli_rejects_invalid_or_mixed_budgets_before_io[arguments6] PASSED [ 99%]
+backend/tests/test_tmdb_import_cli.py::test_enrichment_cli_rejects_invalid_or_mixed_budgets_before_io[arguments7] PASSED [ 99%]
+backend/tests/test_user_repository.py::test_create_user_normalizes_email_hashes_password_and_returns_safe_dto PASSED [ 99%]
+backend/tests/test_user_repository.py::test_user_lookup_uses_the_same_email_normalization PASSED [100%]
+
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============= 575 passed, 1 skipped, 1 warning in 68.18s (0:01:08) =============
+
+===== END ORIGINAL s4-t03-ranking-backend.txt =====
+
+===== BEGIN ORIGINAL s4-t03-ranking-backend-sandbox.txt =====
+SHA-256: 4a99212a4346a1fc22241094ba055bd04fa6be76fd4c3e5a03c866832e28f262
+Original bytes: 81821
+
+============================= test session starts ==============================
+platform darwin -- Python 3.12.4, pytest-9.1.1, pluggy-1.6.0 -- /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/backend
+configfile: pyproject.toml
+plugins: cov-7.1.0, anyio-4.15.1
+collecting ... collected 576 items
+
+backend/tests/test_account_migration.py::test_account_migration_creates_the_required_columns PASSED [  0%]
+backend/tests/test_account_migration.py::test_database_uniqueness_rejects_email_case_variants PASSED [  0%]
+backend/tests/test_account_write_transactions.py::test_TC_S11_runtime_engine_policy_keeps_foreign_keys_and_finite_timeout PASSED [  0%]
+backend/tests/test_account_write_transactions.py::test_TC_S11_reservation_is_real_and_caller_owns_commit_or_rollback PASSED [  0%]
+backend/tests/test_account_write_transactions.py::test_TC_S11_existing_database_transaction_is_rejected_not_silently_discarded PASSED [  0%]
+backend/tests/test_account_write_transactions.py::test_TC_S11_pending_orm_changes_are_rejected_not_expired_or_committed[new] PASSED [  1%]
+backend/tests/test_account_write_transactions.py::test_TC_S11_pending_orm_changes_are_rejected_not_expired_or_committed[dirty] PASSED [  1%]
+backend/tests/test_account_write_transactions.py::test_TC_S11_pending_orm_changes_are_rejected_not_expired_or_committed[deleted] PASSED [  1%]
+backend/tests/test_account_write_transactions.py::test_TC_S11_nested_transaction_is_not_mistaken_for_a_reservation PASSED [  1%]
+backend/tests/test_account_write_transactions.py::test_TC_S11_clean_legacy_read_cache_is_refreshed_after_acquiring_writer PASSED [  1%]
+backend/tests/test_auth_acceptance.py::test_independent_sessions_ignore_forged_identity_and_reset_only_owner ERROR [  1%]
+backend/tests/test_auth_acceptance.py::test_invalid_sessions_reject_every_private_read_and_write[missing] ERROR [  2%]
+backend/tests/test_auth_acceptance.py::test_invalid_sessions_reject_every_private_read_and_write[expired] ERROR [  2%]
+backend/tests/test_auth_acceptance.py::test_invalid_sessions_reject_every_private_read_and_write[revoked] ERROR [  2%]
+backend/tests/test_auth_acceptance.py::test_logout_cookie_replay_relogin_and_actual_backend_restart ERROR [  2%]
+backend/tests/test_auth_acceptance.py::test_reset_confirmation_origin_and_real_delete_failure_preserve_both_accounts ERROR [  2%]
+backend/tests/test_auth_catalogue_handoff.py::test_new_account_reaches_the_recommendation_landing_data PASSED [  2%]
+backend/tests/test_auth_catalogue_handoff.py::test_a_recommended_movie_opens_its_public_detail PASSED [  3%]
+backend/tests/test_auth_catalogue_handoff.py::test_logout_forbids_reusing_the_old_session_on_authenticated_api PASSED [  3%]
+backend/tests/test_auth_catalogue_handoff.py::test_signing_in_again_after_logout_creates_a_fresh_session PASSED [  3%]
+backend/tests/test_auth_catalogue_handoff.py::test_rating_write_requires_the_signed_in_account SKIPPED [  3%]
+backend/tests/test_auth_sessions.py::test_login_creates_opaque_cookie_and_me_resolves_server_user PASSED [  3%]
+backend/tests/test_auth_sessions.py::test_unknown_email_and_wrong_password_have_same_public_error PASSED [  3%]
+backend/tests/test_auth_sessions.py::test_logout_revokes_session_and_expired_or_invalid_cookie_is_unauthorized PASSED [  4%]
+backend/tests/test_auth_sessions.py::test_expired_session_is_unauthorized PASSED [  4%]
+backend/tests/test_auth_sessions.py::test_unknown_cookie_is_unauthorized PASSED [  4%]
+backend/tests/test_auth_sessions.py::test_missing_session_returns_safe_authentication_error PASSED [  4%]
+backend/tests/test_auth_sessions.py::test_client_user_id_cannot_override_the_session_account PASSED [  4%]
+backend/tests/test_auth_sessions.py::test_separate_clients_keep_account_identity_isolated PASSED [  5%]
+backend/tests/test_auth_sessions.py::test_cross_origin_login_is_rejected_before_session_creation PASSED [  5%]
+backend/tests/test_auth_sessions.py::test_same_origin_fetch_metadata_allows_the_vite_proxy PASSED [  5%]
+backend/tests/test_auth_sessions.py::test_cross_origin_logout_cannot_revoke_the_current_session PASSED [  5%]
+backend/tests/test_backdrop_acceptance.py::test_upgrade_enrichment_and_real_account_api_preserve_every_non_media_row PASSED [  5%]
+backend/tests/test_backdrop_acceptance.py::test_database_failure_rolls_back_first_successful_media_write PASSED [  5%]
+backend/tests/test_backdrop_acceptance.py::test_legacy_m2_fixture_has_nullable_media_after_real_migrations PASSED [  6%]
+backend/tests/test_backdrop_storage.py::test_fresh_migration_creates_nullable_backdrop_storage PASSED [  6%]
+backend/tests/test_backdrop_storage.py::test_upgrade_preserves_every_row_identity_and_constraint PASSED [  6%]
+backend/tests/test_backdrop_storage.py::test_revision_extends_the_current_chain_without_a_fork PASSED [  6%]
+backend/tests/test_backdrop_storage.py::test_path_update_clear_and_reads_preserve_core_fields PASSED [  6%]
+backend/tests/test_backdrop_storage.py::test_existing_core_reimport_preserves_a_saved_path PASSED [  6%]
+backend/tests/test_backdrop_storage.py::test_backdrop_write_never_commits_the_callers_transaction PASSED [  7%]
+backend/tests/test_backdrop_storage.py::test_unknown_movie_cannot_create_a_record PASSED [  7%]
+backend/tests/test_backdrop_storage.py::test_non_text_paths_do_not_mutate_existing_data[True] PASSED [  7%]
+backend/tests/test_backdrop_storage.py::test_non_text_paths_do_not_mutate_existing_data[42] PASSED [  7%]
+backend/tests/test_backdrop_storage.py::test_non_text_paths_do_not_mutate_existing_data[image] PASSED [  7%]
+backend/tests/test_backdrop_storage.py::test_non_text_paths_do_not_mutate_existing_data[invalid3] PASSED [  7%]
+backend/tests/test_backdrop_storage.py::test_populated_upgrade_is_idempotent PASSED [  8%]
+backend/tests/test_backdrop_storage.py::test_storage_exposes_only_valid_url_in_detail_dto PASSED [  8%]
+backend/tests/test_backdrop_storage.py::test_existing_uniqueness_and_foreign_keys_still_reject_invalid_rows PASSED [  8%]
+backend/tests/test_backdrop_storage.py::test_explicit_disposable_downgrade_preserves_non_backdrop_data PASSED [  8%]
+backend/tests/test_catalogue_migration.py::test_catalogue_migration_creates_the_required_tables PASSED [  8%]
+backend/tests/test_catalogue_pagination.py::test_public_pages_cover_the_complete_ranked_set[0] PASSED [  9%]
+backend/tests/test_catalogue_pagination.py::test_public_pages_cover_the_complete_ranked_set[1] PASSED [  9%]
+backend/tests/test_catalogue_pagination.py::test_public_pages_cover_the_complete_ranked_set[10] PASSED [  9%]
+backend/tests/test_catalogue_pagination.py::test_public_pages_cover_the_complete_ranked_set[11] PASSED [  9%]
+backend/tests/test_catalogue_pagination.py::test_public_pages_cover_the_complete_ranked_set[25] PASSED [  9%]
+backend/tests/test_catalogue_pagination.py::test_public_pages_cover_the_complete_ranked_set[255] PASSED [  9%]
+backend/tests/test_catalogue_pagination.py::test_home_alphabetical_popular_finite_and_revision_change PASSED [ 10%]
+backend/tests/test_catalogue_pagination.py::test_recommendation_filter_uses_all_candidates_before_page_slice PASSED [ 10%]
+backend/tests/test_catalogue_pagination.py::test_recommendation_genre_id_rejects_invalid_or_overflowing_values[0] PASSED [ 10%]
+backend/tests/test_catalogue_pagination.py::test_recommendation_genre_id_rejects_invalid_or_overflowing_values[abc] PASSED [ 10%]
+backend/tests/test_catalogue_pagination.py::test_recommendation_genre_id_rejects_invalid_or_overflowing_values[2147483648] PASSED [ 10%]
+backend/tests/test_catalogue_pagination.py::test_recommendation_genre_id_rejects_invalid_or_overflowing_values[9223372036854775808] PASSED [ 10%]
+backend/tests/test_catalogue_pagination.py::test_largest_allowed_genre_id_is_checked_as_unknown_without_overflow PASSED [ 11%]
+backend/tests/test_catalogue_pagination.py::test_home_title_desc_sorts_the_whole_catalogue_before_paging[0] PASSED [ 11%]
+backend/tests/test_catalogue_pagination.py::test_home_title_desc_sorts_the_whole_catalogue_before_paging[1] PASSED [ 11%]
+backend/tests/test_catalogue_pagination.py::test_home_title_desc_sorts_the_whole_catalogue_before_paging[10] PASSED [ 11%]
+backend/tests/test_catalogue_pagination.py::test_home_title_desc_sorts_the_whole_catalogue_before_paging[11] PASSED [ 11%]
+backend/tests/test_catalogue_pagination.py::test_home_title_desc_sorts_the_whole_catalogue_before_paging[25] PASSED [ 11%]
+backend/tests/test_catalogue_pagination.py::test_home_title_desc_sorts_the_whole_catalogue_before_paging[255] PASSED [ 12%]
+backend/tests/test_catalogue_pagination.py::test_home_sort_does_not_change_popular_order_or_revision_validation PASSED [ 12%]
+backend/tests/test_catalogue_pagination.py::test_home_sort_has_deterministic_case_and_duplicate_title_ties PASSED [ 12%]
+backend/tests/test_catalogue_pagination.py::test_home_sort_rejects_unsupported_values_without_changing_data[title] PASSED [ 12%]
+backend/tests/test_catalogue_pagination.py::test_home_sort_rejects_unsupported_values_without_changing_data[popularity] PASSED [ 12%]
+backend/tests/test_catalogue_pagination.py::test_home_sort_rejects_unsupported_values_without_changing_data[TITLE_DESC] PASSED [ 13%]
+backend/tests/test_catalogue_pagination.py::test_home_sort_rejects_unsupported_values_without_changing_data[] PASSED [ 13%]
+backend/tests/test_catalogue_pagination.py::test_home_sort_rejects_unsupported_values_without_changing_data[title_desc; DROP TABLE catalog_movies] PASSED [ 13%]
+backend/tests/test_catalogue_pagination.py::test_home_repository_rejects_an_unknown_sort PASSED [ 13%]
+backend/tests/test_filter_preference_preservation.py::test_real_api_supplies_exact_five_movie_snapshot_and_available_empty_genre PASSED [ 13%]
+backend/tests/test_filter_preference_preservation.py::test_read_flow_preserves_committed_rows_for_both_accounts_and_catalogue PASSED [ 13%]
+backend/tests/test_genre_matching.py::test_matches_the_t06_personalised_oracle PASSED [ 14%]
+backend/tests/test_genre_matching.py::test_every_result_shares_a_selected_genre_and_others_are_excluded PASSED [ 14%]
+backend/tests/test_genre_matching.py::test_movie_matching_several_selected_genres_appears_once PASSED [ 14%]
+backend/tests/test_genre_matching.py::test_missing_popularity_sorts_after_finite_scores_without_becoming_zero PASSED [ 14%]
+backend/tests/test_genre_matching.py::test_whole_eligible_set_is_ranked_before_the_limit_of_ten PASSED [ 14%]
+backend/tests/test_genre_matching.py::test_ties_use_title_then_internal_id PASSED [ 14%]
+backend/tests/test_genre_matching.py::test_only_the_active_revision_is_searched PASSED [ 15%]
+backend/tests/test_genre_matching.py::test_no_selected_genres_returns_nothing PASSED [ 15%]
+backend/tests/test_genre_matching.py::test_limit_outside_one_to_ten_is_rejected[0] PASSED [ 15%]
+backend/tests/test_genre_matching.py::test_limit_outside_one_to_ten_is_rejected[11] PASSED [ 15%]
+backend/tests/test_genre_matching.py::test_limit_outside_one_to_ten_is_rejected[-1] PASSED [ 15%]
+backend/tests/test_health.py::test_health_reads_database PASSED          [ 15%]
+backend/tests/test_m2_catalogue_bootstrap.py::test_bootstrap_command_migrates_and_seeds_an_empty_database PASSED [ 16%]
+backend/tests/test_m2_catalogue_bootstrap.py::test_second_bootstrap_run_is_idempotent PASSED [ 16%]
+backend/tests/test_m2_catalogue_bootstrap.py::test_seed_service_never_needs_a_network_connection PASSED [ 16%]
+backend/tests/test_movie_repository.py::test_reimport_preserves_the_internal_movie_id PASSED [ 16%]
+backend/tests/test_movie_repository.py::test_active_reads_exclude_movies_from_an_older_revision PASSED [ 16%]
+backend/tests/test_movie_repository.py::test_unknown_active_movie_id_returns_no_record PASSED [ 17%]
+backend/tests/test_movie_repository.py::test_missing_year_and_overview_remain_null PASSED [ 17%]
+backend/tests/test_movie_repository.py::test_replace_movie_genres_de_duplicates_the_relation PASSED [ 17%]
+backend/tests/test_movie_repository.py::test_no_catalogue_state_has_no_runtime_visible_movies PASSED [ 17%]
+backend/tests/test_movie_repository.py::test_active_movies_use_popularity_then_title_then_internal_id PASSED [ 17%]
+backend/tests/test_movies_api.py::test_list_movies_defaults_to_ten_deterministic_items PASSED [ 17%]
+backend/tests/test_movies_api.py::test_list_movies_limit_is_validated_between_one_and_ten PASSED [ 18%]
+backend/tests/test_movies_api.py::test_list_movies_without_active_catalogue_is_unavailable PASSED [ 18%]
+backend/tests/test_movies_api.py::test_list_movies_non_integer_limit_is_a_validation_error PASSED [ 18%]
+backend/tests/test_movies_api.py::test_list_movies_database_failure_is_service_unavailable_not_catalogue_error PASSED [ 18%]
+backend/tests/test_movies_api.py::test_list_movies_integrates_with_the_real_m2_seed_dataset PASSED [ 18%]
+backend/tests/test_movies_api.py::test_movie_detail_returns_genres_and_treats_missing_fields_as_null PASSED [ 18%]
+backend/tests/test_movies_api.py::test_movie_detail_has_exact_safe_backdrop_shape_and_never_fetches_tmdb PASSED [ 19%]
+backend/tests/test_movies_api.py::test_backdrop_builder_rejects_unsafe_or_missing_paths[/../x.jpg] PASSED [ 19%]
+backend/tests/test_movies_api.py::test_backdrop_builder_rejects_unsafe_or_missing_paths[//evil/x.jpg] PASSED [ 19%]
+backend/tests/test_movies_api.py::test_backdrop_builder_rejects_unsafe_or_missing_paths[https://evil/x.jpg] PASSED [ 19%]
+backend/tests/test_movies_api.py::test_backdrop_builder_rejects_unsafe_or_missing_paths[/x.jpg?token=secret] PASSED [ 19%]
+backend/tests/test_movies_api.py::test_backdrop_builder_rejects_unsafe_or_missing_paths[/%2e%2e.jpg] PASSED [ 19%]
+backend/tests/test_movies_api.py::test_backdrop_builder_rejects_unsafe_or_missing_paths[/x.svg] PASSED [ 20%]
+backend/tests/test_movies_api.py::test_backdrop_builder_rejects_unsafe_or_missing_paths[/x\\y.jpg] PASSED [ 20%]
+backend/tests/test_movies_api.py::test_backdrop_builder_rejects_unsafe_or_missing_paths[ /x.jpg] PASSED [ 20%]
+backend/tests/test_movies_api.py::test_backdrop_builder_rejects_unsafe_or_missing_paths[] PASSED [ 20%]
+backend/tests/test_movies_api.py::test_backdrop_builder_rejects_unsafe_or_missing_paths[None] PASSED [ 20%]
+backend/tests/test_movies_api.py::test_unknown_movie_id_returns_404 PASSED [ 21%]
+backend/tests/test_movies_api.py::test_movie_detail_without_active_catalogue_is_unavailable PASSED [ 21%]
+backend/tests/test_movies_api.py::test_movie_detail_database_failure_is_service_unavailable_not_not_found PASSED [ 21%]
+backend/tests/test_movies_api.py::test_popular_movies_returns_top_ten_using_shared_popularity_order PASSED [ 21%]
+backend/tests/test_movies_api.py::test_popular_movies_excludes_missing_popularity PASSED [ 21%]
+backend/tests/test_movies_api.py::test_popular_movies_with_no_usable_popularity_returns_empty_data PASSED [ 21%]
+backend/tests/test_movies_api.py::test_popular_movies_database_failure_returns_service_unavailable PASSED [ 22%]
+backend/tests/test_movies_api.py::test_popular_movies_without_active_catalogue_is_unavailable PASSED [ 22%]
+backend/tests/test_movies_api.py::test_popular_movies_respects_custom_limit PASSED [ 22%]
+backend/tests/test_movies_api.py::test_popular_movies_rejects_limit_above_ten PASSED [ 22%]
+backend/tests/test_nlp_spike.py::test_nlp_spike_fixture_is_deterministic_and_matches_the_decision PASSED [ 22%]
+backend/tests/test_nlp_spike.py::test_nlp_spike_excludes_source_wrong_genre_and_duplicate_candidates PASSED [ 22%]
+backend/tests/test_overview_index.py::test_rebuild_persists_one_shared_transform_and_opaque_rows PASSED [ 23%]
+backend/tests/test_overview_index.py::test_text_and_mapping_changes_stale_but_media_does_not PASSED [ 23%]
+backend/tests/test_overview_index.py::test_new_catalogue_revision_with_same_text_reuses_fitted_index PASSED [ 23%]
+backend/tests/test_overview_index.py::test_config_change_and_corrupt_artifact_are_unavailable PASSED [ 23%]
+backend/tests/test_overview_index.py::test_partial_build_failure_keeps_last_artifact_but_stale_text_stays_unready PASSED [ 23%]
+backend/tests/test_overview_index.py::test_all_empty_corpus_is_ready_and_cli_reuses_it PASSED [ 23%]
+backend/tests/test_overview_index.py::test_rebuild_command_on_clean_migrated_synthetic_database PASSED [ 24%]
+backend/tests/test_passwords.py::test_password_hash_is_argon2id_and_verifies PASSED [ 24%]
+backend/tests/test_passwords.py::test_invalid_hash_is_a_failed_verification PASSED [ 24%]
+backend/tests/test_passwords.py::test_email_normalization_is_shared_by_account_boundaries PASSED [ 24%]
+backend/tests/test_personalised_recommendations_api.py::test_personalised_response_matches_the_reviewed_synthetic_oracle PASSED [ 24%]
+backend/tests/test_personalised_recommendations_api.py::test_popular_states_match_the_reviewed_synthetic_oracles[popularColdStart-False] PASSED [ 25%]
+backend/tests/test_personalised_recommendations_api.py::test_popular_states_match_the_reviewed_synthetic_oracles[popularNoMatch-True] PASSED [ 25%]
+backend/tests/test_personalised_recommendations_api.py::test_personalised_missing_popularity_is_preserved_and_not_invented PASSED [ 25%]
+backend/tests/test_personalised_recommendations_api.py::test_each_session_uses_only_its_account_preferences_despite_forged_identity PASSED [ 25%]
+backend/tests/test_personalised_recommendations_api.py::test_missing_invalid_expired_and_revoked_sessions_are_rejected[missing] PASSED [ 25%]
+backend/tests/test_personalised_recommendations_api.py::test_missing_invalid_expired_and_revoked_sessions_are_rejected[invalid] PASSED [ 25%]
+backend/tests/test_personalised_recommendations_api.py::test_missing_invalid_expired_and_revoked_sessions_are_rejected[expired] PASSED [ 26%]
+backend/tests/test_personalised_recommendations_api.py::test_missing_invalid_expired_and_revoked_sessions_are_rejected[revoked] PASSED [ 26%]
+backend/tests/test_personalised_recommendations_api.py::test_no_match_with_no_usable_popular_alternative_is_a_valid_empty_success PASSED [ 26%]
+backend/tests/test_personalised_recommendations_api.py::test_recommendations_read_only_local_sqlite_and_never_call_tmdb PASSED [ 26%]
+backend/tests/test_personalised_recommendations_api.py::test_t17_recommendation_detail_round_trip_preserves_database_preferences PASSED [ 26%]
+backend/tests/test_personalised_recommendations_api.py::test_t18_detail_is_public_and_saved_preferences_survive_a_fresh_session PASSED [ 26%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[catalogue-personalised] PASSED [ 27%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[catalogue-no_match] PASSED [ 27%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[catalogue-cold_start] PASSED [ 27%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[preferences-personalised] PASSED [ 27%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[preferences-no_match] PASSED [ 27%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[preferences-cold_start] PASSED [ 27%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[matching-personalised] PASSED [ 28%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[matching-no_match] PASSED [ 28%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[popular-no_match] PASSED [ 28%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[popular-cold_start] PASSED [ 28%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[movie_genres-personalised] PASSED [ 28%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[movie_genres-no_match] PASSED [ 28%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_query_failure_is_not_empty_and_retry_restores_both_accounts[movie_genres-cold_start] PASSED [ 29%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_missing_catalogue_preserves_preferences_and_recovers_after_activation PASSED [ 29%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_active_empty_catalogue_is_cold_start_success_not_a_source_error PASSED [ 29%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_saved_ratings_adjust_scores_without_changing_preferences[1] PASSED [ 29%]
+backend/tests/test_personalised_recommendations_api.py::test_t09_saved_ratings_adjust_scores_without_changing_preferences[5] PASSED [ 29%]
+backend/tests/test_popular_recommendations.py::test_popular_recommendations_rank_by_popularity_then_title_then_id PASSED [ 30%]
+backend/tests/test_popular_recommendations.py::test_popular_recommendations_use_id_as_final_tie_breaker PASSED [ 30%]
+backend/tests/test_popular_recommendations.py::test_popular_recommendations_are_distinct_and_limited_to_ten PASSED [ 30%]
+backend/tests/test_popular_recommendations.py::test_no_usable_popularity_returns_empty_recommendations PASSED [ 30%]
+backend/tests/test_popular_recommendations.py::test_popular_recommendations_exclude_non_finite_database_values PASSED [ 30%]
+backend/tests/test_popular_recommendations.py::test_recommendations_require_authentication PASSED [ 30%]
+backend/tests/test_popular_recommendations.py::test_missing_active_catalogue_returns_catalogue_unavailable PASSED [ 31%]
+backend/tests/test_popular_recommendations.py::test_recommendation_database_failure_returns_service_unavailable PASSED [ 31%]
+backend/tests/test_poster_pipeline.py::test_summary_projects_validated_poster_url PASSED [ 31%]
+backend/tests/test_poster_pipeline.py::test_detail_projects_validated_poster_url PASSED [ 31%]
+backend/tests/test_poster_pipeline.py::test_unsafe_missing_or_nested_paths_are_not_urls[None] PASSED [ 31%]
+backend/tests/test_poster_pipeline.py::test_unsafe_missing_or_nested_paths_are_not_urls[] PASSED [ 31%]
+backend/tests/test_poster_pipeline.py::test_unsafe_missing_or_nested_paths_are_not_urls[bad.jpg] PASSED [ 32%]
+backend/tests/test_poster_pipeline.py::test_unsafe_missing_or_nested_paths_are_not_urls[//evil.invalid/x.jpg] PASSED [ 32%]
+backend/tests/test_poster_pipeline.py::test_unsafe_missing_or_nested_paths_are_not_urls[/../x.jpg] PASSED [ 32%]
+backend/tests/test_poster_pipeline.py::test_unsafe_missing_or_nested_paths_are_not_urls[/nested/x.jpg] PASSED [ 32%]
+backend/tests/test_poster_pipeline.py::test_unsafe_missing_or_nested_paths_are_not_urls[/x.jpg?q=1] PASSED [ 32%]
+backend/tests/test_poster_pipeline.py::test_unsafe_missing_or_nested_paths_are_not_urls[https://evil.invalid/x.jpg] PASSED [ 32%]
+backend/tests/test_poster_pipeline.py::test_unsafe_missing_or_nested_paths_are_not_urls[1] PASSED [ 33%]
+backend/tests/test_poster_pipeline.py::test_only_the_reviewed_size_is_allowed PASSED [ 33%]
+backend/tests/test_poster_pipeline.py::test_import_projects_posters_without_per_movie_detail_calls PASSED [ 33%]
+backend/tests/test_poster_pipeline.py::test_enrichment_is_bounded_idempotent_and_preserves_all_core_text PASSED [ 33%]
+backend/tests/test_poster_pipeline.py::test_missing_or_invalid_metadata_preserves_previous_poster[payload0-missing_movie_count] PASSED [ 33%]
+backend/tests/test_poster_pipeline.py::test_missing_or_invalid_metadata_preserves_previous_poster[payload1-invalid_movie_count] PASSED [ 34%]
+backend/tests/test_poster_pipeline.py::test_known_null_clears_only_the_poster PASSED [ 34%]
+backend/tests/test_poster_pipeline.py::test_partial_provider_failure_rolls_back_every_poster PASSED [ 34%]
+backend/tests/test_poster_pipeline.py::test_database_failure_rolls_back_previously_written_posters PASSED [ 34%]
+backend/tests/test_poster_pipeline.py::test_backfill_preserves_accounts_ratings_preferences_backdrops_and_retired_movies PASSED [ 34%]
+backend/tests/test_poster_pipeline.py::test_bad_budget_is_rejected_before_provider_io[0] PASSED [ 34%]
+backend/tests/test_poster_pipeline.py::test_bad_budget_is_rejected_before_provider_io[301] PASSED [ 35%]
+backend/tests/test_poster_pipeline.py::test_bad_budget_is_rejected_before_provider_io[True] PASSED [ 35%]
+backend/tests/test_poster_pipeline.py::test_bad_budget_is_rejected_before_provider_io[1.5] PASSED [ 35%]
+backend/tests/test_poster_pipeline.py::test_reimport_missing_field_preserves_but_explicit_null_clears PASSED [ 35%]
+backend/tests/test_poster_pipeline.py::test_api_lists_and_detail_read_local_posters_without_provider PASSED [ 35%]
+backend/tests/test_poster_pipeline.py::test_fresh_and_populated_upgrade_preserve_accounts_ratings_and_backdrops PASSED [ 35%]
+backend/tests/test_preference_migration.py::test_migration_creates_the_account_owned_preference_table PASSED [ 36%]
+backend/tests/test_preference_migration.py::test_the_database_rejects_duplicate_and_orphan_preferences PASSED [ 36%]
+backend/tests/test_preference_migration.py::test_two_accounts_may_prefer_the_same_genre PASSED [ 36%]
+backend/tests/test_preference_migration.py::test_deleting_an_account_removes_only_its_own_preferences PASSED [ 36%]
+backend/tests/test_preference_migration.py::test_a_preferred_genre_cannot_be_deleted PASSED [ 36%]
+backend/tests/test_preference_migration.py::test_downgrade_drops_only_the_preference_table PASSED [ 36%]
+backend/tests/test_preferences_api.py::test_visitor_without_a_session_is_rejected[/api/genres] PASSED [ 37%]
+backend/tests/test_preferences_api.py::test_visitor_without_a_session_is_rejected[/api/me/preferences] PASSED [ 37%]
+backend/tests/test_preferences_api.py::test_revoked_session_is_rejected_before_any_read[/api/genres] PASSED [ 37%]
+backend/tests/test_preferences_api.py::test_revoked_session_is_rejected_before_any_read[/api/me/preferences] PASSED [ 37%]
+backend/tests/test_preferences_api.py::test_genres_lists_only_genres_used_by_the_active_catalogue PASSED [ 37%]
+backend/tests/test_preferences_api.py::test_genres_without_an_active_catalogue_is_unavailable PASSED [ 38%]
+backend/tests/test_preferences_api.py::test_new_account_gets_an_empty_list_and_no_guest_identity PASSED [ 38%]
+backend/tests/test_preferences_api.py::test_known_account_reads_only_its_own_saved_genres PASSED [ 38%]
+backend/tests/test_preferences_api.py::test_client_supplied_identity_never_selects_the_account PASSED [ 38%]
+backend/tests/test_preferences_api.py::test_put_accepts_one_and_five_and_returns_committed_sorted_genres[genre_ids0] PASSED [ 38%]
+backend/tests/test_preferences_api.py::test_put_accepts_one_and_five_and_returns_committed_sorted_genres[genre_ids1] PASSED [ 38%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload0] PASSED [ 39%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload1] PASSED [ 39%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload2] PASSED [ 39%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload3] PASSED [ 39%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload4] PASSED [ 39%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload5] PASSED [ 39%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload6] PASSED [ 40%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload7] PASSED [ 40%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload8] PASSED [ 40%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload9] PASSED [ 40%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload10] PASSED [ 40%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload11] PASSED [ 40%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload12] PASSED [ 41%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload13] PASSED [ 41%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload14] PASSED [ 41%]
+backend/tests/test_preferences_api.py::test_invalid_put_body_preserves_the_previous_selection[payload15] PASSED [ 41%]
+backend/tests/test_preferences_api.py::test_missing_or_malformed_put_body_preserves_the_previous_selection[None] PASSED [ 41%]
+backend/tests/test_preferences_api.py::test_missing_or_malformed_put_body_preserves_the_previous_selection[{"genreIds":] PASSED [ 42%]
+backend/tests/test_preferences_api.py::test_missing_or_malformed_put_body_preserves_the_previous_selection[null] PASSED [ 42%]
+backend/tests/test_preferences_api.py::test_unknown_canonical_genre_is_rejected_before_deleting_preferences[genre_ids0] PASSED [ 42%]
+backend/tests/test_preferences_api.py::test_unknown_canonical_genre_is_rejected_before_deleting_preferences[genre_ids1] PASSED [ 42%]
+backend/tests/test_preferences_api.py::test_unknown_canonical_genre_is_rejected_before_deleting_preferences[genre_ids2] PASSED [ 42%]
+backend/tests/test_preferences_api.py::test_unknown_canonical_genre_is_rejected_before_deleting_preferences[genre_ids3] PASSED [ 42%]
+backend/tests/test_preferences_api.py::test_unknown_canonical_genre_is_rejected_before_deleting_preferences[genre_ids4] PASSED [ 43%]
+backend/tests/test_preferences_api.py::test_unknown_canonical_genre_is_rejected_before_deleting_preferences[genre_ids5] PASSED [ 43%]
+backend/tests/test_preferences_api.py::test_put_replaces_instead_of_appending_and_repeated_save_has_no_duplicates PASSED [ 43%]
+backend/tests/test_preferences_api.py::test_put_only_changes_the_session_account_despite_forged_query_and_header PASSED [ 43%]
+backend/tests/test_preferences_api.py::test_put_requires_a_valid_session_and_never_changes_preferences[missing] PASSED [ 43%]
+backend/tests/test_preferences_api.py::test_put_requires_a_valid_session_and_never_changes_preferences[invalid] PASSED [ 43%]
+backend/tests/test_preferences_api.py::test_put_requires_a_valid_session_and_never_changes_preferences[expired] PASSED [ 44%]
+backend/tests/test_preferences_api.py::test_put_requires_a_valid_session_and_never_changes_preferences[revoked] PASSED [ 44%]
+backend/tests/test_preferences_api.py::test_cross_origin_put_is_rejected_before_writes[headers0] PASSED [ 44%]
+backend/tests/test_preferences_api.py::test_cross_origin_put_is_rejected_before_writes[headers1] PASSED [ 44%]
+backend/tests/test_preferences_api.py::test_cross_origin_put_is_rejected_before_writes[headers2] PASSED [ 44%]
+backend/tests/test_preferences_api.py::test_cross_origin_put_is_rejected_before_writes[headers3] PASSED [ 44%]
+backend/tests/test_preferences_api.py::test_same_origin_fetch_metadata_accepts_the_vite_proxy PASSED [ 45%]
+backend/tests/test_preferences_api.py::test_failed_replacement_rolls_back_deletion_and_preserves_both_accounts[insert] PASSED [ 45%]
+backend/tests/test_preferences_api.py::test_failed_replacement_rolls_back_deletion_and_preserves_both_accounts[commit] PASSED [ 45%]
+backend/tests/test_preferences_api.py::test_put_and_get_use_only_local_canonical_genres_without_provider_access PASSED [ 45%]
+backend/tests/test_preferences_api.py::test_two_accounts_remain_isolated_and_a_restores_genres_after_later_login PASSED [ 45%]
+backend/tests/test_profile_reset_api.py::test_confirmed_reset_is_account_scoped_and_preserves_shared_state PASSED [ 46%]
+backend/tests/test_profile_reset_api.py::test_invalid_confirmation_causes_no_mutation[body0] PASSED [ 46%]
+backend/tests/test_profile_reset_api.py::test_invalid_confirmation_causes_no_mutation[body1] PASSED [ 46%]
+backend/tests/test_profile_reset_api.py::test_invalid_confirmation_causes_no_mutation[body2] PASSED [ 46%]
+backend/tests/test_profile_reset_api.py::test_invalid_confirmation_causes_no_mutation[body3] PASSED [ 46%]
+backend/tests/test_profile_reset_api.py::test_invalid_confirmation_causes_no_mutation[body4] PASSED [ 46%]
+backend/tests/test_profile_reset_api.py::test_invalid_confirmation_causes_no_mutation[body5] PASSED [ 47%]
+backend/tests/test_profile_reset_api.py::test_invalid_confirmation_causes_no_mutation[body6] PASSED [ 47%]
+backend/tests/test_profile_reset_api.py::test_invalid_confirmation_causes_no_mutation[body7] PASSED [ 47%]
+backend/tests/test_profile_reset_api.py::test_invalid_confirmation_causes_no_mutation[body8] PASSED [ 47%]
+backend/tests/test_profile_reset_api.py::test_invalid_confirmation_causes_no_mutation[body9] PASSED [ 47%]
+backend/tests/test_profile_reset_api.py::test_invalid_confirmation_causes_no_mutation[body10] PASSED [ 47%]
+backend/tests/test_profile_reset_api.py::test_invalid_confirmation_causes_no_mutation[True] PASSED [ 48%]
+backend/tests/test_profile_reset_api.py::test_invalid_confirmation_causes_no_mutation[None] PASSED [ 48%]
+backend/tests/test_profile_reset_api.py::test_malformed_confirmation_causes_no_mutation[{] PASSED [ 48%]
+backend/tests/test_profile_reset_api.py::test_malformed_confirmation_causes_no_mutation[] PASSED [ 48%]
+backend/tests/test_profile_reset_api.py::test_malformed_confirmation_causes_no_mutation[not json] PASSED [ 48%]
+backend/tests/test_profile_reset_api.py::test_invalid_session_cannot_reset_personalisation[missing] PASSED [ 48%]
+backend/tests/test_profile_reset_api.py::test_invalid_session_cannot_reset_personalisation[invalid] PASSED [ 49%]
+backend/tests/test_profile_reset_api.py::test_invalid_session_cannot_reset_personalisation[expired] PASSED [ 49%]
+backend/tests/test_profile_reset_api.py::test_invalid_session_cannot_reset_personalisation[revoked] PASSED [ 49%]
+backend/tests/test_profile_reset_api.py::test_forbidden_origin_causes_no_mutation[headers0] PASSED [ 49%]
+backend/tests/test_profile_reset_api.py::test_forbidden_origin_causes_no_mutation[headers1] PASSED [ 49%]
+backend/tests/test_profile_reset_api.py::test_forbidden_origin_causes_no_mutation[headers2] PASSED [ 50%]
+backend/tests/test_profile_reset_api.py::test_forbidden_origin_causes_no_mutation[headers3] PASSED [ 50%]
+backend/tests/test_profile_reset_api.py::test_failure_between_deletes_rolls_back_both_sets PASSED [ 50%]
+backend/tests/test_profile_reset_api.py::test_commit_failure_rolls_back_and_never_claims_success PASSED [ 50%]
+backend/tests/test_profile_reset_api.py::test_recommendations_use_cold_start_state_after_reset PASSED [ 50%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_write_reservation_precedes_auth_and_decision_reads[reset] PASSED [ 50%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_write_reservation_precedes_auth_and_decision_reads[preferences] PASSED [ 51%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_write_reservation_precedes_auth_and_decision_reads[rating] PASSED [ 51%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_A_three_genres_two_ratings_reset_preserves_B_and_shared_rows PASSED [ 51%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_both_controlled_commit_orders[delete-False-preferences] PASSED [ 51%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_both_controlled_commit_orders[delete-False-rating] PASSED [ 51%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_both_controlled_commit_orders[delete-True-preferences] PASSED [ 51%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_both_controlled_commit_orders[delete-True-rating] PASSED [ 52%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_both_controlled_commit_orders[wal-False-preferences] PASSED [ 52%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_both_controlled_commit_orders[wal-False-rating] PASSED [ 52%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_both_controlled_commit_orders[wal-True-preferences] PASSED [ 52%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_both_controlled_commit_orders[wal-True-rating] PASSED [ 52%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_other_account_write_waits_then_succeeds_independently[delete-preferences] PASSED [ 52%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_other_account_write_waits_then_succeeds_independently[delete-rating] PASSED [ 53%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_other_account_write_waits_then_succeeds_independently[wal-preferences] PASSED [ 53%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_other_account_write_waits_then_succeeds_independently[wal-rating] PASSED [ 53%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_competing_same_account_operations_are_atomic_and_unique[delete-rating] PASSED [ 53%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_competing_same_account_operations_are_atomic_and_unique[delete-reset] PASSED [ 53%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_competing_same_account_operations_are_atomic_and_unique[wal-rating] PASSED [ 53%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_competing_same_account_operations_are_atomic_and_unique[wal-reset] PASSED [ 54%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_failure_preserves_both_A_sets_and_B_then_allows_retry[second_delete] PASSED [ 54%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_failure_preserves_both_A_sets_and_B_then_allows_retry[commit] PASSED [ 54%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_failed_A_reset_does_not_absorb_a_concurrent_B_write[delete] PASSED [ 54%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_failed_A_reset_does_not_absorb_a_concurrent_B_write[wal] PASSED [ 54%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_invalid_confirmation_releases_reservation_without_mutation[payload0] PASSED [ 55%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_invalid_confirmation_releases_reservation_without_mutation[payload1] PASSED [ 55%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_invalid_confirmation_releases_reservation_without_mutation[payload2] PASSED [ 55%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_invalid_confirmation_releases_reservation_without_mutation[payload3] PASSED [ 55%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_invalid_confirmation_releases_reservation_without_mutation[payload4] PASSED [ 55%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_invalid_session_releases_reservation[missing] PASSED [ 55%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_invalid_session_releases_reservation[invalid] PASSED [ 56%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_invalid_session_releases_reservation[expired] PASSED [ 56%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_invalid_session_releases_reservation[revoked] PASSED [ 56%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_forged_account_selectors_never_reset_B PASSED [ 56%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_origin_refusal_never_acquires_writer_or_mutates PASSED [ 56%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_reset_changes_only_local_personalisation_not_catalogue_mode_rules PASSED [ 56%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_public_reads_do_not_reserve_writer_and_failed_writes_release_it PASSED [ 57%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_external_process_lock_has_bounded_failure_and_recovery[reset] PASSED [ 57%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_external_process_lock_has_bounded_failure_and_recovery[preferences] PASSED [ 57%]
+backend/tests/test_profile_reset_concurrency.py::test_TC_S11_external_process_lock_has_bounded_failure_and_recovery[rating] PASSED [ 57%]
+backend/tests/test_rating_aware_recommendations.py::test_five_star_related_rating_reorders_80_80 PASSED [ 57%]
+backend/tests/test_rating_aware_recommendations.py::test_signs_neutral_and_current_saved_value[1--1] PASSED [ 57%]
+backend/tests/test_rating_aware_recommendations.py::test_signs_neutral_and_current_saved_value[2--1] PASSED [ 58%]
+backend/tests/test_rating_aware_recommendations.py::test_signs_neutral_and_current_saved_value[3-0] PASSED [ 58%]
+backend/tests/test_rating_aware_recommendations.py::test_signs_neutral_and_current_saved_value[4-1] PASSED [ 58%]
+backend/tests/test_rating_aware_recommendations.py::test_neutral_90_80_handoff_keeps_baseline PASSED [ 58%]
+backend/tests/test_rating_aware_recommendations.py::test_rank_whole_set_before_paging_and_view_filter PASSED [ 58%]
+backend/tests/test_rating_aware_recommendations.py::test_overlap_once_null_popularity_and_deterministic_ties PASSED [ 59%]
+backend/tests/test_rating_aware_recommendations.py::test_only_rating_query_failure_degrades[ratings] PASSED [ 59%]
+backend/tests/test_rating_aware_recommendations.py::test_only_rating_query_failure_degrades[catalogue] PASSED [ 59%]
+backend/tests/test_rating_aware_recommendations.py::test_only_rating_query_failure_degrades[preferences] PASSED [ 59%]
+backend/tests/test_rating_aware_recommendations.py::test_only_rating_query_failure_degrades[candidates] PASSED [ 59%]
+backend/tests/test_rating_aware_recommendations.py::test_only_rating_query_failure_degrades[auth] PASSED [ 59%]
+backend/tests/test_rating_aware_recommendations.py::test_popular_fallbacks_keep_order_and_omit_private_scores[genres0] PASSED [ 60%]
+backend/tests/test_rating_aware_recommendations.py::test_popular_fallbacks_keep_order_and_omit_private_scores[genres1] PASSED [ 60%]
+backend/tests/test_rating_aware_recommendations.py::test_account_isolation_reset_logout_switch_and_no_retargeting PASSED [ 60%]
+backend/tests/test_rating_aware_recommendations.py::test_public_dtos_stay_free_of_private_fields PASSED [ 60%]
+backend/tests/test_rating_migration.py::test_migration_creates_account_owned_rating_table PASSED [ 60%]
+backend/tests/test_rating_migration.py::test_database_enforces_rating_range_and_foreign_keys PASSED [ 60%]
+backend/tests/test_rating_migration.py::test_two_accounts_can_rate_same_movie_independently PASSED [ 61%]
+backend/tests/test_rating_migration.py::test_database_rejects_duplicate_user_movie_pair PASSED [ 61%]
+backend/tests/test_rating_migration.py::test_upgrade_preserves_existing_account_preferences_and_catalogue_ids PASSED [ 61%]
+backend/tests/test_rating_repository.py::test_two_accounts_can_rate_same_movie_independently PASSED [ 61%]
+backend/tests/test_rating_repository.py::test_updating_rating_preserves_exactly_one_current_row PASSED [ 61%]
+backend/tests/test_rating_repository.py::test_repository_reads_are_scoped_to_account PASSED [ 61%]
+backend/tests/test_rating_repository.py::test_unknown_movie_cannot_create_orphan_rating PASSED [ 62%]
+backend/tests/test_rating_repository.py::test_repository_rejects_invalid_rating_values[0-ValueError] PASSED [ 62%]
+backend/tests/test_rating_repository.py::test_repository_rejects_invalid_rating_values[6-ValueError] PASSED [ 62%]
+backend/tests/test_rating_repository.py::test_repository_rejects_invalid_rating_values[-1-ValueError] PASSED [ 62%]
+backend/tests/test_rating_repository.py::test_repository_rejects_invalid_rating_values[3.5-TypeError] PASSED [ 62%]
+backend/tests/test_rating_repository.py::test_repository_rejects_invalid_rating_values[5-TypeError] PASSED [ 63%]
+backend/tests/test_rating_repository.py::test_repository_rejects_invalid_rating_values[True-TypeError] PASSED [ 63%]
+backend/tests/test_rating_repository.py::test_repository_rejects_invalid_rating_values[None-TypeError] PASSED [ 63%]
+backend/tests/test_rating_repository.py::test_orm_created_schema_rejects_fractional_rating PASSED [ 63%]
+backend/tests/test_ratings_api.py::test_unrated_movie_returns_an_explicit_null_not_zero PASSED [ 63%]
+backend/tests/test_ratings_api.py::test_get_returns_only_the_current_accounts_rating PASSED [ 63%]
+backend/tests/test_ratings_api.py::test_missing_expired_or_revoked_session_gets_401_and_nothing_changes[get-missing] PASSED [ 64%]
+backend/tests/test_ratings_api.py::test_missing_expired_or_revoked_session_gets_401_and_nothing_changes[get-invalid] PASSED [ 64%]
+backend/tests/test_ratings_api.py::test_missing_expired_or_revoked_session_gets_401_and_nothing_changes[get-expired] PASSED [ 64%]
+backend/tests/test_ratings_api.py::test_missing_expired_or_revoked_session_gets_401_and_nothing_changes[get-revoked] PASSED [ 64%]
+backend/tests/test_ratings_api.py::test_missing_expired_or_revoked_session_gets_401_and_nothing_changes[put-missing] PASSED [ 64%]
+backend/tests/test_ratings_api.py::test_missing_expired_or_revoked_session_gets_401_and_nothing_changes[put-invalid] PASSED [ 64%]
+backend/tests/test_ratings_api.py::test_missing_expired_or_revoked_session_gets_401_and_nothing_changes[put-expired] PASSED [ 65%]
+backend/tests/test_ratings_api.py::test_missing_expired_or_revoked_session_gets_401_and_nothing_changes[put-revoked] PASSED [ 65%]
+backend/tests/test_ratings_api.py::test_unauthenticated_invalid_payload_is_401_not_400[missing] PASSED [ 65%]
+backend/tests/test_ratings_api.py::test_unauthenticated_invalid_payload_is_401_not_400[invalid] PASSED [ 65%]
+backend/tests/test_ratings_api.py::test_unauthenticated_invalid_payload_is_401_not_400[expired] PASSED [ 65%]
+backend/tests/test_ratings_api.py::test_unauthenticated_invalid_payload_is_401_not_400[revoked] PASSED [ 65%]
+backend/tests/test_ratings_api.py::test_unknown_or_inactive_movie_is_404_and_creates_no_rating[00000000-0000-0000-0000-000000000000-get] PASSED [ 66%]
+backend/tests/test_ratings_api.py::test_unknown_or_inactive_movie_is_404_and_creates_no_rating[00000000-0000-0000-0000-000000000000-put] PASSED [ 66%]
+backend/tests/test_ratings_api.py::test_unknown_or_inactive_movie_is_404_and_creates_no_rating[retired-get] PASSED [ 66%]
+backend/tests/test_ratings_api.py::test_unknown_or_inactive_movie_is_404_and_creates_no_rating[retired-put] PASSED [ 66%]
+backend/tests/test_ratings_api.py::test_put_returns_the_committed_rating_for_every_valid_value[1] PASSED [ 66%]
+backend/tests/test_ratings_api.py::test_put_returns_the_committed_rating_for_every_valid_value[2] PASSED [ 67%]
+backend/tests/test_ratings_api.py::test_put_returns_the_committed_rating_for_every_valid_value[3] PASSED [ 67%]
+backend/tests/test_ratings_api.py::test_put_returns_the_committed_rating_for_every_valid_value[4] PASSED [ 67%]
+backend/tests/test_ratings_api.py::test_put_returns_the_committed_rating_for_every_valid_value[5] PASSED [ 67%]
+backend/tests/test_ratings_api.py::test_repeated_saves_update_one_row PASSED [ 67%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body0] PASSED [ 67%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body1] PASSED [ 68%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body2] PASSED [ 68%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body3] PASSED [ 68%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body4] PASSED [ 68%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body5] PASSED [ 68%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body6] PASSED [ 68%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body7] PASSED [ 69%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body8] PASSED [ 69%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body9] PASSED [ 69%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body10] PASSED [ 69%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body11] PASSED [ 69%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body12] PASSED [ 69%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body13] PASSED [ 70%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[body14] PASSED [ 70%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[5_0] PASSED [ 70%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[5_1] PASSED [ 70%]
+backend/tests/test_ratings_api.py::test_invalid_payload_is_rejected_and_preserves_the_previous_rating[None] PASSED [ 70%]
+backend/tests/test_ratings_api.py::test_malformed_json_is_rejected_and_preserves_the_previous_rating[{] PASSED [ 71%]
+backend/tests/test_ratings_api.py::test_malformed_json_is_rejected_and_preserves_the_previous_rating[] PASSED [ 71%]
+backend/tests/test_ratings_api.py::test_malformed_json_is_rejected_and_preserves_the_previous_rating[not json] PASSED [ 71%]
+backend/tests/test_ratings_api.py::test_malformed_json_is_rejected_and_preserves_the_previous_rating[{"rating": 5] PASSED [ 71%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[{-missing] PASSED [ 71%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[{-invalid] PASSED [ 71%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[{-expired] PASSED [ 72%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[{-revoked] PASSED [ 72%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[not json-missing] PASSED [ 72%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[not json-invalid] PASSED [ 72%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[not json-expired] PASSED [ 72%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[not json-revoked] PASSED [ 72%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[{"rating": 5-missing] PASSED [ 73%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[{"rating": 5-invalid] PASSED [ 73%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[{"rating": 5-expired] PASSED [ 73%]
+backend/tests/test_ratings_api.py::test_unparsable_json_is_400_even_without_a_valid_session[{"rating": 5-revoked] PASSED [ 73%]
+backend/tests/test_ratings_api.py::test_forged_identity_never_retargets_another_account PASSED [ 73%]
+backend/tests/test_ratings_api.py::test_cross_origin_put_is_rejected_before_any_write[headers0] PASSED [ 73%]
+backend/tests/test_ratings_api.py::test_cross_origin_put_is_rejected_before_any_write[headers1] PASSED [ 74%]
+backend/tests/test_ratings_api.py::test_cross_origin_put_is_rejected_before_any_write[headers2] PASSED [ 74%]
+backend/tests/test_ratings_api.py::test_cross_origin_put_is_rejected_before_any_write[headers3] PASSED [ 74%]
+backend/tests/test_ratings_api.py::test_same_origin_fetch_metadata_accepts_the_vite_proxy PASSED [ 74%]
+backend/tests/test_ratings_api.py::test_failed_save_rolls_back_and_preserves_the_previous_rating[write] PASSED [ 74%]
+backend/tests/test_ratings_api.py::test_failed_save_rolls_back_and_preserves_the_previous_rating[commit] PASSED [ 75%]
+backend/tests/test_ratings_api_verification.py::test_two_independent_sessions_do_not_share_ratings PASSED [ 75%]
+backend/tests/test_ratings_api_verification.py::test_saving_one_then_five_updates_exactly_one_row PASSED [ 75%]
+backend/tests/test_ratings_api_verification.py::test_logout_and_relogin_restores_latest_rating PASSED [ 75%]
+backend/tests/test_ratings_api_verification.py::test_invalid_payload_preserves_previous_rating[payload0] PASSED [ 75%]
+backend/tests/test_ratings_api_verification.py::test_invalid_payload_preserves_previous_rating[payload1] PASSED [ 75%]
+backend/tests/test_ratings_api_verification.py::test_invalid_payload_preserves_previous_rating[payload2] PASSED [ 76%]
+backend/tests/test_ratings_api_verification.py::test_invalid_payload_preserves_previous_rating[payload3] PASSED [ 76%]
+backend/tests/test_ratings_api_verification.py::test_invalid_payload_preserves_previous_rating[payload4] PASSED [ 76%]
+backend/tests/test_ratings_api_verification.py::test_invalid_payload_preserves_previous_rating[payload5] PASSED [ 76%]
+backend/tests/test_ratings_api_verification.py::test_invalid_payload_preserves_previous_rating[payload6] PASSED [ 76%]
+backend/tests/test_ratings_api_verification.py::test_invalid_payload_preserves_previous_rating[payload7] PASSED [ 76%]
+backend/tests/test_ratings_api_verification.py::test_unknown_movie_preserves_existing_rows PASSED [ 77%]
+backend/tests/test_ratings_api_verification.py::test_repository_failure_rolls_back_previous_rating PASSED [ 77%]
+backend/tests/test_ratings_api_verification.py::test_commit_failure_rolls_back_previous_rating PASSED [ 77%]
+backend/tests/test_ratings_api_verification.py::test_revoked_session_cannot_read_or_write PASSED [ 77%]
+backend/tests/test_ratings_api_verification.py::test_forged_identifiers_cannot_read_or_update_other_account PASSED [ 77%]
+backend/tests/test_ratings_api_verification.py::test_missing_session_cannot_read_or_write PASSED [ 77%]
+backend/tests/test_recommendation_explanation_content.py::test_recommendation_explanation_has_exactly_three_process_steps PASSED [ 78%]
+backend/tests/test_recommendation_explanation_content.py::test_recommendation_explanation_keeps_required_public_statements_outside_steps PASSED [ 78%]
+backend/tests/test_recommendation_explanation_content.py::test_recommendation_explanation_does_not_mislabel_future_text_similarity PASSED [ 78%]
+backend/tests/test_recommendation_fixtures.py::test_fixture_is_explicitly_synthetic_offline_and_provider_neutral PASSED [ 78%]
+backend/tests/test_recommendation_fixtures.py::test_fixture_has_eleven_unique_candidates_and_one_controlled_duplicate PASSED [ 78%]
+backend/tests/test_recommendation_fixtures.py::test_personalised_oracle_is_ranked_distinct_limited_and_explained PASSED [ 78%]
+backend/tests/test_recommendation_fixtures.py::test_cold_start_and_no_match_oracles_use_controlled_popular_fallback PASSED [ 79%]
+backend/tests/test_recommendation_fixtures.py::test_fault_oracles_fix_status_code_message_and_request_id_shape PASSED [ 79%]
+backend/tests/test_registration.py::test_register_creates_account_with_eight_char_password PASSED [ 79%]
+backend/tests/test_registration.py::test_register_rejects_seven_char_password PASSED [ 79%]
+backend/tests/test_registration.py::test_register_rejects_invalid_email_format PASSED [ 79%]
+backend/tests/test_registration.py::test_register_duplicate_email_conflicts_case_insensitively PASSED [ 80%]
+backend/tests/test_registration_verification.py::test_valid_registration_persists_a_hashed_normalized_account PASSED [ 80%]
+backend/tests/test_registration_verification.py::test_passwords_of_eight_or_more_characters_are_accepted[12345678] PASSED [ 80%]
+backend/tests/test_registration_verification.py::test_passwords_of_eight_or_more_characters_are_accepted[aaaaaaaa] PASSED [ 80%]
+backend/tests/test_registration_verification.py::test_passwords_of_eight_or_more_characters_are_accepted[p\xe4ssw\xf6rd] PASSED [ 80%]
+backend/tests/test_registration_verification.py::test_passwords_of_eight_or_more_characters_are_accepted[pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp] PASSED [ 80%]
+backend/tests/test_registration_verification.py::test_passwords_under_eight_characters_are_rejected_without_an_account[] PASSED [ 81%]
+backend/tests/test_registration_verification.py::test_passwords_under_eight_characters_are_rejected_without_an_account[1] PASSED [ 81%]
+backend/tests/test_registration_verification.py::test_passwords_under_eight_characters_are_rejected_without_an_account[movie12] PASSED [ 81%]
+backend/tests/test_registration_verification.py::test_passwords_under_eight_characters_are_rejected_without_an_account[       ] PASSED [ 81%]
+backend/tests/test_registration_verification.py::test_passwords_under_eight_characters_are_rejected_without_an_account[p\xe4ssw\xf6] PASSED [ 81%]
+backend/tests/test_registration_verification.py::test_invalid_emails_are_rejected_without_an_account[] PASSED [ 81%]
+backend/tests/test_registration_verification.py::test_invalid_emails_are_rejected_without_an_account[   ] PASSED [ 82%]
+backend/tests/test_registration_verification.py::test_invalid_emails_are_rejected_without_an_account[plainaddress] PASSED [ 82%]
+backend/tests/test_registration_verification.py::test_invalid_emails_are_rejected_without_an_account[@example.com] PASSED [ 82%]
+backend/tests/test_registration_verification.py::test_invalid_emails_are_rejected_without_an_account[user@] PASSED [ 82%]
+backend/tests/test_registration_verification.py::test_invalid_emails_are_rejected_without_an_account[user@example] PASSED [ 82%]
+backend/tests/test_registration_verification.py::test_invalid_emails_are_rejected_without_an_account[us er@example.com] PASSED [ 82%]
+backend/tests/test_registration_verification.py::test_invalid_emails_are_rejected_without_an_account[a@@b.com] PASSED [ 83%]
+backend/tests/test_registration_verification.py::test_missing_mistyped_or_extra_fields_are_rejected_without_an_account[payload0] PASSED [ 83%]
+backend/tests/test_registration_verification.py::test_missing_mistyped_or_extra_fields_are_rejected_without_an_account[payload1] PASSED [ 83%]
+backend/tests/test_registration_verification.py::test_missing_mistyped_or_extra_fields_are_rejected_without_an_account[payload2] PASSED [ 83%]
+backend/tests/test_registration_verification.py::test_missing_mistyped_or_extra_fields_are_rejected_without_an_account[payload3] PASSED [ 83%]
+backend/tests/test_registration_verification.py::test_missing_mistyped_or_extra_fields_are_rejected_without_an_account[payload4] PASSED [ 84%]
+backend/tests/test_registration_verification.py::test_missing_mistyped_or_extra_fields_are_rejected_without_an_account[payload5] PASSED [ 84%]
+backend/tests/test_registration_verification.py::test_validation_error_does_not_echo_the_submitted_password PASSED [ 84%]
+backend/tests/test_registration_verification.py::test_duplicate_email_is_rejected_case_and_whitespace_insensitively[viewer@example.com] PASSED [ 84%]
+backend/tests/test_registration_verification.py::test_duplicate_email_is_rejected_case_and_whitespace_insensitively[VIEWER@EXAMPLE.COM] PASSED [ 84%]
+backend/tests/test_registration_verification.py::test_duplicate_email_is_rejected_case_and_whitespace_insensitively[Viewer@Example.com] PASSED [ 84%]
+backend/tests/test_registration_verification.py::test_duplicate_email_is_rejected_case_and_whitespace_insensitively[  viewer@example.com  ] PASSED [ 85%]
+backend/tests/test_registration_verification.py::test_concurrent_duplicate_registrations_create_exactly_one_account PASSED [ 85%]
+backend/tests/test_registration_verification.py::test_registration_does_not_create_a_session PASSED [ 85%]
+backend/tests/test_restart_persistence.py::test_preferences_and_rating_survive_application_restart PASSED [ 85%]
+backend/tests/test_review_account_setup.py::test_create_public_demo_once_with_argon2id PASSED [ 85%]
+backend/tests/test_review_account_setup.py::test_rerun_preserves_identity_hash_preferences_rating_and_session PASSED [ 85%]
+backend/tests/test_review_account_setup.py::test_conflicting_password_is_never_reset PASSED [ 86%]
+backend/tests/test_review_account_setup.py::test_unsafe_database_targets_are_refused[sqlite:///:memory:] PASSED [ 86%]
+backend/tests/test_review_account_setup.py::test_unsafe_database_targets_are_refused[postgresql://localhost/review] PASSED [ 86%]
+backend/tests/test_review_account_setup.py::test_unsafe_database_targets_are_refused[sqlite:///./data/m3-review.db?uri=true] PASSED [ 86%]
+backend/tests/test_review_account_setup.py::test_missing_database_is_not_created PASSED [ 86%]
+backend/tests/test_review_account_setup.py::test_no_account_without_an_accepted_tmdb_catalogue[m2-seed] PASSED [ 86%]
+backend/tests/test_review_account_setup.py::test_no_account_without_an_accepted_tmdb_catalogue[None] PASSED [ 87%]
+backend/tests/test_review_account_setup.py::test_empty_catalogue_is_refused PASSED [ 87%]
+backend/tests/test_review_account_setup.py::test_non_tmdb_movies_are_refused_even_if_revision_claims_tmdb PASSED [ 87%]
+backend/tests/test_review_account_setup.py::test_catalogue_and_other_accounts_are_unchanged PASSED [ 87%]
+backend/tests/test_review_account_setup.py::test_cli_requires_explicit_opt_in_and_refuses_production PASSED [ 87%]
+backend/tests/test_review_account_setup.py::test_cli_is_offline_and_prints_no_password_or_token PASSED [ 88%]
+backend/tests/test_review_account_setup.py::test_documented_credentials_authenticate_through_real_login PASSED [ 88%]
+backend/tests/test_s4_t02_rating_signals.py::test_s4_t02_all_five_rating_values_keep_raw_80_80[1--1] PASSED [ 88%]
+backend/tests/test_s4_t02_rating_signals.py::test_s4_t02_all_five_rating_values_keep_raw_80_80[2--1] PASSED [ 88%]
+backend/tests/test_s4_t02_rating_signals.py::test_s4_t02_all_five_rating_values_keep_raw_80_80[3-0] PASSED [ 88%]
+backend/tests/test_s4_t02_rating_signals.py::test_s4_t02_all_five_rating_values_keep_raw_80_80[4-1] PASSED [ 88%]
+backend/tests/test_s4_t02_rating_signals.py::test_s4_t02_all_five_rating_values_keep_raw_80_80[5-1] PASSED [ 89%]
+backend/tests/test_s4_t02_rating_signals.py::test_s4_t02_shared_genres_count_once_and_latest_value_wins PASSED [ 89%]
+backend/tests/test_s4_t02_rating_signals.py::test_s4_t02_account_isolation_and_no_ratings_baseline PASSED [ 89%]
+backend/tests/test_s4_t02_rating_signals.py::test_s4_t02_keeps_saved_rating_history_when_source_leaves_active_catalogue PASSED [ 89%]
+backend/tests/test_s4_t02_rating_signals.py::test_s4_t02_90_80_neutral_handoff PASSED [ 89%]
+backend/tests/test_s4_t02_rating_signals.py::test_s4_t02_whole_set_handoff_oracle_is_explicit PASSED [ 89%]
+backend/tests/test_tmdb_import.py::test_missing_token_is_rejected_without_echoing_it PASSED [ 90%]
+backend/tests/test_tmdb_import.py::test_offline_guard_blocks_real_client_even_with_inherited_token PASSED [ 90%]
+backend/tests/test_tmdb_import.py::test_client_maps_provider_statuses_without_exposing_token[401-TmdbAuthenticationError-TMDb authentication failed] PASSED [ 90%]
+backend/tests/test_tmdb_import.py::test_client_maps_provider_statuses_without_exposing_token[429-TmdbRateLimitError-TMDb rate limit reached] PASSED [ 90%]
+backend/tests/test_tmdb_import.py::test_client_maps_timeout_without_exposing_token PASSED [ 90%]
+backend/tests/test_tmdb_import.py::test_client_maps_network_or_dns_failure_to_safe_guidance PASSED [ 90%]
+backend/tests/test_tmdb_import.py::test_provider_failure_keeps_previous_active_catalogue[failure0] PASSED [ 91%]
+backend/tests/test_tmdb_import.py::test_provider_failure_keeps_previous_active_catalogue[failure1] PASSED [ 91%]
+backend/tests/test_tmdb_import.py::test_provider_failure_keeps_previous_active_catalogue[failure2] PASSED [ 91%]
+backend/tests/test_tmdb_import.py::test_failure_on_a_fresh_database_creates_no_catalogue_data PASSED [ 91%]
+backend/tests/test_tmdb_import.py::test_provider_failure_preserves_tmdb_snapshot_and_existing_account PASSED [ 91%]
+backend/tests/test_tmdb_import.py::test_empty_usable_snapshot_keeps_previous_active_catalogue PASSED [ 92%]
+backend/tests/test_tmdb_import.py::test_successful_import_records_counts_and_maps_provider_fields PASSED [ 92%]
+backend/tests/test_tmdb_import.py::test_reimport_updates_existing_tmdb_movies_without_changing_internal_ids PASSED [ 92%]
+backend/tests/test_tmdb_import.py::test_core_import_maps_valid_null_and_missing_backdrops_without_changing_identity PASSED [ 92%]
+backend/tests/test_tmdb_import.py::test_enrichment_updates_only_media_and_preserves_catalogue_revision PASSED [ 92%]
+backend/tests/test_tmdb_import.py::test_enrichment_limit_and_failure_do_not_change_revision_or_partial_media PASSED [ 92%]
+backend/tests/test_tmdb_import.py::test_enrichment_invalid_path_preserves_previous_value PASSED [ 93%]
+backend/tests/test_tmdb_import.py::test_database_failure_rolls_back_candidate_and_preserves_existing_tmdb_data PASSED [ 93%]
+backend/tests/test_tmdb_import.py::test_public_movie_routes_do_not_trigger_network_or_import PASSED [ 93%]
+backend/tests/test_tmdb_import.py::test_multi_page_import_deduplicates_and_preserves_personal_data[13] PASSED [ 93%]
+backend/tests/test_tmdb_import.py::test_multi_page_import_deduplicates_and_preserves_personal_data[15] PASSED [ 93%]
+backend/tests/test_tmdb_import.py::test_invalid_import_budget_makes_no_provider_calls[0] PASSED [ 93%]
+backend/tests/test_tmdb_import.py::test_invalid_import_budget_makes_no_provider_calls[16] PASSED [ 94%]
+backend/tests/test_tmdb_import.py::test_invalid_import_budget_makes_no_provider_calls[-1] PASSED [ 94%]
+backend/tests/test_tmdb_import.py::test_invalid_import_budget_makes_no_provider_calls[True] PASSED [ 94%]
+backend/tests/test_tmdb_import.py::test_invalid_import_budget_makes_no_provider_calls[1.5] PASSED [ 94%]
+backend/tests/test_tmdb_import.py::test_invalid_import_budget_makes_no_provider_calls[13] PASSED [ 94%]
+backend/tests/test_tmdb_import.py::test_later_page_failure_preserves_previous_snapshot PASSED [ 94%]
+backend/tests/test_tmdb_import.py::test_client_passes_the_bounded_page_to_tmdb[1] PASSED [ 95%]
+backend/tests/test_tmdb_import.py::test_client_passes_the_bounded_page_to_tmdb[13] PASSED [ 95%]
+backend/tests/test_tmdb_import.py::test_client_passes_the_bounded_page_to_tmdb[15] PASSED [ 95%]
+backend/tests/test_tmdb_import.py::test_client_rejects_invalid_pages_without_http[0] PASSED [ 95%]
+backend/tests/test_tmdb_import.py::test_client_rejects_invalid_pages_without_http[16] PASSED [ 95%]
+backend/tests/test_tmdb_import.py::test_client_rejects_invalid_pages_without_http[True] PASSED [ 96%]
+backend/tests/test_tmdb_import.py::test_client_rejects_invalid_pages_without_http[1.5] PASSED [ 96%]
+backend/tests/test_tmdb_import.py::test_client_rejects_invalid_pages_without_http[13] PASSED [ 96%]
+backend/tests/test_tmdb_import_cli.py::test_blank_token_exits_nonzero_with_safe_actionable_guidance PASSED [ 96%]
+backend/tests/test_tmdb_import_cli.py::test_success_output_records_safe_provenance_counts[1] PASSED [ 96%]
+backend/tests/test_tmdb_import_cli.py::test_success_output_records_safe_provenance_counts[13] PASSED [ 96%]
+backend/tests/test_tmdb_import_cli.py::test_success_output_records_safe_provenance_counts[15] PASSED [ 97%]
+backend/tests/test_tmdb_import_cli.py::test_invalid_page_budget_exits_before_client_or_database[0] PASSED [ 97%]
+backend/tests/test_tmdb_import_cli.py::test_invalid_page_budget_exits_before_client_or_database[16] PASSED [ 97%]
+backend/tests/test_tmdb_import_cli.py::test_invalid_page_budget_exits_before_client_or_database[-1] PASSED [ 97%]
+backend/tests/test_tmdb_import_cli.py::test_invalid_page_budget_exits_before_client_or_database[1.5] PASSED [ 97%]
+backend/tests/test_tmdb_import_cli.py::test_invalid_page_budget_exits_before_client_or_database[many] PASSED [ 97%]
+backend/tests/test_tmdb_import_cli.py::test_enrichment_cli_prints_bounded_safe_counts[backdrops] PASSED [ 98%]
+backend/tests/test_tmdb_import_cli.py::test_enrichment_cli_prints_bounded_safe_counts[posters] PASSED [ 98%]
+backend/tests/test_tmdb_import_cli.py::test_enrichment_cli_rejects_invalid_or_mixed_budgets_before_io[arguments0] PASSED [ 98%]
+backend/tests/test_tmdb_import_cli.py::test_enrichment_cli_rejects_invalid_or_mixed_budgets_before_io[arguments1] PASSED [ 98%]
+backend/tests/test_tmdb_import_cli.py::test_enrichment_cli_rejects_invalid_or_mixed_budgets_before_io[arguments2] PASSED [ 98%]
+backend/tests/test_tmdb_import_cli.py::test_enrichment_cli_rejects_invalid_or_mixed_budgets_before_io[arguments3] PASSED [ 98%]
+backend/tests/test_tmdb_import_cli.py::test_enrichment_cli_rejects_invalid_or_mixed_budgets_before_io[arguments4] PASSED [ 99%]
+backend/tests/test_tmdb_import_cli.py::test_enrichment_cli_rejects_invalid_or_mixed_budgets_before_io[arguments5] PASSED [ 99%]
+backend/tests/test_tmdb_import_cli.py::test_enrichment_cli_rejects_invalid_or_mixed_budgets_before_io[arguments6] PASSED [ 99%]
+backend/tests/test_tmdb_import_cli.py::test_enrichment_cli_rejects_invalid_or_mixed_budgets_before_io[arguments7] PASSED [ 99%]
+backend/tests/test_user_repository.py::test_create_user_normalizes_email_hashes_password_and_returns_safe_dto PASSED [ 99%]
+backend/tests/test_user_repository.py::test_user_lookup_uses_the_same_email_normalization PASSED [100%]
+
+==================================== ERRORS ====================================
+_ ERROR at setup of test_independent_sessions_ignore_forged_identity_and_reset_only_owner _
+
+tmp_path = PosixPath('/private/var/folders/k5/w77q5v455sqchk9vfs41w8_h0000gn/T/pytest-of-trantuananh/pytest-5/test_independent_sessions_igno0')
+
+    @pytest.fixture
+    def application(tmp_path):
+        database = tmp_path / "acceptance.db"
+        env = dict(
+            os.environ,
+            DATABASE_URL=f"sqlite:///{database.as_posix()}",
+            SESSION_COOKIE_SECURE="false",
+            TMDB_READ_ACCESS_TOKEN="",
+            PYTHONPATH=str(ROOT / "backend"),
+        )
+        subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "alembic",
+                "-c",
+                "backend/alembic.ini",
+                "upgrade",
+                "head",
+            ],
+            cwd=ROOT,
+            env=env,
+            check=True,
+            capture_output=True,
+        )
+        # Reuse the browser catalogue seeder, never the developer DB or TMDb token.
+        subprocess.run(
+            [
+                sys.executable,
+                "-c",
+                (
+                    "import sys,json; from pathlib import Path; "
+                    "sys.path.insert(0, 'backend/scripts'); "
+                    "from s04_acceptance_server import seed_database; "
+                    "seed_database(Path(sys.argv[1]), "
+                    "json.loads(Path(sys.argv[2]).read_text()))"
+                ),
+                str(database),
+                str(FIXTURE),
+            ],
+            cwd=ROOT,
+            env=env,
+            check=True,
+        )
+        with socket.socket() as probe:
+>           probe.bind(("127.0.0.1", 0))
+E           PermissionError: [Errno 1] Operation not permitted
+
+backend/tests/test_auth_acceptance.py:75: PermissionError
+_ ERROR at setup of test_invalid_sessions_reject_every_private_read_and_write[missing] _
+
+tmp_path = PosixPath('/private/var/folders/k5/w77q5v455sqchk9vfs41w8_h0000gn/T/pytest-of-trantuananh/pytest-5/test_invalid_sessions_reject_e0')
+
+    @pytest.fixture
+    def application(tmp_path):
+        database = tmp_path / "acceptance.db"
+        env = dict(
+            os.environ,
+            DATABASE_URL=f"sqlite:///{database.as_posix()}",
+            SESSION_COOKIE_SECURE="false",
+            TMDB_READ_ACCESS_TOKEN="",
+            PYTHONPATH=str(ROOT / "backend"),
+        )
+        subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "alembic",
+                "-c",
+                "backend/alembic.ini",
+                "upgrade",
+                "head",
+            ],
+            cwd=ROOT,
+            env=env,
+            check=True,
+            capture_output=True,
+        )
+        # Reuse the browser catalogue seeder, never the developer DB or TMDb token.
+        subprocess.run(
+            [
+                sys.executable,
+                "-c",
+                (
+                    "import sys,json; from pathlib import Path; "
+                    "sys.path.insert(0, 'backend/scripts'); "
+                    "from s04_acceptance_server import seed_database; "
+                    "seed_database(Path(sys.argv[1]), "
+                    "json.loads(Path(sys.argv[2]).read_text()))"
+                ),
+                str(database),
+                str(FIXTURE),
+            ],
+            cwd=ROOT,
+            env=env,
+            check=True,
+        )
+        with socket.socket() as probe:
+>           probe.bind(("127.0.0.1", 0))
+E           PermissionError: [Errno 1] Operation not permitted
+
+backend/tests/test_auth_acceptance.py:75: PermissionError
+_ ERROR at setup of test_invalid_sessions_reject_every_private_read_and_write[expired] _
+
+tmp_path = PosixPath('/private/var/folders/k5/w77q5v455sqchk9vfs41w8_h0000gn/T/pytest-of-trantuananh/pytest-5/test_invalid_sessions_reject_e1')
+
+    @pytest.fixture
+    def application(tmp_path):
+        database = tmp_path / "acceptance.db"
+        env = dict(
+            os.environ,
+            DATABASE_URL=f"sqlite:///{database.as_posix()}",
+            SESSION_COOKIE_SECURE="false",
+            TMDB_READ_ACCESS_TOKEN="",
+            PYTHONPATH=str(ROOT / "backend"),
+        )
+        subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "alembic",
+                "-c",
+                "backend/alembic.ini",
+                "upgrade",
+                "head",
+            ],
+            cwd=ROOT,
+            env=env,
+            check=True,
+            capture_output=True,
+        )
+        # Reuse the browser catalogue seeder, never the developer DB or TMDb token.
+        subprocess.run(
+            [
+                sys.executable,
+                "-c",
+                (
+                    "import sys,json; from pathlib import Path; "
+                    "sys.path.insert(0, 'backend/scripts'); "
+                    "from s04_acceptance_server import seed_database; "
+                    "seed_database(Path(sys.argv[1]), "
+                    "json.loads(Path(sys.argv[2]).read_text()))"
+                ),
+                str(database),
+                str(FIXTURE),
+            ],
+            cwd=ROOT,
+            env=env,
+            check=True,
+        )
+        with socket.socket() as probe:
+>           probe.bind(("127.0.0.1", 0))
+E           PermissionError: [Errno 1] Operation not permitted
+
+backend/tests/test_auth_acceptance.py:75: PermissionError
+_ ERROR at setup of test_invalid_sessions_reject_every_private_read_and_write[revoked] _
+
+tmp_path = PosixPath('/private/var/folders/k5/w77q5v455sqchk9vfs41w8_h0000gn/T/pytest-of-trantuananh/pytest-5/test_invalid_sessions_reject_e2')
+
+    @pytest.fixture
+    def application(tmp_path):
+        database = tmp_path / "acceptance.db"
+        env = dict(
+            os.environ,
+            DATABASE_URL=f"sqlite:///{database.as_posix()}",
+            SESSION_COOKIE_SECURE="false",
+            TMDB_READ_ACCESS_TOKEN="",
+            PYTHONPATH=str(ROOT / "backend"),
+        )
+        subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "alembic",
+                "-c",
+                "backend/alembic.ini",
+                "upgrade",
+                "head",
+            ],
+            cwd=ROOT,
+            env=env,
+            check=True,
+            capture_output=True,
+        )
+        # Reuse the browser catalogue seeder, never the developer DB or TMDb token.
+        subprocess.run(
+            [
+                sys.executable,
+                "-c",
+                (
+                    "import sys,json; from pathlib import Path; "
+                    "sys.path.insert(0, 'backend/scripts'); "
+                    "from s04_acceptance_server import seed_database; "
+                    "seed_database(Path(sys.argv[1]), "
+                    "json.loads(Path(sys.argv[2]).read_text()))"
+                ),
+                str(database),
+                str(FIXTURE),
+            ],
+            cwd=ROOT,
+            env=env,
+            check=True,
+        )
+        with socket.socket() as probe:
+>           probe.bind(("127.0.0.1", 0))
+E           PermissionError: [Errno 1] Operation not permitted
+
+backend/tests/test_auth_acceptance.py:75: PermissionError
+_ ERROR at setup of test_logout_cookie_replay_relogin_and_actual_backend_restart _
+
+tmp_path = PosixPath('/private/var/folders/k5/w77q5v455sqchk9vfs41w8_h0000gn/T/pytest-of-trantuananh/pytest-5/test_logout_cookie_replay_relo0')
+
+    @pytest.fixture
+    def application(tmp_path):
+        database = tmp_path / "acceptance.db"
+        env = dict(
+            os.environ,
+            DATABASE_URL=f"sqlite:///{database.as_posix()}",
+            SESSION_COOKIE_SECURE="false",
+            TMDB_READ_ACCESS_TOKEN="",
+            PYTHONPATH=str(ROOT / "backend"),
+        )
+        subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "alembic",
+                "-c",
+                "backend/alembic.ini",
+                "upgrade",
+                "head",
+            ],
+            cwd=ROOT,
+            env=env,
+            check=True,
+            capture_output=True,
+        )
+        # Reuse the browser catalogue seeder, never the developer DB or TMDb token.
+        subprocess.run(
+            [
+                sys.executable,
+                "-c",
+                (
+                    "import sys,json; from pathlib import Path; "
+                    "sys.path.insert(0, 'backend/scripts'); "
+                    "from s04_acceptance_server import seed_database; "
+                    "seed_database(Path(sys.argv[1]), "
+                    "json.loads(Path(sys.argv[2]).read_text()))"
+                ),
+                str(database),
+                str(FIXTURE),
+            ],
+            cwd=ROOT,
+            env=env,
+            check=True,
+        )
+        with socket.socket() as probe:
+>           probe.bind(("127.0.0.1", 0))
+E           PermissionError: [Errno 1] Operation not permitted
+
+backend/tests/test_auth_acceptance.py:75: PermissionError
+_ ERROR at setup of test_reset_confirmation_origin_and_real_delete_failure_preserve_both_accounts _
+
+tmp_path = PosixPath('/private/var/folders/k5/w77q5v455sqchk9vfs41w8_h0000gn/T/pytest-of-trantuananh/pytest-5/test_reset_confirmation_origin0')
+
+    @pytest.fixture
+    def application(tmp_path):
+        database = tmp_path / "acceptance.db"
+        env = dict(
+            os.environ,
+            DATABASE_URL=f"sqlite:///{database.as_posix()}",
+            SESSION_COOKIE_SECURE="false",
+            TMDB_READ_ACCESS_TOKEN="",
+            PYTHONPATH=str(ROOT / "backend"),
+        )
+        subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "alembic",
+                "-c",
+                "backend/alembic.ini",
+                "upgrade",
+                "head",
+            ],
+            cwd=ROOT,
+            env=env,
+            check=True,
+            capture_output=True,
+        )
+        # Reuse the browser catalogue seeder, never the developer DB or TMDb token.
+        subprocess.run(
+            [
+                sys.executable,
+                "-c",
+                (
+                    "import sys,json; from pathlib import Path; "
+                    "sys.path.insert(0, 'backend/scripts'); "
+                    "from s04_acceptance_server import seed_database; "
+                    "seed_database(Path(sys.argv[1]), "
+                    "json.loads(Path(sys.argv[2]).read_text()))"
+                ),
+                str(database),
+                str(FIXTURE),
+            ],
+            cwd=ROOT,
+            env=env,
+            check=True,
+        )
+        with socket.socket() as probe:
+>           probe.bind(("127.0.0.1", 0))
+E           PermissionError: [Errno 1] Operation not permitted
+
+backend/tests/test_auth_acceptance.py:75: PermissionError
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR backend/tests/test_auth_acceptance.py::test_independent_sessions_ignore_forged_identity_and_reset_only_owner
+ERROR backend/tests/test_auth_acceptance.py::test_invalid_sessions_reject_every_private_read_and_write[missing]
+ERROR backend/tests/test_auth_acceptance.py::test_invalid_sessions_reject_every_private_read_and_write[expired]
+ERROR backend/tests/test_auth_acceptance.py::test_invalid_sessions_reject_every_private_read_and_write[revoked]
+ERROR backend/tests/test_auth_acceptance.py::test_logout_cookie_replay_relogin_and_actual_backend_restart
+ERROR backend/tests/test_auth_acceptance.py::test_reset_confirmation_origin_and_real_delete_failure_preserve_both_accounts
+======== 569 passed, 1 skipped, 1 warning, 6 errors in 64.02s (0:01:04) ========
+
+===== END ORIGINAL s4-t03-ranking-backend-sandbox.txt =====
+
+===== BEGIN ORIGINAL s4-t03-ranking-ruff.txt =====
+SHA-256: 82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18
+Original bytes: 19
+
+All checks passed!
+
+===== END ORIGINAL s4-t03-ranking-ruff.txt =====
+
+===== BEGIN ORIGINAL s4-t03-ranking-frontend-test.txt =====
+SHA-256: 95d0d2cb21352a3302f51ed5d627c1959dc47fc80fac147e214ffec1857e5c8c
+Original bytes: 475
+
+
+> frontend@0.0.0 test
+> vitest run
+
+
+ RUN  v5.0.2 /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/frontend
+
+
+ Test Files  29 passed (29)
+      Tests  308 passed (308)
+   Start at  15:31:46
+   Duration  14.43s (tests 43%, environment 41%, import 11%, transform 5%)
+
+    Isolate  29 workers spawned · ~449ms startup each (spawn + environment, per file)
+             at least ~6.06s faster with isolate: false — reuses workers across files instead of one per file
+
+
+===== END ORIGINAL s4-t03-ranking-frontend-test.txt =====
+
+===== BEGIN ORIGINAL s4-t03-ranking-frontend-lint.txt =====
+SHA-256: 0d4695f4da2780a75fa8d28ae5fabe88093b7de3774417c514e2ecd90774e01f
+Original bytes: 35
+
+
+> frontend@0.0.0 lint
+> eslint .
+
+
+===== END ORIGINAL s4-t03-ranking-frontend-lint.txt =====
+
+===== BEGIN ORIGINAL s4-t03-ranking-frontend-build.txt =====
+SHA-256: 8692db0741ec97140ac4dd150defadfb19a0cc0a3a74d41f8d671ebc2452b2bc
+Original bytes: 396
+
+
+> frontend@0.0.0 build
+> tsc -b && vite build
+
+vite v8.3.1 building client environment for production...
+transforming...
+✓ 69 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.79 kB │ gzip:  0.42 kB
+dist/assets/index-DDeFCvjV.css   28.99 kB │ gzip:  6.70 kB
+dist/assets/index-QRTcxH1C.js   323.75 kB │ gzip: 98.89 kB
+
+✓ built in 191ms
+
+===== END ORIGINAL s4-t03-ranking-frontend-build.txt =====
+
+===== BEGIN ORIGINAL s4-t03-ranking-contract.txt =====
+SHA-256: 232ae94acc8058147da90fc50f88748d59beb20e11df66dfca0c992352ab2b2d
+Original bytes: 1006
+
+S4-C03 local document structure: PASS
+Hash convention: SHA-256 of UTF-8 text after CRLF/CR -> LF
+Document final newlines/trailing whitespace: PASS
+Local link targets: 200 checked, 0 missing
+Testing sections: 1, 2, 3, 4
+P0 case IDs: 35 unique; S01=8, S02=6, S03=4, S04=6, S12=5, S13=6
+S4 feature oracle IDs: 10 unique
+sha256-lf docs/api.md c44b907b786a57db427c6b9841950fb3624e975465011a3a45718864ed647921
+sha256-lf docs/architecture.md f69178f7c5e4fb8483be61f2569ee219a346febae8e136135d3fd07efc74725e
+sha256-lf docs/design.md 4534e232a7a1e58e83b2b588bede1b5a8d0011bb6bf74eaad20563b21c3dc90a
+sha256-lf docs/requirements.md 7cfba68a26eb12aee2c1f2cf4d4269cf8ea82fd4a157899b8383debdb6f503e2
+sha256-lf docs/testing.md d36b9fb31d7f3d9eef092ded5bfda0edfa921f61eccd13adb81642bc4a44d5d5
+sha256-lf scripts/verify_s4_c03_contract.py 4484c9cad834fcf88ce9d91cbfe31b7a89d797ff666c0e73b794e5e7ae2e6142
+sha256-lf scripts/test_s4_c03_contract_line_endings.py 86fb7656efa33f1582d23d8b5c8a17737569a5fee006363e1926b4e69ea8f918
+
+===== END ORIGINAL s4-t03-ranking-contract.txt =====
+
+===== BEGIN ORIGINAL s4-t03-ranking-contract-line-endings.txt =====
+SHA-256: ac3261d0237b21afff6aaacaed611220e6ee07cd7127305a793b2d3946eace01
+Original bytes: 120
+
+LF export: PASS (7 normalized hashes)
+CRLF export: PASS (7 normalized hashes)
+LF/CRLF normalized hashes identical: PASS
+
+===== END ORIGINAL s4-t03-ranking-contract-line-endings.txt =====
+
+===== POST-CONSOLIDATION CHECK =====
+Command: /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/.venv/bin/python scripts/verify_s4_c03_contract.py
+Exit: 0
+
+S4-C03 local document structure: PASS
+Hash convention: SHA-256 of UTF-8 text after CRLF/CR -> LF
+Document final newlines/trailing whitespace: PASS
+Local link targets: 200 checked, 0 missing
+Testing sections: 1, 2, 3, 4
+P0 case IDs: 35 unique; S01=8, S02=6, S03=4, S04=6, S12=5, S13=6
+S4 feature oracle IDs: 10 unique
+sha256-lf docs/api.md 83aa4ea9a3598070888fef7bcfc43ef60912a393bdaf050a0c81261744233d3b
+sha256-lf docs/architecture.md f69178f7c5e4fb8483be61f2569ee219a346febae8e136135d3fd07efc74725e
+sha256-lf docs/design.md 4293c9997a8af788535bb7e3109cdc57be001bfef5b5e5553a0a89bd58645738
+sha256-lf docs/requirements.md 7cfba68a26eb12aee2c1f2cf4d4269cf8ea82fd4a157899b8383debdb6f503e2
+sha256-lf docs/testing.md d36b9fb31d7f3d9eef092ded5bfda0edfa921f61eccd13adb81642bc4a44d5d5
+sha256-lf scripts/verify_s4_c03_contract.py 4484c9cad834fcf88ce9d91cbfe31b7a89d797ff666c0e73b794e5e7ae2e6142
+sha256-lf scripts/test_s4_c03_contract_line_endings.py 86fb7656efa33f1582d23d8b5c8a17737569a5fee006363e1926b4e69ea8f918
+
+===== POST-CONSOLIDATION CHECK =====
+Command: /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/.venv/bin/python scripts/test_s4_c03_contract_line_endings.py
+Exit: 0
+
+LF export: PASS (7 normalized hashes)
+CRLF export: PASS (7 normalized hashes)
+LF/CRLF normalized hashes identical: PASS
+
+===== POST-CONSOLIDATION CHECK =====
+Command: git diff --check
+Exit: 0
+
+
+
+===== T33 LOCAL REPRODUCTION BEFORE CI FIX =====
+Command: npm --prefix frontend run test:t33:integration
+Exit: 1
+Output SHA-256: 3316e3a6209d34f8c8bd55f4e0a02a50cc4aada8eaecd75e2709a2559a8bc0c0
+
+
+> frontend@0.0.0 test:t33:integration
+> vitest run --config vitest.t33.config.ts
+
+
+ RUN  v5.0.2 /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/frontend
+
+ ❯ integration/t33-rating.acceptance.tsx (1 test | 1 failed) 2100ms
+   × real UI saves, rolls back, retries, reloads and isolates account ratings without changing preferences or ranking 354ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  integration/t33-rating.acceptance.tsx > real UI saves, rolls back, retries, reloads and isolates account ratings without changing preferences or ranking
+AssertionError: expected { status: 200, body: { …(2) } } to deeply equal { status: 200, body: { …(2) } }
+
+- Expected
++ Received
+
+@@ -2,12 +2,12 @@
+    "body": {
+      "data": {
+        "mode": "personalised",
+        "movies": [
+          {
+-           "adjustedScore": 98,
+-           "basis": "baseline",
++           "adjustedScore": 99,
++           "basis": "rating_signals",
+            "genres": [
+              {
+                "id": 28,
+                "name": "Action",
+              },
+@@ -17,11 +17,11 @@
+              },
+            ],
+            "id": "a8a5631b-e87b-477a-ad70-c4b57aa22d74",
+            "popularityScore": 98,
+            "posterUrl": null,
+-           "ratingAdjustment": 0,
++           "ratingAdjustment": 1,
+            "reason": {
+              "matchedGenres": [
+                {
+                  "id": 28,
+                  "name": "Action",
+@@ -58,12 +58,12 @@
+            },
+            "releaseYear": 2021,
+            "title": "The Last Detour",
+          },
+          {
+-           "adjustedScore": 84,
+-           "basis": "baseline",
++           "adjustedScore": 85,
++           "basis": "rating_signals",
+            "genres": [
+              {
+                "id": 12,
+                "name": "Adventure",
+              },
+@@ -73,11 +73,11 @@
+              },
+            ],
+            "id": "6c4e87b5-72db-4321-88da-08c29d25e61a",
+            "popularityScore": 84,
+            "posterUrl": null,
+-           "ratingAdjustment": 0,
++           "ratingAdjustment": 1,
+            "reason": {
+              "matchedGenres": [
+                {
+                  "id": 28,
+                  "name": "Action",
+
+ ❯ integration/t33-rating.acceptance.tsx:118:24
+    116|     method: "GET",
+    117|   });
+    118|   expect(afterRanking).toEqual(beforeRanking);
+       |                        ^
+    119|   fireEvent.click(
+    120|     screen.getByRole("link", { name: "Back to recommendations" }),
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  16:03:24
+   Duration  2.97s (tests 73%, environment 16%, import 6%, transform 6%)
+
+
+===== T33 AFTER ALIGNING S4 RATING EXPECTATIONS =====
+Command: npm --prefix frontend run test:t33:integration
+Exit: 0
+Output SHA-256: 7905cc253a5bfa5e180c04ae534482a41595d6828dc930e0781e020f558dd7c1
+
+
+> frontend@0.0.0 test:t33:integration
+> vitest run --config vitest.t33.config.ts
+
+
+ RUN  v5.0.2 /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/frontend
+
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  16:04:39
+   Duration  2.98s (tests 75%, environment 15%, transform 5%, import 4%)
+
+
+===== FRONTEND REGRESSION AFTER T33 FIX =====
+Command: npm --prefix frontend test
+Exit: 0
+Output SHA-256: 3ca325e151c56fade428230a5a75aa6f825306bdf903aa5aaddf0dcac0c2cd32
+
+
+> frontend@0.0.0 test
+> vitest run
+
+
+ RUN  v5.0.2 /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/frontend
+
+
+ Test Files  29 passed (29)
+      Tests  308 passed (308)
+   Start at  16:05:08
+   Duration  12.21s (tests 43%, environment 42%, import 11%, transform 4%)
+
+    Isolate  29 workers spawned · ~389ms startup each (spawn + environment, per file)
+             at least ~5.26s faster with isolate: false — reuses workers across files instead of one per file
+
+
+===== FRONTEND LINT AFTER T33 FIX =====
+Command: npm --prefix frontend run lint
+Exit: 0
+Output SHA-256: 0d4695f4da2780a75fa8d28ae5fabe88093b7de3774417c514e2ecd90774e01f
+
+
+> frontend@0.0.0 lint
+> eslint .
+
+
+===== FRONTEND BUILD AFTER T33 FIX =====
+Command: npm --prefix frontend run build
+Exit: 0
+Output SHA-256: 6c6c10103390ceae91c41acecd37605502e030bf39f174dd9bb89c5ac7ccf760
+
+
+> frontend@0.0.0 build
+> tsc -b && vite build
+
+vite v8.3.1 building client environment for production...
+transforming...
+✓ 69 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.79 kB │ gzip:  0.42 kB
+dist/assets/index-DDeFCvjV.css   28.99 kB │ gzip:  6.70 kB
+dist/assets/index-QRTcxH1C.js   323.75 kB │ gzip: 98.89 kB
+
+✓ built in 155ms

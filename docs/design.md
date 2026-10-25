@@ -1,11 +1,13 @@
-# Design contract: Sprint 3 evidence and Sprint 4 proposal
+# Design contract: Sprint 3 evidence and Sprint 4 extensions
 
 This document was reconciled on 2026-10-18 against Sprint 3 `main` SHA
 `bf18ab860fc3e486b57fc3b5ccac4db94c283995`. Tables, endpoints, modules, and
-evidence below reflect that source. Profile/reset UI, rating-adjusted ranking,
-and NLP product scope remain explicitly unfinished.
+evidence below reflect that source. Profile/reset UI and NLP product scope
+remain separate work. S4-T03 adds the backend rating-aware ranking described
+in section 12.5 and [its evidence](evidence/s4-t03-rating-ranking/README.md).
 Section 12 is the proposed Sprint 4 C03 design contract dated 2026-10-24;
-it does not represent implemented or independently reviewed behaviour.
+its implementation status is stated by the feature amendments, including
+section 12.5. It does not establish independent review of those features.
 Request and response shapes are in
 [api.md](api.md), UI state is in [ui.md](ui.md), and ownership/persistence is
 in [architecture.md](architecture.md).
@@ -110,8 +112,8 @@ Genre preferences are stored in `user_genre_preferences` (S3-T01), and current
 account/movie ratings are stored in `user_movie_ratings` (S3-T30). The rating
 HTTP API is implemented under T31, its UI and acceptance under T33/T34, and the
 reset backend under T35. Only the profile/reset UI remains pending here.
-Rating-adjusted ranking (Story #22 / S05b) is planned Sprint 4 rather than
-Sprint 3.
+Rating-adjusted ranking (Story #22 / S05b) extends that Sprint 3 foundation
+under S4-T02/S4-T03; section 12.5 describes the implemented backend flow.
 
 A trailing `?` marks a column that allows NULL. Every other column is NOT NULL.
 
@@ -160,8 +162,8 @@ cascading deletes, and a strict integer database check from 1 through 5.
 Preference validation and account-scoped replacement are implemented under
 T02. T30 implements account-scoped rating storage/repository operations, T31
 implements the protected rating API, and T35 implements the reset backend.
-Profile/reset UI, rating-adjusted ranking, search, and similarity remain
-incomplete. Rating UI is implemented and verified under T33/T34.
+Profile/reset UI, search, and similarity remain separate work. Rating UI is
+implemented and verified under T33/T34; S4-T03 implements backend ranking.
 
 Committed Sprint 3 delivery is narrower than that historical rule list:
 BR1-BR4 use saved genres and local popularity, BR7 stores an optional 1-5
@@ -436,7 +438,9 @@ Sprint 3 personalised ranking uses only saved genres and local catalogue
 popularity. It preserves `data.movies`, `mode` (`personalised` or `popular`),
 `personalised`, `noMatch`, and per-movie `reason.matchedGenres`. Ratings may be
 stored by S05a but do not alter recommendation order in Sprint 3.
-Rating-adjusted ranking belongs to Story #22 / S05b and is planned Sprint 4.
+Rating-adjusted ranking belongs to Story #22 / S05b. The S4-T03 extension in
+section 12.5 now implements that backend behaviour, preserving this ADR's
+Sprint 3 baseline for neutral/no signals and popular fallbacks.
 
 ## 8. UI-driven design changes with repository evidence
 
@@ -647,7 +651,8 @@ are made only where merged source and repository evidence now exist.
 | UI-driven asynchronous-state design | Implemented in recommendation, preference, auth, detail, and rating code; final C03/C05 documentation review still required | `docs/ui.md` and this section must be in the same reviewed PR for [#134](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/134) / [#136](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/136) |
 | Backdrop storage → importer → API → UI → acceptance | Implemented and merged through PRs #180–#183 | [storage](evidence/s3-t26-backdrop-storage.md), [enrichment](backdrop-import-runbook.md), [T37 UI](evidence/s3-t37-backdrop-ui/README.md), and [T28 acceptance](evidence/s3-t28-backdrop-acceptance/README.md) |
 | Database/diagrams | Nine application tables; head `c6f8a2d4e901`; current PNGs regenerated from current PlantUML | `backend/alembic/versions`, `docs/images/erd.puml`, and preserved M2 diagram assets |
-| Deliberately unfinished product scope | Not implemented | Profile/reset UI, rating-adjusted ranking (S05b), and NLP product behaviour remain future work; no completion is claimed |
+| S4 personalised rating ranking (S05b) | Backend implemented under S4-T03 | Full eligible set ranked before slicing; exact C03 private score fields; [executed evidence](evidence/s4-t03-rating-ranking/README.md); score presentation UI remains separate |
+| Deliberately unfinished product scope | Not implemented | Profile/reset UI, personal-score presentation UI, and NLP product behaviour remain separate work; no completion is claimed |
 | C03 publication / C05 integration | C03 PR #187 merged at `bf18ab860fc3e486b57fc3b5ccac4db94c283995`; #134 closed | C05 preserves the merged contracts and current diagrams; its dossier review, approval and merge remain separate |
 
 ### C05 dossier integration after C03 merge
@@ -838,3 +843,50 @@ VN provider slots may be styled as non-clickable placeholders for S5, with
 no live availability claim. Trailer support is only admitted through
 T19/T20 if those tasks are accepted; no full film, autoplay or invented
 provider link enters this C03 contract.
+
+### 12.5 S4-T03 implemented personalised ranking
+
+The existing recommendation service and repository remain the single entry
+point. They resolve the current account from the authenticated session, read
+the active catalogue and saved preferences, and determine the same three
+Sprint 3 modes. Cold-start and no-match alternatives continue to use the
+shared SQL popularity comparator, finite-popularity eligibility and original
+envelope; neither reads rating signals nor exposes personal score fields.
+
+For `mode="personalised"` / `personalised=true`, the existing genre-match
+query uses `EXISTS` to return every eligible movie once, with canonical genres
+loaded and no page limit. The optional S4-T02 `load_account_genre_signals`
+reads only current committed `user_movie_ratings` owned by that session's
+account, including retained historical rated movies. Its existing
+`adjustment_for_candidate` adds one sign per related rated movie: 1/2 gives
+-1, 3 gives 0, 4/5 gives +1. Overlapping genres do not multiply a contribution;
+updating a rating replaces its sign. Eligibility never depends on ratings.
+
+`ranker.py` computes an immutable result per candidate containing the movie,
+adjustment, adjusted score and basis. It reuses the shared score/title/ID
+comparator for descending adjusted score, then ascending title/internal ID,
+with missing scores last. The service ranks the complete eligible set before
+the optional view genre filter and page slice (at most ten). The same computed
+values populate the protected personalised DTO: `ratingAdjustment: int`,
+`adjustedScore: float | null`, and
+`basis: rating_signals | baseline | rating_unavailable`. Raw
+`popularityScore` is never changed. Null popularity yields null adjusted
+score even with a real nonzero adjustment; it never receives an invented base
+score. Finite zero and negative adjusted scores still precede nulls.
+
+Only the rating query's database exceptions are caught, after core inputs
+have been read successfully. Degradation computes the valid baseline with
+adjustment 0 and `basis=rating_unavailable`; a finite adjusted score equals
+raw popularity and a missing one stays null. Successful reads with a nonzero
+net adjustment use `rating_signals`; no effective signal uses `baseline`.
+Core catalogue, preference and candidate/genre failures propagate as their
+existing errors. Invalid sessions remain 401 and cannot reach this fallback.
+
+No server ranking cache or caller-selected account ID is introduced. Every
+request reloads the session owner's committed state, so reset, logout and
+account switch cannot reuse another account's previous scores. Public
+catalogue/detail DTOs and the shared Search/Similar movie shapes contain no
+personal fields. Frontend recommendation types admit the finalized C03
+fields; personal-score badges and degradation messaging remain separate UI
+work. These backend tests do not claim completion of all Story #22 UI or
+independent S4-T05 (#200) verification criteria.

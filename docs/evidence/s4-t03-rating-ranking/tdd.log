@@ -1,0 +1,75 @@
+===== BEGIN ORIGINAL s4-t03-ranking-red.txt =====
+SHA-256: 5351be50c710f5d5a81807052e992c3dbbdc9737984c7fbf1836954c6ce950d9
+Original bytes: 2381
+
+============================= test session starts ==============================
+platform darwin -- Python 3.12.4, pytest-9.1.1, pluggy-1.6.0 -- /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/backend
+configfile: pyproject.toml
+plugins: cov-7.1.0, anyio-4.15.1
+collecting ... collected 1 item
+
+backend/tests/test_rating_aware_recommendations.py::test_five_star_related_rating_reorders_80_80 FAILED [100%]
+
+=================================== FAILURES ===================================
+_________________ test_five_star_related_rating_reorders_80_80 _________________
+
+database = <sqlalchemy.orm.session.Session object at 0x10c43ee10>
+
+    def test_five_star_related_rating_reorders_80_80(database):
+        target, source = seed_ties(database)
+        http, _ = account()
+        assert [m["title"] for m in movies(http)][:2] == ["Alpha Comedy", "Zulu Action"]
+        rate(http, source, 5)
+        ranked = movies(http)
+        # The RED assertion is real missing ordering, before checking additive fields.
+>       assert [m["title"] for m in ranked][:2] == ["Zulu Action", "Alpha Comedy"]
+E       AssertionError: assert ['Alpha Comed...'Zulu Action'] == ['Zulu Action...Alpha Comedy']
+E         
+E         At index 0 diff: 'Alpha Comedy' != 'Zulu Action'
+E         
+E         Full diff:
+E           [
+E         +     'Alpha Comedy',
+E               'Zulu Action',
+E         -     'Alpha Comedy',
+E           ]
+
+backend/tests/test_rating_aware_recommendations.py:111: AssertionError
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED backend/tests/test_rating_aware_recommendations.py::test_five_star_related_rating_reorders_80_80
+========================= 1 failed, 1 warning in 0.73s =========================
+
+===== END ORIGINAL s4-t03-ranking-red.txt =====
+
+===== BEGIN ORIGINAL s4-t03-ranking-green.txt =====
+SHA-256: 2eaec7e9df5fa157a9e5cacac47ceb71de0056e2e7a2b11a8ebce5ab9395ab5d
+Original bytes: 1117
+
+============================= test session starts ==============================
+platform darwin -- Python 3.12.4, pytest-9.1.1, pluggy-1.6.0 -- /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/backend
+configfile: pyproject.toml
+plugins: cov-7.1.0, anyio-4.15.1
+collecting ... collected 1 item
+
+backend/tests/test_rating_aware_recommendations.py::test_five_star_related_rating_reorders_80_80 PASSED [100%]
+
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+========================= 1 passed, 1 warning in 0.53s =========================
+
+===== END ORIGINAL s4-t03-ranking-green.txt =====
+
