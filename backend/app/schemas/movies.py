@@ -86,3 +86,11 @@ class MovieDetailResponse(BaseModel):
 
     data: MovieDetailData
     meta: MovieDetailMeta
+
+
+class MovieSimilarResponse(BaseModel):
+    """Unpaged public Similar result, capped at five movies."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    data: MovieListData

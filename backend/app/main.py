@@ -12,7 +12,9 @@ from sqlalchemy.orm import Session
 from app.db.account_writes import begin_account_write
 from app.db.database import SessionLocal, engine
 from app.db.models import Genre, User, UserMovieRating
+from app.recommendations.overview_index import IndexUnavailable, load_active_index
 from app.recommendations.service import build_account_recommendations
+from app.recommendations.similar import rank_similar_movies
 from app.repositories.movies import (
     CatalogueSort,
     count_active_movies,
@@ -32,6 +34,7 @@ from app.repositories.profile import reset_user_personalisation
 from app.repositories.ratings import get_user_movie_rating, set_user_movie_rating
 from app.repositories.recommendations import (
     count_popular_recommendation_movies,
+    list_genre_matched_movies,
     list_popular_recommendation_movies,
 )
 from app.repositories.users import create_user, get_user_by_email, to_user_dto
@@ -50,7 +53,11 @@ from app.schemas.auth import (
     RegisterRequest,
     RegisterResponse,
 )
-from app.schemas.movies import MovieDetailResponse, MovieListResponse
+from app.schemas.movies import (
+    MovieDetailResponse,
+    MovieListResponse,
+    MovieSimilarResponse,
+)
 from app.schemas.preferences import (
     GenreListData,
     GenreListResponse,
@@ -796,6 +803,43 @@ def get_movie(
     return {
         "data": {"movie": to_movie_detail_dto(movie).model_dump()},
         "meta": {"catalogueRevision": revision.id},
+    }
+
+
+@app.get(
+    "/api/movies/{movie_id}/similar",
+    response_model=MovieSimilarResponse,
+    status_code=200,
+)
+def get_similar_movies(
+    movie_id: str,
+    database_session: Session = Depends(get_db),  # noqa: B008
+):
+    _begin_read_snapshot(database_session)
+    if get_active_catalogue_revision(database_session) is None:
+        return _error(
+            "CATALOGUE_UNAVAILABLE", "Movie catalogue is unavailable", 503
+        )
+
+    source = get_active_movie_by_id(database_session, movie_id=movie_id)
+    if source is None:
+        return _error("MOVIE_NOT_FOUND", "Movie not found", 404)
+
+    try:
+        index = load_active_index(database_session)
+        candidates = list_genre_matched_movies(
+            database_session,
+            genre_ids=[genre.id for genre in source.genres],
+            limit=None,
+        )
+        movies = rank_similar_movies(index, source=source, candidates=candidates)
+    except IndexUnavailable:
+        return _error(
+            "INDEX_UNAVAILABLE", "Search index is temporarily unavailable", 503
+        )
+
+    return {
+        "data": {"movies": [to_movie_summary_dto(m).model_dump() for m in movies]}
     }
 
 
