@@ -155,10 +155,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setState({ status: "unauthenticated" });
   }
   
-  const invalidateRecommendations = useCallback(() => {
-    rotateNavigationScope(accountIdRef.current);
-    setRecommendationVersion((version) => version + 1);
-  }, [rotateNavigationScope]);
+  const invalidateRecommendations = useCallback(
+    (options?: { keepNavigationContext?: boolean }) => {
+      if (!options?.keepNavigationContext) rotateNavigationScope(accountIdRef.current);
+      setRecommendationVersion((version) => version + 1);
+    },
+    [rotateNavigationScope],
+  );
 
   const value = useMemo<AuthContextValue>(
   () => ({

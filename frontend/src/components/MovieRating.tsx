@@ -98,7 +98,8 @@ function AccountMovieRating({ movieId }: { movieId: string }) {
       setSaved(true);
       // Only a confirmed commit can change the account's ranking; a failed or
       // unconfirmed save leaves the current recommendation generation alone.
-      invalidateRecommendations();
+      // Same account, same genres: keep the page/filter/query/hash to return to.
+      invalidateRecommendations({ keepNavigationContext: true });
       feedback.update(notice, { kind: "success", title: "Rating saved", message: `${rating}/5 saved to your account.` });
       pendingNotice.current = null;
     } catch (error: unknown) {
