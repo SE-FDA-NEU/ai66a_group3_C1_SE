@@ -190,3 +190,21 @@ by the following normalized-LF SHA-256 values and the final PR commit:
 |---|---|
 | `backend/scripts/verify_s02_recommendations_ui.py` | `8f1df94c7ea5850f44eced7727cc44965615e575afe5da152b2be46739792534` |
 | `backend/tests/test_browser_readiness.py` | `e697bee38c22662d7b8e604725fcada6768730565b68e20b3aac1c69439f8015` |
+
+### Filter acceptance readiness
+
+The next CI run passed browser rating, but exposed an existing integration-test
+race in [filter-acceptance](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/40284308957/job/121444289104).
+Every new recommendation result remounts its filter and reloads genre options.
+The test waited for the next cards but fired `change` on a disabled, empty
+select; the intended Comedy value became an empty selection, leaving all cards.
+
+Adding a controlled 100 ms delay to the real API transport's genre response
+reproduced that exact failure locally (1 failed). The test now waits for the
+current select to be enabled and contain the requested option before each
+change. With the same delay, it passes (1 passed). All card-order, request-method
+and committed SQLite A/B preference assertions remain unchanged. Application
+filtering/request behaviour is not modified. ESLint and diff checks pass.
+
+Reproduce with `npm.cmd --prefix frontend run test:t16:integration`; it uses
+the existing isolated real API/SQLite bridge and no live provider.
