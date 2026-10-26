@@ -1,0 +1,40 @@
+name: T04 ranking refresh UI and database acceptance
+
+on:
+  push:
+    branches: ["**"]
+    paths: ["backend/**", "frontend/**", ".github/workflows/t04-integration.yml"]
+  pull_request:
+    branches: [main, develop]
+    paths: ["backend/**", "frontend/**", ".github/workflows/t04-integration.yml"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ranking-refresh-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONUTF8: "1"
+      TMDB_READ_ACCESS_TOKEN: ""
+      TMDB_NETWORK_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Install locked dependencies
+        run: |
+          python -m pip install -r backend/requirements.lock.txt
+          python -m pip install -e "./backend[dev]" --no-deps
+          npm --prefix frontend ci
+      - name: Verify UI, API and committed database ranking
+        run: npm --prefix frontend run test:t04:integration

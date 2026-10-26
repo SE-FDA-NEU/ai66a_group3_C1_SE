@@ -4,7 +4,9 @@ import { dirname, resolve } from "node:path";
 import { createInterface } from "node:readline";
 import { fileURLToPath } from "node:url";
 
-export async function startRatingBridge() {
+export async function startRatingBridge(
+  script = "backend/tests/support/t33_rating_bridge.py",
+) {
   const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
   const localPython = resolve(
     root,
@@ -17,7 +19,7 @@ export async function startRatingBridge() {
     (existsSync(localPython) ? localPython : "python");
   const child = spawn(
     python,
-    [resolve(root, "backend/tests/support/t33_rating_bridge.py")],
+    [resolve(root, script)],
     {
       cwd: root,
       env: { ...process.env, PYTHONUTF8: "1", TMDB_READ_ACCESS_TOKEN: "" },
