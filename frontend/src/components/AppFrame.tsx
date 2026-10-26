@@ -25,6 +25,7 @@ export default function AppFrame({ children }: { children: ReactNode }) {
           <NavLink to="/recommendations">My recommendations</NavLink>
           <NavLink to="/preferences">Preferences</NavLink>
           <NavLink to="/watchlist">My watchlist</NavLink>
+          {auth.status === "authenticated" ? <NavLink to="/profile">Profile</NavLink> : null}
           <NavLink to="/about-recommendations">How recommendations work</NavLink>
         </nav>
         <div className="app-header__account">

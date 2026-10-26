@@ -340,6 +340,33 @@ p { line-height: 1.65; }
 .action-feedback__close:hover:not(:disabled) { background: var(--surface-raised); color: var(--text); }
 .feedback-spinner { width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: feedback-spin .85s linear infinite; }
 @keyframes feedback-spin { to { transform: rotate(360deg); } }
+
+/* T13: scoped profile presentation; shared theme/dialog/actions stay unchanged. */
+.profile-page { max-width: 1040px; }
+.profile-heading { padding: 1.5rem 0 2rem; overflow-wrap: anywhere; }
+.profile-heading h1 { margin: .5rem 0; }
+.profile-summary, .profile-reset { margin-bottom: 1.5rem; }
+.profile-section-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .75rem; }
+.profile-section-heading h2 { margin: 0; }
+.profile-label { padding: .45rem .7rem; border: 1px solid var(--border); border-radius: 99px; color: var(--muted); font-size: .75rem; }
+.profile-genres { display: flex; flex-wrap: wrap; gap: .6rem; padding: 0; list-style: none; }
+.profile-genres li { padding: .5rem .85rem; border: 1px solid var(--control-border); border-radius: 99px; background: var(--surface-raised); color: var(--text); }
+.profile-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin: 1.75rem 0; }
+.profile-stats > div { padding: 1.2rem; border: 1px solid var(--border); border-radius: 14px; background: var(--surface-raised); }
+.profile-stats dt { color: var(--muted); font-size: .85rem; }
+.profile-stats dd { margin: .5rem 0 0; font-size: 2rem; font-weight: 750; }
+.profile-reset { border-left: 3px solid var(--accent); }
+.profile-reset p { max-width: 65ch; }
+.profile-message { margin: 1rem 0; padding: 1rem; border: 1px solid var(--control-border); border-radius: 12px; background: var(--surface-raised); overflow-wrap: anywhere; }
+.profile-message--error { border-color: var(--error); }
+.profile-message--error h3, .profile-message--error > p:first-child { color: var(--error); }
+.profile-message--success { color: var(--success); border-color: var(--success); }
+@media (max-width: 600px) {
+  .profile-stats { grid-template-columns: 1fr; gap: .65rem; }
+  .profile-stats > div { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .9rem 1rem; }
+  .profile-stats dd { margin: 0; font-size: 1.6rem; }
+  .profile-page .detail-actions > .button-link { width: 100%; text-align: center; }
+}
 @media (max-width: 1000px) {
   .auth-layout { grid-template-columns: .9fr 1fr; }
   .auth-art { padding: 2rem; }

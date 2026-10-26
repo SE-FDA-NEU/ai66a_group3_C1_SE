@@ -358,11 +358,13 @@ describe("T10 route guards and stale account state", () => {
 
   it("renders a guarded route for a signed-in account", async () => {
     window.history.pushState({}, "", "/profile");
-    vi.spyOn(globalThis, "fetch").mockImplementation(() => jsonResponse(userA));
+    vi.spyOn(globalThis, "fetch").mockImplementation(input => String(input) === "/api/me/profile" ?
+      jsonResponse({ data: { genres: [], ratingCount: 0, watchlistCount: 0 } }) : jsonResponse(userA));
 
     render(<App />);
 
-    expect(await screen.findByRole("heading", { name: "Profile" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Your profile" })).toBeInTheDocument();
+    expect(await screen.findByText("No saved genres yet.")).toBeInTheDocument();
     expect(window.location.pathname).toBe("/profile");
   });
 
