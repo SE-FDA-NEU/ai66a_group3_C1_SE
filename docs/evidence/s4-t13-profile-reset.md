@@ -144,3 +144,49 @@ T14 integrates shared-state invalidation at the acknowledged-success branch
 inside `ProfilePage.confirmReset`. Ambiguous/failed/cancelled requests must not
 call that invalidation. Existing backend reset and concurrency semantics are
 reused; this feature changes no schema/API endpoint or ranking algorithm.
+
+## CI startup repair follow-up
+
+The PR-triggered T34 run failed before application UI assertions while reading
+`http://127.0.0.1:<port>/json/list`: the first 2-second HTTP timeout escaped the
+existing 30-second startup loop. The original failed run is
+[browser-rating-acceptance](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/40280475927/job/121432429967).
+
+The shared `browser_websocket` helper now retries transport failures, partial
+port/JSON responses and missing page targets within that same deadline. It
+still fails immediately when Chromium exits, requires an actual page websocket,
+and fails after the deadline. Business assertions, origin/auth protection,
+rating behaviour and the teammate-review gate are unchanged.
+
+Regression on base `62c2992` with the new tests and old helper: **9 failed,
+2 passed** (timeout, incomplete target and partially written response cases).
+With the repair: **11 passed**. These are real before/after runs with identical
+test assertions and a deterministic clock; the clock avoids waiting 30 seconds
+for failure-path unit cases.
+
+The full isolated backend suite then passed **644 tests, 1 existing skip**.
+Ruff, C03 structure, LF/CRLF and diff whitespace checks also passed. The
+inherited TestClient/httpx deprecation warning remains unchanged.
+
+The unchanged real rating verifier then passed using a migrated temporary
+SQLite database and Chrome 154.0.8037.100 on Windows. Its checks include guest
+protection, save/update/rollback/retry, A/B isolation, delayed account/movie
+replies, revoked/expired session handling and preserved return/preferences.
+Database integrity was `ok`; no development database was used.
+
+```powershell
+.\.venv\Scripts\python.exe backend/scripts/run_isolated_tests.py -q --tb=short -k browser_readiness
+.\.venv\Scripts\python.exe backend/scripts/verify_s13_rating_ui.py --evidence-dir .artifacts/t13-ci-readiness
+.\.venv\Scripts\python.exe backend/scripts/run_isolated_tests.py -q --tb=short
+.\.venv\Scripts\python.exe -m ruff check backend
+```
+
+The real verifier's candidate-source fingerprint was
+`7d98b6d73802672f9d870d4f03165a712aac96f627a564d6e960c2a1ab8785be`
+(capture base `62c2992` plus this repair). Exact repaired source is identified
+by the following normalized-LF SHA-256 values and the final PR commit:
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `backend/scripts/verify_s02_recommendations_ui.py` | `8f1df94c7ea5850f44eced7727cc44965615e575afe5da152b2be46739792534` |
+| `backend/tests/test_browser_readiness.py` | `e697bee38c22662d7b8e604725fcada6768730565b68e20b3aac1c69439f8015` |
