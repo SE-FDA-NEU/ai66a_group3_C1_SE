@@ -1060,8 +1060,11 @@ positive-cosine overview matches ordered by score, normalized title and ID.
 An empty or zero-score corpus returns an empty movie list. An absent, stale or
 corrupt artifact returns 503 `INDEX_UNAVAILABLE`; unavailable catalogue and
 database faults retain their separate 503 errors. Focused synthetic API/DB
-checks are in `backend/tests/test_movie_search_api.py`. Search UI and the full
-Story #30 browser acceptance remain in T10.
+checks are in `backend/tests/test_movie_search_api.py`. T10 adds public `/search`
+through the shared typed movies client, retaining API order, a ten-card cap,
+URL-backed queries, cancellation/stale-response guards and safe detail return.
+Its five Story #30 criteria and browser results are recorded in
+[T10 acceptance evidence](evidence/s4-t10-search/README.md).
 
 Named deterministic fixtures: a `ZEBRA` query finds the title
 `Zebra Case` before any overview fallback; `astronaut rescue moon` with

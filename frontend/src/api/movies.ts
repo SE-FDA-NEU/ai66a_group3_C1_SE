@@ -93,6 +93,14 @@ export async function listMovies(limit = 10): Promise<MovieSummary[]> {
   return body.data.movies;
 }
 
+export async function searchMovies(query: string, signal?: AbortSignal): Promise<MovieSummary[]> {
+  const params = new URLSearchParams({ q: query.trim() });
+  const response = await fetch(`/api/movies/search?${params}`, { signal });
+  if (!response.ok) throw await readError(response);
+  const body = (await response.json()) as { data: { movies: MovieSummary[] } };
+  return body.data.movies;
+}
+
 export async function listMoviePage(
   kind: "catalogue" | "popular",
   page: number,

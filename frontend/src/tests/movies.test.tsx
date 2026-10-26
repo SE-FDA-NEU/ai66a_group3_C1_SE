@@ -1,10 +1,13 @@
 // @vitest-environment jsdom
 
 import "@testing-library/jest-dom/vitest";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import App from "../App";
+import SearchPage from "../pages/SearchPage.tsx";
+import { resolveMovieDetailReturn } from "../navigation/movieDetailReturn.ts";
 
 function jsonResponse(body: unknown, status = 200) {
   return Promise.resolve(
@@ -23,10 +26,146 @@ const movies = Array.from({ length: 10 }, (_, index) => ({
   popularityScore: 100 - index,
 }));
 
+function deferredResponse() {
+  let resolve!: (value: Response) => void;
+  let reject!: (reason: Error) => void;
+  const promise = new Promise<Response>((yes, no) => { resolve = yes; reject = no; });
+  return { promise, resolve, reject };
+}
+
+function searchInput(value: string) {
+  fireEvent.change(screen.getByRole("searchbox", { name: "Title or description" }), { target: { value } });
+}
+
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
   window.history.replaceState({}, "", "/");
+});
+
+describe("S08 public search UI", () => {
+  it.each(["", " ", "a", " a ", "%", "_", " 🎬 "])("validates trimmed short query %j without a search request", async query => {
+    window.history.replaceState({}, "", `/search?q=${encodeURIComponent(query)}`);
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(() => jsonResponse({}, 401));
+    render(<App />);
+    expect(within(screen.getByRole("main")).getByRole("status")).toHaveTextContent(/^Enter at least 2 characters$/);
+    await waitFor(() => expect(screen.getByRole("link", { name: "Sign in" })).toBeInTheDocument());
+    expect(fetchMock.mock.calls.every(([url]) => String(url) === "/api/auth/me")).toBe(true);
+    expect(window.location.pathname).toBe("/search");
+  });
+
+  it("shows loading, trims/encodes the query, caps ten cards and preserves server order without sorting", async () => {
+    window.history.replaceState({}, "", "/search?q=%20%20moon%20%26%20rescue%20%20");
+    const pending = deferredResponse();
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(input =>
+      String(input) === "/api/auth/me" ? jsonResponse({}, 401) : pending.promise);
+    render(<App />);
+    expect(within(screen.getByRole("main")).getByRole("status")).toHaveTextContent("Loading movies...");
+    const ordered = [movies[9], movies[0], ...movies.slice(1, 9), { ...movies[0], id: "extra", title: "Extra" }];
+    await act(async () => pending.resolve(await jsonResponse({ data: { movies: ordered } })));
+    const grid = screen.getByRole("region", { name: "Search results" });
+    expect(within(grid).getAllByRole("article")).toHaveLength(10);
+    expect(within(grid).getAllByRole("heading").map(node => node.textContent)).toEqual(ordered.slice(0, 10).map(row => row.title));
+    expect(screen.queryByText("Extra")).not.toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledWith("/api/movies/search?q=moon+%26+rescue", { signal: expect.any(AbortSignal) });
+    expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
+    expect(fetchMock.mock.calls.some(([url]) => String(url).includes("/api/me/"))).toBe(false);
+  });
+
+  it("renders an empty success exactly and clears it when the query becomes short", async () => {
+    vi.spyOn(globalThis, "fetch").mockImplementation(() => jsonResponse({ data: { movies: [] } }));
+    render(<MemoryRouter initialEntries={["/search?q=unknown"]}><SearchPage /></MemoryRouter>);
+    expect(await screen.findByText("No movies found", { exact: true })).toHaveAttribute("role", "status");
+    expect(screen.queryByRole("article")).not.toBeInTheDocument();
+    searchInput(" x ");
+    expect(screen.getByRole("status")).toHaveTextContent(/^Enter at least 2 characters$/);
+    expect(screen.queryByText("No movies found")).not.toBeInTheDocument();
+  });
+
+  it("recovers from an index error by retrying the current trimmed query", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch")
+      .mockImplementationOnce(() => jsonResponse({ data: { movies: [movies[0]] } }))
+      .mockImplementationOnce(() => jsonResponse({ error: { code: "INDEX_UNAVAILABLE", message: "Search index is temporarily unavailable" } }, 503))
+      .mockImplementationOnce(() => jsonResponse({ data: { movies: [movies[1]] } }));
+    render(<MemoryRouter initialEntries={["/search?q=old"]}><SearchPage /></MemoryRouter>);
+    await screen.findByText("Movie 1");
+    searchInput("  current query  ");
+    expect(await screen.findByRole("alert")).toHaveTextContent("Search index is temporarily unavailable");
+    fireEvent.click(screen.getByRole("button", { name: "Retry" }));
+    expect(screen.getByRole("status")).toHaveTextContent("Loading movies...");
+    expect(await screen.findByText("Movie 2")).toBeInTheDocument();
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+      "/api/movies/search?q=old", "/api/movies/search?q=current+query", "/api/movies/search?q=current+query",
+    ]);
+    expect(screen.getByRole("searchbox")).toHaveValue("  current query  ");
+  });
+
+  it.each(["success", "error"])("ignores a delayed old %s even if fetch ignores abort", async outcome => {
+    const old = deferredResponse();
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementationOnce(() => old.promise)
+      .mockImplementationOnce(() => jsonResponse({ data: { movies: [movies[1]] } }));
+    render(<MemoryRouter initialEntries={["/search?q=old"]}><SearchPage /></MemoryRouter>);
+    const oldSignal = fetchMock.mock.calls[0][1]?.signal;
+    searchInput("new");
+    expect(await screen.findByText("Movie 2")).toBeInTheDocument();
+    expect(oldSignal?.aborted).toBe(true);
+    await act(async () => {
+      if (outcome === "success") old.resolve(await jsonResponse({ data: { movies: [movies[0]] } }));
+      else old.reject(new Error("Old failed request"));
+    });
+    expect(screen.getByText("Movie 2")).toBeInTheDocument();
+    expect(screen.queryByText("Movie 1")).not.toBeInTheDocument();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
+  it.each(["success", "error"])("aborts on unmount and ignores late %s completion", async outcome => {
+    const pending = deferredResponse();
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementationOnce(() => pending.promise);
+    const view = render(<MemoryRouter initialEntries={["/search?q=moon"]}><SearchPage /></MemoryRouter>);
+    const signal = fetchMock.mock.calls[0][1]?.signal;
+    view.unmount();
+    expect(signal?.aborted).toBe(true);
+    await act(async () => {
+      if (outcome === "success") pending.resolve(await jsonResponse({ data: { movies } }));
+      else pending.reject(new Error("Late failure"));
+    });
+    expect(view.container).toBeEmptyDOMElement();
+  });
+
+  it("keeps short-query validation when an older valid query completes", async () => {
+    const pending = deferredResponse();
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementationOnce(() => pending.promise);
+    render(<MemoryRouter initialEntries={["/search?q=moon"]}><SearchPage /></MemoryRouter>);
+    searchInput(" a ");
+    expect(fetchMock.mock.calls[0][1]?.signal?.aborted).toBe(true);
+    await act(async () => pending.resolve(await jsonResponse({ data: { movies } })));
+    expect(screen.getByRole("status")).toHaveTextContent(/^Enter at least 2 characters$/);
+    expect(screen.queryByRole("article")).not.toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("opens public details and restores the search query/hash safely", async () => {
+    window.history.replaceState({}, "", "/search?q=Movie+3&source=s08#results");
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(input => {
+      const url = String(input);
+      if (url === "/api/auth/me") return jsonResponse({}, 401);
+      if (url.startsWith("/api/movies/search?")) return jsonResponse({ data: { movies: [movies[2]] } });
+      if (url === "/api/movies/movie-3") return jsonResponse({ data: { movie: { ...movies[2], overview: "Synthetic detail", voteCount: 0, voteAverage: null } } });
+      throw new Error(`Unexpected request ${url}`);
+    });
+    render(<App />);
+    fireEvent.click(await screen.findByRole("link", { name: "View details for Movie 3" }));
+    expect(window.location.pathname).toBe("/movies/movie-3");
+    const back = await screen.findByRole("link", { name: "Back to search" });
+    expect(back).toHaveAttribute("href", "/search?q=Movie+3&source=s08#results");
+    fireEvent.click(back);
+    expect(await screen.findByRole("searchbox")).toHaveValue("Movie 3");
+    expect(await screen.findByText("Movie 3")).toBeInTheDocument();
+    expect(fetchMock.mock.calls.some(([url]) => String(url).includes("/api/me/"))).toBe(false);
+    for (const returnTo of ["//evil.test/search?q=x", "/search\\evil.test", "https://evil.test/search", "/search/other"]) {
+      expect(resolveMovieDetailReturn({ returnTo }).to).toBe("/");
+    }
+  });
 });
 
 describe("T15 public catalogue UI", () => {

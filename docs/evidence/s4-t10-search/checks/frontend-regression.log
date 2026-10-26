@@ -1,0 +1,15 @@
+
+> frontend@0.0.0 test
+> vitest run
+
+
+ RUN  v5.0.2 /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/frontend
+
+
+ Test Files  32 passed (32)
+      Tests  367 passed (367)
+   Start at  21:32:38
+   Duration  13.26s (tests 43%, environment 42%, import 11%, transform 3%)
+
+    Isolate  32 workers spawned · ~381ms startup each (spawn + environment, per file)
+             at least ~5.72s faster with isolate: false — reuses workers across files instead of one per file
