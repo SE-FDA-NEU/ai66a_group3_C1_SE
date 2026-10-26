@@ -245,3 +245,16 @@ Similar UI and Story #24 browser acceptance.
 | File | SHA-256 after UTF-8 LF normalization |
 |---|---|
 | `docs/api.md` | `22f48e2e2b075115dc6816c1b6b0862024562984b091e6f3e385fa17552ad00a` |
+
+### S4-T13 Profile UI consumer amendment (2026-10-26)
+
+S4-T13 updates design section 12.3 with the delivered Profile/reset states,
+validated acknowledgement, ambiguous-response reconciliation and the separate
+T14 shared-state handoff. API contracts and historical captures above remain
+unchanged. This capture is not a new independent C03 approval or acceptance of
+the downstream T14/T15 scope. Executed checks and screenshots are in
+[T13 evidence](s4-t13-profile-reset.md).
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/design.md` | `c05bd8b9ee78e76cff05da1e0316ea515bfd0c677aaede2623e3f8eaa2be0070` |

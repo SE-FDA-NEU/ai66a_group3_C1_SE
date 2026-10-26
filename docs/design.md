@@ -813,15 +813,30 @@ GET is `unavailable`, not `Not rated yet`. Account switch, logout or movie
 change resets the private widget and invalidates old responses. The ZIP's
 `Rate (AI Learn)` prompt is not a persistence acknowledgement.
 
-`/profile` is guarded. It displays the server summary of saved genres,
-rating count and watchlist count. Reset requires an explicit confirm/cancel
-dialog; cancel sends no POST. After confirmed known success, show exactly
-`Your personalisation profile was reset`, keep auth and watchlist, invalidate
-only this account's private caches and show cold-start after refresh. On
-ambiguous timeout show a reconciliation state and reread profile/preferences/
-ratings; do not show definite success or issue an automatic second reset.
-Real errors preserve previous displayed committed state until refreshed.
-Reload/later login must reflect server persistence.
+S4-T13 implements guarded `/profile` with the server summary of saved genres,
+rating count and watchlist count. The signed-in navbar links to this page.
+The shared confirmation dialog names the genres/ratings that will be cleared
+and the account/watchlist that will be kept. Cancel/Escape sends no POST and
+restores focus. Only `200 {data:{reset:true}}` acknowledges a committed reset;
+show exactly `Your personalisation profile was reset.` and refetch this page's
+summary. Authentication and watchlist membership stay intact.
+
+The client bounds reads/writes to 15 seconds. A documented rejection/rollback
+keeps the shown summary with an error and explicit retry. Network loss, gateway
+errors, malformed acknowledgements and timeouts are ambiguous: reread Profile
+before allowing a newly confirmed attempt, never replay the POST or infer that
+the prior operation succeeded from a zero summary. If reconciliation fails,
+label displayed values as last-confirmed and block reset until a fresh read
+succeeds. Failure of a summary read after an acknowledged reset does not undo
+that acknowledgement. Requests are aborted/generation-guarded on unmount and
+account change; owned pending feedback is dismissed without touching a newer
+action's notice. Reload/later login reads the real persisted state.
+
+S4-T14 (#209) owns the subsequent shared preferences/rating/recommendation
+invalidation and stale cross-page snapshot barriers; S4-T15 (#210) owns full
+Story S11 acceptance. T13 refreshes its own summary and does not claim those
+downstream outputs. Feature tests and real browser screenshots are recorded in
+[T13 evidence](evidence/s4-t13-profile-reset.md).
 
 `/watchlist` is guarded and uses the account list API with page controls,
 added-time ordering, active-catalogue revision and empty/error/retry states.
