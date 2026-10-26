@@ -17,7 +17,7 @@ type RatingLoad =
   | { status: "error"; message: string };
 
 function AccountMovieRating({ movieId }: { movieId: string }) {
-  const { handleUnauthorized } = useAuth();
+  const { handleUnauthorized, invalidateRecommendations } = useAuth();
   const feedback = useFeedback();
   const pendingNotice = useRef<number | null>(null);
   const navigate = useNavigate();
@@ -96,6 +96,9 @@ function AccountMovieRating({ movieId }: { movieId: string }) {
       setCommitted(rating);
       setDraft(rating);
       setSaved(true);
+      // Only a confirmed commit can change the account's ranking; a failed or
+      // unconfirmed save leaves the current recommendation generation alone.
+      invalidateRecommendations();
       feedback.update(notice, { kind: "success", title: "Rating saved", message: `${rating}/5 saved to your account.` });
       pendingNotice.current = null;
     } catch (error: unknown) {
