@@ -62,6 +62,76 @@ test.afterEach(async ({ request }) => {
   expect((await request.post(`${controls}/release-gates`)).status()).toBe(200);
 });
 
+test("T16 extension: pointer halves and keyboard persist real half-star ratings", async ({ page, request }) => {
+  await signIn(page, request, "half-stars");
+  await page.goto(`/movies/${id(1)}`);
+  await expect(page.getByRole("radio")).toHaveCount(10);
+  let writes = 0;
+  page.on("request", request => {
+    if (request.method() === "PUT" && new URL(request.url()).pathname.startsWith("/api/me/ratings/")) writes++;
+  });
+  for (const [theme, width] of [["dark", 1440], ["light", 375]] as const) {
+    await page.setViewportSize({ width, height: 1000 });
+    if (await page.locator("html").getAttribute("data-theme") !== theme)
+      await page.getByRole("button", { name: `Switch to ${theme} theme` }).click();
+    await expect(page.getByRole("button", { name: "Save rating", exact: true })).toBeVisible();
+    for (let star = 1; star <= 5; star++) {
+      const target = page.locator(".star-rating__star").nth(star - 1);
+      await target.scrollIntoViewIfNeeded();
+      const bounds = await target.boundingBox();
+      expect(bounds).not.toBeNull();
+      await page.mouse.click(bounds!.x + bounds!.width / 2, bounds!.y + bounds!.height / 2);
+      await expect(page.getByRole("radio", { name: `${star - 0.5} stars`, exact: true })).toBeChecked();
+      await page.mouse.click(bounds!.x + bounds!.width - 3, bounds!.y + bounds!.height / 2);
+      await expect(page.getByRole("radio", { name: star === 1 ? "1 star" : `${star} stars`, exact: true })).toBeChecked();
+    }
+    const savedValue = theme === "dark" ? 2.5 : 3.5;
+    const half = page.getByRole("radio", { name: `${savedValue} stars`, exact: true });
+    await half.check();
+    await half.focus();
+    await page.keyboard.press("ArrowRight");
+    await expect(page.getByRole("radio", { name: `${savedValue + 0.5} stars`, exact: true })).toBeChecked();
+    await page.keyboard.press("ArrowLeft");
+    await expect(half).toBeChecked();
+    expect(writes).toBe(theme === "dark" ? 0 : 1);
+    await page.getByRole("button", { name: "Save rating", exact: true }).click();
+    await expect(page.getByText(`Your saved rating: ${savedValue}/5`, { exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Dismiss notification", exact: true }).click();
+    await screenshot(page, `half-stars-${width}-${theme}`);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.reload();
+    await expect(page.getByText(`Your saved rating: ${savedValue}/5`, { exact: true })).toBeVisible();
+    expect((await (await page.request.get(`/api/me/ratings/${id(1)}`)).json()).data.rating).toBe(savedValue);
+  }
+});
+
+test("T16 extension: Search sends nothing on typing, submits on Enter/button and restores Back", async ({ page }) => {
+  const searches: string[] = [];
+  page.on("request", request => {
+    if (new URL(request.url()).pathname === "/api/movies/search") searches.push(request.url());
+  });
+  await page.goto("/search?source=t16#results");
+  const input = page.getByRole("searchbox");
+  await input.pressSequentially("astronaut");
+  await expect(page.getByText("Press Enter or Search to see results.", { exact: true })).toBeVisible();
+  expect(searches).toEqual([]);
+  await expect(page).toHaveURL("/search?source=t16#results");
+  await input.press("Enter");
+  await expect(page.locator("article.movie-card").first()).toBeVisible();
+  await expect(page).toHaveURL("/search?source=t16&q=astronaut#results");
+  const submittedCount = searches.length;
+  await input.fill("Changed draft");
+  await expect(page.locator("article.movie-card")).toHaveCount(0);
+  expect(searches).toHaveLength(submittedCount);
+  await screenshot(page, "search-unsent-draft");
+  await page.getByRole("button", { name: "Search", exact: true }).click();
+  await expect(page).toHaveURL("/search?source=t16&q=Changed+draft#results");
+  await expect.poll(() => searches.length).toBeGreaterThan(submittedCount);
+  await page.goBack();
+  await expect(input).toHaveValue("astronaut");
+  await expect(page.locator("article.movie-card").first()).toBeVisible();
+});
+
 for (const kind of ["catalogue", "popular"] as const) {
   test(`TC-S4-T16-RET-001 ${kind} page 2 survives app return and browser Back in both themes`,
     async ({ page }) => {
