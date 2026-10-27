@@ -31,17 +31,23 @@ TMDb catalogue does not have popularity 80, so these numbers are not a claim abo
    Comedy, and the mock computes the adjustment from genre overlap like the backend.
    The real API and SQLite journey below no longer relies on a mock.
 
-## Automated results (tested commit `2ce64ea`)
+## Automated results (branch `afeb6ba` merged with `origin/main` `657025b`)
+
+Run on 2026-10-27 after merging main (PR #230, T13); the merge commit did not exist yet,
+so the working tree is the merge result. The same checks passed earlier on `2ce64ea`
+(32 files, 333 tests).
 
 | Command | Result |
 |---|---|
-| `npm --prefix frontend test` | 32 files, 333 tests passed. |
+| `npm --prefix frontend test` | 34 files, 364 tests passed (includes T13's tests from main). |
 | `npm --prefix frontend run lint` | clean. |
 | `npm --prefix frontend run build` | `tsc -b` and `vite build` passed. |
 | `npm --prefix frontend run test:t04:integration` | 1 passed: jsdom UI, real FastAPI, migrated temporary SQLite. |
 | `npm --prefix frontend run test:t33:integration` | 1 passed (S3 rating regression). |
 | `npm --prefix frontend run test:t16:integration` | 1 passed (S3 filter regression). |
 | `.\.venv\Scripts\python.exe -m ruff check` on the two new Python files | passed. |
+| `.\.venv\Scripts\python.exe scripts/verify_s4_c03_contract.py` | PASS: 203 local links, hashes match the matrix including the new T04 row. |
+| `.\.venv\Scripts\python.exe scripts/test_s4_c03_contract_line_endings.py` | PASS: LF and CRLF exports give identical hashes. |
 
 New tests: `recommendation-ranking-display.test.tsx` (display, rounding, missing score,
 popular mode, no copied rating), `rating-recommendation-refresh.test.tsx` (generation
@@ -61,8 +67,9 @@ Command (needs Chrome and free ports 8000 and 5173):
 .\.venv\Scripts\python.exe backend/scripts/verify_s4_t04_ranking_ui.py --evidence-dir docs/evidence/s4-t04-ranking-ui
 ```
 
-Run at 2026-10-27 10:14 +07:00 on base commit `2ce64ea` with the new verifier and its
-evidence untracked: `result=PASS` for all seven checks
+Last run at 2026-10-27 10:30 +07:00 on `afeb6ba` with `origin/main` `657025b` merged
+(working tree, merge not yet committed): `result=PASS` for all seven checks. An earlier
+run at 10:14 on `2ce64ea` also passed and produced byte-identical screenshots
 ([run output](s4-t04-ranking-ui/t04-browser-run-output.txt),
 [API and database evidence](s4-t04-ranking-ui/t04-api-db-evidence.json)). The API
 evidence names the account and `catalogueRevision` for each state.
