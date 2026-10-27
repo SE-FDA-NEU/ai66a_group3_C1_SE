@@ -1,10 +1,38 @@
-import { test, expect, type Page } from "@playwright/test";
+import { test, expect, type APIRequestContext, type Page, type Route } from "@playwright/test";
 import path from "node:path";
 import { mkdir, writeFile } from "node:fs/promises";
 
 const live = Boolean(process.env.T01_LIVE_URL);
 const fixtureMovie = "20000000-0000-0000-0000-000000000001";
 const controls = "http://127.0.0.1:8014/__acceptance";
+async function armBrowserGate(page: Page, request: APIRequestContext, name: string, endpoint: string) {
+  const requestTag = `${name}-${crypto.randomUUID()}`;
+  const matchesEndpoint = (url: URL) => url.pathname === endpoint;
+  const addTag = (route: Route) => route.continue({
+    headers: { ...route.request().headers(), "x-s04-gate": requestTag },
+  });
+  await page.route(matchesEndpoint, addTag);
+  try {
+    const response = await request.post(`${controls}/gates/${name}/arm`, {
+      data: { method: "GET", path: endpoint, requestTag },
+    });
+    expect(response.status()).toBe(200);
+  } catch (error) {
+    await page.unroute(matchesEndpoint, addTag);
+    throw error;
+  }
+  return { requestTag, dispose: () => page.unroute(matchesEndpoint, addTag) };
+}
+async function gateState(request: APIRequestContext, name: string) {
+  const response = await request.get(`${controls}/gates/${name}`);
+  expect(response.status()).toBe(200);
+  return response.json();
+}
+async function releaseGate(request: APIRequestContext, name: string) {
+  expect((await request.post(`${controls}/gates/${name}/seal`)).status()).toBe(200);
+  expect((await request.post(`${controls}/gates/${name}/release`)).status()).toBe(200);
+  await expect.poll(async () => (await gateState(request, name)).pending).toBe(0);
+}
 async function noOverflow(page: Page) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
 }
@@ -55,6 +83,12 @@ test.beforeEach(async ({ page, request }) => {
   // Deterministic offline image failure checks, not fabricated TMDb screenshots.
   await page.route("https://image.tmdb.org/**", route => route.abort());
 });
+test.afterEach(async ({ request }) => {
+  if (live) return;
+  const response = await request.post(`${controls}/release-gates`);
+  expect(response.status()).toBe(200);
+  expect((await response.json()).pending).toBe(0);
+});
 
 test("S08 search uses real API/index across themes, sizes, states and safe return", async ({ page, request, browser }, info) => {
   test.skip(live, "Search acceptance owns synthetic DB/index fixtures");
@@ -88,14 +122,18 @@ test("S08 search uses real API/index across themes, sizes, states and safe retur
         await page.getByRole("button", { name: `Switch to ${theme} theme` }).click();
       await expect(page.getByText("Enter at least 2 characters", { exact: true })).toBeVisible();
       const gate = `search-loading-${width}-${theme}`;
-      await request.post(`${controls}/gates/${gate}/arm`);
-      await search.fill("  inCEPTION  ");
-      await expect.poll(async () => (await (await request.get(`${controls}/gates/${gate}`)).json()).responses.length).toBe(1);
-      await expect(page.getByText("Loading movies...", { exact: true })).toBeVisible();
-      await noOverflow(page);
-      if (width === 375 && theme === "light") await screenshot(page, "search-loading-375-light");
-      await request.post(`${controls}/gates/${gate}/seal`);
-      await request.post(`${controls}/gates/${gate}/release`);
+      const held = await armBrowserGate(page, request, gate, "/api/movies/search");
+      try {
+        await search.fill("  inCEPTION  ");
+        await expect.poll(async () => (await gateState(request, gate)).responses.length).toBeGreaterThanOrEqual(1);
+        await expect(page.getByText("Loading movies...", { exact: true })).toBeVisible();
+        await noOverflow(page);
+        if (width === 375 && theme === "light") await screenshot(page, "search-loading-375-light");
+        await releaseGate(request, gate);
+      } finally {
+        await held.dispose();
+        await request.post(`${controls}/release-gates`);
+      }
       const api = await (await request.get("/api/movies/search?q=inCEPTION")).json();
       await expect(titles).toHaveText(api.data.movies.map((movie: { title: string }) => movie.title));
       expect(api.data.movies).toHaveLength(10);
@@ -188,28 +226,31 @@ test("S08 search uses real API/index across themes, sizes, states and safe retur
 test("S08 delayed real search response cannot replace a newer query or return after unmount", async ({ page, request }) => {
   test.skip(live, "Delayed responses use the isolated acceptance harness");
   expect((await request.post(`${controls}/scenario/search-ranked`)).ok()).toBe(true);
+  let held: Awaited<ReturnType<typeof armBrowserGate>> | undefined;
   try {
     await page.goto("/search");
-    await request.post(`${controls}/gates/search-stale/arm`);
+    held = await armBrowserGate(page, request, "search-stale", "/api/movies/search");
     await page.getByRole("searchbox").fill("Inception");
-    await expect.poll(async () => (await (await request.get(`${controls}/gates/search-stale`)).json()).responses.length).toBe(1);
-    await request.post(`${controls}/gates/search-stale/seal`);
+    await expect.poll(async () => (await gateState(request, "search-stale")).responses.length).toBeGreaterThanOrEqual(1);
+    expect((await request.post(`${controls}/gates/search-stale/seal`)).status()).toBe(200);
     await page.getByRole("searchbox").fill("astronaut rescue moon");
     await expect(page.locator("article.movie-card h2")).toHaveText(["Moon Rescue", "City Robot"]);
-    await request.post(`${controls}/gates/search-stale/release`);
-    await expect.poll(async () => (await (await request.get(`${controls}/gates/search-stale`)).json()).completed).toBe(1);
+    expect((await request.post(`${controls}/gates/search-stale/release`)).status()).toBe(200);
+    await expect.poll(async () => (await gateState(request, "search-stale")).pending).toBe(0);
     await expect(page.locator("article.movie-card h2")).toHaveText(["Moon Rescue", "City Robot"]);
-    await request.post(`${controls}/gates/search-unmount/arm`);
+    await held.dispose();
+    held = await armBrowserGate(page, request, "search-unmount", "/api/movies/search");
     await page.getByRole("searchbox").fill("Inception");
-    await expect.poll(async () => (await (await request.get(`${controls}/gates/search-unmount`)).json()).responses.length).toBe(1);
-    await request.post(`${controls}/gates/search-unmount/seal`);
+    await expect.poll(async () => (await gateState(request, "search-unmount")).responses.length).toBeGreaterThanOrEqual(1);
+    expect((await request.post(`${controls}/gates/search-unmount/seal`)).status()).toBe(200);
     await page.getByRole("link", { name: "Home", exact: true }).click();
-    await request.post(`${controls}/gates/search-unmount/release`);
-    await expect.poll(async () => (await (await request.get(`${controls}/gates/search-unmount`)).json()).completed).toBe(1);
+    expect((await request.post(`${controls}/gates/search-unmount/release`)).status()).toBe(200);
+    await expect.poll(async () => (await gateState(request, "search-unmount")).pending).toBe(0);
     await expect(page).toHaveURL("/");
     await expect(page.getByRole("heading", { name: "Find your next movie" })).toBeVisible();
     await expect(page.getByRole("searchbox")).toHaveCount(0);
   } finally {
+    await held?.dispose();
     await request.post(`${controls}/release-gates`);
   }
 });
@@ -277,16 +318,28 @@ test("S07 similar movies satisfy all five criteria with the real API, index and 
       observations.push({ width, theme, sourceGenres: source.genres, similarApi: api });
 
       const gate = `similar-loading-${tag}`;
-      await request.post(`${controls}/gates/${gate}/arm`);
-      await page.goto(`/movies/${similarSource}`);
-      await setTheme(page, theme);
-      await expect.poll(async () => (await (await request.get(`${controls}/gates/${gate}`)).json()).responses.length).toBe(1);
-      await expect(page.getByText("Loading similar movies...", { exact: true })).toBeVisible();
-      await expect(sourceHeading).toBeVisible();
-      await noOverflow(page);
-      if (showEvidence) await screenshot(page, "similar-loading-375-light");
-      await request.post(`${controls}/gates/${gate}/seal`);
-      await request.post(`${controls}/gates/${gate}/release`);
+      const held = await armBrowserGate(page, request, gate, `/api/movies/${similarSource}/similar`);
+      try {
+        await page.goto(`/movies/${similarSource}`);
+        await setTheme(page, theme);
+        await expect.poll(async () => (await gateState(request, gate)).responses.length).toBeGreaterThanOrEqual(1);
+        const captured = (await gateState(request, gate)).responses;
+        for (const response of captured) {
+          expect(response).toMatchObject({
+            method: "GET", path: `/api/movies/${similarSource}/similar`,
+            requestTag: held.requestTag, status: 200,
+          });
+          expect(response.body.data.movies.map((movie: SimilarMovie) => movie.title)).toEqual(rankedSimilarTitles);
+        }
+        await expect(page.getByText("Loading similar movies...", { exact: true })).toBeVisible();
+        await expect(sourceHeading).toBeVisible();
+        await noOverflow(page);
+        if (showEvidence) await screenshot(page, "similar-loading-375-light");
+        await releaseGate(request, gate);
+      } finally {
+        await held.dispose();
+        await request.post(`${controls}/release-gates`);
+      }
 
       await expect(titles).toHaveText(rankedSimilarTitles);
       await expect(section.getByRole("heading", { name: "Quiet Archive" })).toHaveCount(0);
@@ -450,14 +503,16 @@ test("S07 similar results are public, identical across accounts, independent of 
 test("S07 delayed real similar response for movie A cannot fill movie B", async ({ page, request }) => {
   test.skip(live, "Delayed responses use the isolated acceptance harness");
   expect((await request.post(`${controls}/scenario/similar-pair`)).ok()).toBe(true);
-  const gateState = async (name: string) => (await (await request.get(`${controls}/gates/${name}`)).json());
+  const armed = await armBrowserGate(page, request, "similar-stale", `/api/movies/${similarSource}/similar`);
   try {
-    await request.post(`${controls}/gates/similar-stale/arm`);
     await page.goto(`/movies/${similarSource}`);
-    await expect.poll(async () => (await gateState("similar-stale")).responses.length).toBe(1);
-    const held = (await gateState("similar-stale")).responses[0].body.data.movies.map((movie: { title: string }) => movie.title);
+    await expect.poll(async () => (await gateState(request, "similar-stale")).responses.length).toBeGreaterThanOrEqual(1);
+    const captures = (await gateState(request, "similar-stale")).responses;
+    for (const response of captures)
+      expect(response).toMatchObject({ method: "GET", path: `/api/movies/${similarSource}/similar`, requestTag: armed.requestTag, status: 200 });
+    const held = captures[0].body.data.movies.map((movie: { title: string }) => movie.title);
     expect(held).toEqual(["Moon Rescue", "Orbit Medic"]);
-    await request.post(`${controls}/gates/similar-stale/seal`);
+    expect((await request.post(`${controls}/gates/similar-stale/seal`)).status()).toBe(200);
     await expect(page.getByText("Loading similar movies...", { exact: true })).toBeVisible();
 
     // Leave A while its response is held, then open B through the public Search page.
@@ -470,11 +525,12 @@ test("S07 delayed real similar response for movie A cannot fill movie B", async 
     await expect(titles).toHaveText(own.map(movie => movie.title));
     expect(own.map(movie => movie.title)).not.toContain("Moon Rescue");
 
-    await request.post(`${controls}/gates/similar-stale/release`);
-    await expect.poll(async () => (await gateState("similar-stale")).completed).toBe(1);
+    expect((await request.post(`${controls}/gates/similar-stale/release`)).status()).toBe(200);
+    await expect.poll(async () => (await gateState(request, "similar-stale")).pending).toBe(0);
     await expect(titles).toHaveText(own.map(movie => movie.title));
     await expect(page.locator(".similar-movies").getByRole("heading", { name: "Moon Rescue" })).toHaveCount(0);
   } finally {
+    await armed.dispose();
     await request.post(`${controls}/release-gates`);
   }
 });
@@ -830,17 +886,23 @@ test("centered action feedback reflects real login/save/logout acknowledgements 
   await page.getByLabel("Password", { exact: true }).fill(password);
   let release!: () => void;
   const held = new Promise<void>(resolve => { release = resolve; });
-  await page.route("**/api/auth/login", async route => {
+  const delayLogin = async (route: Route) => {
     // Delay dispatch, then send the unchanged real browser request. Using an
     // HTTP replay would lose Chromium's Fetch Metadata and test another client.
     await held; await route.continue();
-  });
-  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  };
+  await page.route("**/api/auth/login", delayLogin);
+  // Click may wait for the navigation caused by login. Observe the pending UI
+  // before allowing the held request to finish, then await the click itself.
+  const loginClick = page.getByRole("button", { name: "Sign in", exact: true }).click();
   try {
     await expect(feedback).toContainText("Signing you in");
     await expect(feedback).not.toContainText("You're signed in");
     await expect(page.getByRole("button", { name: "Signing in...", exact: true })).toBeDisabled();
-  } finally { release(); }
+  } finally {
+    release();
+    try { await loginClick; } finally { await page.unroute("**/api/auth/login", delayLogin); }
+  }
   await expect(page).toHaveURL(/\/recommendations$/);
   await expect(feedback).toContainText("You're signed in");
   await page.getByRole("link", { name: "Preferences", exact: true }).click();
@@ -872,9 +934,12 @@ test("genre cards expose descriptions, native keyboard state and no implicit wri
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(page).toHaveURL("/");
+  await expect(page.getByRole("button", { name: "Sign out", exact: true })).toBeVisible();
+  await expect(page.getByRole("banner")).toContainText(email);
   await page.getByRole("link", { name: "Preferences", exact: true }).click();
-  await page.keyboard.press("Escape");
+  await expect(page).toHaveURL("/preferences");
   await expect(page.locator(".preferences-slogan")).toHaveText("Tell Us What You Love to Watch");
+  await page.keyboard.press("Escape");
   const action = page.getByRole("checkbox", { name: "Action", exact: true });
   await action.focus(); await page.keyboard.press("Space");
   await expect(action).toBeChecked();
