@@ -10,6 +10,12 @@ import SearchPage from "../pages/SearchPage.tsx";
 import { resolveMovieDetailReturn } from "../navigation/movieDetailReturn.ts";
 
 function jsonResponse(body: unknown, status = 200) {
+  const payload = body as { data?: { movies?: unknown[] }; meta?: unknown };
+  if (Array.isArray(payload.data?.movies) && !payload.meta) {
+    const count = payload.data.movies.length;
+    body = { ...payload, meta: { count, limit: 10, page: 1, total: count,
+      totalPages: count ? 1 : 0, unfilteredTotal: count, catalogueRevision: "" } };
+  }
   return Promise.resolve(
     new Response(JSON.stringify(body), {
       status,
@@ -45,6 +51,57 @@ afterEach(() => {
 });
 
 describe("S08 public search UI", () => {
+  it("paginates every match and resets to page one only after submitting a new query", async () => {
+    const source = [...movies, { ...movies[0], id: "eleven", title: "Movie 11" },
+      { ...movies[0], id: "twelve", title: "Movie 12" }];
+    const searches: string[] = [];
+    vi.spyOn(globalThis, "fetch").mockImplementation(input => {
+      const url = new URL(String(input), "http://localhost");
+      if (url.pathname === "/api/auth/me") return jsonResponse({}, 401);
+      searches.push(url.search);
+      const page = Number(url.searchParams.get("page") ?? 1);
+      const rows = source.slice((page - 1) * 10, page * 10);
+      return jsonResponse({ data: { movies: rows }, meta: { count: rows.length,
+        limit: 10, page, total: 12, totalPages: 2, unfilteredTotal: 12, catalogueRevision: "rev-a" } });
+    });
+    window.history.replaceState({}, "", "/search?q=moon&source=t16#results");
+    render(<App />);
+    await screen.findByText("Showing 1-10 of 12 movies");
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    await screen.findByText("Showing 11-12 of 12 movies");
+    expect(screen.getByText("Movie 11")).toBeInTheDocument();
+    expect(screen.queryByText("Movie 1")).not.toBeInTheDocument();
+    expect(searches).toHaveLength(2);
+    expect(searches[1]).toContain("page=2&catalogueRevision=rev-a");
+    expect(screen.getByRole("button", { name: "Next" })).toBeDisabled();
+    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "new moon" } });
+    expect(searches).toHaveLength(2);
+    fireEvent.submit(screen.getByRole("search", { name: "Movie search" }));
+    await screen.findByText("Showing 1-10 of 12 movies");
+    expect(new URLSearchParams(window.location.search).get("page")).toBeNull();
+    expect(new URLSearchParams(window.location.search).get("source")).toBe("t16");
+    expect(window.location.hash).toBe("#results");
+    expect(searches[2]).toBe("?q=new+moon");
+  });
+
+  it("recovers a changed catalogue on a deep result page by fetching page one", async () => {
+    const searches: string[] = [];
+    vi.spyOn(globalThis, "fetch").mockImplementation(input => {
+      const url = new URL(String(input), "http://localhost");
+      if (url.pathname === "/api/auth/me") return jsonResponse({}, 401);
+      searches.push(url.search);
+      if (searches.length === 1) return jsonResponse({ error: {
+        code: "CATALOGUE_CHANGED", message: "Movie catalogue changed; reload page 1" } }, 409);
+      return jsonResponse({ data: { movies: [movies[0]] } });
+    });
+    window.history.replaceState({}, "", "/search?q=moon&page=2#results");
+    render(<App />);
+    expect(await screen.findByText("Movie 1")).toBeInTheDocument();
+    expect(searches).toEqual(["?q=moon&page=2", "?q=moon"]);
+    expect(new URLSearchParams(window.location.search).get("page")).toBe("1");
+    expect(window.location.hash).toBe("#results");
+  });
+
   it("keeps typing local until an explicit submit and commits only the submitted query", async () => {
     window.history.replaceState({}, "", "/search?source=t16#results");
     const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(input =>
@@ -108,14 +165,14 @@ describe("S08 public search UI", () => {
       ]);
   });
 
-  it("shows loading, trims/encodes the query, caps ten cards and preserves server order without sorting", async () => {
+  it("shows loading, trims/encodes the query, renders one API page and preserves server order without sorting", async () => {
     window.history.replaceState({}, "", "/search?q=%20%20moon%20%26%20rescue%20%20");
     const pending = deferredResponse();
     const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(input =>
       String(input) === "/api/auth/me" ? jsonResponse({}, 401) : pending.promise);
     render(<App />);
     expect(within(screen.getByRole("main")).getByRole("status")).toHaveTextContent("Loading movies...");
-    const ordered = [movies[9], movies[0], ...movies.slice(1, 9), { ...movies[0], id: "extra", title: "Extra" }];
+    const ordered = [movies[9], movies[0], ...movies.slice(1, 9)];
     await act(async () => pending.resolve(await jsonResponse({ data: { movies: ordered } })));
     const grid = screen.getByRole("region", { name: "Search results" });
     expect(within(grid).getAllByRole("article")).toHaveLength(10);

@@ -1,5 +1,9 @@
 # S4-T16 consumer amendment — catalogue capacity, half stars and explicit Search
 
+The subsequent [full-result Search paging amendment](s4-t16-search-pagination.md)
+extends Search beyond the historical top-ten total limit. The results below
+remain the record of this earlier verified candidate.
+
 Date: 2026-10-27. Issue: [#211](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/211).
 PR: [#235](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/235).
 This additional scope was explicitly requested by the PO in the working session.

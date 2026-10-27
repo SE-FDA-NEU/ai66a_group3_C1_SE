@@ -16,7 +16,7 @@ from app.recommendations.overview_index import (
 def rank_description_matches(
     index: OverviewIndex, *, query: str, movies: Sequence[CatalogMovie]
 ) -> list[CatalogMovie]:
-    """Rank all positive matches before taking ten stable, distinct IDs."""
+    """Rank every positive match; pagination belongs to the API boundary."""
 
     query_vector = index.transform_query(query)
     if not query_vector:
@@ -33,4 +33,4 @@ def rank_description_matches(
         if score > 0:
             ranked.append((score, movie))
     ranked.sort(key=lambda row: (-row[0], normalize_text(row[1].title), row[1].id))
-    return [movie for _, movie in ranked[:10]]
+    return [movie for _, movie in ranked]

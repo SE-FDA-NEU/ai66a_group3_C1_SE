@@ -339,3 +339,17 @@ C03/Story evidence is retained as history, not claimed as new approval.
 | `docs/design.md` | `f934991405d4cef699e908f1af08947bb2bad900b64debd1fa3d4ad563fc7e62` |
 | `docs/requirements.md` | `c45177ffc56abe866f9fa607c8134daced0e9f2aee1a46762a021631778fa92e` |
 | `docs/testing.md` | `e230d6eaa41b86fd50dc86429b24430ee78a71ad1a410412dc43de00d8cd0ca9` |
+
+### S4-T16 complete Search pagination amendment (2026-10-27)
+
+The PO replaced the top-ten-total Search cap with full-set pagination. Title
+precedence and positive-cosine eligibility remain unchanged. Current Story
+#30, requirements and API/UI contracts now specify ten per page, full totals,
+revision recovery and query/page detail return. Historical cap evidence stays
+historical; this amendment does not claim Story acceptance or reviewer approval.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/api.md` | `90072c21ed9d6e51352f67f08c5c3f9cc03b0c0397329a6270497a512d4d7302` |
+| `docs/requirements.md` | `ab8a653d7a36d31e83bdce6f2fd243b8156746e224cee665abd34de1cd574101` |
+| `docs/testing.md` | `2779ffb946f083ba1e7af23a2ebc1ef86953a49cb82662a1eb0d698bc160124c` |

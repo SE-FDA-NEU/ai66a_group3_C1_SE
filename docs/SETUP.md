@@ -591,3 +591,9 @@ submitted query. Direct links with a valid `q` still load their results.
 Half-star feedback preserves the ranking thresholds: 0.5–2 are negative,
 2.5–3.5 neutral, and 4–5 positive. Unrated remains `null`, never 0. A confirmed
 Save is required; reload/login restore the server value.
+
+Search now exposes every matching local movie through numbered pages,
+Previous and Next (ten per page). The total counts matches, not all catalogue
+movies. Enter/Search commits a query; typing does not fetch. A new query starts
+at page 1, and returning from details restores the submitted query and page.
+No migration, new dependency or re-import is needed for this Search change.

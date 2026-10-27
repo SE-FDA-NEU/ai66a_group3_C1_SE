@@ -1,5 +1,5 @@
 export type ListViewContext = {
-  route: "/" | "/popular" | "/recommendations" | "/watchlist";
+  route: "/" | "/popular" | "/search" | "/recommendations" | "/watchlist";
   catalogueRevision?: string;
   accountId?: string;
   recommendationScope?: string;

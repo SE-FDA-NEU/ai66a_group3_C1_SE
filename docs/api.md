@@ -915,7 +915,7 @@ the TMDb metadata API while serving a request.
 |---|---|---|---|---|
 | T02/T03 | `GET /api/me/recommendations` | Session | Existing paged DTO plus optional personal score fields below | Existing 400/401/409/503; rating read degradation is explicit |
 | T06/T07/T08 | `GET /api/movies/{movieId}/similar` | Public | `{data:{movies: MovieSummaryDto[]}}`, at most five | 404 `MOVIE_NOT_FOUND`; 503 `INDEX_UNAVAILABLE`/`CATALOGUE_UNAVAILABLE`/`SERVICE_UNAVAILABLE` |
-| T06/T09/T10 | `GET /api/movies/search?q=<text>` | Public | `{data:{movies: MovieSummaryDto[]}}`, at most ten | 400 `VALIDATION_ERROR`; 503 `INDEX_UNAVAILABLE`/`CATALOGUE_UNAVAILABLE`/`SERVICE_UNAVAILABLE` |
+| T06/T09/T10 | `GET /api/movies/search?q=<text>` | Public | `{data:{movies: MovieSummaryDto[]},meta:MovieListMeta}`, at most ten per page | 400 `VALIDATION_ERROR`; 503 `INDEX_UNAVAILABLE`/`CATALOGUE_UNAVAILABLE`/`SERVICE_UNAVAILABLE` |
 | T11/T12 | `GET /api/me/profile` | Session | Profile summary below | 401 `AUTHENTICATION_REQUIRED`; 503 `SERVICE_UNAVAILABLE` |
 | T12 | `GET /api/me/watchlist?page=1&limit=10&catalogueRevision=<revision>` | Session | Paged watchlist below | 400/401/409 `CATALOGUE_CHANGED`/503 |
 | T12 | `GET /api/me/watchlist/{movieId}` | Session | Membership status below | 401/404 `MOVIE_NOT_FOUND`/503 |
@@ -1017,7 +1017,7 @@ with usable vectors sort by cosine descending, finite popularity descending,
 title ascending, ID ascending; cosine zero remains usable. Missing-text
 candidates follow, ordered by popularity/title/ID. If the source has no usable
 vector, all eligible candidates use the shared popularity/title/ID fallback.
-Return at most five; no eligible candidates is `200 {data:{movies:[]}}`.
+Return at most five; no eligible candidates is `200 {data:{movies:[]},meta:{...,total:0,totalPages:0}}`.
 A failed index is 503 even if a source overview is absent.
 
 T07 backend delivery ([#202](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/202)):
@@ -1046,29 +1046,30 @@ their browser results are recorded in
 Unicode characters after trimming. Title search is a literal,
 case-insensitive substring: escape SQL `%`, `_` and the escape character;
 never interpret the query as a pattern. Any title matches take precedence;
-sort them by title then ID and return at most ten. Only with zero title
+sort the complete set by title then ID before cutting a requested page. Only with zero title
 matches does the shared index transform the query and return strictly
 positive-cosine overview matches by cosine descending, title then ID.
 Zero cosine and unrelated popular films are excluded. No match is
-`200 {data:{movies:[]}}` and the UI displays `No movies found`.
+`200 {data:{movies:[]},meta:{...,total:0,totalPages:0}}` and the UI displays `No movies found`.
 The text route must distinguish 503 index failure from this valid empty result.
 For the title-only branch, a usable local catalogue can answer without an
 index; the description branch requires a ready index.
 
 T09 backend delivery: `GET /api/movies/search?q=<text>` is public and returns
-`{data:{movies: MovieSummaryDto[]}}` with no paging metadata. It trims `q`;
+`{data:{movies: MovieSummaryDto[]},meta:MovieListMeta}`. It trims `q`;
 missing or fewer than two characters returns 400 `VALIDATION_ERROR` with
 `Enter at least 2 characters`. It first searches active-catalogue titles via
 literal escaped SQL LIKE with Unicode casefolding, ordered by folded title and
 opaque ID, and
-caps the result at ten. A title hit does not load the text index. Only
+paginates all matches. A title hit anywhere in the full set does not load the text index,
+even when the requested page is empty. Only
 when there are no title hits does it load the shared fitted index and return
 positive-cosine overview matches ordered by score, normalized title and ID.
 An empty or zero-score corpus returns an empty movie list. An absent, stale or
 corrupt artifact returns 503 `INDEX_UNAVAILABLE`; unavailable catalogue and
 database faults retain their separate 503 errors. Focused synthetic API/DB
 checks are in `backend/tests/test_movie_search_api.py`. T10 adds public `/search`
-through the shared typed movies client, retaining API order, a ten-card cap,
+through the shared typed movies client, retaining global API order, ten cards per page,
 URL-backed submitted queries, cancellation/stale-response guards and safe detail return.
 Typing edits only a local draft; Enter/Search triggers a request. Valid direct
 `q` links load immediately. This submit-only amendment retains title-first
@@ -1196,3 +1197,22 @@ Rating DTO numeric values now include the five half steps. Ownership, commit,
 unchanged. Schema head `f2c7e4a91b60` stores REAL ratings while preserving IDs
 and timestamps. Existing <=2 / >=4 signal boundaries and integer
 `ratingAdjustment` remain unchanged; raw TMDb popularity is never a user rating.
+
+### S4-T16 complete Search pagination amendment
+
+`GET /api/movies/search?q=<text>&page=2&limit=10&catalogueRevision=<id>`
+uses the same `MovieListMeta` as the other public lists: count, limit, page,
+total, totalPages, unfilteredTotal and catalogueRevision. Default page is 1
+(range 1–10000), default limit is 10 (range 1–10). `total` is the complete
+matching set, not ten; Search has no top-ten total-result cutoff. `unfilteredTotal`
+equals total because Search has no additional genre filter. Invalid paging
+is 400 VALIDATION_ERROR; an expected revision mismatch is 409 CATALOGUE_CHANGED.
+
+Title-first selection and positive-cosine ranking execute over the full active
+set before slicing. Out-of-range pages return an empty data array with the
+true total; the UI reconciles to the last valid page. A changed revision
+restarts page 1. No-match remains a successful empty result, distinct from
+an unavailable index/catalogue. Search/Next never call TMDb metadata APIs.
+
+The submitted URL query and page survive details/Similar return, reload and
+Back. New query submission resets page 1; typing alone sends nothing.

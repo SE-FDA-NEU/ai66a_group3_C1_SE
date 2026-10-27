@@ -93,12 +93,17 @@ export async function listMovies(limit = 10): Promise<MovieSummary[]> {
   return body.data.movies;
 }
 
-export async function searchMovies(query: string, signal?: AbortSignal): Promise<MovieSummary[]> {
+export async function searchMoviePage(
+  query: string, page: number, revision?: string, signal?: AbortSignal,
+): Promise<MovieListResponse> {
   const params = new URLSearchParams({ q: query.trim() });
+  if (page !== 1) params.set("page", String(page));
+  if (revision) params.set("catalogueRevision", revision);
   const response = await fetch(`/api/movies/search?${params}`, { signal });
   if (!response.ok) throw await readError(response);
-  const body = (await response.json()) as { data: { movies: MovieSummary[] } };
-  return body.data.movies;
+  const body = (await response.json()) as MovieListResponse;
+  if (!body.meta) throw new MovieApiError("Invalid search response", 0);
+  return body;
 }
 
 export async function getSimilarMovies(movieId: string, signal?: AbortSignal): Promise<MovieSummary[]> {

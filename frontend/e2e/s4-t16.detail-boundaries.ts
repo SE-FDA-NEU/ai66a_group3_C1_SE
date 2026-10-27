@@ -132,6 +132,32 @@ test("T16 extension: Search sends nothing on typing, submits on Enter/button and
   await expect(page.locator("article.movie-card").first()).toBeVisible();
 });
 
+test("Search exposes every ranked match and restores page two from details and Back", async ({ page }) => {
+  await page.goto("/search?q=astronaut&source=t16#results");
+  await expect(page.getByText("Showing 1-10 of 12 movies", { exact: true })).toBeVisible();
+  const first = await page.locator("article.movie-card h2").allTextContents();
+  await page.getByRole("button", { name: "Next", exact: true }).click();
+  await expect(page.getByText("Showing 11-12 of 12 movies", { exact: true })).toBeVisible();
+  const source = page.url();
+  const last = await page.locator("article.movie-card h2").allTextContents();
+  expect(new Set([...first, ...last]).size).toBe(12);
+  await expect(page.getByRole("button", { name: "Next", exact: true })).toBeDisabled();
+  await page.locator("article.movie-card a.movie-card__link").first().click();
+  await page.getByRole("link", { name: "Back to search", exact: true }).click();
+  await expect(page).toHaveURL(source);
+  await expect(page.locator("article.movie-card h2")).toHaveText(last);
+  await page.locator("article.movie-card a.movie-card__link").first().click();
+  await page.goBack();
+  await expect(page).toHaveURL(source);
+  await expect(page.locator("article.movie-card h2")).toHaveText(last);
+  await screenshot(page, "search-page-two");
+  await page.getByRole("searchbox").fill("rescue");
+  await page.getByRole("button", { name: "Search", exact: true }).click();
+  await expect(page.getByText("Showing 1-10 of 12 movies", { exact: true })).toBeVisible();
+  expect(new URL(page.url()).searchParams.get("page")).toBeNull();
+  expect(new URL(page.url()).hash).toBe("#results");
+});
+
 for (const kind of ["catalogue", "popular"] as const) {
   test(`TC-S4-T16-RET-001 ${kind} page 2 survives app return and browser Back in both themes`,
     async ({ page }) => {

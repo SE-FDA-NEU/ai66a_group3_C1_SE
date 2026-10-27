@@ -196,15 +196,15 @@ safe detail-return allowlist. The URL-backed `q` survives reload and details
 return along with unrelated query parameters and the fragment. Existing session
 restoration does not require sign-in or add private account reads to Search.
 
-Results update as the user types. A native labelled search form also submits
-the current query with Enter in the input or the Search button; submission
-prevents a document reload and repeats the current read without changing the
-URL. Both paths trim the query and require at least two Unicode characters.
+Typing edits a local draft only. A native labelled search form submits
+with Enter or the Search button without a document reload. A new query
+updates the URL and resets page 1; resubmitting the same query retries the
+current page. Both paths trim the query and require at least two Unicode characters.
 Short queries show `Enter at least 2 characters` and issue no search request.
 Tab reaches Search after the input, then the result links; Shift+Tab reverses
 that order. Focus remains on the submitted control.
 
-Search retains the server's order and first ten movies, with distinct loading,
+Search retains the server's global order and all matches across pages, with distinct loading,
 empty, error and Retry states. Every new read, including explicit submit, aborts
 the previous one and ignores late success/error completions. It reuses the
 existing poster fallback, responsive grid and light/dark tokens. Inline status
@@ -262,3 +262,12 @@ Keep typed Search drafts local. Enter/Search commits `q`; valid deep links,
 Back and detail-return restore that submitted query. Reuse current components,
 themes, feedback and API ordering. Rating half steps retain explicit Save and
 account/movie request boundaries; do not introduce a second feedback system.
+
+## S4-T16 full-result Search paging
+
+Reuse `PageControls`, `resultSummary` and the safe list-view context with
+route `/search`. Keep `q`, page, unrelated query parameters and hash on details
+return. Read metadata from the actual API; never invent a total of ten.
+Catalogue revision changes reset page 1; do not mix two snapshots. Both title
+and description modes rank/select globally before pagination. No new auth,
+theme, request-generation or feedback store is introduced.

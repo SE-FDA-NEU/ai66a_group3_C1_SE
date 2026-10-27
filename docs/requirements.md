@@ -323,7 +323,8 @@ browsing a long list.
 - Given the catalogue contains "Inception", when I search for "Inception", then
   results include "Inception".
 - Given a search has more than 10 matches, when results are displayed, then
-  only the first 10 are shown.
+  each page shows at most 10 and pagination exposes every matching movie
+  in the same global order; details return restores the query and page.
 - Given I enter fewer than 2 characters, when I submit, then the system shows
   "Enter at least 2 characters".
 - Given "Moon Rescue" has an astronaut rescue mission overview and "City
@@ -443,7 +444,7 @@ numbers or an exact expected value.
 | BR9 | Ratings 4-5 are positive, 1-2 negative, and 3 neutral ranking signals. | With Action and Comedy at 80, an Action 5 puts Action first; 1 puts it below Comedy. | S05b | /recommendations |
 | BR10 | A view genre filters the complete recommendation base before pagination, preserving ranking/mode and never writing preferences or ratings. Change and clear reset to page 1. | 12 Action matches among 35 candidates produce pages of 10 and 2. | S06 | /recommendations |
 | BR11 | Similar movies exclude the source, share a genre, and number at most 5. | Source M10 is excluded; up to 5 other eligible movies may appear. | S07 | /movies/:movieId |
-| BR12 | Title search needs at least 2 characters, is case-insensitive, and returns at most 10 matches. | "a" is rejected; "in" and "IN" match alike; 14 matches return at most 10. | S08 | /search |
+| BR12 | Title search needs at least 2 characters, is case-insensitive, and paginates all matching results, at most 10 per page. | "a" is rejected; "in" and "IN" match alike; 14 matches produce pages of 10 and 4. | S08 | /search |
 | BR13 | The explanation has exactly 3 steps and says popular movies need no preferences. | It lists sign in, choose genres, then receive recommendations with optional ratings. | S10 | /about-recommendations |
 | BR14 | Reset needs confirmation and clears only that account's genres and ratings. | 3 genres and 2 ratings become 0 and 0 after confirmation; cancellation changes neither. | S11 | /profile |
 | BR15 | S07: usable candidates rank by cosine descending, popularity descending, title ascending, then ID; missing-text candidates follow by popularity/title/ID. With no usable source vector, all eligible candidates use popularity/title/ID. S08: trimmed query length >=2; literal case-insensitive title matches take precedence and sort by title/ID. Only if no title matches exist, use overview cosine >0 sorted by cosine descending, title ascending, then ID. No popularity fallback for search. | S07: A=0.68, B=0.21, C=no overview returns A,B,C. S08: no title matches and scores A=0.4, B=0 returns only A; all zero returns "No movies found". | S07, S08 | /movies/:movieId, /search |

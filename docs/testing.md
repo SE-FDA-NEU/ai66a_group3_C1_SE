@@ -12,7 +12,9 @@ Historical M2/M3 evidence remains historical.
 
 S4-T16 consumer amendment: rating feedback now accepts 0.5–5 in exact half
 steps; Search commits only on Enter/Search; setup imports 50 TMDb popular pages.
-This supersedes integer-only rating expectations in historical evidence.
+Search additionally paginates every match, ten per page, with full-set ranking
+and revision-aware detail return. This supersedes integer-only rating and
+top-ten-total Search expectations in historical evidence.
 Current migration/API checks are in
 [rating migration tests](../backend/tests/test_rating_migration.py),
 [rating API tests](../backend/tests/test_ratings_api.py),

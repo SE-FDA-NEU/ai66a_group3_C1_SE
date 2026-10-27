@@ -294,7 +294,7 @@ def list_active_movies(
 
 
 def search_active_movie_titles(session: Session, *, query: str) -> list[CatalogMovie]:
-    """Return at most ten literal title hits from the active catalogue."""
+    """Return all ordered literal title hits from the active catalogue."""
 
     connection = session.connection()
     if connection.dialect.name == "sqlite":
@@ -321,7 +321,6 @@ def search_active_movie_titles(session: Session, *, query: str) -> list[CatalogM
         )
         .options(selectinload(CatalogMovie.genres))
         .order_by(title_key, CatalogMovie.id)
-        .limit(10)
     )
     return list(session.scalars(statement).unique())
 

@@ -68,11 +68,12 @@ class MovieListResponse(BaseModel):
 
 
 class MovieSearchResponse(BaseModel):
-    """Unpaged public Search result, capped at ten movies."""
+    """One page from the complete ordered public Search result."""
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     data: MovieListData
+    meta: MovieListMeta
 
 
 class MovieDetailMeta(BaseModel):

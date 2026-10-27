@@ -800,6 +800,9 @@ def list_popular_movies(
 @app.get("/api/movies/search", response_model=MovieSearchResponse, status_code=200)
 def search_movies(
     q: str | None = Query(default=None),
+    page: int = Query(default=1, ge=1, le=10000),
+    limit: int = Query(default=10, ge=1, le=10),
+    catalogue_revision: str | None = Query(default=None, alias="catalogueRevision"),
     database_session: Session = Depends(get_db),  # noqa: B008
 ):
     query = (q or "").strip()
@@ -811,6 +814,9 @@ def search_movies(
     if revision is None:
         return _error("CATALOGUE_UNAVAILABLE", "Movie catalogue is unavailable", 503)
 
+    if error := _revision_error(catalogue_revision, revision.id):
+        return error
+
     movies = search_active_movie_titles(database_session, query=query)
     if not movies:
         try:
@@ -821,8 +827,12 @@ def search_movies(
             return _error(
                 "INDEX_UNAVAILABLE", "Search index is temporarily unavailable", 503
             )
+    total = len(movies)
+    movies = movies[(page - 1) * limit:page * limit]
     return {"data": {"movies": [to_movie_summary_dto(movie).model_dump()
-                                for movie in movies]}}
+                                for movie in movies]},
+            "meta": _page_meta(count=len(movies), limit=limit, page=page,
+                               total=total, unfiltered_total=total, revision_id=revision.id)}
 
 
 @app.get("/api/movies/{movie_id}", response_model=MovieDetailResponse, status_code=200)
