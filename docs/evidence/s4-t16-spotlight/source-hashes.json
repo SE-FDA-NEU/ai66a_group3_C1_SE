@@ -12,7 +12,7 @@
     "backend/tests/test_personalised_recommendations_api.py": "2223129397d83fd4ab58cde5a3eb9c4d818338f8d35286c84f292102b2451184",
     "backend/tests/test_poster_pipeline.py": "6d93f971386903c4e6ee942c8c0449cf145d4c62bc4e4e64153954343e8c488d",
     "backend/tests/test_similar_movies_api.py": "d8ddc024add9a689d38e2560f3d058f8613d92666ea6a64c5e001e4cd198e2bb",
-    "frontend/e2e/s4-t16.detail-boundaries.ts": "0a31fd32842c9847a61e7e0cd9c86488377b0142441a521140c2db87102d6858",
+    "frontend/e2e/s4-t16.detail-boundaries.ts": "fb509a5750fe21808a2c743854439dc69673b5e6a9a22aa0f4ab65aa72896089",
     "frontend/e2e/support/responseGates.ts": "29ac04e70f5341e6bc45a40bb4d8822f88606ace2e8dbe3810b318a3ebe31e36",
     "frontend/e2e/t01.visual.ts": "07692aa7016d011ce3d9b1a3bcf83642340a2738fed40b19ac48f455aca6087e",
     "frontend/playwright.s04.config.ts": "a6db5d5d3e45bdf1eecdcbc721795b6b072cc2947bcd8f791dd75123dcee74bb",

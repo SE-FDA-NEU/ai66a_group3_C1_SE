@@ -34,8 +34,9 @@ acceptance, a merge or issue closure.
 
 Tested source is based on `64dc41b1cb72c90d1199d586544e1de5a1afed68`;
 [source hashes](s4-t16-spotlight/source-hashes.json) identify the changed code
-and relevant harness/configuration. Documentation-only updates followed the
-successful application test runs.
+and relevant harness/configuration. Application code passed the full suites;
+the later Linux CI selector correction below reran the complete T16 browser
+suite without changing application behavior.
 
 | Check | Result |
 |---|---|
@@ -63,6 +64,14 @@ media field: all ordered IDs, scores, ownership, totals and other fields still
 compare exactly, and each summary backdrop is checked against its detail URL.
 A synthetic scenario initially changed overview text without rebuilding its
 index; the isolated fixture now rebuilds before Search. Final runs passed.
+
+The first Linux CI run on `f3ab2f4` caught a navigation assertion race: the
+browser URL had changed while the old Popular list DOM still contained both
+the spotlight and grid title. The check now waits for the exact detail **h1**,
+rather than matching any heading with that title. This preserves the required
+detail navigation assertion and removes the ambiguous transient list match;
+no sleep, retry, timeout increase or product change was added. The complete
+18-case T16 browser suite was rerun for the corrected selector.
 
 Sanitized results:
 [T16](s4-t16-spotlight/t16-browser.json),

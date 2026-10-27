@@ -277,7 +277,9 @@ for (const kind of ["catalogue", "popular"] as const) {
         const expected = (await (await page.request.get(`/api${href}`)).json()).data.movie;
         await selected.click();
         await expect(page).toHaveURL(href!);
-        await expect(page.getByRole("heading", { name: expected.title, exact: true })).toBeVisible();
+        // The URL may commit before the list DOM unmounts. Its spotlight and
+        // grid legitimately repeat the title; wait for the actual detail h1.
+        await expect(page.getByRole("heading", { name: expected.title, exact: true, level: 1 })).toBeVisible();
         await page.goBack();
         await expect(page).toHaveURL(source);
         await expect(page.getByRole("button", { name: "Previous", exact: true })).toBeEnabled();

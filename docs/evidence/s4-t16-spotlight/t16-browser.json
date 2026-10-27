@@ -1,8 +1,8 @@
 {
   "scope": "Author-local Chrome; isolated synthetic SQLite; final source identified by source-hashes.json",
   "stats": {
-    "startTime": "2026-10-27T13:21:33.137Z",
-    "duration": 42778.971000000005,
+    "startTime": "2026-10-27T13:37:53.648Z",
+    "duration": 37715.502,
     "expected": 18,
     "skipped": 0,
     "unexpected": 0,
@@ -17,7 +17,7 @@
       "runs": [
         {
           "status": "passed",
-          "durationMs": 2442
+          "durationMs": 2308
         }
       ]
     },
@@ -29,7 +29,7 @@
       "runs": [
         {
           "status": "passed",
-          "durationMs": 7713
+          "durationMs": 5350
         }
       ]
     },
@@ -41,7 +41,7 @@
       "runs": [
         {
           "status": "passed",
-          "durationMs": 793
+          "durationMs": 785
         }
       ]
     },
@@ -53,7 +53,7 @@
       "runs": [
         {
           "status": "passed",
-          "durationMs": 2889
+          "durationMs": 2577
         }
       ]
     },
@@ -65,7 +65,7 @@
       "runs": [
         {
           "status": "passed",
-          "durationMs": 774
+          "durationMs": 778
         }
       ]
     },
@@ -77,7 +77,7 @@
       "runs": [
         {
           "status": "passed",
-          "durationMs": 1055
+          "durationMs": 1023
         }
       ]
     },
@@ -89,7 +89,7 @@
       "runs": [
         {
           "status": "passed",
-          "durationMs": 1855
+          "durationMs": 1512
         }
       ]
     },
@@ -101,7 +101,7 @@
       "runs": [
         {
           "status": "passed",
-          "durationMs": 1579
+          "durationMs": 1405
         }
       ]
     },
@@ -113,7 +113,7 @@
       "runs": [
         {
           "status": "passed",
-          "durationMs": 1347
+          "durationMs": 1115
         }
       ]
     },
@@ -125,7 +125,7 @@
       "runs": [
         {
           "status": "passed",
-          "durationMs": 1687
+          "durationMs": 1616
         }
       ]
     },
@@ -137,7 +137,7 @@
       "runs": [
         {
           "status": "passed",
-          "durationMs": 1435
+          "durationMs": 1237
         }
       ]
     },
@@ -149,7 +149,7 @@
       "runs": [
         {
           "status": "passed",
-          "durationMs": 834
+          "durationMs": 841
         }
       ]
     },
@@ -161,7 +161,7 @@
       "runs": [
         {
           "status": "passed",
-          "durationMs": 1489
+          "durationMs": 1590
         }
       ]
     },
@@ -173,7 +173,7 @@
       "runs": [
         {
           "status": "passed",
-          "durationMs": 2095
+          "durationMs": 2093
         }
       ]
     },
@@ -185,7 +185,7 @@
       "runs": [
         {
           "status": "passed",
-          "durationMs": 1767
+          "durationMs": 1506
         }
       ]
     },
@@ -197,7 +197,7 @@
       "runs": [
         {
           "status": "passed",
-          "durationMs": 1536
+          "durationMs": 1313
         }
       ]
     },
@@ -209,7 +209,7 @@
       "runs": [
         {
           "status": "passed",
-          "durationMs": 2909
+          "durationMs": 2786
         }
       ]
     },
@@ -221,7 +221,7 @@
       "runs": [
         {
           "status": "passed",
-          "durationMs": 3338
+          "durationMs": 3342
         }
       ]
     }
