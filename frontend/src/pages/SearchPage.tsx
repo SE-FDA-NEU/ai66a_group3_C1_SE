@@ -41,7 +41,11 @@ export default function SearchPage() {
         <p className="muted">Find a title you know, or describe the story you want to see.</p>
       </div>
     </header>
-    <div className="content-card search-controls" role="search">
+    <form className="content-card search-controls" role="search" aria-label="Movie search"
+      onSubmit={event => {
+        event.preventDefault();
+        if (valid) setRetry(value => value + 1);
+      }}>
       <label htmlFor="movie-search">Title or description</label>
       <input id="movie-search" type="search" value={input} aria-describedby="search-hint"
         onChange={event => {
@@ -51,8 +55,9 @@ export default function SearchPage() {
           navigate({ pathname: "/search", search: params.size ? `?${params}` : "",
             hash: location.hash }, { replace: true });
         }} />
-      <p id="search-hint" className="field-hint">Results update as you type. Up to 10 movies.</p>
-    </div>
+      <button type="submit">Search</button>
+      <p id="search-hint" className="field-hint">Results update as you type. Press Enter or choose Search to submit again. Up to 10 movies.</p>
+    </form>
     {!valid ? <p className="status-panel" role="status">Enter at least 2 characters</p> :
       !current ? <p className="status-panel" role="status">Loading movies...</p> :
       current.status === "error" ? <section className="status-panel" role="alert">

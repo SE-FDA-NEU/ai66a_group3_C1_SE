@@ -48,10 +48,42 @@ describe("S08 public search UI", () => {
     window.history.replaceState({}, "", `/search?q=${encodeURIComponent(query)}`);
     const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(() => jsonResponse({}, 401));
     render(<App />);
+    fireEvent.submit(screen.getByRole("search", { name: "Movie search" }));
     expect(within(screen.getByRole("main")).getByRole("status")).toHaveTextContent(/^Enter at least 2 characters$/);
     await waitFor(() => expect(screen.getByRole("link", { name: "Sign in" })).toBeInTheDocument());
     expect(fetchMock.mock.calls.every(([url]) => String(url) === "/api/auth/me")).toBe(true);
     expect(window.location.pathname).toBe("/search");
+  });
+
+  it.each(["success", "error"])("submits the current query without navigation and ignores an older %s", async outcome => {
+    window.history.replaceState({}, "", "/search?q=%20%20moon%20%26%20rescue%20%20&source=s08#results");
+    const originalUrl = window.location.href;
+    const pending = deferredResponse();
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(input =>
+      String(input) === "/api/auth/me" ? jsonResponse({}, 401) : pending.promise);
+    render(<App />);
+    const oldSignal = fetchMock.mock.calls.find(([url]) => String(url).startsWith("/api/movies/search?"))?.[1]?.signal;
+    fetchMock.mockImplementation(input => String(input) === "/api/auth/me" ? jsonResponse({}, 401) :
+      jsonResponse({ data: { movies: [movies[1]] } }));
+
+    const form = screen.getByRole("search", { name: "Movie search" });
+    expect(screen.getByRole("button", { name: "Search" })).toHaveAttribute("type", "submit");
+    expect(fireEvent.submit(form)).toBe(false);
+    expect(await screen.findByText("Movie 2")).toBeInTheDocument();
+    expect(oldSignal?.aborted).toBe(true);
+    await act(async () => {
+      if (outcome === "success") pending.resolve(await jsonResponse({ data: { movies: [movies[0]] } }));
+      else pending.reject(new Error("Old failed request"));
+    });
+    expect(screen.getByText("Movie 2")).toBeInTheDocument();
+    expect(screen.queryByText("Movie 1")).not.toBeInTheDocument();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(screen.getByRole("searchbox")).toHaveValue("  moon & rescue  ");
+    expect(window.location.href).toBe(originalUrl);
+    expect(fetchMock.mock.calls.filter(([url]) => String(url).startsWith("/api/movies/search?"))
+      .map(([url]) => url)).toEqual([
+        "/api/movies/search?q=moon+%26+rescue", "/api/movies/search?q=moon+%26+rescue",
+      ]);
   });
 
   it("shows loading, trims/encodes the query, caps ten cards and preserves server order without sorting", async () => {

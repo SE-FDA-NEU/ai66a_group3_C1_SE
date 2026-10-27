@@ -142,3 +142,36 @@ Additional mobile/light states: [Loading](screenshots/search-loading-375-light.p
 No scoped Story #30 criterion remains unimplemented. Live provider/imported-DB
 checks were intentionally outside this synthetic offline acceptance. Independent
 review, CI and GitHub Story closure remain separate from these local results.
+
+## Keyboard submit and C03 follow-up (2026-10-27)
+
+The follow-up adds a native labelled search form with a Search submit button.
+Enter in the input and keyboard activation of the button repeat the current
+trimmed read without reloading the document or changing the URL. Live results
+remain available while typing. Short-query submission sends no search request;
+resubmission aborts the previous read and rejects its late success/error.
+The [T01 integration contract](../../s4-t01-ui-contract.md#s4-t10-search-integration-and-keyboard-submit-2026-10-27)
+now records this behaviour and reuse of shared UI/navigation components.
+
+The [C03 matrix](../s4-c03-acceptance-matrix.md#s4-t10-search-ui-consumer-amendment-2026-10-27)
+appends the missing normalized-LF SHA-256 for the current `docs/api.md`.
+Earlier matrix entries, the 2026-10-26 manifest, logs and screenshots above
+remain historical evidence for their original source; they do not describe
+the form added by this follow-up.
+
+Executed locally against the changed working tree:
+
+| Command | Observed result |
+|---|---|
+| `python3 scripts/verify_s4_c03_contract.py` | Passed; all seven current normalized hashes found, no missing local links |
+| `python3 scripts/test_s4_c03_contract_line_endings.py` | Passed; LF and CRLF exports produce identical seven hashes |
+| `npm --prefix frontend test -- src/tests/movies.test.tsx` | 24 passed, including short-query submission and stale success/error after resubmission |
+| `npm --prefix frontend test` | 369 passed, 32 files |
+| `npm --prefix frontend run lint` | Passed |
+| `npm --prefix frontend run build` | Passed, TypeScript and Vite |
+| `npm --prefix frontend run test:t01:ui -- --grep S08` | 2 passed; real API/index, Enter in input, keyboard button submit, Tab/Shift+Tab, retained focus/URL, both themes at 375/768/1440px, delayed responses |
+| `git diff --check` | Passed |
+
+The browser runner initially could not bind port 8014 inside the sandbox.
+Its authorized rerun outside the sandbox passed and removed its temporary
+database. No historical screenshot or source manifest was regenerated.

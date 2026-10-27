@@ -258,3 +258,19 @@ the downstream T14/T15 scope. Executed checks and screenshots are in
 | File | SHA-256 after UTF-8 LF normalization |
 |---|---|
 | `docs/design.md` | `c05bd8b9ee78e76cff05da1e0316ea515bfd0c677aaede2623e3f8eaa2be0070` |
+
+### S4-T10 Search UI consumer amendment (2026-10-27)
+
+S4-T10 records the delivered public Search UI in section 13.2 of
+`docs/api.md`. Its current normalized-LF hash follows. The earlier C03, T01,
+T03, T07, T09, T12 and T13 captures remain historical records. Search now also
+supports native form submission with Enter and the Search button, alongside
+live results, as detailed in the
+[T01 integration contract](../s4-t01-ui-contract.md#s4-t10-search-integration-and-keyboard-submit-2026-10-27)
+and [T10 follow-up evidence](s4-t10-search/README.md#keyboard-submit-and-c03-follow-up-2026-10-27).
+This additive capture does not claim new independent C03 approval or rewrite
+the earlier executed acceptance evidence.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/api.md` | `79ea707de0b4bdf07b439340404a14d3a80f56a11ad4b56f9d908c5867306f94` |
