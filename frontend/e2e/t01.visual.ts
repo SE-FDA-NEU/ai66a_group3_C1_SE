@@ -214,6 +214,271 @@ test("S08 delayed real search response cannot replace a newer query or return af
   }
 });
 
+const similarSource = "20000000-0000-0000-0000-000000000001";
+const archiveMovie = "20000000-0000-0000-0000-000000000013";
+const rankedSimilarTitles = ["Moon Rescue", "Orbit Medic", "City Robot", "Desert Heist", "Jazz Voyage"];
+type SimilarMovie = { id: string; title: string; genres: { id: number }[] };
+async function setTheme(page: Page, theme: string) {
+  if (await page.locator("html").getAttribute("data-theme") !== theme)
+    await page.getByRole("button", { name: `Switch to ${theme} theme` }).click();
+}
+async function similarApi(request: import("@playwright/test").APIRequestContext, movieId: string) {
+  const response = await request.get(`/api/movies/${movieId}/similar`);
+  expect(response.status()).toBe(200);
+  return (await response.json()).data.movies as SimilarMovie[];
+}
+async function similarHrefs(page: Page) {
+  return page.getByRole("region", { name: "Similar movies", exact: true }).locator("article.movie-card")
+    .getByRole("link").evaluateAll(links => links.map(link => link.getAttribute("href")));
+}
+
+test("S07 similar movies satisfy all five criteria with the real API, index and DB", async ({ page, request, browser }, info) => {
+  test.skip(live, "Similar acceptance owns synthetic DB/index fixtures");
+  test.setTimeout(240_000);
+  const observations: object[] = [];
+  const errors: string[] = [];
+  const external: string[] = [];
+  page.on("pageerror", error => errors.push(error.message));
+  page.on("request", request => {
+    if (new URL(request.url()).hostname === "api.themoviedb.org") external.push(request.url());
+  });
+  const scenario = async (name: string) => {
+    const response = await request.post(`${controls}/scenario/${name}`);
+    expect(response.ok()).toBe(true);
+    const data = await response.json();
+    observations.push(data);
+    return data;
+  };
+  const section = page.getByRole("region", { name: "Similar movies", exact: true });
+  const titles = section.locator("article.movie-card h2");
+  const sourceHeading = page.getByRole("heading", { name: "Moon Source", level: 1 });
+  for (const width of [375, 768, 1440]) {
+    for (const theme of ["light", "dark"]) {
+      const tag = `${width}-${theme}`;
+      const showEvidence = width === 375 && theme === "light";
+      await page.setViewportSize({ width, height: 960 });
+
+      // AC1 and AC4: real vectorisation. Popularity runs opposite to cosine, a missing-text
+      // candidate is the most popular, and one candidate matches through two shared genres.
+      const seed = await scenario("similar-ranked");
+      expect(seed.scores["Moon Rescue"]).toBeGreaterThan(seed.scores["Orbit Medic"]);
+      expect(seed.scores["Orbit Medic"]).toBeGreaterThan(seed.scores["City Robot"]);
+      expect(seed.scores["City Robot"]).toBeGreaterThan(0);
+      expect(seed.scores["Desert Heist"]).toBe(0);
+      expect(seed.scores["Jazz Voyage"]).toBe(0);
+      expect(seed.scores["Quiet Archive"]).toBeNull();
+      const api = await similarApi(request, similarSource);
+      const source = (await (await request.get(`/api/movies/${similarSource}`)).json()).data.movie;
+      expect(api.map(movie => movie.title)).toEqual(rankedSimilarTitles);
+      expect(new Set(api.map(movie => movie.id)).size).toBe(5);
+      expect(api.map(movie => movie.id)).not.toContain(similarSource);
+      for (const movie of api)
+        expect(movie.genres.some(genre => source.genres.some((own: { id: number }) => own.id === genre.id))).toBe(true);
+      observations.push({ width, theme, sourceGenres: source.genres, similarApi: api });
+
+      const gate = `similar-loading-${tag}`;
+      await request.post(`${controls}/gates/${gate}/arm`);
+      await page.goto(`/movies/${similarSource}`);
+      await setTheme(page, theme);
+      await expect.poll(async () => (await (await request.get(`${controls}/gates/${gate}`)).json()).responses.length).toBe(1);
+      await expect(page.getByText("Loading similar movies...", { exact: true })).toBeVisible();
+      await expect(sourceHeading).toBeVisible();
+      await noOverflow(page);
+      if (showEvidence) await screenshot(page, "similar-loading-375-light");
+      await request.post(`${controls}/gates/${gate}/seal`);
+      await request.post(`${controls}/gates/${gate}/release`);
+
+      await expect(titles).toHaveText(rankedSimilarTitles);
+      await expect(section.getByRole("heading", { name: "Quiet Archive" })).toHaveCount(0);
+      await expect(section.getByRole("heading", { name: "Archive candidate" })).toHaveCount(0);
+      await expect(section.getByRole("heading", { name: "Moon Source" })).toHaveCount(0);
+      expect(await similarHrefs(page)).toEqual(api.map(movie => `/movies/${movie.id}`));
+      await noOverflow(page);
+      await screenshot(page, `similar-results-${tag}`);
+
+      // Keyboard: Tab enters the section from the last detail control, follows API order and reverses.
+      const link = (title: string) => section.getByRole("link", { name: `View details for ${title}`, exact: true });
+      await page.getByRole("link", { name: "Sign in to save this movie", exact: true }).focus();
+      await page.keyboard.press("Tab");
+      await expect(link("Moon Rescue")).toBeFocused();
+      expect(await link("Moon Rescue").evaluate(node => getComputedStyle(node).outlineStyle)).not.toBe("none");
+      for (const title of rankedSimilarTitles.slice(1)) {
+        await page.keyboard.press("Tab");
+        await expect(link(title)).toBeFocused();
+      }
+      for (const title of [...rankedSimilarTitles].reverse().slice(1)) {
+        await page.keyboard.press("Shift+Tab");
+        await expect(link(title)).toBeFocused();
+      }
+
+      // AC3: the selected ID opens, by keyboard in the dark theme and by click in the light theme.
+      if (theme === "dark") await page.keyboard.press("Enter");
+      else await link("Moon Rescue").click();
+      await expect(page).toHaveURL(`/movies/${api[0].id}`);
+      await expect(page.getByRole("heading", { name: "Moon Rescue", level: 1 })).toBeVisible();
+      const next = await similarApi(request, api[0].id);
+      expect(next.map(movie => movie.id)).not.toContain(api[0].id);
+      await expect(titles).toHaveText(next.map(movie => movie.title));
+      expect(await similarHrefs(page)).toEqual(next.map(movie => `/movies/${movie.id}`));
+
+      // AC2: no suitable candidate keeps the original details visible.
+      await scenario("similar-empty");
+      expect(await similarApi(request, archiveMovie)).toEqual([]);
+      await page.goto(`/movies/${archiveMovie}`);
+      await expect(page.getByRole("heading", { name: "Archive candidate", level: 1 })).toBeVisible();
+      await expect(section.getByText("No similar movies are available", { exact: true })).toBeVisible();
+      await expect(titles).toHaveCount(0);
+      await expect(section.getByRole("alert")).toHaveCount(0);
+      await expect(page.getByRole("heading", { name: "Overview" })).toBeVisible();
+      await noOverflow(page);
+      if (showEvidence) await screenshot(page, "similar-empty-375-light");
+
+      // AC4: adding a candidate without an overview cannot invert the cosine order.
+      const pair = await scenario("similar-pair");
+      expect(pair.scores["Moon Rescue"]).toBeGreaterThan(pair.scores["Orbit Medic"]);
+      await page.goto(`/movies/${similarSource}`);
+      await expect(titles).toHaveText(["Moon Rescue", "Orbit Medic"]);
+      const plus = await scenario("similar-missing-candidate");
+      expect(plus.scores["Quiet Archive"]).toBeNull();
+      await page.reload();
+      await expect(titles).toHaveText(["Moon Rescue", "Orbit Medic", "Quiet Archive"]);
+      expect((await similarApi(request, similarSource)).map(movie => movie.title)).toEqual(["Moon Rescue", "Orbit Medic", "Quiet Archive"]);
+      await noOverflow(page);
+
+      // AC5: a missing, blank or zero-vector source falls back to popularity, then title and ID.
+      for (const name of ["similar-missing-source", "similar-blank-source", "similar-zero-source"]) {
+        expect((await scenario(name)).sourceUsable).toBe(false);
+        await page.reload();
+        await expect(titles).toHaveText(["Quiet Archive", "Orbit Medic", "Moon Rescue"]);
+        await expect(section.getByRole("alert")).toHaveCount(0);
+        await expect(sourceHeading).toBeVisible();
+        expect((await similarApi(request, similarSource)).map(movie => movie.title)).toEqual(["Quiet Archive", "Orbit Medic", "Moon Rescue"]);
+      }
+
+      // A failed index is a recoverable error, not an empty list or a fallback ordering.
+      await scenario("similar-index-failure");
+      const statuses: number[] = [];
+      const record = (response: import("@playwright/test").Response) => {
+        if (new URL(response.url()).pathname.endsWith("/similar")) statuses.push(response.status());
+      };
+      page.on("response", record);
+      await page.goto(`/movies/${similarSource}`);
+      await expect(section.getByRole("alert")).toContainText("Similar movies are unavailable. Search index is temporarily unavailable");
+      await expect(sourceHeading).toBeVisible();
+      await expect(page.getByRole("heading", { name: "Overview" })).toBeVisible();
+      await expect(section.getByText("No similar movies are available", { exact: true })).toHaveCount(0);
+      await expect(titles).toHaveCount(0);
+      await noOverflow(page);
+      if (showEvidence) await screenshot(page, "similar-error-375-light");
+      await scenario("similar-ranked");
+      await section.getByRole("button", { name: "Retry similar movies", exact: true }).click();
+      await expect(titles).toHaveText(rankedSimilarTitles);
+      await expect(section.getByRole("alert")).toHaveCount(0);
+      expect(statuses).toEqual([503, 200]);
+      page.off("response", record);
+      await noOverflow(page);
+      if (showEvidence) await screenshot(page, "similar-retry-375-light");
+    }
+  }
+  expect(errors).toEqual([]);
+  expect(external).toEqual([]);
+  const evidence = { browser: browser.version(), observations, errors, external };
+  await info.attach("similar-api-db.json", { body: JSON.stringify(evidence, null, 2), contentType: "application/json" });
+  if (process.env.T01_SCREENSHOT_DIR)
+    await writeFile(path.join(process.env.T01_SCREENSHOT_DIR, "similar-api-db.json"), JSON.stringify(evidence, null, 2) + "\n");
+});
+
+test("S07 similar results are public, identical across accounts, independent of ratings and keep the return context", async ({ page, request }) => {
+  test.skip(live, "Similar acceptance owns synthetic DB/index fixtures");
+  test.setTimeout(120_000);
+  expect((await request.post(`${controls}/scenario/similar-ranked`)).ok()).toBe(true);
+  const preferenceWrites: string[] = [];
+  page.on("request", request => {
+    if (request.method() !== "GET" && new URL(request.url()).pathname === "/api/me/preferences")
+      preferenceWrites.push(request.method());
+  });
+  const api = await similarApi(request, similarSource);
+  const expected = api.map(movie => `/movies/${movie.id}`);
+  const section = page.getByRole("region", { name: "Similar movies", exact: true });
+  const titles = section.locator("article.movie-card h2");
+
+  // Guest: no sign-in or private read is needed.
+  await page.goto(`/movies/${similarSource}`);
+  await expect(titles).toHaveText(rankedSimilarTitles);
+  expect(await similarHrefs(page)).toEqual(expected);
+
+  const accounts = [] as { email: string; password: string }[];
+  for (const label of ["a", "b"]) {
+    const credentials = { email: `similar-${label}-${crypto.randomUUID()}@example.test`, password: "Synthetic-similar-password" };
+    accounts.push(credentials);
+    expect((await request.post("/api/auth/register", { data: credentials })).status()).toBe(201);
+    expect((await page.request.post("/api/auth/login", { data: credentials })).status()).toBe(200);
+    if (label === "a") expect((await page.request.put("/api/me/preferences", { data: { genreIds: [8101] } })).status()).toBe(200);
+    const before = label === "a" ? await (await page.request.get("/api/me/preferences")).json() : null;
+    // The rating dependency fails for the signed-in account; Similar neither waits for nor depends on it.
+    if (label === "a") await page.route("**/api/me/ratings/**", route => route.fulfill({
+      status: 503, contentType: "application/json", body: JSON.stringify({ error: { code: "SERVICE_UNAVAILABLE", message: "Rating service is unavailable" } }) }));
+    preferenceWrites.length = 0;
+    await page.goto(`/movies/${similarSource}`);
+    await expect(titles).toHaveText(rankedSimilarTitles);
+    expect(await similarHrefs(page)).toEqual(expected);
+    if (label === "a") {
+      await expect(page.getByText("Rating service is unavailable").first()).toBeVisible();
+      await page.unroute("**/api/me/ratings/**");
+      const after = await (await page.request.get("/api/me/preferences")).json();
+      expect(after).toEqual(before);
+      expect(after.data.genres).toEqual([{ id: 8101, name: "Action" }]);
+      expect(preferenceWrites).toEqual([]);
+    }
+    expect((await page.request.post("/api/auth/logout")).status()).toBe(204);
+  }
+
+  // Safe return context survives moving between similar movies.
+  await page.goto("/search?q=astronaut+rescue+moon#results");
+  await expect(page.getByRole("heading", { name: "Moon Rescue" })).toBeVisible();
+  await page.getByRole("link", { name: "View details for Moon Rescue", exact: true }).click();
+  const back = page.getByRole("link", { name: "Back to search", exact: true });
+  await expect(back).toHaveAttribute("href", "/search?q=astronaut+rescue+moon#results");
+  await expect(titles.first()).toBeVisible();
+  await section.getByRole("link", { name: "View details for Orbit Medic", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Orbit Medic", level: 1 })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Back to search", exact: true })).toHaveAttribute("href", "/search?q=astronaut+rescue+moon#results");
+  await page.getByRole("link", { name: "Back to search", exact: true }).click();
+  await expect(page.getByRole("searchbox", { name: "Title or description" })).toHaveValue("astronaut rescue moon");
+});
+
+test("S07 delayed real similar response for movie A cannot fill movie B", async ({ page, request }) => {
+  test.skip(live, "Delayed responses use the isolated acceptance harness");
+  expect((await request.post(`${controls}/scenario/similar-pair`)).ok()).toBe(true);
+  const gateState = async (name: string) => (await (await request.get(`${controls}/gates/${name}`)).json());
+  try {
+    await request.post(`${controls}/gates/similar-stale/arm`);
+    await page.goto(`/movies/${similarSource}`);
+    await expect.poll(async () => (await gateState("similar-stale")).responses.length).toBe(1);
+    const held = (await gateState("similar-stale")).responses[0].body.data.movies.map((movie: { title: string }) => movie.title);
+    expect(held).toEqual(["Moon Rescue", "Orbit Medic"]);
+    await request.post(`${controls}/gates/similar-stale/seal`);
+    await expect(page.getByText("Loading similar movies...", { exact: true })).toBeVisible();
+
+    // Leave A while its response is held, then open B through the public Search page.
+    await page.getByRole("link", { name: "Search", exact: true }).click();
+    await page.getByRole("searchbox", { name: "Title or description" }).fill("Moon Rescue");
+    await page.getByRole("link", { name: "View details for Moon Rescue", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Moon Rescue", level: 1 })).toBeVisible();
+    const own = await similarApi(request, "20000000-0000-0000-0000-000000000002");
+    const titles = page.locator(".similar-movies article.movie-card h2");
+    await expect(titles).toHaveText(own.map(movie => movie.title));
+    expect(own.map(movie => movie.title)).not.toContain("Moon Rescue");
+
+    await request.post(`${controls}/gates/similar-stale/release`);
+    await expect.poll(async () => (await gateState("similar-stale")).completed).toBe(1);
+    await expect(titles).toHaveText(own.map(movie => movie.title));
+    await expect(page.locator(".similar-movies").getByRole("heading", { name: "Moon Rescue" })).toHaveCount(0);
+  } finally {
+    await request.post(`${controls}/release-gates`);
+  }
+});
+
 test("Home title sort precedes paging and button links preserve detail return in both themes", async ({ page, request }) => {
   test.skip(live, "Fixture regression uses its own migrated catalogue");
   const ascending = [];
