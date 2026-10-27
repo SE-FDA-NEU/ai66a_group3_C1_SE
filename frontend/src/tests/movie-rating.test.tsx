@@ -86,9 +86,9 @@ function mount(state: AuthState = A, movieId = "movie-a", strict = false) {
   };
 }
 const picker = () =>
-  screen.getByRole("group", { name: "Your rating (1 to 5)" });
+  screen.getByRole("group", { name: "Your rating (0.5 to 5)" });
 async function ready() {
-  await screen.findByRole("group", { name: "Your rating (1 to 5)" });
+  await screen.findByRole("group", { name: "Your rating (0.5 to 5)" });
 }
 function choose(value: number) {
   fireEvent.click(screen.getByRole("radio", { name: `${value} ${value === 1 ? "star" : "stars"}` }));

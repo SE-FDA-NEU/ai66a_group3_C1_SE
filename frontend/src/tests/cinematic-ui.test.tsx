@@ -76,7 +76,7 @@ function Stars() {
 it("keeps star drafts across theme changes and never writes on select, hover or focus", () => {
   const fetch = vi.spyOn(globalThis, "fetch");
   render(<ThemeProvider><ThemeToggle /><Stars /></ThemeProvider>);
-  expect(screen.getAllByRole("radio")).toHaveLength(5);
+  expect(screen.getAllByRole("radio")).toHaveLength(10);
   expect(screen.queryByRole("radio", { name: "0 stars" })).not.toBeInTheDocument();
   const five = screen.getByRole("radio", { name: "5 stars" });
   fireEvent.mouseEnter(five.closest("label")!);
