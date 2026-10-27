@@ -18,6 +18,8 @@ async function signIn(page: Page, email: string, destination = "/") {
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(page).toHaveURL(destination);
+  await expect(page.getByRole("button", { name: "Sign out", exact: true })).toBeVisible();
+  await expect(page.getByRole("banner")).toContainText(email);
 }
 async function seed(page: Page, genres = 3, ratings = 2, saved = 2) {
   const genreBody = await (await page.request.get("/api/genres")).json();
