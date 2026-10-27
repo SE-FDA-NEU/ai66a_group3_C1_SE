@@ -1,0 +1,12 @@
+
+> frontend@0.0.0 test
+> vitest run src/tests/movies.test.tsx
+
+
+ RUN  v5.0.2 /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/frontend
+
+
+ Test Files  1 passed (1)
+      Tests  22 passed (22)
+   Start at  21:32:40
+   Duration  1.40s (tests 46%, environment 28%, transform 19%, import 8%)

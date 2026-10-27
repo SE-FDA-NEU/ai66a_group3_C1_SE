@@ -29,7 +29,7 @@ are the original implementation crosswalk; Open / Backlog is not a current test 
 | /preferences | Select, save, and revisit 1 to 5 favourite genres for the current account. | U | P0 | F1 | #17 S01 | BR1, BR8, BR18 | — | Open / Backlog |
 | /recommendations | Show paginated personal movies, no-match alternatives, fallback, future rating-informed ranking, and a whole-set view genre filter. | U | P0 and P1 | F2, F4, F6, F7 | #18 S02, #20 S04, #22 S05b, #23 S06 | BR2, BR3, BR4, BR5, BR8, BR9, BR10, BR18, BR21 | — | Post-M3 amendment in progress |
 | /movies/:movieId | View public movie details, rate when signed in, and find text-ranked similar movies. | G; rating U | P0 details; P1 additions | F3, F5, F6, F8 | #19 S03, #21 S05a, #22 S05b, #24 S07 | BR6, BR7, BR8, BR9, BR11, BR15, BR18 | — | Open / Backlog |
-| /search | Search catalogue title or description text and open a selected result. | G | P1 | F9 | #30 S08 | BR12, BR15 | — | Open / Backlog |
+| /search | Search catalogue title or description text and open a selected result. | G | P1 | F9 | #30 S08 | BR12, BR15 | [T10 acceptance](evidence/s4-t10-search/README.md) | Implemented locally; issue closure/review separate |
 | /popular | Browse every finite-popularity movie in global rank order across pages. | G | P1 | F10 | #31 S09 | BR5, BR21 | — | Post-M3 amendment in progress |
 | /about-recommendations | Explain the 3-step account, genre, and optional-rating model. | G | P2 | F11 | #32 S10 | BR13 | — | Open / Backlog |
 | /profile | Confirm and reset the current account's saved genres and ratings. | U | P2 | F12 | #33 S11 | BR8, BR14, BR18 | — | Open / Backlog |

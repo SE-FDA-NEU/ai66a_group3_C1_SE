@@ -10,7 +10,7 @@ export default function AppFrame({ children }: { children: ReactNode }) {
   const authPage = pathname === "/login" || pathname === "/register";
   // Public lists restore sessions as before. Other routes keep their existing
   // guard/rating ownership; the static explanation must not start an API call.
-  const publicList = pathname === "/" || pathname === "/popular";
+  const publicList = pathname === "/" || pathname === "/popular" || pathname === "/search";
   const showSession = !authPage && (publicList || auth.status === "authenticated" || auth.status === "unauthenticated");
   return <>
     <a className="skip-link" href="#main-content">Skip to content</a>
@@ -22,6 +22,7 @@ export default function AppFrame({ children }: { children: ReactNode }) {
         <nav className="primary-nav" aria-label="Main navigation">
           <NavLink to="/" end>Home</NavLink>
           <NavLink to="/popular">Popular movies</NavLink>
+          <NavLink to="/search">Search</NavLink>
           <NavLink to="/recommendations">My recommendations</NavLink>
           <NavLink to="/preferences">Preferences</NavLink>
           <NavLink to="/watchlist">My watchlist</NavLink>

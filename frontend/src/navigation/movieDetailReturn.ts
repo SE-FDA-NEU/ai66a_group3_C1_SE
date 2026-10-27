@@ -20,6 +20,7 @@ const DEFAULT_RETURN: MovieDetailReturnDestination = {
 const SAFE_MOVIE_LIST_ROUTES = new Map([
   ["/", "Return to catalogue"],
   ["/popular", "Back to popular movies"],
+  ["/search", "Back to search"],
   ["/recommendations", "Back to recommendations"],
   ["/watchlist", "Back to watchlist"],
 ]);

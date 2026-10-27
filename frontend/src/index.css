@@ -72,6 +72,10 @@ p { line-height: 1.65; }
 .auth-form { display: grid; gap: .6rem; margin-top: 1.75rem; }
 .auth-form label { font-size: .85rem; font-weight: 700; margin-top: .45rem; }
 .auth-form input { width: 100%; }
+.search-controls { display: grid; gap: .65rem; margin-bottom: 1.5rem; }
+.search-controls label { font-weight: 700; }
+.search-controls input { width: 100%; }
+.search-controls .field-hint { margin: 0; }
 .auth-form button { margin-top: .5rem; }
 .auth-footer { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: .65rem; margin: 1.5rem 0 0; text-align: center; font-size: .875rem; color: var(--muted); }
 .auth-footer a { font-weight: 700; }

@@ -7,6 +7,7 @@ import HomePage from "./pages/HomePage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
 import MovieDetailPage from "./pages/MovieDetailPage.tsx";
 import PopularMoviesPage from "./pages/PopularMoviesPage.tsx";
+import SearchPage from "./pages/SearchPage.tsx";
 import RegisterPage from "./pages/RegisterPage.tsx";
 import { PROTECTED_ROUTES } from "./protectedRoutes.tsx";
 import AppFrame from "./components/AppFrame.tsx";
@@ -24,6 +25,7 @@ function App() {
             element={<RecommendationExplanationPage />}
           />
           <Route path="/popular" element={<PopularMoviesPage />} />
+          <Route path="/search" element={<SearchPage />} />
           <Route path="/movies/:movieId" element={<MovieDetailPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />

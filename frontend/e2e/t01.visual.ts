@@ -1,6 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import path from "node:path";
-import { mkdir } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 
 const live = Boolean(process.env.T01_LIVE_URL);
 const fixtureMovie = "20000000-0000-0000-0000-000000000001";
@@ -54,6 +54,164 @@ test.beforeEach(async ({ page, request }) => {
   expect((await request.post(`${controls}/scenario/ranked`)).ok()).toBe(true);
   // Deterministic offline image failure checks, not fabricated TMDb screenshots.
   await page.route("https://image.tmdb.org/**", route => route.abort());
+});
+
+test("S08 search uses real API/index across themes, sizes, states and safe return", async ({ page, request, browser }, info) => {
+  test.skip(live, "Search acceptance owns synthetic DB/index fixtures");
+  test.setTimeout(120_000);
+  const observations: object[] = [];
+  const errors: string[] = [];
+  const privateRequests: string[] = [];
+  page.on("pageerror", error => errors.push(error.message));
+  page.on("request", request => {
+    const url = new URL(request.url());
+    if (url.pathname.startsWith("/api/me/") || url.hostname === "api.themoviedb.org") privateRequests.push(url.pathname);
+  });
+  const scenario = async (name: string) => {
+    const response = await request.post(`${controls}/scenario/${name}`);
+    expect(response.ok()).toBe(true);
+    const data = await response.json();
+    observations.push(data);
+    return data;
+  };
+  const search = page.getByRole("searchbox", { name: "Title or description" });
+  const titles = page.locator("article.movie-card h2");
+  for (const width of [375, 768, 1440]) {
+    for (const theme of ["light", "dark"]) {
+      const seed = await scenario("search-ranked");
+      expect(seed.titleHits).toBe(11);
+      expect(seed.scores["Moon Rescue"]).toBeGreaterThan(seed.scores["City Robot"]);
+      expect(seed.scores["City Robot"]).toBeGreaterThan(0);
+      await page.setViewportSize({ width, height: 960 });
+      await page.goto("/search");
+      if (await page.locator("html").getAttribute("data-theme") !== theme)
+        await page.getByRole("button", { name: `Switch to ${theme} theme` }).click();
+      await expect(page.getByText("Enter at least 2 characters", { exact: true })).toBeVisible();
+      const gate = `search-loading-${width}-${theme}`;
+      await request.post(`${controls}/gates/${gate}/arm`);
+      await search.fill("  inCEPTION  ");
+      await expect.poll(async () => (await (await request.get(`${controls}/gates/${gate}`)).json()).responses.length).toBe(1);
+      await expect(page.getByText("Loading movies...", { exact: true })).toBeVisible();
+      await noOverflow(page);
+      if (width === 375 && theme === "light") await screenshot(page, "search-loading-375-light");
+      await request.post(`${controls}/gates/${gate}/seal`);
+      await request.post(`${controls}/gates/${gate}/release`);
+      const api = await (await request.get("/api/movies/search?q=inCEPTION")).json();
+      await expect(titles).toHaveText(api.data.movies.map((movie: { title: string }) => movie.title));
+      expect(api.data.movies).toHaveLength(10);
+      expect(api.data.movies[0].title).toBe("Inception");
+      observations.push({ width, theme, titleApi: api });
+      await search.fill("astronaut rescue moon");
+      await expect(titles).toHaveText(["Moon Rescue", "City Robot"]);
+      await search.focus();
+      await expect(search).toBeFocused();
+      expect(await search.evaluate(node => getComputedStyle(node).outlineStyle)).not.toBe("none");
+      const searchUrl = page.url();
+      const submitted = () => page.waitForResponse(response => {
+        const url = new URL(response.url());
+        return url.pathname === "/api/movies/search" && url.searchParams.get("q") === "astronaut rescue moon";
+      });
+      const enterResponse = submitted();
+      await search.press("Enter");
+      expect((await enterResponse).status()).toBe(200);
+      await expect(titles).toHaveText(["Moon Rescue", "City Robot"]);
+      await expect(page).toHaveURL(searchUrl);
+      await expect(search).toBeFocused();
+      await page.keyboard.press("Tab");
+      const submit = page.getByRole("button", { name: "Search", exact: true });
+      await expect(submit).toBeFocused();
+      const buttonResponse = submitted();
+      await page.keyboard.press("Enter");
+      expect((await buttonResponse).status()).toBe(200);
+      await expect(titles).toHaveText(["Moon Rescue", "City Robot"]);
+      await expect(page).toHaveURL(searchUrl);
+      await page.keyboard.press("Tab");
+      await expect(page.getByRole("link", { name: "View details for Moon Rescue" })).toBeFocused();
+      await page.keyboard.press("Shift+Tab");
+      await expect(submit).toBeFocused();
+      await page.keyboard.press("Shift+Tab");
+      await expect(search).toBeFocused();
+      await noOverflow(page);
+      await screenshot(page, `search-results-${width}-${theme}`);
+      await page.getByRole("link", { name: "View details for Moon Rescue" }).click();
+      const back = page.getByRole("link", { name: "Back to search", exact: true });
+      await expect(back).toHaveAttribute("href", "/search?q=astronaut+rescue+moon");
+      await back.click();
+      await expect(search).toHaveValue("astronaut rescue moon");
+      await page.reload();
+      await expect(titles).toHaveText(["Moon Rescue", "City Robot"]);
+      await search.fill("volcano jazz galaxy");
+      await expect(page.getByText("No movies found", { exact: true })).toBeVisible();
+      await expect(titles).toHaveCount(0);
+      await noOverflow(page);
+      if (width === 375 && theme === "light") await screenshot(page, "search-empty-375-light");
+      await scenario("search-index-failure");
+      const failedQueries: string[] = [];
+      const record = (response: import("@playwright/test").Response) => {
+        const url = new URL(response.url());
+        if (url.pathname === "/api/movies/search") failedQueries.push(url.searchParams.get("q")!);
+      };
+      page.on("response", record);
+      await search.fill("rescue astronaut moon");
+      await expect(page.getByRole("alert")).toContainText("Search index is temporarily unavailable");
+      await noOverflow(page);
+      if (width === 375 && theme === "light") await screenshot(page, "search-error-375-light");
+      const fallback = await request.get("/api/movies/search?q=Inception");
+      expect(fallback.status()).toBe(200);
+      expect((await fallback.json()).data.movies).toHaveLength(10);
+      await scenario("search-ranked");
+      await page.getByRole("button", { name: "Retry", exact: true }).click();
+      await expect(titles).toHaveText(["Moon Rescue", "City Robot"]);
+      expect(failedQueries).toEqual(["rescue astronaut moon", "rescue astronaut moon"]);
+      page.off("response", record);
+      await noOverflow(page);
+      if (width === 375 && theme === "light") await screenshot(page, "search-retry-375-light");
+      const zero = await scenario("search-zero");
+      expect(zero.scores["Moon Rescue"]).toBeGreaterThan(0);
+      expect(zero.scores["City Robot"]).toBe(0);
+      await search.fill("astronaut rescue moon");
+      await expect(titles).toHaveText(["Moon Rescue"]);
+      await scenario("search-empty");
+      await search.fill("astronaut moon");
+      await expect(page.getByText("No movies found", { exact: true })).toBeVisible();
+      await noOverflow(page);
+    }
+  }
+  expect(errors).toEqual([]);
+  expect(privateRequests).toEqual([]);
+  const evidence = { browser: browser.version(), observations, errors, privateRequests };
+  await info.attach("search-api-db.json", { body: JSON.stringify(evidence, null, 2), contentType: "application/json" });
+  if (process.env.T01_SCREENSHOT_DIR)
+    await writeFile(path.join(process.env.T01_SCREENSHOT_DIR, "search-api-db.json"), JSON.stringify(evidence, null, 2) + "\n");
+});
+
+test("S08 delayed real search response cannot replace a newer query or return after unmount", async ({ page, request }) => {
+  test.skip(live, "Delayed responses use the isolated acceptance harness");
+  expect((await request.post(`${controls}/scenario/search-ranked`)).ok()).toBe(true);
+  try {
+    await page.goto("/search");
+    await request.post(`${controls}/gates/search-stale/arm`);
+    await page.getByRole("searchbox").fill("Inception");
+    await expect.poll(async () => (await (await request.get(`${controls}/gates/search-stale`)).json()).responses.length).toBe(1);
+    await request.post(`${controls}/gates/search-stale/seal`);
+    await page.getByRole("searchbox").fill("astronaut rescue moon");
+    await expect(page.locator("article.movie-card h2")).toHaveText(["Moon Rescue", "City Robot"]);
+    await request.post(`${controls}/gates/search-stale/release`);
+    await expect.poll(async () => (await (await request.get(`${controls}/gates/search-stale`)).json()).completed).toBe(1);
+    await expect(page.locator("article.movie-card h2")).toHaveText(["Moon Rescue", "City Robot"]);
+    await request.post(`${controls}/gates/search-unmount/arm`);
+    await page.getByRole("searchbox").fill("Inception");
+    await expect.poll(async () => (await (await request.get(`${controls}/gates/search-unmount`)).json()).responses.length).toBe(1);
+    await request.post(`${controls}/gates/search-unmount/seal`);
+    await page.getByRole("link", { name: "Home", exact: true }).click();
+    await request.post(`${controls}/gates/search-unmount/release`);
+    await expect.poll(async () => (await (await request.get(`${controls}/gates/search-unmount`)).json()).completed).toBe(1);
+    await expect(page).toHaveURL("/");
+    await expect(page.getByRole("heading", { name: "Find your next movie" })).toBeVisible();
+    await expect(page.getByRole("searchbox")).toHaveCount(0);
+  } finally {
+    await request.post(`${controls}/release-gates`);
+  }
 });
 
 test("Home title sort precedes paging and button links preserve detail return in both themes", async ({ page, request }) => {

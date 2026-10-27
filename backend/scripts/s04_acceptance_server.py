@@ -112,6 +112,10 @@ def build_harness(path: Path, fixture: dict):
             "db-failure",
             "no-match",
             "no-match-no-popularity",
+            "search-ranked",
+            "search-zero",
+            "search-empty",
+            "search-index-failure",
         }:
             raise HTTPException(400, "Unknown fixture")
         with closing(sqlite3.connect(path)) as connection, connection:
@@ -124,13 +128,34 @@ def build_harness(path: Path, fixture: dict):
                 "UPDATE catalog_movies SET popularity_score = ? WHERE id = ?",
                 [(row["popularity"], row["id"]) for row in fixture["movies"]],
             )
+            connection.executemany(
+                "UPDATE catalog_movies SET title = ?, overview = NULL WHERE id = ?",
+                [(row["title"], row["id"]) for row in fixture["movies"]],
+            )
+            if name.startswith("search-"):
+                # Eleven title hits plus two independent overview documents.
+                search_rows = [
+                    ("Inception" if i == 0 else f"Inception {i:02d}", None, row["id"])
+                    for i, row in enumerate(fixture["movies"][:11])
+                ]
+                search_rows.extend([
+                    ("Moon Rescue", "An astronaut rescue mission on the moon",
+                     fixture["movies"][11]["id"]),
+                    ("City Robot", "A detective investigates a theft" if name == "search-zero"
+                     else "A detective investigates a rescue in the city",
+                     fixture["movies"][12]["id"]),
+                ])
+                connection.executemany(
+                    "UPDATE catalog_movies SET title = ?, overview = ? WHERE id = ?",
+                    search_rows,
+                )
             connection.execute(
                 "UPDATE catalog_movies SET catalogue_revision_id = ?",
                 (fixture["revision"],),
             )
             connection.execute(
                 "UPDATE catalogue_state SET active_revision_id = ? WHERE id = 1",
-                ("s04-empty" if name == "empty" else fixture["revision"],),
+                ("s04-empty" if name in {"empty", "search-empty"} else fixture["revision"],),
             )
             if name in {"no-match", "no-match-no-popularity"}:
                 # The genre was selectable when the editor opened. Retire its
@@ -165,11 +190,33 @@ def build_harness(path: Path, fixture: dict):
                     WHERE catalogue_revision_id =
                     (SELECT active_revision_id FROM catalogue_state WHERE id = 1)"""
             ).fetchone()
+        search_evidence = {}
+        if name.startswith("search-"):
+            from app.db.database import SessionLocal
+            from app.recommendations.overview_index import (
+                cosine_similarity,
+                rebuild_active_index,
+                resolve_index_path,
+            )
+
+            with SessionLocal() as session:
+                index = rebuild_active_index(session)
+            vector = index.transform_query("astronaut rescue moon")
+            search_evidence = {
+                "titleHits": 0 if name == "search-empty" else 11,
+                "scores": {
+                    title: cosine_similarity(vector, index.vector_for(row["id"]))
+                    for title, row in zip(["Moon Rescue", "City Robot"], fixture["movies"][11:])
+                } if name != "search-empty" else {},
+            }
+            if name == "search-index-failure":
+                resolve_index_path().unlink()
         return {
             "scenario": name,
             "preferences": preferences,
             "activeMovies": count,
             "finitePopularity": finite or 0,
+            **search_evidence,
         }
 
     @controls.post("/__acceptance/gates/{name}/{action}")
@@ -203,12 +250,12 @@ def build_harness(path: Path, fixture: dict):
             gate["event"].set()
         return {"released": len(gates)}
 
-    class DelayRealRecommendations:
+    class DelayRealResponses:
         async def __call__(self, scope, receive, send):
             name = capturing
             if (
                 scope["type"] != "http"
-                or scope["path"] != "/api/me/recommendations"
+                or scope["path"] not in {"/api/me/recommendations", "/api/movies/search"}
                 or name is None
             ):
                 return await production_app(scope, receive, send)
@@ -235,7 +282,7 @@ def build_harness(path: Path, fixture: dict):
                 await send(message)
             gate["completed"] += 1
 
-    controls.mount("/", DelayRealRecommendations())
+    controls.mount("/", DelayRealResponses())
     return controls
 
 
@@ -248,6 +295,7 @@ def main() -> None:
         raise RuntimeError("Run via npm --prefix frontend run test:s04:e2e")
     path = Path(directory) / "acceptance.db"
     os.environ["DATABASE_URL"] = sqlite_url(path)
+    os.environ["NLP_INDEX_PATH"] = str(Path(directory) / "overview-index.json")
     live = os.environ.get("S13_TMDB_SMOKE") == "1"
     accepted = os.environ.get("S13_TMDB_DATABASE")
     if accepted and not live:
