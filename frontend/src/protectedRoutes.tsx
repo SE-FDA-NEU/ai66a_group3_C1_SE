@@ -1,6 +1,6 @@
 import type { ReactElement } from "react";
 
-import ProtectedPlaceholderPage from "./pages/ProtectedPlaceholderPage.tsx";
+import ProfilePage from "./pages/ProfilePage.tsx";
 import PreferencesPage from "./pages/PreferencesPage.tsx";
 import RecommendationsPage from "./pages/RecommendationsPage.tsx";
 import WatchlistPage from "./pages/WatchlistPage.tsx";
@@ -11,6 +11,6 @@ import WatchlistPage from "./pages/WatchlistPage.tsx";
 export const PROTECTED_ROUTES: { path: string; element: ReactElement }[] = [
   { path: "/recommendations", element: <RecommendationsPage /> },
   { path: "/preferences", element: <PreferencesPage /> },
-  { path: "/profile", element: <ProtectedPlaceholderPage title="Profile" /> },
+  { path: "/profile", element: <ProfilePage /> },
   { path: "/watchlist", element: <WatchlistPage /> },
 ];

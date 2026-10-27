@@ -99,24 +99,38 @@ it("real React actions preserve committed SQLite preferences for both accounts",
     // Substitute only transport: response bodies come from the real API/DB.
     const request = { url, method, ...(typeof options?.body === "string" ? { body: JSON.parse(options.body) } : {}) };
     const result = await bridge.call("request", request) as { status: number; body: unknown };
+    // Exercise asynchronously loaded options after every filter remount. The
+    // UI must be ready before a real user could select the next genre.
+    if (url === "/api/genres") await new Promise(done => setTimeout(done, 100));
     return new Response(JSON.stringify(result.body), { status: result.status, headers: { "Content-Type": "application/json" } });
   });
   window.history.pushState({}, "", "/recommendations"); render(<App />);
   const select = await screen.findByRole("combobox", { name: "Filter by genre" });
   await waitFor(() => expect(select).toBeEnabled());
   const filterSelect = () => screen.getByRole("combobox", { name: "Filter by genre" });
+  async function chooseGenre(value: string) {
+    // A new result mounts a new filter and reloads its genre options. Wait for
+    // the live control each time; firing change on a disabled/empty select can
+    // turn the intended value into "" and accidentally clear the filter.
+    await waitFor(() => {
+      const control = filterSelect() as HTMLSelectElement;
+      expect(control).toBeEnabled();
+      expect([...control.options].map(option => option.value)).toContain(value);
+    });
+    fireEvent.change(filterSelect(), { target: { value } });
+  }
   const titles = () => [...document.querySelectorAll(".movie-card h2")].map((node) => node.textContent);
   expect(titles()).toEqual(expected);
   const baseline = [...calls];
   const unchanged = async () => expect(await bridge.call("preferences")).toEqual(before);
   await unchanged();
-  fireEvent.change(filterSelect(), { target: { value: "28" } });
+  await chooseGenre("28");
   await waitFor(() => expect(titles()).toEqual(["Action Z", "Action A"])); await unchanged();
   fireEvent.click(screen.getByRole("button", { name: "Clear filter" }));
   await waitFor(() => expect(titles()).toEqual(expected)); await unchanged();
-  fireEvent.change(filterSelect(), { target: { value: "35" } });
+  await chooseGenre("35");
   await waitFor(() => expect(titles()).toEqual(["Comedy C", "Comedy A", "Comedy B"])); await unchanged();
-  fireEvent.change(filterSelect(), { target: { value: "27" } });
+  await chooseGenre("27");
   await screen.findByText("No movies match this filter.");
   expect(titles()).toEqual([]); await unchanged();
   fireEvent.click(screen.getByRole("button", { name: "Show all movies" }));

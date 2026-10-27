@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "test": "vitest run",
     "test:t01:ui": "node scripts/run-s04-e2e.mjs --config playwright.t01.config.ts",
+    "test:t13:ui": "node scripts/run-s04-e2e.mjs --config playwright.t13.config.ts",
     "test:t16:integration": "vitest run --config vitest.t16.config.ts",
     "test:t33:integration": "vitest run --config vitest.t33.config.ts",
     "test:t04:integration": "vitest run --config vitest.t04.config.ts",
