@@ -33,8 +33,9 @@ function deferredResponse() {
   return { promise, resolve, reject };
 }
 
-function searchInput(value: string) {
+function submitQuery(value: string) {
   fireEvent.change(screen.getByRole("searchbox", { name: "Title or description" }), { target: { value } });
+  fireEvent.submit(screen.getByRole("search", { name: "Movie search" }));
 }
 
 afterEach(() => {
@@ -44,6 +45,27 @@ afterEach(() => {
 });
 
 describe("S08 public search UI", () => {
+  it("keeps typing local until an explicit submit and commits only the submitted query", async () => {
+    window.history.replaceState({}, "", "/search?source=t16#results");
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(input =>
+      String(input) === "/api/auth/me" ? jsonResponse({}, 401) : jsonResponse({ data: { movies: [movies[0]] } }));
+    render(<App />);
+    const input = screen.getByRole("searchbox");
+    fireEvent.change(input, { target: { value: "moon rescue" } });
+    await act(async () => { await Promise.resolve(); });
+    expect(fetchMock.mock.calls.filter(([url]) => String(url).startsWith("/api/movies/search?"))).toHaveLength(0);
+    expect(window.location.search).toBe("?source=t16");
+    expect(screen.queryByRole("article")).not.toBeInTheDocument();
+    fireEvent.submit(screen.getByRole("search", { name: "Movie search" }));
+    expect(await screen.findByText("Movie 1")).toBeInTheDocument();
+    expect(window.location.search).toBe("?source=t16&q=moon+rescue");
+    expect(window.location.hash).toBe("#results");
+    fireEvent.change(input, { target: { value: "new unsent draft" } });
+    await act(async () => { await Promise.resolve(); });
+    expect(fetchMock.mock.calls.filter(([url]) => String(url).startsWith("/api/movies/search?"))).toHaveLength(1);
+    expect(screen.queryByRole("article")).not.toBeInTheDocument();
+  });
+
   it.each(["", " ", "a", " a ", "%", "_", " 🎬 "])("validates trimmed short query %j without a search request", async query => {
     window.history.replaceState({}, "", `/search?q=${encodeURIComponent(query)}`);
     const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(() => jsonResponse({}, 401));
@@ -109,7 +131,7 @@ describe("S08 public search UI", () => {
     render(<MemoryRouter initialEntries={["/search?q=unknown"]}><SearchPage /></MemoryRouter>);
     expect(await screen.findByText("No movies found", { exact: true })).toHaveAttribute("role", "status");
     expect(screen.queryByRole("article")).not.toBeInTheDocument();
-    searchInput(" x ");
+    submitQuery(" x ");
     expect(screen.getByRole("status")).toHaveTextContent(/^Enter at least 2 characters$/);
     expect(screen.queryByText("No movies found")).not.toBeInTheDocument();
   });
@@ -121,7 +143,7 @@ describe("S08 public search UI", () => {
       .mockImplementationOnce(() => jsonResponse({ data: { movies: [movies[1]] } }));
     render(<MemoryRouter initialEntries={["/search?q=old"]}><SearchPage /></MemoryRouter>);
     await screen.findByText("Movie 1");
-    searchInput("  current query  ");
+    submitQuery("  current query  ");
     expect(await screen.findByRole("alert")).toHaveTextContent("Search index is temporarily unavailable");
     fireEvent.click(screen.getByRole("button", { name: "Retry" }));
     expect(screen.getByRole("status")).toHaveTextContent("Loading movies...");
@@ -129,7 +151,7 @@ describe("S08 public search UI", () => {
     expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
       "/api/movies/search?q=old", "/api/movies/search?q=current+query", "/api/movies/search?q=current+query",
     ]);
-    expect(screen.getByRole("searchbox")).toHaveValue("  current query  ");
+    expect(screen.getByRole("searchbox")).toHaveValue("current query");
   });
 
   it.each(["success", "error"])("ignores a delayed old %s even if fetch ignores abort", async outcome => {
@@ -138,7 +160,7 @@ describe("S08 public search UI", () => {
       .mockImplementationOnce(() => jsonResponse({ data: { movies: [movies[1]] } }));
     render(<MemoryRouter initialEntries={["/search?q=old"]}><SearchPage /></MemoryRouter>);
     const oldSignal = fetchMock.mock.calls[0][1]?.signal;
-    searchInput("new");
+    submitQuery("new");
     expect(await screen.findByText("Movie 2")).toBeInTheDocument();
     expect(oldSignal?.aborted).toBe(true);
     await act(async () => {
@@ -168,8 +190,8 @@ describe("S08 public search UI", () => {
     const pending = deferredResponse();
     const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementationOnce(() => pending.promise);
     render(<MemoryRouter initialEntries={["/search?q=moon"]}><SearchPage /></MemoryRouter>);
-    searchInput(" a ");
-    expect(fetchMock.mock.calls[0][1]?.signal?.aborted).toBe(true);
+    submitQuery(" a ");
+    expect(fetchMock.mock.calls[0][1]?.signal?.aborted).toBe(false);
     await act(async () => pending.resolve(await jsonResponse({ data: { movies } })));
     expect(screen.getByRole("status")).toHaveTextContent(/^Enter at least 2 characters$/);
     expect(screen.queryByRole("article")).not.toBeInTheDocument();

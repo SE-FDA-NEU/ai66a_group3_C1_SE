@@ -15,6 +15,12 @@ export default function SearchPage() {
   const input = new URLSearchParams(location.search).get("q") ?? "";
   const query = input.trim();
   const valid = [...query].length >= 2;
+  const [draft, setDraft] = useState({ url: input, value: input, invalid: false });
+  // Browser Back/deep links restore the last submitted query. Typing stays local.
+  if (draft.url !== input) setDraft({ url: input, value: input, invalid: false });
+  const draftValue = draft.url === input ? draft.value : input;
+  const invalidDraft = draft.url === input && draft.invalid;
+  const awaitingSubmit = draftValue.trim() !== query;
   const [retry, setRetry] = useState(0);
   const [load, setLoad] = useState<Load | null>(null);
   const key = JSON.stringify([query, retry]);
@@ -44,21 +50,30 @@ export default function SearchPage() {
     <form className="content-card search-controls" role="search" aria-label="Movie search"
       onSubmit={event => {
         event.preventDefault();
-        if (valid) setRetry(value => value + 1);
+        const submitted = draftValue.trim();
+        if ([...submitted].length < 2) {
+          setDraft({ url: input, value: draftValue, invalid: true });
+          return;
+        }
+        if (submitted === query) {
+          setRetry(value => value + 1);
+          setDraft({ url: input, value: draftValue, invalid: false });
+        } else {
+          const params = new URLSearchParams(location.search);
+          params.set("q", submitted);
+          navigate({ pathname: "/search", search: `?${params}`, hash: location.hash });
+        }
       }}>
       <label htmlFor="movie-search">Title or description</label>
-      <input id="movie-search" type="search" value={input} aria-describedby="search-hint"
+      <input id="movie-search" type="search" value={draftValue} aria-describedby="search-hint"
         onChange={event => {
-          const params = new URLSearchParams(location.search);
-          if (event.target.value) params.set("q", event.target.value);
-          else params.delete("q");
-          navigate({ pathname: "/search", search: params.size ? `?${params}` : "",
-            hash: location.hash }, { replace: true });
+          setDraft({ url: input, value: event.target.value, invalid: false });
         }} />
       <button type="submit">Search</button>
-      <p id="search-hint" className="field-hint">Results update as you type. Press Enter or choose Search to submit again. Up to 10 movies.</p>
+      <p id="search-hint" className="field-hint">Enter at least 2 characters, then press Enter or choose Search. Up to 10 movies.</p>
     </form>
-    {!valid ? <p className="status-panel" role="status">Enter at least 2 characters</p> :
+    {invalidDraft || (!valid && !awaitingSubmit) ? <p className="status-panel" role="status">Enter at least 2 characters</p> :
+      awaitingSubmit ? <p className="status-panel" role="status">Press Enter or Search to see results.</p> :
       !current ? <p className="status-panel" role="status">Loading movies...</p> :
       current.status === "error" ? <section className="status-panel" role="alert">
         <h2>Search is unavailable</h2>
