@@ -1,5 +1,8 @@
 # S4-T10 public search and S08 acceptance
 
+Latest UI screenshots: [2026-10-27 keyboard-submit capture](#current-ui-screenshots-2026-10-27).
+The original 2026-10-26 screenshots and source manifest remain historical evidence.
+
 Verified locally on 2026-10-26 (Asia/Ho_Chi_Minh). Story #30's five criteria
 are taken in order from [requirements.md](../../requirements.md#s08-search-for-a-movie-by-title-or-description-p1-5-points).
 This records executed local acceptance; it does not change GitHub issue state
@@ -175,3 +178,44 @@ Executed locally against the changed working tree:
 The browser runner initially could not bind port 8014 inside the sandbox.
 Its authorized rerun outside the sandbox passed and removed its temporary
 database. No historical screenshot or source manifest was regenerated.
+
+## Current UI screenshots (2026-10-27)
+
+Captured from implementation commit `8ead5af8c809e41d72e14c641dce309e56b3b356`
+using the existing Playwright S08 tests. These images show the native Search
+button and Enter instructions added by the keyboard follow-up. The original
+images above are retained; the PR's displayed images now use this new capture.
+
+The database is an isolated synthetic fixture. `Moon Rescue` and `City Robot`
+are test movies with no poster path, so `Poster unavailable` is expected.
+These screenshots verify the current UI and fallback, not a TMDb import or
+live poster delivery. No developer database was imported or modified.
+
+| View | Light | Dark |
+|---|---|---|
+| Mobile 375px results | [Screenshot](screenshots/2026-10-27-keyboard-submit/search-results-375-light.png) | [Screenshot](screenshots/2026-10-27-keyboard-submit/search-results-375-dark.png) |
+| Tablet 768px results | [Screenshot](screenshots/2026-10-27-keyboard-submit/search-results-768-light.png) | [Screenshot](screenshots/2026-10-27-keyboard-submit/search-results-768-dark.png) |
+| Desktop 1440px results | [Screenshot](screenshots/2026-10-27-keyboard-submit/search-results-1440-light.png) | [Screenshot](screenshots/2026-10-27-keyboard-submit/search-results-1440-dark.png) |
+
+Additional mobile/light states: [Loading](screenshots/2026-10-27-keyboard-submit/search-loading-375-light.png),
+[No movies found](screenshots/2026-10-27-keyboard-submit/search-empty-375-light.png),
+[Index error](screenshots/2026-10-27-keyboard-submit/search-error-375-light.png),
+[Retry recovered](screenshots/2026-10-27-keyboard-submit/search-retry-375-light.png).
+
+Reproduction command:
+
+```bash
+T01_SCREENSHOT_DIR=../docs/evidence/s4-t10-search/screenshots/2026-10-27-keyboard-submit npm --prefix frontend run test:t01:ui -- --grep S08
+```
+
+Observed result: **2 passed**. The checks cover real API/index responses,
+Enter in the input, keyboard activation of Search, Tab/Shift+Tab order,
+focus/URL preservation, both themes at 375/768/1440px, loading/empty/error/retry,
+stale responses and safe detail return. Chromium version and API/DB
+observations are in [search-api-db.json](screenshots/2026-10-27-keyboard-submit/search-api-db.json).
+The runner removed its temporary database after completion.
+
+Capture log: [keyboard-submit-browser.log](checks/keyboard-submit-browser.log).
+The new [tested-source manifest](screenshots/2026-10-27-keyboard-submit/tested-source.sha256)
+uses repository-relative paths; the [screenshot manifest](screenshots/2026-10-27-keyboard-submit/screenshots.sha256)
+uses paths relative to its capture directory. Historical manifests are unchanged.
