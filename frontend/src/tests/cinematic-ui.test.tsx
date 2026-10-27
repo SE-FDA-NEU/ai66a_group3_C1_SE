@@ -45,7 +45,7 @@ it("theme changes preserve login input and URL without triggering an API request
   expect(window.location.search).toBe("?from=details");
   expect(fetch).not.toHaveBeenCalled();
   expect(screen.queryByRole("link", { name: "Watchlist" })).not.toBeInTheDocument();
-  expect(screen.queryByRole("link", { name: "Search" })).not.toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "Search" })).toHaveAttribute("href", "/search");
 });
 
 it.each([null, undefined, "https://evil.invalid/x.jpg", "https://image.tmdb.org/t/p/original/x.jpg", "https://image.tmdb.org/t/p/w500/x.jpg?token=secret"])(

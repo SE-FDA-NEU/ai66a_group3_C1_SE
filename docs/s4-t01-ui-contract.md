@@ -73,6 +73,7 @@ than being rewritten as newly executed Sprint 4 evidence.
 | Component / file | Consumer responsibility and invariant |
 |---|---|
 | `AppFrame` | Shared brand/navigation/session UI, skip link and footer. Session writes remain in AuthProvider. Public lists restore the session; existing protected/rating boundaries retain ownership of initial checks. Static explanation starts no API request. No second header per page. |
+| `AppFrame` S4-T10 extension | One active-state `Search` link points to public `/search`. `SearchPage` reuses `MovieGrid`/`MovieCard`, `MoviePoster`, semantic theme tokens, shared button/status styles and safe detail-return context. The labelled search form supports Enter and its native Search submit button. |
 | `AppFrame` S4-T12 extension | One `My watchlist` link in the existing main navigation points to protected `/watchlist`. Detail mounts the account-scoped watchlist action beside the existing rating widget. `MoviePoster`, `PageControls`, `useFeedback`, theme tokens and safe detail-return state are reused. No new theme, notification, rating or navigation system is introduced. |
 | `AppFrame` S4-T13 extension | A signed-in `Profile` link uses the existing protected `/profile` registry entry. `ProfilePage` reuses `ConfirmDialog`, button links, semantic theme tokens and `useFeedback`. It displays its API summary and distinguishes confirmed reset, documented rejection and unconfirmed response/reconciliation. Shared post-reset invalidation remains T14; no new auth/cache/theme/notification store is introduced. |
 | `ThemeProvider` / `ThemeToggle` | Dark default; only `dark`/`light`; local key `cineai-theme`. Inline pre-paint bootstrap and provider use the same key. Blocked/corrupt storage is safe. Toggling changes tokens, never keys/remounts, auth, URL, draft, filter or page. |
@@ -186,3 +187,25 @@ to auth authority, API query keys or ranking inputs.
 
 Actual checks, screenshots and review limits:
 [onboarding/discovery follow-up evidence](evidence/s4-t01-onboarding-polish.md).
+
+## S4-T10 Search integration and keyboard submit (2026-10-27)
+
+The delivered T10 extension adds public `/search` to the existing shell and
+safe detail-return allowlist. The URL-backed `q` survives reload and details
+return along with unrelated query parameters and the fragment. Existing session
+restoration does not require sign-in or add private account reads to Search.
+
+Results update as the user types. A native labelled search form also submits
+the current query with Enter in the input or the Search button; submission
+prevents a document reload and repeats the current read without changing the
+URL. Both paths trim the query and require at least two Unicode characters.
+Short queries show `Enter at least 2 characters` and issue no search request.
+Tab reaches Search after the input, then the result links; Shift+Tab reverses
+that order. Focus remains on the submitted control.
+
+Search retains the server's order and first ten movies, with distinct loading,
+empty, error and Retry states. Every new read, including explicit submit, aborts
+the previous one and ignores late success/error completions. It reuses the
+existing poster fallback, responsive grid and light/dark tokens. Inline status
+and alerts report search reads; no additional feedback or theme store is added.
+See [T10 acceptance and keyboard follow-up](evidence/s4-t10-search/README.md).

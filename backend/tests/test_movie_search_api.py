@@ -10,7 +10,7 @@ import pytest
 from app.db.database import Base
 from app.db.models import CatalogMovie
 from app.main import app, get_db
-from app.recommendations.overview_index import rebuild_active_index
+from app.recommendations.overview_index import cosine_similarity, rebuild_active_index
 from app.repositories.movies import (
     activate_catalogue_revision,
     create_catalogue_revision,
@@ -59,7 +59,7 @@ def seed_movies(session: Session, rows: list[tuple[str, str | None]]) -> list[st
     return ids
 
 
-@pytest.mark.parametrize("query", [None, "", " ", "a", " a "])
+@pytest.mark.parametrize("query", [None, "", " ", "a", " a ", " 🎬 "])
 def test_search_rejects_queries_shorter_than_two_trimmed_characters(search_client, query):
     http, _, _ = search_client
     response = http.get("/api/movies/search", params={} if query is None else {"q": query})
@@ -147,7 +147,13 @@ def test_description_search_real_cosine_orders_two_positive_rows(search_client, 
         ("City Robot", "A detective investigates a rescue in the city"),
         ("Quiet Drama", "A family meets for dinner"),
     ])
-    rebuild_active_index(session, path)
+    index = rebuild_active_index(session, path)
+    vector = index.transform_query("astronaut rescue moon")
+    scores = {movie_id: cosine_similarity(vector, index.vector_for(movie_id))
+              for movie_id in (moon, city, unrelated)}
+    assert scores[moon] > scores[city] > 0
+    assert scores[unrelated] == 0
+    print(f"Two-positive fixture cosine scores: {scores}")
 
     def forbidden_fit(_snapshot):
         raise AssertionError("search must load the fitted index, never refit")
@@ -165,13 +171,68 @@ def test_zero_scores_are_excluded_without_popular_fallback(search_client):
         ("Moon Rescue", "An astronaut rescue mission on the moon"),
         ("City Robot", "A detective investigates a theft"),
     ])
-    rebuild_active_index(session, path)
+    index = rebuild_active_index(session, path)
+    vector = index.transform_query("astronaut rescue moon")
+    assert cosine_similarity(vector, index.vector_for(moon)) > 0
+    assert cosine_similarity(vector, index.vector_for(city)) == 0
     related = http.get("/api/movies/search", params={"q": "astronaut rescue moon"})
     assert [movie["id"] for movie in related.json()["data"]["movies"]] == [moon]
     assert city not in [movie["id"] for movie in related.json()["data"]["movies"]]
     unrelated = http.get("/api/movies/search", params={"q": "volcano jazz galaxy"})
     assert unrelated.status_code == 200
     assert unrelated.json() == {"data": {"movies": []}}
+
+
+@pytest.mark.parametrize("query", ["%", "_", " % ", " _ "])
+def test_single_literal_wildcards_obey_short_query_validation(search_client, query):
+    http, session, _ = search_client
+    seed_movies(session, [("Inception", "dream"), ("100%_Real", "dream")])
+    response = http.get("/api/movies/search", params={"q": query})
+    assert response.status_code == 400
+    assert response.json()["error"]["message"] == "Enter at least 2 characters"
+
+
+@pytest.mark.parametrize("query", ["%%", "__", "in%", "in_"])
+def test_valid_literal_wildcards_do_not_expand_to_unrelated_rows(search_client, query):
+    http, session, path = search_client
+    seed_movies(session, [("Inception", "dream"), ("Inside", "dream")])
+    rebuild_active_index(session, path)
+    response = http.get("/api/movies/search", params={"q": query})
+    assert response.status_code == 200
+    assert response.json() == {"data": {"movies": []}}
+
+
+def test_valid_empty_catalogue_returns_empty_success(search_client):
+    http, session, path = search_client
+    seed_movies(session, [])
+    rebuild_active_index(session, path)
+    response = http.get("/api/movies/search", params={"q": "astronaut rescue moon"})
+    assert response.status_code == 200
+    assert response.json() == {"data": {"movies": []}}
+
+
+def test_static_search_route_never_looks_up_a_movie_id(search_client, monkeypatch):
+    http, session, _ = search_client
+    seed_movies(session, [("Inception", "dream")])
+
+    def forbidden_detail(*_args, **_kwargs):
+        raise AssertionError("static search must not look up a movie ID")
+
+    monkeypatch.setattr("app.main.get_active_movie_by_id", forbidden_detail)
+    assert http.get("/api/movies/search", params={"q": "inception"}).status_code == 200
+    assert http.get("/api/movies/search").status_code == 400
+
+
+def test_index_failure_recovers_after_rebuild_using_same_query(search_client):
+    http, session, path = search_client
+    (moon,) = seed_movies(session, [("Moon Rescue", "astronaut rescue moon")])
+    query = {"q": "astronaut rescue moon"}
+    assert http.get("/api/movies/search", params=query).status_code == 503
+    assert http.get("/api/movies/search", params={"q": "moon"}).status_code == 200
+    rebuild_active_index(session, path)
+    recovered = http.get("/api/movies/search", params=query)
+    assert recovered.status_code == 200
+    assert [row["id"] for row in recovered.json()["data"]["movies"]] == [moon]
 
 
 def test_description_search_ranks_before_ten_item_limit(search_client):

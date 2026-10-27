@@ -1,0 +1,50 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.12.4, pytest-9.1.1, pluggy-1.6.0 -- /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/backend
+configfile: pyproject.toml
+plugins: cov-7.1.0, anyio-4.15.1
+collecting ... collected 33 items
+
+backend/tests/test_movie_search_api.py::test_search_rejects_queries_shorter_than_two_trimmed_characters[None] PASSED
+backend/tests/test_movie_search_api.py::test_search_rejects_queries_shorter_than_two_trimmed_characters[] PASSED
+backend/tests/test_movie_search_api.py::test_search_rejects_queries_shorter_than_two_trimmed_characters[ ] PASSED
+backend/tests/test_movie_search_api.py::test_search_rejects_queries_shorter_than_two_trimmed_characters[a] PASSED
+backend/tests/test_movie_search_api.py::test_search_rejects_queries_shorter_than_two_trimmed_characters[ a ] PASSED
+backend/tests/test_movie_search_api.py::test_search_rejects_queries_shorter_than_two_trimmed_characters[ \U0001f3ac ] PASSED
+backend/tests/test_movie_search_api.py::test_title_hits_are_public_literal_case_insensitive_and_skip_missing_index PASSED
+backend/tests/test_movie_search_api.py::test_title_hits_take_precedence_and_cap_full_set_at_ten PASSED
+backend/tests/test_movie_search_api.py::test_title_ties_use_opaque_id_after_case_insensitive_title PASSED
+backend/tests/test_movie_search_api.py::test_title_search_casefolds_unicode_without_needing_index PASSED
+backend/tests/test_movie_search_api.py::test_description_search_real_cosine_orders_two_positive_rows Two-positive fixture cosine scores: {'c983ff46-0fd6-46bd-8858-aff5fbe20725': 0.8488494876253099, '33b893df-ef51-4efd-b2f3-d17a0a1e067e': 0.19041816044142007, '5bfa7402-cd7a-486a-84f2-b0cf10167bdf': 0.0}
+PASSED
+backend/tests/test_movie_search_api.py::test_zero_scores_are_excluded_without_popular_fallback PASSED
+backend/tests/test_movie_search_api.py::test_single_literal_wildcards_obey_short_query_validation[%] PASSED
+backend/tests/test_movie_search_api.py::test_single_literal_wildcards_obey_short_query_validation[_] PASSED
+backend/tests/test_movie_search_api.py::test_single_literal_wildcards_obey_short_query_validation[ % ] PASSED
+backend/tests/test_movie_search_api.py::test_single_literal_wildcards_obey_short_query_validation[ _ ] PASSED
+backend/tests/test_movie_search_api.py::test_valid_literal_wildcards_do_not_expand_to_unrelated_rows[%%] PASSED
+backend/tests/test_movie_search_api.py::test_valid_literal_wildcards_do_not_expand_to_unrelated_rows[__] PASSED
+backend/tests/test_movie_search_api.py::test_valid_literal_wildcards_do_not_expand_to_unrelated_rows[in%] PASSED
+backend/tests/test_movie_search_api.py::test_valid_literal_wildcards_do_not_expand_to_unrelated_rows[in_] PASSED
+backend/tests/test_movie_search_api.py::test_valid_empty_catalogue_returns_empty_success PASSED
+backend/tests/test_movie_search_api.py::test_static_search_route_never_looks_up_a_movie_id PASSED
+backend/tests/test_movie_search_api.py::test_index_failure_recovers_after_rebuild_using_same_query PASSED
+backend/tests/test_movie_search_api.py::test_description_search_ranks_before_ten_item_limit PASSED
+backend/tests/test_movie_search_api.py::test_empty_vocabulary_is_valid_but_missing_stale_or_corrupt_index_is_error PASSED
+backend/tests/test_movie_search_api.py::test_no_catalogue_and_database_failure_have_distinct_errors PASSED
+backend/tests/test_overview_index.py::test_rebuild_persists_one_shared_transform_and_opaque_rows PASSED
+backend/tests/test_overview_index.py::test_text_and_mapping_changes_stale_but_media_does_not PASSED
+backend/tests/test_overview_index.py::test_new_catalogue_revision_with_same_text_reuses_fitted_index PASSED
+backend/tests/test_overview_index.py::test_config_change_and_corrupt_artifact_are_unavailable PASSED
+backend/tests/test_overview_index.py::test_partial_build_failure_keeps_last_artifact_but_stale_text_stays_unready PASSED
+backend/tests/test_overview_index.py::test_all_empty_corpus_is_ready_and_cli_reuses_it PASSED
+backend/tests/test_overview_index.py::test_rebuild_command_on_clean_migrated_synthetic_database PASSED
+
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 33 passed, 1 warning in 3.04s =========================
