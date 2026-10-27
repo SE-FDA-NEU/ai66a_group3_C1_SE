@@ -1,0 +1,93 @@
+Original regression excerpts (not the later final test count).
+Base production: 486adabf3d2b33805082c5a7a236e52c119c29a8; new assertions added before the two production fixes.
+Command: npm --prefix frontend test -- src/tests/detail-boundaries.test.tsx src/tests/list-context-invalidation.test.tsx
+Later cases expand the component file; this actual earlier RED had 20 cases.
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/tests/detail-boundaries.test.tsx > TC-S4-T16-WATCH-001 never restores account A's watchlist page for account B
+Error: expect(element).toHaveTextContent()
+Received:
+  /watchlist?page=2&source=detail#saved
+  /watchlist?page=2&source=detail#saved
+ ❯ src/tests/detail-boundaries.test.tsx:61:42
+ FAIL  src/tests/list-context-invalidation.test.tsx > TC-S4-T16-RET-002 clears a stale genre after the detail return detects a new revision
+TestingLibraryElementError: Unable to find an element with the text: Showing 1-1 of 1 movies. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+TestingLibraryElementError: Unable to find an element with the text: Showing 1-1 of 1 movies. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+ Test Files  2 failed (2)
+      Tests  2 failed | 18 passed (20)
+      Tests  2 failed | 18 passed (20)
+   Start at  16:46:13
+   Start at  16:46:13
+   Duration  3.25s (tests 45%, environment 34%, transform 12%, import 9%)
+   Duration  3.25s (tests 45%, environment 34%, transform 12%, import 9%)
+
+
+Inherited T01 gate failure before lifecycle fix:
+
+> frontend@0.0.0 test:t01:ui
+> node scripts/run-s04-e2e.mjs --config playwright.t01.config.ts
+
+[WebServer] INFO:     Started server process [20756]
+[WebServer] INFO:     Waiting for application startup.
+[WebServer] INFO:     Application startup complete.
+[WebServer] INFO:     Uvicorn running on http://127.0.0.1:8014 (Press CTRL+C to quit)
+[WebServer] (node:8224) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 17 tests using 1 worker
+
+(node:28444) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok  1 e2e\t01.visual.ts:59:1 › S08 search uses real API/index across themes, sizes, states and safe return (7.7s)
+  ok  2 e2e\t01.visual.ts:188:1 › S08 delayed real search response cannot replace a newer query or return after unmount (1.0s)
+  ok  3 e2e\t01.visual.ts:235:1 › S07 similar movies satisfy all five criteria with the real API, index and DB (14.5s)
+  ok  4 e2e\t01.visual.ts:391:1 › S07 similar results are public, identical across accounts, independent of ratings and keep the return context (1.7s)
+  x   5 e2e\t01.visual.ts:450:1 › S07 delayed real similar response for movie A cannot fill movie B (5.4s)
+(node:13520) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok  6 e2e\t01.visual.ts:482:1 › Home title sort precedes paging and button links preserve detail return in both themes (3.6s)
+  ok  7 e2e\t01.visual.ts:535:1 › personal navigation actions use shared buttons without changing saved genres (2.5s)
+  ok  8 e2e\t01.visual.ts:582:1 › existing public pages, both themes and 375/768/1440 layouts (4.2s)
+  ok  9 e2e\t01.visual.ts:614:1 › native star keyboard draft, save and theme preserve real state (1.9s)
+  ok 10 e2e\t01.visual.ts:665:1 › Home hero and navbar leave personalisation entirely user initiated (1.2s)
+  ok 11 e2e\t01.visual.ts:715:1 › guest Start survives the registration detour and opens real Preferences after sign-in (923ms)
+  ok 12 e2e\t01.visual.ts:741:1 › theme toggle preserves a real paginated URL and its ordered results (694ms)
+  ok 13 e2e\t01.visual.ts:756:1 › blocked browser storage still renders and switches theme (792ms)
+  ok 14 e2e\t01.visual.ts:772:1 › reference auth layouts stay concise, responsive and fully functional in both themes (1.3s)
+  ok 15 e2e\t01.visual.ts:799:1 › centered action feedback reflects real login/save/logout acknowledgements without blocking the page (1.9s)
+  ok 16 e2e\t01.visual.ts:863:1 › genre cards expose descriptions, native keyboard state and no implicit writes (839ms)
+  -  17 e2e\t01.visual.ts:893:1 › read-only imported TMDb catalogue screenshots, real poster loading and themes
+
+
+  1) e2e\t01.visual.ts:450:1 › S07 delayed real similar response for movie A cannot fill movie B ───
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 2
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+      455 |     await request.post(`${controls}/gates/similar-stale/arm`);
+      456 |     await page.goto(`/movies/${similarSource}`);
+    > 457 |     await expect.poll(async () => (await gateState("similar-stale")).responses.length).toBe(1);
+          |                                                                                        ^
+      458 |     const held = (await gateState("similar-stale")).responses[0].body.data.movies.map((movie: { title: string }) => movie.title);
+      459 |     expect(held).toEqual(["Moon Rescue", "Orbit Medic"]);
+      460 |     await request.post(`${controls}/gates/similar-stale/seal`);
+        at C:\Users\Admin\Desktop\Ki 1 Nam 3\Kỹ thuật phần mềm - Software Engineering\ai66a_group3_C1_SE\frontend\e2e\t01.visual.ts:457:88
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\t01\t01.visual.ts-S07-delayed--1b5e1-movie-A-cannot-fill-movie-B\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\t01\t01.visual.ts-S07-delayed--1b5e1-movie-A-cannot-fill-movie-B\error-context.md
+
+  1 failed
+    e2e\t01.visual.ts:450:1 › S07 delayed real similar response for movie A cannot fill movie B ────
+  1 skipped
+  15 passed (55.6s)
+s04_temporary_database_removed=true

@@ -301,3 +301,14 @@ does not claim new independent C03 approval or the reviewer's own re-run.
 | File | SHA-256 after UTF-8 LF normalization |
 |---|---|
 | `docs/api.md` | `2830607e57403f09d708663bfee98eac6c472f47e244d67ca1d346eb81886452` |
+
+### S4-T16 S03 execution amendment (2026-10-27)
+
+T16 adds scoped executable S03 pytest/interface mapping and records two
+actual return-context regressions. Other P0 rows and C05 shared default
+setup/clean-clone ownership remain explicit. This current consumer hash
+does not rewrite the historical C03 checks or claim independent approval.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/testing.md` | `f418c9b115a58b24afa26d6192005ec140d22c711d09c22bf45fdea46fe52d6c` |

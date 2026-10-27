@@ -226,3 +226,25 @@ the return link on the selected movie still reads `Back to search`,
 `Back to recommendations` and so on, and an unsafe or absent destination falls
 back to the catalogue. Saved genres and ratings are never read or written. See
 [T08 acceptance and evidence](evidence/s4-t08-similar-ui/README.md).
+
+## S4-T16 detail-return and request boundaries (2026-10-27)
+
+Current S03 return semantics are page/query/sort/filter/fragment preservation
+when the source context remains valid. A new catalogue revision returns public
+lists to page 1 (keeping Home's chosen title sort); Recommendations also clears
+its stale `genreId`, preserving unrelated source/query/fragment values. A
+changed account or preference scope discards the old recommendation context.
+A historical Watchlist context belonging to another account is replaced with
+that account's page 1 before its private list request; the old page/revision
+is not sent under the new account.
+
+Rating saves retain valid same-account navigation context but refresh the
+ranking only after a confirmed response. Membership changes never change the
+ranking. Details, rating, watchlist and Similar have independent read/error
+states; a membership service error leaves the source and other widgets usable.
+Late reads/writes must not populate a new movie/account, announce stale success,
+invalidate its ranking, or redirect it on an old 401. Watchlist removal reconciles
+actual totals and the remaining valid page, keeping a safe return destination.
+The existing shared buttons/themes and keyboard behaviour remain unchanged.
+
+See [T16 execution and review handoff](evidence/s4-t16-detail-boundaries.md).
