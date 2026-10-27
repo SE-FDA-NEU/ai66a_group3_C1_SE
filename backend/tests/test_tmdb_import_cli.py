@@ -31,7 +31,7 @@ def test_blank_token_exits_nonzero_with_safe_actionable_guidance(
     )
 
 
-@pytest.mark.parametrize("pages", [1, 13, 15])
+@pytest.mark.parametrize("pages", [1, 13, 15, 50])
 def test_success_output_records_safe_provenance_counts(
     monkeypatch, capsys, pages
 ) -> None:
@@ -66,7 +66,7 @@ def test_success_output_records_safe_provenance_counts(
         import_snapshot,
     )
 
-    exit_code = command.main([] if pages == 1 else ["--pages", str(pages)])
+    exit_code = command.main([] if pages == 50 else ["--pages", str(pages)])
 
     assert exit_code == 0
     assert received_pages == [pages]
@@ -86,7 +86,7 @@ def test_success_output_records_safe_provenance_counts(
     )
 
 
-@pytest.mark.parametrize("pages", ["0", "16", "-1", "1.5", "many"])
+@pytest.mark.parametrize("pages", ["0", "51", "-1", "1.5", "many"])
 def test_invalid_page_budget_exits_before_client_or_database(monkeypatch, pages):
     def forbidden(*_args, **_kwargs):
         raise AssertionError("invalid arguments must not open a client or database")

@@ -83,7 +83,7 @@ def sessions() -> Iterator[sessionmaker]:
     Base.metadata.create_all(engine)
     factory = sessionmaker(bind=engine)
     with factory() as session, session.begin():
-        import_tmdb_catalogue(session, client=Gateway())
+        import_tmdb_catalogue(session, client=Gateway(), pages=1)
     try:
         yield factory
     finally:
@@ -101,7 +101,7 @@ def state(factory) -> tuple:
 def test_import_projects_posters_without_per_movie_detail_calls(sessions) -> None:
     gateway = Gateway()
     with sessions() as session, session.begin():
-        import_tmdb_catalogue(session, client=gateway)
+        import_tmdb_catalogue(session, client=gateway, pages=1)
     assert gateway.calls == [("popular", 1)]
     assert state(sessions)[1] == ["/oldA.jpg", "/oldB.jpg"]
 
@@ -212,7 +212,7 @@ def test_reimport_missing_field_preserves_but_explicit_null_clears(sessions) -> 
     gateway.movies[1]["poster_path"] = None
     ids = [row[0] for row in state(sessions)[0]]
     with sessions() as session, session.begin():
-        import_tmdb_catalogue(session, client=gateway)
+        import_tmdb_catalogue(session, client=gateway, pages=1)
     assert state(sessions)[1] == ["/oldA.jpg", None]
     assert [row[0] for row in state(sessions)[0]] == ids
 
