@@ -632,15 +632,23 @@ def get_watchlist_membership(
     ))
 
 
+async def _watchlist_body_present(request: Request) -> bool:
+    return bool(await request.body())
+
+
 @app.put("/api/me/watchlist/{movie_id}", response_model=MembershipResponse)
 @app.delete("/api/me/watchlist/{movie_id}", response_model=MembershipResponse, response_model_exclude_none=True)
-async def write_watchlist_membership(
+def write_watchlist_membership(
     movie_id: str,
     request: Request,
     user: User = Depends(current_account_write_user),  # noqa: B008
     database_session: Session = Depends(get_account_write_db),  # noqa: B008
+    has_body: bool = Depends(_watchlist_body_present),
 ):
-    if _unexpected_selectors(request) or await request.body():
+    # SQLite COMMIT can wait for a list's read snapshot. Run this synchronous DB
+    # work in FastAPI's worker pool so the ASGI loop can finish other requests
+    # and release their snapshots instead of creating a self-induced busy 503.
+    if _unexpected_selectors(request) or has_body:
         return _error("VALIDATION_ERROR", "Please correct the highlighted fields", 400)
     movie = get_active_movie_by_id(database_session, movie_id=movie_id)
     if movie is None:

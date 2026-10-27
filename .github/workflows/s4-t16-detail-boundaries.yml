@@ -17,6 +17,7 @@ jobs:
       TMDB_READ_ACCESS_TOKEN: ""
       TMDB_NETWORK_DISABLED: "1"
       PYTHONUTF8: "1"
+      S04_SQL_DIAGNOSTICS: "1"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

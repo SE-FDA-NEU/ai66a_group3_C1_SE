@@ -6,6 +6,7 @@ discovery/fixtures; this scoped module already runs directly from the repo root.
 
 from __future__ import annotations
 
+import asyncio
 from collections.abc import Iterator
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -213,3 +214,57 @@ def test_TC_P0_S03_005_detail_widgets_preserve_both_accounts_preferences(details
         assert b.get("/api/me/preferences").json() == before_b
         assert {item["id"] for item in before_a["data"]["genres"]} == {28}
         assert {item["id"] for item in before_b["data"]["genres"]} == {35}
+
+
+def test_TC_P0_S03_006_membership_commit_allows_read_snapshot_cleanup(details):
+    """TC-P0-S03-006: one ASGI loop, real SQLite reader/writer; no sleep/retry.
+
+    A list's read snapshot is released by another coroutine when the membership
+    writer reaches COMMIT. Blocking that event loop would prevent the release
+    and turn an otherwise valid write into a busy-timeout 503.
+    """
+    from sqlalchemy import event
+
+    credentials = {"email": "concurrent@example.test", "password": "Synthetic-t16-password"}
+    assert details.http.post("/api/auth/register", json=credentials).status_code == 201
+    assert details.http.post("/api/auth/login", json=credentials).status_code == 200
+
+    def short_busy_timeout(connection, _record):
+        connection.execute("PRAGMA busy_timeout=250")
+
+    details.engine.dispose()
+    event.listen(details.engine, "connect", short_busy_timeout)
+    reader = details.engine.connect()
+    reader.exec_driver_sql("BEGIN")
+    reader.exec_driver_sql("SELECT id FROM catalog_movies").all()
+
+    async def exercise():
+        loop = asyncio.get_running_loop()
+        at_commit = asyncio.Event()
+
+        def committing(_connection):
+            loop.call_soon_threadsafe(at_commit.set)
+
+        async def release_reader():
+            await at_commit.wait()
+            reader.rollback()
+
+        event.listen(details.engine, "commit", committing)
+        try:
+            async with httpx.AsyncClient(
+                transport=httpx.ASGITransport(app=details.app),
+                base_url="http://testserver", cookies=details.http.cookies,
+            ) as http:
+                result, _ = await asyncio.wait_for(asyncio.gather(
+                    http.put(f"/api/me/watchlist/{details.movies[0]}"), release_reader(),
+                ), timeout=10)
+                assert result.status_code == 200, result.text
+                assert result.json()["data"]["inWatchlist"] is True
+        finally:
+            event.remove(details.engine, "commit", committing)
+
+    try:
+        asyncio.run(exercise())
+    finally:
+        reader.close()
+        event.remove(details.engine, "connect", short_busy_timeout)
