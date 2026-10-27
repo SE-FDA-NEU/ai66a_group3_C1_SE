@@ -550,6 +550,15 @@ def main() -> int:
 
                 # 7. Account switch: B (no saved genres) never sees A's scores or reasons.
                 sign_out_to_login(page)
+                page.wait_for(
+                    lambda state: (
+                        state["path"] == "/login"
+                        and {"email", "password"}.issubset(
+                            {field["id"] for field in state["fields"]}
+                        )
+                    ),
+                    "account B login form ready",
+                )
                 page.fill("#email", EMAIL_B)
                 page.fill("#password", PASSWORD)
                 page.click_text("button", "Sign in")
