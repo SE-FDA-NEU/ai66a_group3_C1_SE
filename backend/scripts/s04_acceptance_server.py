@@ -72,6 +72,49 @@ def seed_database(path: Path, fixture: dict) -> None:
         )
 
 
+ACTION, COMEDY, ARCHIVE = 8101, 8102, 8103
+SIMILAR_SOURCE_TEXT = "astronaut rescue mission on the moon base"
+# (fixture position, title, overview, popularity, genres or None to keep the seed genres)
+MOON_RESCUE = (2, "Moon Rescue", "An astronaut rescue mission on the moon", 5, None)
+ORBIT_MEDIC = (4, "Orbit Medic", "A medic joins an astronaut rescue crew", 10, None)
+QUIET_ARCHIVE = (6, "Quiet Archive", None, 100, None)
+# Candidates the Action source must not see: same table, a genre it does not share.
+AWAY = [(number, None, None, None, [COMEDY]) for number in (6, 8, 10, 12)]
+SIMILAR_SCENARIOS: dict[str, list[tuple]] = {
+    # Seven distinct candidates, one of them (Moon Rescue) matched through two shared
+    # genres. Popularity runs opposite to cosine so a popularity-only order is visible.
+    "similar-ranked": [
+        (1, "Moon Source", SIMILAR_SOURCE_TEXT, 90, [ACTION, ARCHIVE]),
+        (2, "Moon Rescue", MOON_RESCUE[2], 5, [ACTION, ARCHIVE]),
+        ORBIT_MEDIC,
+        (6, "City Robot", "A detective investigates a rescue in the city", 20, None),
+        (8, "Desert Heist", "A heist in the desert", 50, None),
+        (10, "Jazz Voyage", "A jazz band travels across the sea", 40, None),
+        (12, "Quiet Archive", None, 100, None),
+    ],
+    "similar-pair": [
+        (1, "Moon Source", SIMILAR_SOURCE_TEXT, 90, None), MOON_RESCUE, ORBIT_MEDIC,
+        *AWAY,
+    ],
+    "similar-missing-candidate": [
+        (1, "Moon Source", SIMILAR_SOURCE_TEXT, 90, None), MOON_RESCUE, ORBIT_MEDIC,
+        *[row for row in AWAY if row[0] != 6], QUIET_ARCHIVE,
+    ],
+    "similar-empty": [],
+}
+# Same candidates as "similar-missing-candidate"; only the source overview differs.
+for _name, _overview in {
+    "similar-missing-source": None,
+    "similar-blank-source": "   ",
+    "similar-zero-source": "the of and",
+}.items():
+    SIMILAR_SCENARIOS[_name] = [
+        (1, "Moon Source", _overview, 90, None),
+        *SIMILAR_SCENARIOS["similar-missing-candidate"][1:],
+    ]
+SIMILAR_SCENARIOS["similar-index-failure"] = SIMILAR_SCENARIOS["similar-ranked"]
+
+
 def build_harness(path: Path, fixture: dict):
     from app.main import app as production_app
     from fastapi import FastAPI, HTTPException
@@ -116,7 +159,7 @@ def build_harness(path: Path, fixture: dict):
             "search-zero",
             "search-empty",
             "search-index-failure",
-        }:
+        } | SIMILAR_SCENARIOS.keys():
             raise HTTPException(400, "Unknown fixture")
         with closing(sqlite3.connect(path)) as connection, connection:
             if broken:
@@ -124,6 +167,16 @@ def build_harness(path: Path, fixture: dict):
                     "ALTER TABLE catalog_movies_unavailable RENAME TO catalog_movies"
                 )
                 broken = False
+            # Similar scenarios change genres; every scenario starts from the seed.
+            connection.execute("DELETE FROM movie_genres")
+            connection.executemany(
+                "INSERT INTO movie_genres (movie_id, genre_id) VALUES (?, ?)",
+                [
+                    (row["id"], genre)
+                    for row in fixture["movies"]
+                    for genre in row["genreIds"]
+                ],
+            )
             connection.executemany(
                 "UPDATE catalog_movies SET popularity_score = ? WHERE id = ?",
                 [(row["popularity"], row["id"]) for row in fixture["movies"]],
@@ -149,6 +202,20 @@ def build_harness(path: Path, fixture: dict):
                     "UPDATE catalog_movies SET title = ?, overview = ? WHERE id = ?",
                     search_rows,
                 )
+            for number, title, overview, popularity, genres in SIMILAR_SCENARIOS.get(name, []):
+                movie_id = fixture["movies"][number - 1]["id"]
+                if title is not None or overview is not None or popularity is not None:
+                    connection.execute(
+                        "UPDATE catalog_movies SET title = COALESCE(?, title), overview = ?,"
+                        " popularity_score = COALESCE(?, popularity_score) WHERE id = ?",
+                        (title, overview, popularity, movie_id),
+                    )
+                if genres is not None:
+                    connection.execute("DELETE FROM movie_genres WHERE movie_id = ?", (movie_id,))
+                    connection.executemany(
+                        "INSERT INTO movie_genres (movie_id, genre_id) VALUES (?, ?)",
+                        [(movie_id, genre) for genre in genres],
+                    )
             connection.execute(
                 "UPDATE catalog_movies SET catalogue_revision_id = ?",
                 (fixture["revision"],),
@@ -211,12 +278,44 @@ def build_harness(path: Path, fixture: dict):
             }
             if name == "search-index-failure":
                 resolve_index_path().unlink()
+        similar_evidence = {}
+        if name in SIMILAR_SCENARIOS:
+            from app.db.database import SessionLocal
+            from app.recommendations.overview_index import (
+                cosine_similarity,
+                rebuild_active_index,
+                resolve_index_path,
+            )
+
+            source = fixture["movies"][12 if name == "similar-empty" else 0]["id"]
+            with SessionLocal() as session:
+                index = rebuild_active_index(session)
+            with closing(sqlite3.connect(path)) as connection:
+                titles = dict(connection.execute("SELECT id, title FROM catalog_movies"))
+            source_vector = index.vector_for(source)
+            similar_evidence = {
+                "sourceId": source,
+                "sourceUsable": bool(source_vector),
+                # None marks a missing or zero vector; 0.0 is a valid usable score.
+                "scores": {
+                    titles[row["id"]]: (
+                        cosine_similarity(source_vector, index.vector_for(row["id"]))
+                        if source_vector and index.vector_for(row["id"])
+                        else None
+                    )
+                    for row in fixture["movies"]
+                    if row["id"] != source
+                },
+            }
+            if name == "similar-index-failure":
+                resolve_index_path().unlink()
         return {
             "scenario": name,
             "preferences": preferences,
             "activeMovies": count,
             "finitePopularity": finite or 0,
             **search_evidence,
+            **similar_evidence,
         }
 
     @controls.post("/__acceptance/gates/{name}/{action}")
@@ -255,7 +354,10 @@ def build_harness(path: Path, fixture: dict):
             name = capturing
             if (
                 scope["type"] != "http"
-                or scope["path"] not in {"/api/me/recommendations", "/api/movies/search"}
+                or not (
+                    scope["path"] in {"/api/me/recommendations", "/api/movies/search"}
+                    or scope["path"].endswith("/similar")
+                )
                 or name is None
             ):
                 return await production_app(scope, receive, send)

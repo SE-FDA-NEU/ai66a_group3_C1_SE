@@ -1,0 +1,51 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.1.1, pluggy-1.6.0 -- F:\\1 t\xe0i li\u1ec7u h\u1ecdc t\u1eadp\\SE\\ai66a_group3_C1_SE\\.venv\\Scripts\\python.exe
+rootdir: F:\\1 t\xe0i li\u1ec7u h\u1ecdc t\u1eadp\\SE\\ai66a_group3_C1_SE\\backend
+configfile: pyproject.toml
+plugins: anyio-4.15.1, cov-7.1.0
+collecting ... collected 37 items
+
+backend\tests\test_similar_movies_api.py::test_usable_source_orders_cosine_then_appends_missing_text_candidate PASSED [  2%]
+backend\tests\test_similar_movies_api.py::test_missing_text_candidate_cannot_invert_relative_cosine_order PASSED [  5%]
+backend\tests\test_similar_movies_api.py::test_source_without_usable_vector_uses_popularity_title_id_for_all[None] PASSED [  8%]
+backend\tests\test_similar_movies_api.py::test_source_without_usable_vector_uses_popularity_title_id_for_all[] PASSED [ 10%]
+backend\tests\test_similar_movies_api.py::test_source_without_usable_vector_uses_popularity_title_id_for_all[   ] PASSED [ 13%]
+backend\tests\test_similar_movies_api.py::test_source_without_usable_vector_uses_popularity_title_id_for_all[the and of] PASSED [ 16%]
+backend\tests\test_similar_movies_api.py::test_usable_text_with_cosine_zero_precedes_missing_text PASSED [ 18%]
+backend\tests\test_similar_movies_api.py::test_ties_use_popularity_with_null_last_then_title_then_id PASSED [ 21%]
+backend\tests\test_similar_movies_api.py::test_only_shared_genre_candidates_distinct_source_excluded_and_limited PASSED [ 24%]
+backend\tests\test_similar_movies_api.py::test_response_uses_public_summary_shape_and_opaque_ids PASSED [ 27%]
+backend\tests\test_similar_movies_api.py::test_unknown_source_is_404_even_when_the_index_is_missing PASSED [ 29%]
+backend\tests\test_similar_movies_api.py::test_movie_outside_the_active_revision_is_404 PASSED [ 32%]
+backend\tests\test_similar_movies_api.py::test_no_active_catalogue_is_503_catalogue_unavailable PASSED [ 35%]
+backend\tests\test_similar_movies_api.py::test_source_without_eligible_candidates_is_successful_empty PASSED [ 37%]
+backend\tests\test_similar_movies_api.py::test_absent_stale_and_corrupt_index_are_errors_not_empty_or_fallback PASSED [ 40%]
+backend\tests\test_similar_movies_api.py::test_failed_index_is_503_even_when_the_source_has_no_overview PASSED [ 43%]
+backend\tests\test_similar_movies_api.py::test_media_only_update_keeps_the_index_ready PASSED [ 45%]
+backend\tests\test_similar_movies_api.py::test_route_is_registered_as_a_public_get_and_does_not_shadow_details PASSED [ 48%]
+backend\tests\test_similar_movies_api.py::test_response_is_identical_for_guest_and_signed_in_accounts PASSED [ 51%]
+backend\tests\test_similar_movies_api.py::test_similar_never_calls_the_network_or_tmdb PASSED [ 54%]
+backend\tests\test_similar_movies_api.py::test_comparator_oracle_usable_source_is_a_b_c_and_missing_source_is_c_b_a PASSED [ 56%]
+backend\tests\test_similar_movies_api.py::test_comparator_exact_ties_and_null_popularity_boundaries PASSED [ 59%]
+backend\tests\test_similar_movies_api.py::test_comparator_deduplicates_excludes_source_and_limits_after_grouping PASSED [ 62%]
+backend\tests\test_similar_movies_api.py::test_comparator_id_missing_from_index_is_an_index_error_not_missing_text PASSED [ 64%]
+backend\tests\test_overview_index.py::test_rebuild_persists_one_shared_transform_and_opaque_rows PASSED [ 67%]
+backend\tests\test_overview_index.py::test_text_and_mapping_changes_stale_but_media_does_not PASSED [ 70%]
+backend\tests\test_overview_index.py::test_new_catalogue_revision_with_same_text_reuses_fitted_index PASSED [ 72%]
+backend\tests\test_overview_index.py::test_config_change_and_corrupt_artifact_are_unavailable PASSED [ 75%]
+backend\tests\test_overview_index.py::test_partial_build_failure_keeps_last_artifact_but_stale_text_stays_unready PASSED [ 78%]
+backend\tests\test_overview_index.py::test_all_empty_corpus_is_ready_and_cli_reuses_it PASSED [ 81%]
+backend\tests\test_overview_index.py::test_rebuild_command_on_clean_migrated_synthetic_database PASSED [ 83%]
+backend\tests\test_auth_acceptance.py::test_independent_sessions_ignore_forged_identity_and_reset_only_owner PASSED [ 86%]
+backend\tests\test_auth_acceptance.py::test_invalid_sessions_reject_every_private_read_and_write[missing] PASSED [ 89%]
+backend\tests\test_auth_acceptance.py::test_invalid_sessions_reject_every_private_read_and_write[expired] PASSED [ 91%]
+backend\tests\test_auth_acceptance.py::test_invalid_sessions_reject_every_private_read_and_write[revoked] PASSED [ 94%]
+backend\tests\test_auth_acceptance.py::test_logout_cookie_replay_relogin_and_actual_backend_restart PASSED [ 97%]
+backend\tests\test_auth_acceptance.py::test_reset_confirmation_origin_and_real_delete_failure_preserve_both_accounts PASSED [100%]
+
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  F:\\1 t\xe0i li\u1ec7u h\u1ecdc t\u1eadp\\SE\\ai66a_group3_C1_SE\\.venv\\Lib\\site-packages\\fastapi\\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.\n    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================== 37 passed, 1 warning in 60.77s (0:01:00) ===================

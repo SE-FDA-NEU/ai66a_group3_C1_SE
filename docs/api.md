@@ -1032,8 +1032,14 @@ are ranked by `rank_similar_movies` in
 de-duplicated before ranking. A source or candidate ID absent from the loaded
 index mapping is also `INDEX_UNAVAILABLE`. Cosine, popularity, title and ID
 ties use the shared `score_title_id_ordering` comparator. Focused synthetic
-API/DB checks are in `backend/tests/test_similar_movies_api.py`. The Similar
-widget and the five-criterion browser acceptance remain in T08.
+API/DB checks are in `backend/tests/test_similar_movies_api.py`. T08 adds the
+public Similar movies section to `/movies/:movieId` through the shared typed
+movies client. It keeps the server's order and at most five distinct movies
+other than the source, never reads the account or rating APIs, and carries the
+safe detail-return context to the selected movie. Its loading, empty, error and
+Retry states leave the source details visible. The five Story #24 criteria and
+their browser results are recorded in
+[T08 acceptance evidence](evidence/s4-t08-similar-ui/README.md).
 
 `GET /api/movies/search?q=<text>` trims the query and requires at least two
 Unicode characters after trimming. Title search is a literal,

@@ -101,6 +101,13 @@ export async function searchMovies(query: string, signal?: AbortSignal): Promise
   return body.data.movies;
 }
 
+export async function getSimilarMovies(movieId: string, signal?: AbortSignal): Promise<MovieSummary[]> {
+  const response = await fetch(`/api/movies/${encodeURIComponent(movieId)}/similar`, { signal });
+  if (!response.ok) throw await readError(response);
+  const body = (await response.json()) as { data: { movies: MovieSummary[] } };
+  return body.data.movies;
+}
+
 export async function listMoviePage(
   kind: "catalogue" | "popular",
   page: number,

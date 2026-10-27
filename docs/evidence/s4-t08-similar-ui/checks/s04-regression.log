@@ -1,0 +1,27 @@
+
+> frontend@0.0.0 test:s04:e2e
+> node scripts/run-s04-e2e.mjs
+
+[WebServer] INFO:     Started server process [9416]
+[WebServer] INFO:     Waiting for application startup.
+[WebServer] INFO:     Application startup complete.
+[WebServer] INFO:     Uvicorn running on http://127.0.0.1:8014 (Press CTRL+C to quit)
+
+Running 11 tests using 1 worker
+
+  ok  1 e2e\s04.acceptance.ts:122:1 › AC1/AC2/AC4: real sign-in, A90 B80 C80 top ten, Enter preferences and fresh matches (5.1s)
+  ok  2 e2e\s04.acceptance.ts:151:1 › AC4: saved genres with no match show true popular alternatives and edit/retry (2.6s)
+  ok  3 e2e\s04.acceptance.ts:168:3 › AC3: successful empty shows guidance and zero cards (1.7s)
+  ok  4 e2e\s04.acceptance.ts:168:3 › AC3: successful no-popularity shows guidance and zero cards (1.7s)
+  ok  5 e2e\s04.acceptance.ts:181:1 › AC4: no-match without usable popular alternatives still has edit/retry and zero cards (2.2s)
+  ok  6 e2e\s04.acceptance.ts:194:1 › real SQL failure is Error/Retry, preserves genres and recovers (2.8s)
+  ok  7 e2e\s04.acceptance.ts:223:1 › delayed real cold-start response cannot replace results after a real genre save (2.9s)
+  ok  8 e2e\s13.acceptance.ts:103:1 › S13 AC2: unknown email and incorrect password have the exact same visible message (2.5s)
+  ok  9 e2e\s13.acceptance.ts:120:1 › S13 AC3: guest routes and rating CTA reach login without private requests or writes (3.3s)
+  ok 10 e2e\s13.acceptance.ts:144:1 › S13 AC1/AC4/AC5: real login, save, logout/replay, switch, delayed A response and relogin (7.3s)
+  -  11 e2e\s13.acceptance.ts:222:1 › S13 live TMDb environment smoke (separate from synthetic acceptance)
+
+  1 skipped
+  10 passed (42.3s)
+s04_temporary_database_removed=true
+s04 exit=0

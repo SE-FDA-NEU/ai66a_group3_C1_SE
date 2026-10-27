@@ -53,6 +53,7 @@ it("restores a saved rating on a direct detail load without changing preferences
       return json({ data: { movieId: "movie-a", rating: 5 } });
     if (path === "/api/me/watchlist/movie-a")
       return json({ data: { movieId: "movie-a", inWatchlist: false, addedAt: null } });
+    if (path === "/api/movies/movie-a/similar") return json({ data: { movies: [] } });
     throw new Error(`Unexpected request: ${path}`);
   });
   render(<App />);
@@ -61,6 +62,7 @@ it("restores a saved rating on a direct detail load without changing preferences
   expect(calls).toEqual([
     "/api/movies/movie-a",
     "/api/auth/me",
+    "/api/movies/movie-a/similar",
     "/api/me/ratings/movie-a",
     "/api/me/watchlist/movie-a",
   ]);
@@ -72,17 +74,18 @@ it("public content stays visible while session checking waits without private re
   const fetch = vi
     .spyOn(globalThis, "fetch")
     .mockResolvedValueOnce(json({ data: { movie: movie() } }))
-    .mockReturnValueOnce(session.promise);
+    .mockReturnValueOnce(session.promise)
+    .mockResolvedValueOnce(json({ data: { movies: [] } }));
   render(<App />);
   await screen.findByText("Public overview");
   expect(screen.getByText("Checking sign-in status...")).toBeInTheDocument();
-  await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
+  await waitFor(() => expect(fetch).toHaveBeenCalledTimes(3));
   await act(async () => {
     session.resolve(json({}, 401));
   });
   await screen.findByRole("link", { name: "Sign in to rate this movie" });
   expect(window.location.pathname).toBe("/movies/movie-a");
-  expect(fetch).toHaveBeenCalledTimes(2);
+  expect(fetch).toHaveBeenCalledTimes(3);
 });
 
 it("a failed session check has retry without hiding details or faking unrated", async () => {
@@ -90,6 +93,7 @@ it("a failed session check has retry without hiding details or faking unrated", 
   vi.spyOn(globalThis, "fetch")
     .mockResolvedValueOnce(json({ data: { movie: movie() } }))
     .mockResolvedValueOnce(json({ error: { message: "Unavailable" } }, 503))
+    .mockResolvedValueOnce(json({ data: { movies: [] } }))
     .mockResolvedValueOnce(json({ data: { user } }))
     .mockResolvedValueOnce(json({ data: { movieId: "movie-a", rating: 3 } }))
     .mockResolvedValueOnce(json({ data: { movieId: "movie-a", inWatchlist: false, addedAt: null } }));

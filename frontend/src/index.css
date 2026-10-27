@@ -179,6 +179,8 @@ p { line-height: 1.65; }
 .movie-detail__facts > div { padding: .85rem; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-raised); }
 .movie-detail__facts dt { color: var(--muted); font-weight: 650; font-size: .72rem; }
 .movie-detail__facts dd { margin: .5rem 0 0; font-size: .85rem; line-height: 1.5; }
+.similar-movies { margin: 0 1.5rem; padding: 1.5rem 0 1.75rem; border-top: 1px solid var(--border); }
+.similar-movies h2 { margin-top: 0; }
 .movie-rating { margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid var(--border); }
 .rating-committed { font-weight: 700; }
 .rating-form { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; }
@@ -239,6 +241,7 @@ p { line-height: 1.65; }
   .movie-detail__hero { min-height: 250px; margin: .5rem .75rem 0; }
   .movie-detail__hero-content { padding: 1.25rem; }
   .movie-detail__return { margin-inline: .75rem; }
+  .similar-movies { margin-inline: .75rem; }
   .movie-detail__body { display: block; padding: 1.25rem .75rem; }
   .movie-detail__poster { width: 130px; margin: 0 0 1.25rem; }
   .movie-detail__facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
