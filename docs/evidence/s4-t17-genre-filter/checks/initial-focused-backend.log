@@ -1,0 +1,127 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.12.4, pytest-9.1.1, pluggy-1.6.0 -- /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/backend
+configfile: pyproject.toml
+plugins: cov-7.1.0, anyio-4.15.1
+collecting ... collected 48 items
+
+backend/tests/test_filter_preference_preservation.py::test_real_api_supplies_exact_five_movie_snapshot_and_available_empty_genre PASSED [  2%]
+backend/tests/test_filter_preference_preservation.py::test_read_flow_preserves_committed_rows_for_both_accounts_and_catalogue PASSED [  4%]
+backend/tests/test_filter_preference_preservation.py::test_exact_two_action_three_comedy_filter_and_clear_after_real_rating PASSED [  6%]
+backend/tests/test_catalogue_pagination.py::test_public_pages_cover_the_complete_ranked_set[0] PASSED [  8%]
+backend/tests/test_catalogue_pagination.py::test_public_pages_cover_the_complete_ranked_set[1] PASSED [ 10%]
+backend/tests/test_catalogue_pagination.py::test_public_pages_cover_the_complete_ranked_set[10] PASSED [ 12%]
+backend/tests/test_catalogue_pagination.py::test_public_pages_cover_the_complete_ranked_set[11] PASSED [ 14%]
+backend/tests/test_catalogue_pagination.py::test_public_pages_cover_the_complete_ranked_set[25] PASSED [ 16%]
+backend/tests/test_catalogue_pagination.py::test_public_pages_cover_the_complete_ranked_set[255] PASSED [ 18%]
+backend/tests/test_catalogue_pagination.py::test_home_alphabetical_popular_finite_and_revision_change PASSED [ 20%]
+backend/tests/test_catalogue_pagination.py::test_recommendation_filter_uses_all_candidates_before_page_slice PASSED [ 22%]
+backend/tests/test_catalogue_pagination.py::test_rating_reranked_filter_pages_and_clear_use_complete_account_base FAILED [ 25%]
+backend/tests/test_catalogue_pagination.py::test_recommendation_genre_id_rejects_invalid_or_overflowing_values[0] PASSED [ 27%]
+backend/tests/test_catalogue_pagination.py::test_recommendation_genre_id_rejects_invalid_or_overflowing_values[abc] PASSED [ 29%]
+backend/tests/test_catalogue_pagination.py::test_recommendation_genre_id_rejects_invalid_or_overflowing_values[2147483648] PASSED [ 31%]
+backend/tests/test_catalogue_pagination.py::test_recommendation_genre_id_rejects_invalid_or_overflowing_values[9223372036854775808] PASSED [ 33%]
+backend/tests/test_catalogue_pagination.py::test_largest_allowed_genre_id_is_checked_as_unknown_without_overflow PASSED [ 35%]
+backend/tests/test_catalogue_pagination.py::test_home_title_desc_sorts_the_whole_catalogue_before_paging[0] PASSED [ 37%]
+backend/tests/test_catalogue_pagination.py::test_home_title_desc_sorts_the_whole_catalogue_before_paging[1] PASSED [ 39%]
+backend/tests/test_catalogue_pagination.py::test_home_title_desc_sorts_the_whole_catalogue_before_paging[10] PASSED [ 41%]
+backend/tests/test_catalogue_pagination.py::test_home_title_desc_sorts_the_whole_catalogue_before_paging[11] PASSED [ 43%]
+backend/tests/test_catalogue_pagination.py::test_home_title_desc_sorts_the_whole_catalogue_before_paging[25] PASSED [ 45%]
+backend/tests/test_catalogue_pagination.py::test_home_title_desc_sorts_the_whole_catalogue_before_paging[255] PASSED [ 47%]
+backend/tests/test_catalogue_pagination.py::test_home_sort_does_not_change_popular_order_or_revision_validation PASSED [ 50%]
+backend/tests/test_catalogue_pagination.py::test_home_sort_has_deterministic_case_and_duplicate_title_ties PASSED [ 52%]
+backend/tests/test_catalogue_pagination.py::test_home_sort_rejects_unsupported_values_without_changing_data[title] PASSED [ 54%]
+backend/tests/test_catalogue_pagination.py::test_home_sort_rejects_unsupported_values_without_changing_data[popularity] PASSED [ 56%]
+backend/tests/test_catalogue_pagination.py::test_home_sort_rejects_unsupported_values_without_changing_data[TITLE_DESC] PASSED [ 58%]
+backend/tests/test_catalogue_pagination.py::test_home_sort_rejects_unsupported_values_without_changing_data[] PASSED [ 60%]
+backend/tests/test_catalogue_pagination.py::test_home_sort_rejects_unsupported_values_without_changing_data[title_desc; DROP TABLE catalog_movies] PASSED [ 62%]
+backend/tests/test_catalogue_pagination.py::test_home_repository_rejects_an_unknown_sort PASSED [ 64%]
+backend/tests/test_rating_aware_recommendations.py::test_five_star_related_rating_reorders_80_80 PASSED [ 66%]
+backend/tests/test_rating_aware_recommendations.py::test_signs_neutral_and_current_saved_value[1--1] PASSED [ 68%]
+backend/tests/test_rating_aware_recommendations.py::test_signs_neutral_and_current_saved_value[2--1] PASSED [ 70%]
+backend/tests/test_rating_aware_recommendations.py::test_signs_neutral_and_current_saved_value[3-0] PASSED [ 72%]
+backend/tests/test_rating_aware_recommendations.py::test_signs_neutral_and_current_saved_value[4-1] PASSED [ 75%]
+backend/tests/test_rating_aware_recommendations.py::test_neutral_90_80_handoff_keeps_baseline PASSED [ 77%]
+backend/tests/test_rating_aware_recommendations.py::test_rank_whole_set_before_paging_and_view_filter PASSED [ 79%]
+backend/tests/test_rating_aware_recommendations.py::test_overlap_once_null_popularity_and_deterministic_ties PASSED [ 81%]
+backend/tests/test_rating_aware_recommendations.py::test_only_rating_query_failure_degrades[ratings] PASSED [ 83%]
+backend/tests/test_rating_aware_recommendations.py::test_only_rating_query_failure_degrades[catalogue] PASSED [ 85%]
+backend/tests/test_rating_aware_recommendations.py::test_only_rating_query_failure_degrades[preferences] PASSED [ 87%]
+backend/tests/test_rating_aware_recommendations.py::test_only_rating_query_failure_degrades[candidates] PASSED [ 89%]
+backend/tests/test_rating_aware_recommendations.py::test_only_rating_query_failure_degrades[auth] PASSED [ 91%]
+backend/tests/test_rating_aware_recommendations.py::test_popular_fallbacks_keep_order_and_omit_private_scores[genres0] PASSED [ 93%]
+backend/tests/test_rating_aware_recommendations.py::test_popular_fallbacks_keep_order_and_omit_private_scores[genres1] PASSED [ 95%]
+backend/tests/test_rating_aware_recommendations.py::test_account_isolation_reset_logout_switch_and_no_retargeting PASSED [ 97%]
+backend/tests/test_rating_aware_recommendations.py::test_public_dtos_stay_free_of_private_fields PASSED [100%]
+
+=================================== FAILURES ===================================
+____ test_rating_reranked_filter_pages_and_clear_use_complete_account_base _____
+
+client = (<starlette.testclient.TestClient object at 0x108e832c0>, <sqlalchemy.orm.session.Session object at 0x106a2e2a0>)
+
+    def test_rating_reranked_filter_pages_and_clear_use_complete_account_base(client):
+        http, session = client
+        for genre_id, name in [(12, "Drama"), (28, "Action"), (27, "Horror")]:
+            upsert_genre(session, genre_id=genre_id, name=name)
+        revision = create_catalogue_revision(session, provider="test")
+        ids = []
+        for index in range(36):
+            movie = upsert_catalogue_movie(
+                session, catalogue_revision_id=revision.id, source="test",
+                source_id=str(index), title=f"Candidate {index:02d}",
+                popularity_score=1000 if index == 35 else 80 if index < 23 else 79.5,
+            )
+            replace_movie_genres(session, movie=movie,
+                                 genre_ids=[27 if index == 35 else 12 if index < 23 else 28])
+            ids.append(movie.id)
+        activate_catalogue_revision(session, revision_id=revision.id)
+        session.commit()
+        assert http.post("/api/auth/login", json={
+            "email": "pagination@example.com", "password": "movie123"
+        }).status_code == 200
+        assert http.put("/api/me/preferences", json={"genreIds": [12, 28]}).status_code == 200
+        preferences = http.get("/api/me/preferences").json()
+    
+        def pages(genre_id=None):
+            collected = []
+            total = 12 if genre_id == 28 else 35
+            for page in range(1, (total + 9) // 10 + 1):
+                params = {"page": page, "catalogueRevision": revision.id}
+                if genre_id is not None:
+                    params["genreId"] = genre_id
+                response = http.get("/api/me/recommendations", params=params)
+                assert response.status_code == 200
+                body = response.json()
+                assert body["meta"] == {
+                    "count": min(10, total - (page - 1) * 10), "limit": 10,
+                    "page": page, "total": total, "totalPages": (total + 9) // 10,
+                    "unfilteredTotal": 35, "catalogueRevision": revision.id,
+                }
+                assert body["data"]["personalised"] and not body["data"]["noMatch"]
+                collected.extend(body["data"]["movies"])
+            assert len({m["id"] for m in collected}) == total
+            return collected
+    
+        original = pages()
+        assert [m["id"] for m in original] == ids[:35]
+        assert all(m["genres"][0]["id"] == 12 for m in original[:10])
+        assert [m["id"] for m in pages(28)] == ids[23:35]  # None were visible on page 1.
+    
+        for rating, expected in [(5, ids[23:35] + ids[:23]), (1, ids[:35])]:
+>           assert http.put(f"/api/me/ratings/{ids[34]}", json={"rating": rating}).status_code == 200
+E           AssertionError: assert 503 == 200
+E            +  where 503 = <Response [503 Service Unavailable]>.status_code
+E            +    where <Response [503 Service Unavailable]> = put('/api/me/ratings/515096c4-203d-4831-a9cb-60207c84717e', json={'rating': 5})
+E            +      where put = <starlette.testclient.TestClient object at 0x108e832c0>.put
+
+backend/tests/test_catalogue_pagination.py:189: AssertionError
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED backend/tests/test_catalogue_pagination.py::test_rating_reranked_filter_pages_and_clear_use_complete_account_base
+=================== 1 failed, 47 passed, 1 warning in 7.57s ====================

@@ -104,6 +104,139 @@ it("resets A's page and genre before B's recommendation request", async () => {
     .every(request => !request.url.includes("genreId=") && !request.url.includes("page=2"))).toBe(true);
 });
 
+it.each([200, 401, 409, 503])("rejects A's delayed filtered page (%s) after switching to B", async status => {
+  const delayed = delayedResponse();
+  let account = "a";
+  let oldSignal: AbortSignal | null | undefined;
+  const requests: { account: string; url: string }[] = [];
+  vi.spyOn(globalThis, "fetch").mockImplementation((input, options) => {
+    const url = String(input);
+    if (url === "/api/auth/me") return json({ data: { user: { id: "a", email: "a@example.com" } } });
+    if (url === "/api/auth/login") {
+      account = "b";
+      return json({ data: { user: { id: "b", email: "b@example.com" } } });
+    }
+    if (url === "/api/genres") return json({ data: { genres: [action] } });
+    if (url.startsWith("/api/me/recommendations?")) {
+      requests.push({ account, url });
+      if (account === "a" && url.includes("page=2")) {
+        oldSignal = options?.signal;
+        return delayed.pending; // Intentionally ignores cancellation in the transport.
+      }
+      return account === "a"
+        ? json(recommendations([movie("A private ranking", "a1")], 1, 12))
+        : json(recommendations([movie("B current ranking", "b1")], 1, 1, "rev-b"));
+    }
+    throw new Error(`Unexpected request ${url}`);
+  });
+  window.history.pushState({}, "", "/recommendations?page=1&genreId=28");
+  renderRecommendationsWithControls();
+  await screen.findByText("A private ranking");
+  fireEvent.click(screen.getByRole("button", { name: "Next" }));
+  await waitFor(() => expect(oldSignal).toBeDefined());
+  fireEvent.click(screen.getByRole("button", { name: "Switch account" }));
+  await screen.findByText("B current ranking");
+  const accepted = window.history.state.usr.listViewContext;
+  expect(accepted).toMatchObject({ accountId: "b", catalogueRevision: "rev-b" });
+  expect(oldSignal?.aborted).toBe(true);
+  await act(async () => delayed.resolve(new Response(JSON.stringify(status === 200
+    ? recommendations([movie("A obsolete ranking", "a2")], 2, 12, "rev-obsolete")
+    : { error: { code: status === 401 ? "AUTHENTICATION_REQUIRED" : status === 409
+      ? "CATALOGUE_CHANGED" : "SERVICE_UNAVAILABLE", message: "Old account failure" } }), { status })));
+  expect(window.location.search).toBe("?page=1");
+  expect(window.history.state.usr.listViewContext).toEqual(accepted);
+  expect(screen.getByText("B current ranking")).toBeInTheDocument();
+  expect(screen.queryByText(/A (private|obsolete) ranking/)).not.toBeInTheDocument();
+  expect(screen.getByRole("combobox")).toHaveValue("");
+  expect(requests.filter(request => request.account === "b")).toHaveLength(1);
+  expect(requests.filter(request => request.account === "b").every(({ url }) =>
+    !url.includes("genreId=") && !url.includes("rev-a") && !url.includes("page=2"))).toBe(true);
+});
+
+it("ignores a filtered page after unmount and fetches the current snapshot on Back", async () => {
+  const delayed = delayedResponse();
+  let pendingPage = true;
+  let oldSignal: AbortSignal | null | undefined;
+  const requests: string[] = [];
+  vi.spyOn(globalThis, "fetch").mockImplementation((input, options) => {
+    const url = String(input);
+    if (url === "/api/auth/me") return json({ data: { user: { id: "a", email: "a@example.com" } } });
+    if (url === "/api/genres") return json({ data: { genres: [action] } });
+    if (url.startsWith("/api/me/recommendations?")) {
+      requests.push(url);
+      if (url.includes("page=2") && pendingPage) {
+        oldSignal = options?.signal; pendingPage = false;
+        return delayed.pending;
+      }
+      const page = url.includes("page=2") ? 2 : 1;
+      return json(recommendations([movie(page === 1 ? "Initial movie" : "Latest movie", "a1")], page, 12));
+    }
+    throw new Error(`Unexpected request ${url}`);
+  });
+  window.history.pushState({}, "", "/recommendations?page=1&genreId=28");
+  renderRecommendationsWithControls();
+  await screen.findByText("Initial movie");
+  fireEvent.click(screen.getByRole("button", { name: "Next" }));
+  await waitFor(() => expect(oldSignal).toBeDefined());
+  fireEvent.click(screen.getByRole("button", { name: "Open preferences" }));
+  await screen.findByText("Preferences screen");
+  expect(oldSignal?.aborted).toBe(true);
+  await act(async () => delayed.resolve(new Response(JSON.stringify(
+    recommendations([movie("Obsolete movie", "old")], 2, 12, "rev-obsolete")), { status: 200 })));
+  expect(window.location.pathname).toBe("/preferences");
+  expect(screen.queryByText("Obsolete movie")).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "Browser Back" }));
+  await screen.findByText("Latest movie");
+  expect(window.location.search).toBe("?page=2&genreId=28");
+  expect(requests.at(-1)).toContain("catalogueRevision=rev-a");
+  expect(window.history.state.usr.listViewContext).toMatchObject({ accountId: "a", catalogueRevision: "rev-a" });
+  expect(screen.queryByText("Obsolete movie")).not.toBeInTheDocument();
+});
+
+it("discards A's detail return page, genre and revision after signing in as B", async () => {
+  let account = "a";
+  const requests: { account: string; url: string }[] = [];
+  vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+    const url = String(input);
+    if (url === "/api/auth/me") return json({ data: { user: { id: "a", email: "a@example.com" } } });
+    if (url === "/api/auth/login") {
+      account = "b";
+      return json({ data: { user: { id: "b", email: "b@example.com" } } });
+    }
+    if (url === "/api/genres") return json({ data: { genres: [action] } });
+    if (url.startsWith("/api/me/recommendations?")) {
+      requests.push({ account, url });
+      return account === "a"
+        ? json(recommendations([movie("A private movie", "a1")], 2, 12))
+        : json(recommendations([movie("B private movie", "b1")], 1, 1, "rev-b"));
+    }
+    if (url === "/api/movies/a1") return json({ data: { movie: {
+      ...movie("A private movie", "a1"), overview: "Public detail", voteAverage: null, voteCount: null,
+    } } });
+    if (url === "/api/me/ratings/a1") return json({ data: { movieId: "a1", rating: null } });
+    if (url === "/api/me/watchlist/a1") return json({ data: { movieId: "a1", inWatchlist: false } });
+    if (url.startsWith("/api/movies/a1/similar")) return json({ data: { movies: [] } });
+    throw new Error(`Unexpected request ${url}`);
+  });
+  window.history.pushState({}, "", "/recommendations?page=2&genreId=28");
+  renderRecommendationsWithControls();
+  await screen.findByText("A private movie");
+  const contextA = window.history.state.usr.listViewContext;
+  fireEvent.click(screen.getByRole("link", { name: "View details for A private movie" }));
+  await screen.findByText("Public detail");
+  expect(window.history.state.usr.listViewContext).toEqual(contextA);
+  await act(async () => fireEvent.click(screen.getByRole("button", { name: "Switch account" })));
+  fireEvent.click(screen.getByRole("link", { name: "Back to recommendations" }));
+  await screen.findByText("B private movie");
+  expect(window.location.search).toBe("?page=1");
+  expect(window.history.state.usr.listViewContext).toMatchObject({ accountId: "b", catalogueRevision: "rev-b" });
+  expect(window.history.state.usr.listViewContext.recommendationScope).not.toBe(contextA.recommendationScope);
+  expect(requests.filter(request => request.account === "b")).toEqual([
+    { account: "b", url: "/api/me/recommendations?limit=10" },
+  ]);
+  expect(screen.queryByText("A private movie")).not.toBeInTheDocument();
+});
+
 it("browser Back cannot restore an old filter after preferences change", async () => {
   const requests: string[] = [];
   vi.spyOn(globalThis, "fetch").mockImplementation(input => {
