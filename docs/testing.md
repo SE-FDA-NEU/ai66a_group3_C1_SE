@@ -10,6 +10,17 @@ authors. This document does not certify independent review. The current implemen
 [api.md](api.md#1-conventions); planned additions are in its section 13.
 Historical M2/M3 evidence remains historical.
 
+S4-T16 consumer amendment: rating feedback now accepts 0.5–5 in exact half
+steps; Search commits only on Enter/Search; setup imports 50 TMDb popular pages.
+This supersedes integer-only rating expectations in historical evidence.
+Current migration/API checks are in
+[rating migration tests](../backend/tests/test_rating_migration.py),
+[rating API tests](../backend/tests/test_ratings_api.py),
+[50-page import tests](../backend/tests/test_tmdb_import.py),
+[Search draft tests](../frontend/src/tests/movies.test.tsx), and
+[Chrome pointer/keyboard and submit-only checks](../frontend/e2e/s4-t16.detail-boundaries.ts).
+These retain the original S03 detail-return/account-boundary coverage.
+
 ## 1. What we test, and why
 
 | Layer | Production nodes | Test method and purpose |

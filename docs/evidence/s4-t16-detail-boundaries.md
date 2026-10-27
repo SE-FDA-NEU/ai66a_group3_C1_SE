@@ -1,5 +1,10 @@
 # S4-T16 — Detail return and widget request boundaries
 
+The original T16 results below describe the detail-boundary candidate. The PO
+subsequently authorized catalogue capacity, half-star ratings and submit-only
+Search in this same PR; its current results and scope are recorded separately
+in [the T16 extension evidence](s4-t16-extensions.md).
+
 Issue: [#211](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/211).
 Parent: [S03 #19](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/19).
 Author: @kietxuan, assisted by Codex. Independent reviewer: @NguyenTuanAnh0608.

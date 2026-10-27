@@ -324,3 +324,18 @@ independent review/clean-clone acceptance.
 | File | SHA-256 after UTF-8 LF normalization |
 |---|---|
 | `docs/testing.md` | `207cd3e94cb85094a0e11a7ef38d70822d3faca9d4215f4cfa34583dd522f199` |
+
+### S4-T16 PO-authorized half-star, catalogue and Search amendment (2026-10-27)
+
+This consumer amendment changes the current rating domain to exact half steps,
+raises the bounded import/default to 50 pages, and makes UI Search submit-only.
+The explicit user request authorizes these changes; historical integer-only
+C03/Story evidence is retained as history, not claimed as new approval.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/api.md` | `8f5c911fbc486c52c2f9bda2515bc4b4195f49adcaa9971a7521cfcbe3323289` |
+| `docs/architecture.md` | `2aa7eb64f45722515ce3c0e5b146866b03610b9bdef4243d31bea025600eeb66` |
+| `docs/design.md` | `f934991405d4cef699e908f1af08947bb2bad900b64debd1fa3d4ad563fc7e62` |
+| `docs/requirements.md` | `c45177ffc56abe866f9fa607c8134daced0e9f2aee1a46762a021631778fa92e` |
+| `docs/testing.md` | `e230d6eaa41b86fd50dc86429b24430ee78a71ad1a410412dc43de00d8cd0ca9` |

@@ -189,7 +189,7 @@ IDs and TMDb credentials are never included.
 
 ```text
 movieId: string
-rating: 1 | 2 | 3 | 4 | 5 | null
+rating: 0.5 | 1 | 1.5 | 2 | 2.5 | 3 | 3.5 | 4 | 4.5 | 5 | null
 ```
 
 ## 4. S12 registration
@@ -769,8 +769,9 @@ Exact success (`200`, only after commit):
 }
 ```
 
-`rating` is a strict JSON integer and only `1`, `2`, `3`, `4`, or `5` is
-valid. The server must reject `0`, `6`, negatives, fractions such as `3.5`,
+`rating` is a strict JSON number from `0.5` through `5` in exact `0.5` steps
+(including numeric whole values such as `4.0`). The server rejects `0`, `6`,
+negatives, non-half-steps such as `3.25` or `3.500000000001`,
 strings including `"5"`, booleans, `null`, a missing field, extra identity
 fields, malformed JSON, and any malformed payload with
 `400 VALIDATION_ERROR` / `Please correct the highlighted fields`. Rejection
@@ -786,7 +787,7 @@ does not replace a previously committed rating.
 
 Neither route accepts `userId`, account ID, email, username, or owner ID. A
 forged identity field cannot read, update, or retarget another account. The
-database target is one row per `(user_id, movie_id)` with a `1..5` check; the
+database target is one row per `(user_id, movie_id)` with a numeric `0.5..5` / exact half-step check; the
 storage contract is in [architecture.md](architecture.md).
 
 ## 10. Sprint 3 profile-reset backend contract (implemented under S3-T35)
@@ -1068,7 +1069,10 @@ corrupt artifact returns 503 `INDEX_UNAVAILABLE`; unavailable catalogue and
 database faults retain their separate 503 errors. Focused synthetic API/DB
 checks are in `backend/tests/test_movie_search_api.py`. T10 adds public `/search`
 through the shared typed movies client, retaining API order, a ten-card cap,
-URL-backed queries, cancellation/stale-response guards and safe detail return.
+URL-backed submitted queries, cancellation/stale-response guards and safe detail return.
+Typing edits only a local draft; Enter/Search triggers a request. Valid direct
+`q` links load immediately. This submit-only amendment retains title-first
+ranking and positive-cosine fallback without changing the endpoint.
 Its five Story #30 criteria and browser results are recorded in
 [T10 acceptance evidence](evidence/s4-t10-search/README.md).
 
@@ -1184,3 +1188,11 @@ The corresponding first S13 acceptance criterion is replaced locally in
 [requirements.md](requirements.md#s13-sign-in-and-sign-out-securely-p0-5-points).
 The GitHub Story #45 AC must be reconciled before merge so the old
 `always /recommendations` and new Home outcomes are not both accepted.
+
+### S4-T16 half-star consumer amendment
+
+Rating DTO numeric values now include the five half steps. Ownership, commit,
+401 handling, rollback, explicit Save and recommendation invalidation remain
+unchanged. Schema head `f2c7e4a91b60` stores REAL ratings while preserving IDs
+and timestamps. Existing <=2 / >=4 signal boundaries and integer
+`ratingAdjustment` remain unchanged; raw TMDb popularity is never a user rating.

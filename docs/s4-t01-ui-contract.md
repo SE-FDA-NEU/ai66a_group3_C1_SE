@@ -79,7 +79,7 @@ than being rewritten as newly executed Sprint 4 evidence.
 | `SimilarMovies` (S4-T08) | `{movieId,returnTo,returnContext?}`; one public read of `/api/movies/{id}/similar` per movie and retry. Keyed by movie and aborted on change; late completions are ignored. Renders `MovieGrid`/`MovieCard`, so poster fallback, tokens and the 5/4/3/2-column layout are reused. Never reads account, rating or watchlist state. Loading, empty and error/Retry stay inside its own section; the source details are never hidden. |
 | `ThemeProvider` / `ThemeToggle` | Dark default; only `dark`/`light`; local key `cineai-theme`. Inline pre-paint bootstrap and provider use the same key. Blocked/corrupt storage is safe. Toggling changes tokens, never keys/remounts, auth, URL, draft, filter or page. |
 | `MoviePoster` | `{movieId,title,posterUrl?,eager?}`; strict w500 HTTPS CDN URL only; width/height 500/750 and fixed 2:3 region; lazy list images, eager detail poster; labelled missing/error fallback; failure state resets on movie or URL change. |
-| `StarRating` | Controlled integer `RatingValue|null`; five native labelled radios, Arrow/Space/touch; selection/hover/focus never writes. Consumer owns explicit Save, pending/error/retry and committed value. Existing `MovieRating` keeps account/movie isolation. |
+| `StarRating` | Controlled half-step `RatingValue|null` (0.5–5); five visual stars with ten native labelled radios, Arrow/Space/touch; left half/midpoint selects the half step, right end the whole step; selection/hover/focus never writes. Consumer owns explicit Save, pending/error/retry and committed value. Existing `MovieRating` keeps account/movie isolation. |
 | `ConfirmDialog` | Consumer controls `open`, pending and real mutation. Label/description, focus trap, initial safe Cancel focus, Escape cancel when idle, restore trigger. Pending blocks duplicate/cancel actions. No reset API is wired by T01. |
 | `ExternalTrailerLink` | Example primitive only: validated YouTube watch URL or unavailable text; new tab with noopener/noreferrer; no iframe/autoplay/fake player. #215 owns real backend selection and live integration. |
 | `ProviderBadges` | Example primitive only: deduplicated non-clickable provider names. Future provider task owns region, missing data and JustWatch attribution before mounting it. |
@@ -87,7 +87,7 @@ than being rewritten as newly executed Sprint 4 evidence.
 The new header keeps existing product naming within the page copy; CineAI is a
 visual wordmark, not a claim about new AI capabilities. `TMDb popularity`, saved
 `Your rating`, and future `Ranking score for you` must remain distinct. Only
-existing real data appears. There is no score 0 or half-star input.
+existing real data appears. Unrated is null; there is no score 0. The PO-authorized T16 amendment adds half-star input.
 
 ## Design tokens and accessibility
 
@@ -98,7 +98,7 @@ and common card/action/status/dialog classes instead of fixed dark-only colors.
 System font fallbacks work offline; no new external font dependency is required.
 
 Poster grid adapts to 375px/tablet/desktop, header/actions wrap, title text wraps,
-minimum action targets are 44px, star targets 48px. Keyboard focus is visible;
+minimum action targets are 44px, visual stars 48px with approximately 24x48px half targets. Keyboard focus is visible;
 errors have readable text, not color alone. Reduced-motion disables transitions.
 Backdrop retains its dark overlay even in light theme so its title stays legible.
 Browser and unit evidence is linked below; these checks are not a full WCAG
@@ -255,3 +255,10 @@ auth-before-validation, reservation/commit/rollback and UI acknowledgement
 semantics are unchanged; no retries or timeout increases hide a failed write.
 
 See [T16 execution and review handoff](evidence/s4-t16-detail-boundaries.md).
+
+## T16 submit-only Search amendment
+
+Keep typed Search drafts local. Enter/Search commits `q`; valid deep links,
+Back and detail-return restore that submitted query. Reuse current components,
+themes, feedback and API ordering. Rating half steps retain explicit Save and
+account/movie request boundaries; do not introduce a second feedback system.

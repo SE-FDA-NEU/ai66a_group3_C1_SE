@@ -180,7 +180,7 @@ the active revision. S3-T01 migration `9d2f5a1c3b84` added
 `user_movie_ratings`. S3-T26 migration `c6f8a2d4e901` extends that revision with
 nullable `catalog_movies.backdrop_path` and is the single current head. The ERD
 shows both account relations, the unique `(user_id, movie_id)` rating pair, the
-strict integer `1..5` rating check, and nullable backdrop storage. No import-run
+numeric `0.5..5` half-step rating check, and nullable backdrop storage. No import-run
 table has been migrated. The preserved seven-table M2 baseline is available as
 [erd-m2.png](images/erd-m2.png) with [PlantUML source](images/erd-m2.puml).
 
@@ -193,9 +193,9 @@ Both application-owned tables are implemented:
 | Table | Columns | Keys and constraints | Ownership/delete rule |
 |---|---|---|---|
 | `user_genre_preferences` | `user_id` VARCHAR(36), `genre_id` INTEGER | Composite primary key/unique `(user_id, genre_id)`; FK `user_id -> users.id` ON DELETE CASCADE; FK `genre_id -> genres.id` ON DELETE RESTRICT | Rows belong to one user; deleting/resetting one account's preference rows cannot affect another account or the genre catalogue. |
-| `user_movie_ratings` | `id` VARCHAR(36), `user_id` VARCHAR(36), `movie_id` VARCHAR(36), `rating` INTEGER, `created_at` DATETIME, `updated_at` DATETIME | Primary key `id`; unique `(user_id, movie_id)`; FK `user_id -> users.id` ON DELETE CASCADE; FK `movie_id -> catalog_movies.id` ON DELETE CASCADE; CHECK `typeof(rating) = 'integer' AND rating BETWEEN 1 AND 5` | One current rating per user/movie; deleting its account or catalogue movie removes the owned rating. |
+| `user_movie_ratings` | `id` VARCHAR(36), `user_id` VARCHAR(36), `movie_id` VARCHAR(36), `rating` FLOAT (SQLite REAL), `created_at` DATETIME, `updated_at` DATETIME | Primary key `id`; unique `(user_id, movie_id)`; FK `user_id -> users.id` ON DELETE CASCADE; FK `movie_id -> catalog_movies.id` ON DELETE CASCADE; CHECK `typeof(rating) IN ('integer','real') AND rating BETWEEN 0.5 AND 5 AND rating*2 = CAST(rating*2 AS INTEGER)` | One current rating per user/movie; deleting its account or catalogue movie removes the owned rating. |
 
-The T30 repository also enforces a strict integer before persistence. The
+The current repository enforces finite numeric half steps before persistence. The
 implemented T31 API retains request validation because the SQLite check is
 defence in depth and does not define the public JSON contract.
 The stable internal movie ID lets a rating continue to identify the same
@@ -433,3 +433,14 @@ DELETE removes only the current account's row and both operations acknowledge
 only after commit. GET/PUT status uses `inWatchlist`; DELETE acknowledges a
 known active movie with `200 {data:{movieId,inWatchlist:false}}`, including a
 repeat request. Reset deliberately does not touch this table.
+
+### S4-T16 current storage amendment
+
+The current Alembic head is `f2c7e4a91b60`, following watchlist migration
+`e9b6f0a42c17`. It rebuilds only the ratings table as REAL with an exact
+half-step check, preserving row identities, ownership, unique pairs and
+timestamps. Old integer-only ERD imagery describes the historical S3 baseline;
+the current table/constraint contract above supersedes its rating column.
+Downgrade refuses fractional rows instead of silently rounding. Setup now
+imports 50 popular pages (about 1,000 raw rows), then rebuilds/checks the
+shared overview index for the active revision.
