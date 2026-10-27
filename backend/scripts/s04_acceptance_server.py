@@ -161,6 +161,7 @@ def build_harness(path: Path, fixture: dict):
             "search-index-failure",
             "detail-boundaries",
             "detail-new-revision",
+            "popular-spotlight",
         } | SIMILAR_SCENARIOS.keys():
             raise HTTPException(400, "Unknown fixture")
         with closing(sqlite3.connect(path)) as connection, connection:
@@ -184,9 +185,19 @@ def build_harness(path: Path, fixture: dict):
                 [(row["popularity"], row["id"]) for row in fixture["movies"]],
             )
             connection.executemany(
-                "UPDATE catalog_movies SET title = ?, overview = NULL WHERE id = ?",
+                "UPDATE catalog_movies SET title = ?, overview = NULL, "
+                "poster_path = NULL, backdrop_path = NULL WHERE id = ?",
                 [(row["title"], row["id"]) for row in fixture["movies"]],
             )
+            if name == "popular-spotlight":
+                connection.executemany(
+                    "UPDATE catalog_movies SET title=?, overview=?, popularity_score=?, "
+                    "poster_path=?, backdrop_path=? WHERE id=?",
+                    [("The Last Observatory: A Journey Across the Midnight Sky" if number == 1 else
+                      f"Synthetic Film {number:02d}", "An astronaut rescue mission on the moon",
+                      100 - number, f"/spotlight{number}.jpg", f"/scene{number}.jpg", row["id"])
+                     for number, row in enumerate(fixture["movies"], 1)],
+                )
             if name.startswith("search-"):
                 # Eleven title hits plus two independent overview documents.
                 search_rows = [
@@ -285,7 +296,7 @@ def build_harness(path: Path, fixture: dict):
                     (SELECT active_revision_id FROM catalogue_state WHERE id = 1)"""
             ).fetchone()
         search_evidence = {}
-        if name.startswith("detail-"):
+        if name.startswith("detail-") or name == "popular-spotlight":
             from app.db.database import SessionLocal
             from app.recommendations.overview_index import rebuild_active_index
 

@@ -39,6 +39,18 @@ def test_detail_projects_validated_poster_url() -> None:
     assert detail.get("posterUrl") == "https://image.tmdb.org/t/p/w500/posterA.jpg"
 
 
+@pytest.mark.parametrize(("path", "expected"), [
+    ("/sceneA.jpg", "https://image.tmdb.org/t/p/w780/sceneA.jpg"),
+    (None, None), ("", None), ("bad.jpg", None), ("/nested/x.jpg", None),
+    ("//evil.invalid/a.jpg", None), ("/a.jpg?token=x", None),
+    ("https://evil.invalid/a.jpg", None), (1, None),
+])
+def test_summary_projects_only_validated_backdrop_urls(path, expected) -> None:
+    movie = movie_with_poster(None)
+    movie.backdrop_path = path
+    assert to_movie_summary_dto(movie).backdropUrl == expected
+
+
 @pytest.mark.parametrize("path", [None, "", "bad.jpg", "//evil.invalid/x.jpg", "/../x.jpg",
                                     "/nested/x.jpg", "/x.jpg?q=1", "https://evil.invalid/x.jpg", 1])
 def test_unsafe_missing_or_nested_paths_are_not_urls(path) -> None:

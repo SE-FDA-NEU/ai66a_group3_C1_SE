@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { searchMoviePage, MovieApiError, type MovieSummary, type PageMeta } from "../api/movies.ts";
 import MovieGrid from "../components/MovieGrid.tsx";
 import PageControls from "../components/PageControls.tsx";
+import CollectionHeading from "../components/CollectionHeading.tsx";
 import { currentReturnPath } from "../navigation/movieDetailReturn.ts";
 import { pageSearch, readPage, resultSummary } from "../navigation/listPage.ts";
 import { listViewState, readListViewState, sameListViewContext } from "../navigation/listViewState.ts";
@@ -69,13 +70,10 @@ export default function SearchPage() {
   }, [query, page, key, valid, navigate]);
 
   return <main className="page search-page">
-    <header className="catalogue-header">
-      <div className="catalogue-header__copy">
-        <p className="eyebrow">Find a story</p>
-        <h1>Search movies</h1>
-        <p className="muted">Find a title you know, or describe the story you want to see.</p>
-      </div>
-    </header>
+    <CollectionHeading kind="search" eyebrow="Find a story" title="Search movies"
+      description="A title in mind, or a story to explore.">
+      <span className="collection-heading__note">Title &amp; overview</span>
+    </CollectionHeading>
     <form className="content-card search-controls" role="search" aria-label="Movie search"
       onSubmit={event => {
         event.preventDefault();

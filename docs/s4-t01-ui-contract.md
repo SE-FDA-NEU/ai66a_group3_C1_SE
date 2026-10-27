@@ -116,7 +116,8 @@ by its tasks; this migration must not recreate their tables or reset accounts.
 Summaries, recommendations and detail responses add nullable `posterUrl`.
 Backend builds `https://image.tmdb.org/t/p/w500/<filename>` from a validated flat
 path (1–128 alphanumeric/underscore/hyphen characters + jpg/jpeg/png/webp).
-Frontend validates the same allowlist. Existing backdrop remains w780/detail-only.
+Frontend validates the same allowlist. Backdrops retain the w780 allowlist;
+the later T16 carousel amendment below also exposes them on movie summaries.
 No token, source/provider ID or raw path is added to the browser DTO.
 
 Normal bounded TMDb imports retain the available poster field without adding
@@ -174,8 +175,9 @@ New checks are recorded separately in
 [button/title-sort evidence](evidence/s4-t01-buttons-title-sort.md).
 
 The follow-up after PR #220 reuses these contracts: two-column auth presentation,
-genre descriptions/cards, a real-poster Home hero and a Popular page-one #1
-spotlight. It changes no API DTO, database schema, ranking, result totals or genre
+genre descriptions/cards, a real-poster Home hero and an initial Popular page-one
+#1 spotlight (superseded by the T16 carousel below). That earlier change altered
+no API DTO, database schema, ranking, result totals or genre
 selection rule. Featured details use the existing list-return state. Decorative
 auth artwork is CSS, not a screenshot of another app or a new remote dependency.
 
@@ -271,3 +273,31 @@ return. Read metadata from the actual API; never invent a total of ten.
 Catalogue revision changes reset page 1; do not mix two snapshots. Both title
 and description modes rank/select globally before pagination. No new auth,
 theme, request-generation or feedback store is introduced.
+
+## S4-T16 Popular carousel and collection headings (2026-10-27)
+
+`CollectionHeading` gives Popular, Search and My watchlist a compact icon,
+single h1, short description and existing action. It uses current theme tokens
+and keeps the existing page routes, Search submit-only behavior, list totals
+and account protections. Home and Recommendations retain their existing layout.
+
+On every nonempty Popular page, `PopularSpotlight` presents the first three
+movies supplied by that page's API response, or fewer on the last page. The
+badge is the catalogue rank `(page - 1) * limit + slide + 1`; the counter is
+the local slide position, e.g. rank #12 and `2 / 3` on page 2. Never call the
+page's first entry the catalogue's #1. Keep all entries in the grid below.
+
+Previous/Next arrows are visibly centered on the left/right edges (48px desktop,
+44px mobile). Dots and ArrowLeft/ArrowRight also select slides, wrapping at both
+ends. There is no autoplay. A single entry hides unnecessary controls. The
+current slide uses the existing safe history state `featuredMovieId`, so app
+return and browser Back restore it without adding a history entry per click.
+Changing pages selects that page's first movie; stale IDs safely select first.
+
+Use the validated summary `backdropUrl`, never an unrelated poster as a backdrop.
+Missing, unsafe or failed images leave the theme-safe gradient and readable
+title/actions. Poster failure keeps the existing poster fallback. Selection
+does not refetch metadata, modify ranking, save preferences or write account
+data. No migration, catalogue import or NLP rebuild is required.
+
+See [execution, real captures and review handoff](evidence/s4-t16-spotlight.md).

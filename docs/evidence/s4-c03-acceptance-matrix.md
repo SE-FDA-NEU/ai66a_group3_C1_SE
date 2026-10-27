@@ -353,3 +353,18 @@ historical; this amendment does not claim Story acceptance or reviewer approval.
 | `docs/api.md` | `90072c21ed9d6e51352f67f08c5c3f9cc03b0c0397329a6270497a512d4d7302` |
 | `docs/requirements.md` | `ab8a653d7a36d31e83bdce6f2fd243b8156746e224cee665abd34de1cd574101` |
 | `docs/testing.md` | `2779ffb946f083ba1e7af23a2ebc1ef86953a49cb82662a1eb0d698bc160124c` |
+
+### S4-T16 current-page Popular carousel and compact collection headings (2026-10-27)
+
+The PO authorized each Popular page's first three entries as a manual carousel
+and compact Popular/Search/Watchlist headings. Summary DTOs add a validated
+nullable backdrop URL; ranking, paging, ownership and NLP inputs do not change.
+Actual execution is in [the carousel evidence](s4-t16-spotlight.md). These hashes
+identify the current documentation, not an independent approval or Story closure.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/api.md` | `5fabac42cea87cc1a7b22845924cb4cd873e63fe39b45995934b57f815cbba36` |
+| `docs/architecture.md` | `3d23d7ddf48f789e55518c41787c4034d7d8d5eb9c24ec2b0033edcfca91c843` |
+| `docs/design.md` | `aaed16ff142183eafc3457faf84f96c42cf21b8092a6bd2fd594a3ccc0981e47` |
+| `docs/testing.md` | `c8d92cbc1f995fedf4d8dd4e31a2a8a43558e92b9584159128299f1a702fbbae` |

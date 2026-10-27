@@ -106,7 +106,7 @@ The catalogue flow is:
 ```text
 TMDb metadata API -> required server-side importer -> local SQLite
 local SQLite -> backend API -> browser frontend
-browser frontend -> public TMDb image CDN (backdrop bytes only)
+browser frontend -> public TMDb image CDN (allowlisted poster/backdrop bytes only)
 ```
 
 The runtime boundaries are:
@@ -115,11 +115,11 @@ The runtime boundaries are:
 2. Backend API.
 3. SQLite database.
 4. Server-side TMDb importer; required catalogue preparation from Sprint 3.
-5. Public TMDb image CDN; browser delivery of allowlisted backdrop bytes only.
+5. Public TMDb image CDN; browser delivery of allowlisted poster/backdrop bytes only.
 
 | Component | Responsibility | Must not do |
 |---|---|---|
-| Browser frontend | Render auth, catalogue, preferences, recommendations, ratings, and movie-detail backdrops; call the matching application API contract. | Receive TMDb credentials, call the TMDb metadata API, or use `/api/movies` as evidence for `/api/movies/popular`. The only provider-origin browser request is an allowlisted public backdrop URL returned by the detail API. |
+| Browser frontend | Render auth, catalogue, preferences, recommendations, ratings, and movie imagery; call the matching application API contract. | Receive TMDb credentials, call the TMDb metadata API, or use `/api/movies` as evidence for `/api/movies/popular`. Provider-origin browser requests are limited to allowlisted public poster/backdrop URLs returned by the application API. |
 | Backend API | Validate input, resolve the session account, read the active catalogue, and return stable DTOs/errors. | Trust a client-supplied `user_id` or call the TMDb metadata API while serving a page request. |
 | SQLite database | Persist all nine application tables, including account preferences/ratings and nullable movie backdrop paths. | Select an account independently of the authenticated session. |
 | TMDb importer | Required Sprint 3 dev/staging/demo catalogue preparation: fetch bounded provider data, validate it and write one atomic revision. | Run in the browser, expose credentials or silently fall back to seed on failure. |

@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import "@testing-library/jest-dom/vitest";
-import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { BrowserRouter, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { afterEach, expect, it, vi } from "vitest";
 import App from "../App.tsx";
@@ -195,7 +195,8 @@ it.each([
     meta: { count: 1, limit: 10, page: 2, total: 12, totalPages: 2,
       unfilteredTotal: 12, catalogueRevision: "rev-delayed" },
   }), { status: 200, headers: { "Content-Type": "application/json" } })));
-  expect(await screen.findByText("Delayed public movie")).toBeInTheDocument();
+  const grid = await screen.findByRole("region", { name: kind === "popular" ? "Popular movies" : "Movie catalogue" });
+  expect(within(grid).getByRole("heading", { name: "Delayed public movie" })).toBeInTheDocument();
   expect(window.location.pathname).toBe(route);
   expect(window.location.search).toBe("?page=2&source=shared");
   expect(window.location.hash).toBe("#results");

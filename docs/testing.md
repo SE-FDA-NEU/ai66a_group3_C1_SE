@@ -10,6 +10,16 @@ authors. This document does not certify independent review. The current implemen
 [api.md](api.md#1-conventions); planned additions are in its section 13.
 Historical M2/M3 evidence remains historical.
 
+S4-T16 presentation follow-up: Popular features its current page's first three
+movies, correct global ranks, edge arrows/dots/keyboard, image fallback and
+slide-preserving detail return. Popular, Search and My watchlist share compact
+headings. The T16 browser suite now has 18 cases; its responsive case checks
+375/768/1440px in both themes. Captures and current execution are recorded in
+[carousel/heading evidence](evidence/s4-t16-spotlight.md). The summary DTO's
+nullable backdrop URL uses the existing server/client allowlists, with no
+runtime TMDb metadata request. Enrichment acceptance continues to compare all
+non-media response fields while checking each updated URL against details.
+
 S4-T16 consumer amendment: rating feedback now accepts 0.5–5 in exact half
 steps; Search commits only on Enter/Search; setup imports 50 TMDb popular pages.
 Search additionally paginates every match, ten per page, with full-set ranking

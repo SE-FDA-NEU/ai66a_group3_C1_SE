@@ -143,6 +143,7 @@ releaseYear: number | null
 genres: GenreDto[]
 popularityScore: number | null
 posterUrl: string | null
+backdropUrl: string | null
 ```
 
 ### `MovieDetailDto`
@@ -163,7 +164,11 @@ posterUrl: string | null
 The public movie `id` is the stable internal ID. A TMDb source ID is not part
 of a public DTO. `backdropUrl` is a server-built HTTPS image URL from a
 validated local TMDb path, or JSON `null` when absent or invalid. It appears
-only on details. T01 adds `posterUrl` to summaries, recommendations and details:
+on details and, under the PO-authorized T16 carousel amendment, summaries
+(including recommendations, Search, Similar and watchlist entries). Its format
+is `https://image.tmdb.org/t/p/w780/<validated-filename>`; lists can render
+their current-page backdrop without a per-movie detail request.
+T01 adds `posterUrl` to summaries, recommendations and details:
 either `https://image.tmdb.org/t/p/w500/<validated-filename>` or JSON `null`.
 No raw `poster_path`, binary image, provider token or per-card detail fetch is
 exposed. Only one flat jpg/jpeg/png/webp filename is allowed; arbitrary hosts,

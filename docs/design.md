@@ -51,7 +51,7 @@ read the local database and never call the TMDb metadata API.
 
 | Component | Technology | Responsibility |
 |---|---|---|
-| Browser frontend | React, TypeScript, Vite, React Router | Renders public and signed-in experiences, including preferences, recommendations, rating controls, and backdrop fallback. Calls relative `/api` paths; a detail backdrop loads only from the allowlisted public image CDN URL returned by the API. |
+| Browser frontend | React, TypeScript, Vite, React Router | Renders public and signed-in experiences, including preferences, recommendations, rating controls, posters and backdrop fallback. Calls relative `/api` paths; imagery loads only from allowlisted public image CDN URLs returned by the API (T16 also exposes nullable backdrops on summaries). |
 | Backend API | Python 3.12, FastAPI, Pydantic | Validates input, resolves the session cookie to an account, applies the business rules, and returns DTOs and error envelopes. |
 | SQLite database | SQLite, SQLAlchemy, Alembic | Stores all nine application tables, including preferences, ratings, and nullable backdrop paths. The backend turns on `PRAGMA foreign_keys` for every connection. |
 | TMDb importer | Python command, httpx | Required catalogue preparation for Sprint 3 dev/staging/demo. Fetches genres and a bounded number of popular pages (default 50; `--pages` accepts 1–50), writes a new revision, and activates it only after every write succeeds. |

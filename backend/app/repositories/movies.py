@@ -368,6 +368,7 @@ def to_movie_summary_dto(movie: CatalogMovie) -> MovieSummaryDto:
         genres=[GenreDto(id=genre.id, name=genre.name) for genre in movie.genres],
         popularityScore=movie.popularity_score,
         posterUrl=poster_url(movie.poster_path),
+        backdropUrl=backdrop_url(movie.backdrop_path),
     )
 
 

@@ -11,6 +11,7 @@ export type MovieSummary = {
   popularityScore: number | null;
   // Additive rollout: older backend responses may omit this image field.
   posterUrl?: string | null;
+  backdropUrl?: string | null;
 };
 
 export type MovieDetail = MovieSummary & {

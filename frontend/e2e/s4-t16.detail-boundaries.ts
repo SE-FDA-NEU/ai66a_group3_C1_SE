@@ -28,6 +28,105 @@ async function screenshot(page: Page, name: string) {
   await page.screenshot({ path: path.join(directory, `${name}.png`), fullPage: true });
 }
 
+async function fixtureArtwork(page: Page, failFirst = false) {
+  await page.unroute("https://image.tmdb.org/**");
+  await page.route("https://image.tmdb.org/**", async route => {
+    const url = route.request().url();
+    if (failFirst && url.includes("/scene1.jpg")) return route.abort();
+    const number = Number(url.match(/(?:scene|spotlight)(\d+)/)?.[1] ?? 1);
+    const colors = ["#6d4b93", "#28677e", "#976b3b"];
+    // Explicit synthetic vector artwork: offline browser fixture, never film evidence.
+    const body = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700"><defs><linearGradient id="g"><stop stop-color="#151d34"/><stop offset="1" stop-color="${colors[number % 3]}"/></linearGradient></defs><path fill="url(#g)" d="M0 0h1200v700H0z"/><circle cx="900" cy="180" r="100" fill="#dfcdad" opacity=".6"/><path d="m0 700 300-400 180 180 220-180 500 400Z" fill="#13182b"/><text x="720" y="560" fill="#d3cce2" font-size="22" font-family="sans-serif">SYNTHETIC ART ${number}</text></svg>`;
+    await route.fulfill({ contentType: "image/svg+xml", body });
+  });
+}
+
+test("Popular highlights three movies on every page without refetching or reordering", async ({ page, request }) => {
+  expect((await request.post(`${controls}/scenario/popular-spotlight`)).ok()).toBe(true);
+  await fixtureArtwork(page);
+  let reads = 0;
+  page.on("request", r => { if (new URL(r.url()).pathname.startsWith("/api/")) reads++; });
+  for (const pageNumber of [1, 2]) {
+    await page.goto(`/popular?page=${pageNumber}&source=spotlight#catalogue-shelf`);
+    const api = await (await page.request.get(`/api/movies/popular?page=${pageNumber}`)).json();
+    const picks = api.data.movies.slice(0, 3);
+    const region = page.getByRole("region", { name: "Popular movie spotlight" });
+    await expect(region.getByRole("heading")).toHaveText(picks[0].title);
+    const titles = await page.locator("article.movie-card h2").allTextContents();
+    const before = reads, url = page.url();
+    for (let step = 0; step < 4; step++) {
+      await expect(region.getByRole("heading")).toHaveText(picks[step % 3].title);
+      await expect(region).toContainText(`#${(pageNumber - 1) * 10 + step % 3 + 1} in this catalogue`);
+      await region.getByRole("button", { name: "Next featured movie" }).click();
+    }
+    await expect(page).toHaveURL(url);
+    expect(reads).toBe(before);
+    expect(await page.locator("article.movie-card h2").allTextContents()).toEqual(titles);
+    await expect(region.getByRole("heading")).toHaveText(picks[1].title);
+    await region.getByRole("button", { name: "Next featured movie" }).focus();
+    await page.keyboard.press("ArrowLeft");
+    await expect(region.getByRole("heading")).toHaveText(picks[0].title);
+    await region.getByRole("button", { name: `Show featured movie 2: ${picks[1].title}` }).click();
+    await region.getByRole("link", { name: `Explore featured movie ${picks[1].title}` }).click();
+    await page.getByRole("link", { name: "Back to popular movies", exact: true }).click();
+    await expect(page).toHaveURL(url);
+    await expect(region.getByRole("heading")).toHaveText(picks[1].title);
+    await region.getByRole("link", { name: `Explore featured movie ${picks[1].title}` }).click();
+    await page.goBack();
+    await expect(region.getByRole("heading")).toHaveText(picks[1].title);
+  }
+});
+
+test("Collection headings and edge controls fit both themes at mobile, tablet and desktop", async ({ page, request }) => {
+  expect((await request.post(`${controls}/scenario/popular-spotlight`)).ok()).toBe(true);
+  await fixtureArtwork(page);
+  await signIn(page, request, "collection-heading");
+  for (let number = 1; number <= 11; number++)
+    expect((await page.request.put(`/api/me/watchlist/${id(number)}`)).status()).toBe(200);
+  for (const theme of ["dark", "light"]) for (const width of [375, 768, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto("/popular?page=2");
+    if (await page.locator("html").getAttribute("data-theme") !== theme)
+      await page.getByRole("button", { name: `Switch to ${theme} theme` }).click();
+    const region = page.getByRole("region", { name: "Popular movie spotlight" });
+    await expect(region).toContainText("#11 in this catalogue");
+    await expect.poll(() => region.locator(".popular-spotlight__backdrop")
+      .evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
+    const banner = (await region.boundingBox())!;
+    for (const [label, side] of [["Previous featured movie", "left"], ["Next featured movie", "right"]]) {
+      const bounds = (await region.getByRole("button", { name: label }).boundingBox())!;
+      expect(Math.abs(bounds.y + bounds.height / 2 - banner.y - banner.height / 2)).toBeLessThan(2);
+      expect(bounds.width).toBeGreaterThanOrEqual(44);
+      expect(side === "left" ? bounds.x - banner.x : banner.x + banner.width - bounds.x - bounds.width).toBeLessThan(16);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await screenshot(page, `popular-carousel-${width}-${theme}`);
+    await page.goto("/search?q=moon");
+    await expect(page.getByRole("heading", { name: "Search movies", exact: true })).toBeVisible();
+    await expect(page.locator("article.movie-card").first()).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await screenshot(page, `search-heading-${width}-${theme}`);
+    await page.goto("/watchlist?page=2");
+    await expect(page.getByRole("heading", { name: "My watchlist", exact: true })).toBeVisible();
+    await expect(page.locator("article.watchlist-card")).toHaveCount(1);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await screenshot(page, `watchlist-heading-${width}-${theme}`);
+  }
+});
+
+test("A failed Popular backdrop keeps the gradient and the next slide loads its own image", async ({ page, request }) => {
+  expect((await request.post(`${controls}/scenario/popular-spotlight`)).ok()).toBe(true);
+  await fixtureArtwork(page, true);
+  await page.goto("/popular");
+  const region = page.getByRole("region", { name: "Popular movie spotlight" });
+  await expect(region.getByRole("heading")).toHaveText("The Last Observatory: A Journey Across the Midnight Sky");
+  await expect(region.locator(".popular-spotlight__backdrop")).toHaveCount(0);
+  await region.getByRole("button", { name: "Next featured movie" }).click();
+  await expect(region.getByRole("heading")).toHaveText("Synthetic Film 02");
+  await expect.poll(() => region.locator(".popular-spotlight__backdrop")
+    .evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
+});
+
 async function arm(request: APIRequestContext, name: string, apiPath: string, method = "GET") {
   expect((await request.post(`${controls}/gates/${name}/arm`, {
     data: { paths: [apiPath], methods: [method] },

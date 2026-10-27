@@ -569,6 +569,17 @@ and passing required checks before merging. Final C05 root-pytest setup remains
 its own task, not an additional T11 dependency.
 
 
+## T16 Popular carousel and compact collection headings
+
+Update this branch, then restart the backend and frontend so both consume the
+additive nullable `backdropUrl` in movie summaries. This UI follow-up needs no
+new migration, import or NLP index rebuild; existing imported backdrops work.
+The first three movies on each Popular page form its manual carousel. Page 2
+starts at catalogue rank #11 (with the normal ten-per-page setting).
+Missing/failed artwork uses the gradient fallback. Search still runs only on
+Enter/Search, and My watchlist remains account-owned and persistent.
+See [the UI handoff and checks](evidence/s4-t16-spotlight.md).
+
 ## T16 consumer amendment: catalogue, half stars and explicit Search
 
 Current migration head is `f2c7e4a91b60`, following watchlist head

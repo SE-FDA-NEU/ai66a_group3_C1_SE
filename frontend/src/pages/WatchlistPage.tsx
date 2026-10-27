@@ -5,6 +5,7 @@ import { getMembership, getWatchlistPage, setMembership, WatchlistApiError, type
 import { useAuth } from "../auth/authState.ts";
 import MoviePoster from "../components/MoviePoster.tsx";
 import PageControls from "../components/PageControls.tsx";
+import CollectionHeading from "../components/CollectionHeading.tsx";
 import { useFeedback } from "../feedback.ts";
 import { currentReturnPath, movieDetailReturnState } from "../navigation/movieDetailReturn.ts";
 import { pageSearch, readPage } from "../navigation/listPage.ts";
@@ -193,11 +194,10 @@ export default function WatchlistPage() {
   const context = { route: "/watchlist" as const, catalogueRevision: current?.kind === "ready" ?
     current.result.meta.catalogueRevision : undefined, accountId };
   return <main className="page watchlist-page">
-    <header className="catalogue-header watchlist-header">
-      <div><p className="eyebrow">Your collection</p><h1>My watchlist</h1>
-        <p className="muted">Movies you saved for another night.</p></div>
+    <CollectionHeading kind="watchlist" eyebrow="Your collection" title="My watchlist"
+      description="Movies you saved for another night.">
       <Link className="button-link button-secondary" to="/">Explore movies</Link>
-    </header>
+    </CollectionHeading>
     {writeError ? <div className="status-panel" role="alert"><p>{writeError}</p>
       <button type="button" onClick={() => setReload(value => value + 1)}>Refresh watchlist</button></div> : null}
     {!current ? <p className="status-panel" role="status">Loading your watchlist...</p> :

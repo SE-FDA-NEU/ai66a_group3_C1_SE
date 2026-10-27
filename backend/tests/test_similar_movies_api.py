@@ -34,7 +34,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 ACTION, COMEDY, DRAMA = 1, 2, 3
-SUMMARY_KEYS = {"id", "title", "releaseYear", "genres", "popularityScore", "posterUrl"}
+SUMMARY_KEYS = {"id", "title", "releaseYear", "genres", "popularityScore", "posterUrl", "backdropUrl"}
 INDEX_MESSAGE = "Search index is temporarily unavailable"
 
 # (id, title, overview, popularity, genre ids). The source and A/B/C use an

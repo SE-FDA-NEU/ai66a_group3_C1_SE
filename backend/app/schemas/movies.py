@@ -21,6 +21,7 @@ class MovieSummaryDto(BaseModel):
     genres: list[GenreDto]
     popularityScore: float | None
     posterUrl: str | None = None
+    backdropUrl: str | None = None
 
 
 class MovieDetailDto(BaseModel):

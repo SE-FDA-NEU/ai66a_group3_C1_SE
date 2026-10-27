@@ -932,10 +932,13 @@ test("read-only imported TMDb catalogue screenshots, real poster loading and the
   await screenshot(page, "t01-details-mobile-dark");
   await page.goto("/popular");
   const popular = await (await page.request.get("/api/movies/popular?limit=10")).json();
-  const spotlight = page.getByRole("region", { name: "Most popular movie spotlight" });
+  const spotlight = page.getByRole("region", { name: "Popular movie spotlight" });
   await expect(spotlight.getByRole("heading", { level: 2 })).toHaveText(popular.data.movies[0].title);
-  await expect(spotlight.locator("img").last()).toBeVisible();
-  await expect.poll(() => spotlight.locator("img").last().evaluate((img: HTMLImageElement) => img.naturalWidth), { timeout: 30_000 }).toBeGreaterThan(0);
+  if (popular.data.movies[0].backdropUrl) {
+    const artwork = spotlight.locator(".popular-spotlight__backdrop");
+    await expect(artwork).toBeVisible();
+    await expect.poll(() => artwork.evaluate((img: HTMLImageElement) => img.naturalWidth), { timeout: 30_000 }).toBeGreaterThan(0);
+  }
   await page.setViewportSize({ width: 1440, height: 1000 });
   await settlePublicPosters(page);
   await screenshot(page, "onboarding-popular-1440-dark-imported");

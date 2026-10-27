@@ -190,3 +190,7 @@ Additional desktop/mobile public-return and stale-response captures are in the
   of T16, T05 #200, or completed C03 #217.
 - PR merge/closure is permitted only after applicable CI and independent review
   pass. No approval, instructor result, review event or Story acceptance is fabricated.
+
+Later PO-authorized follow-up: [current-page Popular carousel, compact collection
+headings and updated execution](s4-t16-spotlight.md). Earlier counts above remain
+historical; the linked evidence records the current source and checks.

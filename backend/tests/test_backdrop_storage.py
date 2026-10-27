@@ -325,7 +325,7 @@ def test_populated_upgrade_is_idempotent(database) -> None:
     assert _snapshot(engine, include_backdrop=True) == before
 
 
-def test_storage_exposes_only_valid_url_in_detail_dto(database) -> None:
+def test_storage_exposes_only_valid_url_in_detail_and_summary_dto(database) -> None:
     engine, _url = database
     with Session(engine) as session, session.begin():
         movies.set_movie_backdrop_path(
@@ -335,7 +335,7 @@ def test_storage_exposes_only_valid_url_in_detail_dto(database) -> None:
         summary = movies.to_movie_summary_dto(movie).model_dump()
         detail = movies.to_movie_detail_dto(movie).model_dump()
         assert "backdrop_path" not in summary | detail
-        assert "backdropUrl" not in summary
+        assert summary["backdropUrl"] == "https://image.tmdb.org/t/p/w780/storage-only.jpg"
         assert detail["backdropUrl"] == "https://image.tmdb.org/t/p/w780/storage-only.jpg"
 
 

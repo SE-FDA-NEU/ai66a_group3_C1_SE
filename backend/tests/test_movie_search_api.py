@@ -83,7 +83,7 @@ def test_title_hits_are_public_literal_case_insensitive_and_skip_missing_index(s
     assert [movie["id"] for movie in response.json()["data"]["movies"]] == [inception]
     assert set(response.json()) == {"data", "meta"}
     assert set(response.json()["data"]["movies"][0]) == {
-        "id", "title", "releaseYear", "genres", "popularityScore", "posterUrl"
+        "id", "title", "releaseYear", "genres", "popularityScore", "posterUrl", "backdropUrl"
     }
     assert [movie["id"] for movie in http.get(
         "/api/movies/search", params={"q": "%_"}
