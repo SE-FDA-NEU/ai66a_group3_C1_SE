@@ -779,9 +779,9 @@ never render as a valid empty list.
 
 In either theme, `TMDb popularity` labels raw `popularityScore`;
 `Your rating` labels only this account's committed 1–5 rating (or
-`Not rated yet` after a successful read); `Personal adjusted score`
-labels only the personalised candidate's `adjustedScore` and its
-`basis`. A related rated film may change rank without making the
+`Not rated yet` after a successful read); `Ranking score for you`
+labels only the personalised candidate's `adjustedScore`, followed by a
+short reason chosen from its `basis`. A related rated film may change rank without making the
 candidate appear rated. Null popularity/score displays
 `Information unavailable`, not 0 or NaN. If rating signals cannot be
 read but the allowed baseline response succeeds, disclose that limitation
@@ -902,6 +902,7 @@ request reloads the session owner's committed state, so reset, logout and
 account switch cannot reuse another account's previous scores. Public
 catalogue/detail DTOs and the shared Search/Similar movie shapes contain no
 personal fields. Frontend recommendation types admit the finalized C03
-fields; personal-score badges and degradation messaging remain separate UI
-work. These backend tests do not claim completion of all Story #22 UI or
+fields; S4-T04 renders them on personalised cards only, as `Ranking score for
+you` beside `TMDb popularity`, with the basis-driven reason and the
+`rating_unavailable` disclosure. These backend tests do not claim completion of all Story #22 UI or
 independent S4-T05 (#200) verification criteria.

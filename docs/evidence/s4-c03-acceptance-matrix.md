@@ -274,3 +274,17 @@ the earlier executed acceptance evidence.
 | File | SHA-256 after UTF-8 LF normalization |
 |---|---|
 | `docs/api.md` | `79ea707de0b4bdf07b439340404a14d3a80f56a11ad4b56f9d908c5867306f94` |
+
+### S4-T04 Ranking score display consumer amendment (2026-10-27)
+
+S4-T04 renames the design label to `Ranking score for you` in section 12.2 and
+records the personalised-card rendering in section 12.5. API contracts and the
+historical captures above are unchanged. The hash below is for the merged
+`docs/design.md`, taken after merging main with the T13 capture. Executed
+checks, screenshots and limits are in [T04 evidence](s4-t04-ranking-refresh.md).
+This capture is not a new independent C03 approval, and it does not claim the
+independent review of T04 itself.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/design.md` | `c67dbd494c6ac1388b92206a71bb8c594389af5878ea2ae16765126d184f396a` |

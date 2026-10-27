@@ -119,6 +119,9 @@ p { line-height: 1.65; }
 .movie-popularity { display: flex; flex-wrap: wrap; gap: .25rem .5rem; margin: .8rem 0 0; font-size: .72rem; }
 .movie-popularity dt { font-weight: 700; }
 .movie-popularity dd { margin: 0; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.movie-ranking { margin-top: .3rem; }
+.movie-ranking dd { color: var(--accent); font-weight: 700; }
+.movie-ranking-reason { margin: .3rem 0 0; color: var(--muted); font-size: .72rem; line-height: 1.5; }
 .movie-reason { margin: .8rem 0 0; color: var(--accent); font-size: .74rem; line-height: 1.6; }
 .movie-poster { position: relative; aspect-ratio: 2 / 3; overflow: hidden; background: var(--surface-raised); }
 .movie-poster img { display: block; width: 100%; height: 100%; object-fit: cover; }

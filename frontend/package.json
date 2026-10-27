@@ -11,6 +11,7 @@
     "test:t13:ui": "node scripts/run-s04-e2e.mjs --config playwright.t13.config.ts",
     "test:t16:integration": "vitest run --config vitest.t16.config.ts",
     "test:t33:integration": "vitest run --config vitest.t33.config.ts",
+    "test:t04:integration": "vitest run --config vitest.t04.config.ts",
     "test:t28:acceptance": "node scripts/verify-t28-backdrop.mjs",
     "test:s04:e2e": "node scripts/run-s04-e2e.mjs",
     "test:s04:runner": "node --test scripts/run-s04-e2e.node-test.mjs",
