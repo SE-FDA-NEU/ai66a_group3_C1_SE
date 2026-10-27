@@ -260,7 +260,8 @@ class UserMovieRating(Base):
             name="uq_user_movie_ratings_user_movie",
         ),
         CheckConstraint(
-            "typeof(rating) = 'integer' AND rating BETWEEN 1 AND 5",
+            "typeof(rating) IN ('integer', 'real') AND rating BETWEEN 0.5 AND 5 "
+            "AND rating * 2 = CAST(rating * 2 AS INTEGER)",
             name="ck_user_movie_ratings_rating_range",
         ),
     )
@@ -280,8 +281,8 @@ class UserMovieRating(Base):
         nullable=False,
         index=True,
     )
-    rating: Mapped[int] = mapped_column(
-        Integer,
+    rating: Mapped[float] = mapped_column(
+        Float,
         nullable=False,
     )
     created_at: Mapped[datetime] = mapped_column(
