@@ -1,0 +1,17 @@
+
+> frontend@0.0.0 test:t01:ui
+> node scripts/run-s04-e2e.mjs --config playwright.t01.config.ts --grep S07
+
+[WebServer] INFO:     Started server process [26768]
+[WebServer] INFO:     Waiting for application startup.
+[WebServer] INFO:     Application startup complete.
+[WebServer] INFO:     Uvicorn running on http://127.0.0.1:8014 (Press CTRL+C to quit)
+
+Running 3 tests using 1 worker
+
+  ok 1 e2e\t01.visual.ts:235:1 › S07 similar movies satisfy all five criteria with the real API, index and DB (29.3s)
+  ok 2 e2e\t01.visual.ts:391:1 › S07 similar results are public, identical across accounts, independent of ratings and keep the return context (3.1s)
+  ok 3 e2e\t01.visual.ts:450:1 › S07 delayed real similar response for movie A cannot fill movie B (1.6s)
+
+  3 passed (42.4s)
+s04_temporary_database_removed=true

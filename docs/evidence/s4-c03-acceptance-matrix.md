@@ -288,3 +288,16 @@ independent review of T04 itself.
 | File | SHA-256 after UTF-8 LF normalization |
 |---|---|
 | `docs/design.md` | `c67dbd494c6ac1388b92206a71bb8c594389af5878ea2ae16765126d184f396a` |
+
+### S4-T08 Similar UI consumer amendment (2026-10-27)
+
+S4-T08 records the delivered public Similar movies section of `/movies/:movieId`
+in section 13.2 of `docs/api.md`. Its current normalized-LF hash follows. The
+earlier C03, T01, T03, T07, T09, T10, T12 and T13 captures remain historical
+records. The widget, its five Story #24 results and the limits are in the
+[T08 acceptance evidence](s4-t08-similar-ui/README.md). This additive capture
+does not claim new independent C03 approval or the reviewer's own re-run.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/api.md` | `2830607e57403f09d708663bfee98eac6c472f47e244d67ca1d346eb81886452` |
