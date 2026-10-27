@@ -1,6 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 import path from "node:path";
 import { mkdir, writeFile } from "node:fs/promises";
+import { releaseResponseGate, waitForResponseGate } from "./support/responseGates.ts";
 
 const live = Boolean(process.env.T01_LIVE_URL);
 const fixtureMovie = "20000000-0000-0000-0000-000000000001";
@@ -56,6 +57,10 @@ test.beforeEach(async ({ page, request }) => {
   await page.route("https://image.tmdb.org/**", route => route.abort());
 });
 
+test.afterEach(async ({ request }) => {
+  if (!live) expect((await request.post(`${controls}/release-gates`)).status()).toBe(200);
+});
+
 test("S08 search uses real API/index across themes, sizes, states and safe return", async ({ page, request, browser }, info) => {
   test.skip(live, "Search acceptance owns synthetic DB/index fixtures");
   test.setTimeout(120_000);
@@ -90,7 +95,7 @@ test("S08 search uses real API/index across themes, sizes, states and safe retur
       const gate = `search-loading-${width}-${theme}`;
       await request.post(`${controls}/gates/${gate}/arm`);
       await search.fill("  inCEPTION  ");
-      await expect.poll(async () => (await (await request.get(`${controls}/gates/${gate}`)).json()).responses.length).toBe(1);
+      await waitForResponseGate(request, controls, gate, "/api/movies/search");
       await expect(page.getByText("Loading movies...", { exact: true })).toBeVisible();
       await noOverflow(page);
       if (width === 375 && theme === "light") await screenshot(page, "search-loading-375-light");
@@ -192,20 +197,18 @@ test("S08 delayed real search response cannot replace a newer query or return af
     await page.goto("/search");
     await request.post(`${controls}/gates/search-stale/arm`);
     await page.getByRole("searchbox").fill("Inception");
-    await expect.poll(async () => (await (await request.get(`${controls}/gates/search-stale`)).json()).responses.length).toBe(1);
+    await waitForResponseGate(request, controls, "search-stale", "/api/movies/search");
     await request.post(`${controls}/gates/search-stale/seal`);
     await page.getByRole("searchbox").fill("astronaut rescue moon");
     await expect(page.locator("article.movie-card h2")).toHaveText(["Moon Rescue", "City Robot"]);
-    await request.post(`${controls}/gates/search-stale/release`);
-    await expect.poll(async () => (await (await request.get(`${controls}/gates/search-stale`)).json()).completed).toBe(1);
+    await releaseResponseGate(request, controls, "search-stale");
     await expect(page.locator("article.movie-card h2")).toHaveText(["Moon Rescue", "City Robot"]);
     await request.post(`${controls}/gates/search-unmount/arm`);
     await page.getByRole("searchbox").fill("Inception");
-    await expect.poll(async () => (await (await request.get(`${controls}/gates/search-unmount`)).json()).responses.length).toBe(1);
+    await waitForResponseGate(request, controls, "search-unmount", "/api/movies/search");
     await request.post(`${controls}/gates/search-unmount/seal`);
     await page.getByRole("link", { name: "Home", exact: true }).click();
-    await request.post(`${controls}/gates/search-unmount/release`);
-    await expect.poll(async () => (await (await request.get(`${controls}/gates/search-unmount`)).json()).completed).toBe(1);
+    await releaseResponseGate(request, controls, "search-unmount");
     await expect(page).toHaveURL("/");
     await expect(page.getByRole("heading", { name: "Find your next movie" })).toBeVisible();
     await expect(page.getByRole("searchbox")).toHaveCount(0);
@@ -280,7 +283,7 @@ test("S07 similar movies satisfy all five criteria with the real API, index and 
       await request.post(`${controls}/gates/${gate}/arm`);
       await page.goto(`/movies/${similarSource}`);
       await setTheme(page, theme);
-      await expect.poll(async () => (await (await request.get(`${controls}/gates/${gate}`)).json()).responses.length).toBe(1);
+      await waitForResponseGate(request, controls, gate, `/api/movies/${similarSource}/similar`);
       await expect(page.getByText("Loading similar movies...", { exact: true })).toBeVisible();
       await expect(sourceHeading).toBeVisible();
       await noOverflow(page);
@@ -454,7 +457,7 @@ test("S07 delayed real similar response for movie A cannot fill movie B", async 
   try {
     await request.post(`${controls}/gates/similar-stale/arm`);
     await page.goto(`/movies/${similarSource}`);
-    await expect.poll(async () => (await gateState("similar-stale")).responses.length).toBe(1);
+    await waitForResponseGate(request, controls, "similar-stale", `/api/movies/${similarSource}/similar`);
     const held = (await gateState("similar-stale")).responses[0].body.data.movies.map((movie: { title: string }) => movie.title);
     expect(held).toEqual(["Moon Rescue", "Orbit Medic"]);
     await request.post(`${controls}/gates/similar-stale/seal`);
@@ -470,8 +473,7 @@ test("S07 delayed real similar response for movie A cannot fill movie B", async 
     await expect(titles).toHaveText(own.map(movie => movie.title));
     expect(own.map(movie => movie.title)).not.toContain("Moon Rescue");
 
-    await request.post(`${controls}/gates/similar-stale/release`);
-    await expect.poll(async () => (await gateState("similar-stale")).completed).toBe(1);
+    await releaseResponseGate(request, controls, "similar-stale");
     await expect(titles).toHaveText(own.map(movie => movie.title));
     await expect(page.locator(".similar-movies").getByRole("heading", { name: "Moon Rescue" })).toHaveCount(0);
   } finally {

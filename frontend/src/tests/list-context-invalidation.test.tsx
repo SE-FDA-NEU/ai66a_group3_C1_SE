@@ -271,7 +271,7 @@ it("returns from details with the old revision and resets a changed catalogue", 
     url.includes("catalogueRevision=rev-a"))).toBe(true);
 });
 
-it("returns from recommendation details with its revision and keeps the filter on page 1", async () => {
+it("TC-S4-T16-RET-002 clears a stale genre after the detail return detects a new revision", async () => {
   let activeRevision = "rev-a";
   const requests: string[] = [];
   const sample = movie("Filtered Movie", "filtered-11");
@@ -301,11 +301,12 @@ it("returns from recommendation details with its revision and keeps the filter o
   activeRevision = "rev-b";
   const beforeReturn = requests.length;
   fireEvent.click(screen.getByRole("link", { name: "Back to recommendations" }));
-  expect(await screen.findByText("Showing 1-1 of 1 matches (1 recommendations before filtering)"))
+  expect(await screen.findByText("Showing 1-1 of 1 movies"))
     .toBeInTheDocument();
-  expect(window.location.search).toBe("?page=1&genreId=28");
+  expect(window.location.search).toBe("?page=1");
   expect(requests.slice(beforeReturn).some(url => url.includes("page=2") &&
     url.includes("genreId=28") && url.includes("catalogueRevision=rev-a"))).toBe(true);
+  expect(requests.at(-1)).not.toContain("genreId=");
 });
 
 it("offers Clear filter when the server rejects an unknown genre", async () => {

@@ -1,0 +1,47 @@
+name: S4 T16 detail boundaries
+
+on:
+  push:
+    paths: ["backend/**", "frontend/**", "tests/**", ".github/workflows/s4-t16-detail-boundaries.yml"]
+  pull_request:
+    paths: ["backend/**", "frontend/**", "tests/**", ".github/workflows/s4-t16-detail-boundaries.yml"]
+
+permissions:
+  contents: read
+
+jobs:
+  details:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      TMDB_READ_ACCESS_TOKEN: ""
+      TMDB_NETWORK_DISABLED: "1"
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Install locked runtimes
+        run: |
+          python -m pip install -r backend/requirements.lock.txt
+          python -m pip install -e './backend[dev]' --no-deps
+          npm --prefix frontend ci
+          cd frontend
+          npx playwright install --with-deps chromium
+      - name: Run root S03 production API and migrated SQLite cases
+        run: |
+          python -m ruff check tests/test_s03_details.py
+          python -m pytest tests/test_s03_details.py -v
+      - name: Run component request and navigation regressions
+        run: npm --prefix frontend test -- src/tests/detail-boundaries.test.tsx src/tests/list-context-invalidation.test.tsx src/tests/movie-detail-return.test.tsx src/tests/movie-detail-rating.test.tsx src/tests/rating-recommendation-refresh.test.tsx src/tests/watchlist.test.tsx src/tests/similar-movies.test.tsx
+      - name: Run isolated real-browser detail journeys
+        run: npm --prefix frontend run test:s4:t16:ui
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: s4-t16-browser-results
+          path: frontend/test-results/s4-t16/

@@ -159,6 +159,8 @@ def build_harness(path: Path, fixture: dict):
             "search-zero",
             "search-empty",
             "search-index-failure",
+            "detail-boundaries",
+            "detail-new-revision",
         } | SIMILAR_SCENARIOS.keys():
             raise HTTPException(400, "Unknown fixture")
         with closing(sqlite3.connect(path)) as connection, connection:
@@ -224,6 +226,31 @@ def build_harness(path: Path, fixture: dict):
                 "UPDATE catalogue_state SET active_revision_id = ? WHERE id = 1",
                 ("s04-empty" if name in {"empty", "search-empty"} else fixture["revision"],),
             )
+            if name.startswith("detail-"):
+                # More than ten matching rows exercise a real filtered page 2.
+                connection.execute("DELETE FROM movie_genres")
+                connection.executemany(
+                    "INSERT INTO movie_genres (movie_id, genre_id) VALUES (?, ?)",
+                    [(row["id"], genre) for row in fixture["movies"] for genre in (ACTION, COMEDY)],
+                )
+                connection.execute(
+                    "UPDATE catalog_movies SET release_year=2020, "
+                    "overview='An astronaut rescue mission on the moon'"
+                )
+                connection.execute(
+                    "UPDATE catalog_movies SET release_year=NULL, overview=NULL WHERE id=?",
+                    (fixture["movies"][-1]["id"],),
+                )
+                if name == "detail-new-revision":
+                    revision_id = "s04-detail-next"
+                    connection.execute(
+                        "INSERT OR IGNORE INTO catalogue_revisions "
+                        "(id, provider, created_at, inserted_movie_count, updated_movie_count, rejected_movie_count) "
+                        "VALUES (?, 's04-synthetic', ?, 0, 13, 0)",
+                        (revision_id, utc_timestamp()),
+                    )
+                    connection.execute("UPDATE catalog_movies SET catalogue_revision_id=?", (revision_id,))
+                    connection.execute("UPDATE catalogue_state SET active_revision_id=? WHERE id=1", (revision_id,))
             if name in {"no-match", "no-match-no-popularity"}:
                 # The genre was selectable when the editor opened. Retire its
                 # only movie before saving: a genuine canonical-but-no-match
@@ -258,6 +285,12 @@ def build_harness(path: Path, fixture: dict):
                     (SELECT active_revision_id FROM catalogue_state WHERE id = 1)"""
             ).fetchone()
         search_evidence = {}
+        if name.startswith("detail-"):
+            from app.db.database import SessionLocal
+            from app.recommendations.overview_index import rebuild_active_index
+
+            with SessionLocal() as session:
+                rebuild_active_index(session)
         if name.startswith("search-"):
             from app.db.database import SessionLocal
             from app.recommendations.overview_index import (
@@ -319,12 +352,21 @@ def build_harness(path: Path, fixture: dict):
         }
 
     @controls.post("/__acceptance/gates/{name}/{action}")
-    async def control_gate(name: str, action: str):
+    async def control_gate(name: str, action: str, body: dict | None = None):
         nonlocal capturing
         if action == "arm":
             if capturing is not None or name in gates:
                 raise HTTPException(409, "Gate already exists or is capturing")
-            gates[name] = {"event": asyncio.Event(), "responses": [], "completed": 0}
+            paths = body.get("paths") if body else None
+            methods = body.get("methods") if body else None
+            if paths is not None and (not isinstance(paths, list) or not paths
+                                      or any(not isinstance(item, str) or not item.startswith("/api/") for item in paths)):
+                raise HTTPException(400, "Expected exact API paths")
+            if methods is not None and (not isinstance(methods, list) or not methods
+                                        or any(not isinstance(item, str) or item not in {"GET", "PUT", "DELETE"} for item in methods)):
+                raise HTTPException(400, "Expected API methods")
+            gates[name] = {"event": asyncio.Event(), "responses": [], "completed": 0,
+                           "active": 0, "paths": paths, "methods": methods}
             capturing = name
         elif name not in gates:
             raise HTTPException(404, "Unknown gate")
@@ -339,6 +381,8 @@ def build_harness(path: Path, fixture: dict):
 
     @controls.get("/__acceptance/gates/{name}")
     def inspect_gate(name: str):
+        if name not in gates:
+            raise HTTPException(404, "Unknown gate")
         return gate_state(gates[name])
 
     @controls.post("/__acceptance/release-gates")
@@ -352,37 +396,42 @@ def build_harness(path: Path, fixture: dict):
     class DelayRealResponses:
         async def __call__(self, scope, receive, send):
             name = capturing
-            if (
-                scope["type"] != "http"
-                or not (
-                    scope["path"] in {"/api/me/recommendations", "/api/movies/search"}
-                    or scope["path"].endswith("/similar")
-                )
-                or name is None
-            ):
+            if scope["type"] != "http" or name is None:
+                return await production_app(scope, receive, send)
+            gate = gates[name]
+            selected = scope["path"] in gate["paths"] if gate["paths"] is not None else (
+                scope["path"] in {"/api/me/recommendations", "/api/movies/search"}
+                or scope["path"].endswith("/similar")
+            )
+            if not selected or (gate["methods"] is not None and scope["method"] not in gate["methods"]):
                 return await production_app(scope, receive, send)
             messages = []
 
             async def capture(message):
                 messages.append(message)
 
-            await production_app(scope, receive, capture)
-            gate = gates[name]
-            gate["responses"].append(
-                {
-                    "status": next(
-                        m["status"]
-                        for m in messages
-                        if m["type"] == "http.response.start"
-                    ),
-                    "body": json.loads(b"".join(m.get("body", b"") for m in messages)),
-                }
-            )
-            # A deadline makes harness bugs fail instead of hanging the server.
-            await asyncio.wait_for(gate["event"].wait(), timeout=45)
-            for message in messages:
-                await send(message)
-            gate["completed"] += 1
+            gate["active"] += 1
+            try:
+                await production_app(scope, receive, capture)
+                gate["responses"].append(
+                    {
+                        "path": scope["path"],
+                        "method": scope["method"],
+                        "status": next(
+                            m["status"]
+                            for m in messages
+                            if m["type"] == "http.response.start"
+                        ),
+                        "body": json.loads(b"".join(m.get("body", b"") for m in messages)),
+                    }
+                )
+                # A deadline makes harness bugs fail instead of hanging the server.
+                await asyncio.wait_for(gate["event"].wait(), timeout=45)
+                for message in messages:
+                    await send(message)
+                gate["completed"] += 1
+            finally:
+                gate["active"] -= 1
 
     controls.mount("/", DelayRealResponses())
     return controls
@@ -435,6 +484,14 @@ def main() -> None:
         seed_database(path, fixture)
     sys.path.insert(0, str(ROOT / "backend"))
     from app.db.database import engine
+
+    if os.environ.get("S04_SQL_DIAGNOSTICS") == "1":
+        from sqlalchemy import event
+
+        @event.listens_for(engine, "handle_error")
+        def report_test_database_error(context):
+            print("S04 DB diagnostic:", type(context.original_exception).__name__,
+                  str(context.original_exception), file=sys.stderr, flush=True)
 
     try:
         uvicorn.run(build_harness(path, fixture), host="127.0.0.1", port=8014)
