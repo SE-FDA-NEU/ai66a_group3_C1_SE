@@ -61,6 +61,7 @@ actual 503 envelope rather than a business-rule refusal.
 | TC-P0-S03-003 | S03 #19 | Missing active catalogue versus injected DB fault | Both 503 with correct `CATALOGUE_UNAVAILABLE` or `SERVICE_UNAVAILABLE`, never false 404 ([route](../backend/app/main.py)). | Infrastructure boundary |
 | TC-P0-S03-004 | S03 #19 | Guest opens a valid detail ID with a list-context query, then with an external-looking query | In both cases production detail GET remains public 200 with the same movie and no redirect/private data; separate React/browser test must reject unsafe return URLs and restore safe page/filter/revision ([route](../backend/app/main.py), [navigation](../frontend/src/navigation/movieDetailReturn.ts)). | Safe return boundary |
 | TC-P0-S03-005 | S03 #19 / T16 #211 | A/B save distinct preferences; guest/A/B read details/similar; A saves a rating and watchlist membership, then reads recommendations | Both persisted preference sets remain identical; B has no A rating/membership ([production routes](../backend/app/main.py), [root API/SQLite tests](../tests/test_s03_details.py)). | Persistence/isolation |
+| TC-P0-S03-006 | S03 #19 / T16 #211 | One ASGI event loop, a real list read snapshot and a membership writer at COMMIT; another coroutine releases the reader | Membership returns 200 with true saved state instead of a self-induced SQLite busy 503; worker-thread DB commit leaves the loop available for reader cleanup ([membership route](../backend/app/main.py), [deterministic SQLite/ASGI regression](../tests/test_s03_details.py)). | Concurrent widget/list boundary |
 | TC-P0-S04-001 | S04 #20 | Guest with 25 active movies including null popularity requests catalogue pages 1/2/3 | 200 pages 10/10/5, `total=25,totalPages=3`; alphabetical whole-set order and null-popularity entry retained ([movie repo](../backend/app/repositories/movies.py), [route](../backend/app/main.py)). | Normal/paging |
 | TC-P0-S04-002 | S04 #20 | Cold-start A with no preferences requests recommendations | 200 `mode=popular,personalised=false,noMatch=false`; finite-popularity order and no private score fields ([service](../backend/app/recommendations/service.py)). | Normal/cold start |
 | TC-P0-S04-003 | S04 #20 | Limit 9 and 10 on a 25-movie catalogue | Both accepted; counts 9/10 and totals remain 25 ([route](../backend/app/main.py)). | Boundary 9/10 |
@@ -147,7 +148,8 @@ states is collected by the relevant feature owner and reconciled by #218.
 [tests/test_s03_details.py](../tests/test_s03_details.py) implements
 `TC-P0-S03-001` (normal plus three missing-year/summary variants), `002`
 (404), `003` (distinct 503 errors), `004` (public query/redirect boundary),
-and `005` (real A/B sessions and preference preservation): eight pytest
+`005` (real A/B sessions and preference preservation), and `006` (one ASGI
+loop with a real SQLite reader/writer): nine pytest
 items in total. After the documented editable backend installation, run
 from the repository root:
 
@@ -216,13 +218,19 @@ that the final documented cases actually execute and pass.
 
 ## 4. What the tests found
 
-S4-T16 reproduced two real production regressions against `486adab`:
+S4-T16 reproduced two return-context regressions against `486adab`:
 recommendation revision recovery retained a stale genre, and a historical
 Watchlist return could restore A's page for B. New assertions failed before
 the fixes (`2 failed, 18 passed`) and passed after the fixes. The
 [T16 evidence](evidence/s4-t16-detail-boundaries.md) records final runs,
 source identity, screenshots and the independent review/Story-checkbox
-handoff still required. These are actual bug regressions, not setup failures
+handoff still required. A later Linux CI run reproduced membership 503 while
+seeding. A deterministic same-loop SQLite regression then proved the third
+bug: the async membership handler blocked the loop at COMMIT, preventing a
+concurrent read snapshot from being released. The DB handler now runs in the
+worker pool; async raw-body validation and all auth/transaction/DTO contracts
+remain unchanged. TC-P0-S03-006 failed with HTTP 503 before the fix and passed
+with HTTP 200 afterward. These are actual bug regressions, not setup failures
 or a claim of deliberate business-rule mutation. The following C03 paragraph
 is the historical baseline before feature implementation.
 

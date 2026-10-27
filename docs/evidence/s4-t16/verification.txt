@@ -1,23 +1,25 @@
-Executable commit: 31c5bf7b9e8b006809a1bb2fcb69338589246421
+Final tested executable: fd826e66990118169079571430b0f53fc211c687
 Captured: 2026-10-27, Windows / Asia-Saigon
+This supersedes the first local 31c5bf7 candidate after a real Linux CI failure exposed a third bug.
 Transport normalization only: UTF-8, LF, line-end whitespace removed.
-Full command output follows; <new-temp> is a fresh unique temporary path.
+Full command output follows; <new-temp> denotes a new unique temporary path.
 
 $ python -m pytest tests/test_s03_details.py -v --tb=short -p no:cacheprovider --basetemp <new-temp>
 ============================= test session starts =============================
 platform win32 -- Python 3.12.6, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\Admin\Desktop\Ki 1 Nam 3\Kỹ thuật phần mềm - Software Engineering\ai66a_group3_C1_SE\.venv\Scripts\python.exe
 rootdir: C:\Users\Admin\Desktop\Ki 1 Nam 3\Kỹ thuật phần mềm - Software Engineering\ai66a_group3_C1_SE
 plugins: anyio-4.15.1, cov-7.1.0
-collecting ... collected 8 items
+collecting ... collected 9 items
 
-tests/test_s03_details.py::test_TC_P0_S03_001_public_known_id PASSED     [ 12%]
-tests/test_s03_details.py::test_TC_P0_S03_002_unknown_id_refused PASSED  [ 25%]
-tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[year] PASSED [ 37%]
-tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[summary] PASSED [ 50%]
-tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[both] PASSED [ 62%]
-tests/test_s03_details.py::test_TC_P0_S03_003_catalogue_and_database_failures_are_distinct PASSED [ 75%]
-tests/test_s03_details.py::test_TC_P0_S03_004_return_query_cannot_redirect_or_change_public_movie PASSED [ 87%]
-tests/test_s03_details.py::test_TC_P0_S03_005_detail_widgets_preserve_both_accounts_preferences PASSED [100%]
+tests/test_s03_details.py::test_TC_P0_S03_001_public_known_id PASSED     [ 11%]
+tests/test_s03_details.py::test_TC_P0_S03_002_unknown_id_refused PASSED  [ 22%]
+tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[year] PASSED [ 33%]
+tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[summary] PASSED [ 44%]
+tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[both] PASSED [ 55%]
+tests/test_s03_details.py::test_TC_P0_S03_003_catalogue_and_database_failures_are_distinct PASSED [ 66%]
+tests/test_s03_details.py::test_TC_P0_S03_004_return_query_cannot_redirect_or_change_public_movie PASSED [ 77%]
+tests/test_s03_details.py::test_TC_P0_S03_005_detail_widgets_preserve_both_accounts_preferences PASSED [ 88%]
+tests/test_s03_details.py::test_TC_P0_S03_006_membership_commit_allows_read_snapshot_cleanup PASSED [100%]
 
 ============================== warnings summary ===============================
 tests/test_s03_details.py::test_TC_P0_S03_001_public_known_id
@@ -25,7 +27,7 @@ tests/test_s03_details.py::test_TC_P0_S03_001_public_known_id
     from starlette.testclient import TestClient as TestClient  # noqa
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-======================== 8 passed, 1 warning in 2.13s =========================
+======================== 9 passed, 1 warning in 2.52s =========================
 
 
 $ pytest tests/test_s03_details.py -v --tb=short -p no:cacheprovider --basetemp <new-temp>
@@ -33,16 +35,17 @@ $ pytest tests/test_s03_details.py -v --tb=short -p no:cacheprovider --basetemp 
 platform win32 -- Python 3.12.6, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\Admin\Desktop\Ki 1 Nam 3\Kỹ thuật phần mềm - Software Engineering\ai66a_group3_C1_SE\.venv\Scripts\python.exe
 rootdir: C:\Users\Admin\Desktop\Ki 1 Nam 3\Kỹ thuật phần mềm - Software Engineering\ai66a_group3_C1_SE
 plugins: anyio-4.15.1, cov-7.1.0
-collecting ... collected 8 items
+collecting ... collected 9 items
 
-tests/test_s03_details.py::test_TC_P0_S03_001_public_known_id PASSED     [ 12%]
-tests/test_s03_details.py::test_TC_P0_S03_002_unknown_id_refused PASSED  [ 25%]
-tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[year] PASSED [ 37%]
-tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[summary] PASSED [ 50%]
-tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[both] PASSED [ 62%]
-tests/test_s03_details.py::test_TC_P0_S03_003_catalogue_and_database_failures_are_distinct PASSED [ 75%]
-tests/test_s03_details.py::test_TC_P0_S03_004_return_query_cannot_redirect_or_change_public_movie PASSED [ 87%]
-tests/test_s03_details.py::test_TC_P0_S03_005_detail_widgets_preserve_both_accounts_preferences PASSED [100%]
+tests/test_s03_details.py::test_TC_P0_S03_001_public_known_id PASSED     [ 11%]
+tests/test_s03_details.py::test_TC_P0_S03_002_unknown_id_refused PASSED  [ 22%]
+tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[year] PASSED [ 33%]
+tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[summary] PASSED [ 44%]
+tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[both] PASSED [ 55%]
+tests/test_s03_details.py::test_TC_P0_S03_003_catalogue_and_database_failures_are_distinct PASSED [ 66%]
+tests/test_s03_details.py::test_TC_P0_S03_004_return_query_cannot_redirect_or_change_public_movie PASSED [ 77%]
+tests/test_s03_details.py::test_TC_P0_S03_005_detail_widgets_preserve_both_accounts_preferences PASSED [ 88%]
+tests/test_s03_details.py::test_TC_P0_S03_006_membership_commit_allows_read_snapshot_cleanup PASSED [100%]
 
 ============================== warnings summary ===============================
 tests/test_s03_details.py::test_TC_P0_S03_001_public_known_id
@@ -50,7 +53,7 @@ tests/test_s03_details.py::test_TC_P0_S03_001_public_known_id
     from starlette.testclient import TestClient as TestClient  # noqa
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-======================== 8 passed, 1 warning in 2.02s =========================
+======================== 9 passed, 1 warning in 2.71s =========================
 
 
 $ npm --prefix frontend test
@@ -63,11 +66,11 @@ $ npm --prefix frontend test
 
  Test Files  36 passed (36)
       Tests  407 passed (407)
-   Start at  17:14:21
-   Duration  34.54s (environment 49%, tests 36%, import 12%, transform 2%)
+   Start at  17:30:08
+   Duration  34.84s (environment 49%, tests 36%, import 12%, transform 2%)
 
-    Isolate  36 workers spawned · ~998ms startup each (spawn + environment, per file)
-             at least ~16.97s faster with isolate: false — reuses workers across files instead of one per file
+    Isolate  36 workers spawned · ~999ms startup each (spawn + environment, per file)
+             at least ~16.99s faster with isolate: false — reuses workers across files instead of one per file
 
 
 $ python backend/scripts/run_isolated_tests.py -q --tb=short -p no:cacheprovider --basetemp <new-temp>
@@ -98,38 +101,38 @@ INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, 
     from starlette.testclient import TestClient as TestClient  # noqa
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-656 passed, 1 skipped, 1 warning in 159.27s (0:02:39)
+656 passed, 1 skipped, 1 warning in 161.07s (0:02:41)
 
 
 $ npm --prefix frontend run test:s4:t16:ui
 > frontend@0.0.0 test:s4:t16:ui
 > node scripts/run-s04-e2e.mjs --config playwright.s4-t16.config.ts
 
-[WebServer] INFO:     Started server process [15064]
+[WebServer] INFO:     Started server process [15848]
 [WebServer] INFO:     Waiting for application startup.
 [WebServer] INFO:     Application startup complete.
 [WebServer] INFO:     Uvicorn running on http://127.0.0.1:8014 (Press CTRL+C to quit)
-[WebServer] (node:11032) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (node:28848) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
 [WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
 
 Running 12 tests using 1 worker
 
-(node:32932) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(node:3672) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
 (Use `node --trace-warnings ...` to show where the warning was created)
-  ok  1 e2e\s4-t16.detail-boundaries.ts:66:3 › TC-S4-T16-RET-001 catalogue page 2 survives app return and browser Back in both themes (2.0s)
-  ok  2 e2e\s4-t16.detail-boundaries.ts:66:3 › TC-S4-T16-RET-001 popular page 2 survives app return and browser Back in both themes (1.8s)
+  ok  1 e2e\s4-t16.detail-boundaries.ts:66:3 › TC-S4-T16-RET-001 catalogue page 2 survives app return and browser Back in both themes (2.3s)
+  ok  2 e2e\s4-t16.detail-boundaries.ts:66:3 › TC-S4-T16-RET-001 popular page 2 survives app return and browser Back in both themes (1.6s)
   ok  3 e2e\s4-t16.detail-boundaries.ts:103:1 › TC-S4-T16-PUBLIC-001 actual missing-field and not-found labels, with a safe return (1.4s)
-  ok  4 e2e\s4-t16.detail-boundaries.ts:125:1 › TC-S4-T16-RET-003 recommendation page/filter survive rating save and preferences remain unchanged (1.9s)
-  ok  5 e2e\s4-t16.detail-boundaries.ts:153:1 › TC-S4-T16-RET-002 a changed catalogue clears the old recommendation filter on return (1.5s)
-  ok  6 e2e\s4-t16.detail-boundaries.ts:174:1 › TC-S4-T16-RET-004 search to details to similar keeps the original safe search query (825ms)
+  ok  4 e2e\s4-t16.detail-boundaries.ts:125:1 › TC-S4-T16-RET-003 recommendation page/filter survive rating save and preferences remain unchanged (1.8s)
+  ok  5 e2e\s4-t16.detail-boundaries.ts:153:1 › TC-S4-T16-RET-002 a changed catalogue clears the old recommendation filter on return (1.4s)
+  ok  6 e2e\s4-t16.detail-boundaries.ts:174:1 › TC-S4-T16-RET-004 search to details to similar keeps the original safe search query (845ms)
   ok  7 e2e\s4-t16.detail-boundaries.ts:192:1 › TC-S4-T16-RET-005 changed preferences invalidate a historical detail-return filter (1.5s)
-  ok  8 e2e\s4-t16.detail-boundaries.ts:216:1 › TC-S4-T16-WATCH-001 account B cannot restore account A's page through historical details (2.2s)
+  ok  8 e2e\s4-t16.detail-boundaries.ts:216:1 › TC-S4-T16-WATCH-001 account B cannot restore account A's page through historical details (2.0s)
   ok  9 e2e\s4-t16.detail-boundaries.ts:251:1 › TC-S4-T16-WATCH-004 watchlist page 2 returns exactly and last-row removal reconciles totals (1.7s)
   ok 10 e2e\s4-t16.detail-boundaries.ts:277:1 › TC-S4-T16-FAIL-001 membership service outage leaves real details, rating, similar and recommendations usable (1.5s)
-  ok 11 e2e\s4-t16.detail-boundaries.ts:301:1 › TC-S4-T16-ASYNC-001 delayed detail, rating, membership and similar for A cannot fill B (3.0s)
-  ok 12 e2e\s4-t16.detail-boundaries.ts:327:1 › TC-S4-T16-ASYNC-002 delayed private reads and a committed write cannot leak after account switch (3.5s)
+  ok 11 e2e\s4-t16.detail-boundaries.ts:301:1 › TC-S4-T16-ASYNC-001 delayed detail, rating, membership and similar for A cannot fill B (2.9s)
+  ok 12 e2e\s4-t16.detail-boundaries.ts:327:1 › TC-S4-T16-ASYNC-002 delayed private reads and a committed write cannot leak after account switch (3.4s)
 
-  12 passed (27.9s)
+  12 passed (27.4s)
 s04_temporary_database_removed=true
 
 
@@ -137,37 +140,59 @@ $ npm --prefix frontend run test:t01:ui
 > frontend@0.0.0 test:t01:ui
 > node scripts/run-s04-e2e.mjs --config playwright.t01.config.ts
 
-[WebServer] INFO:     Started server process [33564]
+[WebServer] INFO:     Started server process [21468]
 [WebServer] INFO:     Waiting for application startup.
 [WebServer] INFO:     Application startup complete.
 [WebServer] INFO:     Uvicorn running on http://127.0.0.1:8014 (Press CTRL+C to quit)
-[WebServer] (node:29656) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (node:12660) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
 [WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
 
 Running 17 tests using 1 worker
 
-(node:17288) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(node:2020) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
 (Use `node --trace-warnings ...` to show where the warning was created)
-  ok  1 e2e\t01.visual.ts:64:1 › S08 search uses real API/index across themes, sizes, states and safe return (7.5s)
-  ok  2 e2e\t01.visual.ts:193:1 › S08 delayed real search response cannot replace a newer query or return after unmount (1.1s)
-  ok  3 e2e\t01.visual.ts:238:1 › S07 similar movies satisfy all five criteria with the real API, index and DB (13.7s)
-  ok  4 e2e\t01.visual.ts:394:1 › S07 similar results are public, identical across accounts, independent of ratings and keep the return context (1.9s)
-  ok  5 e2e\t01.visual.ts:453:1 › S07 delayed real similar response for movie A cannot fill movie B (1.1s)
-  ok  6 e2e\t01.visual.ts:484:1 › Home title sort precedes paging and button links preserve detail return in both themes (3.4s)
-  ok  7 e2e\t01.visual.ts:537:1 › personal navigation actions use shared buttons without changing saved genres (2.4s)
+  ok  1 e2e\t01.visual.ts:64:1 › S08 search uses real API/index across themes, sizes, states and safe return (7.6s)
+  ok  2 e2e\t01.visual.ts:193:1 › S08 delayed real search response cannot replace a newer query or return after unmount (1.0s)
+  ok  3 e2e\t01.visual.ts:238:1 › S07 similar movies satisfy all five criteria with the real API, index and DB (14.2s)
+  ok  4 e2e\t01.visual.ts:394:1 › S07 similar results are public, identical across accounts, independent of ratings and keep the return context (1.8s)
+  ok  5 e2e\t01.visual.ts:453:1 › S07 delayed real similar response for movie A cannot fill movie B (1.0s)
+  ok  6 e2e\t01.visual.ts:484:1 › Home title sort precedes paging and button links preserve detail return in both themes (3.6s)
+  ok  7 e2e\t01.visual.ts:537:1 › personal navigation actions use shared buttons without changing saved genres (2.5s)
   ok  8 e2e\t01.visual.ts:584:1 › existing public pages, both themes and 375/768/1440 layouts (4.0s)
   ok  9 e2e\t01.visual.ts:616:1 › native star keyboard draft, save and theme preserve real state (1.8s)
-  ok 10 e2e\t01.visual.ts:667:1 › Home hero and navbar leave personalisation entirely user initiated (1.2s)
-  ok 11 e2e\t01.visual.ts:717:1 › guest Start survives the registration detour and opens real Preferences after sign-in (959ms)
-  ok 12 e2e\t01.visual.ts:743:1 › theme toggle preserves a real paginated URL and its ordered results (703ms)
-  ok 13 e2e\t01.visual.ts:758:1 › blocked browser storage still renders and switches theme (839ms)
-  ok 14 e2e\t01.visual.ts:774:1 › reference auth layouts stay concise, responsive and fully functional in both themes (1.4s)
+  ok 10 e2e\t01.visual.ts:667:1 › Home hero and navbar leave personalisation entirely user initiated (1.3s)
+  ok 11 e2e\t01.visual.ts:717:1 › guest Start survives the registration detour and opens real Preferences after sign-in (983ms)
+  ok 12 e2e\t01.visual.ts:743:1 › theme toggle preserves a real paginated URL and its ordered results (705ms)
+  ok 13 e2e\t01.visual.ts:758:1 › blocked browser storage still renders and switches theme (783ms)
+  ok 14 e2e\t01.visual.ts:774:1 › reference auth layouts stay concise, responsive and fully functional in both themes (1.3s)
   ok 15 e2e\t01.visual.ts:801:1 › centered action feedback reflects real login/save/logout acknowledgements without blocking the page (1.8s)
-  ok 16 e2e\t01.visual.ts:865:1 › genre cards expose descriptions, native keyboard state and no implicit writes (878ms)
+  ok 16 e2e\t01.visual.ts:865:1 › genre cards expose descriptions, native keyboard state and no implicit writes (880ms)
   -  17 e2e\t01.visual.ts:895:1 › read-only imported TMDb catalogue screenshots, real poster loading and themes
 
   1 skipped
-  16 passed (49.2s)
+  16 passed (49.6s)
+s04_temporary_database_removed=true
+
+
+$ npm --prefix frontend run test:s04:e2e -- --config playwright.t12.config.ts
+> frontend@0.0.0 test:s04:e2e
+> node scripts/run-s04-e2e.mjs --config playwright.t12.config.ts
+
+[WebServer] INFO:     Started server process [23628]
+[WebServer] INFO:     Waiting for application startup.
+[WebServer] INFO:     Application startup complete.
+[WebServer] INFO:     Uvicorn running on http://127.0.0.1:8014 (Press CTRL+C to quit)
+[WebServer] (node:7356) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:17448) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 1 e2e\t12.watchlist.ts:27:1 › detail add, reload, account separation, return context and removal (2.8s)
+  ok 2 e2e\t12.watchlist.ts:75:1 › saved list remains usable at mobile, tablet and desktop in both themes (2.6s)
+
+  2 passed (10.3s)
 s04_temporary_database_removed=true
 
 
@@ -189,7 +214,7 @@ dist/index.html                   0.81 kB │ gzip:   0.43 kB
 dist/assets/index-m8xDzgxp.css   31.77 kB │ gzip:   7.13 kB
 dist/assets/index-b0wsJORo.js   351.09 kB │ gzip: 104.91 kB
 
-✓ built in 178ms
+✓ built in 185ms
 
 
 $ python -m ruff check backend tests/test_s03_details.py
@@ -200,15 +225,15 @@ $ python scripts/verify_s4_c03_contract.py
 S4-C03 local document structure: PASS
 Hash convention: SHA-256 of UTF-8 text after CRLF/CR -> LF
 Document final newlines/trailing whitespace: PASS
-Local link targets: 217 checked, 0 missing
+Local link targets: 219 checked, 0 missing
 Testing sections: 1, 2, 3, 4
-P0 case IDs: 36 unique; S01=8, S02=6, S03=5, S04=6, S12=5, S13=6
+P0 case IDs: 37 unique; S01=8, S02=6, S03=6, S04=6, S12=5, S13=6
 S4 feature oracle IDs: 10 unique
 sha256-lf docs/api.md 2830607e57403f09d708663bfee98eac6c472f47e244d67ca1d346eb81886452
 sha256-lf docs/architecture.md 61a3019a5edbc8b0365aa247586ebe191786e95e7a991985502aa4e673b52ef8
 sha256-lf docs/design.md c67dbd494c6ac1388b92206a71bb8c594389af5878ea2ae16765126d184f396a
 sha256-lf docs/requirements.md 7cfba68a26eb12aee2c1f2cf4d4269cf8ea82fd4a157899b8383debdb6f503e2
-sha256-lf docs/testing.md f418c9b115a58b24afa26d6192005ec140d22c711d09c22bf45fdea46fe52d6c
+sha256-lf docs/testing.md 207cd3e94cb85094a0e11a7ef38d70822d3faca9d4215f4cfa34583dd522f199
 sha256-lf scripts/verify_s4_c03_contract.py 4484c9cad834fcf88ce9d91cbfe31b7a89d797ff666c0e73b794e5e7ae2e6142
 sha256-lf scripts/test_s4_c03_contract_line_endings.py 86fb7656efa33f1582d23d8b5c8a17737569a5fee006363e1926b4e69ea8f918
 

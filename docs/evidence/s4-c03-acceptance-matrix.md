@@ -312,3 +312,15 @@ does not rewrite the historical C03 checks or claim independent approval.
 | File | SHA-256 after UTF-8 LF normalization |
 |---|---|
 | `docs/testing.md` | `f418c9b115a58b24afa26d6192005ec140d22c711d09c22bf45fdea46fe52d6c` |
+
+### S4-T16 same-loop membership concurrency follow-up (2026-10-27)
+
+Linux CI exposed a membership busy-timeout 503. The real SQLite/ASGI
+regression TC-P0-S03-006 failed before the worker-handler fix and passed
+after it; S03 now has nine executed items. This supersedes only the
+previous T16 testing-document fingerprint, not historical results or
+independent review/clean-clone acceptance.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/testing.md` | `207cd3e94cb85094a0e11a7ef38d70822d3faca9d4215f4cfa34583dd522f199` |

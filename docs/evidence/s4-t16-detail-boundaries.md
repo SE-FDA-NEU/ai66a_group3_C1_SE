@@ -11,7 +11,7 @@ T04 #199, T08 #203, T10 #205 and T12 #207 were Closed/merged before work.
 T14 is not a dependency. Existing S3/S4 implementation and regression cases
 are reused; no Story Points, new feature, algorithm or visual redesign is added.
 
-Two real bugs were reproduced before production changes:
+Three production regressions were verified by failing assertions before their fixes:
 
 1. After a details return detected `CATALOGUE_CHANGED`, Recommendations went to
    page 1 but retained the old `genreId`. The current S03 amendment requires the
@@ -21,6 +21,15 @@ Two real bugs were reproduced before production changes:
    request B's page 2. Both accounts can have a valid page 2, so total-page
    clamping is insufficient. The old account context is now discarded before
    the first private list read; B starts at page 1 with no A revision.
+
+3. A strict Linux CI run on `34ba7b4` reproduced the preparatory membership
+   503. A new deterministic test reproduced the cause without a browser or
+   network: on a single ASGI event loop, the async membership route blocked at
+   SQLite COMMIT while a read snapshot needed that same loop to be released.
+   The new `TC-P0-S03-006` failed with actual HTTP 503, then passed with HTTP
+   200 after moving synchronous DB work into FastAPI's worker handler. Raw-body
+   presence is still read asynchronously after account authentication; no
+   payload/auth/transaction/response contract, timeout or retry policy changes.
 
 The two new assertions failed on the inherited production code (`2 failed,
 18 passed`), then passed with the fixes. Later added cases broaden write/error
@@ -54,8 +63,8 @@ resources before removing each case directory. `/health` is also bound to the
 temporary default engine. The user's `.env`, imported DB and accounts were not
 seeded, reset or reimported by this work.
 
-Tested executable commit:
-[`31c5bf7b9e8b006809a1bb2fcb69338589246421`](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/31c5bf7b9e8b006809a1bb2fcb69338589246421).
+Final tested executable commit:
+[`fd826e66990118169079571430b0f53fc211c687`](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/fd826e66990118169079571430b0f53fc211c687).
 Python 3.12.6, Node 24.19.0, Windows, installed Chrome. A following
 documentation/images-only commit packages this evidence; executable paths
 remain identical. [Manifest and source hashes](s4-t16/manifest.json),
@@ -65,15 +74,16 @@ Logs preserve output content with UTF-8/LF and line-end whitespace normalization
 
 | Check on the executable commit | Observed result |
 |---|---|
-| Root S03 `python -m pytest` | 8 passed, 0 skipped; 2.13s |
-| Root S03 direct `pytest` selection | 8 passed, 0 skipped; 2.02s |
-| Full frontend | 407 passed in 36 files; 34.54s |
-| Full isolated backend | 656 passed, 1 inherited skip; 159.27s |
-| T16 Chrome / real API + SQLite + index | 12 passed, 0 skipped/retries/flaky; 27.9s |
-| T01 full Chrome regression | 16 passed, 1 optional live-mode skip; 49.2s |
+| Root S03 `python -m pytest` | 9 passed, 0 skipped; 2.52s |
+| Root S03 direct `pytest` selection | 9 passed, 0 skipped; 2.71s |
+| Full frontend | 407 passed in 36 files; 34.84s |
+| Full isolated backend | 656 passed, 1 inherited skip; 161.07s |
+| T16 Chrome / real API + SQLite + index | 12 passed, 0 skipped/retries/flaky; 27.4s |
+| T01 full Chrome regression | 16 passed, 1 optional live-mode skip; 49.6s |
+| T12 Watchlist browser regression | 2 passed, 0 skipped; 10.3s |
 | Frontend lint / production build | Passed |
 | Ruff backend + root S03 | Passed |
-| C03 structure / independent LF + CRLF exports | Passed; 36 unique P0 matrix IDs, 217 valid local links |
+| C03 structure / independent LF + CRLF exports | Passed; 37 unique P0 matrix IDs and all local links valid |
 
 The backend skip is the inherited Sprint 2 placeholder
 `test_rating_write_requires_the_signed_in_account` in
@@ -84,14 +94,16 @@ are still unimplemented; baseline cleanup belongs to the T05/C05 audit. The
 T01 skip is the optional read-only live-TMDb screenshot mode, deliberately
 separate from synthetic/token-free acceptance.
 
-One preparatory browser run returned 503 while seeding membership before its
-delay gate was armed. No underlying SQL exception was captured in that run.
-Subsequent fresh full runs passed (26.7s, 26.0s, 28.4s, then 27.9s on the
-committed executable), with retries disabled and separate databases/servers.
-This observation is retained, not labelled a proven production bug fix. If it
-recurs during review/CI, investigate before merge; the test-only
-`S04_SQL_DIAGNOSTICS=1` flag logs underlying DB exceptions without changing
-production behaviour or retrying a request.
+The earlier local candidate `31c5bf7` passed 8 root cases, 407 frontend cases,
+656 backend cases plus the inherited skip, 12 T16 browser cases and 16 T01
+cases plus the optional live-mode skip. Fresh local browser passes did not
+reveal the membership concurrency bug reliably. The
+[Linux CI failure](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/40487936557/job/122134327129)
+was therefore investigated rather than retried to manufacture green. The new
+same-loop SQLite RED/GREEN test proves the fixed contention mechanism. The
+test-only `S04_SQL_DIAGNOSTICS=1` flag records underlying DB exceptions; it does
+not retry, alter timeouts or replace production behaviour.
+The [original failing CI output](s4-t16/ci-initial-failure.txt) is retained.
 
 ## Reproduce the author checks
 
@@ -117,7 +129,7 @@ The existing `test:t16:integration` script is the **S3 filter suite**, not this
 S4 detail suite. Preserve existing extended backend/frontend CI tiers. The new
 workflow explicitly runs the root S03 cases and T16 component/browser cases.
 
-Root S03 supplies eight items for `TC-P0-S03-001` through `005`, including three
+Root S03 supplies nine items for `TC-P0-S03-001` through `006`, including three
 missing-field variants. Full TC-ID/production-node/interface mapping is in
 [testing.md](../testing.md#s03--s4-t16-scoped-execution). TestClient proves HTTP,
 DTOs and persistence; actual React labels and navigation are proven separately.

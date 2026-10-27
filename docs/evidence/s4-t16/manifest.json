@@ -2,7 +2,7 @@
   "issue": 211,
   "date": "2026-10-27",
   "baseCommit": "486adabf3d2b33805082c5a7a236e52c119c29a8",
-  "testedExecutableCommit": "31c5bf7b9e8b006809a1bb2fcb69338589246421",
+  "testedExecutableCommit": "fd826e66990118169079571430b0f53fc211c687",
   "evidenceNote": "A later documentation/images-only commit packages this evidence; executable paths remain identical.",
   "environment": {
     "os": "Windows",
@@ -11,34 +11,34 @@
     "browserChannel": "chrome"
   },
   "rootS03": {
-    "passed": 8,
+    "passed": 9,
     "skipped": 0,
-    "pythonModuleSeconds": 2.13,
-    "directPytestSeconds": 2.02
+    "pythonModuleSeconds": 2.52,
+    "directPytestSeconds": 2.71
   },
   "frontend": {
     "passed": 407,
     "skipped": 0,
-    "seconds": 34.54
+    "seconds": 34.84
   },
   "backend": {
     "passed": 656,
     "skipped": 1,
-    "seconds": 159.27,
+    "seconds": 161.07,
     "existingSkip": "test_auth_catalogue_handoff.py::test_rating_write_requires_the_signed_in_account: obsolete Sprint 2 placeholder; actual rating API is exercised by current suites."
   },
   "browser": {
     "stats": {
-      "startTime": "2026-10-27T10:14:21.933Z",
-      "duration": 27918.208,
+      "startTime": "2026-10-27T10:30:03.592Z",
+      "duration": 27397.463,
       "expected": 12,
       "skipped": 0,
       "unexpected": 0,
       "flaky": 0
     },
     "metadata": {
-      "testedCommit": "31c5bf7b9e8b006809a1bb2fcb69338589246421",
-      "workingTree": "M docs/evidence/s4-c03-acceptance-matrix.md\n M docs/s4-t01-ui-contract.md\n M docs/testing.md\n?? docs/evidence/s4-t16-detail-boundaries.md\n?? docs/images/sprint4/t16-detail/\n?? tmp/",
+      "testedCommit": "fd826e66990118169079571430b0f53fc211c687",
+      "workingTree": "?? tmp/",
       "node": "v24.19.0",
       "python": "Python 3.12.6",
       "sourceSha256": {
@@ -73,7 +73,7 @@
         "backend/app/db/models.py": "b66dcc2b47b825d92a0f140070fba2e8d24df282b2dac1fcb3f813c478b1875c",
         "backend/app/integrations/__init__.py": "2caae80d7dba8bb9f2ab2d2e8efb6accc6b3decd019f2e65e9d31dcb89814b51",
         "backend/app/integrations/tmdb.py": "8eb5d8726a4b9d9847eb9d63261033644f7616a9814ded373dee25911a2c761a",
-        "backend/app/main.py": "c433f3a6a15748541ffc2aa33d687135143827c4df451542752034f6225a9fb7",
+        "backend/app/main.py": "d75815afeb07f8e15482c47a0990bac8fb5ae8cddecfd041bf407564dfe4516d",
         "backend/app/recommendations/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "backend/app/recommendations/overview_index.py": "edd68f86c06466dc9b10b5afb82ae6052eb5c29413cc49d9c0ac923e300df0ff",
         "backend/app/recommendations/ranker.py": "271dbaa8615f3038a5cc15e5eb4c55e5db57e4340db23a4d094a71e5d729e2af",
@@ -223,8 +223,8 @@
   },
   "t01": {
     "stats": {
-      "startTime": "2026-10-27T10:14:50.996Z",
-      "duration": 49208.954000000005,
+      "startTime": "2026-10-27T10:30:32.154Z",
+      "duration": 49623.61,
       "expected": 16,
       "skipped": 1,
       "unexpected": 0,
@@ -232,7 +232,23 @@
     },
     "existingSkip": "Optional read-only live imported-TMDb screenshot mode is disabled in synthetic/offline acceptance."
   },
-  "earlierFreshBrowserRuns": [
+  "t12": {
+    "stats": {
+      "startTime": "2026-10-27T10:31:23.030Z",
+      "duration": 10336.746,
+      "expected": 2,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  },
+  "initialCI": {
+    "commit": "34ba7b488ba18b6d211c5121d21de99835646065",
+    "conclusion": "failure",
+    "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/40487936557/job/122134327129",
+    "followUp": "TC-P0-S03-006 reproduced actual 503 before the worker-handler fix, then 200 after it; no test retry/timeout relaxation."
+  },
+  "preConcurrencyFixFreshBrowserRuns": [
     {
       "run": 2,
       "stats": {
@@ -267,8 +283,8 @@
     }
   ],
   "normalizedLfSourceSha256": {
-    ".github/workflows/s4-t16-detail-boundaries.yml": "d7e87048266b8919228142a9c88b48f3af756fe74368b68379557884f194e324",
-    "backend/app/main.py": "5548a341fb4c1077d78ef24da075bd5bb0fa9978dd56e740c29c9740f1d496d2",
+    ".github/workflows/s4-t16-detail-boundaries.yml": "28e1d6e2bd28bb2270dccd94192a880f9e2c3c90190e8c4cb379beb70719f6af",
+    "backend/app/main.py": "58e6df48527638327db0d901f283da85d32247cc400e139c283d4470523679d3",
     "backend/scripts/s04_acceptance_server.py": "8307e72a081d96d4c1c93e43bdbe71b8b21483728094427b3fd699a217dffdee",
     "frontend/e2e/s4-t16.detail-boundaries.ts": "6d47eae8e3e59620f018dd92d512178901d7be43d8472517dec254c08a9fbdc2",
     "frontend/e2e/support/responseGates.ts": "29ac04e70f5341e6bc45a40bb4d8822f88606ace2e8dbe3810b318a3ebe31e36",
@@ -285,7 +301,7 @@
     "frontend/src/pages/WatchlistPage.tsx": "28ac29b1fe1aa33423f513ab27ecfb1b1b213c044d2239c9bdcf792464409607",
     "frontend/src/tests/detail-boundaries.test.tsx": "14c250a95214a32e037151911843fcca61e9275c4abb380d60b5ba33ff6d29d8",
     "frontend/src/tests/list-context-invalidation.test.tsx": "1f85ea71e0691dad08b7612125ee014996c201319a5c6c400f88a2e944d73490",
-    "tests/test_s03_details.py": "8199561c72c62962f44892159c82b132616f479d1b90764651c4ac039e22810b"
+    "tests/test_s03_details.py": "2d24dabc4a390d829f63a5b4bedb915b5216b7ed9270418e72afe8a335442209"
   },
   "independentReview": "pending; no acceptance claimed",
   "story19PostM3Checkbox": "unchanged; PO must reconcile only after independent review",

@@ -247,4 +247,11 @@ invalidate its ranking, or redirect it on an old 401. Watchlist removal reconcil
 actual totals and the remaining valid page, keeping a safe return destination.
 The existing shared buttons/themes and keyboard behaviour remain unchanged.
 
+The concurrency follow-up keeps SQLite membership writes in a synchronous
+FastAPI worker handler, with raw-body presence read by a separate async
+dependency after account authentication. A waiting COMMIT therefore cannot
+block the ASGI loop needed to close another list read snapshot. Wire payload,
+auth-before-validation, reservation/commit/rollback and UI acknowledgement
+semantics are unchanged; no retries or timeout increases hide a failed write.
+
 See [T16 execution and review handoff](evidence/s4-t16-detail-boundaries.md).
