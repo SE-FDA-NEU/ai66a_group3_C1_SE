@@ -1,7 +1,8 @@
 # S4-T10 public search and S08 acceptance
 
 Latest UI screenshots: [2026-10-27 keyboard-submit capture](#current-ui-screenshots-2026-10-27).
-The original 2026-10-26 screenshots and source manifest remain historical evidence.
+Superseded screenshots from 2026-10-26 have been removed. The original source
+manifest, API/DB observations and test logs remain historical evidence.
 
 Verified locally on 2026-10-26 (Asia/Ho_Chi_Minh). Story #30's five criteria
 are taken in order from [requirements.md](../../requirements.md#s08-search-for-a-movie-by-title-or-description-p1-5-points).
@@ -131,16 +132,10 @@ flows. This is Chromium verification, not a full accessibility or cross-browser
 certification. Screenshots show real rendered synthetic fixture data with the
 shared poster-unavailable fallback, not imported TMDb data.
 
-| View | Light | Dark |
-|---|---|---|
-| Mobile 375px results | [Screenshot](screenshots/search-results-375-light.png) | [Screenshot](screenshots/search-results-375-dark.png) |
-| Tablet 768px results | [Screenshot](screenshots/search-results-768-light.png) | [Screenshot](screenshots/search-results-768-dark.png) |
-| Desktop 1440px results | [Screenshot](screenshots/search-results-1440-light.png) | [Screenshot](screenshots/search-results-1440-dark.png) |
-
-Additional mobile/light states: [Loading](screenshots/search-loading-375-light.png),
-[No movies found](screenshots/search-empty-375-light.png),
-[Index error](screenshots/search-error-375-light.png),
-[Retry recovered](screenshots/search-retry-375-light.png).
+The pre-submit screenshots from this run have been removed because they no
+longer show the delivered UI. Use the
+[current screenshot set](#current-ui-screenshots-2026-10-27) for all widths,
+themes and loading/empty/error/retry states.
 
 No scoped Story #30 criterion remains unimplemented. Live provider/imported-DB
 checks were intentionally outside this synthetic offline acceptance. Independent
@@ -158,9 +153,9 @@ now records this behaviour and reuse of shared UI/navigation components.
 
 The [C03 matrix](../s4-c03-acceptance-matrix.md#s4-t10-search-ui-consumer-amendment-2026-10-27)
 appends the missing normalized-LF SHA-256 for the current `docs/api.md`.
-Earlier matrix entries, the 2026-10-26 manifest, logs and screenshots above
-remain historical evidence for their original source; they do not describe
-the form added by this follow-up.
+Earlier matrix entries, the 2026-10-26 manifest and logs remain historical
+evidence for their original source; they do not describe the form added by
+this follow-up. The superseded screenshots have been removed.
 
 Executed locally against the changed working tree:
 
@@ -177,14 +172,15 @@ Executed locally against the changed working tree:
 
 The browser runner initially could not bind port 8014 inside the sandbox.
 Its authorized rerun outside the sandbox passed and removed its temporary
-database. No historical screenshot or source manifest was regenerated.
+database. This verification did not capture screenshots; refreshed images
+are recorded below. The original source manifest is unchanged.
 
 ## Current UI screenshots (2026-10-27)
 
 Captured from implementation commit `8ead5af8c809e41d72e14c641dce309e56b3b356`
 using the existing Playwright S08 tests. These images show the native Search
-button and Enter instructions added by the keyboard follow-up. The original
-images above are retained; the PR's displayed images now use this new capture.
+button and Enter instructions added by the keyboard follow-up. This is the
+only screenshot set retained in this directory; the PR also uses this capture.
 
 The database is an isolated synthetic fixture. `Moon Rescue` and `City Robot`
 are test movies with no poster path, so `Poster unavailable` is expected.
