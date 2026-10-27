@@ -125,7 +125,10 @@ def build_harness(path: Path, fixture: dict):
     broken = False
 
     def gate_state(gate: dict) -> dict:
-        return {key: value for key, value in gate.items() if key != "event"}
+        return {
+            key: value for key, value in gate.items()
+            if key not in {"event", "drained"}
+        }
 
     @controls.get("/__acceptance/ready")
     def ready():
@@ -319,12 +322,26 @@ def build_harness(path: Path, fixture: dict):
         }
 
     @controls.post("/__acceptance/gates/{name}/{action}")
-    async def control_gate(name: str, action: str):
+    async def control_gate(name: str, action: str, match: dict[str, str] | None = None):
         nonlocal capturing
         if action == "arm":
             if capturing is not None or name in gates:
                 raise HTTPException(409, "Gate already exists or is capturing")
-            gates[name] = {"event": asyncio.Event(), "responses": [], "completed": 0}
+            match = match or {}
+            if any(key not in {"method", "path", "requestTag"} for key in match):
+                raise HTTPException(400, "Unknown gate matcher")
+            if match.get("path") and not (
+                match["path"] in {"/api/me/recommendations", "/api/movies/search"}
+                or (match["path"].startswith("/api/movies/") and match["path"].endswith("/similar"))
+            ):
+                raise HTTPException(400, "Unsupported gate path")
+            drained = asyncio.Event()
+            drained.set()
+            gates[name] = {
+                "event": asyncio.Event(), "drained": drained,
+                "responses": [], "completed": 0, "aborted": 0, "pending": 0,
+                "match": match,
+            }
             capturing = name
         elif name not in gates:
             raise HTTPException(404, "Unknown gate")
@@ -339,50 +356,78 @@ def build_harness(path: Path, fixture: dict):
 
     @controls.get("/__acceptance/gates/{name}")
     def inspect_gate(name: str):
+        if name not in gates:
+            raise HTTPException(404, "Unknown gate")
         return gate_state(gates[name])
 
     @controls.post("/__acceptance/release-gates")
     async def release_gates():
         nonlocal capturing
         capturing = None
-        for gate in gates.values():
+        active = list(gates.values())
+        for gate in active:
             gate["event"].set()
-        return {"released": len(gates)}
+        try:
+            await asyncio.wait_for(
+                asyncio.gather(*(gate["drained"].wait() for gate in active)),
+                timeout=10,
+            )
+        except TimeoutError:
+            pass
+        gates.clear()
+        return {"released": len(active), "pending": sum(gate["pending"] for gate in active)}
 
     class DelayRealResponses:
         async def __call__(self, scope, receive, send):
             name = capturing
+            gate = gates.get(name) if name is not None else None
+            headers = dict(scope.get("headers", []))
+            request_tag = headers.get(b"x-s04-gate", b"").decode("ascii", errors="ignore")
             if (
                 scope["type"] != "http"
                 or not (
                     scope["path"] in {"/api/me/recommendations", "/api/movies/search"}
                     or scope["path"].endswith("/similar")
                 )
-                or name is None
+                or gate is None
+                or (gate["match"].get("method") and gate["match"]["method"] != scope["method"])
+                or (gate["match"].get("path") and gate["match"]["path"] != scope["path"])
+                or (gate["match"].get("requestTag") and gate["match"]["requestTag"] != request_tag)
             ):
                 return await production_app(scope, receive, send)
-            messages = []
+            gate["pending"] += 1
+            gate["drained"].clear()
+            try:
+                messages = []
 
-            async def capture(message):
-                messages.append(message)
+                async def capture(message):
+                    messages.append(message)
 
-            await production_app(scope, receive, capture)
-            gate = gates[name]
-            gate["responses"].append(
-                {
-                    "status": next(
-                        m["status"]
-                        for m in messages
-                        if m["type"] == "http.response.start"
-                    ),
-                    "body": json.loads(b"".join(m.get("body", b"") for m in messages)),
-                }
-            )
-            # A deadline makes harness bugs fail instead of hanging the server.
-            await asyncio.wait_for(gate["event"].wait(), timeout=45)
-            for message in messages:
-                await send(message)
-            gate["completed"] += 1
+                await production_app(scope, receive, capture)
+                gate["responses"].append(
+                    {
+                        "method": scope["method"], "path": scope["path"],
+                        "requestTag": request_tag,
+                        "status": next(
+                            m["status"]
+                            for m in messages
+                            if m["type"] == "http.response.start"
+                        ),
+                        "body": json.loads(b"".join(m.get("body", b"") for m in messages)),
+                    }
+                )
+                # A deadline makes harness bugs fail instead of hanging the server.
+                await asyncio.wait_for(gate["event"].wait(), timeout=45)
+                for message in messages:
+                    await send(message)
+                gate["completed"] += 1
+            except asyncio.CancelledError:
+                gate["aborted"] += 1
+                raise
+            finally:
+                gate["pending"] -= 1
+                if gate["pending"] == 0:
+                    gate["drained"].set()
 
     controls.mount("/", DelayRealResponses())
     return controls

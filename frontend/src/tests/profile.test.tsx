@@ -57,7 +57,8 @@ it("keeps unavailable data distinct from an empty successful profile and retries
 
 it("cancel and Escape send no reset, preserve data and restore keyboard focus", async () => {
   const fetch = vi.spyOn(globalThis, "fetch").mockImplementation(() => json({ data: before }));
-  render(tree());
+  const account = auth();
+  render(tree(account));
   await screen.findByTestId("profile-ratings-count");
   const trigger = screen.getByRole("button", { name: "Reset personalisation" });
   trigger.focus();
@@ -71,6 +72,7 @@ it("cancel and Escape send no reset, preserve data and restore keyboard focus", 
   expect(trigger).toHaveFocus();
   expect(fetch.mock.calls.filter(([, init]) => init?.method === "POST")).toHaveLength(0);
   expect(screen.getByTestId("profile-ratings-count")).toHaveTextContent("2");
+  expect(account.invalidateRecommendations).not.toHaveBeenCalled();
 });
 
 it("blocks duplicate pending submissions and refreshes only after committed acknowledgement", async () => {
@@ -92,21 +94,25 @@ it("blocks duplicate pending submissions and refreshes only after committed ackn
   await waitFor(() => expect(screen.getByTestId("profile-ratings-count")).toHaveTextContent("0"));
   expect(screen.getAllByText(success).length).toBeGreaterThan(0);
   expect(screen.getByTestId("profile-watchlist-count")).toHaveTextContent("1");
-  expect(account.invalidateRecommendations).not.toHaveBeenCalled(); // owned by T14
+  expect(account.invalidateRecommendations).toHaveBeenCalledOnce();
+  expect(account.invalidateRecommendations).toHaveBeenCalledWith();
 });
 
 it("preserves the displayed summary on explicit rollback, then allows a confirmed retry", async () => {
   let writes = 0;
   vi.spyOn(globalThis, "fetch").mockImplementation((_input, init) => init?.method === "POST" ?
     (++writes === 1 ? rollback() : json({ data: { reset: true } })) : json({ data: writes > 1 ? after : before }));
-  render(tree());
+  const account = auth();
+  render(tree(account));
   await screen.findByTestId("profile-ratings-count");
   await submitReset();
   await screen.findByText(/Your displayed profile has not been cleared/);
   expect(screen.getByTestId("profile-ratings-count")).toHaveTextContent("2");
+  expect(account.invalidateRecommendations).not.toHaveBeenCalled();
   await submitReset();
   await waitFor(() => expect(screen.getByTestId("profile-ratings-count")).toHaveTextContent("0"));
   expect(writes).toBe(2);
+  expect(account.invalidateRecommendations).toHaveBeenCalledOnce();
 });
 
 it.each([true, false])("reconciles a lost reset reply without claiming success or replaying the POST (committed=%s)", async committed => {
@@ -115,13 +121,15 @@ it.each([true, false])("reconciles a lost reset reply without claiming success o
     if (init?.method === "POST") { writes++; return Promise.reject(new TypeError("Response lost")); }
     return json({ data: writes && committed ? after : before });
   });
-  render(tree());
+  const account = auth();
+  render(tree(account));
   await screen.findByTestId("profile-ratings-count");
   await submitReset();
   await screen.findByText(/summary shows your current server data/);
   expect(screen.getByTestId("profile-ratings-count")).toHaveTextContent(committed ? "0" : "2");
   expect(screen.queryByText(success)).not.toBeInTheDocument();
   expect(writes).toBe(1);
+  expect(account.invalidateRecommendations).not.toHaveBeenCalled();
   expect(screen.getByRole("button", { name: "Reset personalisation" })).toBeEnabled();
 });
 
@@ -145,13 +153,17 @@ it("requires a successful fresh read before retrying an unconfirmed reset", asyn
 
 it("keeps an acknowledged reset successful even when the following read fails", async () => {
   let reads = 0;
+  const account = auth();
   vi.spyOn(globalThis, "fetch").mockImplementation((_input, init) => init?.method === "POST" ?
     json({ data: { reset: true } }) : ++reads === 1 ? json({ data: before }) : rollback());
-  render(tree());
+  render(tree(account));
   await screen.findByTestId("profile-ratings-count");
   await submitReset();
   await screen.findByText("Profile unavailable");
   expect(screen.getAllByText(success).length).toBeGreaterThan(0);
+  expect(screen.queryByText("Action")).not.toBeInTheDocument();
+  expect(screen.queryByTestId("profile-ratings-count")).not.toBeInTheDocument();
+  expect(account.invalidateRecommendations).toHaveBeenCalledOnce();
 });
 
 it.each(["GET", "POST"])("passes a protected %s 401 to the existing handler", async method => {
@@ -204,13 +216,17 @@ it("cannot carry an old account's reset acknowledgement or pending notice into t
   vi.spyOn(globalThis, "fetch").mockImplementation((_input, init) => init?.method === "POST" ?
     new Promise<Response>(resolve => { finish = resolve; }) : json({ data: ++reads === 1 ? before :
       { genres: [{ id: 35, name: "Comedy" }], ratingCount: 1, watchlistCount: 4 } }));
-  const view = render(tree(auth("a")));
+  const accountA = auth("a");
+  const accountB = auth("b");
+  const view = render(tree(accountA));
   await screen.findByTestId("profile-ratings-count");
   await submitReset();
-  view.rerender(tree(auth("b")));
+  view.rerender(tree(accountB));
   await waitFor(() => expect(screen.getByTestId("profile-watchlist-count")).toHaveTextContent("4"));
   expect(screen.queryByText("Resetting personalisation…")).not.toBeInTheDocument();
   await act(async () => finish(new Response(JSON.stringify({ data: { reset: true } }))));
   expect(screen.getByTestId("profile-ratings-count")).toHaveTextContent("1");
   expect(screen.queryByText(success)).not.toBeInTheDocument();
+  expect(accountA.invalidateRecommendations).not.toHaveBeenCalled();
+  expect(accountB.invalidateRecommendations).not.toHaveBeenCalled();
 });

@@ -18,6 +18,8 @@ async function signIn(page: Page, email: string, destination = "/") {
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(page).toHaveURL(destination);
+  await expect(page.getByRole("button", { name: "Sign out", exact: true })).toBeVisible();
+  await expect(page.getByRole("banner")).toContainText(email);
 }
 async function seed(page: Page, genres = 3, ratings = 2, saved = 2) {
   const genreBody = await (await page.request.get("/api/genres")).json();
@@ -84,7 +86,31 @@ test("real reset, cancel, persistence, A/B ownership and preserved watchlists", 
   await expect(page.getByTestId("profile-ratings-count")).toHaveText("0");
   await expect(page.getByTestId("profile-watchlist-count")).toHaveText("2");
   expect(posts).toBe(1);
+  const preferencesAfter = await (await page.request.get("/api/me/preferences")).json();
+  expect(preferencesAfter.data.genres).toEqual([]);
+  const recommendationsAfter = await (await page.request.get("/api/me/recommendations?limit=10")).json();
+  expect(recommendationsAfter.data).toMatchObject({ mode: "popular", personalised: false, noMatch: false });
+  for (const movie of recommendationsAfter.data.movies) expect(movie.reason.matchedGenres).toEqual([]);
+  const firstMovie = (await (await page.request.get("/api/movies?limit=10")).json()).data.movies[0];
+  expect((await (await page.request.get(`/api/me/ratings/${firstMovie.id}`)).json()).data.rating).toBeNull();
   await screenshot(page, "profile-success-dark-1440");
+  for (const theme of ["dark", "light"]) for (const width of [375, 768, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    if (await page.locator("html").getAttribute("data-theme") !== theme)
+      await page.getByRole("button", { name: `Switch to ${theme} theme` }).click();
+    await expect(page.getByTestId("profile-genres-count")).toHaveText("0");
+    await expect(page.getByTestId("profile-ratings-count")).toHaveText("0");
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+    if (theme === "light" && width === 375) await screenshot(page, "t14-profile-success-light-375");
+  }
+  await page.getByRole("link", { name: "Change my genres" }).click();
+  await expect(page.getByText("0 of 5 selected")).toBeVisible();
+  await screenshot(page, "t14-preferences-empty-light-1440");
+  await page.getByRole("link", { name: "Back to recommendations" }).click();
+  await expect(page.getByText("Not personalised")).toBeVisible();
+  await page.getByRole("button", { name: "Dismiss notification" }).click();
+  await screenshot(page, "t14-recommendations-popular-light-1440");
+  await page.getByRole("link", { name: "Profile", exact: true }).click();
   await page.getByRole("link", { name: "View watchlist" }).click();
   await expect(page.locator("article.watchlist-card")).toHaveCount(2);
   await page.getByRole("button", { name: "Sign out" }).click();
@@ -99,6 +125,13 @@ test("real reset, cancel, persistence, A/B ownership and preserved watchlists", 
   await expect(page.getByTestId("profile-ratings-count")).toHaveText("0");
   await page.reload();
   await expect(page.getByTestId("profile-genres-count")).toHaveText("0");
+  const genre = (await (await page.request.get("/api/genres")).json()).data.genres[0];
+  expect((await page.request.put("/api/me/preferences", { data: { genreIds: [genre.id] } })).status()).toBe(200);
+  expect((await page.request.put(`/api/me/ratings/${firstMovie.id}`, { data: { rating: 4 } })).status()).toBe(200);
+  await page.reload();
+  await expect(page.getByTestId("profile-genres-count")).toHaveText("1");
+  await expect(page.getByTestId("profile-ratings-count")).toHaveText("1");
+  await expect(page.getByTestId("profile-watchlist-count")).toHaveText("2");
 });
 
 test("both themes, responsive keyboard controls and real page visuals", async ({ page, request }) => {
