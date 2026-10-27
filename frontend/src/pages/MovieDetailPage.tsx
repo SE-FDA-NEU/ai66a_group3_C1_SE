@@ -8,6 +8,7 @@ import MovieBackdropHero from "../components/MovieBackdropHero.tsx";
 import MovieRating from "../components/MovieRating.tsx";
 import MoviePoster from "../components/MoviePoster.tsx";
 import MovieWatchlist from "../components/MovieWatchlist.tsx";
+import SimilarMovies from "../components/SimilarMovies.tsx";
 
 const INFORMATION_UNAVAILABLE = "Information unavailable";
 
@@ -167,6 +168,12 @@ function MovieDetailPage() {
           <MovieWatchlist movieId={movie.id} />
           </div>
         </div>
+        <SimilarMovies
+          key={movie.id}
+          movieId={movie.id}
+          returnTo={returnDestination.to}
+          returnContext={returnDestination.state?.listViewContext}
+        />
       </article>
     </main>
   );
