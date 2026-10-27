@@ -351,6 +351,8 @@ describe("T15 public catalogue UI", () => {
             { error: { code: "AUTHENTICATION_REQUIRED" } },
             401,
           );
+        if (String(input) === "/api/movies/public-movie/similar")
+          return jsonResponse({ data: { movies: [] } });
         return Promise.reject(
           new Error(`Unexpected private request: ${String(input)}`),
         );
@@ -381,7 +383,8 @@ describe("T15 public catalogue UI", () => {
     expect(
       await screen.findByRole("link", { name: "Sign in to rate this movie" }),
     ).toHaveAttribute("href", "/login");
-    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock).toHaveBeenCalledTimes(3);
     expect(fetchMock).toHaveBeenCalledWith("/api/movies/public-movie");
+    expect(fetchMock).toHaveBeenCalledWith("/api/movies/public-movie/similar", expect.anything());
   });
 });

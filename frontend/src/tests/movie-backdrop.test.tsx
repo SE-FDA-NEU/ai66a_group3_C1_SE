@@ -132,6 +132,7 @@ describe("movie detail backdrop transitions", () => {
         return response({ data: { movie: detail("movie-a", IMAGE_A) } });
       if (url === "/api/movies/movie-b") return nextMovie.promise;
       if (url === "/api/auth/me") return response({}, 401);
+      if (url.endsWith("/similar")) return response({ data: { movies: [] } });
       throw new Error(`Unexpected request: ${url}`);
     });
 
@@ -162,7 +163,9 @@ describe("movie detail backdrop transitions", () => {
     expect(calls).toEqual([
       "/api/movies/movie-a",
       "/api/auth/me",
+      "/api/movies/movie-a/similar",
       "/api/movies/movie-b",
+      "/api/movies/movie-b/similar",
     ]);
   });
 

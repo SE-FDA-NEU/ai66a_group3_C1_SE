@@ -35,6 +35,7 @@ function installApi(options: { loggedIn?: boolean;
     if (url.pathname === "/api/genres") return json({ data: { genres } });
     if (url.pathname === "/api/me/preferences") return json({ data: { genres: [genres[0]] } });
     if (url.pathname === "/api/me/ratings/m-1") return json({ data: { movieId: "m-1", rating: null } });
+    if (url.pathname === "/api/movies/m-1/similar") return json({ data: { movies: [] } });
     if (url.pathname === "/api/movies/m-1") return json({ data: { movie: { ...firstMovie,
       overview: "Synthetic movie overview.", voteAverage: 7, voteCount: 50 } }, meta: { catalogueRevision: "polish-r1" } });
     if (["/api/movies", "/api/movies/popular", "/api/me/recommendations"].includes(url.pathname)) {
