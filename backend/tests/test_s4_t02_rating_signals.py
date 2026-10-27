@@ -76,10 +76,11 @@ def save_rating(session: Session, *, account: str, movie_id: str, value: int) ->
 
 
 @pytest.mark.parametrize(("rating", "sign"), [
-    (1, -1), (2, -1), (3, 0), (4, 1), (5, 1),
+    (0.5, -1), (1, -1), (1.5, -1), (2, -1), (2.5, 0),
+    (3, 0), (3.5, 0), (4, 1), (4.5, 1), (5, 1),
 ])
-def test_s4_t02_all_five_rating_values_keep_raw_80_80(
-    seeded_session: tuple[Session, dict[str, str]], rating: int, sign: int
+def test_s4_t02_all_rating_values_keep_raw_80_80(
+    seeded_session: tuple[Session, dict[str, str]], rating: float, sign: int
 ) -> None:
     session, ids = seeded_session
     save_rating(session, account=ACCOUNT_A, movie_id=ids["Action Signal"], value=rating)
