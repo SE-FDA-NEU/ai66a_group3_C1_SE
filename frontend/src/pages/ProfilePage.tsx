@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 import { getProfile, resetProfile, ProfileApiError, type ProfileSummary } from "../api/profile.ts";
 import { useAuth } from "../auth/authState.ts";
+import { invalidatePersonalisationAfterReset } from "../auth/resetInvalidation.ts";
 import ConfirmDialog from "../components/ConfirmDialog.tsx";
 import { useFeedback } from "../feedback.ts";
 
@@ -12,11 +13,12 @@ type ResetState = "idle" | "pending" | "success" | "rejected" | "reconciling" | 
 export default function ProfilePage() {
   const auth = useAuth();
   return auth.status === "authenticated" ?
-    <AccountProfile key={auth.user.id} email={auth.user.email} /> : null;
+    <AccountProfile key={auth.user.id} accountId={auth.user.id} email={auth.user.email} /> : null;
 }
 
-function AccountProfile({ email }: { email: string }) {
-  const { handleUnauthorized } = useAuth();
+function AccountProfile({ accountId, email }: { accountId: string; email: string }) {
+  const auth = useAuth();
+  const { handleUnauthorized } = auth;
   const feedback = useFeedback();
   const [summary, setSummary] = useState<ProfileSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -101,8 +103,10 @@ function AccountProfile({ email }: { email: string }) {
       await resetProfile(controller.signal);
       if (!mounted.current || controller.signal.aborted || attempt !== generation.current) return;
       acknowledged = true;
-      // T14 owns shared personalisation invalidation. This acknowledgement is
-      // the integration point; T13 refreshes only this page's server summary.
+      invalidatePersonalisationAfterReset(auth, accountId);
+      // The prior summary cannot be shown as current after a committed reset.
+      // The existing profile client provides the fresh summary below.
+      setSummary(null);
       setResetState("success");
       setDialog(false);
       feedback.update(notice, { kind: "success", title: SUCCESS });
