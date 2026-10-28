@@ -380,3 +380,34 @@ or acceptance checkbox auto-checked by this documentation update.
 | File | SHA-256 after UTF-8 LF normalization |
 |---|---|
 | `docs/testing.md` | `696ffea3bf9a3ae08556bf7b456f999ec52e495dfd32b45f89f0df3df67d9d8b` |
+
+### T05 P0 execution amendment (2026-10-28)
+
+The current testing contract maps all 37 Section 2 IDs to collected root
+pytest nodes. The [T05 evidence](s4-t05-acceptance.md) records execution,
+rating/ranking/browser verification and review limits. Historical hashes above
+remain historical; this row identifies the current normalized-LF document.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/testing.md` | `7373a00b16f87766683f4b558af959eba1614366df227b743cc8dd1accae9ca6` |
+
+### T05 touch and numeric-boundary follow-up (2026-10-28)
+
+The current contract records the final T05 Chrome touch case and the root
+page-10000/10001 boundary assertions. The earlier T05 row remains the hash of
+the prior candidate; the following row identifies this final document.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/testing.md` | `8d0ef67dbd621da619a74bacdf4bd9a6bd11fcd89486de469da9f6962e81b1c6` |
+
+### T05 CI root-suite follow-up (2026-10-28)
+
+The main CI workflow now runs the root acceptance suite and its Section 2
+trace verifier after the existing backend suite. The preceding entries remain
+historical hashes; this row identifies the current testing document.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/testing.md` | `3b846be2f3434dc478c7f38667741e9cb8d2907387dc878281ed2756e590ce94` |

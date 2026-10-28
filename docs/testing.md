@@ -3,17 +3,17 @@
 Status: expected contract for [S4-C03 #217](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/217),
 dated 2026-10-24, with the S03 execution amendment from
 [S4-T16 #211](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/211).
-S03 now has scoped executable root pytest and separate interface tests; its
-commands and limits are below. Other planned rows and the shared six-P0
-default discovery/clean-clone gate still need C05 #219 and their assigned
-authors. This document does not certify independent review. The current implemented boundary is
+S03 and the other five P0 Stories now have executable root pytest and
+separate interface tests. The [T05 acceptance record](evidence/s4-t05-acceptance.md)
+maps each Section 2 ID to its executed node and records the current run and
+review limits. This document does not certify independent review. The current implemented boundary is
 [api.md](api.md#1-conventions); planned additions are in its section 13.
 Historical M2/M3 evidence remains historical.
 
 S4-T16 presentation follow-up: Popular features its current page's first three
 movies, correct global ranks, edge arrows/dots/keyboard, image fallback and
 slide-preserving detail return. Popular, Search and My watchlist share compact
-headings. After integrating T14, the T16 browser suite has 19 cases; its responsive case checks
+headings. The T16/T05 browser suite now has 20 cases; its responsive case checks
 375/768/1440px in both themes. Captures and current execution are recorded in
 [carousel/heading evidence](evidence/s4-t16-spotlight.md). The summary DTO's
 nullable backdrop URL uses the existing server/client allowlists, with no
@@ -31,6 +31,8 @@ steps; Search commits only on Enter/Search; setup imports 50 TMDb popular pages.
 Search additionally paginates every match, ten per page, with full-set ranking
 and revision-aware detail return. This supersedes integer-only rating and
 top-ten-total Search expectations in historical evidence.
+The T05 browser case also uses Chrome touch emulation at 375px to prove that a
+half-star tap remains draft until explicit Save, then survives reload.
 Current migration/API checks are in
 [rating migration tests](../backend/tests/test_rating_migration.py),
 [rating API tests](../backend/tests/test_ratings_api.py),
@@ -57,9 +59,9 @@ Optional media is verified without real network in CI.
 
 ## 2. Test cases for every P0 story
 
-Each ID below specifies a root pytest case; the S03 rows link to the executed
-implementation added by T16, while other rows remain planned until their own
-test/evidence is supplied. `Normal`,
+Each ID below specifies a root pytest case. T16 supplied the S03 rows; T05
+supplied the remaining root cases in `tests/test_p0_acceptance.py`.
+`Normal`,
 `Refusal`, `Boundary`, `Failure` and `Isolation` are case kinds, not
 claims of a run. The linked node is the production rule the assertion must
 exercise. One test may share setup, but every ID needs its own meaningful
@@ -94,7 +96,7 @@ actual 503 envelope rather than a business-rule refusal.
 | TC-P0-S04-001 | S04 #20 | Guest with 25 active movies including null popularity requests catalogue pages 1/2/3 | 200 pages 10/10/5, `total=25,totalPages=3`; alphabetical whole-set order and null-popularity entry retained ([movie repo](../backend/app/repositories/movies.py), [route](../backend/app/main.py)). | Normal/paging |
 | TC-P0-S04-002 | S04 #20 | Cold-start A with no preferences requests recommendations | 200 `mode=popular,personalised=false,noMatch=false`; finite-popularity order and no private score fields ([service](../backend/app/recommendations/service.py)). | Normal/cold start |
 | TC-P0-S04-003 | S04 #20 | Limit 9 and 10 on a 25-movie catalogue | Both accepted; counts 9/10 and totals remain 25 ([route](../backend/app/main.py)). | Boundary 9/10 |
-| TC-P0-S04-004 | S04 #20 | Limit 11 or 0, or page 0/non-integer | 400 `VALIDATION_ERROR`, no silent total-catalogue cap or coercion ([route](../backend/app/main.py)). | Boundary 11/refusal |
+| TC-P0-S04-004 | S04 #20 | Limit 11 or 0, or page 0/non-integer/10001; page 10000 is valid | Invalid values return 400 `VALIDATION_ERROR`; page 10000 is a valid empty page, without silent total-catalogue cap or coercion ([route](../backend/app/main.py)). | Boundary 11/refusal |
 | TC-P0-S04-005 | S04 #20 | Active empty catalogue versus no active revision | Empty active revision is 200 empty with total 0; missing revision is 503 `CATALOGUE_UNAVAILABLE` ([movie repo](../backend/app/repositories/movies.py), [route](../backend/app/main.py)). | Data boundary |
 | TC-P0-S04-006 | S04 #20 | Page 2 with stale `catalogueRevision` after import | 409 `CATALOGUE_CHANGED`; client clears old results/restarts page 1 in separate React check ([route](../backend/app/main.py)). | Revision refusal |
 | TC-P0-S12-001 | S12 #44 | Register mixed-case email with 8-character password | 201 safe user DTO; normalized email and Argon2id hash persisted, no session created ([route](../backend/app/main.py), [users repo](../backend/app/repositories/users.py)). | Normal/boundary 8 |
@@ -137,12 +139,14 @@ separately below and in its evidence; other rows are not accepted by implication
 
 ## 3. Automated tests
 
-The intended **single repository-root default** is `pytest` (verbose:
-`python -m pytest -v`). C05 #219 owns the root `tests/` discovery,
-shared fixtures and direct command setup after this contract. The root suite
-must execute every Section 2 ID, not simply collect a matrix; existing
+The **single repository-root default** is `pytest` (verbose:
+`python -m pytest -v`). The root suite executes every Section 2 ID using
+the migrated disposable SQLite fixture in `tests/test_s03_details.py`; existing
 `backend/tests/` and frontend Vitest/browser suites remain intact and
 useful. Do not delete or skip them to manufacture green results.
+Main CI keeps its backend suite and additionally runs `python -m pytest tests
+-v` followed by `python scripts/verify_s4_t05_trace.py` so the root P0 cases
+and their Section 2 mapping are checked on each branch push and PR run.
 
 Root fixtures create a fresh temporary SQLite file, run Alembic migrations,
 enable foreign keys, override `get_db` for in-process `TestClient`,
@@ -155,7 +159,7 @@ but status/DB assertions run the real production route/repository. Store
 deterministic expected order and exact HTTP errors, not snapshots of fake
 responses. Real live TMDb provenance smoke is separate and manual.
 
-Expected commands after C05 infrastructure exists:
+Verified local commands:
 
 ```text
 pytest
@@ -278,6 +282,11 @@ only; it does not execute or pass the new Section 2 IDs.
 The [C03 acceptance matrix](evidence/s4-c03-acceptance-matrix.md) maps
 the supplied requirements to exact contract sections and records the
 reproducible local document checks.
+
+The [T05 record](evidence/s4-t05-acceptance.md) includes current root-case
+execution, independent rating/ranking API and browser verification, and
+labelled test-effectiveness mutations. It does not reclassify a mutation as
+T02/T03 feature TDD or assign reviewer credit before a review occurs.
 
 The final dossier needs at least one actual bug with fix/PR/guarding test,
 or a clearly labelled intentional **business-rule mutation** with the failing
