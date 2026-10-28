@@ -98,7 +98,7 @@ it("filters complete recommendations into two pages and preserves the view URL",
   expect(window.location.search).toContain("genreId=28");
   fireEvent.click(screen.getByRole("link", { name: "View details for Rec 33" }));
   expect(await screen.findByText("Filtered page two detail")).toBeInTheDocument();
-  await screen.findByRole("group", { name: "Your rating (1 to 5)" });
+  await screen.findByRole("group", { name: "Your rating (0.5 to 5)" });
   fireEvent.click(screen.getByRole("radio", { name: "5 stars" }));
   fireEvent.click(screen.getByRole("button", { name: "Save rating" }));
   await screen.findByText("Rating saved.");

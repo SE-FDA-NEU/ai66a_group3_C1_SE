@@ -151,7 +151,7 @@ it("real React actions preserve committed SQLite preferences for both accounts",
     recommendationScope: expect.any(String), catalogueRevision: expect.any(String) });
   const returnUrl = window.location.pathname + window.location.search;
   fireEvent.click(screen.getByRole("link", { name: "View details for Action Z" }));
-  await screen.findByRole("group", { name: "Your rating (1 to 5)" });
+  await screen.findByRole("group", { name: "Your rating (0.5 to 5)" });
   fireEvent.click(screen.getByRole("radio", { name: "1 star" }));
   fireEvent.click(screen.getByRole("button", { name: "Save rating" }));
   await screen.findByText("Rating saved.");
