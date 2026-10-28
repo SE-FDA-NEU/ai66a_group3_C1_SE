@@ -118,12 +118,12 @@ source; base Git SHA `d3c24ac` alone is not the GREEN candidate. This audit
 reproduces regression on current code; it does not invent missing old SHAs.
 
 The [mutation log](s4-t05-mutations.txt) is a separate, labelled
-test-effectiveness exercise: nine relevant wrong business rules caused pytest
-assertions to fail; each source file was restored byte-for-byte and the exact
-same test passed. The S05b score mutation is a representative Section 4 item
-for C04 #218. The mutation runner refuses syntax/setup failures as evidence.
-This is representative mutation evidence, not a per-case campaign for every
-new business-rule test in the issue; that stricter check remains open.
+test-effectiveness exercise: all 36 newly authored root test nodes have a
+relevant wrong business rule that caused their own pytest assertion to fail.
+Each source file was restored byte-for-byte and the exact same node passed.
+The S05b score mutation is a representative Section 4 item for C04 #218.
+The runner refuses syntax/setup failures as evidence. The six inherited S03
+IDs already have T16's bug/fix evidence and were not authored in T05.
 
 ## Execution and review boundary
 
