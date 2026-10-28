@@ -1,0 +1,5 @@
+﻿
+> frontend@0.0.0 lint
+> eslint .
+
+lint_exit_code=0

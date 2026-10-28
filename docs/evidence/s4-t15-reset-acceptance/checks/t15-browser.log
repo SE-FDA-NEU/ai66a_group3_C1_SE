@@ -1,0 +1,31 @@
+﻿
+> frontend@0.0.0 test:t15:ui
+> node scripts/run-s04-e2e.mjs --config playwright.t15.config.ts
+
+s04_managed_servers=true
+
+Running 12 tests using 1 worker
+
+npm : (node:10660) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+At line:2 char:1
++ npm --prefix frontend run test:t15:ui 2>&1 | Out-File -Encoding utf8  ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ((node:10660) Wa... env being set.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok  1 e2e\t15.reset-acceptance.ts:130:3 › journey dark 1440px: A3/2 and B1/1, cancel, confirm, later login, B intact (17.1s)
+  ok  2 e2e\t15.reset-acceptance.ts:130:3 › journey light 375px: A3/2 and B1/1, cancel, confirm, later login, B intact (15.0s)
+  ok  3 e2e\t15.reset-acceptance.ts:231:1 › prior rating signals are gone after reset and reselection; cold start is non-personalised (6.3s)
+  ok  4 e2e\t15.reset-acceptance.ts:297:3 › keyboard order, focus return and dialog fit: dark 375px (3.5s)
+  ok  5 e2e\t15.reset-acceptance.ts:297:3 › keyboard order, focus return and dialog fit: dark 1440px (3.2s)
+  ok  6 e2e\t15.reset-acceptance.ts:297:3 › keyboard order, focus return and dialog fit: light 375px (3.3s)
+  ok  7 e2e\t15.reset-acceptance.ts:297:3 › keyboard order, focus return and dialog fit: light 1440px (3.5s)
+  ok  8 e2e\t15.reset-acceptance.ts:347:1 › duplicate submissions are blocked while one reset is pending (3.4s)
+  ok  9 e2e\t15.reset-acceptance.ts:377:1 › explicit failure, lost-before-commit and lost-after-commit keep truthful status and both watchlists (8.8s)
+  ok 10 e2e\t15.reset-acceptance.ts:453:1 › reset stays blocked while the profile read is unfinished (3.1s)
+  ok 11 e2e\t15.reset-acceptance.ts:475:1 › a delayed old profile response cannot overwrite a completed reset (3.3s)
+  ok 12 e2e\t15.reset-acceptance.ts:500:1 › a recommendations read in flight before the reset cannot restore old cards (3.5s)
+
+  12 passed (1.3m)
+s04_temporary_database_removed=true
