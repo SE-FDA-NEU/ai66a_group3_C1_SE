@@ -253,6 +253,15 @@ def test_TC_P0_S02_006_filter_after_whole_set_ranking(details):
         == 12
     )
     assert selected(a) == [28]
+    for genre_id in (0, 2147483648):
+        error(
+            a.get(RECOMMENDATIONS, params={"genreId": genre_id}),
+            400,
+            "VALIDATION_ERROR",
+        )
+    error(
+        a.get(RECOMMENDATIONS, params={"genreId": 2147483647}), 400, "GENRE_NOT_FOUND"
+    )
 
 
 def test_TC_P0_S04_001_public_catalogue_pages_include_null_popularity(details):
@@ -310,8 +319,15 @@ def test_TC_P0_S04_003_limit_9_and_10_keep_full_total(details):
 
 
 def test_TC_P0_S04_004_limit_and_page_refusals(details):
-    for params in ({"limit": 0}, {"limit": 11}, {"page": 0}, {"page": "bad"}):
+    for params in (
+        {"limit": 0},
+        {"limit": 11},
+        {"page": 0},
+        {"page": 10001},
+        {"page": "bad"},
+    ):
         error(details.http.get("/api/movies", params=params), 400, "VALIDATION_ERROR")
+    assert movies(details.http.get("/api/movies", params={"page": 10000})) == []
 
 
 def test_TC_P0_S04_005_empty_active_versus_missing_revision(details):

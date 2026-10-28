@@ -128,15 +128,18 @@ for C04 #218. The mutation runner refuses syntax/setup failures as evidence.
 |---|---|---|
 | Focused root P0/rating command | Every Section 2 ID and added rating journeys pass | 45 passed, one inherited Starlette warning. |
 | Full repository `python -m pytest -v` | Existing backend plus root regression | 761 passed, 1 historical skipped placeholder, 210 subtests passed; this run began before the final added failed-update test and shared-fixture move. Final-candidate rerun is recorded below. |
+| Default `python -m pytest` | Full discovery with the shared root fixture | 762 passed, 1 historical skipped placeholder; began before the final numeric-boundary assertions, which passed separately. |
 | Full frontend Vitest | No component regression | 435 passed in 38 files. |
 | T04 real API/SQLite integration | Confirmed-save refresh matches ranking API | 1 passed. |
 | T33 real API/SQLite integration | Rating widget keeps committed/draft and account boundary | 1 passed. |
 | Chrome ranking verifier | Real browser compares displayed order, fields and reasons with API/DB | 7 checks PASS, Chrome 156, database integrity `ok`; first sandboxed browser launch failed before checks. |
 | T01 Chrome suite | Star keyboard/navigation and P0 browser regression | 16 passed; one marked live-TMDb screenshot test skipped by fixture mode; temporary DB removed. |
 | T13 Chrome suite | Reset/reselection, account ownership and session recovery | 4 passed; temporary DB removed. |
+| T16 Chrome suite | Half-star pointer/keyboard, return context, account races | First concurrent run: 2 passed, then server fixture disconnected during case 3 and subsequent cases failed with `ECONNREFUSED`. Isolated rerun after full pytest: 19 passed, temporary DB removed. |
+| Frontend lint/build | ESLint, TypeScript and Vite | Both passed. |
 
-Final default and verbose results, candidate commit and reviewer decision are
-to be added after final verification. The current root tests' Git authors are
+Final verbose result and final executable commit are to be added after final
+verification. The current root tests' Git authors are
 Kiet for S03 and Tuan Anh for the new P0/rating suite. The requirement for
 each named member to author a root pytest through their own reviewed PR is
 therefore **not yet demonstrated** by this branch; backend or Vitest authorship

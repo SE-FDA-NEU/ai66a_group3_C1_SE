@@ -110,6 +110,10 @@ def run(node: str) -> subprocess.CompletedProcess[str]:
     )
 
 
+def clean_output(output: str) -> str:
+    return "\n".join(line.rstrip() for line in output.splitlines()).strip()
+
+
 def main() -> int:
     lines = [
         "S4-T05 deliberate business-rule mutations (not feature TDD)",
@@ -143,9 +147,9 @@ def main() -> int:
                 f"\n## {label}",
                 f"node={node}",
                 f"red_exit={red.returncode}",
-                red_output.strip(),
+                clean_output(red_output),
                 f"green_exit={green.returncode}",
-                green_output.strip(),
+                clean_output(green_output),
             )
         )
         if (
