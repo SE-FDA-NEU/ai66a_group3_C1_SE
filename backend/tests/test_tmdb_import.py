@@ -203,7 +203,7 @@ def test_provider_failure_keeps_previous_active_catalogue(
     client = FakeTmdbClient(failure=failure)
 
     with database() as session, pytest.raises(TmdbImportError), session.begin():
-        import_tmdb_catalogue(session, client=client)
+        import_tmdb_catalogue(session, client=client, pages=1)
 
     with database() as session:
         active_revision = get_active_catalogue_revision(session)
@@ -221,7 +221,7 @@ def test_failure_on_a_fresh_database_creates_no_catalogue_data(
     )
 
     with database() as session, pytest.raises(TmdbAuthenticationError), session.begin():
-        import_tmdb_catalogue(session, client=client)
+        import_tmdb_catalogue(session, client=client, pages=1)
 
     with database() as session:
         assert get_active_catalogue_revision(session) is None
@@ -233,7 +233,7 @@ def test_provider_failure_preserves_tmdb_snapshot_and_existing_account(
     database: sessionmaker[Session],
 ) -> None:
     with database() as session, session.begin():
-        result = import_tmdb_catalogue(session, client=_valid_tmdb_client())
+        result = import_tmdb_catalogue(session, client=_valid_tmdb_client(), pages=1)
         session.add(
             User(
                 id="account-that-must-survive",
@@ -255,7 +255,7 @@ def test_provider_failure_preserves_tmdb_snapshot_and_existing_account(
         pytest.raises(TmdbAuthenticationError),
         session.begin(),
     ):
-        import_tmdb_catalogue(session, client=failed_client)
+        import_tmdb_catalogue(session, client=failed_client, pages=1)
 
     with database() as session:
         active = get_active_catalogue_revision(session)
@@ -286,7 +286,7 @@ def test_empty_usable_snapshot_keeps_previous_active_catalogue(
         pytest.raises(TmdbPayloadError, match="(?i)usable movies"),
         session.begin(),
     ):
-        import_tmdb_catalogue(session, client=client)
+        import_tmdb_catalogue(session, client=client, pages=1)
 
     with database() as session:
         active_revision = get_active_catalogue_revision(session)
@@ -305,6 +305,7 @@ def test_successful_import_records_counts_and_maps_provider_fields(
             session,
             client=client,
             fetched_at=fetched_at,
+            pages=1,
         )
         revision = session.get(CatalogueRevision, result.active_revision_id)
         assert revision is not None
@@ -356,7 +357,7 @@ def test_reimport_updates_existing_tmdb_movies_without_changing_internal_ids(
 ) -> None:
     first_client = _valid_tmdb_client()
     with database() as session, session.begin():
-        first_result = import_tmdb_catalogue(session, client=first_client)
+        first_result = import_tmdb_catalogue(session, client=first_client, pages=1)
 
     with database() as session:
         first_movie = get_movie_by_source_id(session, source="tmdb", source_id="101")
@@ -365,7 +366,7 @@ def test_reimport_updates_existing_tmdb_movies_without_changing_internal_ids(
 
     second_client = _valid_tmdb_client(title="Updated TMDb movie")
     with database() as session, session.begin():
-        second_result = import_tmdb_catalogue(session, client=second_client)
+        second_result = import_tmdb_catalogue(session, client=second_client, pages=1)
         assert second_result.active_revision_id != first_result.active_revision_id
         assert second_result.inserted_movie_count == 0
         assert second_result.updated_movie_count == 2
@@ -394,7 +395,7 @@ def test_core_import_maps_valid_null_and_missing_backdrops_without_changing_iden
         ]},
     )
     with database() as session, session.begin():
-        import_tmdb_catalogue(session, client=client)
+        import_tmdb_catalogue(session, client=client, pages=1)
         first = get_movie_by_source_id(session, source="tmdb", source_id="101")
         second = get_movie_by_source_id(session, source="tmdb", source_id="102")
         original_ids = (first.id, second.id)
@@ -406,7 +407,7 @@ def test_core_import_maps_valid_null_and_missing_backdrops_without_changing_iden
     for invalid in ({}, {"backdrop_path": "https://evil.example/x.jpg"}, {"backdrop_path": "/../x.jpg"}):
         client.popular_pages[1][0] = {key: value for key, value in client.popular_pages[1][0].items() if key != "backdrop_path"} | invalid
         with database() as session, session.begin():
-            result = import_tmdb_catalogue(session, client=client)
+            result = import_tmdb_catalogue(session, client=client, pages=1)
             assert result.updated_movie_count == 2
             first = get_movie_by_source_id(session, source="tmdb", source_id="101")
             second = get_movie_by_source_id(session, source="tmdb", source_id="102")
@@ -417,7 +418,7 @@ def test_core_import_maps_valid_null_and_missing_backdrops_without_changing_iden
 
     client.popular_pages[1][0]["backdrop_path"] = None
     with database() as session, session.begin():
-        import_tmdb_catalogue(session, client=client)
+        import_tmdb_catalogue(session, client=client, pages=1)
         first = get_movie_by_source_id(session, source="tmdb", source_id="101")
         assert first.id == original_ids[0]
         assert first.backdrop_path is None
@@ -434,7 +435,7 @@ def test_enrichment_updates_only_media_and_preserves_catalogue_revision(database
         details={101: {"backdrop_path": "/sample-backdrop.jpg"}, 102: {"backdrop_path": None}},
     )
     with database() as session, session.begin():
-        imported = import_tmdb_catalogue(session, client=client)
+        imported = import_tmdb_catalogue(session, client=client, pages=1)
         first = get_movie_by_source_id(session, source="tmdb", source_id="101")
         original_id = first.id
         original_core = (first.title, first.overview, first.popularity_score, [g.id for g in first.genres])
@@ -466,7 +467,7 @@ def test_enrichment_updates_only_media_and_preserves_catalogue_revision(database
 def test_enrichment_limit_and_failure_do_not_change_revision_or_partial_media(database):
     client = _valid_tmdb_client()
     with database() as session, session.begin():
-        imported = import_tmdb_catalogue(session, client=client)
+        imported = import_tmdb_catalogue(session, client=client, pages=1)
     client.details[101] = {"backdrop_path": "/first.jpg"}
     client.details[202] = {"backdrop_path": "/second.jpg"}
     client.calls.clear()
@@ -495,7 +496,7 @@ def test_enrichment_invalid_path_preserves_previous_value(database):
         details={101: {"backdrop_path": "/../bad.jpg"}},
     )
     with database() as session, session.begin():
-        imported = import_tmdb_catalogue(session, client=client)
+        imported = import_tmdb_catalogue(session, client=client, pages=1)
     with database() as session, session.begin():
         result = enrich_tmdb_backdrops(session, client=client)
         assert (result.invalid_movie_count, result.updated_movie_count) == (1, 0)
@@ -507,7 +508,7 @@ def test_database_failure_rolls_back_candidate_and_preserves_existing_tmdb_data(
     database: sessionmaker[Session], monkeypatch: pytest.MonkeyPatch
 ) -> None:
     with database() as session, session.begin():
-        first_result = import_tmdb_catalogue(session, client=_valid_tmdb_client())
+        first_result = import_tmdb_catalogue(session, client=_valid_tmdb_client(), pages=1)
         session.add(
             User(
                 id="account-unchanged-after-db-failure",
@@ -530,7 +531,7 @@ def test_database_failure_rolls_back_candidate_and_preserves_existing_tmdb_data(
         pytest.raises(SQLAlchemyError),
         session.begin(),
     ):
-        import_tmdb_catalogue(session, client=_valid_tmdb_client("Changed title"))
+        import_tmdb_catalogue(session, client=_valid_tmdb_client("Changed title"), pages=1)
 
     with database() as session:
         active = get_active_catalogue_revision(session)
@@ -575,7 +576,7 @@ def test_public_movie_routes_do_not_trigger_network_or_import(
     assert detail_response.status_code == 200
 
 
-@pytest.mark.parametrize("pages", [13, 15])
+@pytest.mark.parametrize("pages", [13, 15, 50])
 def test_multi_page_import_deduplicates_and_preserves_personal_data(database, pages):
     client = FakeTmdbClient(
         genres=[{"id": 28, "name": "Action"}],
@@ -593,7 +594,7 @@ def test_multi_page_import_deduplicates_and_preserves_personal_data(database, pa
         },
     )
     with database() as session, session.begin():
-        import_tmdb_catalogue(session, client=client)
+        import_tmdb_catalogue(session, client=client, pages=1)
         movie = get_movie_by_source_id(session, source="tmdb", source_id="1")
         retained_id = movie.id
         session.add(
@@ -618,7 +619,9 @@ def test_multi_page_import_deduplicates_and_preserves_personal_data(database, pa
     client.popular_pages[2].append(client.popular_pages[1][0])
     client.calls.clear()
     with database() as session, session.begin():
-        result = import_tmdb_catalogue(session, client=client, pages=pages)
+        # The documented no-argument default must exercise the full 50-page budget.
+        result = (import_tmdb_catalogue(session, client=client) if pages == 50 else
+                  import_tmdb_catalogue(session, client=client, pages=pages))
 
     assert result.movie_count == pages * 20
     assert result.inserted_movie_count == pages * 20 - 20
@@ -646,7 +649,7 @@ def test_multi_page_import_deduplicates_and_preserves_personal_data(database, pa
         assert session.get(UserMovieRating, "retained-rating").rating == 4
 
 
-@pytest.mark.parametrize("pages", [0, 16, -1, True, 1.5, "13"])
+@pytest.mark.parametrize("pages", [0, 51, -1, True, 1.5, "13"])
 def test_invalid_import_budget_makes_no_provider_calls(database, pages):
     client = _valid_tmdb_client()
     with database() as session, pytest.raises(ValueError, match="pages must"):
@@ -656,7 +659,7 @@ def test_invalid_import_budget_makes_no_provider_calls(database, pages):
 
 def test_later_page_failure_preserves_previous_snapshot(database):
     with database() as session, session.begin():
-        previous = import_tmdb_catalogue(session, client=_valid_tmdb_client())
+        previous = import_tmdb_catalogue(session, client=_valid_tmdb_client(), pages=1)
 
     class LaterPageFailure(FakeTmdbClient):
         def fetch_popular_movies(self, page):
@@ -679,7 +682,7 @@ def test_later_page_failure_preserves_previous_snapshot(database):
         )
 
 
-@pytest.mark.parametrize("page", [1, 13, 15])
+@pytest.mark.parametrize("page", [1, 13, 15, 50])
 def test_client_passes_the_bounded_page_to_tmdb(page):
     requests = []
 
@@ -695,7 +698,7 @@ def test_client_passes_the_bounded_page_to_tmdb(page):
     assert requests[0].url.params["page"] == str(page)
 
 
-@pytest.mark.parametrize("page", [0, 16, True, 1.5, "13"])
+@pytest.mark.parametrize("page", [0, 51, True, 1.5, "13"])
 def test_client_rejects_invalid_pages_without_http(page):
     def forbidden(_request):
         raise AssertionError("invalid page must not make an HTTP request")

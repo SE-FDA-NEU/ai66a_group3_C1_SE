@@ -198,10 +198,11 @@ def test_upgrade_preserves_every_row_identity_and_constraint(tmp_path: Path) -> 
         assert len(before["users"]) == 2
         assert len(before["user_genre_preferences"]) == 3
         assert len(before["user_movie_ratings"]) == 2
-        _alembic(url, "upgrade", "head")
+        # Attribute the additive-constraint assertion to the backdrop migration,
+        # rather than later migrations that intentionally change rating checks.
+        _alembic(url, "upgrade", BACKDROP_REVISION)
         after = _snapshot(engine)
         assert {table: after[table] for table in before} == before
-        assert after["user_movie_watchlist"] == []
         after_constraints = _constraints(engine)
         assert {table: after_constraints[table] for table in constraints} == constraints
         with engine.connect() as connection:
@@ -209,6 +210,10 @@ def test_upgrade_preserves_every_row_identity_and_constraint(tmp_path: Path) -> 
             assert connection.execute(
                 text("SELECT backdrop_path FROM catalog_movies ORDER BY id")
             ).scalars().all() == [None, None, None]
+        _alembic(url, "upgrade", "head")
+        current = _snapshot(engine)
+        assert {table: current[table] for table in before} == before
+        assert current["user_movie_watchlist"] == []
     finally:
         engine.dispose()
 
@@ -320,7 +325,7 @@ def test_populated_upgrade_is_idempotent(database) -> None:
     assert _snapshot(engine, include_backdrop=True) == before
 
 
-def test_storage_exposes_only_valid_url_in_detail_dto(database) -> None:
+def test_storage_exposes_only_valid_url_in_detail_and_summary_dto(database) -> None:
     engine, _url = database
     with Session(engine) as session, session.begin():
         movies.set_movie_backdrop_path(
@@ -330,7 +335,7 @@ def test_storage_exposes_only_valid_url_in_detail_dto(database) -> None:
         summary = movies.to_movie_summary_dto(movie).model_dump()
         detail = movies.to_movie_detail_dto(movie).model_dump()
         assert "backdrop_path" not in summary | detail
-        assert "backdropUrl" not in summary
+        assert summary["backdropUrl"] == "https://image.tmdb.org/t/p/w780/storage-only.jpg"
         assert detail["backdropUrl"] == "https://image.tmdb.org/t/p/w780/storage-only.jpg"
 
 

@@ -233,12 +233,12 @@ receive popular guidance after signing in so that I can choose immediately.
 As a signed-in viewer who has watched a movie, I want to give and update a
 rating so that I can save my feedback.
 
-- Given I am signed in and open a valid movie, when I submit an integer rating
-  from 1 to 5, then the system confirms it was saved and shows my current
+- Given I am signed in and open a valid movie, when I submit a numeric rating
+  from 0.5 to 5 in exact 0.5 steps, then the system confirms it was saved and shows my current
   account rating.
 - Given my account rated a movie, when I change the rating, then only one
   current rating is kept for that movie.
-- Given I submit 0, 6, or a non-integer rating, when processed, then it is
+- Given I submit 0, 6, a non-half-step such as 3.25, or a nonnumeric rating, when processed, then it is
   rejected and an earlier account rating is kept.
 - Given saving fails, when I submit a valid rating, then the system says the
   rating was not saved, keeps the selection for retry, and shows no success.
@@ -246,6 +246,11 @@ rating so that I can save my feedback.
   recommendation flow still works.
 - Given Account A rated a movie, when Account B opens it, then Account B does
   not display Account A's rating as its own.
+
+Half-star amendment authorized during S4-T16: five visual stars expose ten
+keyboard/pointer choices. Midpoint/left half selects the half step; right end
+selects the whole star. Only Save persists the draft. Existing integer ratings
+remain valid. Ranking thresholds stay <=2 negative, >=4 positive, otherwise neutral.
 
 ### S05b Use movie ratings to improve recommendations (P1, 5 points)
 
@@ -307,6 +312,10 @@ genre.
 
 ### S08 Search for a movie by title or description (P1, 5 points)
 
+Typing only edits a local draft and sends no search request. Enter or the
+Search button commits the trimmed query into the URL. Deep links and Back
+restore the submitted query; pending old responses cannot replace a new result.
+
 As a viewer who knows a movie title or a kind of story, I want to search the
 catalogue by title or description so that I can find relevant movies without
 browsing a long list.
@@ -314,7 +323,8 @@ browsing a long list.
 - Given the catalogue contains "Inception", when I search for "Inception", then
   results include "Inception".
 - Given a search has more than 10 matches, when results are displayed, then
-  only the first 10 are shown.
+  each page shows at most 10 and pagination exposes every matching movie
+  in the same global order; details return restores the query and page.
 - Given I enter fewer than 2 characters, when I submit, then the system shows
   "Enter at least 2 characters".
 - Given "Moon Rescue" has an astronaut rescue mission overview and "City
@@ -429,12 +439,12 @@ numbers or an exact expected value.
 | BR4 | Zero complete saved-genre matches produce a no-match message and paginated popular alternatives; a zero view-filter result remains filtered-empty. | 35 base matches but 0 Horror view matches do not trigger fallback. | S02, S04 | /recommendations |
 | BR5 | Finite-popularity popular and fallback sets rank globally by popularity descending, title ascending, ID ascending, with at most 10 per page. | 25 candidates produce 3 pages. | S04, S09 | /recommendations, /popular |
 | BR6 | A movie ID opens only its own details; an unknown ID opens no other movie. | ID 42 opens movie 42; ID 999 shows "Movie not found". | S03 | /movies/:movieId |
-| BR7 | A rating is a whole integer from 1 to 5; invalid input does not replace a saved rating. | 4 is accepted; 4.5, 0, and 6 are rejected. | S05a | /movies/:movieId |
+| BR7 | A rating is a number from 0.5 to 5 in exact 0.5 steps; invalid input does not replace a saved rating. | 4 and 4.5 are accepted; 3.25, 0, and 6 are rejected. | S05a | /movies/:movieId |
 | BR8 | Preferences and ratings belong only to their authenticated account and persist after a later sign-in. | Account A saves 3 genres and 2 ratings, signs out, then sees 3 and 2 after sign-in; B sees 0 and 0. | S01, S05a, S05b, S11, S13 | protected routes |
 | BR9 | Ratings 4-5 are positive, 1-2 negative, and 3 neutral ranking signals. | With Action and Comedy at 80, an Action 5 puts Action first; 1 puts it below Comedy. | S05b | /recommendations |
 | BR10 | A view genre filters the complete recommendation base before pagination, preserving ranking/mode and never writing preferences or ratings. Change and clear reset to page 1. | 12 Action matches among 35 candidates produce pages of 10 and 2. | S06 | /recommendations |
 | BR11 | Similar movies exclude the source, share a genre, and number at most 5. | Source M10 is excluded; up to 5 other eligible movies may appear. | S07 | /movies/:movieId |
-| BR12 | Title search needs at least 2 characters, is case-insensitive, and returns at most 10 matches. | "a" is rejected; "in" and "IN" match alike; 14 matches return at most 10. | S08 | /search |
+| BR12 | Title search needs at least 2 characters, is case-insensitive, and paginates all matching results, at most 10 per page. | "a" is rejected; "in" and "IN" match alike; 14 matches produce pages of 10 and 4. | S08 | /search |
 | BR13 | The explanation has exactly 3 steps and says popular movies need no preferences. | It lists sign in, choose genres, then receive recommendations with optional ratings. | S10 | /about-recommendations |
 | BR14 | Reset needs confirmation and clears only that account's genres and ratings. | 3 genres and 2 ratings become 0 and 0 after confirmation; cancellation changes neither. | S11 | /profile |
 | BR15 | S07: usable candidates rank by cosine descending, popularity descending, title ascending, then ID; missing-text candidates follow by popularity/title/ID. With no usable source vector, all eligible candidates use popularity/title/ID. S08: trimmed query length >=2; literal case-insensitive title matches take precedence and sort by title/ID. Only if no title matches exist, use overview cosine >0 sorted by cosine descending, title ascending, then ID. No popularity fallback for search. | S07: A=0.68, B=0.21, C=no overview returns A,B,C. S08: no title matches and scores A=0.4, B=0 returns only A; all zero returns "No movies found". | S07, S08 | /movies/:movieId, /search |
@@ -474,3 +484,11 @@ genres. A viewer whose genres match nothing sees popular alternatives with
 actions to edit preferences or retry. Rating, profile reset, and saved
 recommendations always act on the current authenticated account; signing out
 returns the viewer to public discovery.
+
+### S4-T16 catalogue capacity amendment
+
+Standard setup imports 50 popular pages from TMDb (also the CLI default),
+targeting about 1,000 movies before deduplication and validation. Record the
+actual accepted count; do not require an identical catalogue on every machine.
+Ranking/filtering still happen before local pagination, with ten results per
+page. Rebuild/check the shared overview index after changing the snapshot.

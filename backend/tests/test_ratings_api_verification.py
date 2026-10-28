@@ -311,7 +311,7 @@ def test_logout_and_relogin_restores_latest_rating(
         {"rating": 0},
         {"rating": 6},
         {"rating": "5"},
-        {"rating": 3.5},
+        {"rating": 3.25},
         {"rating": True},
         {"rating": None},
         {},

@@ -51,10 +51,10 @@ read the local database and never call the TMDb metadata API.
 
 | Component | Technology | Responsibility |
 |---|---|---|
-| Browser frontend | React, TypeScript, Vite, React Router | Renders public and signed-in experiences, including preferences, recommendations, rating controls, and backdrop fallback. Calls relative `/api` paths; a detail backdrop loads only from the allowlisted public image CDN URL returned by the API. |
+| Browser frontend | React, TypeScript, Vite, React Router | Renders public and signed-in experiences, including preferences, recommendations, rating controls, posters and backdrop fallback. Calls relative `/api` paths; imagery loads only from allowlisted public image CDN URLs returned by the API (T16 also exposes nullable backdrops on summaries). |
 | Backend API | Python 3.12, FastAPI, Pydantic | Validates input, resolves the session cookie to an account, applies the business rules, and returns DTOs and error envelopes. |
 | SQLite database | SQLite, SQLAlchemy, Alembic | Stores all nine application tables, including preferences, ratings, and nullable backdrop paths. The backend turns on `PRAGMA foreign_keys` for every connection. |
-| TMDb importer | Python command, httpx | Required catalogue preparation for Sprint 3 dev/staging/demo. Fetches genres and a bounded number of popular pages (default 1; `--pages` accepts 1–15), writes a new revision, and activates it only after every write succeeds. |
+| TMDb importer | Python command, httpx | Required catalogue preparation for Sprint 3 dev/staging/demo. Fetches genres and a bounded number of popular pages (default 50; `--pages` accepts 1–50), writes a new revision, and activates it only after every write succeeds. |
 | TMDb API | External service | Source of movie, genre, and backdrop-path metadata for the importer only. It is not called when a user opens a page. |
 | TMDb image CDN | External public CDN | Serves backdrop image bytes to the browser without exposing or requiring the metadata API token. |
 
@@ -104,7 +104,7 @@ current head and creates no additional table.
 
 The current ERD shows all nine application tables (excluding the Alembic
 bookkeeping table), both account-owned relations, nullable
-`catalog_movies.backdrop_path`, unique rating ownership, and the strict integer
+`catalog_movies.backdrop_path`, unique rating ownership, and the numeric half-step
 rating range. The seven-table M2 baseline remains available as
 [erd-m2.png](images/erd-m2.png) with [source](images/erd-m2.puml).
 
@@ -127,7 +127,7 @@ A trailing `?` marks a column that allows NULL. Every other column is NOT NULL.
 | `genres` | Genres, keyed by the provider's genre ID | `id` INTEGER (not auto-incremented), `name` VARCHAR(100) | `id` | None | None |
 | `movie_genres` | Links each movie to its genres | `movie_id` VARCHAR(36), `genre_id` INTEGER | (`movie_id`, `genre_id`) | `movie_id` to `catalog_movies.id`, ON DELETE CASCADE; `genre_id` to `genres.id`, ON DELETE RESTRICT | None |
 | `user_genre_preferences` | Current genre choices owned by an account | `user_id` VARCHAR(36), `genre_id` INTEGER | (`user_id`, `genre_id`) | `user_id` to `users.id`, ON DELETE CASCADE; `genre_id` to `genres.id`, ON DELETE RESTRICT | None |
-| `user_movie_ratings` | One current rating per account/movie pair | `id` VARCHAR(36), `user_id` VARCHAR(36), `movie_id` VARCHAR(36), `rating` INTEGER, `created_at` DATETIME, `updated_at` DATETIME | `id` | `user_id` to `users.id`, ON DELETE CASCADE; `movie_id` to `catalog_movies.id`, ON DELETE CASCADE | UNIQUE (`user_id`, `movie_id`); CHECK strict integer `rating` from 1 through 5 |
+| `user_movie_ratings` | One current rating per account/movie pair | `id` VARCHAR(36), `user_id` VARCHAR(36), `movie_id` VARCHAR(36), `rating` FLOAT (SQLite REAL), `created_at` DATETIME, `updated_at` DATETIME | `id` | `user_id` to `users.id`, ON DELETE CASCADE; `movie_id` to `catalog_movies.id`, ON DELETE CASCADE | UNIQUE (`user_id`, `movie_id`); CHECK numeric `rating` from 0.5 through 5 in exact half steps |
 
 Multiplicities:
 
@@ -144,7 +144,7 @@ key plus a unique `(user_id, movie_id)` pair. Migration `9d2f5a1c3b84` (S3-T01)
 creates preferences; migration `b7e4c2d91f30` (S3-T30) creates ratings. The
 current head `c6f8a2d4e901` (S3-T26) adds only nullable backdrop storage. The
 rating migration continues to enforce account/movie foreign keys,
-cascading deletes, and a strict integer database check from 1 through 5.
+cascading deletes, and a numeric database check from 0.5 through 5 in exact half steps.
 
 ### Business rules enforced through Sprint 3
 
@@ -166,7 +166,7 @@ Profile/reset UI, search, and similarity remain separate work. Rating UI is
 implemented and verified under T33/T34; S4-T03 implements backend ranking.
 
 Committed Sprint 3 delivery is narrower than that historical rule list:
-BR1-BR4 use saved genres and local popularity, BR7 stores an optional 1-5
+BR1-BR4 use saved genres and local popularity, BR7 stores an optional 0.5-5
 rating without using it for ranking, and BR14 freezes the authenticated reset
 backend transaction. BR9 rating-adjusted ranking remains Sprint 4.
 
@@ -199,7 +199,7 @@ Conventions:
 | S01 | `GET /api/me/preferences` | Signed in | None | `200` with the saved genres | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | Implemented in Sprint 3 (S3-T01) |
 | S01 | `PUT /api/me/preferences` | Signed in, same-origin | `genreIds`: 1 to 5 distinct genre IDs | `200` with the saved genres after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 GENRE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | Implemented in Sprint 3 (S3-T02) |
 | S05a | `GET /api/me/ratings/{movieId}` | Signed in | Opaque movie ID | `200` with committed `rating` or `null` | `401 AUTHENTICATION_REQUIRED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | Implemented in Sprint 3 (S3-T31) |
-| S05a | `PUT /api/me/ratings/{movieId}` | Signed in, same-origin | Strict `{ "rating": 1..5 }` | `200` only after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | Implemented in Sprint 3 (S3-T31) |
+| S05a | `PUT /api/me/ratings/{movieId}` | Signed in, same-origin | Strict numeric `{ "rating": 0.5..5 }` in 0.5 steps | `200` only after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | Implemented in Sprint 3 (S3-T31) |
 | S11 | `POST /api/me/profile/reset` | Signed in, same-origin | Exact `{ "confirm": true }` | `200` only after preferences/ratings delete transaction commits | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `503 SERVICE_UNAVAILABLE` | Backend implemented in Sprint 3 (S3-T35); UI pending |
 
 All six P0 Stories appear in the table: S01 (genres and preferences), S02 and
@@ -802,10 +802,10 @@ step or invented NLP claim is added.
 
 ### 12.3 Five-star, profile and watchlist interactions
 
-The rating control has five labelled buttons/radio options with values
-1–5. Hover and focus may preview a value; pointer leave/blur restores the
+The rating control has five visual stars and ten labelled radio options from
+0.5–5 in half steps. Hover and focus may preview a value; pointer leave/blur restores the
 draft/committed display. Click or keyboard arrows/Space/Enter changes only
-the **draft** integer. `Save rating` explicitly sends one existing PUT;
+the **draft** half-step number. `Save rating` explicitly sends one existing PUT;
 pending prevents duplicate submission. Only a validated committed
 acknowledgement updates `Your rating` and shows success. A failed write
 preserves the last committed value and the draft for retry. A failed initial
@@ -906,3 +906,14 @@ fields; S4-T04 renders them on personalised cards only, as `Ranking score for
 you` beside `TMDb popularity`, with the basis-driven reason and the
 `rating_unavailable` disclosure. These backend tests do not claim completion of all Story #22 UI or
 independent S4-T05 (#200) verification criteria.
+
+### S4-T16 current storage amendment
+
+The current Alembic head is `f2c7e4a91b60`, following watchlist migration
+`e9b6f0a42c17`. It rebuilds only the ratings table as REAL with an exact
+half-step check, preserving row identities, ownership, unique pairs and
+timestamps. Old integer-only ERD imagery describes the historical S3 baseline;
+the current table/constraint contract above supersedes its rating column.
+Downgrade refuses fractional rows instead of silently rounding. Setup now
+imports 50 popular pages (about 1,000 raw rows), then rebuilds/checks the
+shared overview index for the active revision.

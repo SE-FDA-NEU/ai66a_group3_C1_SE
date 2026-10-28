@@ -68,7 +68,7 @@ describe("S4-T04 recommendation generation after a rating save", () => {
       init?.method === "PUT" ? put.promise : ratingResponse(null));
     const { invalidateRecommendations } = mountRating();
 
-    await screen.findByRole("group", { name: "Your rating (1 to 5)" });
+    await screen.findByRole("group", { name: "Your rating (0.5 to 5)" });
     expect(invalidateRecommendations).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByRole("radio", { name: "5 stars" }));
@@ -91,7 +91,7 @@ describe("S4-T04 recommendation generation after a rating save", () => {
         : ratingResponse(2));
     const { invalidateRecommendations } = mountRating();
 
-    await screen.findByRole("group", { name: "Your rating (1 to 5)" });
+    await screen.findByRole("group", { name: "Your rating (0.5 to 5)" });
     fireEvent.click(screen.getByRole("radio", { name: "5 stars" }));
     fireEvent.click(screen.getByRole("button", { name: "Save rating" }));
 
@@ -224,7 +224,7 @@ describe("S4-T04 save-to-rerank journey", () => {
   async function rateFromRecommendations(value: number) {
     await screen.findByRole("heading", { name: "Recommended for you" }, { timeout: 5000 });
     fireEvent.click(screen.getByRole("link", { name: "View details for Zenith Action" }));
-    await screen.findByRole("group", { name: "Your rating (1 to 5)" });
+    await screen.findByRole("group", { name: "Your rating (0.5 to 5)" });
     fireEvent.click(screen.getByRole("radio", { name: `${value} ${value === 1 ? "star" : "stars"}` }));
     fireEvent.click(screen.getByRole("button", { name: "Save rating" }));
     await screen.findByText("Rating saved.");

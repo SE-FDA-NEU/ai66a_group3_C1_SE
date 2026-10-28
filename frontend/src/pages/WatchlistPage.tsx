@@ -5,6 +5,7 @@ import { getMembership, getWatchlistPage, setMembership, WatchlistApiError, type
 import { useAuth } from "../auth/authState.ts";
 import MoviePoster from "../components/MoviePoster.tsx";
 import PageControls from "../components/PageControls.tsx";
+import CollectionHeading from "../components/CollectionHeading.tsx";
 import { useFeedback } from "../feedback.ts";
 import { currentReturnPath, movieDetailReturnState } from "../navigation/movieDetailReturn.ts";
 import { pageSearch, readPage } from "../navigation/listPage.ts";
@@ -23,6 +24,8 @@ export default function WatchlistPage() {
   const navigate = useNavigate();
   const accountId = auth.status === "authenticated" ? auth.user.id : "";
   const page = readPage(location.search);
+  const storedContext = readListViewState(location.state, "/watchlist");
+  const staleAccount = storedContext !== null && storedContext.accountId !== accountId;
   const [reload, setReload] = useState(0);
   const [load, setLoad] = useState<Load | null>(null);
   const [pendingId, setPendingId] = useState<string | null>(null);
@@ -34,7 +37,14 @@ export default function WatchlistPage() {
   const generation = useRef(0);
   const revision = useRef<string | undefined>(undefined);
   const key = `${accountId}:${page}:${reload}`;
-  const current = load?.key === key ? load : null;
+  const current = !staleAccount && load?.key === key ? load : null;
+
+  useEffect(() => {
+    if (!accountId || !staleAccount) return;
+    revision.current = undefined;
+    navigate({ pathname: "/watchlist", search: pageSearch(location.search, 1), hash: location.hash },
+      { replace: true, state: listViewState({ route: "/watchlist", accountId }) });
+  }, [accountId, staleAccount, location.search, location.hash, navigate]);
 
   useEffect(() => () => {
     generation.current += 1;
@@ -52,6 +62,8 @@ export default function WatchlistPage() {
   }, [location.search, location.hash, page, navigate]);
 
   useEffect(() => {
+    // An account change invalidates the source list before any private read.
+    if (!accountId || staleAccount) return;
     const controller = new AbortController();
     const stored = readListViewState(location.state, "/watchlist");
     const requestedRevision = stored?.accountId === accountId ? stored.catalogueRevision : revision.current;
@@ -112,7 +124,7 @@ export default function WatchlistPage() {
     return () => controller.abort();
     // The route is protected and remounts when the account changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key, page, accountId, navigate]);
+  }, [key, page, accountId, staleAccount, navigate]);
 
   async function remove(movieId: string) {
     if (pendingRef.current) return;
@@ -182,11 +194,10 @@ export default function WatchlistPage() {
   const context = { route: "/watchlist" as const, catalogueRevision: current?.kind === "ready" ?
     current.result.meta.catalogueRevision : undefined, accountId };
   return <main className="page watchlist-page">
-    <header className="catalogue-header watchlist-header">
-      <div><p className="eyebrow">Your collection</p><h1>My watchlist</h1>
-        <p className="muted">Movies you saved for another night.</p></div>
+    <CollectionHeading kind="watchlist" eyebrow="Your collection" title="My watchlist"
+      description="Movies you saved for another night.">
       <Link className="button-link button-secondary" to="/">Explore movies</Link>
-    </header>
+    </CollectionHeading>
     {writeError ? <div className="status-panel" role="alert"><p>{writeError}</p>
       <button type="button" onClick={() => setReload(value => value + 1)}>Refresh watchlist</button></div> : null}
     {!current ? <p className="status-panel" role="status">Loading your watchlist...</p> :

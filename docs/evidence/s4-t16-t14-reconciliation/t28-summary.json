@@ -1,0 +1,79 @@
+{
+  "mode": "synthetic-offline",
+  "result": "PASS",
+  "cases": [
+    {
+      "name": "bright-desktop",
+      "result": "PASS"
+    },
+    {
+      "name": "bright-mobile",
+      "result": "PASS"
+    },
+    {
+      "name": "dark-mobile",
+      "result": "PASS"
+    },
+    {
+      "name": "null-mobile",
+      "result": "PASS"
+    },
+    {
+      "name": "broken-mobile",
+      "result": "PASS"
+    },
+    {
+      "name": "delayed-real-details-A-to-B",
+      "result": "PASS"
+    },
+    {
+      "name": "delayed-image-events-A-to-C",
+      "result": "PASS"
+    },
+    {
+      "name": "broken-A-does-not-poison-C",
+      "result": "PASS"
+    },
+    {
+      "name": "account-rating-and-delayed-old-account",
+      "result": "PASS"
+    },
+    {
+      "name": "delayed-rating-movie-A-to-B",
+      "result": "PASS"
+    },
+    {
+      "name": "UI-ranking-after-media-only-update",
+      "result": "PASS"
+    },
+    {
+      "name": "media-audit-valid-11",
+      "result": "PASS"
+    },
+    {
+      "name": "media-audit-valid-12",
+      "result": "PASS"
+    },
+    {
+      "name": "media-audit-missing-13",
+      "result": "PASS"
+    },
+    {
+      "name": "media-audit-invalid-14",
+      "result": "PASS"
+    },
+    {
+      "name": "media-audit-failure-15",
+      "result": "PASS"
+    },
+    {
+      "name": "media-audit-clear-16",
+      "result": "PASS"
+    },
+    {
+      "name": "actual-API-null-and-unknown",
+      "result": "PASS"
+    }
+  ],
+  "scope": "Synthetic offline temporary DB/API/browser; no developer app stopped"
+}

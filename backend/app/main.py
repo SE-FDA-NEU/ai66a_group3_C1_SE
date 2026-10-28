@@ -632,15 +632,23 @@ def get_watchlist_membership(
     ))
 
 
+async def _watchlist_body_present(request: Request) -> bool:
+    return bool(await request.body())
+
+
 @app.put("/api/me/watchlist/{movie_id}", response_model=MembershipResponse)
 @app.delete("/api/me/watchlist/{movie_id}", response_model=MembershipResponse, response_model_exclude_none=True)
-async def write_watchlist_membership(
+def write_watchlist_membership(
     movie_id: str,
     request: Request,
     user: User = Depends(current_account_write_user),  # noqa: B008
     database_session: Session = Depends(get_account_write_db),  # noqa: B008
+    has_body: bool = Depends(_watchlist_body_present),
 ):
-    if _unexpected_selectors(request) or await request.body():
+    # SQLite COMMIT can wait for a list's read snapshot. Run this synchronous DB
+    # work in FastAPI's worker pool so the ASGI loop can finish other requests
+    # and release their snapshots instead of creating a self-induced busy 503.
+    if _unexpected_selectors(request) or has_body:
         return _error("VALIDATION_ERROR", "Please correct the highlighted fields", 400)
     movie = get_active_movie_by_id(database_session, movie_id=movie_id)
     if movie is None:
@@ -792,6 +800,9 @@ def list_popular_movies(
 @app.get("/api/movies/search", response_model=MovieSearchResponse, status_code=200)
 def search_movies(
     q: str | None = Query(default=None),
+    page: int = Query(default=1, ge=1, le=10000),
+    limit: int = Query(default=10, ge=1, le=10),
+    catalogue_revision: str | None = Query(default=None, alias="catalogueRevision"),
     database_session: Session = Depends(get_db),  # noqa: B008
 ):
     query = (q or "").strip()
@@ -803,6 +814,9 @@ def search_movies(
     if revision is None:
         return _error("CATALOGUE_UNAVAILABLE", "Movie catalogue is unavailable", 503)
 
+    if error := _revision_error(catalogue_revision, revision.id):
+        return error
+
     movies = search_active_movie_titles(database_session, query=query)
     if not movies:
         try:
@@ -813,8 +827,12 @@ def search_movies(
             return _error(
                 "INDEX_UNAVAILABLE", "Search index is temporarily unavailable", 503
             )
+    total = len(movies)
+    movies = movies[(page - 1) * limit:page * limit]
     return {"data": {"movies": [to_movie_summary_dto(movie).model_dump()
-                                for movie in movies]}}
+                                for movie in movies]},
+            "meta": _page_meta(count=len(movies), limit=limit, page=page,
+                               total=total, unfiltered_total=total, revision_id=revision.id)}
 
 
 @app.get("/api/movies/{movie_id}", response_model=MovieDetailResponse, status_code=200)

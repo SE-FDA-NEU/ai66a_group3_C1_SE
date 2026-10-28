@@ -65,7 +65,7 @@ function scores(title: string) {
 async function rate(value: number) {
   await screen.findByRole("heading", { name: "Recommended for you" });
   fireEvent.click(screen.getByRole("link", { name: "View details for Zulu Action" }));
-  await screen.findByRole("group", { name: "Your rating (1 to 5)" });
+  await screen.findByRole("group", { name: "Your rating (0.5 to 5)" });
   fireEvent.click(
     screen.getByRole("radio", { name: `${value} ${value === 1 ? "star" : "stars"}` }),
   );

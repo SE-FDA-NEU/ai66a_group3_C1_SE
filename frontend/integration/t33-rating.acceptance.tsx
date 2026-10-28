@@ -204,7 +204,7 @@ it("real UI saves, rolls back, retries, reloads and isolates committed rating si
   render(<App />);
   await screen.findByRole("link", { name: "Sign in to rate this movie" });
   expect(
-    screen.queryByRole("group", { name: "Your rating (1 to 5)" }),
+    screen.queryByRole("group", { name: "Your rating (0.5 to 5)" }),
   ).not.toBeInTheDocument();
   expect(calls.slice(afterLogout).some(({ url }) => url.startsWith("/api/me/ratings/"))).toBe(false);
   fireEvent.click(screen.getByRole("link", { name: "Sign in to rate this movie" }));

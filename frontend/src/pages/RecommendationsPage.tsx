@@ -122,8 +122,13 @@ export default function RecommendationsPage() {
       }
       if (error instanceof RecommendationApiError && error.code === "CATALOGUE_CHANGED") {
         revision.current = undefined;
+        // A filter belongs to the old recommendation snapshot. The S03 return
+        // contract starts the new catalogue at page 1 without that stale filter.
+        const params = new URLSearchParams(currentLocation.search);
+        params.set("page", "1");
+        params.delete("genreId");
         navigate({ pathname: currentLocation.pathname,
-          search: pageSearch(currentLocation.search, 1), hash: currentLocation.hash },
+          search: `?${params}`, hash: currentLocation.hash },
           { replace: true, state: listViewState(context(undefined)) });
         if (page === 1) setRetry(value => value + 1);
         return;

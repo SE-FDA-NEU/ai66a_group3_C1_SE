@@ -16,8 +16,8 @@ import httpx
 TMDB_BASE_URL = "https://api.themoviedb.org/3"
 TMDB_SOURCE = "tmdb"
 DEFAULT_TIMEOUT_SECONDS = 10.0
-DEFAULT_POPULAR_PAGES = 1
-MAX_POPULAR_PAGES = 15
+DEFAULT_POPULAR_PAGES = 50
+MAX_POPULAR_PAGES = 50
 
 
 class TmdbImportError(RuntimeError):

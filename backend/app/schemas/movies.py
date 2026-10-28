@@ -21,6 +21,7 @@ class MovieSummaryDto(BaseModel):
     genres: list[GenreDto]
     popularityScore: float | None
     posterUrl: str | None = None
+    backdropUrl: str | None = None
 
 
 class MovieDetailDto(BaseModel):
@@ -68,11 +69,12 @@ class MovieListResponse(BaseModel):
 
 
 class MovieSearchResponse(BaseModel):
-    """Unpaged public Search result, capped at ten movies."""
+    """One page from the complete ordered public Search result."""
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     data: MovieListData
+    meta: MovieListMeta
 
 
 class MovieDetailMeta(BaseModel):

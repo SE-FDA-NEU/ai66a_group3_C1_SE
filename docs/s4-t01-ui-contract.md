@@ -80,7 +80,7 @@ than being rewritten as newly executed Sprint 4 evidence.
 | `SimilarMovies` (S4-T08) | `{movieId,returnTo,returnContext?}`; one active public read of `/api/movies/{id}/similar` per movie and retry. Keyed by movie and aborted on change; late completions are ignored. Renders `MovieGrid`/`MovieCard`, so poster fallback, tokens and the 5/4/3/2-column layout are reused. Never reads account, rating or watchlist state. Loading, empty and error/Retry stay inside its own section; the source details are never hidden. |
 | `ThemeProvider` / `ThemeToggle` | Dark default; only `dark`/`light`; local key `cineai-theme`. Inline pre-paint bootstrap and provider use the same key. Blocked/corrupt storage is safe. Toggling changes tokens, never keys/remounts, auth, URL, draft, filter or page. |
 | `MoviePoster` | `{movieId,title,posterUrl?,eager?}`; strict w500 HTTPS CDN URL only; width/height 500/750 and fixed 2:3 region; lazy list images, eager detail poster; labelled missing/error fallback; failure state resets on movie or URL change. |
-| `StarRating` | Controlled integer `RatingValue|null`; five native labelled radios, Arrow/Space/touch; selection/hover/focus never writes. Consumer owns explicit Save, pending/error/retry and committed value. Existing `MovieRating` keeps account/movie isolation. |
+| `StarRating` | Controlled half-step `RatingValue|null` (0.5–5); five visual stars with ten native labelled radios, Arrow/Space/touch; left half/midpoint selects the half step, right end the whole step; selection/hover/focus never writes. Consumer owns explicit Save, pending/error/retry and committed value. Existing `MovieRating` keeps account/movie isolation. |
 | `ConfirmDialog` | Consumer controls `open`, pending and real mutation. Label/description, focus trap, initial safe Cancel focus, Escape cancel when idle, restore trigger. Pending blocks duplicate/cancel actions. No reset API is wired by T01. |
 | `ExternalTrailerLink` | Example primitive only: validated YouTube watch URL or unavailable text; new tab with noopener/noreferrer; no iframe/autoplay/fake player. #215 owns real backend selection and live integration. |
 | `ProviderBadges` | Example primitive only: deduplicated non-clickable provider names. Future provider task owns region, missing data and JustWatch attribution before mounting it. |
@@ -88,7 +88,7 @@ than being rewritten as newly executed Sprint 4 evidence.
 The new header keeps existing product naming within the page copy; CineAI is a
 visual wordmark, not a claim about new AI capabilities. `TMDb popularity`, saved
 `Your rating`, and future `Ranking score for you` must remain distinct. Only
-existing real data appears. There is no score 0 or half-star input.
+existing real data appears. Unrated is null; there is no score 0. The PO-authorized T16 amendment adds half-star input.
 
 ## Design tokens and accessibility
 
@@ -99,7 +99,7 @@ and common card/action/status/dialog classes instead of fixed dark-only colors.
 System font fallbacks work offline; no new external font dependency is required.
 
 Poster grid adapts to 375px/tablet/desktop, header/actions wrap, title text wraps,
-minimum action targets are 44px, star targets 48px. Keyboard focus is visible;
+minimum action targets are 44px, visual stars 48px with approximately 24x48px half targets. Keyboard focus is visible;
 errors have readable text, not color alone. Reduced-motion disables transitions.
 Backdrop retains its dark overlay even in light theme so its title stays legible.
 Browser and unit evidence is linked below; these checks are not a full WCAG
@@ -117,7 +117,8 @@ by its tasks; this migration must not recreate their tables or reset accounts.
 Summaries, recommendations and detail responses add nullable `posterUrl`.
 Backend builds `https://image.tmdb.org/t/p/w500/<filename>` from a validated flat
 path (1–128 alphanumeric/underscore/hyphen characters + jpg/jpeg/png/webp).
-Frontend validates the same allowlist. Existing backdrop remains w780/detail-only.
+Frontend validates the same allowlist. Backdrops retain the w780 allowlist;
+the later T16 carousel amendment below also exposes them on movie summaries.
 No token, source/provider ID or raw path is added to the browser DTO.
 
 Normal bounded TMDb imports retain the available poster field without adding
@@ -175,8 +176,9 @@ New checks are recorded separately in
 [button/title-sort evidence](evidence/s4-t01-buttons-title-sort.md).
 
 The follow-up after PR #220 reuses these contracts: two-column auth presentation,
-genre descriptions/cards, a real-poster Home hero and a Popular page-one #1
-spotlight. It changes no API DTO, database schema, ranking, result totals or genre
+genre descriptions/cards, a real-poster Home hero and an initial Popular page-one
+#1 spotlight (superseded by the T16 carousel below). That earlier change altered
+no API DTO, database schema, ranking, result totals or genre
 selection rule. Featured details use the existing list-return state. Decorative
 auth artwork is CSS, not a screenshot of another app or a new remote dependency.
 
@@ -197,15 +199,15 @@ safe detail-return allowlist. The URL-backed `q` survives reload and details
 return along with unrelated query parameters and the fragment. Existing session
 restoration does not require sign-in or add private account reads to Search.
 
-Results update as the user types. A native labelled search form also submits
-the current query with Enter in the input or the Search button; submission
-prevents a document reload and repeats the current read without changing the
-URL. Both paths trim the query and require at least two Unicode characters.
+Typing edits a local draft only. A native labelled search form submits
+with Enter or the Search button without a document reload. A new query
+updates the URL and resets page 1; resubmitting the same query retries the
+current page. Both paths trim the query and require at least two Unicode characters.
 Short queries show `Enter at least 2 characters` and issue no search request.
 Tab reaches Search after the input, then the result links; Shift+Tab reverses
 that order. Focus remains on the submitted control.
 
-Search retains the server's order and first ten movies, with distinct loading,
+Search retains the server's global order and all matches across pages, with distinct loading,
 empty, error and Retry states. Every new read, including explicit submit, aborts
 the previous one and ignores late success/error completions. It reuses the
 existing poster fallback, responsive grid and light/dark tokens. Inline status
@@ -236,3 +238,94 @@ source details, server order, selected-ID navigation and stale-response safety.
 The Windows fixture runner owns its server processes and removes only its own
 temporary SQLite database after the browser command exits. See the
 [T14 gate correction evidence](evidence/s4-t14-reset-invalidation.md#browser-gate-correction-and-final-local-checks-uncommitted).
+
+## S4-T16 detail-return and request boundaries (2026-10-27)
+
+Current S03 return semantics are page/query/sort/filter/fragment preservation
+when the source context remains valid. A new catalogue revision returns public
+lists to page 1 (keeping Home's chosen title sort); Recommendations also clears
+its stale `genreId`, preserving unrelated source/query/fragment values. A
+changed account or preference scope discards the old recommendation context.
+A historical Watchlist context belonging to another account is replaced with
+that account's page 1 before its private list request; the old page/revision
+is not sent under the new account.
+
+Rating saves retain valid same-account navigation context but refresh the
+ranking only after a confirmed response. Membership changes never change the
+ranking. Details, rating, watchlist and Similar have independent read/error
+states; a membership service error leaves the source and other widgets usable.
+Late reads/writes must not populate a new movie/account, announce stale success,
+invalidate its ranking, or redirect it on an old 401. Watchlist removal reconciles
+actual totals and the remaining valid page, keeping a safe return destination.
+The existing shared buttons/themes and keyboard behaviour remain unchanged.
+
+The concurrency follow-up keeps SQLite membership writes in a synchronous
+FastAPI worker handler, with raw-body presence read by a separate async
+dependency after account authentication. A waiting COMMIT therefore cannot
+block the ASGI loop needed to close another list read snapshot. Wire payload,
+auth-before-validation, reservation/commit/rollback and UI acknowledgement
+semantics are unchanged; no retries or timeout increases hide a failed write.
+
+See [T16 execution and review handoff](evidence/s4-t16-detail-boundaries.md).
+
+## T16 submit-only Search amendment
+
+Keep typed Search drafts local. Enter/Search commits `q`; valid deep links,
+Back and detail-return restore that submitted query. Reuse current components,
+themes, feedback and API ordering. Rating half steps retain explicit Save and
+account/movie request boundaries; do not introduce a second feedback system.
+
+## S4-T16 full-result Search paging
+
+Reuse `PageControls`, `resultSummary` and the safe list-view context with
+route `/search`. Keep `q`, page, unrelated query parameters and hash on details
+return. Read metadata from the actual API; never invent a total of ten.
+Catalogue revision changes reset page 1; do not mix two snapshots. Both title
+and description modes rank/select globally before pagination. No new auth,
+theme, request-generation or feedback store is introduced.
+
+## S4-T16 Popular carousel and collection headings (2026-10-27)
+
+`CollectionHeading` gives Popular, Search and My watchlist a compact icon,
+single h1, short description and existing action. It uses current theme tokens
+and keeps the existing page routes, Search submit-only behavior, list totals
+and account protections. Home and Recommendations retain their existing layout.
+
+On every nonempty Popular page, `PopularSpotlight` presents the first three
+movies supplied by that page's API response, or fewer on the last page. The
+badge is the catalogue rank `(page - 1) * limit + slide + 1`; the counter is
+the local slide position, e.g. rank #12 and `2 / 3` on page 2. Never call the
+page's first entry the catalogue's #1. Keep all entries in the grid below.
+
+Previous/Next arrows are visibly centered on the left/right edges (48px desktop,
+44px mobile). Dots and ArrowLeft/ArrowRight also select slides, wrapping at both
+ends. There is no autoplay. A single entry hides unnecessary controls. The
+current slide uses the existing safe history state `featuredMovieId`, so app
+return and browser Back restore it without adding a history entry per click.
+Changing pages selects that page's first movie; stale IDs safely select first.
+
+Use the validated summary `backdropUrl`, never an unrelated poster as a backdrop.
+Missing, unsafe or failed images leave the theme-safe gradient and readable
+title/actions. Poster failure keeps the existing poster fallback. Selection
+does not refetch metadata, modify ranking, save preferences or write account
+data. No migration, catalogue import or NLP rebuild is required.
+
+See [execution, real captures and review handoff](evidence/s4-t16-spotlight.md).
+
+## T14/T16 integration (2026-10-28)
+
+Keep T14's committed-reset invalidation, Profile refresh, account guard and
+Windows server ownership together with every T16 consumer amendment above.
+The isolated test gate has one matcher: `{method, path, requestTag?}`. It
+supports exact detail/rating/membership reads and membership writes as well
+as Search, Similar and Recommendations. Request tags isolate browser requests
+from API oracles; cancelled StrictMode requests are counted and drained before
+cleanup. T16 helpers observe `pending`, not the superseded `active` field.
+Search test actions explicitly submit; the UI still sends nothing on typing.
+
+The original T14 runner/configuration is retained, including external-server
+ownership on Windows and verified removal of its own temporary database.
+Linux browser acceptance jobs pin Ubuntu 24.04 after the previous floating
+runner exceeded its installation budget. Assertions, test deadlines, retries
+and skips are unchanged. Current merged-candidate results are in the
+[integration evidence](evidence/s4-t16-t14-reconciliation.md).

@@ -175,6 +175,7 @@ def _expanded_expected_response(
                 "popularityScore": candidate["popularityScore"],
                 "reason": expected["reason"],
                 "posterUrl": None,
+                "backdropUrl": None,
             }
         )
         if case["expectedResponse"]["data"]["personalised"]:

@@ -1,8 +1,10 @@
 export type ListViewContext = {
-  route: "/" | "/popular" | "/recommendations" | "/watchlist";
+  route: "/" | "/popular" | "/search" | "/recommendations" | "/watchlist";
   catalogueRevision?: string;
   accountId?: string;
   recommendationScope?: string;
+  // Presentation-only Popular slide, carried through existing safe return state.
+  featuredMovieId?: string;
 };
 
 export type ListViewState = { listViewContext: ListViewContext };
@@ -22,6 +24,8 @@ export function readListViewState(
     (typeof context.catalogueRevision !== "string" || context.catalogueRevision.length > 128))
     return null;
   if (route === "/watchlist" && typeof context.accountId !== "string") return null;
+  if (context.featuredMovieId !== undefined &&
+    (typeof context.featuredMovieId !== "string" || context.featuredMovieId.length > 128)) return null;
   if (route === "/recommendations" &&
     (typeof context.accountId !== "string" ||
       typeof context.recommendationScope !== "string")) return null;

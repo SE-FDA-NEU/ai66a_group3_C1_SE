@@ -32,7 +32,7 @@ def main(argv: list[str] | None = None) -> int:
         type=int,
         choices=range(1, MAX_POPULAR_PAGES + 1),
         default=None,
-        help="Popular pages to import (default: 1; 13 usually yields about 260 movies).",
+        help="Popular pages to import (1-50; default: 50, up to about 1,000 raw movies).",
     )
     enrichment = parser.add_mutually_exclusive_group()
     enrichment.add_argument(

@@ -301,3 +301,82 @@ does not claim new independent C03 approval or the reviewer's own re-run.
 | File | SHA-256 after UTF-8 LF normalization |
 |---|---|
 | `docs/api.md` | `2830607e57403f09d708663bfee98eac6c472f47e244d67ca1d346eb81886452` |
+
+### S4-T16 S03 execution amendment (2026-10-27)
+
+T16 adds scoped executable S03 pytest/interface mapping and records two
+actual return-context regressions. Other P0 rows and C05 shared default
+setup/clean-clone ownership remain explicit. This current consumer hash
+does not rewrite the historical C03 checks or claim independent approval.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/testing.md` | `f418c9b115a58b24afa26d6192005ec140d22c711d09c22bf45fdea46fe52d6c` |
+
+### S4-T16 same-loop membership concurrency follow-up (2026-10-27)
+
+Linux CI exposed a membership busy-timeout 503. The real SQLite/ASGI
+regression TC-P0-S03-006 failed before the worker-handler fix and passed
+after it; S03 now has nine executed items. This supersedes only the
+previous T16 testing-document fingerprint, not historical results or
+independent review/clean-clone acceptance.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/testing.md` | `207cd3e94cb85094a0e11a7ef38d70822d3faca9d4215f4cfa34583dd522f199` |
+
+### S4-T16 PO-authorized half-star, catalogue and Search amendment (2026-10-27)
+
+This consumer amendment changes the current rating domain to exact half steps,
+raises the bounded import/default to 50 pages, and makes UI Search submit-only.
+The explicit user request authorizes these changes; historical integer-only
+C03/Story evidence is retained as history, not claimed as new approval.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/api.md` | `8f5c911fbc486c52c2f9bda2515bc4b4195f49adcaa9971a7521cfcbe3323289` |
+| `docs/architecture.md` | `2aa7eb64f45722515ce3c0e5b146866b03610b9bdef4243d31bea025600eeb66` |
+| `docs/design.md` | `f934991405d4cef699e908f1af08947bb2bad900b64debd1fa3d4ad563fc7e62` |
+| `docs/requirements.md` | `c45177ffc56abe866f9fa607c8134daced0e9f2aee1a46762a021631778fa92e` |
+| `docs/testing.md` | `e230d6eaa41b86fd50dc86429b24430ee78a71ad1a410412dc43de00d8cd0ca9` |
+
+### S4-T16 complete Search pagination amendment (2026-10-27)
+
+The PO replaced the top-ten-total Search cap with full-set pagination. Title
+precedence and positive-cosine eligibility remain unchanged. Current Story
+#30, requirements and API/UI contracts now specify ten per page, full totals,
+revision recovery and query/page detail return. Historical cap evidence stays
+historical; this amendment does not claim Story acceptance or reviewer approval.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/api.md` | `90072c21ed9d6e51352f67f08c5c3f9cc03b0c0397329a6270497a512d4d7302` |
+| `docs/requirements.md` | `ab8a653d7a36d31e83bdce6f2fd243b8156746e224cee665abd34de1cd574101` |
+| `docs/testing.md` | `2779ffb946f083ba1e7af23a2ebc1ef86953a49cb82662a1eb0d698bc160124c` |
+
+### S4-T16 current-page Popular carousel and compact collection headings (2026-10-27)
+
+The PO authorized each Popular page's first three entries as a manual carousel
+and compact Popular/Search/Watchlist headings. Summary DTOs add a validated
+nullable backdrop URL; ranking, paging, ownership and NLP inputs do not change.
+Actual execution is in [the carousel evidence](s4-t16-spotlight.md). These hashes
+identify the current documentation, not an independent approval or Story closure.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/api.md` | `5fabac42cea87cc1a7b22845924cb4cd873e63fe39b45995934b57f815cbba36` |
+| `docs/architecture.md` | `3d23d7ddf48f789e55518c41787c4034d7d8d5eb9c24ec2b0033edcfca91c843` |
+| `docs/design.md` | `aaed16ff142183eafc3457faf84f96c42cf21b8092a6bd2fd594a3ccc0981e47` |
+| `docs/testing.md` | `c8d92cbc1f995fedf4d8dd4e31a2a8a43558e92b9584159128299f1a702fbbae` |
+
+### T14/T16 integrated gate and regression handoff (2026-10-28)
+
+Merged T14 reset/runner behavior is retained alongside T16's consumer changes.
+The current testing contract records 19 T16 browser cases and the unified
+exact method/path/tag gate. [Integration execution](s4-t16-t14-reconciliation.md)
+distinguishes local results from CI and independent review; no Story is closed
+or acceptance checkbox auto-checked by this documentation update.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/testing.md` | `696ffea3bf9a3ae08556bf7b456f999ec52e495dfd32b45f89f0df3df67d9d8b` |

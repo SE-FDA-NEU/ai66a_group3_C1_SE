@@ -1,0 +1,33 @@
+{
+  "base": "64dc41b1cb72c90d1199d586544e1de5a1afed68",
+  "normalization": "UTF-8 LF",
+  "sha256": {
+    "backend/app/repositories/movies.py": "51771959906784a72219304bcbf4a2c9d3854685d92c8cb8c8628512062190cd",
+    "backend/app/schemas/movies.py": "611fb2a230c302c0ac81a9a0f43ec55998f75578d1e932a214babedbc9c1f1e9",
+    "backend/scripts/s04_acceptance_server.py": "5e2641e790bcf04468bf8116ac43a6b6ab9d4474e4409702a830a42762478381",
+    "backend/tests/support/backdrop_acceptance.py": "1fc37b643e4f6e6614bb58eb5dc4caa5980dffe45e2a4f4d376ed5bcc88f3d82",
+    "backend/tests/test_backdrop_acceptance.py": "b34b43eeb6b76f001af2b1ce16eab77d2a3ab98ad62281fa5d104327b88a3da5",
+    "backend/tests/test_backdrop_storage.py": "2dbb09fce35d2f4e589b09a36bd8d8a1ddb7e51517c5657b05c29cced5d06733",
+    "backend/tests/test_movie_search_api.py": "1955cf22b08638718198b4d5d4902d459d989c22950464efa87c39f8676674cb",
+    "backend/tests/test_personalised_recommendations_api.py": "2223129397d83fd4ab58cde5a3eb9c4d818338f8d35286c84f292102b2451184",
+    "backend/tests/test_poster_pipeline.py": "6d93f971386903c4e6ee942c8c0449cf145d4c62bc4e4e64153954343e8c488d",
+    "backend/tests/test_similar_movies_api.py": "d8ddc024add9a689d38e2560f3d058f8613d92666ea6a64c5e001e4cd198e2bb",
+    "frontend/e2e/s4-t16.detail-boundaries.ts": "fb509a5750fe21808a2c743854439dc69673b5e6a9a22aa0f4ab65aa72896089",
+    "frontend/e2e/support/responseGates.ts": "29ac04e70f5341e6bc45a40bb4d8822f88606ace2e8dbe3810b318a3ebe31e36",
+    "frontend/e2e/t01.visual.ts": "07692aa7016d011ce3d9b1a3bcf83642340a2738fed40b19ac48f455aca6087e",
+    "frontend/playwright.s04.config.ts": "a6db5d5d3e45bdf1eecdcbc721795b6b072cc2947bcd8f791dd75123dcee74bb",
+    "frontend/playwright.s4-t16.config.ts": "07a30eaa54ef25f1d8ed12f87e1d55303fd9ee94b57f2a31c07d746bef499c05",
+    "frontend/src/api/movies.ts": "5de8bc376f179a8e07393f156790ffce9257ce0cbc0621d731be84300bec808c",
+    "frontend/src/components/CollectionHeading.tsx": "258f7c40c3a87091ce42d7eaf09e3a443e530c9ec96965be497ed8ce793eb5c1",
+    "frontend/src/components/PopularSpotlight.tsx": "2112224799654c5744108bba7a90a0aa456d2894dc6c8490a99cd12d2351805c",
+    "frontend/src/components/PublicMovieList.tsx": "d0345f1484c98959c65f8666db756710c7f4d694113b7482ac7aac40878e3e16",
+    "frontend/src/index.css": "f84c1cc33e82807323bdb356e70aeff8a75e71f68a713a5722121bae40cd970c",
+    "frontend/src/navigation/listViewState.ts": "349fb56a1d2e87c48f6109f1441a205c55018db1e95f1994331990adb6a16c60",
+    "frontend/src/pages/SearchPage.tsx": "c99fd49cd3171ee1034028836679c029abf0fabebcb7baef6a60609c0ee87934",
+    "frontend/src/pages/WatchlistPage.tsx": "2bcbf899ac62d7578187a35c208ab921f8a22ab3d7996f4759547e1b62d31706",
+    "frontend/src/tests/list-context-invalidation.test.tsx": "fb434eeb931916495ad6a1b63a896746e9c1285b6ae6b6ffd2b09d9c631d8bfa",
+    "frontend/src/tests/onboarding-polish.test.tsx": "38bf5e56dd148cdd3c84725e059d78675695969b542df7bf8c67c837a838205c",
+    "frontend/src/tests/popular-spotlight.test.tsx": "bd5dccbbb6bc3ec4868177355f2f8229da8c680d896eb1895ea636f4f918f77a",
+    "tests/test_s03_details.py": "2d24dabc4a390d829f63a5b4bedb915b5216b7ed9270418e72afe8a335442209"
+  }
+}

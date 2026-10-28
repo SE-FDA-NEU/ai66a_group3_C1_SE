@@ -13,6 +13,7 @@ const supportFiles = [
   "frontend/package.json", "frontend/package-lock.json", "frontend/playwright.s04.config.ts",
   "frontend/vite.s04.config.ts", "frontend/e2e/s04.acceptance.ts",
   "frontend/e2e/s13.acceptance.ts", "backend/tests/test_auth_acceptance.py",
+  "frontend/e2e/support/responseGates.ts",
   "frontend/scripts/run-s04-e2e.mjs", "frontend/scripts/run-s04-e2e.node-test.mjs",
   "backend/requirements.lock.txt", "backend/pyproject.toml", "backend/alembic.ini",
   "backend/scripts/s04_acceptance_server.py", "backend/scripts/collect_s04_evidence.py",

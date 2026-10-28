@@ -103,7 +103,9 @@ python -m pip install -e "./backend[dev]" --no-deps
 npm --prefix frontend ci
 
 python -m alembic -c backend/alembic.ini upgrade head
-python -m app.cli.import_tmdb_catalogue --pages 15
+python -m app.cli.import_tmdb_catalogue --pages 50
+python -m app.cli.rebuild_overview_index rebuild
+python -m app.cli.rebuild_overview_index check
 python -m app.cli.create_review_account --confirm-local-demo
 ```
 
@@ -125,7 +127,9 @@ py -3.12 -m venv .venv
 npm.cmd --prefix frontend ci
 
 .\.venv\Scripts\python.exe -m alembic -c backend/alembic.ini upgrade head
-.\.venv\Scripts\python.exe -m app.cli.import_tmdb_catalogue --pages 15
+.\.venv\Scripts\python.exe -m app.cli.import_tmdb_catalogue --pages 50
+.\.venv\Scripts\python.exe -m app.cli.rebuild_overview_index rebuild
+.\.venv\Scripts\python.exe -m app.cli.rebuild_overview_index check
 .\.venv\Scripts\python.exe -m app.cli.create_review_account --confirm-local-demo
 ```
 
@@ -134,10 +138,10 @@ some historical image paths are long. For an existing Windows clone in a
 deep directory, use `git config core.longpaths true` if Git reports spurious
 changes or cannot read those paths. No global Git setting is required.
 
-For the standard review catalogue, run `python -m app.cli.import_tmdb_catalogue --pages 15`
-as shown above (up to 300 raw movies; 1–15 pages allowed).
-Back up an existing database first. Reuse `--pages 15` on subsequent refreshes;
-omitting it returns to a one-page active snapshot. Accounts, preferences and
+For the standard review catalogue, run `python -m app.cli.import_tmdb_catalogue --pages 50`
+as shown above (up to about 1,000 raw movies; 1–50 pages allowed).
+Back up an existing database first. Reuse `--pages 50` on subsequent refreshes;
+omitting it also uses the 50-page budget. Accounts, preferences and
 ratings are retained, and each UI page remains limited to ten movies. See the
 [TMDb runbook](tmdb-sprint3-runbook.md) for the bounded import contract.
 
@@ -153,7 +157,7 @@ At the T01 stage, the head was `d8a4e6f20195` (parent `c6f8a2d4e901`). Merged C0
 adds contracts/tests only, with no competing migration. Recheck the migration
 chain if a later schema PR merges before this candidate.
 
-Fresh `--pages 15` imports now also retain valid TMDb `poster_path` fields in
+Fresh `--pages 50` imports now also retain valid TMDb `poster_path` fields in
 the existing catalogue import. For an **existing** accepted catalogue, do not
 re-import or shrink its snapshot just to obtain posters. With the same root
 `.env`, run this optional, bounded **poster-only** backfill from the repo root:
@@ -168,13 +172,15 @@ TMDb movies, atomically updates poster paths and preserves catalogue revision,
 movie IDs, overview, popularity, genres, backdrops and account-owned data.
 Provider failure rolls back the entire pass; missing/invalid paths retain their
 old value, while an explicit provider `null` clears the poster. Repeating a small
-limit visits the same deterministic prefix, not the next batch; use 300 for this
-200–300-movie catalogue. No image files are stored in SQLite.
+limit visits the same deterministic prefix, not the next batch. This optional
+repair is capped at 300 detail lookups and does not enrich the entire new
+1,000-movie catalogue. Fresh popular imports retain poster/backdrop paths for
+all valid returned movies without one detail lookup per movie. No image files are stored in SQLite.
 
 Runtime pages use local API data and public image-CDN URLs; no metadata request
 or token is sent from the browser. A missing or failed poster shows a labelled
 fallback. Dark is the default theme; the header toggle persists only the theme
-choice (`cineai-theme`), not credentials. Rating stars select an integer draft;
+choice (`cineai-theme`), not credentials. Rating stars select 0.5–5 in 0.5 steps;
 **Save rating** still performs the existing server-confirmed write.
 
 Detailed handoff, test commands and merge caveats:
@@ -223,9 +229,10 @@ imported_at=<UTC timestamp>
 sample_source_ids=<up to three TMDb source IDs>
 ```
 
-Before accepting the environment, verify 200-300 distinct active TMDb movies
+Before accepting the environment, record the actual distinct active TMDb movie count
+(target: about 1,000; up to 1,000 raw rows before deduplication/validation)
 under `catalogue_state.active_revision_id`. Import exit code 0 alone does not
-prove this range; investigate any shortfall before claiming readiness. The
+prove an exact count; investigate a material shortfall before claiming readiness. The
 unfiltered Home endpoint's `meta.total` must equal this active count. Verify
 provider/source=tmdb, distinct source IDs,
 fetch/import timestamps and movie/genre/finite-popularity counts using the
@@ -352,7 +359,7 @@ database. Keep any personal/service passwords private.
    use **Change my genres**. There is no **My preferences** control.
 4. Open **View details** on a recommendation card. Confirm the movie title,
    genres and overview; missing optional fields use **Information unavailable**.
-5. Select `4 / 5` under **Your rating (1 to 5)** and choose **Save rating**.
+5. Under **Your rating (0.5 to 5)**, select `2.5 / 5` by pressing the middle/left half of the third star (right half selects 3), then choose **Save rating**. Arrow keys move in 0.5 steps; selection alone never saves.
    Wait for **Your saved rating: 4/5** and **Rating saved.**; a selected draft
    alone is not proof of persistence.
 6. Use **Back to recommendations**, then **Change my genres**. Confirm the saved
@@ -561,3 +568,43 @@ are incorporated without changing those contracts. Obtain independent review
 and passing required checks before merging. Final C05 root-pytest setup remains
 its own task, not an additional T11 dependency.
 
+
+## T16 Popular carousel and compact collection headings
+
+Update this branch, then restart the backend and frontend so both consume the
+additive nullable `backdropUrl` in movie summaries. This UI follow-up needs no
+new migration, import or NLP index rebuild; existing imported backdrops work.
+The first three movies on each Popular page form its manual carousel. Page 2
+starts at catalogue rank #11 (with the normal ten-per-page setting).
+Missing/failed artwork uses the gradient fallback. Search still runs only on
+Enter/Search, and My watchlist remains account-owned and persistent.
+See [the UI handoff and checks](evidence/s4-t16-spotlight.md).
+
+## T16 consumer amendment: catalogue, half stars and explicit Search
+
+Current migration head is `f2c7e4a91b60`, following watchlist head
+`e9b6f0a42c17`. Existing users, rating IDs, values/timestamps, preferences and
+watchlists are preserved. Back up valuable SQLite databases before upgrading;
+use SQLite's backup API (or stop both servers before copying the file). A
+downgrade is deliberately refused while half-star ratings exist, rather than
+silently rounding or deleting feedback. Never downgrade the working database
+just to test the migration.
+
+After every successful import, rebuild and check the shared overview index
+as shown above before starting/restarting the backend. A changed catalogue
+revision makes the old artifact stale. Runtime Search/Similar use this local
+index; Next/Previous never import TMDb movies.
+
+Search keeps typed text local. Press Enter or choose Search to commit the
+query and fetch results; browser Back and return from details restore the last
+submitted query. Direct links with a valid `q` still load their results.
+
+Half-star feedback preserves the ranking thresholds: 0.5–2 are negative,
+2.5–3.5 neutral, and 4–5 positive. Unrated remains `null`, never 0. A confirmed
+Save is required; reload/login restore the server value.
+
+Search now exposes every matching local movie through numbered pages,
+Previous and Next (ten per page). The total counts matches, not all catalogue
+movies. Enter/Search commits a query; typing does not fetch. A new query starts
+at page 1, and returning from details restores the submitted query and page.
+No migration, new dependency or re-import is needed for this Search change.
