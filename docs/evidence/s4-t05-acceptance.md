@@ -157,3 +157,38 @@ cannot be substituted. A non-coauthor independent reviewer must inspect this
 candidate and record their decision before #200 can close. Current GitHub
 #22 remains Open, and S03 #19 still has an unchecked post-M3 return-context AC;
 these issue states are not silently changed by this test result.
+
+## Gates still open on this candidate
+
+The main CI workflow previously ran only `backend/tests/`; T16's separate
+workflow ran only the root S03 file. This branch adds `python -m pytest tests
+-v` and `python scripts/verify_s4_t05_trace.py` after the existing backend
+suite in `.github/workflows/ci.yml`. Local execution is evidence for the
+commands, but the new hosted CI checks cannot be claimed green until this
+commit is pushed and Actions completes on the PR head.
+The new root command passed 45/45 locally on this candidate, and the trace
+script mapped 37 unique Section 2 IDs to those 45 nodes.
+
+The per-member root-pytest authorship criterion is not met by this branch's
+evidence: only Kiet and Tuan Anh are established as authors of the current
+root tests. Each remaining member needs a meaningful root pytest contribution
+through their own independently reviewed PR, or an existing qualifying PR
+with verifiable test authorship and review must be linked here. Renaming test
+authors or adding credit would not satisfy this criterion.
+
+The original T02 signals-only RED source was neither committed nor hashed.
+That historical pre-implementation RED cannot be reconstructed by a mutation
+run today. Keep this as a documented TDD provenance gap and request an
+explicit, recorded decision from the #200 issue owner/reviewer on how the
+criterion is handled; do not mark full #200 acceptance complete on the basis
+of the mutation evidence. The later active-history RED/GREEN remains valid
+only for that correction.
+
+The live GitHub Story #21 still has integer-only rating wording, and Story
+#45 still has conflicting post-login destinations. The agreed contract is
+half-step ratings from 0.5 through 5, Home as the default login destination,
+and a safe protected route as the destination when login was prompted by a
+specific protected action. The exact issue amendment text is recorded in
+[the Story update draft](s4-t05-story-issue-updates.md). Those GitHub issue
+bodies require synchronization before final acceptance; this local document
+does not claim that they have been edited.

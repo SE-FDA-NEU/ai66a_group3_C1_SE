@@ -144,6 +144,9 @@ The **single repository-root default** is `pytest` (verbose:
 the migrated disposable SQLite fixture in `tests/test_s03_details.py`; existing
 `backend/tests/` and frontend Vitest/browser suites remain intact and
 useful. Do not delete or skip them to manufacture green results.
+Main CI keeps its backend suite and additionally runs `python -m pytest tests
+-v` followed by `python scripts/verify_s4_t05_trace.py` so the root P0 cases
+and their Section 2 mapping are checked on each branch push and PR run.
 
 Root fixtures create a fresh temporary SQLite file, run Alembic migrations,
 enable foreign keys, override `get_db` for in-process `TestClient`,
