@@ -380,3 +380,14 @@ or acceptance checkbox auto-checked by this documentation update.
 | File | SHA-256 after UTF-8 LF normalization |
 |---|---|
 | `docs/testing.md` | `696ffea3bf9a3ae08556bf7b456f999ec52e495dfd32b45f89f0df3df67d9d8b` |
+
+### T05 P0 execution amendment (2026-10-28)
+
+The current testing contract maps all 37 Section 2 IDs to collected root
+pytest nodes. The [T05 evidence](s4-t05-acceptance.md) records execution,
+rating/ranking/browser verification and review limits. Historical hashes above
+remain historical; this row identifies the current normalized-LF document.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/testing.md` | `7373a00b16f87766683f4b558af959eba1614366df227b743cc8dd1accae9ca6` |

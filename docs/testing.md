@@ -3,10 +3,10 @@
 Status: expected contract for [S4-C03 #217](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/217),
 dated 2026-10-24, with the S03 execution amendment from
 [S4-T16 #211](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/211).
-S03 now has scoped executable root pytest and separate interface tests; its
-commands and limits are below. Other planned rows and the shared six-P0
-default discovery/clean-clone gate still need C05 #219 and their assigned
-authors. This document does not certify independent review. The current implemented boundary is
+S03 and the other five P0 Stories now have executable root pytest and
+separate interface tests. The [T05 acceptance record](evidence/s4-t05-acceptance.md)
+maps each Section 2 ID to its executed node and records the current run and
+review limits. This document does not certify independent review. The current implemented boundary is
 [api.md](api.md#1-conventions); planned additions are in its section 13.
 Historical M2/M3 evidence remains historical.
 
@@ -57,9 +57,9 @@ Optional media is verified without real network in CI.
 
 ## 2. Test cases for every P0 story
 
-Each ID below specifies a root pytest case; the S03 rows link to the executed
-implementation added by T16, while other rows remain planned until their own
-test/evidence is supplied. `Normal`,
+Each ID below specifies a root pytest case. T16 supplied the S03 rows; T05
+supplied the remaining root cases in `tests/test_p0_acceptance.py`.
+`Normal`,
 `Refusal`, `Boundary`, `Failure` and `Isolation` are case kinds, not
 claims of a run. The linked node is the production rule the assertion must
 exercise. One test may share setup, but every ID needs its own meaningful
@@ -137,10 +137,9 @@ separately below and in its evidence; other rows are not accepted by implication
 
 ## 3. Automated tests
 
-The intended **single repository-root default** is `pytest` (verbose:
-`python -m pytest -v`). C05 #219 owns the root `tests/` discovery,
-shared fixtures and direct command setup after this contract. The root suite
-must execute every Section 2 ID, not simply collect a matrix; existing
+The **single repository-root default** is `pytest` (verbose:
+`python -m pytest -v`). The root suite executes every Section 2 ID using
+the migrated disposable SQLite fixture in `tests/test_s03_details.py`; existing
 `backend/tests/` and frontend Vitest/browser suites remain intact and
 useful. Do not delete or skip them to manufacture green results.
 
@@ -155,7 +154,7 @@ but status/DB assertions run the real production route/repository. Store
 deterministic expected order and exact HTTP errors, not snapshots of fake
 responses. Real live TMDb provenance smoke is separate and manual.
 
-Expected commands after C05 infrastructure exists:
+Verified local commands:
 
 ```text
 pytest
@@ -278,6 +277,11 @@ only; it does not execute or pass the new Section 2 IDs.
 The [C03 acceptance matrix](evidence/s4-c03-acceptance-matrix.md) maps
 the supplied requirements to exact contract sections and records the
 reproducible local document checks.
+
+The [T05 record](evidence/s4-t05-acceptance.md) includes current root-case
+execution, independent rating/ranking API and browser verification, and
+labelled test-effectiveness mutations. It does not reclassify a mutation as
+T02/T03 feature TDD or assign reviewer credit before a review occurs.
 
 The final dossier needs at least one actual bug with fix/PR/guarding test,
 or a clearly labelled intentional **business-rule mutation** with the failing
