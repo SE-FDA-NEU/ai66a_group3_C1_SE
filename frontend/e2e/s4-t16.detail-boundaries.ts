@@ -245,6 +245,38 @@ test("T16 extension: pointer halves and keyboard persist real half-star ratings"
   }
 });
 
+test("T05 touch selection stays a draft until an explicit save", async ({ browser, request }) => {
+  const context = await browser.newContext({
+    baseURL: "http://127.0.0.1:5174", hasTouch: true, isMobile: true,
+    viewport: { width: 375, height: 812 },
+  });
+  try {
+    const page = await context.newPage();
+    await signIn(page, request, "touch");
+    await page.goto(`/movies/${id(1)}`);
+    await expect(page.getByText("Not rated yet", { exact: true })).toBeVisible();
+    let writes = 0;
+    page.on("request", outgoing => {
+      if (outgoing.method() === "PUT" && new URL(outgoing.url()).pathname.startsWith("/api/me/ratings/")) writes++;
+    });
+    const third = page.locator(".star-rating__star").nth(2);
+    await third.scrollIntoViewIfNeeded();
+    const bounds = await third.boundingBox();
+    expect(bounds).not.toBeNull();
+    await page.touchscreen.tap(bounds!.x + bounds!.width / 4, bounds!.y + bounds!.height / 2);
+    await expect(page.getByRole("radio", { name: "2.5 stars", exact: true })).toBeChecked();
+    await expect(page.getByText("Not rated yet", { exact: true })).toBeVisible();
+    expect(writes).toBe(0);
+    await page.getByRole("button", { name: "Save rating", exact: true }).click();
+    await expect(page.getByText("Your saved rating: 2.5/5", { exact: true })).toBeVisible();
+    expect(writes).toBe(1);
+    await page.reload();
+    await expect(page.getByText("Your saved rating: 2.5/5", { exact: true })).toBeVisible();
+  } finally {
+    await context.close();
+  }
+});
+
 test("T16 extension: Search sends nothing on typing, submits on Enter/button and restores Back", async ({ page }) => {
   const searches: string[] = [];
   page.on("request", request => {

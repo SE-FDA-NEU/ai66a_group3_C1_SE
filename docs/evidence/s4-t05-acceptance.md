@@ -94,6 +94,7 @@ frontend tests.
 | #22 full set, distinct and one signal | `TC-P0-S02-001`, `TC-P0-S02-006`, existing `test_rank_whole_set_before_paging_and_view_filter` and `test_overlap_once_null_popularity_and_deterministic_ties` | 25 distinct page 10/10/5; view filter after rank; shared genre overlap adds one sign. |
 | #22 failure and alternatives | `test_s05b_rating_query_failure_is_truthful_and_core_failure_is_error`, `test_s05b_reset_reselection_removes_old_signal_preserves_b`; [browser output](s4-t05-ranking-ui/t04-browser-run-output.txt) | Rating-only failure uses 200 baseline with `rating_unavailable`; core failure remains 503. After A reset/reselection the old signal vanishes, B remains identical; Popular has no private score/reason. |
 | Save-to-rerank and account UI | T04 real API/SQLite integration and Chrome browser; [score screenshots](s4-t05-ranking-ui/t04-02-personalised-rating-5-raised.png), [failure screenshot](s4-t05-ranking-ui/t04-06-rating-signals-unavailable.png), T01 Chrome | Confirmed save refreshes the same account and keeps return context; rendered order/score/reason match the API capture. Chrome checked keyboard focus, six theme/width combinations and account switch. |
+| Touch and stale rating responses | [T05 touch browser case](../../frontend/e2e/s4-t16.detail-boundaries.ts), existing `movie-rating.test.tsx` and `rating-recommendation-refresh.test.tsx` | Chrome touch emulation at 375px selects 2.5 stars without a write; explicit Save makes one PUT and reload keeps 2.5. Existing component checks reject late 200/401/503 after account or movie switch, keep a failed draft for Retry and rerank only on confirmed save. |
 
 The historical #21 text rejects any non-integer rating, but the later T16
 contract and current migrated API accept exact half-star values 0.5 through 5.
@@ -121,6 +122,8 @@ test-effectiveness exercise: nine relevant wrong business rules caused pytest
 assertions to fail; each source file was restored byte-for-byte and the exact
 same test passed. The S05b score mutation is a representative Section 4 item
 for C04 #218. The mutation runner refuses syntax/setup failures as evidence.
+This is representative mutation evidence, not a per-case campaign for every
+new business-rule test in the issue; that stricter check remains open.
 
 ## Execution and review boundary
 
@@ -135,11 +138,18 @@ for C04 #218. The mutation runner refuses syntax/setup failures as evidence.
 | Chrome ranking verifier | Real browser compares displayed order, fields and reasons with API/DB | 7 checks PASS, Chrome 156, database integrity `ok`; first sandboxed browser launch failed before checks. |
 | T01 Chrome suite | Star keyboard/navigation and P0 browser regression | 16 passed; one marked live-TMDb screenshot test skipped by fixture mode; temporary DB removed. |
 | T13 Chrome suite | Reset/reselection, account ownership and session recovery | 4 passed; temporary DB removed. |
-| T16 Chrome suite | Half-star pointer/keyboard, return context, account races | First concurrent run: 2 passed, then server fixture disconnected during case 3 and subsequent cases failed with `ECONNREFUSED`. Isolated rerun after full pytest: 19 passed, temporary DB removed. |
+| T16/T05 Chrome suite | Half-star pointer, keyboard, touch, return context, account races | First concurrent run: 2 passed, then server fixture disconnected during case 3 and subsequent cases failed with `ECONNREFUSED`. Isolated rerun: 19 passed. Final run after adding touch: 20 passed; temporary DB removed. |
 | Frontend lint/build | ESLint, TypeScript and Vite | Both passed. |
 
-Final verbose result and final executable commit are to be added after final
-verification. The current root tests' Git authors are
+The final verbose run on committed executable/test SHA `5ae1e0f` returned
+**762 passed, 1 historical skipped, 210 subtests passed** in 346.20 seconds.
+The skipped placeholder is in `backend/tests/test_auth_catalogue_handoff.py`;
+none of the 37 Section 2 IDs is skipped or xfailed. The T05 touch browser
+test was added after that SHA and exercised in the separate 20-case Chrome run;
+it changes no application code or Python test. Its normalized-LF SHA-256 is
+`0958c0abccb84497c378a55cde175eb04716c0e3737356abd2ccc3173134776d`.
+The final frontend rerun returned 435 Vitest tests; lint and build passed.
+The current root tests' Git authors are
 Kiet for S03 and Tuan Anh for the new P0/rating suite. The requirement for
 each named member to author a root pytest through their own reviewed PR is
 therefore **not yet demonstrated** by this branch; backend or Vitest authorship

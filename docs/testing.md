@@ -13,7 +13,7 @@ Historical M2/M3 evidence remains historical.
 S4-T16 presentation follow-up: Popular features its current page's first three
 movies, correct global ranks, edge arrows/dots/keyboard, image fallback and
 slide-preserving detail return. Popular, Search and My watchlist share compact
-headings. After integrating T14, the T16 browser suite has 19 cases; its responsive case checks
+headings. The T16/T05 browser suite now has 20 cases; its responsive case checks
 375/768/1440px in both themes. Captures and current execution are recorded in
 [carousel/heading evidence](evidence/s4-t16-spotlight.md). The summary DTO's
 nullable backdrop URL uses the existing server/client allowlists, with no
@@ -31,6 +31,8 @@ steps; Search commits only on Enter/Search; setup imports 50 TMDb popular pages.
 Search additionally paginates every match, ten per page, with full-set ranking
 and revision-aware detail return. This supersedes integer-only rating and
 top-ten-total Search expectations in historical evidence.
+The T05 browser case also uses Chrome touch emulation at 375px to prove that a
+half-star tap remains draft until explicit Save, then survives reload.
 Current migration/API checks are in
 [rating migration tests](../backend/tests/test_rating_migration.py),
 [rating API tests](../backend/tests/test_ratings_api.py),
@@ -94,7 +96,7 @@ actual 503 envelope rather than a business-rule refusal.
 | TC-P0-S04-001 | S04 #20 | Guest with 25 active movies including null popularity requests catalogue pages 1/2/3 | 200 pages 10/10/5, `total=25,totalPages=3`; alphabetical whole-set order and null-popularity entry retained ([movie repo](../backend/app/repositories/movies.py), [route](../backend/app/main.py)). | Normal/paging |
 | TC-P0-S04-002 | S04 #20 | Cold-start A with no preferences requests recommendations | 200 `mode=popular,personalised=false,noMatch=false`; finite-popularity order and no private score fields ([service](../backend/app/recommendations/service.py)). | Normal/cold start |
 | TC-P0-S04-003 | S04 #20 | Limit 9 and 10 on a 25-movie catalogue | Both accepted; counts 9/10 and totals remain 25 ([route](../backend/app/main.py)). | Boundary 9/10 |
-| TC-P0-S04-004 | S04 #20 | Limit 11 or 0, or page 0/non-integer | 400 `VALIDATION_ERROR`, no silent total-catalogue cap or coercion ([route](../backend/app/main.py)). | Boundary 11/refusal |
+| TC-P0-S04-004 | S04 #20 | Limit 11 or 0, or page 0/non-integer/10001; page 10000 is valid | Invalid values return 400 `VALIDATION_ERROR`; page 10000 is a valid empty page, without silent total-catalogue cap or coercion ([route](../backend/app/main.py)). | Boundary 11/refusal |
 | TC-P0-S04-005 | S04 #20 | Active empty catalogue versus no active revision | Empty active revision is 200 empty with total 0; missing revision is 503 `CATALOGUE_UNAVAILABLE` ([movie repo](../backend/app/repositories/movies.py), [route](../backend/app/main.py)). | Data boundary |
 | TC-P0-S04-006 | S04 #20 | Page 2 with stale `catalogueRevision` after import | 409 `CATALOGUE_CHANGED`; client clears old results/restarts page 1 in separate React check ([route](../backend/app/main.py)). | Revision refusal |
 | TC-P0-S12-001 | S12 #44 | Register mixed-case email with 8-character password | 201 safe user DTO; normalized email and Argon2id hash persisted, no session created ([route](../backend/app/main.py), [users repo](../backend/app/repositories/users.py)). | Normal/boundary 8 |

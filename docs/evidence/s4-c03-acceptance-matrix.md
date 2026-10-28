@@ -391,3 +391,13 @@ remain historical; this row identifies the current normalized-LF document.
 | File | SHA-256 after UTF-8 LF normalization |
 |---|---|
 | `docs/testing.md` | `7373a00b16f87766683f4b558af959eba1614366df227b743cc8dd1accae9ca6` |
+
+### T05 touch and numeric-boundary follow-up (2026-10-28)
+
+The current contract records the final T05 Chrome touch case and the root
+page-10000/10001 boundary assertions. The earlier T05 row remains the hash of
+the prior candidate; the following row identifies this final document.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/testing.md` | `8d0ef67dbd621da619a74bacdf4bd9a6bd11fcd89486de469da9f6962e81b1c6` |
