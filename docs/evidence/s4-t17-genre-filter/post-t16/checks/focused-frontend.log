@@ -1,0 +1,23 @@
+Captured: 2026-10-28T10:36:29.547705+07:00
+HEAD: af50498bd2c7326760497c864cd542e47f533de8
+Command: npm --prefix frontend test -- src/tests/recommendation-filter-acceptance.test.tsx src/tests/recommendation-filter.test.tsx src/tests/rating-recommendation-refresh.test.tsx src/tests/pagination-navigation.test.tsx src/tests/list-context-invalidation.test.tsx
+Environment: TMDB_READ_ACCESS_TOKEN=empty TMDB_NETWORK_DISABLED=1
+
+
+> frontend@0.0.0 test
+> vitest run src/tests/recommendation-filter-acceptance.test.tsx src/tests/recommendation-filter.test.tsx src/tests/rating-recommendation-refresh.test.tsx src/tests/pagination-navigation.test.tsx src/tests/list-context-invalidation.test.tsx
+
+
+ RUN  v5.0.2 /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/frontend
+
+
+ Test Files  5 passed (5)
+      Tests  29 passed (29)
+   Start at  10:36:30
+   Duration  3.65s (tests 42%, environment 38%, transform 11%, import 9%)
+
+    Isolate  5 workers spawned · ~563ms startup each (spawn + environment, per file)
+             at least ~844ms faster with isolate: false — reuses workers across files instead of one per file
+
+
+Exit code: 0

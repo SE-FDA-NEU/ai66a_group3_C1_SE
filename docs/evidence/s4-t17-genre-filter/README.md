@@ -1,5 +1,12 @@
 # S4-T17 (#212): recommendation genre filtering after rating reranking
 
+Latest verification: [post-T16 candidate, 2026-10-28](post-t16/README.md).
+It includes main/PR #235 and the two half-star rating selector corrections,
+with a new tested SHA, results and source fingerprint. The 2026-10-27 report,
+logs, browser captures and 251-file manifest below are retained as historical
+evidence; they do not certify the post-T16 candidate. Independent review and
+clean-clone verification remain pending.
+
 Executed 2026-10-27 (Asia/Ho_Chi_Minh). Scope: the supplied genre-filter
 regression task, including post-M3 pagination and account/return isolation.
 Only tests, test fixtures/transport and evidence changed. No production code,

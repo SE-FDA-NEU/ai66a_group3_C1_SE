@@ -1,0 +1,15 @@
+Captured: 2026-10-28T10:45:54.902443+07:00
+HEAD: af50498bd2c7326760497c864cd542e47f533de8
+Command: git diff --check
+Exit code: 0
+
+Command: git merge-base --is-ancestor f69c20e1405b5e2fe0fd7dfff1d05d7591fbb0ea af50498bd2c7326760497c864cd542e47f533de8
+Exit code: 0
+
+Command: git diff --exit-code af50498bd2c7326760497c864cd542e47f533de8 -- backend frontend tests .github/workflows
+Exit code: 0
+
+All 299 source hashes match.
+Manifest SHA-256: 5809b754f96573585b25c2e790ccf945529c3b82b293984fe04434708247c28c
+Historical test logs, browser JSON and source manifest unchanged.
+Exit code: 0

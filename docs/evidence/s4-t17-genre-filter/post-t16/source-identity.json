@@ -1,0 +1,14 @@
+{
+  "capturedAt": "2026-10-28T10:36:41.821625+07:00",
+  "testedCommit": "af50498bd2c7326760497c864cd542e47f533de8",
+  "mainCommit": "f69c20e1405b5e2fe0fd7dfff1d05d7591fbb0ea",
+  "mergeCommit": "c07f06d09a6048e949ceeb78d13b1cba50978045",
+  "historicalT17Commit": "51a2a532ade4c5a16312d5cf5f875b65d6832c4e",
+  "manifestFileCount": 299,
+  "manifestSha256": "5809b754f96573585b25c2e790ccf945529c3b82b293984fe04434708247c28c",
+  "manifestScope": "All tracked files under backend/, frontend/, tests/ and .github/workflows/; docs/evidence excluded to avoid self-reference.",
+  "executionEnvironment": "Existing workspace and installed dependencies; no clean-clone verification claimed.",
+  "python": "Python 3.12.4",
+  "node": "v24.21.0",
+  "npm": "11.19.0"
+}
