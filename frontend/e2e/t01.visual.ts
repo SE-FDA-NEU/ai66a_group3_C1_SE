@@ -5,6 +5,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 const live = Boolean(process.env.T01_LIVE_URL);
 const fixtureMovie = "20000000-0000-0000-0000-000000000001";
 const controls = "http://127.0.0.1:8014/__acceptance";
+const diagnostics = new WeakMap<Page, { pageErrors: string[]; requestFailures: object[] }>();
 async function armBrowserGate(page: Page, request: APIRequestContext, name: string, endpoint: string) {
   const requestTag = `${name}-${crypto.randomUUID()}`;
   const matchesEndpoint = (url: URL) => url.pathname === endpoint;
@@ -79,12 +80,21 @@ async function expectActionButton(link: ReturnType<Page["getByRole"]>) {
 
 test.beforeEach(async ({ page, request }) => {
   if (live) return;
+  const diagnostic = { pageErrors: [] as string[], requestFailures: [] as object[] };
+  diagnostics.set(page, diagnostic);
+  page.on("pageerror", error => diagnostic.pageErrors.push(error.message));
+  page.on("requestfailed", failed => {
+    // No headers, bodies, cookies, tokens or live-database requests are recorded.
+    diagnostic.requestFailures.push({ url: failed.url(), error: failed.failure()?.errorText });
+  });
   expect((await request.post(`${controls}/scenario/ranked`)).ok()).toBe(true);
   // Deterministic offline image failure checks, not fabricated TMDb screenshots.
   await page.route("https://image.tmdb.org/**", route => route.abort());
 });
-test.afterEach(async ({ request }) => {
+test.afterEach(async ({ page, request }, info) => {
   if (live) return;
+  if (info.status !== info.expectedStatus)
+    console.error("t01_browser_diagnostics=" + JSON.stringify(diagnostics.get(page)));
   const response = await request.post(`${controls}/release-gates`);
   expect(response.status()).toBe(200);
   expect((await response.json()).pending).toBe(0);
@@ -125,6 +135,7 @@ test("S08 search uses real API/index across themes, sizes, states and safe retur
       const held = await armBrowserGate(page, request, gate, "/api/movies/search");
       try {
         await search.fill("  inCEPTION  ");
+        await search.press("Enter");
         await expect.poll(async () => (await gateState(request, gate)).responses.length).toBeGreaterThanOrEqual(1);
         await expect(page.getByText("Loading movies...", { exact: true })).toBeVisible();
         await noOverflow(page);
@@ -140,6 +151,7 @@ test("S08 search uses real API/index across themes, sizes, states and safe retur
       expect(api.data.movies[0].title).toBe("Inception");
       observations.push({ width, theme, titleApi: api });
       await search.fill("astronaut rescue moon");
+      await search.press("Enter");
       await expect(titles).toHaveText(["Moon Rescue", "City Robot"]);
       await search.focus();
       await expect(search).toBeFocused();
@@ -179,6 +191,7 @@ test("S08 search uses real API/index across themes, sizes, states and safe retur
       await page.reload();
       await expect(titles).toHaveText(["Moon Rescue", "City Robot"]);
       await search.fill("volcano jazz galaxy");
+      await search.press("Enter");
       await expect(page.getByText("No movies found", { exact: true })).toBeVisible();
       await expect(titles).toHaveCount(0);
       await noOverflow(page);
@@ -191,6 +204,7 @@ test("S08 search uses real API/index across themes, sizes, states and safe retur
       };
       page.on("response", record);
       await search.fill("rescue astronaut moon");
+      await search.press("Enter");
       await expect(page.getByRole("alert")).toContainText("Search index is temporarily unavailable");
       await noOverflow(page);
       if (width === 375 && theme === "light") await screenshot(page, "search-error-375-light");
@@ -208,9 +222,11 @@ test("S08 search uses real API/index across themes, sizes, states and safe retur
       expect(zero.scores["Moon Rescue"]).toBeGreaterThan(0);
       expect(zero.scores["City Robot"]).toBe(0);
       await search.fill("astronaut rescue moon");
+      await search.press("Enter");
       await expect(titles).toHaveText(["Moon Rescue"]);
       await scenario("search-empty");
       await search.fill("astronaut moon");
+      await search.press("Enter");
       await expect(page.getByText("No movies found", { exact: true })).toBeVisible();
       await noOverflow(page);
     }
@@ -231,9 +247,11 @@ test("S08 delayed real search response cannot replace a newer query or return af
     await page.goto("/search");
     held = await armBrowserGate(page, request, "search-stale", "/api/movies/search");
     await page.getByRole("searchbox").fill("Inception");
+    await page.getByRole("searchbox").press("Enter");
     await expect.poll(async () => (await gateState(request, "search-stale")).responses.length).toBeGreaterThanOrEqual(1);
     expect((await request.post(`${controls}/gates/search-stale/seal`)).status()).toBe(200);
     await page.getByRole("searchbox").fill("astronaut rescue moon");
+    await page.getByRole("searchbox").press("Enter");
     await expect(page.locator("article.movie-card h2")).toHaveText(["Moon Rescue", "City Robot"]);
     expect((await request.post(`${controls}/gates/search-stale/release`)).status()).toBe(200);
     await expect.poll(async () => (await gateState(request, "search-stale")).pending).toBe(0);
@@ -241,6 +259,7 @@ test("S08 delayed real search response cannot replace a newer query or return af
     await held.dispose();
     held = await armBrowserGate(page, request, "search-unmount", "/api/movies/search");
     await page.getByRole("searchbox").fill("Inception");
+    await page.getByRole("searchbox").press("Enter");
     await expect.poll(async () => (await gateState(request, "search-unmount")).responses.length).toBeGreaterThanOrEqual(1);
     expect((await request.post(`${controls}/gates/search-unmount/seal`)).status()).toBe(200);
     await page.getByRole("link", { name: "Home", exact: true }).click();
@@ -518,6 +537,7 @@ test("S07 delayed real similar response for movie A cannot fill movie B", async 
     // Leave A while its response is held, then open B through the public Search page.
     await page.getByRole("link", { name: "Search", exact: true }).click();
     await page.getByRole("searchbox", { name: "Title or description" }).fill("Moon Rescue");
+    await page.getByRole("searchbox", { name: "Title or description" }).press("Enter");
     await page.getByRole("link", { name: "View details for Moon Rescue", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Moon Rescue", level: 1 })).toBeVisible();
     const own = await similarApi(request, "20000000-0000-0000-0000-000000000002");
@@ -599,6 +619,8 @@ test("personal navigation actions use shared buttons without changing saved genr
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(page).toHaveURL("/");
+  await expect(page.getByRole("button", { name: "Sign out", exact: true })).toBeVisible();
+  await expect(page.getByRole("banner")).toContainText(email);
   await page.getByRole("link", { name: "Preferences", exact: true }).click();
   const action = page.getByRole("checkbox", { name: "Action", exact: true });
   await action.check();
@@ -677,6 +699,8 @@ test("native star keyboard draft, save and theme preserve real state", async ({ 
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(page).toHaveURL("/");
+  await expect(page.getByRole("button", { name: "Sign out", exact: true })).toBeVisible();
+  await expect(page.getByRole("banner")).toContainText(email);
   await page.getByRole("link", { name: "Start", exact: true }).click();
   await expect(page).toHaveURL(/\/preferences$/);
   await page.getByRole("checkbox", { name: "Action", exact: true }).check();
@@ -695,12 +719,14 @@ test("native star keyboard draft, save and theme preserve real state", async ({ 
   expect(await page.locator("article.movie-card h2").allTextContents()).toEqual(filteredTitles);
   await page.getByRole("button", { name: "Switch to light theme" }).click();
   await page.goto(`/movies/${fixtureMovie}`);
-  await expect(page.getByRole("radio")).toHaveCount(5);
+  await expect(page.getByRole("radio")).toHaveCount(10);
   let writes = 0;
   page.on("request", r => { if (r.method() === "PUT" && r.url().includes("/rating")) writes++; });
   const three = page.getByRole("radio", { name: "3 stars", exact: true });
   await three.focus();
   await page.keyboard.press("Space");
+  await page.keyboard.press("ArrowRight");
+  await expect(page.getByRole("radio", { name: "3.5 stars", exact: true })).toBeChecked();
   await page.keyboard.press("ArrowRight");
   await expect(page.getByRole("radio", { name: "4 stars", exact: true })).toBeChecked();
   expect(writes).toBe(0);
@@ -910,6 +936,8 @@ test("centered action feedback reflects real login/save/logout acknowledgements 
   await page.getByRole("button", { name: "Save preferences", exact: true }).click();
   await expect(feedback).toContainText("Your taste is saved");
   await page.goto(`/movies/${fixtureMovie}`);
+  await expect(page.getByRole("button", { name: "Sign out", exact: true })).toBeVisible();
+  await expect(page.getByRole("banner")).toContainText(email);
   await page.getByRole("radio", { name: "5 stars", exact: true }).check();
   await page.getByRole("button", { name: "Save rating", exact: true }).click();
   await expect(page.getByText("Your saved rating: 5/5", { exact: true })).toBeVisible();
@@ -983,10 +1011,13 @@ test("read-only imported TMDb catalogue screenshots, real poster loading and the
   await screenshot(page, "t01-details-mobile-dark");
   await page.goto("/popular");
   const popular = await (await page.request.get("/api/movies/popular?limit=10")).json();
-  const spotlight = page.getByRole("region", { name: "Most popular movie spotlight" });
+  const spotlight = page.getByRole("region", { name: "Popular movie spotlight" });
   await expect(spotlight.getByRole("heading", { level: 2 })).toHaveText(popular.data.movies[0].title);
-  await expect(spotlight.locator("img").last()).toBeVisible();
-  await expect.poll(() => spotlight.locator("img").last().evaluate((img: HTMLImageElement) => img.naturalWidth), { timeout: 30_000 }).toBeGreaterThan(0);
+  if (popular.data.movies[0].backdropUrl) {
+    const artwork = spotlight.locator(".popular-spotlight__backdrop");
+    await expect(artwork).toBeVisible();
+    await expect.poll(() => artwork.evaluate((img: HTMLImageElement) => img.naturalWidth), { timeout: 30_000 }).toBeGreaterThan(0);
+  }
   await page.setViewportSize({ width: 1440, height: 1000 });
   await settlePublicPosters(page);
   await screenshot(page, "onboarding-popular-1440-dark-imported");

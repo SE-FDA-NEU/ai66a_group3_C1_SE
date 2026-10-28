@@ -10,6 +10,7 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import re
 import sqlite3
 import subprocess
 import sys
@@ -115,6 +116,16 @@ for _name, _overview in {
 SIMILAR_SCENARIOS["similar-index-failure"] = SIMILAR_SCENARIOS["similar-ranked"]
 
 
+def supported_gate_path(path: str) -> bool:
+    """Only isolate the actual public/widget reads and membership writes under test."""
+    return path in {"/api/me/recommendations", "/api/movies/search"} or bool(
+        re.fullmatch(
+            r"/api/(?:movies/[A-Za-z0-9_-]+(?:/similar)?|me/(?:ratings|watchlist)/[A-Za-z0-9_-]+)",
+            path,
+        )
+    )
+
+
 def build_harness(path: Path, fixture: dict):
     from app.main import app as production_app
     from fastapi import FastAPI, HTTPException
@@ -162,6 +173,9 @@ def build_harness(path: Path, fixture: dict):
             "search-zero",
             "search-empty",
             "search-index-failure",
+            "detail-boundaries",
+            "detail-new-revision",
+            "popular-spotlight",
         } | SIMILAR_SCENARIOS.keys():
             raise HTTPException(400, "Unknown fixture")
         with closing(sqlite3.connect(path)) as connection, connection:
@@ -185,9 +199,19 @@ def build_harness(path: Path, fixture: dict):
                 [(row["popularity"], row["id"]) for row in fixture["movies"]],
             )
             connection.executemany(
-                "UPDATE catalog_movies SET title = ?, overview = NULL WHERE id = ?",
+                "UPDATE catalog_movies SET title = ?, overview = NULL, "
+                "poster_path = NULL, backdrop_path = NULL WHERE id = ?",
                 [(row["title"], row["id"]) for row in fixture["movies"]],
             )
+            if name == "popular-spotlight":
+                connection.executemany(
+                    "UPDATE catalog_movies SET title=?, overview=?, popularity_score=?, "
+                    "poster_path=?, backdrop_path=? WHERE id=?",
+                    [("The Last Observatory: A Journey Across the Midnight Sky" if number == 1 else
+                      f"Synthetic Film {number:02d}", "An astronaut rescue mission on the moon",
+                      100 - number, f"/spotlight{number}.jpg", f"/scene{number}.jpg", row["id"])
+                     for number, row in enumerate(fixture["movies"], 1)],
+                )
             if name.startswith("search-"):
                 # Eleven title hits plus two independent overview documents.
                 search_rows = [
@@ -227,6 +251,31 @@ def build_harness(path: Path, fixture: dict):
                 "UPDATE catalogue_state SET active_revision_id = ? WHERE id = 1",
                 ("s04-empty" if name in {"empty", "search-empty"} else fixture["revision"],),
             )
+            if name.startswith("detail-"):
+                # More than ten matching rows exercise a real filtered page 2.
+                connection.execute("DELETE FROM movie_genres")
+                connection.executemany(
+                    "INSERT INTO movie_genres (movie_id, genre_id) VALUES (?, ?)",
+                    [(row["id"], genre) for row in fixture["movies"] for genre in (ACTION, COMEDY)],
+                )
+                connection.execute(
+                    "UPDATE catalog_movies SET release_year=2020, "
+                    "overview='An astronaut rescue mission on the moon'"
+                )
+                connection.execute(
+                    "UPDATE catalog_movies SET release_year=NULL, overview=NULL WHERE id=?",
+                    (fixture["movies"][-1]["id"],),
+                )
+                if name == "detail-new-revision":
+                    revision_id = "s04-detail-next"
+                    connection.execute(
+                        "INSERT OR IGNORE INTO catalogue_revisions "
+                        "(id, provider, created_at, inserted_movie_count, updated_movie_count, rejected_movie_count) "
+                        "VALUES (?, 's04-synthetic', ?, 0, 13, 0)",
+                        (revision_id, utc_timestamp()),
+                    )
+                    connection.execute("UPDATE catalog_movies SET catalogue_revision_id=?", (revision_id,))
+                    connection.execute("UPDATE catalogue_state SET active_revision_id=? WHERE id=1", (revision_id,))
             if name in {"no-match", "no-match-no-popularity"}:
                 # The genre was selectable when the editor opened. Retire its
                 # only movie before saving: a genuine canonical-but-no-match
@@ -261,6 +310,12 @@ def build_harness(path: Path, fixture: dict):
                     (SELECT active_revision_id FROM catalogue_state WHERE id = 1)"""
             ).fetchone()
         search_evidence = {}
+        if name.startswith("detail-") or name == "popular-spotlight":
+            from app.db.database import SessionLocal
+            from app.recommendations.overview_index import rebuild_active_index
+
+            with SessionLocal() as session:
+                rebuild_active_index(session)
         if name.startswith("search-"):
             from app.db.database import SessionLocal
             from app.recommendations.overview_index import (
@@ -330,10 +385,9 @@ def build_harness(path: Path, fixture: dict):
             match = match or {}
             if any(key not in {"method", "path", "requestTag"} for key in match):
                 raise HTTPException(400, "Unknown gate matcher")
-            if match.get("path") and not (
-                match["path"] in {"/api/me/recommendations", "/api/movies/search"}
-                or (match["path"].startswith("/api/movies/") and match["path"].endswith("/similar"))
-            ):
+            if match.get("method") and match["method"] not in {"GET", "PUT", "DELETE"}:
+                raise HTTPException(400, "Unsupported gate method")
+            if match.get("path") and not supported_gate_path(match["path"]):
                 raise HTTPException(400, "Unsupported gate path")
             drained = asyncio.Event()
             drained.set()
@@ -381,17 +435,17 @@ def build_harness(path: Path, fixture: dict):
         async def __call__(self, scope, receive, send):
             name = capturing
             gate = gates.get(name) if name is not None else None
+            if scope["type"] != "http" or gate is None:
+                return await production_app(scope, receive, send)
             headers = dict(scope.get("headers", []))
             request_tag = headers.get(b"x-s04-gate", b"").decode("ascii", errors="ignore")
+            selected = scope["path"] == gate["match"]["path"] if gate["match"].get("path") else (
+                scope["path"] in {"/api/me/recommendations", "/api/movies/search"}
+                or scope["path"].endswith("/similar")
+            )
             if (
-                scope["type"] != "http"
-                or not (
-                    scope["path"] in {"/api/me/recommendations", "/api/movies/search"}
-                    or scope["path"].endswith("/similar")
-                )
-                or gate is None
+                not selected
                 or (gate["match"].get("method") and gate["match"]["method"] != scope["method"])
-                or (gate["match"].get("path") and gate["match"]["path"] != scope["path"])
                 or (gate["match"].get("requestTag") and gate["match"]["requestTag"] != request_tag)
             ):
                 return await production_app(scope, receive, send)
@@ -480,6 +534,14 @@ def main() -> None:
         seed_database(path, fixture)
     sys.path.insert(0, str(ROOT / "backend"))
     from app.db.database import engine
+
+    if os.environ.get("S04_SQL_DIAGNOSTICS") == "1":
+        from sqlalchemy import event
+
+        @event.listens_for(engine, "handle_error")
+        def report_test_database_error(context):
+            print("S04 DB diagnostic:", type(context.original_exception).__name__,
+                  str(context.original_exception), file=sys.stderr, flush=True)
 
     try:
         uvicorn.run(build_harness(path, fixture), host="127.0.0.1", port=8014)

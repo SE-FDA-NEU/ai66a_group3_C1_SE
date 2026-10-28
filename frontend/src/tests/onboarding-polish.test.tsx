@@ -210,16 +210,17 @@ it("does not let a late rating completion overwrite sign-out feedback", async ()
   expect(screen.queryByText("5/5 saved to your account.")).not.toBeInTheDocument();
 });
 
-it("features the first server-ranked film only on Popular page one without changing list totals", async () => {
+it("features the server-ranked film on every Popular page without changing list totals", async () => {
   const requests = installApi(); open("/popular");
-  const spotlight = await screen.findByRole("region", { name: "Most popular movie spotlight" });
+  const spotlight = await screen.findByRole("region", { name: "Popular movie spotlight" });
   expect(within(spotlight).getByRole("heading", { name: firstMovie.title })).toBeVisible();
   expect(spotlight).toHaveTextContent("95");
   expect(within(screen.getByRole("region", { name: "Popular movies" })).getAllByRole("article")).toHaveLength(1);
   expect(screen.getByText("Showing 1-1 of 11 movies")).toBeVisible();
   fireEvent.click(screen.getByRole("button", { name: "Next" }));
-  await screen.findByRole("heading", { name: "Page two" });
-  expect(screen.queryByRole("region", { name: "Most popular movie spotlight" })).not.toBeInTheDocument();
+  await waitFor(() => expect(within(screen.getByRole("region", { name: "Popular movie spotlight" }))
+    .getByRole("heading", { name: "Page two" })).toBeVisible());
+  expect(screen.getByRole("region", { name: "Popular movie spotlight" })).toHaveTextContent("#11 in this catalogue");
   expect(requests.filter(request => request === "GET /api/movies/popular")).toHaveLength(2);
   expect(requests.some(request => request.includes("/api/movies/m-"))).toBe(false);
 });
@@ -229,7 +230,7 @@ it("returns from the featured movie to the same Popular context", async () => {
   fireEvent.click(await screen.findByRole("link", { name: `Explore featured movie ${firstMovie.title}` }));
   await screen.findByRole("heading", { name: firstMovie.title, level: 1 });
   fireEvent.click(screen.getByRole("link", { name: /Back to/ }));
-  await screen.findByRole("region", { name: "Most popular movie spotlight" });
+  await screen.findByRole("region", { name: "Popular movie spotlight" });
   expect(window.location.pathname).toBe("/popular");
   expect(JSON.stringify(window.history.state)).toContain("polish-r1");
 });

@@ -262,7 +262,7 @@ def test_unknown_or_inactive_movie_is_404_and_creates_no_rating(
 # --- PUT ------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("rating", [1, 2, 3, 4, 5])
+@pytest.mark.parametrize("rating", [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5])
 def test_put_returns_the_committed_rating_for_every_valid_value(
     database_session: Session,
     viewer: tuple[TestClient, str],
@@ -305,8 +305,8 @@ def test_repeated_saves_update_one_row(
         {"rating": 0},
         {"rating": 6},
         {"rating": -1},
-        {"rating": 3.5},
-        {"rating": 4.0},
+        {"rating": 3.25},
+        {"rating": 3.500000000001},
         {"rating": "5"},
         {"rating": True},
         {"rating": False},

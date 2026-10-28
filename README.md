@@ -353,28 +353,32 @@ Running the M2 bootstrap is not a prerequisite:
 
 ```bash
 python -m alembic -c backend/alembic.ini upgrade head
-python -m app.cli.import_tmdb_catalogue --pages 15
+python -m app.cli.import_tmdb_catalogue --pages 50
+python -m app.cli.rebuild_overview_index rebuild
+python -m app.cli.rebuild_overview_index check
 ```
 
 Set `TMDB_READ_ACCESS_TOKEN` only in the server environment or in the local,
-gitignored `.env` file. The CLI default reads one page of TMDb popular movies and
+gitignored `.env` file. The CLI default reads 50 pages of TMDb popular movies and
 the official movie genre list; it requests a movie-detail record only when a
 popular result omits `genre_ids`. It never runs as part of browser requests,
 automated tests, or the M2 bootstrap command.
 
-The standard review setup imports 15 pages and verifies 200-300 distinct
-active TMDb movies in the configured database. The CLI default remains one
-page for other intentional uses. The review command is:
+The standard review setup imports 50 pages, targeting about 1,000 distinct
+active TMDb movies in the configured database. The CLI default is also 50
+pages; explicit smaller budgets are intended for targeted smoke tests. The review command is:
 
 ```bash
-python -m app.cli.import_tmdb_catalogue --pages 15
+python -m app.cli.import_tmdb_catalogue --pages 50
+python -m app.cli.rebuild_overview_index rebuild
+python -m app.cli.rebuild_overview_index check
 ```
 
-The allowed budget is 1–15 pages (roughly 20–300 results before validation and
+The allowed budget is 1–50 pages (roughly 20–1,000 results before validation and
 deduplication). Live counts can vary. Each import activates a new snapshot; it
 does not append blindly. Retained TMDb movies keep their internal IDs, and
 accounts, preferences and ratings are not deleted. A later import without
-`--pages 15` returns to the one-page default. Back up an existing database before
+`--pages` uses the same 50-page default. Back up an existing database before
 refreshing it. Public and recommendation pages contain at most ten cards;
 pagination makes the complete eligible catalogue reachable.
 

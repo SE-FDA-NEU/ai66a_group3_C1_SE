@@ -215,7 +215,7 @@ def test_unknown_movie_cannot_create_orphan_rating(
         (0, ValueError),
         (6, ValueError),
         (-1, ValueError),
-        (3.5, TypeError),
+        (3.25, ValueError),
         ("5", TypeError),
         (True, TypeError),
         (None, TypeError),
@@ -228,7 +228,7 @@ def test_repository_rejects_invalid_rating_values(
 ) -> None:
     with pytest.raises(
         expected_exception,
-        match="rating must be an integer from 1 to 5",
+        match="rating must be a number from 0.5 to 5 in half-star steps",
     ):
         set_user_movie_rating(
             database_session,
@@ -237,7 +237,7 @@ def test_repository_rejects_invalid_rating_values(
             rating=rating,  # type: ignore[arg-type]
         )
 
-def test_orm_created_schema_rejects_fractional_rating(
+def test_orm_created_schema_rejects_quarter_star_rating(
     database_session: Session,
 ) -> None:
     with pytest.raises(IntegrityError):
@@ -258,7 +258,7 @@ def test_orm_created_schema_rejects_fractional_rating(
                         'fractional-rating',
                         'user-a',
                         'movie-a',
-                        3.5,
+                        3.25,
                         '2026-10-10 00:00:00',
                         '2026-10-10 00:00:00'
                     )

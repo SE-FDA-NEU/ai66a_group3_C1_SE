@@ -1,11 +1,43 @@
 # Sprint 4 C03 testing contract
 
-Status: proposed expected results for [S4-C03 #217](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/217),
-dated 2026-10-24. This is the specification **before** the Sprint 4 root
-pytest implementation and independent review. It does not claim any case
-below already executes or passes. The current implemented boundary is
+Status: expected contract for [S4-C03 #217](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/217),
+dated 2026-10-24, with the S03 execution amendment from
+[S4-T16 #211](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/211).
+S03 now has scoped executable root pytest and separate interface tests; its
+commands and limits are below. Other planned rows and the shared six-P0
+default discovery/clean-clone gate still need C05 #219 and their assigned
+authors. This document does not certify independent review. The current implemented boundary is
 [api.md](api.md#1-conventions); planned additions are in its section 13.
 Historical M2/M3 evidence remains historical.
+
+S4-T16 presentation follow-up: Popular features its current page's first three
+movies, correct global ranks, edge arrows/dots/keyboard, image fallback and
+slide-preserving detail return. Popular, Search and My watchlist share compact
+headings. After integrating T14, the T16 browser suite has 19 cases; its responsive case checks
+375/768/1440px in both themes. Captures and current execution are recorded in
+[carousel/heading evidence](evidence/s4-t16-spotlight.md). The summary DTO's
+nullable backdrop URL uses the existing server/client allowlists, with no
+runtime TMDb metadata request. Enrichment acceptance continues to compare all
+non-media response fields while checking each updated URL against details.
+
+The [T14/T16 reconciliation record](evidence/s4-t16-t14-reconciliation.md)
+documents the unified exact method/path/tag response gate, cancelled-request
+draining, Windows runner cleanup, and a real delayed Home-read/Start boundary.
+T14 reset invalidation and T16 half-star/Search/carousel behavior are verified
+together; earlier source fingerprints and counts remain historical.
+
+S4-T16 consumer amendment: rating feedback now accepts 0.5–5 in exact half
+steps; Search commits only on Enter/Search; setup imports 50 TMDb popular pages.
+Search additionally paginates every match, ten per page, with full-set ranking
+and revision-aware detail return. This supersedes integer-only rating and
+top-ten-total Search expectations in historical evidence.
+Current migration/API checks are in
+[rating migration tests](../backend/tests/test_rating_migration.py),
+[rating API tests](../backend/tests/test_ratings_api.py),
+[50-page import tests](../backend/tests/test_tmdb_import.py),
+[Search draft tests](../frontend/src/tests/movies.test.tsx), and
+[Chrome pointer/keyboard and submit-only checks](../frontend/e2e/s4-t16.detail-boundaries.ts).
+These retain the original S03 detail-return/account-boundary coverage.
 
 ## 1. What we test, and why
 
@@ -25,7 +57,9 @@ Optional media is verified without real network in CI.
 
 ## 2. Test cases for every P0 story
 
-Each ID below is a **planned executable root pytest** case. `Normal`,
+Each ID below specifies a root pytest case; the S03 rows link to the executed
+implementation added by T16, while other rows remain planned until their own
+test/evidence is supplied. `Normal`,
 `Refusal`, `Boundary`, `Failure` and `Isolation` are case kinds, not
 claims of a run. The linked node is the production rule the assertion must
 exercise. One test may share setup, but every ID needs its own meaningful
@@ -55,6 +89,8 @@ actual 503 envelope rather than a business-rule refusal.
 | TC-P0-S03-002 | S03 #19 | Public GET unknown opaque movie ID | 404 `MOVIE_NOT_FOUND`, never a blank success; UI return target is separately verified in React ([route](../backend/app/main.py), [detail page](../frontend/src/pages/MovieDetailPage.tsx)). | Business refusal |
 | TC-P0-S03-003 | S03 #19 | Missing active catalogue versus injected DB fault | Both 503 with correct `CATALOGUE_UNAVAILABLE` or `SERVICE_UNAVAILABLE`, never false 404 ([route](../backend/app/main.py)). | Infrastructure boundary |
 | TC-P0-S03-004 | S03 #19 | Guest opens a valid detail ID with a list-context query, then with an external-looking query | In both cases production detail GET remains public 200 with the same movie and no redirect/private data; separate React/browser test must reject unsafe return URLs and restore safe page/filter/revision ([route](../backend/app/main.py), [navigation](../frontend/src/navigation/movieDetailReturn.ts)). | Safe return boundary |
+| TC-P0-S03-005 | S03 #19 / T16 #211 | A/B save distinct preferences; guest/A/B read details/similar; A saves a rating and watchlist membership, then reads recommendations | Both persisted preference sets remain identical; B has no A rating/membership ([production routes](../backend/app/main.py), [root API/SQLite tests](../tests/test_s03_details.py)). | Persistence/isolation |
+| TC-P0-S03-006 | S03 #19 / T16 #211 | One ASGI event loop, a real list read snapshot and a membership writer at COMMIT; another coroutine releases the reader | Membership returns 200 with true saved state instead of a self-induced SQLite busy 503; worker-thread DB commit leaves the loop available for reader cleanup ([membership route](../backend/app/main.py), [deterministic SQLite/ASGI regression](../tests/test_s03_details.py)). | Concurrent widget/list boundary |
 | TC-P0-S04-001 | S04 #20 | Guest with 25 active movies including null popularity requests catalogue pages 1/2/3 | 200 pages 10/10/5, `total=25,totalPages=3`; alphabetical whole-set order and null-popularity entry retained ([movie repo](../backend/app/repositories/movies.py), [route](../backend/app/main.py)). | Normal/paging |
 | TC-P0-S04-002 | S04 #20 | Cold-start A with no preferences requests recommendations | 200 `mode=popular,personalised=false,noMatch=false`; finite-popularity order and no private score fields ([service](../backend/app/recommendations/service.py)). | Normal/cold start |
 | TC-P0-S04-003 | S04 #20 | Limit 9 and 10 on a 25-movie catalogue | Both accepted; counts 9/10 and totals remain 25 ([route](../backend/app/main.py)). | Boundary 9/10 |
@@ -96,7 +132,8 @@ the six-P0 floor:
 | TC-S4-UI-001 | #195/#208 | Five integer draft/hover/keyboard/explicit-save semantics, null poster fallback, both themes, 320px layout and account/movie stale-response protection. |
 | TC-S4-AUTH-001 | T01 / Story #45 | Browser check: normal Home/direct login -> Home with authenticated header and no automatic preference/recommendation read or save; guest Start -> login/register -> Preferences; single navbar My recommendations -> cold-start without genres; unsafe return destination -> Home. |
 
-These rows define expected checks; no feature or browser result is claimed.
+These rows define expected checks. Author-local T16 execution is recorded
+separately below and in its evidence; other rows are not accepted by implication.
 
 ## 3. Automated tests
 
@@ -135,6 +172,61 @@ and date. A `TestClient` pass does not establish React rendering, keyboard
 behaviour, both themes or navigation. Browser/API/database evidence for those
 states is collected by the relevant feature owner and reconciled by #218.
 
+### S03 / S4-T16 scoped execution
+
+[tests/test_s03_details.py](../tests/test_s03_details.py) implements
+`TC-P0-S03-001` (normal plus three missing-year/summary variants), `002`
+(404), `003` (distinct 503 errors), `004` (public query/redirect boundary),
+`005` (real A/B sessions and preference preservation), and `006` (one ASGI
+loop with a real SQLite reader/writer): nine pytest
+items in total. After the documented editable backend installation, run
+from the repository root:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest tests/test_s03_details.py -v
+npm.cmd --prefix frontend run test:s4:t16:ui
+```
+
+The module configures its own migrated temporary SQLite, foreign keys,
+default engine and `get_db` before using production routes. It ignores
+dotenv loading, blanks the provider token and rejects real HTTP transports.
+It needs no service/browser/token for pytest. This scoped command does not
+claim the entire six-P0 default suite has been delivered; C05 retains shared
+discovery, fixtures, CI/default-command and independent clean-clone ownership.
+Existing backend and frontend CI tiers remain intact; T16 adds an explicit
+[S03/interface job](../.github/workflows/s4-t16-detail-boundaries.yml).
+
+If Windows denies an old pytest temp/cache directory, use a **new** path,
+without deleting or changing permissions on an existing directory:
+
+```powershell
+$caseTemp = Join-Path $env:TEMP ('s03-' + [guid]::NewGuid().ToString('N'))
+.\.venv\Scripts\python.exe -m pytest tests/test_s03_details.py -v -p no:cacheprovider --basetemp "$caseTemp"
+```
+
+The browser command owns temporary servers on 8014/5174 and a separate
+migrated database/index. Release those ports before running; its parent
+runner removes its database on exit. `S04_BROWSER_CHANNEL=chrome` selects
+an installed Chrome; otherwise install Playwright Chromium as documented.
+This is separate from the old S3 `test:t16:integration` filter suite.
+
+Interface traceability for the current post-M3 S03 return AC:
+
+| Case ID | Executable assertion |
+|---|---|
+| TC-S4-T16-RET-001 | [Browser](../frontend/e2e/s4-t16.detail-boundaries.ts): Home Z-A and Popular page 2, app return and browser Back, dark desktop/light mobile; no guest private reads. |
+| TC-S4-T16-RET-002 | [Component](../frontend/src/tests/list-context-invalidation.test.tsx) and browser: old revision gets a real 409, returns to page 1 and drops the stale genre filter. |
+| TC-S4-T16-RET-003 | Browser: filtered recommendation page 2 survives confirmed rating save/refetch; preferences unchanged. Existing [rating refresh tests](../frontend/src/tests/rating-recommendation-refresh.test.tsx) also cover failure/draft semantics. |
+| TC-S4-T16-RET-004 | Browser: search query -> exact detail -> exact Similar -> original search query/fragment. |
+| TC-S4-T16-RET-005 | Browser and existing context tests: changed preferences invalidate a historical detail return without reverting saved genres. |
+| TC-S4-T16-WATCH-001 | [Component](../frontend/src/tests/detail-boundaries.test.tsx) and browser: B cannot inherit A's watchlist page/context, even when both have two valid pages. |
+| TC-S4-T16-WATCH-002 / WATCH-003 | Component: ignored-abort late membership success after movie/account/logout changes, and late 401 after movie/account changes. |
+| TC-S4-T16-WATCH-004 | Browser: exact Watchlist page 2 return; removal of its last row produces total 10/page 1 with ten actual cards. |
+| TC-S4-T16-WRITE-001 / WRITE-002 | Component: old membership 200/401/503 and old rating-save success cannot notify/invalidate the new movie/account. Existing rating cases retain stale 401/503 coverage. |
+| TC-S4-T16-ASYNC-001 / ASYNC-002 | Browser: hold real detail/rating/membership/similar responses, switch movie/account through the SPA and release; also release an old committed membership PUT after account switch. |
+| TC-S4-T16-FAIL-001 | Component/browser: a controlled membership 503 has Retry and does not hide source details, rating, Similar or the recommendation return. |
+| TC-S4-T16-PUBLIC-001 | Browser: actual `Information unavailable` and `Movie not found` labels; unsafe external return state falls back to the catalogue. |
+
 Contract publication has separate read-only structure and line-ending
 checks: `python scripts/verify_s4_c03_contract.py` and
 `python scripts/test_s4_c03_contract_line_endings.py`. Both use UTF-8
@@ -155,9 +247,26 @@ that the final documented cases actually execute and pass.
 
 ## 4. What the tests found
 
-**Pending implementation and execution.** No new root suite runtime, screenshot,
-mutation result, TDD RED/GREEN event, reviewer acceptance or bug-fix PR is
-claimed by this contract. Record future evidence here only from an actual
+S4-T16 reproduced two return-context regressions against `486adab`:
+recommendation revision recovery retained a stale genre, and a historical
+Watchlist return could restore A's page for B. New assertions failed before
+the fixes (`2 failed, 18 passed`) and passed after the fixes. The
+[T16 evidence](evidence/s4-t16-detail-boundaries.md) records final runs,
+source identity, screenshots and the independent review/Story-checkbox
+handoff still required. A later Linux CI run reproduced membership 503 while
+seeding. A deterministic same-loop SQLite regression then proved the third
+bug: the async membership handler blocked the loop at COMMIT, preventing a
+concurrent read snapshot from being released. The DB handler now runs in the
+worker pool; async raw-body validation and all auth/transaction/DTO contracts
+remain unchanged. TC-P0-S03-006 failed with HTTP 503 before the fix and passed
+with HTTP 200 afterward. These are actual bug regressions, not setup failures
+or a claim of deliberate business-rule mutation. The following C03 paragraph
+is the historical baseline before feature implementation.
+
+At C03 publication, no new root suite runtime, screenshot, mutation result,
+TDD RED/GREEN event, reviewer acceptance or bug-fix PR was claimed. The S03
+amendment above supersedes that pending execution status only for its own
+cases, not the entire M4 suite. Record further evidence here only from an actual
 run: candidate SHA, command, date/time, environment, measured seconds,
 expected/observed statuses and DB values, TC-ID-to-test-node mapping,
 full-output screenshot and independent non-coauthor reviewer.

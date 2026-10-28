@@ -111,3 +111,59 @@ def test_failure_cleanup_allows_next_gate_without_500_or_unknown_gate(monkeypatc
             assert (await next_request).status_code == 200
 
     asyncio.run(check())
+
+
+@pytest.mark.parametrize(("path", "method"), [
+    ("/api/movies/movie-a", "GET"),
+    ("/api/me/ratings/movie-a", "GET"),
+    ("/api/me/watchlist/movie-a", "GET"),
+    ("/api/me/watchlist/movie-a", "PUT"),
+])
+def test_detail_widget_and_write_gates_keep_exact_method_path_and_tag(monkeypatch, path, method) -> None:
+    async def check() -> None:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=_harness(monkeypatch)),
+            base_url="http://acceptance.test",
+        ) as client:
+            name, tag = "t16-widget", "selected-account-request"
+            assert (await client.post(f"/__acceptance/gates/{name}/arm", json={
+                "method": method, "path": path, "requestTag": tag,
+            })).status_code == 200
+            # Neither an untagged oracle nor another method/movie is held.
+            assert (await client.request(method, path)).status_code == 200
+            other = "PUT" if method == "GET" else "GET"
+            assert (await client.request(other, path, headers={"x-s04-gate": tag})).status_code == 200
+            assert (await client.request(method, path.replace("movie-a", "movie-b"),
+                                         headers={"x-s04-gate": tag})).status_code == 200
+            selected = asyncio.create_task(client.request(method, path, headers={"x-s04-gate": tag}))
+            state = await _captured(client, name, 1)
+            assert state["pending"] == 1
+            assert [(row["method"], row["path"], row["requestTag"], row["status"])
+                    for row in state["responses"]] == [(method, path, tag, 200)]
+            assert (await client.post(f"/__acceptance/gates/{name}/seal")).status_code == 200
+            assert (await client.post(f"/__acceptance/gates/{name}/release")).status_code == 200
+            assert (await selected).status_code == 200
+            state = (await client.get(f"/__acceptance/gates/{name}")).json()
+            assert (state["completed"], state["pending"], state["aborted"]) == (1, 0, 0)
+            assert (await client.post("/__acceptance/release-gates")).json() == {"released": 1, "pending": 0}
+
+    asyncio.run(check())
+
+
+@pytest.mark.parametrize(("match", "status"), [
+    ({"path": "/api/auth/login", "method": "GET"}, 400),
+    ({"path": "/api/movies/movie-a?other=1", "method": "GET"}, 400),
+    ({"path": "/api/me/watchlist/movie-a", "method": "POST"}, 400),
+    ({"paths": ["/api/movies/movie-a"], "methods": ["GET"]}, 422),
+])
+def test_invalid_or_obsolete_gate_matcher_is_rejected_before_capture(monkeypatch, match, status) -> None:
+    async def check() -> None:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=_harness(monkeypatch)),
+            base_url="http://acceptance.test",
+        ) as client:
+            response = await client.post("/__acceptance/gates/invalid/arm", json=match)
+            assert response.status_code == status
+            assert (await client.post("/__acceptance/release-gates")).json() == {"released": 0, "pending": 0}
+
+    asyncio.run(check())

@@ -149,7 +149,10 @@ def rankings(engine) -> dict:
     with Session(engine) as session:
         return {
             user: [
-                movie.model_dump()
+                # Backdrop presentation now appears in summary DTOs. Its URL
+                # may change during enrichment; every ranking/ownership field
+                # and the exact ordered movie IDs must still remain identical.
+                movie.model_dump(exclude={"backdropUrl"})
                 for movie in build_account_recommendations(
                     session, user_id=f"t28-user-{user}", limit=10
                 ).movies

@@ -1,0 +1,241 @@
+{
+  "scope": "Author-local Chrome; isolated synthetic migrated SQLite; source-hashes.json identifies the resolved working tree",
+  "stats": {
+    "startTime": "2026-10-28T00:27:39.007Z",
+    "duration": 40927.128,
+    "expected": 19,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "cases": [
+    {
+      "title": "Start opens Preferences while a real Home catalogue read is still pending",
+      "file": "s4-t16.detail-boundaries.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1340
+        }
+      ]
+    },
+    {
+      "title": "Popular highlights three movies on every page without refetching or reordering",
+      "file": "s4-t16.detail-boundaries.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 2156
+        }
+      ]
+    },
+    {
+      "title": "Collection headings and edge controls fit both themes at mobile, tablet and desktop",
+      "file": "s4-t16.detail-boundaries.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 7069
+        }
+      ]
+    },
+    {
+      "title": "A failed Popular backdrop keeps the gradient and the next slide loads its own image",
+      "file": "s4-t16.detail-boundaries.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1013
+        }
+      ]
+    },
+    {
+      "title": "T16 extension: pointer halves and keyboard persist real half-star ratings",
+      "file": "s4-t16.detail-boundaries.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 3014
+        }
+      ]
+    },
+    {
+      "title": "T16 extension: Search sends nothing on typing, submits on Enter/button and restores Back",
+      "file": "s4-t16.detail-boundaries.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 873
+        }
+      ]
+    },
+    {
+      "title": "Search exposes every ranked match and restores page two from details and Back",
+      "file": "s4-t16.detail-boundaries.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1099
+        }
+      ]
+    },
+    {
+      "title": "TC-S4-T16-RET-001 catalogue page 2 survives app return and browser Back in both themes",
+      "file": "s4-t16.detail-boundaries.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1672
+        }
+      ]
+    },
+    {
+      "title": "TC-S4-T16-RET-001 popular page 2 survives app return and browser Back in both themes",
+      "file": "s4-t16.detail-boundaries.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1513
+        }
+      ]
+    },
+    {
+      "title": "TC-S4-T16-PUBLIC-001 actual missing-field and not-found labels, with a safe return",
+      "file": "s4-t16.detail-boundaries.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1365
+        }
+      ]
+    },
+    {
+      "title": "TC-S4-T16-RET-003 recommendation page/filter survive rating save and preferences remain unchanged",
+      "file": "s4-t16.detail-boundaries.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1761
+        }
+      ]
+    },
+    {
+      "title": "TC-S4-T16-RET-002 a changed catalogue clears the old recommendation filter on return",
+      "file": "s4-t16.detail-boundaries.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1498
+        }
+      ]
+    },
+    {
+      "title": "TC-S4-T16-RET-004 search to details to similar keeps the original safe search query",
+      "file": "s4-t16.detail-boundaries.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 979
+        }
+      ]
+    },
+    {
+      "title": "TC-S4-T16-RET-005 changed preferences invalidate a historical detail-return filter",
+      "file": "s4-t16.detail-boundaries.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1692
+        }
+      ]
+    },
+    {
+      "title": "TC-S4-T16-WATCH-001 account B cannot restore account A's page through historical details",
+      "file": "s4-t16.detail-boundaries.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 2196
+        }
+      ]
+    },
+    {
+      "title": "TC-S4-T16-WATCH-004 watchlist page 2 returns exactly and last-row removal reconciles totals",
+      "file": "s4-t16.detail-boundaries.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1699
+        }
+      ]
+    },
+    {
+      "title": "TC-S4-T16-FAIL-001 membership service outage leaves real details, rating, similar and recommendations usable",
+      "file": "s4-t16.detail-boundaries.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1404
+        }
+      ]
+    },
+    {
+      "title": "TC-S4-T16-ASYNC-001 delayed detail, rating, membership and similar for A cannot fill B",
+      "file": "s4-t16.detail-boundaries.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 3097
+        }
+      ]
+    },
+    {
+      "title": "TC-S4-T16-ASYNC-002 delayed private reads and a committed write cannot leak after account switch",
+      "file": "s4-t16.detail-boundaries.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 3977
+        }
+      ]
+    }
+  ]
+}

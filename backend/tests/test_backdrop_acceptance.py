@@ -69,6 +69,25 @@ def test_upgrade_enrichment_and_real_account_api_preserve_every_non_media_row(
                 user: client.get("/api/me/recommendations").json()
                 for user, client in (("a", account_a), ("b", account_b))
             }
+
+            def without_backdrops(response):
+                # Media enrichment may update the additive summary URL. Every
+                # ranking, score, preference, identity and paging field must stay.
+                return {
+                    **response,
+                    "data": {
+                        **response["data"],
+                        "movies": [
+                            {
+                                key: value
+                                for key, value in movie.items()
+                                if key != "backdropUrl"
+                            }
+                            for movie in response["data"]["movies"]
+                        ],
+                    },
+                }
+
             for scenario, updated in (
                 ("valid", 2),
                 ("valid", 0),
@@ -87,9 +106,16 @@ def test_upgrade_enrichment_and_real_account_api_preserve_every_non_media_row(
                     assert result["rolledBack"]
                 assert snapshot(database) == before
                 for user, client in (("a", account_a), ("b", account_b)):
-                    assert (
-                        client.get("/api/me/recommendations").json() == responses[user]
+                    current = client.get("/api/me/recommendations").json()
+                    assert without_backdrops(current) == without_backdrops(
+                        responses[user]
                     )
+                    for movie in current["data"]["movies"]:
+                        detail = client.get(f"/api/movies/{movie['id']}")
+                        assert (
+                            movie["backdropUrl"]
+                            == detail.json()["data"]["movie"]["backdropUrl"]
+                        )
             monkeypatch.setattr(
                 "app.integrations.tmdb.TmdbClient._get_json",
                 lambda *_a, **_k: pytest.fail("Runtime API fetched TMDb"),

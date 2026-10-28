@@ -1,0 +1,61 @@
+{
+  "scope": "Author-local Chrome; isolated synthetic migrated SQLite; source-hashes.json identifies the resolved working tree",
+  "stats": {
+    "startTime": "2026-10-28T00:27:26.259Z",
+    "duration": 9090.981,
+    "expected": 4,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "cases": [
+    {
+      "title": "real reset, cancel, persistence, A/B ownership and preserved watchlists",
+      "file": "t13.profile.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 3729
+        }
+      ]
+    },
+    {
+      "title": "both themes, responsive keyboard controls and real page visuals",
+      "file": "t13.profile.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1746
+        }
+      ]
+    },
+    {
+      "title": "explicit rejection and ambiguous committed response require truthful recovery",
+      "file": "t13.profile.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1336
+        }
+      ]
+    },
+    {
+      "title": "signed-out access restores Profile intent and expired sessions use the existing guard",
+      "file": "t13.profile.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1168
+        }
+      ]
+    }
+  ]
+}
