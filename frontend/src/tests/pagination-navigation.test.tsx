@@ -49,19 +49,25 @@ it("restores Home page 2 after details and keeps public access during session ve
 
 it("filters complete recommendations into two pages and preserves the view URL", async () => {
   const calls: string[] = [];
+  const writes: string[] = [];
+  let reranked = false;
   const base = Array.from({ length: 35 }, (_, index) => ({
     id: `rec-${index}`, title: `Rec ${index}`, releaseYear: 2025,
     genres: index >= 23 ? [genre] : [{ id: 18, name: "Drama" }],
     popularityScore: 35 - index,
     reason: { matchedGenres: [{ id: 18, name: "Drama" }] },
   }));
-  vi.spyOn(globalThis, "fetch").mockImplementation(input => {
+  vi.spyOn(globalThis, "fetch").mockImplementation((input, options) => {
     const url = String(input); calls.push(url);
+    if (options?.method && options.method !== "GET") writes.push(`${options.method} ${url}`);
     if (url === "/api/auth/me") return json({ data: { user: { id: "viewer", email: "viewer@example.com" } } });
     if (url === "/api/genres") return json({ data: { genres: [genre, { id: 18, name: "Drama" }] } });
     if (url.startsWith("/api/me/recommendations?")) {
       const params = new URL(url, "http://localhost").searchParams;
-      const candidates = params.get("genreId") === "28" ? base.slice(23) : base;
+      // Fixed server snapshots; the UI must never calculate or sort this order.
+      const current = reranked ? [...base.slice(23), ...base.slice(0, 23)] : base;
+      const candidates = params.get("genreId") === "28"
+        ? current.filter(movie => movie.genres.some(item => item.id === 28)) : current;
       const page = Number(params.get("page") ?? 1);
       const movies = candidates.slice((page - 1) * 10, page * 10);
       return json({ data: { movies, mode: "personalised", personalised: true,
@@ -72,7 +78,12 @@ it("filters complete recommendations into two pages and preserves the view URL",
     if (url === "/api/movies/rec-33") return json({ data: { movie: {
       ...base[33], overview: "Filtered page two detail", voteAverage: null,
       voteCount: null, backdropUrl: null } } });
-    if (url === "/api/me/ratings/rec-33") return json({ data: { movieId: "rec-33", rating: null } });
+    if (url === "/api/me/ratings/rec-33") {
+      if (options?.method === "PUT") reranked = true;
+      return json({ data: { movieId: "rec-33", rating: reranked ? 5 : null } });
+    }
+    if (url === "/api/me/watchlist/rec-33") return json({ data: { movieId: "rec-33", inWatchlist: false } });
+    if (url.startsWith("/api/movies/rec-33/similar")) return json({ data: { movies: [] } });
     throw new Error(`Unexpected request ${url}`);
   });
   window.history.pushState({}, "", "/recommendations"); render(<App />);
@@ -87,10 +98,28 @@ it("filters complete recommendations into two pages and preserves the view URL",
   expect(window.location.search).toContain("genreId=28");
   fireEvent.click(screen.getByRole("link", { name: "View details for Rec 33" }));
   expect(await screen.findByText("Filtered page two detail")).toBeInTheDocument();
+  await screen.findByRole("group", { name: "Your rating (0.5 to 5)" });
+  fireEvent.click(screen.getByRole("radio", { name: "5 stars" }));
+  fireEvent.click(screen.getByRole("button", { name: "Save rating" }));
+  await screen.findByText("Rating saved.");
+  const beforeReturn = calls.length;
   fireEvent.click(screen.getByRole("link", { name: "Back to recommendations" }));
   expect(await screen.findByText("Showing 11-12 of 12 matches (35 recommendations before filtering)")).toBeInTheDocument();
-  expect(calls.every(url => !url.startsWith("/api/me/preferences") &&
-    !url.startsWith("/api/me/ratings/") || url === "/api/me/ratings/rec-33")).toBe(true);
+  expect([...document.querySelectorAll(".movie-card h2")].map(node => node.textContent))
+    .toEqual(["Rec 33", "Rec 34"]);
+  expect(calls.slice(beforeReturn).find(url => url.startsWith("/api/me/recommendations")))
+    .toContain("page=2&genreId=28&catalogueRevision=rev-a");
+  fireEvent.click(screen.getByRole("button", { name: "Clear filter" }));
+  expect(await screen.findByText("Showing 1-10 of 35 movies")).toBeInTheDocument();
+  expect(window.location.search).toBe("?page=1");
+  expect([...document.querySelectorAll(".movie-card h2")].map(node => node.textContent))
+    .toEqual(base.slice(23, 33).map(movie => movie.title));
+  fireEvent.click(screen.getByRole("button", { name: "Next" }));
+  expect(await screen.findByText("Showing 11-20 of 35 movies")).toBeInTheDocument();
+  expect([...document.querySelectorAll(".movie-card h2")].map(node => node.textContent))
+    .toEqual([...base.slice(33), ...base.slice(0, 8)].map(movie => movie.title));
+  expect(calls.every(url => !url.startsWith("/api/me/preferences"))).toBe(true);
+  expect(writes).toEqual(["PUT /api/me/ratings/rec-33"]);
 });
 
 it("drops an old catalogue revision and restarts from page 1", async () => {

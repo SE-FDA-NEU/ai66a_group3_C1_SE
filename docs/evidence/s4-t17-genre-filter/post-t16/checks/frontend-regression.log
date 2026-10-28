@@ -1,0 +1,23 @@
+Captured: 2026-10-28T10:36:58.523720+07:00
+HEAD: af50498bd2c7326760497c864cd542e47f533de8
+Command: npm --prefix frontend test
+Environment: TMDB_READ_ACCESS_TOKEN=empty TMDB_NETWORK_DISABLED=1
+
+
+> frontend@0.0.0 test
+> vitest run
+
+
+ RUN  v5.0.2 /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/frontend
+
+
+ Test Files  38 passed (38)
+      Tests  435 passed (435)
+   Start at  10:36:58
+   Duration  18.65s (tests 47%, environment 38%, import 11%, transform 4%)
+
+    Isolate  38 workers spawned · ~412ms startup each (spawn + environment, per file)
+             at least ~7.42s faster with isolate: false — reuses workers across files instead of one per file
+
+
+Exit code: 0

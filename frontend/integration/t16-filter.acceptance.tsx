@@ -94,7 +94,7 @@ it("real React actions preserve committed SQLite preferences for both accounts",
   const calls: { url: string; method: string }[] = [];
   vi.spyOn(globalThis, "fetch").mockImplementation(async (input, options) => {
     const url = String(input); const method = options?.method ?? "GET";
-    expect(options?.credentials).toBe("include");
+    if (!url.startsWith("/api/movies/")) expect(options?.credentials).toBe("include");
     calls.push({ url, method });
     // Substitute only transport: response bodies come from the real API/DB.
     const request = { url, method, ...(typeof options?.body === "string" ? { body: JSON.parse(options.body) } : {}) };
@@ -104,7 +104,7 @@ it("real React actions preserve committed SQLite preferences for both accounts",
     if (url === "/api/genres") await new Promise(done => setTimeout(done, 100));
     return new Response(JSON.stringify(result.body), { status: result.status, headers: { "Content-Type": "application/json" } });
   });
-  window.history.pushState({}, "", "/recommendations"); render(<App />);
+  window.history.pushState({}, "", "/recommendations?source=t05"); render(<App />);
   const select = await screen.findByRole("combobox", { name: "Filter by genre" });
   await waitFor(() => expect(select).toBeEnabled());
   const filterSelect = () => screen.getByRole("combobox", { name: "Filter by genre" });
@@ -141,4 +141,60 @@ it("real React actions preserve committed SQLite preferences for both accounts",
   expect(filterCalls.some(({ url }) => url.includes("genreId=27"))).toBe(true);
   expect(filterCalls.every(({ url }) => url.startsWith("/api/me/recommendations") || url === "/api/genres")).toBe(true);
   expect(calls.every(({ method }) => method === "GET")).toBe(true);
+
+  // Keep the exact 2 Action / 3 Comedy oracle, then save a real rating through
+  // the detail UI. Only the API calculates scores and determines the new order.
+  await chooseGenre("28");
+  await waitFor(() => expect(titles()).toEqual(["Action Z", "Action A"]));
+  const context = window.history.state.usr.listViewContext;
+  expect(context).toMatchObject({ route: "/recommendations", accountId: expect.any(String),
+    recommendationScope: expect.any(String), catalogueRevision: expect.any(String) });
+  const returnUrl = window.location.pathname + window.location.search;
+  fireEvent.click(screen.getByRole("link", { name: "View details for Action Z" }));
+  await screen.findByRole("group", { name: "Your rating (0.5 to 5)" });
+  fireEvent.click(screen.getByRole("radio", { name: "1 star" }));
+  fireEvent.click(screen.getByRole("button", { name: "Save rating" }));
+  await screen.findByText("Rating saved.");
+  expect(screen.getByRole("link", { name: "Back to recommendations" }))
+    .toHaveAttribute("href", returnUrl);
+  const beforeReturn = calls.length;
+  fireEvent.click(screen.getByRole("link", { name: "Back to recommendations" }));
+  await waitFor(() => expect(titles()).toEqual(["Action Z", "Action A"]));
+  expect(window.history.state.usr.listViewContext).toEqual(context);
+  expect(calls.slice(beforeReturn).filter(({ url }) => url.startsWith("/api/me/recommendations")))
+    .toEqual([{ method: "GET", url: expect.stringContaining(`catalogueRevision=${context.catalogueRevision}`) }]);
+  expect(new URLSearchParams(window.location.search).get("genreId")).toBe("28");
+  expect(new URLSearchParams(window.location.search).get("page")).toBe("1");
+  await unchanged();
+
+  const response = await bridge.call("request", {
+    method: "GET", url: "/api/me/recommendations",
+  }) as { status: number; body: { data: { movies: { title: string }[] }; meta: { total: number } } };
+  expect(response.status).toBe(200);
+  const latest = response.body.data.movies.map(movie => movie.title);
+  expect(latest).toEqual(["Comedy C", "Action Z", "Action A", "Comedy A", "Comedy B"]);
+  expect(latest).not.toEqual(expected);
+  fireEvent.click(screen.getByRole("button", { name: "Clear filter" }));
+  await waitFor(() => expect(titles()).toEqual(latest));
+  expect(screen.getByText("Showing 1-5 of 5 movies")).toBeInTheDocument();
+  expect(window.location.search).toBe("?source=t05&page=1");
+  await unchanged();
+  await chooseGenre("35");
+  await waitFor(() => expect(titles()).toEqual(["Comedy C", "Comedy A", "Comedy B"]));
+  expect(screen.getByText("Showing 1-3 of 3 matches (5 recommendations before filtering)"))
+    .toBeInTheDocument();
+  await unchanged();
+  await chooseGenre("27");
+  await screen.findByText("No movies match this filter.");
+  fireEvent.click(screen.getByRole("button", { name: "Show all movies" }));
+  await waitFor(() => expect(titles()).toEqual(latest));
+  await unchanged();
+  const other = await bridge.call("request", {
+    account: "b", method: "GET", url: "/api/me/recommendations",
+  }) as typeof response;
+  expect(other.status).toBe(200);
+  expect(other.body.data.movies.map(movie => movie.title)).toEqual(["Outside snapshot"]);
+  expect(other.body.meta.total).toBe(1);
+  expect(calls.filter(({ method }) => method !== "GET"))
+    .toEqual([{ method: "PUT", url: expect.stringMatching(/^\/api\/me\/ratings\//) }]);
 });

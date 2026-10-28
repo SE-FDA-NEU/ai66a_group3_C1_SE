@@ -1,0 +1,13 @@
+
+> frontend@0.0.0 test:t04:integration
+> vitest run --config vitest.t04.config.ts
+
+
+ RUN  v5.0.2 /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/frontend
+
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  22:03:46
+   Duration  4.63s (tests 65%, environment 17%, transform 13%, import 4%)
+

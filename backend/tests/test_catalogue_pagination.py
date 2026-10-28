@@ -28,7 +28,11 @@ def client() -> Iterator[tuple[TestClient, Session]]:
     session = sessionmaker(bind=engine, autoflush=False)()
     create_user(session, email="pagination@example.com", password="movie123")
     session.commit()
-    app.dependency_overrides[get_db] = lambda: session
+    def request_session():
+        with Session(engine, autoflush=False) as request_db:
+            yield request_db
+
+    app.dependency_overrides[get_db] = request_session
     with TestClient(app) as http:
         yield http, session
     app.dependency_overrides.clear()
@@ -135,6 +139,65 @@ def test_recommendation_filter_uses_all_candidates_before_page_slice(client):
     assert out_of_range["data"]["personalised"]
     assert out_of_range["meta"]["total"] == 35
     assert http.get("/api/me/recommendations", params={"genreId": 999}).status_code == 400
+
+
+def test_rating_reranked_filter_pages_and_clear_use_complete_account_base(client):
+    http, session = client
+    for genre_id, name in [(12, "Drama"), (28, "Action"), (27, "Horror")]:
+        upsert_genre(session, genre_id=genre_id, name=name)
+    revision = create_catalogue_revision(session, provider="test")
+    ids = []
+    for index in range(36):
+        movie = upsert_catalogue_movie(
+            session, catalogue_revision_id=revision.id, source="test",
+            source_id=str(index), title=f"Candidate {index:02d}",
+            popularity_score=1000 if index == 35 else 80 if index < 23 else 79.5,
+        )
+        replace_movie_genres(session, movie=movie,
+                             genre_ids=[27 if index == 35 else 12 if index < 23 else 28])
+        ids.append(movie.id)
+    activate_catalogue_revision(session, revision_id=revision.id)
+    session.commit()
+    assert http.post("/api/auth/login", json={
+        "email": "pagination@example.com", "password": "movie123"
+    }).status_code == 200
+    assert http.put("/api/me/preferences", json={"genreIds": [12, 28]}).status_code == 200
+    preferences = http.get("/api/me/preferences").json()
+
+    def pages(genre_id=None):
+        collected = []
+        total = 12 if genre_id == 28 else 35
+        for page in range(1, (total + 9) // 10 + 1):
+            params = {"page": page, "catalogueRevision": revision.id}
+            if genre_id is not None:
+                params["genreId"] = genre_id
+            response = http.get("/api/me/recommendations", params=params)
+            assert response.status_code == 200
+            body = response.json()
+            assert body["meta"] == {
+                "count": min(10, total - (page - 1) * 10), "limit": 10,
+                "page": page, "total": total, "totalPages": (total + 9) // 10,
+                "unfilteredTotal": 35, "catalogueRevision": revision.id,
+            }
+            assert body["data"]["personalised"] and not body["data"]["noMatch"]
+            collected.extend(body["data"]["movies"])
+        assert len({m["id"] for m in collected}) == total
+        return collected
+
+    original = pages()
+    assert [m["id"] for m in original] == ids[:35]
+    assert all(m["genres"][0]["id"] == 12 for m in original[:10])
+    assert [m["id"] for m in pages(28)] == ids[23:35]  # None were visible on page 1.
+
+    for rating, expected in [(5, ids[23:35] + ids[:23]), (1, ids[:35])]:
+        assert http.put(f"/api/me/ratings/{ids[34]}", json={"rating": rating}).status_code == 200
+        latest = pages()
+        assert [m["id"] for m in latest] == expected
+        filtered = pages(28)
+        assert filtered == [m for m in latest if m["genres"][0]["id"] == 28]
+        assert pages() == latest  # Removing genreId restores latest server order/scores.
+        assert latest != original
+        assert http.get("/api/me/preferences").json() == preferences
 
 
 @pytest.mark.parametrize("genre_id", ["0", "abc", "2147483648", "9223372036854775808"])

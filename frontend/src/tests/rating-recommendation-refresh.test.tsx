@@ -116,13 +116,20 @@ describe("S4-T04 delayed responses around a rating save", () => {
   it("a pre-save response that arrives late cannot restore the old ranking", async () => {
     const preSave = deferred();
     let calls = 0;
-    vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+    let oldSignal: AbortSignal | null | undefined;
+    const latest = [card("movie-a", "Zenith Action", 1),
+      card("movie-b", "Aardvark Comedy", 0, comedy)];
+    vi.spyOn(globalThis, "fetch").mockImplementation((input, init) => {
       const url = String(input);
       if (url === "/api/genres") return json({ data: { genres: [action, comedy] } });
       if (url.startsWith("/api/me/recommendations")) {
         calls += 1;
-        return calls === 1 ? preSave.promise : json(body([
-          card("movie-a", "Zenith Action", 1), card("movie-b", "Aardvark Comedy", 0, comedy)]));
+        if (calls === 1) { oldSignal = init?.signal; return preSave.promise; }
+        const genreId = new URL(url, "http://localhost").searchParams.get("genreId");
+        const selected = latest.filter(movie => !genreId || String(movie.genres[0].id) === genreId);
+        return json({ ...body(selected), meta: { count: selected.length, limit: 10,
+          page: 1, total: selected.length, totalPages: 1, unfilteredTotal: 2,
+          catalogueRevision: "rev-current" } });
       }
       return Promise.reject(new Error(`Unexpected request: ${url}`));
     });
@@ -143,6 +150,7 @@ describe("S4-T04 delayed responses around a rating save", () => {
     // A committed rating save advances the generation while the first request is pending.
     view.rerender(tree(1));
     await screen.findByRole("heading", { name: "Zenith Action" });
+    expect(oldSignal?.aborted).toBe(true);
 
     await act(async () => { preSave.resolve(new Response(JSON.stringify(body([
       card("movie-b", "Aardvark Comedy", 0, comedy), card("movie-a", "Zenith Action", 0)])),
@@ -154,6 +162,16 @@ describe("S4-T04 delayed responses around a rating save", () => {
     const boosted = screen.getByRole("heading", { name: "Zenith Action" }).closest("article")!;
     expect(within(boosted).getByText("Ranking score for you").nextElementSibling)
       .toHaveTextContent("81");
+    await waitFor(() => expect(screen.getByRole("combobox")).toBeEnabled());
+    fireEvent.change(screen.getByRole("combobox"), { target: { value: "35" } });
+    await waitFor(() => expect(screen.queryByRole("heading", { name: "Zenith Action" })).not.toBeInTheDocument());
+    expect(screen.getByRole("heading", { name: "Aardvark Comedy" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Clear filter" }));
+    await screen.findByRole("heading", { name: "Zenith Action" });
+    expect([...document.querySelectorAll(".movie-card h2")].map(node => node.textContent))
+      .toEqual(["Zenith Action", "Aardvark Comedy"]);
+    expect(within(screen.getByRole("heading", { name: "Zenith Action" }).closest("article")!)
+      .getByText("Ranking score for you").nextElementSibling).toHaveTextContent("81");
   });
 });
 
