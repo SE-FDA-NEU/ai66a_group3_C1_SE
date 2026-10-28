@@ -89,6 +89,39 @@ function countResetPosts(page: Page) {
   return seen;
 }
 
+// Holds EVERY request to `url` made while holding (React StrictMode may send a duplicate on
+// mount, so holding only the first one would not be deterministic). Each held request keeps its
+// real body, fetched before any later write, and is delivered on release(). stopHolding() lets
+// later requests through. settled() reports how every late reply ended: "delivered", or
+// "abandoned" if the browser had already dropped it. Any other error is rethrown.
+async function holdRequests(page: Page, url: string) {
+  let holding = true, held = 0, release!: () => void;
+  const gate = new Promise<void>(resolve => { release = resolve; });
+  const outcomes: Promise<"delivered" | "abandoned">[] = [];
+  await page.route(url, async route => {
+    if (!holding) return route.continue();
+    held++;
+    const outcome = (async () => {
+      const snapshot = await route.fetch();
+      await gate;
+      try { await route.fulfill({ response: snapshot }); return "delivered" as const; }
+      catch (error) {
+        if (error instanceof Error && /already handled|abort|disposed|closed/i.test(error.message)) return "abandoned" as const;
+        throw error;
+      }
+    })();
+    outcomes.push(outcome);
+    await outcome.catch(() => undefined); // the test observes the same promise through settled()
+  });
+  return {
+    held: () => held, release, stopHolding: () => { holding = false; },
+    settled: async () => (await Promise.all(outcomes)).join(","),
+  };
+}
+// Two animation frames after the late reply: React has had the chance to apply it.
+const afterLateReply = (page: Page) => page.evaluate(() => new Promise<void>(resolve =>
+  requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
+
 test.beforeEach(async ({ request }) => {
   expect((await request.post("http://127.0.0.1:8014/__acceptance/scenario/ranked")).ok()).toBe(true);
 });
@@ -417,32 +450,75 @@ test("explicit failure, lost-before-commit and lost-after-commit keep truthful s
   }
 });
 
-test("a read that was in flight before the reset cannot restore old recommendations", async ({ page, request }) => {
+test("reset stays blocked while the profile read is unfinished", async ({ page, request }) => {
+  await signIn(page, await account(request, "blocked"));
+  await seed(page.request, A);
+  const read = await holdRequests(page, "**/api/me/profile");
+  const seen = countResetPosts(page);
+  await page.getByRole("link", { name: "Profile", exact: true }).click();
+  await expect.poll(read.held).toBeGreaterThanOrEqual(1);
+  await expect(page.getByText("Loading your profile…")).toBeVisible();
+  await expect(resetButton(page)).toBeDisabled();
+  await resetButton(page).click({ force: true });
+  await expect(dialogOf(page)).toHaveCount(0);
+  await expect(page.getByTestId("profile-genres-count")).toHaveCount(0);
+  expect(seen.posts).toBe(0);
+  await shot(page, "profile-read-pending-reset-blocked");
+  read.release();
+  expect(await read.settled()).toMatch(/delivered/);
+  await counts(page, 3, 2, 2);
+  await expect(resetButton(page)).toBeEnabled();
+  expect(seen.posts).toBe(0);
+  expect((await server(page.request, [1, 2])).profile).toMatchObject({ ratingCount: 2, watchlistCount: 2 });
+});
+
+test("a delayed old profile response cannot overwrite a completed reset", async ({ page, request }) => {
+  await signIn(page, await account(request, "oldprofile"));
+  await seed(page.request, A);
+  const old = await holdRequests(page, "**/api/me/profile"); // the first visit's reads: real 3/2/2 summary
+  await page.getByRole("link", { name: "Profile", exact: true }).click();
+  await expect.poll(old.held).toBeGreaterThanOrEqual(1);
+  await page.getByRole("link", { name: "Home", exact: true }).click();
+  old.stopHolding();
+  await page.getByRole("link", { name: "Profile", exact: true }).click(); // second visit reads normally
+  await counts(page, 3, 2, 2);
+  await confirmWithClicks(page);
+  await expect(page.locator(".profile-reset").getByText(success, { exact: true })).toBeVisible();
+  await counts(page, 0, 0, 2);
+  old.release(); // the old 3/2/2 reply is delivered after the reset completed
+  const outcome = await old.settled();
+  test.info().annotations.push({ type: "late-reply", description: outcome });
+  await afterLateReply(page);
+  await counts(page, 0, 0, 2);
+  await expect(page.getByText("No saved genres yet.")).toBeVisible();
+  await expect(page.getByRole("list", { name: "Saved genres" })).toHaveCount(0);
+  await expect(page.locator(".profile-reset").getByText(success, { exact: true })).toBeVisible();
+  expect((await server(page.request, [1, 2])).profile).toEqual({ genres: [], ratingCount: 0, watchlistCount: 2 });
+  await shot(page, "old-profile-response-after-reset");
+});
+
+test("a recommendations read in flight before the reset cannot restore old cards", async ({ page, request }) => {
   await signIn(page, await account(request, "stale"));
   await seed(page.request, A);
-  let held = 0, releaseStale!: () => void;
-  const gate = new Promise<void>(resolve => { releaseStale = resolve; });
-  await page.route("**/api/me/recommendations*", async route => {
-    if (held++ > 0) return route.continue();
-    const stale = await route.fetch(); // personalised snapshot taken before the reset
-    await gate;
-    await route.fulfill({ response: stale }).catch(() => undefined);
-  });
+  const old = await holdRequests(page, "**/api/me/recommendations*"); // personalised snapshot before the reset
   await page.getByRole("link", { name: "My recommendations", exact: true }).first().click();
-  await expect.poll(() => held).toBe(1);
+  await expect.poll(old.held).toBeGreaterThanOrEqual(1);
   await page.getByRole("link", { name: "Profile", exact: true }).click();
+  old.stopHolding();
   await expect(page.getByTestId("profile-genres-count")).toHaveText("3");
   await confirmWithClicks(page);
   await expect(page.locator(".profile-reset").getByText(success, { exact: true })).toBeVisible();
   await counts(page, 0, 0, 2);
   await page.getByRole("link", { name: "My recommendations", exact: true }).last().click();
   await expect(page.getByText("Not personalised")).toBeVisible();
-  releaseStale();
-  await page.waitForTimeout(500);
+  old.release();
+  const outcome = await old.settled();
+  test.info().annotations.push({ type: "late-reply", description: outcome });
+  await afterLateReply(page);
   await expect(page.getByText("Not personalised")).toBeVisible();
   await expect(page.getByText("Your ratings have not changed this score.")).toHaveCount(0);
   await expect(page.getByText(/Because you like/)).toHaveCount(0);
   await page.getByRole("link", { name: "Preferences", exact: true }).click();
   await expect(page.getByText("0 of 5 selected")).toBeVisible();
-  await shot(page, "stale-after-reset");
+  await shot(page, "stale-recommendations-after-reset");
 });
