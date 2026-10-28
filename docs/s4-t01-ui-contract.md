@@ -76,7 +76,8 @@ than being rewritten as newly executed Sprint 4 evidence.
 | `AppFrame` S4-T10 extension | One active-state `Search` link points to public `/search`. `SearchPage` reuses `MovieGrid`/`MovieCard`, `MoviePoster`, semantic theme tokens, shared button/status styles and safe detail-return context. The labelled search form supports Enter and its native Search submit button. |
 | `AppFrame` S4-T12 extension | One `My watchlist` link in the existing main navigation points to protected `/watchlist`. Detail mounts the account-scoped watchlist action beside the existing rating widget. `MoviePoster`, `PageControls`, `useFeedback`, theme tokens and safe detail-return state are reused. No new theme, notification, rating or navigation system is introduced. |
 | `AppFrame` S4-T13 extension | A signed-in `Profile` link uses the existing protected `/profile` registry entry. `ProfilePage` reuses `ConfirmDialog`, button links, semantic theme tokens and `useFeedback`. It displays its API summary and distinguishes confirmed reset, documented rejection and unconfirmed response/reconciliation. Shared post-reset invalidation remains T14; no new auth/cache/theme/notification store is introduced. |
-| `SimilarMovies` (S4-T08) | `{movieId,returnTo,returnContext?}`; one public read of `/api/movies/{id}/similar` per movie and retry. Keyed by movie and aborted on change; late completions are ignored. Renders `MovieGrid`/`MovieCard`, so poster fallback, tokens and the 5/4/3/2-column layout are reused. Never reads account, rating or watchlist state. Loading, empty and error/Retry stay inside its own section; the source details are never hidden. |
+| S4-T14 reset invalidation | A validated committed reset discards the current Profile summary, calls the account-guarded `invalidatePersonalisationAfterReset` helper, then rereads Profile through its existing client. The helper advances the shared recommendation generation and rotates its navigation scope. Preferences and per-movie ratings are route-local, abort on unmount and refetch through their existing clients when reopened. Rejection, cancellation and ambiguous responses do not invalidate early. Auth and watchlist state stay intact. |
+| `SimilarMovies` (S4-T08) | `{movieId,returnTo,returnContext?}`; one active public read of `/api/movies/{id}/similar` per movie and retry. Keyed by movie and aborted on change; late completions are ignored. Renders `MovieGrid`/`MovieCard`, so poster fallback, tokens and the 5/4/3/2-column layout are reused. Never reads account, rating or watchlist state. Loading, empty and error/Retry stay inside its own section; the source details are never hidden. |
 | `ThemeProvider` / `ThemeToggle` | Dark default; only `dark`/`light`; local key `cineai-theme`. Inline pre-paint bootstrap and provider use the same key. Blocked/corrupt storage is safe. Toggling changes tokens, never keys/remounts, auth, URL, draft, filter or page. |
 | `MoviePoster` | `{movieId,title,posterUrl?,eager?}`; strict w500 HTTPS CDN URL only; width/height 500/750 and fixed 2:3 region; lazy list images, eager detail poster; labelled missing/error fallback; failure state resets on movie or URL change. |
 | `StarRating` | Controlled half-step `RatingValue|null` (0.5–5); five visual stars with ten native labelled radios, Arrow/Space/touch; left half/midpoint selects the half step, right end the whole step; selection/hover/focus never writes. Consumer owns explicit Save, pending/error/retry and committed value. Existing `MovieRating` keeps account/movie isolation. |
@@ -216,8 +217,8 @@ See [T10 acceptance and keyboard follow-up](evidence/s4-t10-search/README.md).
 ## S4-T08 Similar movies integration (2026-10-27)
 
 The details page mounts `SimilarMovies` below the existing body, after the
-rating and watchlist widgets, in its own `Similar movies` section. It issues one
-public read for the current movie and shows loading, up to five distinct cards
+rating and watchlist widgets, in its own `Similar movies` section. It keeps one
+active public read for the current movie and shows loading, up to five distinct cards
 in the server's order, `No similar movies are available`, or an inline alert
 with `Retry similar movies`. The source movie, rating and watchlist are not
 hidden, delayed or coupled to this read in any state.
@@ -228,6 +229,15 @@ the return link on the selected movie still reads `Back to search`,
 `Back to recommendations` and so on, and an unsafe or absent destination falls
 back to the catalogue. Saved genres and ratings are never read or written. See
 [T08 acceptance and evidence](evidence/s4-t08-similar-ui/README.md).
+
+In development React StrictMode may start and abort a duplicate request during
+effect setup/cleanup. The T01 browser gate matches the exact Similar movie
+endpoint and a test request tag, accepts those duplicate or cancelled attempts,
+and releases every held response in cleanup. It still checks visible loading,
+source details, server order, selected-ID navigation and stale-response safety.
+The Windows fixture runner owns its server processes and removes only its own
+temporary SQLite database after the browser command exits. See the
+[T14 gate correction evidence](evidence/s4-t14-reset-invalidation.md#browser-gate-correction-and-final-local-checks-uncommitted).
 
 ## S4-T16 detail-return and request boundaries (2026-10-27)
 
@@ -301,3 +311,21 @@ does not refetch metadata, modify ranking, save preferences or write account
 data. No migration, catalogue import or NLP rebuild is required.
 
 See [execution, real captures and review handoff](evidence/s4-t16-spotlight.md).
+
+## T14/T16 integration (2026-10-28)
+
+Keep T14's committed-reset invalidation, Profile refresh, account guard and
+Windows server ownership together with every T16 consumer amendment above.
+The isolated test gate has one matcher: `{method, path, requestTag?}`. It
+supports exact detail/rating/membership reads and membership writes as well
+as Search, Similar and Recommendations. Request tags isolate browser requests
+from API oracles; cancelled StrictMode requests are counted and drained before
+cleanup. T16 helpers observe `pending`, not the superseded `active` field.
+Search test actions explicitly submit; the UI still sends nothing on typing.
+
+The original T14 runner/configuration is retained, including external-server
+ownership on Windows and verified removal of its own temporary database.
+Linux browser acceptance jobs pin Ubuntu 24.04 after the previous floating
+runner exceeded its installation budget. Assertions, test deadlines, retries
+and skips are unchanged. Current merged-candidate results are in the
+[integration evidence](evidence/s4-t16-t14-reconciliation.md).

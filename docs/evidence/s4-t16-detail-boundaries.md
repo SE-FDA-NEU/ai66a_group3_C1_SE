@@ -194,3 +194,5 @@ Additional desktop/mobile public-return and stale-response captures are in the
 Later PO-authorized follow-up: [current-page Popular carousel, compact collection
 headings and updated execution](s4-t16-spotlight.md). Earlier counts above remain
 historical; the linked evidence records the current source and checks.
+
+Current integration follow-up: [T14/T16 reconciliation and combined execution](s4-t16-t14-reconciliation.md). Earlier counts/source captures remain historical.

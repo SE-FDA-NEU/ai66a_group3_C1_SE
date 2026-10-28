@@ -368,3 +368,15 @@ identify the current documentation, not an independent approval or Story closure
 | `docs/architecture.md` | `3d23d7ddf48f789e55518c41787c4034d7d8d5eb9c24ec2b0033edcfca91c843` |
 | `docs/design.md` | `aaed16ff142183eafc3457faf84f96c42cf21b8092a6bd2fd594a3ccc0981e47` |
 | `docs/testing.md` | `c8d92cbc1f995fedf4d8dd4e31a2a8a43558e92b9584159128299f1a702fbbae` |
+
+### T14/T16 integrated gate and regression handoff (2026-10-28)
+
+Merged T14 reset/runner behavior is retained alongside T16's consumer changes.
+The current testing contract records 19 T16 browser cases and the unified
+exact method/path/tag gate. [Integration execution](s4-t16-t14-reconciliation.md)
+distinguishes local results from CI and independent review; no Story is closed
+or acceptance checkbox auto-checked by this documentation update.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/testing.md` | `696ffea3bf9a3ae08556bf7b456f999ec52e495dfd32b45f89f0df3df67d9d8b` |

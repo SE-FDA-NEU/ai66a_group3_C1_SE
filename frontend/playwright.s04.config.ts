@@ -50,7 +50,7 @@ export default defineConfig({
     // Do not persist auth cookies, passwords or session tokens in traces/HARs.
     trace: "off",
   },
-  webServer: [
+  webServer: process.env.S04_EXTERNAL_SERVERS === "1" ? undefined : [
     {
       command: `"${python}" backend/scripts/s04_acceptance_server.py`,
       cwd: root,

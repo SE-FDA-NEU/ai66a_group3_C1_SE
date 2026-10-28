@@ -13,12 +13,18 @@ Historical M2/M3 evidence remains historical.
 S4-T16 presentation follow-up: Popular features its current page's first three
 movies, correct global ranks, edge arrows/dots/keyboard, image fallback and
 slide-preserving detail return. Popular, Search and My watchlist share compact
-headings. The T16 browser suite now has 18 cases; its responsive case checks
+headings. After integrating T14, the T16 browser suite has 19 cases; its responsive case checks
 375/768/1440px in both themes. Captures and current execution are recorded in
 [carousel/heading evidence](evidence/s4-t16-spotlight.md). The summary DTO's
 nullable backdrop URL uses the existing server/client allowlists, with no
 runtime TMDb metadata request. Enrichment acceptance continues to compare all
 non-media response fields while checking each updated URL against details.
+
+The [T14/T16 reconciliation record](evidence/s4-t16-t14-reconciliation.md)
+documents the unified exact method/path/tag response gate, cancelled-request
+draining, Windows runner cleanup, and a real delayed Home-read/Start boundary.
+T14 reset invalidation and T16 half-star/Search/carousel behavior are verified
+together; earlier source fingerprints and counts remain historical.
 
 S4-T16 consumer amendment: rating feedback now accepts 0.5–5 in exact half
 steps; Search commits only on Enter/Search; setup imports 50 TMDb popular pages.

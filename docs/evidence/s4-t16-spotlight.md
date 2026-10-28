@@ -141,3 +141,5 @@ viewport; verify Search still waits for Enter/Search. Missing artwork should
 leave readable titles/actions. Obtain teammate review on the final PR head
 before merging. Current local success does not automatically close T16 or any
 parent Story.
+
+Current integration follow-up: [T14/T16 reconciliation and combined execution](s4-t16-t14-reconciliation.md). Earlier counts/source captures remain historical.

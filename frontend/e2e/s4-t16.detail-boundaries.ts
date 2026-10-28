@@ -41,6 +41,46 @@ async function fixtureArtwork(page: Page, failFirst = false) {
   });
 }
 
+test("Start opens Preferences while a real Home catalogue read is still pending", async ({ page, request }) => {
+  const email = `t16-start-${crypto.randomUUID()}@example.test`;
+  expect((await request.post("/api/auth/register", { data: { email, password } })).status()).toBe(201);
+  await page.goto("/login");
+  await page.getByLabel("Email", { exact: true }).fill(email);
+  await page.getByLabel("Password", { exact: true }).fill(password);
+  let release!: () => void;
+  const held = new Promise<void>(resolve => { release = resolve; });
+  let pending = 0;
+  const matches = (url: URL) => url.pathname === "/api/movies";
+  await page.route(matches, async route => {
+    pending++;
+    try {
+      const response = await route.fetch();
+      await held;
+      await route.fulfill({ response });
+    } finally { pending--; }
+  });
+  try {
+    await page.getByRole("button", { name: "Sign in", exact: true }).click();
+    await expect(page).toHaveURL("/");
+    await expect(page.getByRole("banner")).toContainText(email);
+    await expect(page.getByRole("button", { name: "Sign out", exact: true })).toBeVisible();
+    await expect.poll(() => pending).toBeGreaterThan(0);
+    await page.getByRole("link", { name: "Start", exact: true }).click();
+    await expect(page).toHaveURL("/preferences");
+    release();
+    await expect.poll(() => pending).toBe(0);
+    await page.getByRole("checkbox", { name: "Action", exact: true }).check();
+    await expect(page).toHaveURL("/preferences");
+    await expect(page.getByRole("checkbox", { name: "Action", exact: true })).toBeChecked();
+    const preferences = await page.request.get("/api/me/preferences");
+    expect(preferences.status()).toBe(200);
+    expect((await preferences.json()).data.genres).toEqual([]);
+  } finally {
+    release();
+    await page.unroute(matches);
+  }
+});
+
 test("Popular highlights three movies on every page without refetching or reordering", async ({ page, request }) => {
   expect((await request.post(`${controls}/scenario/popular-spotlight`)).ok()).toBe(true);
   await fixtureArtwork(page);
@@ -129,18 +169,19 @@ test("A failed Popular backdrop keeps the gradient and the next slide loads its 
 
 async function arm(request: APIRequestContext, name: string, apiPath: string, method = "GET") {
   expect((await request.post(`${controls}/gates/${name}/arm`, {
-    data: { paths: [apiPath], methods: [method] },
+    data: { path: apiPath, method },
   })).status()).toBe(200);
 }
 
-async function captured(request: APIRequestContext, name: string, apiPath: string) {
+async function captured(request: APIRequestContext, name: string, apiPath: string, method = "GET") {
   // StrictMode may start more than one physical request. Require at least one
   // real response and verify identity/payload, rather than assuming exactly one.
   await expect.poll(async () => {
     const result = await request.get(`${controls}/gates/${name}`);
     expect(result.status()).toBe(200);
     const gate = await result.json();
-    expect(gate.responses.every((row: { path: string }) => row.path === apiPath)).toBe(true);
+    expect(gate.responses.every((row: { path: string; method: string; status: number }) =>
+      row.path === apiPath && row.method === method && row.status === 200)).toBe(true);
     return gate.responses.length;
   }).toBeGreaterThan(0);
   expect((await request.post(`${controls}/gates/${name}/seal`)).status()).toBe(200);
@@ -550,7 +591,7 @@ test("TC-S4-T16-ASYNC-002 delayed private reads and a committed write cannot lea
   await expect(page.getByRole("button", { name: "Add to watchlist" })).toBeVisible();
   await arm(request, gate, `/api/me/watchlist/${id(1)}`, "PUT");
   await page.getByRole("button", { name: "Add to watchlist" }).click();
-  const rows = await captured(request, gate, `/api/me/watchlist/${id(1)}`);
+  const rows = await captured(request, gate, `/api/me/watchlist/${id(1)}`, "PUT");
   expect(rows.every((row: { body: { data: { inWatchlist: boolean } } }) => row.body.data.inWatchlist)).toBe(true);
   await page.getByRole("button", { name: "Sign out", exact: true }).click();
   await expect(page.getByRole("link", { name: "Sign in", exact: true })).toBeVisible();

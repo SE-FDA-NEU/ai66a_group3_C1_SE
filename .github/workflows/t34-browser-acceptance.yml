@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
   browser-rating-acceptance:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     env:
       PYTHONUTF8: "1"
