@@ -29,7 +29,9 @@ function tree(account = auth()) {
     <Routes><Route path="/profile" element={<ProfilePage />} /><Route path="/" element={<h1>Home</h1>} /></Routes>
   </MemoryRouter></ActionFeedback></AuthContext.Provider>;
 }
-const posts = (fetch: ReturnType<typeof vi.spyOn>) => fetch.mock.calls.filter(([, init]) => (init as RequestInit | undefined)?.method === "POST");
+const posts = (
+  fetchSpy: { mock: { calls: Parameters<typeof globalThis.fetch>[] } },
+) => fetchSpy.mock.calls.filter(([, init]) => init?.method === "POST");
 const resetTrigger = () => screen.getByRole("button", { name: "Reset personalisation" });
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 
