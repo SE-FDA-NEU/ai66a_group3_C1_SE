@@ -89,22 +89,28 @@ function countResetPosts(page: Page) {
   return seen;
 }
 
+type Snapshot = { data: { genres?: unknown[]; ratingCount?: number; watchlistCount?: number; mode?: string; personalised?: boolean } };
+
 // Holds EVERY request to `url` made while holding (React StrictMode may send a duplicate on
-// mount, so holding only the first one would not be deterministic). Each held request keeps its
-// real body, fetched before any later write, and is delivered on release(). stopHolding() lets
-// later requests through. settled() reports how every late reply ended: "delivered", or
-// "abandoned" if the browser had already dropped it. Any other error is rethrown.
+// mount, so holding only the first one would not be deterministic). Each held request first
+// fetches its real body from the backend and records it (snapshots()), so a test can assert
+// what the old reply contains before it does anything else; ready() is true once every held
+// request has its snapshot. The reply is delivered on release(). stopHolding() lets later
+// requests through. settled() reports how every late reply ended: "delivered", or "abandoned"
+// if the browser had already dropped it. Any other error is rethrown.
 async function holdRequests(page: Page, url: string) {
-  let holding = true, held = 0, release!: () => void;
+  let holding = true, started = 0, release!: () => void;
   const gate = new Promise<void>(resolve => { release = resolve; });
+  const snapshots: Snapshot[] = [];
   const outcomes: Promise<"delivered" | "abandoned">[] = [];
   await page.route(url, async route => {
     if (!holding) return route.continue();
-    held++;
+    started++;
     const outcome = (async () => {
-      const snapshot = await route.fetch();
+      const response = await route.fetch();
+      snapshots.push(await response.json() as Snapshot);
       await gate;
-      try { await route.fulfill({ response: snapshot }); return "delivered" as const; }
+      try { await route.fulfill({ response }); return "delivered" as const; }
       catch (error) {
         if (error instanceof Error && /already handled|abort|disposed|closed/i.test(error.message)) return "abandoned" as const;
         throw error;
@@ -114,7 +120,8 @@ async function holdRequests(page: Page, url: string) {
     await outcome.catch(() => undefined); // the test observes the same promise through settled()
   });
   return {
-    held: () => held, release, stopHolding: () => { holding = false; },
+    ready: () => started > 0 && snapshots.length === started,
+    snapshots: () => snapshots, release, stopHolding: () => { holding = false; },
     settled: async () => (await Promise.all(outcomes)).join(","),
   };
 }
@@ -456,7 +463,7 @@ test("reset stays blocked while the profile read is unfinished", async ({ page, 
   const read = await holdRequests(page, "**/api/me/profile");
   const seen = countResetPosts(page);
   await page.getByRole("link", { name: "Profile", exact: true }).click();
-  await expect.poll(read.held).toBeGreaterThanOrEqual(1);
+  await expect.poll(read.ready).toBe(true);
   await expect(page.getByText("Loading your profile…")).toBeVisible();
   await expect(resetButton(page)).toBeDisabled();
   await resetButton(page).click({ force: true });
@@ -477,7 +484,12 @@ test("a delayed old profile response cannot overwrite a completed reset", async 
   await seed(page.request, A);
   const old = await holdRequests(page, "**/api/me/profile"); // the first visit's reads: real 3/2/2 summary
   await page.getByRole("link", { name: "Profile", exact: true }).click();
-  await expect.poll(old.held).toBeGreaterThanOrEqual(1);
+  await expect.poll(old.ready).toBe(true);
+  // The reply that will arrive late really is the pre-reset 3/2/2 summary.
+  for (const snapshot of old.snapshots()) {
+    expect(snapshot.data.genres).toHaveLength(3);
+    expect([snapshot.data.ratingCount, snapshot.data.watchlistCount]).toEqual([2, 2]);
+  }
   await page.getByRole("link", { name: "Home", exact: true }).click();
   old.stopHolding();
   await page.getByRole("link", { name: "Profile", exact: true }).click(); // second visit reads normally
@@ -502,7 +514,9 @@ test("a recommendations read in flight before the reset cannot restore old cards
   await seed(page.request, A);
   const old = await holdRequests(page, "**/api/me/recommendations*"); // personalised snapshot before the reset
   await page.getByRole("link", { name: "My recommendations", exact: true }).first().click();
-  await expect.poll(old.held).toBeGreaterThanOrEqual(1);
+  await expect.poll(old.ready).toBe(true);
+  // The reply that will arrive late really is the personalised pre-reset snapshot.
+  for (const snapshot of old.snapshots()) expect(snapshot.data).toMatchObject({ mode: "personalised", personalised: true });
   await page.getByRole("link", { name: "Profile", exact: true }).click();
   old.stopHolding();
   await expect(page.getByTestId("profile-genres-count")).toHaveText("3");
