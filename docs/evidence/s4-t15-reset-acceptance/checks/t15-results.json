@@ -21,8 +21,8 @@
     "grepInvert": null,
     "maxFailures": 0,
     "metadata": {
-      "testedCommit": "63d221093c6bbdaa155808495a405da623da39cb",
-      "workingTree": "M .github/workflows/t13-profile.yml\n M .gitignore\n D docs/evidence/s4-t15-reset-acceptance/screenshots/duplicate-pending.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/failure-1-rejected.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/failure-2-lost-before-commit.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/failure-3-reconciled.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/failure-3-unconfirmed.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-dark-1440-1-before.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-dark-1440-2-confirm.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-dark-1440-3-after.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-light-375-1-before.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-light-375-2-confirm.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-light-375-3-after.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/keyboard-confirm-dark-1440.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/keyboard-confirm-dark-375.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/keyboard-confirm-light-1440.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/keyboard-confirm-light-375.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/signals-1-rated-recommendations.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/signals-2-cold-start.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/signals-3-reselected.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/stale-after-reset.png\n M frontend/e2e/t15.reset-acceptance.ts\n?? .claude/\n?? CLAUDE.md\n?? NOTE.md\n?? docs/evidence/s4-t15-reset-acceptance/checks/\n?? frontend/screenshot/output/t06-registration-tests.png\n?? frontend/screenshot/output/t10-after-sign-out-guard-redirects-to-login.png\n?? frontend/screenshot/output/t10-after-sign-out-home.png\n?? frontend/screenshot/output/t10-public-catalogue-no-login.png\n?? frontend/screenshot/output/t10-public-movie-detail-no-login.png\n?? frontend/screenshot/output/t10-redirect-recommendations-to-login.png\n?? frontend/screenshot/output/t10-signed-in-recommendations.png\n?? frontend/screenshot/output/t31-full-suite-and-lint.png\n?? frontend/screenshot/output/t31-rating-api-tests.png\n?? frontend/src/tests/profile-stale-reads.test.tsx",
+      "testedCommit": "4f1dc130f4f021b89e87abcda1adf284ed95f5db",
+      "workingTree": "M .gitignore\n D docs/evidence/s4-t15-reset-acceptance/checks/frontend-lint.log\n D docs/evidence/s4-t15-reset-acceptance/checks/frontend-unit.log\n D docs/evidence/s4-t15-reset-acceptance/checks/t13-regression.log\n M docs/evidence/s4-t15-reset-acceptance/checks/t15-browser.log\n D docs/evidence/s4-t15-reset-acceptance/checks/t15-results.json\n D docs/evidence/s4-t15-reset-acceptance/screenshots/duplicate-pending.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/failure-1-rejected.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/failure-2-lost-before-commit.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/failure-3-reconciled.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/failure-3-unconfirmed.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-dark-1440-1-before.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-dark-1440-2-confirm.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-dark-1440-3-after.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-light-375-1-before.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-light-375-2-confirm.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-light-375-3-after.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/keyboard-confirm-dark-1440.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/keyboard-confirm-dark-375.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/keyboard-confirm-light-1440.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/keyboard-confirm-light-375.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/old-profile-response-after-reset.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/profile-read-pending-reset-blocked.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/signals-1-rated-recommendations.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/signals-2-cold-start.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/signals-3-reselected.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/stale-recommendations-after-reset.png\nR  docs/evidence/s4-t15-reset-acceptance/tested-source.sha256 -> docs/evidence/s4-t15-reset-acceptance/tested-source.historical-crlf.sha256\n M frontend/e2e/t15.reset-acceptance.ts\n M frontend/src/tests/profile-stale-reads.test.tsx\n?? .claude/\n?? CLAUDE.md\n?? NOTE.md\n?? docs/evidence/s4-t15-reset-acceptance/tested-source.sha256\n?? docs/evidence/s4-t15-reset-acceptance/verify-tested-source.mjs\n?? frontend/screenshot/output/t06-registration-tests.png\n?? frontend/screenshot/output/t10-after-sign-out-guard-redirects-to-login.png\n?? frontend/screenshot/output/t10-after-sign-out-home.png\n?? frontend/screenshot/output/t10-public-catalogue-no-login.png\n?? frontend/screenshot/output/t10-public-movie-detail-no-login.png\n?? frontend/screenshot/output/t10-redirect-recommendations-to-login.png\n?? frontend/screenshot/output/t10-signed-in-recommendations.png\n?? frontend/screenshot/output/t31-full-suite-and-lint.png\n?? frontend/screenshot/output/t31-rating-api-tests.png",
       "node": "v24.21.0",
       "python": "Python 3.12.10",
       "sourceSha256": {
@@ -182,7 +182,7 @@
         "frontend/src/tests/preferences-account-switch.test.tsx": "e704f6c85090b604bce2f9a5b75d53265456af2dbccee392492978d6b54564f9",
         "frontend/src/tests/preferences.test.tsx": "99dd91e740e5384a057517b3d6e2b5b13facd798d870ae4a8f8ede76917ca092",
         "frontend/src/tests/profile-client.test.ts": "84aeafe440f77c255675a07fd4d5056b21fe9c22d0ff4e1e708512206ecc6470",
-        "frontend/src/tests/profile-stale-reads.test.tsx": "e16bed7853023888eab506ad820a425237f9569af87151126c1912b01010c8bc",
+        "frontend/src/tests/profile-stale-reads.test.tsx": "d187b6846fdd0b7c17b98ed25465818a045bf8b695a35faafeca381d2fe25d85",
         "frontend/src/tests/profile.test.tsx": "da5793083d83ddfef3ec40b644c20358dbed09ff1785120440c635dc8acf5ceb",
         "frontend/src/tests/rating-recommendation-refresh.test.tsx": "c952953b9873c3bf18c89deea5e76bab57e9d09fae8e34050e5bb874f3ea1eb4",
         "frontend/src/tests/rating-session-refresh.test.tsx": "c9064bffa75c8225632b8763ad4f15fc759ad3b7e608aa48a9ad037b931e5e39",
@@ -211,8 +211,8 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "testedCommit": "63d221093c6bbdaa155808495a405da623da39cb",
-          "workingTree": "M .github/workflows/t13-profile.yml\n M .gitignore\n D docs/evidence/s4-t15-reset-acceptance/screenshots/duplicate-pending.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/failure-1-rejected.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/failure-2-lost-before-commit.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/failure-3-reconciled.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/failure-3-unconfirmed.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-dark-1440-1-before.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-dark-1440-2-confirm.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-dark-1440-3-after.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-light-375-1-before.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-light-375-2-confirm.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-light-375-3-after.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/keyboard-confirm-dark-1440.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/keyboard-confirm-dark-375.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/keyboard-confirm-light-1440.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/keyboard-confirm-light-375.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/signals-1-rated-recommendations.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/signals-2-cold-start.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/signals-3-reselected.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/stale-after-reset.png\n M frontend/e2e/t15.reset-acceptance.ts\n?? .claude/\n?? CLAUDE.md\n?? NOTE.md\n?? docs/evidence/s4-t15-reset-acceptance/checks/\n?? frontend/screenshot/output/t06-registration-tests.png\n?? frontend/screenshot/output/t10-after-sign-out-guard-redirects-to-login.png\n?? frontend/screenshot/output/t10-after-sign-out-home.png\n?? frontend/screenshot/output/t10-public-catalogue-no-login.png\n?? frontend/screenshot/output/t10-public-movie-detail-no-login.png\n?? frontend/screenshot/output/t10-redirect-recommendations-to-login.png\n?? frontend/screenshot/output/t10-signed-in-recommendations.png\n?? frontend/screenshot/output/t31-full-suite-and-lint.png\n?? frontend/screenshot/output/t31-rating-api-tests.png\n?? frontend/src/tests/profile-stale-reads.test.tsx",
+          "testedCommit": "4f1dc130f4f021b89e87abcda1adf284ed95f5db",
+          "workingTree": "M .gitignore\n D docs/evidence/s4-t15-reset-acceptance/checks/frontend-lint.log\n D docs/evidence/s4-t15-reset-acceptance/checks/frontend-unit.log\n D docs/evidence/s4-t15-reset-acceptance/checks/t13-regression.log\n M docs/evidence/s4-t15-reset-acceptance/checks/t15-browser.log\n D docs/evidence/s4-t15-reset-acceptance/checks/t15-results.json\n D docs/evidence/s4-t15-reset-acceptance/screenshots/duplicate-pending.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/failure-1-rejected.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/failure-2-lost-before-commit.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/failure-3-reconciled.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/failure-3-unconfirmed.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-dark-1440-1-before.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-dark-1440-2-confirm.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-dark-1440-3-after.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-light-375-1-before.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-light-375-2-confirm.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-light-375-3-after.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/keyboard-confirm-dark-1440.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/keyboard-confirm-dark-375.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/keyboard-confirm-light-1440.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/keyboard-confirm-light-375.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/old-profile-response-after-reset.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/profile-read-pending-reset-blocked.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/signals-1-rated-recommendations.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/signals-2-cold-start.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/signals-3-reselected.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/stale-recommendations-after-reset.png\nR  docs/evidence/s4-t15-reset-acceptance/tested-source.sha256 -> docs/evidence/s4-t15-reset-acceptance/tested-source.historical-crlf.sha256\n M frontend/e2e/t15.reset-acceptance.ts\n M frontend/src/tests/profile-stale-reads.test.tsx\n?? .claude/\n?? CLAUDE.md\n?? NOTE.md\n?? docs/evidence/s4-t15-reset-acceptance/tested-source.sha256\n?? docs/evidence/s4-t15-reset-acceptance/verify-tested-source.mjs\n?? frontend/screenshot/output/t06-registration-tests.png\n?? frontend/screenshot/output/t10-after-sign-out-guard-redirects-to-login.png\n?? frontend/screenshot/output/t10-after-sign-out-home.png\n?? frontend/screenshot/output/t10-public-catalogue-no-login.png\n?? frontend/screenshot/output/t10-public-movie-detail-no-login.png\n?? frontend/screenshot/output/t10-redirect-recommendations-to-login.png\n?? frontend/screenshot/output/t10-signed-in-recommendations.png\n?? frontend/screenshot/output/t31-full-suite-and-lint.png\n?? frontend/screenshot/output/t31-rating-api-tests.png",
           "node": "v24.21.0",
           "python": "Python 3.12.10",
           "sourceSha256": {
@@ -372,7 +372,7 @@
             "frontend/src/tests/preferences-account-switch.test.tsx": "e704f6c85090b604bce2f9a5b75d53265456af2dbccee392492978d6b54564f9",
             "frontend/src/tests/preferences.test.tsx": "99dd91e740e5384a057517b3d6e2b5b13facd798d870ae4a8f8ede76917ca092",
             "frontend/src/tests/profile-client.test.ts": "84aeafe440f77c255675a07fd4d5056b21fe9c22d0ff4e1e708512206ecc6470",
-            "frontend/src/tests/profile-stale-reads.test.tsx": "e16bed7853023888eab506ad820a425237f9569af87151126c1912b01010c8bc",
+            "frontend/src/tests/profile-stale-reads.test.tsx": "d187b6846fdd0b7c17b98ed25465818a045bf8b695a35faafeca381d2fe25d85",
             "frontend/src/tests/profile.test.tsx": "da5793083d83ddfef3ec40b644c20358dbed09ff1785120440c635dc8acf5ceb",
             "frontend/src/tests/rating-recommendation-refresh.test.tsx": "c952953b9873c3bf18c89deea5e76bab57e9d09fae8e34050e5bb874f3ea1eb4",
             "frontend/src/tests/rating-session-refresh.test.tsx": "c9064bffa75c8225632b8763ad4f15fc759ad3b7e608aa48a9ad037b931e5e39",
@@ -412,8 +412,8 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "testedCommit": "63d221093c6bbdaa155808495a405da623da39cb",
-          "workingTree": "M .github/workflows/t13-profile.yml\n M .gitignore\n D docs/evidence/s4-t15-reset-acceptance/screenshots/duplicate-pending.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/failure-1-rejected.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/failure-2-lost-before-commit.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/failure-3-reconciled.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/failure-3-unconfirmed.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-dark-1440-1-before.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-dark-1440-2-confirm.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-dark-1440-3-after.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-light-375-1-before.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-light-375-2-confirm.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-light-375-3-after.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/keyboard-confirm-dark-1440.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/keyboard-confirm-dark-375.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/keyboard-confirm-light-1440.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/keyboard-confirm-light-375.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/signals-1-rated-recommendations.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/signals-2-cold-start.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/signals-3-reselected.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/stale-after-reset.png\n M frontend/e2e/t15.reset-acceptance.ts\n?? .claude/\n?? CLAUDE.md\n?? NOTE.md\n?? docs/evidence/s4-t15-reset-acceptance/checks/\n?? frontend/screenshot/output/t06-registration-tests.png\n?? frontend/screenshot/output/t10-after-sign-out-guard-redirects-to-login.png\n?? frontend/screenshot/output/t10-after-sign-out-home.png\n?? frontend/screenshot/output/t10-public-catalogue-no-login.png\n?? frontend/screenshot/output/t10-public-movie-detail-no-login.png\n?? frontend/screenshot/output/t10-redirect-recommendations-to-login.png\n?? frontend/screenshot/output/t10-signed-in-recommendations.png\n?? frontend/screenshot/output/t31-full-suite-and-lint.png\n?? frontend/screenshot/output/t31-rating-api-tests.png\n?? frontend/src/tests/profile-stale-reads.test.tsx",
+          "testedCommit": "4f1dc130f4f021b89e87abcda1adf284ed95f5db",
+          "workingTree": "M .gitignore\n D docs/evidence/s4-t15-reset-acceptance/checks/frontend-lint.log\n D docs/evidence/s4-t15-reset-acceptance/checks/frontend-unit.log\n D docs/evidence/s4-t15-reset-acceptance/checks/t13-regression.log\n M docs/evidence/s4-t15-reset-acceptance/checks/t15-browser.log\n D docs/evidence/s4-t15-reset-acceptance/checks/t15-results.json\n D docs/evidence/s4-t15-reset-acceptance/screenshots/duplicate-pending.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/failure-1-rejected.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/failure-2-lost-before-commit.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/failure-3-reconciled.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/failure-3-unconfirmed.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-dark-1440-1-before.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-dark-1440-2-confirm.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-dark-1440-3-after.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-light-375-1-before.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-light-375-2-confirm.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/journey-light-375-3-after.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/keyboard-confirm-dark-1440.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/keyboard-confirm-dark-375.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/keyboard-confirm-light-1440.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/keyboard-confirm-light-375.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/old-profile-response-after-reset.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/profile-read-pending-reset-blocked.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/signals-1-rated-recommendations.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/signals-2-cold-start.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/signals-3-reselected.png\n D docs/evidence/s4-t15-reset-acceptance/screenshots/stale-recommendations-after-reset.png\nR  docs/evidence/s4-t15-reset-acceptance/tested-source.sha256 -> docs/evidence/s4-t15-reset-acceptance/tested-source.historical-crlf.sha256\n M frontend/e2e/t15.reset-acceptance.ts\n M frontend/src/tests/profile-stale-reads.test.tsx\n?? .claude/\n?? CLAUDE.md\n?? NOTE.md\n?? docs/evidence/s4-t15-reset-acceptance/tested-source.sha256\n?? docs/evidence/s4-t15-reset-acceptance/verify-tested-source.mjs\n?? frontend/screenshot/output/t06-registration-tests.png\n?? frontend/screenshot/output/t10-after-sign-out-guard-redirects-to-login.png\n?? frontend/screenshot/output/t10-after-sign-out-home.png\n?? frontend/screenshot/output/t10-public-catalogue-no-login.png\n?? frontend/screenshot/output/t10-public-movie-detail-no-login.png\n?? frontend/screenshot/output/t10-redirect-recommendations-to-login.png\n?? frontend/screenshot/output/t10-signed-in-recommendations.png\n?? frontend/screenshot/output/t31-full-suite-and-lint.png\n?? frontend/screenshot/output/t31-rating-api-tests.png",
           "node": "v24.21.0",
           "python": "Python 3.12.10",
           "sourceSha256": {
@@ -573,7 +573,7 @@
             "frontend/src/tests/preferences-account-switch.test.tsx": "e704f6c85090b604bce2f9a5b75d53265456af2dbccee392492978d6b54564f9",
             "frontend/src/tests/preferences.test.tsx": "99dd91e740e5384a057517b3d6e2b5b13facd798d870ae4a8f8ede76917ca092",
             "frontend/src/tests/profile-client.test.ts": "84aeafe440f77c255675a07fd4d5056b21fe9c22d0ff4e1e708512206ecc6470",
-            "frontend/src/tests/profile-stale-reads.test.tsx": "e16bed7853023888eab506ad820a425237f9569af87151126c1912b01010c8bc",
+            "frontend/src/tests/profile-stale-reads.test.tsx": "d187b6846fdd0b7c17b98ed25465818a045bf8b695a35faafeca381d2fe25d85",
             "frontend/src/tests/profile.test.tsx": "da5793083d83ddfef3ec40b644c20358dbed09ff1785120440c635dc8acf5ceb",
             "frontend/src/tests/rating-recommendation-refresh.test.tsx": "c952953b9873c3bf18c89deea5e76bab57e9d09fae8e34050e5bb874f3ea1eb4",
             "frontend/src/tests/rating-session-refresh.test.tsx": "c9064bffa75c8225632b8763ad4f15fc759ad3b7e608aa48a9ad037b931e5e39",
@@ -665,12 +665,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 17143,
+                  "duration": 8323,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-28T18:28:46.073Z",
+                  "startTime": "2026-10-29T04:23:18.681Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -680,7 +680,7 @@
           ],
           "id": "51dc00b98f4d24e93d85-5cd3407fcebdc835e4b1",
           "file": "t15.reset-acceptance.ts",
-          "line": 130,
+          "line": 137,
           "column": 3
         },
         {
@@ -699,12 +699,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 15001,
+                  "duration": 7408,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-28T18:29:03.753Z",
+                  "startTime": "2026-10-29T04:23:27.571Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -714,7 +714,7 @@
           ],
           "id": "51dc00b98f4d24e93d85-79bfd7ac3b74543b4d00",
           "file": "t15.reset-acceptance.ts",
-          "line": 130,
+          "line": 137,
           "column": 3
         },
         {
@@ -733,12 +733,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 6335,
+                  "duration": 2477,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-28T18:29:18.800Z",
+                  "startTime": "2026-10-29T04:23:34.997Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -748,7 +748,7 @@
           ],
           "id": "51dc00b98f4d24e93d85-cbbae5bab51e8b1c7fb3",
           "file": "t15.reset-acceptance.ts",
-          "line": 231,
+          "line": 238,
           "column": 1
         },
         {
@@ -767,12 +767,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3474,
+                  "duration": 1285,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-28T18:29:25.171Z",
+                  "startTime": "2026-10-29T04:23:37.490Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -782,7 +782,7 @@
           ],
           "id": "51dc00b98f4d24e93d85-d5ecf8e5485d8a08407b",
           "file": "t15.reset-acceptance.ts",
-          "line": 297,
+          "line": 304,
           "column": 3
         },
         {
@@ -801,12 +801,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3221,
+                  "duration": 1336,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-28T18:29:28.688Z",
+                  "startTime": "2026-10-29T04:23:38.788Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -816,7 +816,7 @@
           ],
           "id": "51dc00b98f4d24e93d85-36695ea733c396161207",
           "file": "t15.reset-acceptance.ts",
-          "line": 297,
+          "line": 304,
           "column": 3
         },
         {
@@ -835,12 +835,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3270,
+                  "duration": 1448,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-28T18:29:31.942Z",
+                  "startTime": "2026-10-29T04:23:40.135Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -850,7 +850,7 @@
           ],
           "id": "51dc00b98f4d24e93d85-0e2a4c10698cfff2740c",
           "file": "t15.reset-acceptance.ts",
-          "line": 297,
+          "line": 304,
           "column": 3
         },
         {
@@ -869,12 +869,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3469,
+                  "duration": 1360,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-28T18:29:35.261Z",
+                  "startTime": "2026-10-29T04:23:41.595Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -884,7 +884,7 @@
           ],
           "id": "51dc00b98f4d24e93d85-49b46cb5434703db3eaf",
           "file": "t15.reset-acceptance.ts",
-          "line": 297,
+          "line": 304,
           "column": 3
         },
         {
@@ -903,12 +903,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3410,
+                  "duration": 1418,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-28T18:29:38.780Z",
+                  "startTime": "2026-10-29T04:23:42.967Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -918,7 +918,7 @@
           ],
           "id": "51dc00b98f4d24e93d85-e976d94420b0d6a57c51",
           "file": "t15.reset-acceptance.ts",
-          "line": 347,
+          "line": 354,
           "column": 1
         },
         {
@@ -937,12 +937,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 8827,
+                  "duration": 3878,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-28T18:29:42.240Z",
+                  "startTime": "2026-10-29T04:23:44.397Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -952,7 +952,7 @@
           ],
           "id": "51dc00b98f4d24e93d85-79f23db3660546bdf2de",
           "file": "t15.reset-acceptance.ts",
-          "line": 377,
+          "line": 384,
           "column": 1
         },
         {
@@ -971,12 +971,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3135,
+                  "duration": 1397,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-28T18:29:51.119Z",
+                  "startTime": "2026-10-29T04:23:48.288Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -986,7 +986,7 @@
           ],
           "id": "51dc00b98f4d24e93d85-27393c6d7cce5a4a5379",
           "file": "t15.reset-acceptance.ts",
-          "line": 453,
+          "line": 460,
           "column": 1
         },
         {
@@ -999,7 +999,7 @@
               "annotations": [
                 {
                   "type": "late-reply",
-                  "description": "delivered"
+                  "description": "delivered,delivered"
                 }
               ],
               "expectedStatus": "passed",
@@ -1010,16 +1010,16 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3303,
+                  "duration": 1952,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-28T18:29:54.302Z",
+                  "startTime": "2026-10-29T04:23:49.699Z",
                   "annotations": [
                     {
                       "type": "late-reply",
-                      "description": "delivered"
+                      "description": "delivered,delivered"
                     }
                   ],
                   "attachments": []
@@ -1030,7 +1030,7 @@
           ],
           "id": "51dc00b98f4d24e93d85-f6da588e9fc48d490ded",
           "file": "t15.reset-acceptance.ts",
-          "line": 475,
+          "line": 482,
           "column": 1
         },
         {
@@ -1054,12 +1054,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3497,
+                  "duration": 2112,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-28T18:29:57.649Z",
+                  "startTime": "2026-10-29T04:23:51.666Z",
                   "annotations": [
                     {
                       "type": "late-reply",
@@ -1074,7 +1074,7 @@
           ],
           "id": "51dc00b98f4d24e93d85-21e3fe5badff3b0a83e7",
           "file": "t15.reset-acceptance.ts",
-          "line": 500,
+          "line": 512,
           "column": 1
         }
       ]
@@ -1082,8 +1082,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-10-28T18:28:44.883Z",
-    "duration": 77101.193,
+    "startTime": "2026-10-29T04:23:17.701Z",
+    "duration": 36437.715000000004,
     "expected": 12,
     "skipped": 0,
     "unexpected": 0,

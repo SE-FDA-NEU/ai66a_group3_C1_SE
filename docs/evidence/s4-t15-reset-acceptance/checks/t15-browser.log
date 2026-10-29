@@ -6,26 +6,26 @@ s04_managed_servers=true
 
 Running 12 tests using 1 worker
 
-npm : (node:10660) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+npm : (node:30004) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
 At line:2 char:1
 + npm --prefix frontend run test:t15:ui 2>&1 | Out-File -Encoding utf8  ...
 + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : NotSpecified: ((node:10660) Wa... env being set.:String) [], RemoteException
+    + CategoryInfo          : NotSpecified: ((node:30004) Wa... env being set.:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
  
 (Use `node --trace-warnings ...` to show where the warning was created)
-  ok  1 e2e\t15.reset-acceptance.ts:130:3 › journey dark 1440px: A3/2 and B1/1, cancel, confirm, later login, B intact (17.1s)
-  ok  2 e2e\t15.reset-acceptance.ts:130:3 › journey light 375px: A3/2 and B1/1, cancel, confirm, later login, B intact (15.0s)
-  ok  3 e2e\t15.reset-acceptance.ts:231:1 › prior rating signals are gone after reset and reselection; cold start is non-personalised (6.3s)
-  ok  4 e2e\t15.reset-acceptance.ts:297:3 › keyboard order, focus return and dialog fit: dark 375px (3.5s)
-  ok  5 e2e\t15.reset-acceptance.ts:297:3 › keyboard order, focus return and dialog fit: dark 1440px (3.2s)
-  ok  6 e2e\t15.reset-acceptance.ts:297:3 › keyboard order, focus return and dialog fit: light 375px (3.3s)
-  ok  7 e2e\t15.reset-acceptance.ts:297:3 › keyboard order, focus return and dialog fit: light 1440px (3.5s)
-  ok  8 e2e\t15.reset-acceptance.ts:347:1 › duplicate submissions are blocked while one reset is pending (3.4s)
-  ok  9 e2e\t15.reset-acceptance.ts:377:1 › explicit failure, lost-before-commit and lost-after-commit keep truthful status and both watchlists (8.8s)
-  ok 10 e2e\t15.reset-acceptance.ts:453:1 › reset stays blocked while the profile read is unfinished (3.1s)
-  ok 11 e2e\t15.reset-acceptance.ts:475:1 › a delayed old profile response cannot overwrite a completed reset (3.3s)
-  ok 12 e2e\t15.reset-acceptance.ts:500:1 › a recommendations read in flight before the reset cannot restore old cards (3.5s)
+  ok  1 e2e\t15.reset-acceptance.ts:137:3 › journey dark 1440px: A3/2 and B1/1, cancel, confirm, later login, B intact (8.3s)
+  ok  2 e2e\t15.reset-acceptance.ts:137:3 › journey light 375px: A3/2 and B1/1, cancel, confirm, later login, B intact (7.4s)
+  ok  3 e2e\t15.reset-acceptance.ts:238:1 › prior rating signals are gone after reset and reselection; cold start is non-personalised (2.5s)
+  ok  4 e2e\t15.reset-acceptance.ts:304:3 › keyboard order, focus return and dialog fit: dark 375px (1.3s)
+  ok  5 e2e\t15.reset-acceptance.ts:304:3 › keyboard order, focus return and dialog fit: dark 1440px (1.3s)
+  ok  6 e2e\t15.reset-acceptance.ts:304:3 › keyboard order, focus return and dialog fit: light 375px (1.4s)
+  ok  7 e2e\t15.reset-acceptance.ts:304:3 › keyboard order, focus return and dialog fit: light 1440px (1.4s)
+  ok  8 e2e\t15.reset-acceptance.ts:354:1 › duplicate submissions are blocked while one reset is pending (1.4s)
+  ok  9 e2e\t15.reset-acceptance.ts:384:1 › explicit failure, lost-before-commit and lost-after-commit keep truthful status and both watchlists (3.9s)
+  ok 10 e2e\t15.reset-acceptance.ts:460:1 › reset stays blocked while the profile read is unfinished (1.4s)
+  ok 11 e2e\t15.reset-acceptance.ts:482:1 › a delayed old profile response cannot overwrite a completed reset (2.0s)
+  ok 12 e2e\t15.reset-acceptance.ts:512:1 › a recommendations read in flight before the reset cannot restore old cards (2.1s)
 
-  12 passed (1.3m)
+  12 passed (36.4s)
 s04_temporary_database_removed=true

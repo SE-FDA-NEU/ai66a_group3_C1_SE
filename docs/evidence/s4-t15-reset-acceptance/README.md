@@ -7,17 +7,23 @@ Planned independent reviewer: @anotify-vie. **Not yet performed.** Nothing below
 
 ## Tested source
 
-- Tested base: `63d221093c6bbdaa155808495a405da623da39cb`, the head of branch `210-verify-full-reset`
+- Tested base: `4f1dc130f4f021b89e87abcda1adf284ed95f5db`, the head of branch `210-verify-full-reset`
   (on `origin/main` `aab5bed`) when these results were produced.
-- The results were produced on that base **plus uncommitted working-tree changes**: the CI step, the
-  stale-read tests and the revised browser spec. Their exact content is pinned in
+- The results were produced on that base **plus uncommitted working-tree changes**: the `posts()` type fix,
+  the snapshot check in `holdRequests()`, and this evidence folder. Their exact content is pinned in
   [tested-source.sha256](tested-source.sha256), which also lists the production files the tests ran against.
-  The raw Playwright report ([checks/t15-results.json](checks/t15-results.json)) records the same base commit and
+  The raw Playwright report ([checks/t15-results.json](checks/t15-results.json)) records the base commit and
   the working-tree status.
-- Once committed, anyone can confirm the PR head contains exactly the tested files: from the repository root run
-  `sha256sum -c docs/evidence/s4-t15-reset-acceptance/tested-source.sha256`. The tested code commit is the last commit that
-  touched those files (`git log -1 --format=%H -- frontend/e2e/t15.reset-acceptance.ts`).
-- Logs: [checks/](checks/) holds `t15-browser.log`, `t13-regression.log`, `frontend-unit.log`, `frontend-lint.log`.
+- Each hash is SHA-256 of the file as UTF-8 **with CRLF converted to LF**, which is how Git stores these files, so
+  Windows and Linux checkouts agree. Plain `sha256sum -c` is not used because it hashes the checkout's own line
+  endings. From the repository root:
+  `node docs/evidence/s4-t15-reset-acceptance/verify-tested-source.mjs` (prints `11/11 match`, exit code 1 on any mismatch).
+  Once committed, the same command at the PR head proves it contains exactly the tested files; the tested code
+  commit is the last one touching them (`git log -1 --format=%H -- frontend/e2e/t15.reset-acceptance.ts`).
+- [tested-source.historical-crlf.sha256](tested-source.historical-crlf.sha256) is the earlier manifest, hashed from a
+  Windows CRLF working tree before the fixes above. It is kept only as history and is **not** reproducible across machines.
+- Logs: [checks/](checks/) holds `t15-browser.log`, `t13-regression.log`, `frontend-unit.log`, `frontend-build.log`,
+  `frontend-lint.log`.
 
 ## What was added
 
@@ -31,7 +37,7 @@ No production source changed. T15 is a verification task, so the change is test 
 - `.github/workflows/t13-profile.yml`: new steps run `npm --prefix frontend run test:t15:ui`, upload
   `frontend/test-results/t15-results.json` always (error if missing) and `frontend/test-results/t15/` when the job fails.
   The T15 step runs even if the T13 step failed (`!cancelled()`).
-- This document, the checks and 21 real screenshots.
+- `docs/evidence/s4-t15-reset-acceptance/verify-tested-source.mjs`, this document, the checks and 21 real screenshots.
 
 Every committed-state assertion reads the server as the account itself (`/api/me/profile`, `/preferences`,
 `/ratings/{id}`, `/watchlist`, `/recommendations`), not what the page claims. Account B runs in a second browser
@@ -46,6 +52,7 @@ $env:S04_PYTHON = (Resolve-Path '.\.venv\Scripts\python.exe').Path
 npm --prefix frontend run test:t15:ui
 npm --prefix frontend run test:t13:ui
 npm --prefix frontend test
+npm --prefix frontend run build
 npm --prefix frontend run lint
 ```
 
@@ -75,10 +82,11 @@ Windows 11, PowerShell, Node v24.21.0, Python from `.venv`, **Microsoft Edge** t
 
 | Command | Result |
 |---|---|
-| `npm --prefix frontend run test:t15:ui` | 12 passed (1.3 min), 0 flaky; `s04_temporary_database_removed=true` |
+| `npm --prefix frontend run test:t15:ui` | 12 passed, 0 flaky; `s04_temporary_database_removed=true` |
 | Same suite, the three request-holding cases repeated 4 times | 12 of 12 passed |
 | `npm --prefix frontend run test:t13:ui` | 4 passed (regression of the existing T13 suite) |
 | `npm --prefix frontend test` | 39 files, 439 tests passed |
+| `npm --prefix frontend run build` (`tsc -b` and Vite) | exit code 0 |
 | `npm --prefix frontend run lint` | exit code 0 |
 
 The backend was not changed and the Python suites were not rerun for this candidate.
@@ -106,6 +114,8 @@ Each break was temporary and reverted; `ProfilePage.tsx` etc. are unchanged in t
    request was aborted**, so they prove the observable behaviour but not the page's own guards (mutation row 4).
    The guards are proved by the component tests, which build the cases the UI cannot: a read restarted while the
    confirmation dialog is open and still in flight when the reset completes, and a reply from an earlier visit.
+   Before any reset, each held reply is read from the real backend and asserted to be the old content (profile 3 genres,
+   2 ratings, 2 watchlist; recommendations `personalised`), and the test waits until every held request has its snapshot.
    Late replies were delivered by Playwright (`late-reply: delivered` annotation in the report); the app had already
    aborted its request, so the browser discarded them.
 3. **Failures are injected at the network layer.** The 503 envelope and the aborted responses are test controls, not a real

@@ -6,18 +6,18 @@ s04_managed_servers=true
 
 Running 4 tests using 1 worker
 
-npm : (node:23668) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
-At line:4 char:1
+npm : (node:6788) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+At line:3 char:1
 + npm --prefix frontend run test:t13:ui 2>&1 | Out-File -Encoding utf8  ...
 + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : NotSpecified: ((node:23668) Wa... env being set.:String) [], RemoteException
+    + CategoryInfo          : NotSpecified: ((node:6788) War... env being set.:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
  
 (Use `node --trace-warnings ...` to show where the warning was created)
-  ok 1 e2e\t13.profile.ts:55:1 › real reset, cancel, persistence, A/B ownership and preserved watchlists (13.5s)
-  ok 2 e2e\t13.profile.ts:137:1 › both themes, responsive keyboard controls and real page visuals (2.6s)
-  ok 3 e2e\t13.profile.ts:188:1 › explicit rejection and ambiguous committed response require truthful recovery (2.1s)
-  ok 4 e2e\t13.profile.ts:226:1 › signed-out access restores Profile intent and expired sessions use the existing guard (1.8s)
+  ok 1 e2e\t13.profile.ts:55:1 › real reset, cancel, persistence, A/B ownership and preserved watchlists (7.0s)
+  ok 2 e2e\t13.profile.ts:137:1 › both themes, responsive keyboard controls and real page visuals (1.9s)
+  ok 3 e2e\t13.profile.ts:188:1 › explicit rejection and ambiguous committed response require truthful recovery (1.5s)
+  ok 4 e2e\t13.profile.ts:226:1 › signed-out access restores Profile intent and expired sessions use the existing guard (1.3s)
 
-  4 passed (22.7s)
+  4 passed (13.8s)
 s04_temporary_database_removed=true
