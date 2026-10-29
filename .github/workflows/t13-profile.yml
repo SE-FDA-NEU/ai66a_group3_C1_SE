@@ -45,3 +45,21 @@ jobs:
           name: t13-profile-results
           path: frontend/test-results/t13-results.json
           if-no-files-found: warn
+      - name: Verify full reset acceptance (T15) on isolated SQLite
+        if: ${{ !cancelled() }}
+        run: npm --prefix frontend run test:t15:ui
+      - name: Upload T15 result summary
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: t15-reset-acceptance-results
+          path: frontend/test-results/t15-results.json
+          if-no-files-found: error
+      - name: Upload T15 failure output
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: t15-reset-acceptance-failures
+          path: frontend/test-results/t15/
+          if-no-files-found: warn
+          retention-days: 14
