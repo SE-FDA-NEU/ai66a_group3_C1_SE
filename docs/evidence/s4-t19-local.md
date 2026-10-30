@@ -1,34 +1,50 @@
-# S4 #19 implementation and local test evidence
+# S4-T19 / #214 local evidence
 
-The tested implementation is on branch `pr-190-head` at
-`fe91c0ba87f3a4b4f17a998d8d146acc72c90f6e`, following commits
-`57f4247` (storage and selection) and `385f9a1` (enrichment command).
-The branch was pushed to `origin`; this evidence record was prepared afterward.
-No provider token or live database was used in these checks.
+Verified on 30 October 2026 from branch `pr-190-head`, executable HEAD
+`b4b1797a17e01c7593705608cc552c3e338b90e2` (implementation commit
+`fe91c0ba87f3a4b4f17a998d8d146acc72c90f6e`; the later commit added this
+evidence document). Windows PowerShell, Python 3.12.3, Node.js 24.20.0 and
+npm 11.19.0 were used. No TMDb token value was printed or written to evidence.
 
-| Check | Expected | Actual |
-|---|---|---|
-| `python -m pytest backend/tests/test_trailer_enrichment.py backend/tests/test_tmdb_import_cli.py backend/tests/test_movies_api.py -q` | Selection, API, budget, status and rollback tests pass | 70 passed; one pre-existing Starlette deprecation warning |
-| `python -m pytest backend/tests/test_backdrop_storage.py backend/tests/test_backdrop_acceptance.py backend/tests/test_trailer_enrichment.py backend/tests/test_tmdb_import_cli.py backend/tests/test_movies_api.py -q` | Legacy migration and trailer paths coexist | 88 passed; one pre-existing warning |
-| `python -m ruff check backend` | No lint findings | All checks passed |
-| `cd frontend; npm run build` | TypeScript and production bundle build | Passed |
-| `cd frontend; npm run test -- --run src/tests/movie-backdrop.test.tsx src/tests/visual-primitives.test.tsx` | Trailer link, null and navigation states pass | 24 passed |
-| `cd frontend; npm run test` | Full frontend suite passes | 440 passed |
-| `cd frontend; npm run lint` | No lint findings | Passed |
-| `git diff --check` | No whitespace errors | Passed |
+## Executed checks
 
-The initial full repository pytest run, before correcting two historical
-migration snapshot helpers, had 775 passed, 1 skipped, 3 failed and 2 errors.
-The three failures and two errors were the old snapshots comparing new nullable
-trailer columns against pre-migration schemas; one new test also hit a subprocess
-timeout during that long run. All five affected tests passed in the focused
-88-test rerun. The full repository suite has not been rerun after the helper
-correction.
+| Command / action | Expected | Actual | Raw local output |
+|---|---|---|---|
+| `.\.venv\Scripts\python.exe -m pytest -q` | Root suite passes with isolated, token-free provider fixtures | **787 passed, 1 skipped, 210 subtests passed** in 331.27 s; one Starlette deprecation warning | [root-pytest.log](s4-t19/checks/root-pytest.log) |
+| `.\.venv\Scripts\python.exe -m ruff check backend` | No backend lint findings | **All checks passed** | [backend-ruff.log](s4-t19/checks/backend-ruff.log) |
+| `cd frontend; npm.cmd run test` | Frontend tests pass | **440 passed in 39 files** | [frontend-test.log](s4-t19/checks/frontend-test.log) |
+| `cd frontend; npm.cmd run lint` | No frontend lint findings | Exit 0 | [frontend-lint.log](s4-t19/checks/frontend-lint.log) |
+| `cd frontend; npm.cmd run build` | TypeScript and production bundle build | Exit 0; 79 modules transformed | [frontend-build.log](s4-t19/checks/frontend-build.log) |
+| Chrome against Vite with intercepted synthetic local API | Trailer link visible only for a valid trailer; no runtime TMDb metadata request | 2 screenshots; valid link, absent null link, **0 TMDb requests** | [browser-synthetic.log](s4-t19/checks/browser-synthetic.log), [capture script](s4-t19/checks/capture-synthetic-screenshots.cjs) |
+| Read-only inspection of configured local DB | Establish whether live trailer enrichment has already run | Active `tmdb` revision, **295 active movies**, **trailer column absent** | [local-db-readonly.log](s4-t19/checks/local-db-readonly.log) |
+| Diff path/token-pattern scan and `git diff --check` from `9f285a1` to HEAD | No `.env`/DB dump path, obvious literal token or whitespace error | 20 changed files; 0 forbidden paths; 0 candidate token literals; whitespace check passed | [diff-and-screenshots.log](s4-t19/checks/diff-and-screenshots.log) |
 
-The synthetic API test verifies the exact populated and null details DTO, and
-blocks any runtime TMDb videos request. The SQLite upgrade test verifies that
-existing movie IDs, account rows, preferences and ratings remain present. The
-frontend test verifies a safe YouTube link and that it disappears on navigation
-to a movie with no trailer. Live TMDb import, a separate human review, CI,
-PR/merge and issue closure remain pending; this record does not claim those
-steps are complete.
+The browser screenshots are **real Chrome rendering of synthetic, intercepted
+API responses**, not live TMDb import evidence. They show [trailer present](s4-t19/screenshots/trailer-present.png)
+and [trailer absent](s4-t19/screenshots/trailer-absent.png). The capture script
+asserts the generated YouTube URL, absence of a link for JSON `null`, and no
+request to `api.themoviedb.org`. SHA-256 values for both screenshots are in
+the diff/screenshot log. Backend tests use an isolated real SQLite database
+with synthetic provider responses and check migration preservation, bounded
+requests, deterministic selection, clearing, stale/error preservation,
+rollback, and the exact details DTO.
+
+The full root suite was rerun after correcting the historical migration
+snapshot helpers. Its earlier failed run (775 passed, 1 skipped, 3 failed,
+2 errors) is superseded by the passing result above. The focused 70- and
+88-test results reported previously were real, but no raw logs were retained
+for those runs; the current root-suite log covers those tests.
+
+## Pending gates and limits
+
+- **Live TMDb enrichment was not run.** The configured local database has not
+  been migrated to the trailer schema; it was inspected without writes. The
+  token is configured privately, but no token value is present in these files.
+- The repository's [#213 G4 follow-up](s4-t18-core-pre-g4/follow-up/README.md)
+  still records the PO/SM decision as Pending and recommends Defer. A later
+  explicit Go and current capacity have not been verified here.
+- A clean clone for this candidate, hosted CI, independent human review, live
+  API/browser smoke, PR merge and issue closure have not been verified.
+- The logs, screenshots and capture script under `s4-t19/` are local working
+  tree artifacts. They are not part of the tested Git HEAD or a published PR
+  until deliberately added and reviewed.
