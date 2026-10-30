@@ -98,7 +98,7 @@ def main(argv: list[str] | None = None) -> int:
             print("TMDb trailer enrichment stopped" if result.authentication_stopped else "TMDb trailer enrichment complete")
             print(f"eligible={result.eligible_movie_count}")
             print(f"fetched={result.fetched_movie_count}")
-            print(f"remaining={result.eligible_movie_count - result.fetched_movie_count}")
+            print(f"remaining={result.remaining_movie_count}")
             print(f"updated={result.updated_movie_count}")
             print(f"cleared={result.cleared_movie_count}")
             print(f"unchanged={result.unchanged_movie_count}")

@@ -2,19 +2,22 @@
 
 from collections.abc import Iterator
 
+import httpx
 import pytest
 from app.catalogue.tmdb_import import enrich_tmdb_trailers, import_tmdb_catalogue
 from app.catalogue.trailers import select_trailer, youtube_url
 from app.db.database import Base
 from app.db.models import CatalogMovie
 from app.integrations.tmdb import (
+    VIDEO_LANGUAGES,
     TmdbAuthenticationError,
+    TmdbClient,
     TmdbImportError,
     TmdbPayloadError,
 )
 from app.main import app, get_db
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine, inspect, select, text
+from sqlalchemy import create_engine, func, inspect, select, text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
@@ -50,6 +53,28 @@ def test_selection_is_strict_and_stable_when_shuffled():
 def test_malformed_envelope_never_means_empty_success(payload):
     with pytest.raises(TmdbPayloadError):
         select_trailer(payload)
+
+
+def test_http_adapter_requests_other_languages_and_selects_non_english_trailer():
+    requests = []
+
+    def respond(request):
+        requests.append(request)
+        languages = request.url.params.get("include_video_language", "").split(",")
+        results = [video("frenchKey12", language="fr")] if "fr" in languages else []
+        return httpx.Response(200, json={"id": 401, "results": results})
+
+    with httpx.Client(base_url="https://api.themoviedb.org/3",
+                      transport=httpx.MockTransport(respond)) as http_client:
+        provider = TmdbClient("synthetic-token", http_client=http_client)
+        selected = select_trailer(provider.fetch_movie_videos(401))
+
+    assert len(requests) == 1
+    assert requests[0].url.path == "/3/movie/401/videos"
+    assert requests[0].url.params["language"] == "en-US"
+    assert requests[0].url.params["include_video_language"] == VIDEO_LANGUAGES
+    assert selected is not None and selected.language == "fr"
+    assert selected.key == "frenchKey12"
 
 
 class Gateway:
@@ -100,11 +125,12 @@ def test_bounded_idempotent_success_clear_and_safe_details(database, monkeypatch
     assert gateway.calls == [101]
     assert rows(database)[0].trailer_key == "AbCdEf123_-"
     with database() as session, session.begin():
-        repeat = enrich_tmdb_trailers(session, client=gateway, limit=1)
-    assert repeat.unchanged_movie_count == 1
+        repeat = enrich_tmdb_trailers(session, client=gateway, limit=2)
+    assert repeat.unchanged_movie_count == 2
+    assert gateway.calls[1] == 102
     gateway.videos[101] = {"results": []}
     with database() as session, session.begin():
-        cleared = enrich_tmdb_trailers(session, client=gateway, limit=1)
+        cleared = enrich_tmdb_trailers(session, client=gateway, limit=2)
     assert cleared.cleared_movie_count == 1
     assert rows(database)[0].trailer_key is None
     assert rows(database)[0].trailer_status == "success"
@@ -112,7 +138,7 @@ def test_bounded_idempotent_success_clear_and_safe_details(database, monkeypatch
 
     gateway.videos[101] = {"results": [video()]}
     with database() as session, session.begin():
-        enrich_tmdb_trailers(session, client=gateway, limit=1)
+        enrich_tmdb_trailers(session, client=gateway, limit=2)
 
     def dependency():
         with database() as session:
@@ -153,7 +179,7 @@ def test_malformed_and_provider_failures_keep_last_success(database):
     succeeded = rows(database)[0].trailer_succeeded_at
     gateway.videos[101] = {"results": None}
     with database() as session, session.begin():
-        result = enrich_tmdb_trailers(session, client=gateway, limit=1)
+        result = enrich_tmdb_trailers(session, client=gateway, limit=2)
     movie = rows(database)[0]
     assert result.failed_movie_count == 1
     assert movie.trailer_key == "AbCdEf123_-" and movie.trailer_status == "stale"
@@ -163,6 +189,44 @@ def test_malformed_and_provider_failures_keep_last_success(database):
         result = enrich_tmdb_trailers(session, client=gateway, limit=2)
     assert result.failed_movie_count == 1 and result.fetched_movie_count == 2
     assert rows(database)[0].trailer_key == "AbCdEf123_-"
+
+
+def test_301_movies_advance_to_unattempted_movie_on_second_pass():
+    class LargeGateway(Gateway):
+        def fetch_popular_movies(self, page):
+            return [{"id": movie_id, "title": f"Movie {movie_id}", "genre_ids": [28]}
+                    for movie_id in range(1000, 1301)]
+
+        def fetch_movie_videos(self, movie_id):
+            self.calls.append(movie_id)
+            return {"results": []}
+
+    engine = create_engine("sqlite://", connect_args={"check_same_thread": False},
+                           poolclass=StaticPool)
+    Base.metadata.create_all(engine)
+    factory = sessionmaker(bind=engine)
+    gateway = LargeGateway()
+    try:
+        with factory() as session, session.begin():
+            import_tmdb_catalogue(session, client=gateway, pages=1)
+        with factory() as session, session.begin():
+            first = enrich_tmdb_trailers(session, client=gateway, limit=300)
+        assert first.fetched_movie_count == 300
+        assert first.remaining_movie_count == 1
+        assert gateway.calls == list(range(1000, 1300))
+
+        with factory() as session, session.begin():
+            second = enrich_tmdb_trailers(session, client=gateway, limit=300)
+        assert second.fetched_movie_count <= 300
+        assert second.remaining_movie_count == 0
+        assert gateway.calls[300] == 1300
+        assert len(gateway.calls) <= 600
+        with factory() as session:
+            attempted = session.scalar(select(func.count()).select_from(CatalogMovie)
+                                       .where(CatalogMovie.trailer_attempted_at.is_not(None)))
+        assert attempted == 301
+    finally:
+        engine.dispose()
 
 
 def test_authentication_stops_before_next_movie(database):

@@ -11,10 +11,14 @@ python -m app.cli.import_tmdb_catalogue --enrich-trailers --limit 300
 ```
 
 `--limit` accepts 1–300 and defaults to 300. A run selects at most that many
-active `source=tmdb` movies in source-ID order and makes at most one
-`/movie/{id}/videos` request per selected movie. Repeat the command after
-fixing a provider problem or to refresh metadata. The command prints `eligible`,
-`fetched`, `remaining`, `updated`, `cleared`, `unchanged` and `failed` counts.
+active `source=tmdb` movies, first those with no `trailer_attempted_at`, then
+the oldest attempted movies, with `source_id` breaking ties. Each selected
+movie makes at most one `/movie/{id}/videos` HTTP request, so the pass stays
+within 300 requests. Repeat the command to continue through a catalogue
+larger than 300 movies or to refresh the oldest results. The command prints
+`eligible`, `fetched`, `remaining`, `updated`, `cleared`, `unchanged` and
+`failed` counts. `remaining` counts movies never attempted after this pass;
+it reaches zero after every active movie has been attempted at least once.
 The exit code is nonzero when any movie fails or authentication is rejected.
 Authentication failure stops further requests. Database write failure rolls
 back the pass. Do not publish the token, `.env` or a database dump.
@@ -22,6 +26,15 @@ back the pass. Do not publish the token, `.env` or a database dump.
 Only videos with `site=YouTube`, `type=Trailer`, `official=true` and a valid
 11-character key are eligible. Selection prioritizes English (`iso_639_1=en`),
 then the newest valid `published_at`, then lexicographically smallest key.
+The request explicitly sets `language=en-US` and supplies the ISO 639-1 codes
+and `null` in `include_video_language`, so English and other tagged videos can
+be ranked from one response. TMDb's [movie videos reference](https://developer.themoviedb.org/reference/movie-videos)
+documents the `en-US` default but does not currently list
+`include_video_language` for this movie endpoint; the offline HTTP adapter
+test proves the outgoing query and selector behavior, not TMDb's live response.
+Verify a non-English-only movie in the live smoke before claiming complete
+multilingual coverage.
+
 Missing or invalid dates sort after valid dates. An eligible empty result clears
 the previous trailer. A malformed results envelope or failed request keeps the
 last successful metadata and sets `trailer_status` to `stale` (or `error` if

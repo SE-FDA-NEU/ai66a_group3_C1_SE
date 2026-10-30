@@ -168,7 +168,8 @@ def test_trailer_cli_prints_safe_counts_and_failure_exit(monkeypatch, capsys, fa
 
     def enrich(_session, *, client, limit):
         limits.append(limit)
-        return TmdbTrailerEnrichmentResult(3, 2, 1, 0, 1 - failed, failed, stopped)
+        return TmdbTrailerEnrichmentResult(3, 2, 1, 0, 1 - failed, failed, stopped,
+                                           remaining_movie_count=1)
 
     monkeypatch.setattr(command, "enrich_tmdb_trailers", enrich)
     assert command.main(["--enrich-trailers", "--limit", "2"]) == exit_code

@@ -35,6 +35,28 @@ snapshot helpers. Its earlier failed run (775 passed, 1 skipped, 3 failed,
 88-test results reported previously were real, but no raw logs were retained
 for those runs; the current root-suite log covers those tests.
 
+## Follow-up fixes checked on 30 October 2026
+
+These checks cover the current **uncommitted working tree** on HEAD
+`5c7e3089aedc678cbd7d2d971afc6c0fcc297205`, after adding batch progress,
+an explicit multilingual videos query, and the current `docs/api.md` C03
+fingerprint. They are separate from the earlier committed baseline above.
+
+| Check | Actual | Local output |
+|---|---|---|
+| 301-movie synthetic catalogue, two enrichment passes | First pass fetched 300, `remaining=1`; second pass requested movie 301 first, `remaining=0`; each pass fetched at most 300 | [focused pytest log](s4-t19/checks/trailer-followup-pytest.log) and `test_301_movies_advance_to_unattempted_movie_on_second_pass` |
+| Mock HTTP adapter with French-only official trailer | One `/movie/{id}/videos` request sent `language=en-US` and `include_video_language` including `fr`; selector returned the French trailer | [focused pytest log](s4-t19/checks/trailer-followup-pytest.log) and `test_http_adapter_requests_other_languages_and_selects_non_english_trailer` |
+| Focused trailer, CLI, details and importer tests | **111 passed**, one Starlette deprecation warning | [focused pytest log](s4-t19/checks/trailer-followup-pytest.log) |
+| Root `pytest -q` | **789 passed, 1 skipped, 210 subtests passed** in 258.94 s, one Starlette deprecation warning | [root pytest log](s4-t19/checks/root-pytest-followup.log) |
+| Backend Ruff | **All checks passed** | [Ruff log](s4-t19/checks/trailer-followup-ruff.log) |
+| C03 contract and LF/CRLF verifier | **PASS**; current `docs/api.md` normalized-LF hash `28322e8f3a504d9b380ad9a3b72b8cc49eeb185cc992c24f644f04346d8886a1` | [contract log](s4-t19/checks/trailer-followup-c03.log), [line-ending log](s4-t19/checks/trailer-followup-c03-line-endings.log) |
+
+The adapter test verifies the outgoing query and handling of a simulated TMDb
+response. TMDb's movie videos reference documents `language=en-US` as the
+default but does not list `include_video_language` for this endpoint. A live
+non-English-only movie response remains unverified; do not present the mock as
+proof of TMDb's production filtering behavior.
+
 ## Pending gates and limits
 
 - **Live TMDb enrichment was not run.** The configured local database has not

@@ -94,6 +94,7 @@ class TmdbTrailerEnrichmentResult:
     unchanged_movie_count: int
     failed_movie_count: int
     authentication_stopped: bool
+    remaining_movie_count: int = 0
 
 
 @dataclass(frozen=True)
@@ -329,8 +330,11 @@ def enrich_tmdb_trailers(
         raise ValueError("an active TMDb catalogue is required for trailer enrichment")
     active = (CatalogMovie.catalogue_revision_id == revision.id, CatalogMovie.source == TMDB_SOURCE)
     eligible = session.scalar(select(func.count()).select_from(CatalogMovie).where(*active)) or 0
+    # A null attempt is a movie this command has never visited. Once every
+    # movie has been visited, refresh the oldest attempt first.
     movies = list(session.scalars(select(CatalogMovie).where(*active)
-                                  .order_by(CatalogMovie.source_id).limit(limit)))
+                                  .order_by(CatalogMovie.trailer_attempted_at.asc().nullsfirst(),
+                                            CatalogMovie.source_id).limit(limit)))
     fetched = updated = cleared = unchanged = failed = 0
     authentication_stopped = False
     for movie in movies:
@@ -362,8 +366,11 @@ def enrich_tmdb_trailers(
         else:
             updated += 1
             cleared += trailer is None and before[1] is not None
+    remaining = session.scalar(select(func.count()).select_from(CatalogMovie).where(
+        *active, CatalogMovie.trailer_attempted_at.is_(None))) or 0
     return TmdbTrailerEnrichmentResult(
         eligible_movie_count=eligible, fetched_movie_count=fetched,
+        remaining_movie_count=remaining,
         updated_movie_count=updated, cleared_movie_count=cleared,
         unchanged_movie_count=unchanged, failed_movie_count=failed,
         authentication_stopped=authentication_stopped,
