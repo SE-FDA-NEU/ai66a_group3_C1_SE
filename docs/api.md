@@ -691,7 +691,8 @@ Success (`200`):
       "voteAverage": 7.2,
       "voteCount": 1200,
       "backdropUrl": "https://image.tmdb.org/t/p/w780/example.jpg",
-      "posterUrl": null
+      "posterUrl": null,
+      "trailer": null
     }
   },
   "meta": {
@@ -712,6 +713,16 @@ allowlisted `https://image.tmdb.org/t/p/w780/<file>` URL or JSON `null`; raw
 provider paths and tokens are never returned. Storage failure is never
 translated to a false 404. Movie detail remains public; a guest opening it
 does not cause the frontend to call a private rating endpoint.
+
+The optional `trailer` is always present on details as either JSON `null` or
+`{ "site": "YouTube", "key": "AbCdEf123_-", "name": "Official trailer",
+"type": "Trailer", "official": true, "language": "en",
+"publishedAt": "2026-10-20T10:00:00Z",
+"url": "https://www.youtube.com/watch?v=AbCdEf123_-" }`. `name`, `language`
+and `publishedAt` can be null. The URL is built from a validated 11-character
+YouTube key stored in SQLite. The details route never calls TMDb; trailer
+enrichment status and timestamps are operator-only DB fields. See the
+[trailer runbook](trailer-import-runbook.md).
 
 ## 9. Sprint 3 rating contract (implemented under S3-T31)
 

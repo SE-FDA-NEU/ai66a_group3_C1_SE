@@ -122,6 +122,32 @@ describe("movie backdrop hero", () => {
 });
 
 describe("movie detail backdrop transitions", () => {
+  it("shows only a valid trailer link from the local detail response", async () => {
+    const trailer = {
+      site: "YouTube", key: "AbCdEf123_-", name: "Official trailer",
+      type: "Trailer", official: true, language: "en",
+      publishedAt: "2026-10-20T10:00:00Z",
+      url: "https://www.youtube.com/watch?v=AbCdEf123_-",
+    };
+    vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+      const url = String(input);
+      if (url === "/api/movies/movie-a")
+        return response({ data: { movie: { ...detail("movie-a"), trailer } } });
+      if (url === "/api/movies/movie-b")
+        return response({ data: { movie: { ...detail("movie-b"), trailer: null } } });
+      if (url === "/api/auth/me") return response({}, 401);
+      if (url.endsWith("/similar")) return response({ data: { movies: [] } });
+      throw new Error(`Unexpected request: ${url}`);
+    });
+    render(<DetailRoutes />);
+    const link = await screen.findByRole("link", { name: /Watch trailer/ });
+    expect(link).toHaveAttribute("href", trailer.url);
+    expect(link).toHaveAttribute("rel", "noopener noreferrer");
+    fireEvent.click(screen.getByRole("link", { name: "Open movie B" }));
+    await screen.findByRole("heading", { name: "Title movie-b" });
+    expect(screen.queryByRole("link", { name: /Watch trailer/ })).not.toBeInTheDocument();
+  });
+
   it("cannot apply delayed old image events to the next movie", async () => {
     const nextMovie = deferredResponse();
     const calls: string[] = [];

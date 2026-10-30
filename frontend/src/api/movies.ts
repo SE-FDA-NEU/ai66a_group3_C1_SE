@@ -20,6 +20,16 @@ export type MovieDetail = MovieSummary & {
   voteCount: number | null;
   // Older detail deployments may omit this additive field during rollout.
   backdropUrl?: string | null;
+  trailer?: {
+    site: "YouTube";
+    key: string;
+    name: string | null;
+    type: "Trailer";
+    official: true;
+    language: string | null;
+    publishedAt: string | null;
+    url: string;
+  } | null;
 };
 
 export type CatalogueSort = "title_asc" | "title_desc";

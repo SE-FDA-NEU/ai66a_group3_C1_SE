@@ -39,6 +39,20 @@ class MovieDetailDto(BaseModel):
     voteCount: int | None
     backdropUrl: str | None
     posterUrl: str | None = None
+    trailer: "TrailerDto | None" = None
+
+
+class TrailerDto(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    site: str
+    key: str
+    name: str | None
+    type: str
+    official: bool
+    language: str | None
+    publishedAt: str | None
+    url: str
 
 
 class MovieListMeta(BaseModel):
