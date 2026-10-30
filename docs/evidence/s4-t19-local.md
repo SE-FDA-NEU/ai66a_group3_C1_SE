@@ -57,7 +57,7 @@ default but does not list `include_video_language` for this endpoint. A live
 non-English-only movie response remains unverified; do not present the mock as
 proof of TMDb's production filtering behavior.
 
-## Pending gates and limits
+## Historical pending gates and limits (30 October 2026)
 
 - **Live TMDb enrichment was not run.** The configured local database has not
   been migrated to the trailer schema; it was inspected without writes. The
@@ -70,3 +70,12 @@ proof of TMDb's production filtering behavior.
 - The logs, screenshots and capture script under `s4-t19/` are local working
   tree artifacts. They are not part of the tested Git HEAD or a published PR
   until deliberately added and reviewed.
+
+## 31 October 2026 follow-up
+
+The requester reports that the PO has confirmed G4 Go. The statements above
+describe the earlier candidate and are retained as historical evidence.
+The [live smoke and full-batch record](s4-t19-live-20261031.md) documents the
+new `--all` implementation, real TMDb language behavior, separate database,
+API/browser checks, clean-clone check and final test output. Hosted CI and
+independent review still require verification against the published PR head.

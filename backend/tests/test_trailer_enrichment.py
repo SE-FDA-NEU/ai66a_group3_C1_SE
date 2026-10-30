@@ -61,7 +61,11 @@ def test_http_adapter_requests_other_languages_and_selects_non_english_trailer()
     def respond(request):
         requests.append(request)
         languages = request.url.params.get("include_video_language", "").split(",")
-        results = [video("frenchKey12", language="fr")] if "fr" in languages else []
+        # The live TMDb smoke returned an empty array for a broad 185-code
+        # include list, despite videos in the default response.
+        results = [video("frenchKey12", language="fr")] if (
+            "fr" in languages and len(languages) <= 35
+        ) else []
         return httpx.Response(200, json={"id": 401, "results": results})
 
     with httpx.Client(base_url="https://api.themoviedb.org/3",
@@ -73,6 +77,7 @@ def test_http_adapter_requests_other_languages_and_selects_non_english_trailer()
     assert requests[0].url.path == "/3/movie/401/videos"
     assert requests[0].url.params["language"] == "en-US"
     assert requests[0].url.params["include_video_language"] == VIDEO_LANGUAGES
+    assert {"en", "fr", "ko", "vi"} <= set(VIDEO_LANGUAGES.split(","))
     assert selected is not None and selected.language == "fr"
     assert selected.key == "frenchKey12"
 

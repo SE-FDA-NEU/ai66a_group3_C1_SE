@@ -1,0 +1,20 @@
+TMDb catalogue import complete
+provider=tmdb
+active_revision=73a8d37d-ef53-4adf-a402-6ef014eae4a9
+inserted=20
+updated=0
+rejected=0
+movies=20
+associated_genres=13
+finite_popularity_movies=20
+source_fetched_at=2026-10-30T17:54:12.535058Z
+imported_at=2026-10-30T17:54:13.720525Z
+sample_source_ids=155,791523,1058424
+TMDb trailer enrichment all complete
+active_revision=73a8d37d-ef53-4adf-a402-6ef014eae4a9
+eligible=20
+processed=20
+with_trailer=19
+without_trailer=1
+failed=0
+remaining=0

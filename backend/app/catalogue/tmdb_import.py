@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
 from math import isfinite
 from typing import Any, Protocol
 
 from sqlalchemy import func, select
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.catalogue.backdrops import valid_backdrop_path
@@ -95,6 +96,28 @@ class TmdbTrailerEnrichmentResult:
     failed_movie_count: int
     authentication_stopped: bool
     remaining_movie_count: int = 0
+    with_trailer_movie_count: int = 0
+    without_trailer_movie_count: int = 0
+
+
+@dataclass(frozen=True)
+class TmdbTrailerAllResult:
+    active_revision_id: str
+    eligible_movie_count: int
+    processed_movie_count: int
+    with_trailer_movie_count: int
+    without_trailer_movie_count: int
+    failed_movie_count: int
+    remaining_movie_count: int
+    authentication_stopped: bool
+
+
+class TmdbTrailerAllDatabaseError(SQLAlchemyError):
+    """A failed batch rolled back; earlier committed batches remain resumable."""
+
+    def __init__(self, partial_result: TmdbTrailerAllResult) -> None:
+        self.partial_result = partial_result
+        super().__init__("trailer enrichment batch failed")
 
 
 @dataclass(frozen=True)
@@ -316,7 +339,8 @@ def enrich_tmdb_posters(
 
 
 def enrich_tmdb_trailers(
-    session: Session, *, client: TmdbCatalogueGateway, limit: int = MAX_ENRICHMENT_MOVIES
+    session: Session, *, client: TmdbCatalogueGateway, limit: int = MAX_ENRICHMENT_MOVIES,
+    only_unattempted: bool = False,
 ) -> TmdbTrailerEnrichmentResult:
     """Backfill active TMDb movies, with one bounded videos request per movie.
 
@@ -332,9 +356,12 @@ def enrich_tmdb_trailers(
     eligible = session.scalar(select(func.count()).select_from(CatalogMovie).where(*active)) or 0
     # A null attempt is a movie this command has never visited. Once every
     # movie has been visited, refresh the oldest attempt first.
-    movies = list(session.scalars(select(CatalogMovie).where(*active)
-                                  .order_by(CatalogMovie.trailer_attempted_at.asc().nullsfirst(),
-                                            CatalogMovie.source_id).limit(limit)))
+    query = select(CatalogMovie).where(*active)
+    if only_unattempted:
+        query = query.where(CatalogMovie.trailer_attempted_at.is_(None))
+    movies = list(session.scalars(query.order_by(
+        CatalogMovie.trailer_attempted_at.asc().nullsfirst(), CatalogMovie.source_id
+    ).limit(limit)))
     fetched = updated = cleared = unchanged = failed = 0
     authentication_stopped = False
     for movie in movies:
@@ -368,13 +395,70 @@ def enrich_tmdb_trailers(
             cleared += trailer is None and before[1] is not None
     remaining = session.scalar(select(func.count()).select_from(CatalogMovie).where(
         *active, CatalogMovie.trailer_attempted_at.is_(None))) or 0
+    with_trailer = sum(movie.trailer_key is not None for movie in movies[:fetched])
     return TmdbTrailerEnrichmentResult(
         eligible_movie_count=eligible, fetched_movie_count=fetched,
         remaining_movie_count=remaining,
+        with_trailer_movie_count=with_trailer,
+        without_trailer_movie_count=fetched - with_trailer,
         updated_movie_count=updated, cleared_movie_count=cleared,
         unchanged_movie_count=unchanged, failed_movie_count=failed,
         authentication_stopped=authentication_stopped,
     )
+
+
+def enrich_tmdb_trailers_all(
+    session_factory: Callable[[], Session], *, client: TmdbCatalogueGateway,
+    batch_size: int = MAX_ENRICHMENT_MOVIES,
+) -> TmdbTrailerAllResult:
+    """Commit each pending-only batch; a later invocation resumes unfinished work."""
+    if type(batch_size) is not int or not 1 <= batch_size <= MAX_ENRICHMENT_MOVIES:
+        raise ValueError(f"batch_size must be an integer from 1 to {MAX_ENRICHMENT_MOVIES}")
+    with session_factory() as session:
+        revision = get_active_catalogue_revision(session)
+        if revision is None or revision.provider != TMDB_SOURCE:
+            raise ValueError("an active TMDb catalogue is required for trailer enrichment")
+        revision_id = revision.id
+        active = (CatalogMovie.catalogue_revision_id == revision_id,
+                  CatalogMovie.source == TMDB_SOURCE)
+        eligible = session.scalar(select(func.count()).select_from(CatalogMovie).where(*active)) or 0
+        remaining = session.scalar(select(func.count()).select_from(CatalogMovie).where(
+            *active, CatalogMovie.trailer_attempted_at.is_(None))) or 0
+
+    processed = with_trailer = without_trailer = failed = 0
+    authentication_stopped = False
+
+    def snapshot() -> TmdbTrailerAllResult:
+        return TmdbTrailerAllResult(
+            active_revision_id=revision_id, eligible_movie_count=eligible,
+            processed_movie_count=processed, with_trailer_movie_count=with_trailer,
+            without_trailer_movie_count=without_trailer, failed_movie_count=failed,
+            remaining_movie_count=remaining, authentication_stopped=authentication_stopped,
+        )
+
+    while remaining:
+        try:
+            with session_factory() as session, session.begin():
+                current = get_active_catalogue_revision(session)
+                if current is None or current.id != revision_id:
+                    raise ValueError("active TMDb catalogue changed during trailer enrichment")
+                batch = enrich_tmdb_trailers(
+                    session, client=client, limit=min(batch_size, remaining),
+                    only_unattempted=True,
+                )
+        except SQLAlchemyError as exc:
+            raise TmdbTrailerAllDatabaseError(snapshot()) from exc
+        if batch.fetched_movie_count == 0:
+            raise ValueError("pending trailer movies changed during enrichment")
+        processed += batch.fetched_movie_count
+        with_trailer += batch.with_trailer_movie_count
+        without_trailer += batch.without_trailer_movie_count
+        failed += batch.failed_movie_count
+        remaining = batch.remaining_movie_count
+        authentication_stopped = batch.authentication_stopped
+        if authentication_stopped:
+            break
+    return snapshot()
 
 
 def _set_movie_trailer(

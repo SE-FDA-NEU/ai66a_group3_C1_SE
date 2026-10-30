@@ -18,19 +18,13 @@ TMDB_SOURCE = "tmdb"
 DEFAULT_TIMEOUT_SECONDS = 10.0
 DEFAULT_POPULAR_PAGES = 50
 MAX_POPULAR_PAGES = 50
-# Movie videos default to en-US. Request the ISO 639-1 video languages in the
-# same response so the catalogue selector can compare English with other
-# official trailers while keeping one HTTP request per movie.
+# Movie videos default to en-US. A live TMDb probe showed that a broad ISO
+# 639-1 list can return an empty videos array even when the default request
+# has videos. This bounded fallback set was checked against the live endpoint.
+# Keep one HTTP request per movie so a batch remains within 300 requests.
 VIDEO_LANGUAGES = (
-    "aa,ab,ae,af,ak,am,an,ar,as,av,ay,az,ba,be,bg,bh,bi,bm,bn,bo,br,bs,"
-    "ca,ce,ch,co,cr,cs,cu,cv,cy,da,de,dv,dz,ee,el,en,eo,es,et,eu,fa,"
-    "ff,fi,fj,fo,fr,fy,ga,gd,gl,gn,gu,gv,ha,he,hi,ho,hr,ht,hu,hy,hz,"
-    "ia,id,ie,ig,ii,ik,io,is,it,iu,ja,jv,ka,kg,ki,kj,kk,kl,km,kn,ko,"
-    "kr,ks,ku,kv,kw,ky,la,lb,lg,li,ln,lo,lt,lu,lv,mg,mh,mi,mk,ml,mn,"
-    "mr,ms,mt,my,na,nb,nd,ne,ng,nl,nn,no,nr,nv,ny,oc,oj,om,or,os,pa,"
-    "pi,pl,ps,pt,qu,rm,rn,ro,ru,rw,sa,sc,sd,se,sg,si,sk,sl,sm,sn,so,"
-    "sq,sr,ss,st,su,sv,sw,ta,te,tg,th,ti,tk,tl,tn,to,tr,ts,tt,tw,ty,"
-    "ug,uk,ur,uz,ve,vi,vo,wa,wo,xh,yi,yo,za,zh,zu,null"
+    "en,ko,fr,vi,ja,es,zh,hi,de,it,pt,ru,ar,th,id,tr,nl,sv,pl,uk,bn,"
+    "fa,ta,te,ml,ur,he,el,da,fi,no,cs,hu,ro,null"
 )
 
 

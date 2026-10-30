@@ -11,6 +11,8 @@ from app.catalogue.tmdb_import import (
     TmdbBackdropEnrichmentResult,
     TmdbImportResult,
     TmdbPosterEnrichmentResult,
+    TmdbTrailerAllDatabaseError,
+    TmdbTrailerAllResult,
     TmdbTrailerEnrichmentResult,
 )
 from app.cli import import_tmdb_catalogue as command
@@ -148,6 +150,10 @@ def test_enrichment_cli_prints_bounded_safe_counts(monkeypatch, capsys, media):
     ["--enrich-trailers", "--limit", "301"],
     ["--enrich-trailers", "--pages", "1"],
     ["--enrich-trailers", "--enrich-posters"],
+    ["--all"],
+    ["--enrich-backdrops", "--all"],
+    ["--enrich-posters", "--all"],
+    ["--enrich-trailers", "--all", "--pages", "1"],
 ])
 def test_enrichment_cli_rejects_invalid_or_mixed_budgets_before_io(monkeypatch, arguments):
     def forbidden(*_args, **_kwargs):
@@ -179,6 +185,26 @@ def test_trailer_cli_prints_safe_counts_and_failure_exit(monkeypatch, capsys, fa
                              "TMDb trailer enrichment complete\n")
     assert "eligible=3\nfetched=2\nremaining=1\nupdated=1\n" in output
     assert f"failed={failed}\n" in output
+
+
+def test_all_cli_reports_only_committed_batches_after_database_failure(monkeypatch, capsys):
+    partial = TmdbTrailerAllResult(
+        active_revision_id="revision-opaque-id", eligible_movie_count=5,
+        processed_movie_count=2, with_trailer_movie_count=1,
+        without_trailer_movie_count=1, failed_movie_count=0,
+        remaining_movie_count=3, authentication_stopped=False,
+    )
+    monkeypatch.setattr(command.TmdbClient, "from_environment", lambda: _FakeClient())
+
+    def fail(_factory, *, client, batch_size):
+        assert batch_size == 2
+        raise TmdbTrailerAllDatabaseError(partial)
+
+    monkeypatch.setattr(command, "enrich_tmdb_trailers_all", fail)
+    assert command.main(["--enrich-trailers", "--all", "--limit", "2"]) == 1
+    captured = capsys.readouterr()
+    assert "processed=2\nwith_trailer=1\nwithout_trailer=1\nfailed=0\nremaining=3\n" in captured.out
+    assert captured.err == "TMDb trailer enrichment failed: current batch rolled back\n"
 
 
 class _FakeClient:

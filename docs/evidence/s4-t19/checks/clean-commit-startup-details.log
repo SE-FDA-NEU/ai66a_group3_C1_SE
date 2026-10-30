@@ -1,0 +1,4 @@
+source_commit=aae62045ac318964fc50c5e7d2fe2c9229b364a1
+health=ok
+present_status=200 title=The Dark Knight trailer_url=https://www.youtube.com/watch?v=_PZpmTj1Q8Q
+absent_status=200 title=Buddy trailer_is_null=True
