@@ -11,6 +11,7 @@ from app.catalogue.tmdb_import import (
     TmdbBackdropEnrichmentResult,
     TmdbImportResult,
     TmdbPosterEnrichmentResult,
+    TmdbTrailerEnrichmentResult,
 )
 from app.cli import import_tmdb_catalogue as command
 
@@ -143,6 +144,10 @@ def test_enrichment_cli_prints_bounded_safe_counts(monkeypatch, capsys, media):
     ["--enrich-posters", "--limit", "301"],
     ["--enrich-posters", "--pages", "15"],
     ["--enrich-posters", "--enrich-backdrops"],
+    ["--enrich-trailers", "--limit", "0"],
+    ["--enrich-trailers", "--limit", "301"],
+    ["--enrich-trailers", "--pages", "1"],
+    ["--enrich-trailers", "--enrich-posters"],
 ])
 def test_enrichment_cli_rejects_invalid_or_mixed_budgets_before_io(monkeypatch, arguments):
     def forbidden(*_args, **_kwargs):
@@ -153,6 +158,26 @@ def test_enrichment_cli_rejects_invalid_or_mixed_budgets_before_io(monkeypatch, 
     with pytest.raises(SystemExit) as error:
         command.main(arguments)
     assert error.value.code == 2
+
+
+@pytest.mark.parametrize("failed,stopped,exit_code", [(0, False, 0), (1, False, 1), (1, True, 1)])
+def test_trailer_cli_prints_safe_counts_and_failure_exit(monkeypatch, capsys, failed, stopped, exit_code):
+    monkeypatch.setattr(command.TmdbClient, "from_environment", lambda *_args: _FakeClient())
+    monkeypatch.setattr(command, "SessionLocal", lambda: _FakeSession())
+    limits = []
+
+    def enrich(_session, *, client, limit):
+        limits.append(limit)
+        return TmdbTrailerEnrichmentResult(3, 2, 1, 0, 1 - failed, failed, stopped)
+
+    monkeypatch.setattr(command, "enrich_tmdb_trailers", enrich)
+    assert command.main(["--enrich-trailers", "--limit", "2"]) == exit_code
+    assert limits == [2]
+    output = capsys.readouterr().out
+    assert output.startswith("TMDb trailer enrichment stopped\n" if stopped else
+                             "TMDb trailer enrichment complete\n")
+    assert "eligible=3\nfetched=2\nremaining=1\nupdated=1\n" in output
+    assert f"failed={failed}\n" in output
 
 
 class _FakeClient:

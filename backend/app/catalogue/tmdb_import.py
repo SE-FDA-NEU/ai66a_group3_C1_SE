@@ -13,11 +13,14 @@ from sqlalchemy.orm import Session
 
 from app.catalogue.backdrops import valid_backdrop_path
 from app.catalogue.posters import valid_poster_path
+from app.catalogue.trailers import Trailer, select_trailer
 from app.db.models import CatalogMovie, utc_now
 from app.integrations.tmdb import (
     DEFAULT_POPULAR_PAGES,
     MAX_POPULAR_PAGES,
     TMDB_SOURCE,
+    TmdbAuthenticationError,
+    TmdbImportError,
     TmdbPayloadError,
 )
 from app.repositories.movies import (
@@ -41,6 +44,8 @@ class TmdbCatalogueGateway(Protocol):
     def fetch_popular_movies(self, page: int) -> list[Mapping[str, Any]]: ...
 
     def fetch_movie_details(self, movie_id: int) -> Mapping[str, Any]: ...
+
+    def fetch_movie_videos(self, movie_id: int) -> Mapping[str, Any]: ...
 
 
 @dataclass(frozen=True)
@@ -78,6 +83,17 @@ class TmdbBackdropEnrichmentResult:
 @dataclass(frozen=True)
 class TmdbPosterEnrichmentResult(TmdbBackdropEnrichmentResult):
     """The same safe counts for an explicitly poster-only update."""
+
+
+@dataclass(frozen=True)
+class TmdbTrailerEnrichmentResult:
+    eligible_movie_count: int
+    fetched_movie_count: int
+    updated_movie_count: int
+    cleared_movie_count: int
+    unchanged_movie_count: int
+    failed_movie_count: int
+    authentication_stopped: bool
 
 
 @dataclass(frozen=True)
@@ -296,6 +312,85 @@ def enrich_tmdb_posters(
         updated_movie_count=updated, cleared_movie_count=cleared,
         unchanged_movie_count=unchanged, missing_movie_count=missing, invalid_movie_count=invalid,
     )
+
+
+def enrich_tmdb_trailers(
+    session: Session, *, client: TmdbCatalogueGateway, limit: int = MAX_ENRICHMENT_MOVIES
+) -> TmdbTrailerEnrichmentResult:
+    """Backfill active TMDb movies, with one bounded videos request per movie.
+
+    Provider failures retain the last successful trailer and persist only a safe
+    status. Database failures roll back the caller's whole transaction.
+    """
+    if type(limit) is not int or not 1 <= limit <= MAX_ENRICHMENT_MOVIES:
+        raise ValueError(f"limit must be an integer from 1 to {MAX_ENRICHMENT_MOVIES}")
+    revision = get_active_catalogue_revision(session)
+    if revision is None or revision.provider != TMDB_SOURCE:
+        raise ValueError("an active TMDb catalogue is required for trailer enrichment")
+    active = (CatalogMovie.catalogue_revision_id == revision.id, CatalogMovie.source == TMDB_SOURCE)
+    eligible = session.scalar(select(func.count()).select_from(CatalogMovie).where(*active)) or 0
+    movies = list(session.scalars(select(CatalogMovie).where(*active)
+                                  .order_by(CatalogMovie.source_id).limit(limit)))
+    fetched = updated = cleared = unchanged = failed = 0
+    authentication_stopped = False
+    for movie in movies:
+        if not movie.source_id.isdecimal() or int(movie.source_id) <= 0:
+            raise ValueError("active TMDb catalogue contains an invalid source ID")
+        fetched += 1
+        attempted_at = utc_now()
+        try:
+            trailer = select_trailer(client.fetch_movie_videos(int(movie.source_id)))
+        except TmdbImportError as exc:
+            movie.trailer_attempted_at = attempted_at
+            movie.trailer_status = "stale" if movie.trailer_succeeded_at else "error"
+            session.flush()
+            failed += 1
+            if isinstance(exc, TmdbAuthenticationError):
+                authentication_stopped = True
+                break
+            continue
+
+        before = (movie.trailer_site, movie.trailer_key, movie.trailer_name,
+                  movie.trailer_type, movie.trailer_official, movie.trailer_language,
+                  _sqlite_utc(movie.trailer_published_at))
+        _set_movie_trailer(session, movie, trailer, attempted_at)
+        after = (movie.trailer_site, movie.trailer_key, movie.trailer_name,
+                 movie.trailer_type, movie.trailer_official, movie.trailer_language,
+                 _sqlite_utc(movie.trailer_published_at))
+        if before == after:
+            unchanged += 1
+        else:
+            updated += 1
+            cleared += trailer is None and before[1] is not None
+    return TmdbTrailerEnrichmentResult(
+        eligible_movie_count=eligible, fetched_movie_count=fetched,
+        updated_movie_count=updated, cleared_movie_count=cleared,
+        unchanged_movie_count=unchanged, failed_movie_count=failed,
+        authentication_stopped=authentication_stopped,
+    )
+
+
+def _set_movie_trailer(
+    session: Session, movie: CatalogMovie, trailer: Trailer | None, attempted_at: datetime
+) -> None:
+    movie.trailer_site = trailer.site if trailer else None
+    movie.trailer_key = trailer.key if trailer else None
+    movie.trailer_name = trailer.name if trailer else None
+    movie.trailer_type = trailer.type if trailer else None
+    movie.trailer_official = trailer.official if trailer else None
+    movie.trailer_language = trailer.language if trailer else None
+    movie.trailer_published_at = trailer.published_at if trailer else None
+    movie.trailer_attempted_at = attempted_at
+    movie.trailer_succeeded_at = attempted_at
+    movie.trailer_status = "success"
+    session.flush()
+
+
+def _sqlite_utc(value: datetime | None) -> datetime | None:
+    """SQLite drops timezone metadata; compare UTC instants consistently."""
+    if value is None:
+        return None
+    return value.replace(tzinfo=UTC) if value.tzinfo is None else value.astimezone(UTC)
 
 
 def _prepare_genres(raw_genres: list[Mapping[str, Any]]) -> dict[int, str]:

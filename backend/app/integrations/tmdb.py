@@ -120,6 +120,12 @@ class TmdbClient:
             params={"language": "en-US"},
         )
 
+    def fetch_movie_videos(self, movie_id: int) -> Mapping[str, Any]:
+        """Fetch one movie's videos without a language filter for ranking."""
+        if type(movie_id) is not int or movie_id <= 0:
+            raise ValueError("movie_id must be positive")
+        return self._get_json(f"/movie/{movie_id}/videos", params={})
+
     def _get_json(
         self, path: str, *, params: Mapping[str, str | int]
     ) -> Mapping[str, Any]:
