@@ -1,0 +1,30 @@
+
+> frontend@0.0.0 test:t15:ui
+> node scripts/run-s04-e2e.mjs --config playwright.t15.config.ts
+
+[WebServer] INFO:     Started server process [9078]
+[WebServer] INFO:     Waiting for application startup.
+[WebServer] INFO:     Application startup complete.
+[WebServer] INFO:     Uvicorn running on http://127.0.0.1:8014 (Press CTRL+C to quit)
+[WebServer] (node:9092) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 12 tests using 1 worker
+
+(node:9093) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 e2e/t15.reset-acceptance.ts:137:3 › journey dark 1440px: A3/2 and B1/1, cancel, confirm, later login, B intact (3.7s)
+  ✓   2 e2e/t15.reset-acceptance.ts:137:3 › journey light 375px: A3/2 and B1/1, cancel, confirm, later login, B intact (3.4s)
+  ✓   3 e2e/t15.reset-acceptance.ts:238:1 › prior rating signals are gone after reset and reselection; cold start is non-personalised (1.2s)
+  ✓   4 e2e/t15.reset-acceptance.ts:304:3 › keyboard order, focus return and dialog fit: dark 375px (872ms)
+  ✓   5 e2e/t15.reset-acceptance.ts:304:3 › keyboard order, focus return and dialog fit: dark 1440px (873ms)
+  ✓   6 e2e/t15.reset-acceptance.ts:304:3 › keyboard order, focus return and dialog fit: light 375px (866ms)
+  ✓   7 e2e/t15.reset-acceptance.ts:304:3 › keyboard order, focus return and dialog fit: light 1440px (915ms)
+  ✓   8 e2e/t15.reset-acceptance.ts:354:1 › duplicate submissions are blocked while one reset is pending (1.0s)
+  ✓   9 e2e/t15.reset-acceptance.ts:384:1 › explicit failure, lost-before-commit and lost-after-commit keep truthful status and both watchlists (2.2s)
+  ✓  10 e2e/t15.reset-acceptance.ts:460:1 › reset stays blocked while the profile read is unfinished (854ms)
+  ✓  11 e2e/t15.reset-acceptance.ts:482:1 › a delayed old profile response cannot overwrite a completed reset (1.0s)
+  ✓  12 e2e/t15.reset-acceptance.ts:512:1 › a recommendations read in flight before the reset cannot restore old cards (1.2s)
+
+  12 passed (21.5s)
+s04_temporary_database_removed=true

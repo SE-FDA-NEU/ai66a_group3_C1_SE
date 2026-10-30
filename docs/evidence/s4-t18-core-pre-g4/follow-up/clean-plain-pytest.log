@@ -1,0 +1,82 @@
+Started: 2026-10-30T10:43:47.924712+07:00
+Command: pytest
+Cwd: /private/tmp/s4-c05-early-20261030
+============================= test session starts ==============================
+platform darwin -- Python 3.12.4, pytest-9.1.1, pluggy-1.6.0
+rootdir: /private/tmp/s4-c05-early-20261030
+configfile: pytest.ini
+testpaths: tests, backend/tests, scripts
+plugins: cov-7.1.0, anyio-4.15.1
+collected 766 items
+
+tests/test_p0_acceptance.py ...............................              [  4%]
+tests/test_pytest_setup.py ...                                           [  4%]
+tests/test_rating_ranking_acceptance.py .....                            [  5%]
+tests/test_s03_details.py .........                                      [  6%]
+backend/tests/test_account_migration.py ..                               [  6%]
+backend/tests/test_account_write_transactions.py ........                [  7%]
+backend/tests/test_auth_acceptance.py ......                             [  8%]
+backend/tests/test_auth_catalogue_handoff.py ....s                       [  9%]
+backend/tests/test_auth_sessions.py ...........                          [ 10%]
+backend/tests/test_backdrop_acceptance.py ...                            [ 10%]
+backend/tests/test_backdrop_storage.py ...............                   [ 12%]
+backend/tests/test_browser_readiness.py ...........                      [ 14%]
+backend/tests/test_catalogue_migration.py .                              [ 14%]
+backend/tests/test_catalogue_pagination.py ............................  [ 18%]
+backend/tests/test_filter_preference_preservation.py ...                 [ 18%]
+backend/tests/test_genre_matching.py ...........                         [ 19%]
+backend/tests/test_health.py .                                           [ 19%]
+backend/tests/test_m2_catalogue_bootstrap.py ...                         [ 20%]
+backend/tests/test_movie_repository.py .......                           [ 21%]
+backend/tests/test_movie_search_api.py ................................. [ 25%]
+..                                                                       [ 25%]
+backend/tests/test_movies_api.py ............................            [ 29%]
+backend/tests/test_nlp_spike.py ..                                       [ 29%]
+backend/tests/test_overview_index.py .......                             [ 30%]
+backend/tests/test_passwords.py ...                                      [ 31%]
+backend/tests/test_personalised_recommendations_api.py ................. [ 33%]
+.............                                                            [ 34%]
+backend/tests/test_popular_recommendations.py ........                   [ 36%]
+backend/tests/test_poster_pipeline.py .................................. [ 40%]
+..                                                                       [ 40%]
+backend/tests/test_preference_migration.py ......                        [ 41%]
+backend/tests/test_preferences_api.py .................................. [ 45%]
+.................                                                        [ 48%]
+backend/tests/test_profile_reset_api.py ............................     [ 51%]
+backend/tests/test_profile_reset_concurrency.py ........................ [ 54%]
+................                                                         [ 57%]
+backend/tests/test_rating_aware_recommendations.py .................     [ 59%]
+backend/tests/test_rating_migration.py ...........                       [ 60%]
+backend/tests/test_rating_repository.py ............                     [ 62%]
+backend/tests/test_ratings_api.py ...................................... [ 67%]
+.................................                                        [ 71%]
+backend/tests/test_ratings_api_verification.py .................         [ 73%]
+backend/tests/test_recommendation_explanation_content.py ...             [ 74%]
+backend/tests/test_recommendation_fixtures.py .....                      [ 74%]
+backend/tests/test_registration.py ....                                  [ 75%]
+backend/tests/test_registration_verification.py ........................ [ 78%]
+.......                                                                  [ 79%]
+backend/tests/test_restart_persistence.py .                              [ 79%]
+backend/tests/test_review_account_setup.py ...............               [ 81%]
+backend/tests/test_s04_acceptance_gate.py ..........                     [ 82%]
+backend/tests/test_s4_t02_rating_signals.py ...............              [ 84%]
+backend/tests/test_s4_t12_watchlist.py ................                  [ 86%]
+backend/tests/test_s4_t12_watchlist_migration.py ....                    [ 87%]
+backend/tests/test_similar_movies_api.py ........................        [ 90%]
+backend/tests/test_tmdb_import.py ...................................... [ 95%]
+.                                                                        [ 95%]
+backend/tests/test_tmdb_import_cli.py ....................               [ 98%]
+backend/tests/test_user_repository.py ..                                 [ 98%]
+scripts/test_m3_dossier_cover.py ........                                [ 99%]
+scripts/test_s3_closeout.py ....                                         [100%]
+
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /private/tmp/s4-c05-early-20261030/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============= 765 passed, 1 skipped, 1 warning in 94.48s (0:01:34) =============
+
+Exit: 0
+Elapsed: 99.00s

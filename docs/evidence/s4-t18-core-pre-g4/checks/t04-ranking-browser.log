@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/backend/scripts/verify_s4_t04_ranking_ui.py", line 646, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/backend/scripts/verify_s4_t04_ranking_ui.py", line 267, in main
+    browser_path = find_browser(args.browser)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/backend/scripts/verify_s09_popular_ui.py", line 284, in find_browser
+    raise FileNotFoundError(
+FileNotFoundError: No Chromium browser found. Pass --browser with a Chrome, Chromium, or Edge executable.

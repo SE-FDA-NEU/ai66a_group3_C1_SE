@@ -1,0 +1,7 @@
+Started: 2026-10-30T10:35:42.434254+07:00
+Command: /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/.venv/bin/python -m app.cli.import_tmdb_catalogue --pages 50
+Cwd: /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE
+TMDb catalogue import failed: TMDb request failed; check network/DNS access to api.themoviedb.org
+
+Exit: 1
+Elapsed: 0.77s

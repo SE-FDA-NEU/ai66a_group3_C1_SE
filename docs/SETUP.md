@@ -442,7 +442,33 @@ to use it instead. CI uses the Playwright Chromium installation.
 
 ## Troubleshooting
 
-### `/health` returns 503, or `test_health` fails with 503
+### Direct pytest / EARLY_TEST_SETUP (#219)
+
+After the locked Python installation and editable backend install above, run
+from the repository root with the virtual environment active:
+
+```text
+pytest
+python -m pytest -v
+```
+
+No `.env`, application database, manual migration, provider token, live network,
+running server or `PYTHONPATH` export is required for these commands. Root
+`pytest.ini` discovers `tests/`, `backend/tests/` and existing script regressions,
+and configures imports.
+Root `conftest.py` replaces inherited database/token/index configuration and
+migrates a temporary SQLite database **before collection/application imports**,
+including the default engine used by `/health`. It cleans up after the session;
+existing per-case fixtures retain their own isolation. CI executes the same
+default command and retains the extended backend/frontend tiers.
+
+This is the #219 early infrastructure output, not final #219 acceptance. The
+application setup/import/index steps above remain required for live catalogue
+verification and are separate from token-free automated tests. An earlier
+`test_health` 503 was a missing pytest bootstrap; manually migrating the
+developer DB is not an acceptable test workaround.
+
+### Application `/health` returns 503
 
 The database has no migration table, so the migrations have not been applied.
 The response is `503` with the code `SERVICE_UNAVAILABLE`. Apply migrations:

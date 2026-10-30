@@ -1,0 +1,17 @@
+Started: 2026-10-30T10:42:53.221621+07:00
+Command: /private/tmp/s4-c05-early-20261030/.venv/bin/python -m pip install --no-cache-dir --upgrade pip
+Cwd: /private/tmp/s4-c05-early-20261030
+Requirement already satisfied: pip in ./.venv/lib/python3.12/site-packages (24.0)
+Collecting pip
+  Downloading pip-26.2.2-py3-none-any.whl.metadata (4.6 kB)
+Downloading pip-26.2.2-py3-none-any.whl (1.8 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 6.2 MB/s eta 0:00:00
+Installing collected packages: pip
+  Attempting uninstall: pip
+    Found existing installation: pip 24.0
+    Uninstalling pip-24.0:
+      Successfully uninstalled pip-24.0
+Successfully installed pip-26.2.2
+
+Exit: 0
+Elapsed: 2.28s

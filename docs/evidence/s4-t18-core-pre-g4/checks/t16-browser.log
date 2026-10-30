@@ -1,0 +1,38 @@
+
+> frontend@0.0.0 test:s4:t16:ui
+> node scripts/run-s04-e2e.mjs --config playwright.s4-t16.config.ts
+
+[WebServer] INFO:     Started server process [9576]
+[WebServer] INFO:     Waiting for application startup.
+[WebServer] INFO:     Application startup complete.
+[WebServer] INFO:     Uvicorn running on http://127.0.0.1:8014 (Press CTRL+C to quit)
+[WebServer] (node:9597) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 20 tests using 1 worker
+
+(node:9602) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 e2e/s4-t16.detail-boundaries.ts:44:1 › Start opens Preferences while a real Home catalogue read is still pending (1.3s)
+  ✓   2 e2e/s4-t16.detail-boundaries.ts:84:1 › Popular highlights three movies on every page without refetching or reordering (2.0s)
+  ✓   3 e2e/s4-t16.detail-boundaries.ts:120:1 › Collection headings and edge controls fit both themes at mobile, tablet and desktop (4.1s)
+  ✓   4 e2e/s4-t16.detail-boundaries.ts:157:1 › A failed Popular backdrop keeps the gradient and the next slide loads its own image (740ms)
+  ✓   5 e2e/s4-t16.detail-boundaries.ts:205:1 › T16 extension: pointer halves and keyboard persist real half-star ratings (2.6s)
+  ✓   6 e2e/s4-t16.detail-boundaries.ts:248:1 › T05 touch selection stays a draft until an explicit save (1.8s)
+  ✓   7 e2e/s4-t16.detail-boundaries.ts:280:1 › T16 extension: Search sends nothing on typing, submits on Enter/button and restores Back (1.1s)
+  ✓   8 e2e/s4-t16.detail-boundaries.ts:307:1 › Search exposes every ranked match and restores page two from details and Back (1.1s)
+  ✓   9 e2e/s4-t16.detail-boundaries.ts:334:3 › TC-S4-T16-RET-001 catalogue page 2 survives app return and browser Back in both themes (1.6s)
+  ✓  10 e2e/s4-t16.detail-boundaries.ts:334:3 › TC-S4-T16-RET-001 popular page 2 survives app return and browser Back in both themes (1.4s)
+  ✓  11 e2e/s4-t16.detail-boundaries.ts:373:1 › TC-S4-T16-PUBLIC-001 actual missing-field and not-found labels, with a safe return (1.2s)
+  ✓  12 e2e/s4-t16.detail-boundaries.ts:395:1 › TC-S4-T16-RET-003 recommendation page/filter survive rating save and preferences remain unchanged (1.8s)
+  ✓  13 e2e/s4-t16.detail-boundaries.ts:423:1 › TC-S4-T16-RET-002 a changed catalogue clears the old recommendation filter on return (1.7s)
+  ✓  14 e2e/s4-t16.detail-boundaries.ts:444:1 › TC-S4-T16-RET-004 search to details to similar keeps the original safe search query (998ms)
+  ✓  15 e2e/s4-t16.detail-boundaries.ts:462:1 › TC-S4-T16-RET-005 changed preferences invalidate a historical detail-return filter (1.8s)
+  ✓  16 e2e/s4-t16.detail-boundaries.ts:486:1 › TC-S4-T16-WATCH-001 account B cannot restore account A's page through historical details (2.2s)
+  ✓  17 e2e/s4-t16.detail-boundaries.ts:521:1 › TC-S4-T16-WATCH-004 watchlist page 2 returns exactly and last-row removal reconciles totals (1.5s)
+  ✓  18 e2e/s4-t16.detail-boundaries.ts:547:1 › TC-S4-T16-FAIL-001 membership service outage leaves real details, rating, similar and recommendations usable (1.2s)
+  ✓  19 e2e/s4-t16.detail-boundaries.ts:571:1 › TC-S4-T16-ASYNC-001 delayed detail, rating, membership and similar for A cannot fill B (2.9s)
+  ✓  20 e2e/s4-t16.detail-boundaries.ts:597:1 › TC-S4-T16-ASYNC-002 delayed private reads and a committed write cannot leak after account switch (3.2s)
+
+  20 passed (39.6s)
+s04_temporary_database_removed=true

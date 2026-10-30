@@ -1,0 +1,19 @@
+Date: 2026-10-30; Asia/Ho_Chi_Minh
+Sanitized observations from unauthenticated network diagnosis outside sandbox.
+No Authorization header/token was used in these diagnostic requests.
+
+Python httpx GET https://api.themoviedb.org/3/genre/movie/list, timeout=20
+DNS resolved api.themoviedb.org; certifi CA bundle exists.
+Actual: httpx.ConnectError: [Errno 54] Connection reset by peer during TLS start.
+Exit: 1
+
+curl -4 -I --connect-timeout 10 --max-time 20 https://api.themoviedb.org/3/genre/movie/list
+Actual: curl: (35) Recv failure: Connection reset by peer
+Exit: 35
+
+curl -6 -I --connect-timeout 10 --max-time 20 https://api.themoviedb.org/3/genre/movie/list
+Actual: curl: (35) Recv failure: Connection reset by peer
+Exit: 35
+
+This is a sanitized observation record, not a complete terminal transcript.
+No successful catalogue import, actual provider provenance or UI result inferred.

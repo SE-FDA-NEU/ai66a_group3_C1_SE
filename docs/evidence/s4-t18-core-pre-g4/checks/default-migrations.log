@@ -1,0 +1,12 @@
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.

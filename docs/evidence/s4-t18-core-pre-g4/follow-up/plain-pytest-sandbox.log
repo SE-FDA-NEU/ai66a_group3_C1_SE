@@ -1,0 +1,406 @@
+Started: 2026-10-30T10:33:21.914383+07:00
+Command: pytest
+Cwd: /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE
+============================= test session starts ==============================
+platform darwin -- Python 3.12.4, pytest-9.1.1, pluggy-1.6.0
+rootdir: /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE
+configfile: pytest.ini
+testpaths: tests, backend/tests
+plugins: cov-7.1.0, anyio-4.15.1
+collected 754 items
+
+tests/test_p0_acceptance.py ...............................              [  4%]
+tests/test_pytest_setup.py ...                                           [  4%]
+tests/test_rating_ranking_acceptance.py .....                            [  5%]
+tests/test_s03_details.py .........                                      [  6%]
+backend/tests/test_account_migration.py ..                               [  6%]
+backend/tests/test_account_write_transactions.py ........                [  7%]
+backend/tests/test_auth_acceptance.py EEEEEE                             [  8%]
+backend/tests/test_auth_catalogue_handoff.py ....s                       [  9%]
+backend/tests/test_auth_sessions.py ...........                          [ 10%]
+backend/tests/test_backdrop_acceptance.py ...                            [ 11%]
+backend/tests/test_backdrop_storage.py ...............                   [ 12%]
+backend/tests/test_browser_readiness.py ...........                      [ 14%]
+backend/tests/test_catalogue_migration.py .                              [ 14%]
+backend/tests/test_catalogue_pagination.py ............................  [ 18%]
+backend/tests/test_filter_preference_preservation.py ...                 [ 18%]
+backend/tests/test_genre_matching.py ...........                         [ 20%]
+backend/tests/test_health.py .                                           [ 20%]
+backend/tests/test_m2_catalogue_bootstrap.py ...                         [ 20%]
+backend/tests/test_movie_repository.py .......                           [ 21%]
+backend/tests/test_movie_search_api.py ................................. [ 25%]
+..                                                                       [ 26%]
+backend/tests/test_movies_api.py ............................            [ 29%]
+backend/tests/test_nlp_spike.py ..                                       [ 30%]
+backend/tests/test_overview_index.py .......                             [ 31%]
+backend/tests/test_passwords.py ...                                      [ 31%]
+backend/tests/test_personalised_recommendations_api.py ................. [ 33%]
+.............                                                            [ 35%]
+backend/tests/test_popular_recommendations.py ........                   [ 36%]
+backend/tests/test_poster_pipeline.py .................................. [ 41%]
+..                                                                       [ 41%]
+backend/tests/test_preference_migration.py ......                        [ 42%]
+backend/tests/test_preferences_api.py .................................. [ 46%]
+.................                                                        [ 48%]
+backend/tests/test_profile_reset_api.py ............................     [ 52%]
+backend/tests/test_profile_reset_concurrency.py ........................ [ 55%]
+................                                                         [ 57%]
+backend/tests/test_rating_aware_recommendations.py .................     [ 60%]
+backend/tests/test_rating_migration.py ...........                       [ 61%]
+backend/tests/test_rating_repository.py ............                     [ 63%]
+backend/tests/test_ratings_api.py ...................................... [ 68%]
+.................................                                        [ 72%]
+backend/tests/test_ratings_api_verification.py .................         [ 74%]
+backend/tests/test_recommendation_explanation_content.py ...             [ 75%]
+backend/tests/test_recommendation_fixtures.py .....                      [ 75%]
+backend/tests/test_registration.py ....                                  [ 76%]
+backend/tests/test_registration_verification.py ........................ [ 79%]
+.......                                                                  [ 80%]
+backend/tests/test_restart_persistence.py .                              [ 80%]
+backend/tests/test_review_account_setup.py ...............               [ 82%]
+backend/tests/test_s04_acceptance_gate.py ..........                     [ 84%]
+backend/tests/test_s4_t02_rating_signals.py ...............              [ 86%]
+backend/tests/test_s4_t12_watchlist.py ................                  [ 88%]
+backend/tests/test_s4_t12_watchlist_migration.py ....                    [ 88%]
+backend/tests/test_similar_movies_api.py ........................        [ 91%]
+backend/tests/test_tmdb_import.py ...................................... [ 96%]
+.                                                                        [ 97%]
+backend/tests/test_tmdb_import_cli.py ....................               [ 99%]
+backend/tests/test_user_repository.py ..                                 [100%]
+
+==================================== ERRORS ====================================
+_ ERROR at setup of test_independent_sessions_ignore_forged_identity_and_reset_only_owner _
+
+tmp_path = PosixPath('/private/var/folders/k5/w77q5v455sqchk9vfs41w8_h0000gn/T/pytest-of-trantuananh/pytest-8/test_independent_sessions_igno0')
+
+    @pytest.fixture
+    def application(tmp_path):
+        database = tmp_path / "acceptance.db"
+        env = dict(
+            os.environ,
+            DATABASE_URL=f"sqlite:///{database.as_posix()}",
+            SESSION_COOKIE_SECURE="false",
+            TMDB_READ_ACCESS_TOKEN="",
+            PYTHONPATH=str(ROOT / "backend"),
+        )
+        subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "alembic",
+                "-c",
+                "backend/alembic.ini",
+                "upgrade",
+                "head",
+            ],
+            cwd=ROOT,
+            env=env,
+            check=True,
+            capture_output=True,
+        )
+        # Reuse the browser catalogue seeder, never the developer DB or TMDb token.
+        subprocess.run(
+            [
+                sys.executable,
+                "-c",
+                (
+                    "import sys,json; from pathlib import Path; "
+                    "sys.path.insert(0, 'backend/scripts'); "
+                    "from s04_acceptance_server import seed_database; "
+                    "seed_database(Path(sys.argv[1]), "
+                    "json.loads(Path(sys.argv[2]).read_text()))"
+                ),
+                str(database),
+                str(FIXTURE),
+            ],
+            cwd=ROOT,
+            env=env,
+            check=True,
+        )
+        with socket.socket() as probe:
+>           probe.bind(("127.0.0.1", 0))
+E           PermissionError: [Errno 1] Operation not permitted
+
+backend/tests/test_auth_acceptance.py:75: PermissionError
+_ ERROR at setup of test_invalid_sessions_reject_every_private_read_and_write[missing] _
+
+tmp_path = PosixPath('/private/var/folders/k5/w77q5v455sqchk9vfs41w8_h0000gn/T/pytest-of-trantuananh/pytest-8/test_invalid_sessions_reject_e0')
+
+    @pytest.fixture
+    def application(tmp_path):
+        database = tmp_path / "acceptance.db"
+        env = dict(
+            os.environ,
+            DATABASE_URL=f"sqlite:///{database.as_posix()}",
+            SESSION_COOKIE_SECURE="false",
+            TMDB_READ_ACCESS_TOKEN="",
+            PYTHONPATH=str(ROOT / "backend"),
+        )
+        subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "alembic",
+                "-c",
+                "backend/alembic.ini",
+                "upgrade",
+                "head",
+            ],
+            cwd=ROOT,
+            env=env,
+            check=True,
+            capture_output=True,
+        )
+        # Reuse the browser catalogue seeder, never the developer DB or TMDb token.
+        subprocess.run(
+            [
+                sys.executable,
+                "-c",
+                (
+                    "import sys,json; from pathlib import Path; "
+                    "sys.path.insert(0, 'backend/scripts'); "
+                    "from s04_acceptance_server import seed_database; "
+                    "seed_database(Path(sys.argv[1]), "
+                    "json.loads(Path(sys.argv[2]).read_text()))"
+                ),
+                str(database),
+                str(FIXTURE),
+            ],
+            cwd=ROOT,
+            env=env,
+            check=True,
+        )
+        with socket.socket() as probe:
+>           probe.bind(("127.0.0.1", 0))
+E           PermissionError: [Errno 1] Operation not permitted
+
+backend/tests/test_auth_acceptance.py:75: PermissionError
+_ ERROR at setup of test_invalid_sessions_reject_every_private_read_and_write[expired] _
+
+tmp_path = PosixPath('/private/var/folders/k5/w77q5v455sqchk9vfs41w8_h0000gn/T/pytest-of-trantuananh/pytest-8/test_invalid_sessions_reject_e1')
+
+    @pytest.fixture
+    def application(tmp_path):
+        database = tmp_path / "acceptance.db"
+        env = dict(
+            os.environ,
+            DATABASE_URL=f"sqlite:///{database.as_posix()}",
+            SESSION_COOKIE_SECURE="false",
+            TMDB_READ_ACCESS_TOKEN="",
+            PYTHONPATH=str(ROOT / "backend"),
+        )
+        subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "alembic",
+                "-c",
+                "backend/alembic.ini",
+                "upgrade",
+                "head",
+            ],
+            cwd=ROOT,
+            env=env,
+            check=True,
+            capture_output=True,
+        )
+        # Reuse the browser catalogue seeder, never the developer DB or TMDb token.
+        subprocess.run(
+            [
+                sys.executable,
+                "-c",
+                (
+                    "import sys,json; from pathlib import Path; "
+                    "sys.path.insert(0, 'backend/scripts'); "
+                    "from s04_acceptance_server import seed_database; "
+                    "seed_database(Path(sys.argv[1]), "
+                    "json.loads(Path(sys.argv[2]).read_text()))"
+                ),
+                str(database),
+                str(FIXTURE),
+            ],
+            cwd=ROOT,
+            env=env,
+            check=True,
+        )
+        with socket.socket() as probe:
+>           probe.bind(("127.0.0.1", 0))
+E           PermissionError: [Errno 1] Operation not permitted
+
+backend/tests/test_auth_acceptance.py:75: PermissionError
+_ ERROR at setup of test_invalid_sessions_reject_every_private_read_and_write[revoked] _
+
+tmp_path = PosixPath('/private/var/folders/k5/w77q5v455sqchk9vfs41w8_h0000gn/T/pytest-of-trantuananh/pytest-8/test_invalid_sessions_reject_e2')
+
+    @pytest.fixture
+    def application(tmp_path):
+        database = tmp_path / "acceptance.db"
+        env = dict(
+            os.environ,
+            DATABASE_URL=f"sqlite:///{database.as_posix()}",
+            SESSION_COOKIE_SECURE="false",
+            TMDB_READ_ACCESS_TOKEN="",
+            PYTHONPATH=str(ROOT / "backend"),
+        )
+        subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "alembic",
+                "-c",
+                "backend/alembic.ini",
+                "upgrade",
+                "head",
+            ],
+            cwd=ROOT,
+            env=env,
+            check=True,
+            capture_output=True,
+        )
+        # Reuse the browser catalogue seeder, never the developer DB or TMDb token.
+        subprocess.run(
+            [
+                sys.executable,
+                "-c",
+                (
+                    "import sys,json; from pathlib import Path; "
+                    "sys.path.insert(0, 'backend/scripts'); "
+                    "from s04_acceptance_server import seed_database; "
+                    "seed_database(Path(sys.argv[1]), "
+                    "json.loads(Path(sys.argv[2]).read_text()))"
+                ),
+                str(database),
+                str(FIXTURE),
+            ],
+            cwd=ROOT,
+            env=env,
+            check=True,
+        )
+        with socket.socket() as probe:
+>           probe.bind(("127.0.0.1", 0))
+E           PermissionError: [Errno 1] Operation not permitted
+
+backend/tests/test_auth_acceptance.py:75: PermissionError
+_ ERROR at setup of test_logout_cookie_replay_relogin_and_actual_backend_restart _
+
+tmp_path = PosixPath('/private/var/folders/k5/w77q5v455sqchk9vfs41w8_h0000gn/T/pytest-of-trantuananh/pytest-8/test_logout_cookie_replay_relo0')
+
+    @pytest.fixture
+    def application(tmp_path):
+        database = tmp_path / "acceptance.db"
+        env = dict(
+            os.environ,
+            DATABASE_URL=f"sqlite:///{database.as_posix()}",
+            SESSION_COOKIE_SECURE="false",
+            TMDB_READ_ACCESS_TOKEN="",
+            PYTHONPATH=str(ROOT / "backend"),
+        )
+        subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "alembic",
+                "-c",
+                "backend/alembic.ini",
+                "upgrade",
+                "head",
+            ],
+            cwd=ROOT,
+            env=env,
+            check=True,
+            capture_output=True,
+        )
+        # Reuse the browser catalogue seeder, never the developer DB or TMDb token.
+        subprocess.run(
+            [
+                sys.executable,
+                "-c",
+                (
+                    "import sys,json; from pathlib import Path; "
+                    "sys.path.insert(0, 'backend/scripts'); "
+                    "from s04_acceptance_server import seed_database; "
+                    "seed_database(Path(sys.argv[1]), "
+                    "json.loads(Path(sys.argv[2]).read_text()))"
+                ),
+                str(database),
+                str(FIXTURE),
+            ],
+            cwd=ROOT,
+            env=env,
+            check=True,
+        )
+        with socket.socket() as probe:
+>           probe.bind(("127.0.0.1", 0))
+E           PermissionError: [Errno 1] Operation not permitted
+
+backend/tests/test_auth_acceptance.py:75: PermissionError
+_ ERROR at setup of test_reset_confirmation_origin_and_real_delete_failure_preserve_both_accounts _
+
+tmp_path = PosixPath('/private/var/folders/k5/w77q5v455sqchk9vfs41w8_h0000gn/T/pytest-of-trantuananh/pytest-8/test_reset_confirmation_origin0')
+
+    @pytest.fixture
+    def application(tmp_path):
+        database = tmp_path / "acceptance.db"
+        env = dict(
+            os.environ,
+            DATABASE_URL=f"sqlite:///{database.as_posix()}",
+            SESSION_COOKIE_SECURE="false",
+            TMDB_READ_ACCESS_TOKEN="",
+            PYTHONPATH=str(ROOT / "backend"),
+        )
+        subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "alembic",
+                "-c",
+                "backend/alembic.ini",
+                "upgrade",
+                "head",
+            ],
+            cwd=ROOT,
+            env=env,
+            check=True,
+            capture_output=True,
+        )
+        # Reuse the browser catalogue seeder, never the developer DB or TMDb token.
+        subprocess.run(
+            [
+                sys.executable,
+                "-c",
+                (
+                    "import sys,json; from pathlib import Path; "
+                    "sys.path.insert(0, 'backend/scripts'); "
+                    "from s04_acceptance_server import seed_database; "
+                    "seed_database(Path(sys.argv[1]), "
+                    "json.loads(Path(sys.argv[2]).read_text()))"
+                ),
+                str(database),
+                str(FIXTURE),
+            ],
+            cwd=ROOT,
+            env=env,
+            check=True,
+        )
+        with socket.socket() as probe:
+>           probe.bind(("127.0.0.1", 0))
+E           PermissionError: [Errno 1] Operation not permitted
+
+backend/tests/test_auth_acceptance.py:75: PermissionError
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR backend/tests/test_auth_acceptance.py::test_independent_sessions_ignore_forged_identity_and_reset_only_owner
+ERROR backend/tests/test_auth_acceptance.py::test_invalid_sessions_reject_every_private_read_and_write[missing]
+ERROR backend/tests/test_auth_acceptance.py::test_invalid_sessions_reject_every_private_read_and_write[expired]
+ERROR backend/tests/test_auth_acceptance.py::test_invalid_sessions_reject_every_private_read_and_write[revoked]
+ERROR backend/tests/test_auth_acceptance.py::test_logout_cookie_replay_relogin_and_actual_backend_restart
+ERROR backend/tests/test_auth_acceptance.py::test_reset_confirmation_origin_and_real_delete_failure_preserve_both_accounts
+======== 747 passed, 1 skipped, 1 warning, 6 errors in 84.51s (0:01:24) ========
+
+Exit: 1
+Elapsed: 87.01s
