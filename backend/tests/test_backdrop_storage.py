@@ -126,7 +126,8 @@ def _snapshot(engine: Engine, *, include_backdrop: bool = False) -> dict:
             columns = [
                 column
                 for column in table.columns
-                if include_backdrop or column.name not in {"backdrop_path", "poster_path"}
+                if not column.name.startswith("trailer_")
+                and (include_backdrop or column.name not in {"backdrop_path", "poster_path"})
             ]
             snapshot[table.name] = [
                 tuple(row)

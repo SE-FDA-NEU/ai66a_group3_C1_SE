@@ -130,7 +130,8 @@ def snapshot(path: Path, *, media: bool = False) -> dict:
             columns = [
                 r[1]
                 for r in db.execute(f'PRAGMA table_info("{table}")')
-                if media or r[1] not in {"backdrop_path", "poster_path"}
+                if not r[1].startswith("trailer_")
+                and (media or r[1] not in {"backdrop_path", "poster_path"})
             ]
             quoted = ",".join(f'"{column}"' for column in columns)
             result[table] = db.execute(
