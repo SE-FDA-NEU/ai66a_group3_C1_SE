@@ -411,3 +411,14 @@ historical hashes; this row identifies the current testing document.
 | File | SHA-256 after UTF-8 LF normalization |
 |---|---|
 | `docs/testing.md` | `3b846be2f3434dc478c7f38667741e9cb8d2907387dc878281ed2756e590ce94` |
+
+## C05 EARLY_TEST_SETUP follow-up — 30 October 2026
+
+Root pytest now owns the default-engine temporary DB before collection.
+The test-case contracts and historical execution records above are retained.
+This fingerprint identifies the updated commands/bootstrap documentation, not
+independent review or final acceptance of #219.
+
+| File | SHA-256 (normalized LF) |
+|---|---|
+| `docs/testing.md` | `3358ac14a0e71af42958265f72c2194b501dda11e7be9f5f1a22e3248211474b` |

@@ -144,8 +144,8 @@ The **single repository-root default** is `pytest` (verbose:
 the migrated disposable SQLite fixture in `tests/test_s03_details.py`; existing
 `backend/tests/` and frontend Vitest/browser suites remain intact and
 useful. Do not delete or skip them to manufacture green results.
-Main CI keeps its backend suite and additionally runs `python -m pytest tests
--v` followed by `python scripts/verify_s4_t05_trace.py` so the root P0 cases
+Main CI keeps its backend suite and additionally runs `python -m pytest -v`
+followed by `python scripts/verify_s4_t05_trace.py` so the root P0 cases
 and their Section 2 mapping are checked on each branch push and PR run.
 
 Root fixtures create a fresh temporary SQLite file, run Alembic migrations,
@@ -168,7 +168,20 @@ python backend/scripts/run_isolated_tests.py -v
 npm --prefix frontend test
 ```
 
-The first two commands are the future root acceptance gate; the third is
+The first two commands use the committed #219 `EARLY_TEST_SETUP` in root
+`pytest.ini` and `conftest.py`: discovery includes `tests/`, `backend/tests/`
+and the existing `scripts/` regressions,
+and `backend` is added to the import path. Before collection (and therefore
+before application/default-engine imports), pytest selects a new temporary
+SQLite file, blanks the provider token, disables live TMDb and selects a
+temporary index path, then applies Alembic migrations. Session cleanup disposes
+the engine, deletes temporary files and restores inherited environment even
+after migration/collection failure. Do not manually create/migrate a default
+test database or set `DATABASE_URL`/`PYTHONPATH` to make these commands pass.
+Per-case fixtures still own their synthetic data and dependency overrides.
+This early output does not close #219 or replace its independent review.
+
+The first two commands are the root acceptance gate; the third is
 the existing backend isolation runner; the fourth covers React. Record the
 actual root runtime in seconds and a screenshot of the **full** verbose
 output, with command, environment, candidate SHA, passed/failed/skipped count
