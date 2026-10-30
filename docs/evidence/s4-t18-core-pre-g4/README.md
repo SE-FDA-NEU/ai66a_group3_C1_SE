@@ -9,8 +9,11 @@ the operator manually migrated a database. Those passes prove regression with
 manual provisioning, not #219 EARLY_TEST_SETUP or the required direct-pytest
 rehearsal. The earlier claim that no requirement remained uncovered is withdrawn.
 The [follow-up](follow-up/README.md) records the scoped bootstrap fix and new
-results. Live catalogue/index, independent reviewer execution and PO/SM capacity
-and G4 decisions are separate outstanding gates; **T18 is not complete**.
+results. The [resumed smoke](follow-up/windows-portability/README.md) subsequently
+imported **964 real TMDb movies**, verified index readiness and passed API/UI
+checks, and corrected Windows assertions on both PRs. Independent reviewer
+execution and PO/SM capacity and G4 records remain outstanding;
+**T18 is not complete**.
 
 [manifest.json](manifest.json) records identity, versions and browser statistics.
 [tested-source.sha256](tested-source.sha256) historically covers 316 tracked files under

@@ -9,10 +9,17 @@ were compared byte-for-byte against that commit in the separate checkout.
 The T18 branch also includes those changes for verification; their inclusion
 does not mean #240 has been independently reviewed or merged into main.
 
+**Latest continuation:** the [Windows and live-TMDb follow-up](windows-portability/README.md)
+records the URL-object/collection-failure corrections in both PRs, full pytest
+passes on the corrected heads, and a successful real 50-page import with **964
+movies**, a ready index and passing API/browser smoke. It supersedes the live
+connectivity failure below. The earlier logs and SHA in this report remain
+historical observations of their own candidates.
+
 **T18 remains incomplete.** The original report's claim that no requirement was
 uncovered was incorrect. Manually migrating a test DB hid a gap in #219's
-automatic default-engine isolation. Live catalogue acceptance and independent
-preflight/G4 records are also outstanding. Keep #213 and #219 Open; consuming
+automatic default-engine isolation. Author live-catalogue smoke now passes;
+independent preflight/capacity/G4 records remain outstanding. Keep #213 and #219 Open; consuming
 the reviewed early output does not depend on #219's final closure.
 
 ## Direct pytest correction
@@ -73,6 +80,12 @@ running-server prerequisite, live TMDb or token dependency.
 
 ## Attempted live catalogue and index
 
+**Historical failed attempt:** the [successful continuation](windows-portability/README.md)
+uses a different smoke database and records actual counts, provenance, index
+readiness and real API/UI acceptance. The zero rows below apply only to this
+earlier failed smoke database; they do not describe the configured developer
+database or the successful later snapshot.
+
 The configured private token was available; it was read only into the importer
 process environment. No token value, `.env`, database dump or provider payload
 is included. The separate DB is
@@ -111,7 +124,8 @@ the actual active count and run detail/popular/Search/Similar plus the documente
 disposable-account API/UI/persistence journey. If a live test assumes an older
 200–300-movie catalogue, reconcile that assertion with the reviewed 50-page
 budget and actual imported SQL count; do not shrink the dataset to make it pass.
-Until this succeeds, live readiness remains **Blocked**, never Pass.
+For this failed attempt, live readiness remained **Blocked**, never Pass.
+The linked continuation supplies the later successful author smoke.
 
 ## Independent review and G4
 
@@ -123,7 +137,7 @@ of independent execution, and cannot approve later changes automatically.
 
 | Gate | Current record / required completion |
 |---|---|
-| #219 EARLY_TEST_SETUP | Implemented and author-tested; [PR #240](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/240) awaits substantive non-coauthor review, hosted checks and merge. Review requested from @vu-huzy. Keep #219 Open. |
+| #219 EARLY_TEST_SETUP | Implemented and author-tested; corrected [PR #240](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/240) head `058a367` has passing hosted checks. An `ok` approval exists on preceding `641f48a`; substantive final-head independent execution and merge remain outstanding. Keep #219 Open. |
 | #213 independent preflight | **Pending**. Reviewer must record identity/date, exact final SHA, machine/tool versions, committed setup and commands, expected/actual, full outputs and blockers after the early PR merges. Planned #213 reviewer: @NguyenTuanAnh0608; #219 reviewer: @vu-huzy. Coauthors need another independent reviewer. |
 | Current author capacity | **Not supplied**; record member-confirmed remaining hours/date and retained scope. |
 | Current reviewer capacity | **Not supplied**; record member-confirmed remaining hours/date and review scope. |
@@ -134,10 +148,17 @@ No approval, human execution, hours, merge or Go decision is invented. The
 machine-readable [manifest](manifest.json) leaves these facts null and sets
 `t18Accepted=false`. Changes here use **Refs #213 / Refs #219**, not closure.
 
-Hosted checks on #240 SHA `641f48a` now passed Python (including default pytest),
+At the time of this historical record, hosted checks on #240 SHA `641f48a` passed Python (including default pytest),
 Node tests/build, details and profile acceptance, secrets and issue-link checks.
 The [required independent-review check](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/40999409405/job/123880040024)
-still fails because no independent approval has been supplied. Do not bypass
+then failed because no independent approval had been supplied. Do not bypass
 it to merge. [CI snapshot](github-checks.json) records this early PR and the
 old T18 head before publication of this correction; its old-head approvals and
 checks do not establish acceptance of the updated T18 head.
+
+The [latest GitHub snapshot](windows-portability/resumed-github-status.json)
+records #240 head `058a367`: hosted checks pass, while the `ok` approval by
+@kietxuan is attached to preceding head `641f48a`. #239 also has an `ok`
+approval from @kietxuan on `8d23a86`, before the Windows/evidence continuation.
+These approvals do not contain an independent execution record. Both PRs were
+still Open/unmerged when that snapshot was captured.

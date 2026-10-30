@@ -1,0 +1,13 @@
+Started: 2026-10-30T15:07:31.894532+07:00
+Command: ['.venv/bin/python', '-m', 'app.cli.rebuild_overview_index', 'rebuild']
+Cwd: /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE
+ready=true
+catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702
+corpusDigest=3ac90bf45649bba63965b0ff9b723d9588c00a64c58a7a204029aa80a19aca1e
+configFingerprint=41785781f34ba44091ac64f3b1c0503402ee760c518af1429d0acb94bbc31c99
+movies=964
+usableDocuments=962
+vocabularyTerms=7718
+
+Exit: 0
+Elapsed: 1.13s

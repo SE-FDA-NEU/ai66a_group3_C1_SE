@@ -1,0 +1,274 @@
+{
+  "239": {
+    "httpStatus": 200,
+    "state": "open",
+    "merged": false,
+    "head": "8d23a864983ec57c17494cca49da9fd9d7692e03",
+    "branch": "s4-t18-core-preflight",
+    "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/239",
+    "reviewsHttpStatus": 200,
+    "reviews": [
+      {
+        "author": "NguyenTuanAnh0608",
+        "state": "APPROVED",
+        "commit": "3dd5de698bf841fd44a3ebffe7d26dae6dae444d",
+        "submitted": "2026-10-29T17:32:35Z",
+        "body": "oke"
+      },
+      {
+        "author": "hoang3003",
+        "state": "APPROVED",
+        "commit": "3dd5de698bf841fd44a3ebffe7d26dae6dae444d",
+        "submitted": "2026-10-29T18:13:48Z",
+        "body": "ok"
+      },
+      {
+        "author": "kietxuan",
+        "state": "APPROVED",
+        "commit": "8d23a864983ec57c17494cca49da9fd9d7692e03",
+        "submitted": "2026-10-30T08:14:04Z",
+        "body": "ok"
+      }
+    ],
+    "checksHttpStatus": 200,
+    "checks": [
+      {
+        "name": "PR is linked to a planned issue",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41025079452/job/123961166720"
+      },
+      {
+        "name": "Someone else must review",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41025079452/job/123961166409"
+      },
+      {
+        "name": "Pull request is reviewable",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41025079452/job/123961166252"
+      },
+      {
+        "name": "Pull request is reviewable",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41000262734/job/123882777976"
+      },
+      {
+        "name": "PR is linked to a planned issue",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41000262734/job/123882777910"
+      },
+      {
+        "name": "Someone else must review",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41000262734/job/123882777720"
+      },
+      {
+        "name": "Python tests",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41000230999/job/123882718318"
+      },
+      {
+        "name": "Node build and tests",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41000230999/job/123882718269"
+      },
+      {
+        "name": "Python tests",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41000225405/job/123882699249"
+      },
+      {
+        "name": "Node build and tests",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41000225405/job/123882699163"
+      },
+      {
+        "name": "Someone else must review",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41000231028/job/123882677777"
+      },
+      {
+        "name": "PR is linked to a planned issue",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41000231028/job/123882677532"
+      },
+      {
+        "name": "No secrets committed",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41000230999/job/123882677478"
+      },
+      {
+        "name": "Pull request is reviewable",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41000231028/job/123882677458"
+      },
+      {
+        "name": "profile-acceptance",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41000230972/job/123882677376"
+      },
+      {
+        "name": "Detect stack",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41000230999/job/123882677267"
+      },
+      {
+        "name": "details",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41000230977/job/123882677159"
+      },
+      {
+        "name": "profile-acceptance",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41000225463/job/123882667308"
+      },
+      {
+        "name": "Detect stack",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41000225405/job/123882660415"
+      },
+      {
+        "name": "details",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41000225471/job/123882660393"
+      },
+      {
+        "name": "No secrets committed",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41000225405/job/123882660275"
+      }
+    ]
+  },
+  "240": {
+    "httpStatus": 200,
+    "state": "open",
+    "merged": false,
+    "head": "058a36794637d38635099a89fd0d6d85f27ba53d",
+    "branch": "s4-c05-early-test-setup",
+    "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/240",
+    "reviewsHttpStatus": 200,
+    "reviews": [
+      {
+        "author": "kietxuan",
+        "state": "APPROVED",
+        "commit": "641f48a09a4a0bd057a73e05f6455a61e816150a",
+        "submitted": "2026-10-30T06:18:00Z",
+        "body": "ok\n"
+      }
+    ],
+    "checksHttpStatus": 200,
+    "checks": [
+      {
+        "name": "Node build and tests",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41024735102/job/123960102580"
+      },
+      {
+        "name": "Python tests",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41024735102/job/123960102499"
+      },
+      {
+        "name": "Node build and tests",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41024728714/job/123960065163"
+      },
+      {
+        "name": "Python tests",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41024728714/job/123960064951"
+      },
+      {
+        "name": "profile-acceptance",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41024735136/job/123960039934"
+      },
+      {
+        "name": "Detect stack",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41024735102/job/123960036632"
+      },
+      {
+        "name": "details",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41024735103/job/123960036459"
+      },
+      {
+        "name": "No secrets committed",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41024735102/job/123960036430"
+      },
+      {
+        "name": "Someone else must review",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41024735090/job/123960036372"
+      },
+      {
+        "name": "Pull request is reviewable",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41024735090/job/123960036346"
+      },
+      {
+        "name": "PR is linked to a planned issue",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41024735090/job/123960036056"
+      },
+      {
+        "name": "Detect stack",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41024728714/job/123960015841"
+      },
+      {
+        "name": "profile-acceptance",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41024728854/job/123960015671"
+      },
+      {
+        "name": "details",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41024728710/job/123960015469"
+      },
+      {
+        "name": "No secrets committed",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/41024728714/job/123960015409"
+      }
+    ]
+  }
+}

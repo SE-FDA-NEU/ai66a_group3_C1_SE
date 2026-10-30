@@ -1,0 +1,90 @@
+
+  VITE v8.3.1  ready in 245 ms
+
+  ➜  Local:   http://127.0.0.1:5174/
+INFO:     Started server process [7203]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8014 (Press CTRL+C to quit)
+INFO:     127.0.0.1:50408 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50412 - "GET /api/movies?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50421 - "GET /api/auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:50423 - "GET /api/movies?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50433 - "GET /api/movies?page=2&limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50440 - "GET /api/movies/popular?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50441 - "GET /api/auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:50442 - "GET /api/movies/popular?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50443 - "GET /api/movies/popular?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50446 - "GET /api/movies/popular?page=2&limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50447 - "GET /api/movies/popular?limit=10&page=2&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50454 - "GET /api/auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:50455 - "GET /api/movies/search?q=the+stakes+in HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50456 - "GET /api/movies/0e570bbb-ab2a-4926-9633-9b8f46c987a3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50457 - "GET /api/movies/0e570bbb-ab2a-4926-9633-9b8f46c987a3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50469 - "GET /api/movies/eacab369-a9e2-49ea-98b1-ff4679159e42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50470 - "GET /api/movies/eacab369-a9e2-49ea-98b1-ff4679159e42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50471 - "GET /api/auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:50474 - "GET /api/movies/eacab369-a9e2-49ea-98b1-ff4679159e42/similar HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50476 - "POST /api/auth/register HTTP/1.1" 201 Created
+INFO:     127.0.0.1:50478 - "POST /api/auth/register HTTP/1.1" 201 Created
+INFO:     127.0.0.1:50486 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50488 - "GET /api/movies?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50490 - "GET /api/me/recommendations HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50495 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50499 - "GET /api/me/preferences HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50498 - "GET /api/genres HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50500 - "PUT /api/me/preferences HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50502 - "GET /api/me/recommendations?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50506 - "GET /api/me/preferences HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50508 - "GET /api/genres HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50510 - "GET /api/me/recommendations HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50518 - "GET /api/movies/eacab369-a9e2-49ea-98b1-ff4679159e42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50519 - "GET /api/movies/eacab369-a9e2-49ea-98b1-ff4679159e42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50520 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50528 - "GET /api/me/ratings/eacab369-a9e2-49ea-98b1-ff4679159e42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50529 - "GET /api/me/watchlist/eacab369-a9e2-49ea-98b1-ff4679159e42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50522 - "GET /api/movies/eacab369-a9e2-49ea-98b1-ff4679159e42/similar HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50531 - "PUT /api/me/ratings/eacab369-a9e2-49ea-98b1-ff4679159e42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50533 - "PUT /api/me/watchlist/eacab369-a9e2-49ea-98b1-ff4679159e42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50541 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50543 - "GET /api/me/watchlist?page=1&limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50551 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50555 - "GET /api/me/preferences HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50553 - "GET /api/movies?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50557 - "GET /api/me/ratings/eacab369-a9e2-49ea-98b1-ff4679159e42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50559 - "GET /api/me/watchlist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50568 - "GET /api/movies/eacab369-a9e2-49ea-98b1-ff4679159e42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50569 - "GET /api/movies/eacab369-a9e2-49ea-98b1-ff4679159e42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50571 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50580 - "GET /api/me/ratings/eacab369-a9e2-49ea-98b1-ff4679159e42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50581 - "GET /api/me/watchlist/eacab369-a9e2-49ea-98b1-ff4679159e42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50573 - "GET /api/movies/eacab369-a9e2-49ea-98b1-ff4679159e42/similar HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [7203]
+INFO:     Started server process [7238]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8014 (Press CTRL+C to quit)
+INFO:     127.0.0.1:50586 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50591 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50593 - "GET /api/me/watchlist?page=1&limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50594 - "POST /api/auth/logout HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:50599 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50603 - "GET /api/me/preferences HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50601 - "GET /api/movies?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50605 - "GET /api/me/ratings/eacab369-a9e2-49ea-98b1-ff4679159e42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50607 - "GET /api/me/watchlist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50610 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50612 - "GET /api/me/profile HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50614 - "POST /api/me/profile/reset HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50616 - "GET /api/me/preferences HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50618 - "GET /api/me/ratings/eacab369-a9e2-49ea-98b1-ff4679159e42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50620 - "GET /api/me/profile HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50622 - "GET /api/me/watchlist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50624 - "GET /api/me/recommendations HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [7238]

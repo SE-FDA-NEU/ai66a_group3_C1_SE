@@ -39,13 +39,45 @@
     }
   },
   "liveCatalogue": {
-    "status": "Failed import; downstream acceptance blocked",
-    "movies": 0,
-    "activeRevision": null,
+    "status": "PASS (author live smoke)",
+    "database": "/private/tmp/s4-t18-live-resume-20261030/catalogue.db",
+    "pages": 50,
+    "movies": 964,
+    "distinctSourceIds": 964,
+    "provider": "tmdb",
+    "activeRevision": "00a9831b-1c3a-489b-a8cf-51d36424e702",
+    "inserted": 964,
+    "updated": 0,
+    "rejected": 36,
+    "finitePopularityMovies": 964,
+    "associatedGenres": 19,
+    "fetchTimestampCount": 964,
     "migration": "f2c7e4a91b60",
-    "indexBuilt": false,
-    "configFingerprintExpectedFromSource": "41785781f34ba44091ac64f3b1c0503402ee760c518af1429d0acb94bbc31c99",
-    "actualCorpusDigest": null
+    "index": {
+      "ready": true,
+      "catalogueRevision": "00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "corpusDigest": "3ac90bf45649bba63965b0ff9b723d9588c00a64c58a7a204029aa80a19aca1e",
+      "configFingerprint": "41785781f34ba44091ac64f3b1c0503402ee760c518af1429d0acb94bbc31c99",
+      "movies": 964,
+      "usableDocuments": 962
+    },
+    "apiExpectedStatusAssertions": 217,
+    "descriptionQuery": "the stakes in",
+    "descriptionTitleMatchesInSql": 0,
+    "browserStatus": "PASS",
+    "browserChecks": [
+      "Home SQL/API total, active revision, pagination and real poster",
+      "Popular pages 1/2, current carousel, real backdrop",
+      "Description Search via submit, non-title query, detail return",
+      "Detail and local-index Similar on tablet",
+      "A: real UI cold-start, saved genre, personalised ranking, 4.5 stars, watchlist",
+      "B: independent session sees no A genres/ratings/watchlist",
+      "Backend restart and logout/login preserve A session-owned data",
+      "Confirmed Profile reset clears A genres/ratings, preserves watchlist and returns popular"
+    ],
+    "pageErrors": [],
+    "browserMetadataRequests": [],
+    "report": "windows-portability/README.md"
   },
   "independentReviewerExecution": null,
   "capacity": {
@@ -58,7 +90,7 @@
     "recommendation": "Defer",
     "poSmDecision": null
   },
-  "earlySetupReviewMerge": "Pending independent review/CI/merge; #219 remains Open",
+  "earlySetupReviewMerge": "Current head 058a367 author-tested; hosted checks pass; previous-head approval exists; final-head independent execution/merge outstanding; #219 remains Open",
   "t18Accepted": false,
   "earlySetupPr": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/240",
   "earlySetupReviewRequestedFrom": "vu-huzy",
@@ -67,5 +99,38 @@
     "pythonNodeDetailsProfile": "passed",
     "requiredIndependentReview": "failed (approval not yet supplied)",
     "merged": false
+  },
+  "liveCatalogueHistoricalFailedAttempt": {
+    "status": "Failed import; downstream acceptance blocked",
+    "movies": 0,
+    "activeRevision": null,
+    "migration": "f2c7e4a91b60",
+    "indexBuilt": false,
+    "configFingerprintExpectedFromSource": "41785781f34ba44091ac64f3b1c0503402ee760c518af1429d0acb94bbc31c99",
+    "actualCorpusDigest": null
+  },
+  "latestFollowUp": {
+    "report": "windows-portability/README.md",
+    "sourceCommit": "6aa1941dd506f6ce6a3c683f4580c748f75125f4",
+    "earlySourceCommit": "058a36794637d38635099a89fd0d6d85f27ba53d",
+    "pytest": {
+      "pr239": {
+        "passed": 765,
+        "skipped": 1,
+        "subtestsPassed": 210,
+        "seconds": 149.93,
+        "log": "resumed-module-pytest.log"
+      },
+      "pr240": {
+        "passed": 765,
+        "skipped": 1,
+        "subtestsPassed": 210,
+        "seconds": 150.42,
+        "log": "resumed-early-module-pytest.log"
+      },
+      "focusedEachPr": {
+        "passed": 4
+      }
+    }
   }
 }

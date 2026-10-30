@@ -104,7 +104,9 @@
   "followUp": {
     "report": "follow-up/README.md",
     "sourceCommit": "641f48a09a4a0bd057a73e05f6455a61e816150a",
-    "status": "T18 incomplete; direct pytest fixed and author-tested; early review/merge, successful live catalogue/index, independent preflight and capacity/G4 still required",
-    "originalManualDatabaseRunIsDirectPytestAcceptance": false
+    "status": "Windows assertions fixed in both PRs; direct pytest and real TMDb catalogue/index/API/browser author smoke pass; T18 incomplete pending early merge, independent execution, capacity and G4 records",
+    "originalManualDatabaseRunIsDirectPytestAcceptance": false,
+    "latestReport": "follow-up/windows-portability/README.md",
+    "latestSourceCommit": "6aa1941dd506f6ce6a3c683f4580c748f75125f4"
   }
 }

@@ -1,0 +1,39 @@
+
+  VITE v8.3.1  ready in 366 ms
+
+  ➜  Local:   http://127.0.0.1:5174/
+INFO:     Started server process [6796]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8014 (Press CTRL+C to quit)
+INFO:     127.0.0.1:50038 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50042 - "GET /api/movies?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50050 - "GET /api/auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:50051 - "GET /api/movies?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50052 - "GET /api/movies?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50061 - "GET /api/movies?page=2&limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50067 - "GET /api/movies/popular?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50068 - "GET /api/auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:50070 - "GET /api/movies/popular?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50072 - "GET /api/movies/popular?page=2&limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50073 - "GET /api/movies/popular?limit=10&page=2&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50081 - "GET /api/auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:50082 - "GET /api/movies/search?q=the+stakes+in HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50083 - "GET /api/movies/0e570bbb-ab2a-4926-9633-9b8f46c987a3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50084 - "GET /api/movies/0e570bbb-ab2a-4926-9633-9b8f46c987a3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50098 - "GET /api/movies/eacab369-a9e2-49ea-98b1-ff4679159e42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50099 - "GET /api/movies/eacab369-a9e2-49ea-98b1-ff4679159e42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50100 - "GET /api/auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:50102 - "GET /api/movies/eacab369-a9e2-49ea-98b1-ff4679159e42/similar HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50104 - "POST /api/auth/register HTTP/1.1" 201 Created
+INFO:     127.0.0.1:50106 - "POST /api/auth/register HTTP/1.1" 201 Created
+INFO:     127.0.0.1:50112 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50114 - "GET /api/me/recommendations HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50116 - "GET /api/movies?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50122 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50126 - "GET /api/me/preferences HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50125 - "GET /api/genres HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [6796]

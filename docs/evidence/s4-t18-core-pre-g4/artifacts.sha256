@@ -1,5 +1,5 @@
 76561298702e07c90792251139342f9da5c5de244bf9060612b19e29569c3868  docs/evidence/s4-t18-core-pre-g4/.gitattributes
-5a83860e1c9bd6b567b47fa58af2895e4f16de4462840d713d122052346f53c2  docs/evidence/s4-t18-core-pre-g4/README.md
+06177717dc8049245b13c61a6777217a8608f1e78cc3057ffd4a9c7161e9faaa  docs/evidence/s4-t18-core-pre-g4/README.md
 e1bf99906139c2022dab2106cc31f6693eb138643ec874350ee3d0333a625648  docs/evidence/s4-t18-core-pre-g4/browser/s04-results.json
 083a02f3e9774ea362013d01ca80b18b3cfb7addd1721035665cd9027f3157e4  docs/evidence/s4-t18-core-pre-g4/browser/t01-results.json
 33dd7d0ff096c5390d4ba990a772190c9e247541d5e1863c744779b45e704924  docs/evidence/s4-t18-core-pre-g4/browser/t12-results.json
@@ -62,7 +62,7 @@ c76e6fcfef860057df7f1e44d3d92418bf5aecde82af9e5333b19aead4fe26f8  docs/evidence/
 36b77aa347601b2423aa7d9d1fe93cae3d98efafd3c1a6028736e68b31a7a6b7  docs/evidence/s4-t18-core-pre-g4/clean-clone/uvicorn.log
 ff21f255b8080f5351512b105a4e2cf3ff75786d60811fff8a35890dc3154886  docs/evidence/s4-t18-core-pre-g4/clean-clone/vite-node24.log
 fcc8e7ac43aadd4a7f70332c97301f1a75fa49cae46372747795b0680cbe5ed8  docs/evidence/s4-t18-core-pre-g4/clean-clone/vite.log
-87673c063e384b063667cc6eb0e5932550658849114df63ef31fdbc08698ba3d  docs/evidence/s4-t18-core-pre-g4/follow-up/README.md
+c132c98ef54da4ba8f3347d379559fc87f024721097d918164320f856a6e1be7  docs/evidence/s4-t18-core-pre-g4/follow-up/README.md
 ce8c87f2abc716697309855bda66ac93953772ee16b945777b6191bd167e093c  docs/evidence/s4-t18-core-pre-g4/follow-up/bootstrap-regressions.log
 d593bcafc1a610b155a768c048a8dd742ac72417d593d563d22f1159fcc94104  docs/evidence/s4-t18-core-pre-g4/follow-up/c03-contract.log
 ac3261d0237b21afff6aaacaed611220e6ee07cd7127305a793b2d3946eace01  docs/evidence/s4-t18-core-pre-g4/follow-up/c03-line-endings.log
@@ -84,14 +84,14 @@ fe575c38f26e6fbe54350207d5742ef6cdd8cdb7638f7ecd5bccf0856b0db0a9  docs/evidence/
 a2127f506eeba574695a85c415830e66e8be216436c5fefdcfc21eac223ab4ef  docs/evidence/s4-t18-core-pre-g4/follow-up/live-migrations.log
 0f38b285474a2bdc3b93dac8beb4a222ece267b5b7fb9e7e3be28bc81ae16bed  docs/evidence/s4-t18-core-pre-g4/follow-up/live-network.log
 3cba53b846248c20861846ad7e03ca3f8ad3602ae00f9b85db1728c7e1a34311  docs/evidence/s4-t18-core-pre-g4/follow-up/live-provenance.json
-1cb44a21d9c7f49aaab76da5a35dc6b27847629a43fe9d7cab839c9b9a879d2b  docs/evidence/s4-t18-core-pre-g4/follow-up/manifest.json
+0bb5ce255fe2bf2bb356fc55bf8d824c87d912a3380f388ff468176f3835266e  docs/evidence/s4-t18-core-pre-g4/follow-up/manifest.json
 a0d83290c67e09b1fa8c10e0cdf659f53415329f64541591b6ee4440f1c8763e  docs/evidence/s4-t18-core-pre-g4/follow-up/plain-module-pytest-verbose.log
 8c21bedf602732948ce5c3cbe940498944f0f932cdbe137b54086d18a47bcb4a  docs/evidence/s4-t18-core-pre-g4/follow-up/plain-pytest-sandbox.log
 fd2a43bf8fa8b6b1b8126451ed352b53ae25575634b2e77d4574d9766f42ec7c  docs/evidence/s4-t18-core-pre-g4/follow-up/plain-pytest.log
 82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18  docs/evidence/s4-t18-core-pre-g4/follow-up/ruff.log
 f01c44a6edfe843ee9ff5b4cd35cc2470ab2f161ddad31278ef12b05841ba1c1  docs/evidence/s4-t18-core-pre-g4/follow-up/t05-trace.log
 cbd2ea63dd08aa09768ce72623f58e5f61c6c8b00978e6cf7d225ddcde7983c3  docs/evidence/s4-t18-core-pre-g4/follow-up/tested-source.sha256
-352b6840f17131467757124e2df87b2433d202de519669a5b7827eeaff85b23b  docs/evidence/s4-t18-core-pre-g4/manifest.json
+51f110ff9f75d0540a41df69375817956327ddfe92a7f0d425a440122e177adf  docs/evidence/s4-t18-core-pre-g4/manifest.json
 2bc311805be5f02c614b0fa7298f7bb05cf4b6ecdaa9173197b1ef918a253fdb  docs/evidence/s4-t18-core-pre-g4/ranking-ui/t04-01-personalised-baseline-and-missing-score.png
 22af0e655a262794623c84928d6f75b1295472751818b70b2bcec0aabd5b0ce0  docs/evidence/s4-t18-core-pre-g4/ranking-ui/t04-02-personalised-rating-5-raised.png
 26ce4a73562a33842750b20b54a367fd7fb4e86938b15b085543b42a65c35eda  docs/evidence/s4-t18-core-pre-g4/ranking-ui/t04-03-dark-1440px.png
