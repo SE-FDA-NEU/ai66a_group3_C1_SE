@@ -33,11 +33,12 @@ import os
 from pathlib import Path
 from app.main import app, engine
 from fastapi.testclient import TestClient
+from sqlalchemy.engine import make_url
 
 database = Path(engine.url.database)
 Path(os.environ["BOOTSTRAP_MARKER"]).write_text(str(database.parent))
 assert database.is_file()
-assert str(engine.url) == os.environ["DATABASE_URL"]
+assert engine.url == make_url(os.environ["DATABASE_URL"])
 assert os.environ["TMDB_READ_ACCESS_TOKEN"] == ""
 assert os.environ["TMDB_NETWORK_DISABLED"] == "1"
 assert Path(os.environ["NLP_INDEX_PATH"]).parent == database.parent
@@ -68,6 +69,8 @@ def test_default_engine():
         timeout=60, check=False,
     )
     assert result.returncode == (2 if invocation == "collection-failure" else 0), result.stdout + result.stderr
+    if invocation == "collection-failure":
+        assert "intentional collection failure" in result.stdout + result.stderr
     assert marker.is_file(), result.stdout + result.stderr
     assert not Path(marker.read_text()).exists()
     assert external_db.read_bytes() == b"external database must remain untouched"
