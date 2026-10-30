@@ -2,18 +2,24 @@
 
 Executed 29–30 October 2026, Asia/Ho_Chi_Minh (+07:00).
 Tested committed candidate: **`24e8086f23e7567f20a9e9c237400bf15adf12b1`**.
-All application, test, script and workflow files remained byte-for-byte equal
-to this commit. This delivery adds only this evidence directory. No production
-defect or genuine uncovered requirement was found; no production changes,
-new tests, new architecture or optional trailer implementation were needed.
+The original run kept application, test, script and workflow files equal to
+this commit. **Correction, 30 October:** direct pytest isolation was incomplete:
+`test_health_reads_database` used the default engine and failed with 503 until
+the operator manually migrated a database. Those passes prove regression with
+manual provisioning, not #219 EARLY_TEST_SETUP or the required direct-pytest
+rehearsal. The earlier claim that no requirement remained uncovered is withdrawn.
+The [follow-up](follow-up/README.md) records the scoped bootstrap fix and new
+results. Live catalogue/index, independent reviewer execution and PO/SM capacity
+and G4 decisions are separate outstanding gates; **T18 is not complete**.
 
 [manifest.json](manifest.json) records identity, versions and browser statistics.
-[tested-source.sha256](tested-source.sha256) covers 316 tracked files under
+[tested-source.sha256](tested-source.sha256) historically covers 316 tracked files under
 `backend/`, `frontend/`, `tests/`, `scripts/` and `.github/workflows/` (raw-byte
 SHA-256, including existing binary assets). Its SHA-256 is
 `ada822707fc62638e950fee59fcc559ed7280e2d7f53695730e742a8dd5d36a2`.
-From the repository root, `shasum -a 256 -c
-docs/evidence/s4-t18-core-pre-g4/tested-source.sha256` verifies these files.
+Verify that historical manifest in a checkout of `24e8086`; the follow-up changes
+pytest setup/tests/CI and has its own [source manifest](follow-up/tested-source.sha256).
+Do not use the original manifest as a fingerprint of the corrected candidate.
 
 The evidence directory was renamed from `s4-core-pre-g4` to
 `s4-t18-core-pre-g4` for delivery. Historical commands and raw logs retain the
@@ -36,7 +42,7 @@ identify work items rather than those implementation PR numbers.
 The [C01 scope](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/216)
 was also read: mandatory core includes watchlist, while trailer work remains
 gated. No locally identifiable merged C01 delivery or #219
-`EARLY_TEST_SETUP` marker was found. Remote #219 reads were unavailable and
+`EARLY_TEST_SETUP` marker was found at the original tested SHA. Remote #219 reads were unavailable and
 `gh` is not installed. This run uses the committed setup, isolated backend
 runner and existing root fixtures actually present at the tested SHA; it does
 not claim a later C05 setup slice exists or has been accepted.
@@ -254,7 +260,7 @@ These attempts are not counted as passes, and raw output is retained.
 | Attempt | Actual failure / resolution |
 |---|---|
 | Initial default pytest with `DATABASE_URL=sqlite:///:memory:` inside sandbox | **1 failed, 755 passed, 1 skipped, 6 errors**: health used an unmigrated DB; six auth fixtures could not bind local sockets. [Log](checks/default-pytest.log). |
-| Same default command outside sandbox, before fixing DB setup | **1 failed, 761 passed, 1 skipped**: only health failed. [Log](checks/default-pytest-escalated.log). Replaced the in-memory invocation with a new file DB, migrated first, and the complete default run passed. This was an invocation/setup defect, not a product fix. |
+| Same default command outside sandbox, before fixing DB setup | **1 failed, 761 passed, 1 skipped**: only health failed. [Log](checks/default-pytest-escalated.log). Manually migrating a new DB made this historical run pass, but was a workaround for missing automatic pytest setup. It did not satisfy #219's default-engine isolation requirement. See the bootstrap correction and reruns in [follow-up](follow-up/README.md). |
 | Initial extended backend inside sandbox | **699 passed, 1 skipped, 6 errors**, all local socket permission failures. [Log](checks/backend-extended.log). Authorized rerun passed 705/1. |
 | Initial T01 browser inside sandbox | Server bind denied before assertions; [log](checks/t01-browser.log). Authorized rerun passed 16/1. |
 | Rating verifier without explicit browser | Browser auto-detection did not find macOS Chrome; [log](checks/t04-ranking-browser.log). Used the existing `--browser` option, then all seven checks passed. |
@@ -268,9 +274,11 @@ checks, independent review, hosted CI and an explicit PO/SM capacity decision
 are recorded. Current available author/reviewer/final-regression hours were
 not supplied; historical issue estimates are not treated as current capacity.
 
-- Live TMDb import, real catalogue provenance/count and live index rebuild/check
-  remain **unexecuted operator checks**. No private token was inspected, and no
-  explicit safe live-smoke arrangement was established. Follow the existing
+- Live TMDb import was **attempted in the follow-up and failed** because HTTPS
+  connections to the provider reset outside the sandbox as well. The separate
+  migrated DB contains zero movies and no active revision. Index rebuild/check
+  fail without an accepted catalogue. These required gates remain unfulfilled;
+  original clean-clone startup evidence is offline only. Follow the existing
   [SETUP](../../SETUP.md) and [TMDb runbook](../../tmdb-sprint3-runbook.md);
   retain only redacted safe evidence. The two live-only browser skips are not passes.
 - Human independent substantive review, reviewer identity/eligibility,

@@ -1,0 +1,71 @@
+{
+  "testedCommit": "641f48a09a4a0bd057a73e05f6455a61e816150a",
+  "runner": "Codex (author verification; not independent human reviewer)",
+  "date": "2026-10-30",
+  "timezone": "Asia/Ho_Chi_Minh",
+  "python": "3.12.4",
+  "sqlite": "3.45.3",
+  "cleanClone": "/private/tmp/s4-c05-early-20261030",
+  "cleanCloneWorkingTree": "",
+  "sourceFiles": 322,
+  "sourceEqualsCleanCommittedCandidate": true,
+  "results": {
+    "workingPlain": {
+      "passed": 765,
+      "skipped": 1,
+      "seconds": 91.24
+    },
+    "workingVerbose": {
+      "passed": 765,
+      "skipped": 1,
+      "subtestsPassed": 210,
+      "seconds": 92.0
+    },
+    "cleanPlain": {
+      "passed": 765,
+      "skipped": 1,
+      "seconds": 94.48
+    },
+    "cleanVerbose": {
+      "passed": 765,
+      "skipped": 1,
+      "subtestsPassed": 210,
+      "seconds": 92.23
+    },
+    "cleanExtendedBackend": {
+      "passed": 705,
+      "skipped": 1,
+      "seconds": 81.07
+    }
+  },
+  "liveCatalogue": {
+    "status": "Failed import; downstream acceptance blocked",
+    "movies": 0,
+    "activeRevision": null,
+    "migration": "f2c7e4a91b60",
+    "indexBuilt": false,
+    "configFingerprintExpectedFromSource": "41785781f34ba44091ac64f3b1c0503402ee760c518af1429d0acb94bbc31c99",
+    "actualCorpusDigest": null
+  },
+  "independentReviewerExecution": null,
+  "capacity": {
+    "authorHours": null,
+    "reviewerHours": null,
+    "finalRegressionHours": null,
+    "confirmedBy": null
+  },
+  "g4": {
+    "recommendation": "Defer",
+    "poSmDecision": null
+  },
+  "earlySetupReviewMerge": "Pending independent review/CI/merge; #219 remains Open",
+  "t18Accepted": false,
+  "earlySetupPr": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/240",
+  "earlySetupReviewRequestedFrom": "vu-huzy",
+  "hostedEarlySetupChecks": {
+    "testedHead": "641f48a09a4a0bd057a73e05f6455a61e816150a",
+    "pythonNodeDetailsProfile": "passed",
+    "requiredIndependentReview": "failed (approval not yet supplied)",
+    "merged": false
+  }
+}

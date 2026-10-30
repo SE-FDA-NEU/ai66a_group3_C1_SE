@@ -83,8 +83,8 @@ jobs:
             --cov-report=term-missing \
             --junitxml=junit.xml
 
-      - name: Run root acceptance tests
-        run: python -m pytest tests -v
+      - name: Run default pytest with automatic temporary database setup
+        run: python -m pytest -v
 
       - name: Verify S4-T05 P0 traceability
         run: python scripts/verify_s4_t05_trace.py

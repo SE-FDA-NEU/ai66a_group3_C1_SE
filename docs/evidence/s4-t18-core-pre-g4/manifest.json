@@ -100,5 +100,11 @@
       "unexpected": 0,
       "flaky": 0
     }
+  },
+  "followUp": {
+    "report": "follow-up/README.md",
+    "sourceCommit": "641f48a09a4a0bd057a73e05f6455a61e816150a",
+    "status": "T18 incomplete; direct pytest fixed and author-tested; early review/merge, successful live catalogue/index, independent preflight and capacity/G4 still required",
+    "originalManualDatabaseRunIsDirectPytestAcceptance": false
   }
 }

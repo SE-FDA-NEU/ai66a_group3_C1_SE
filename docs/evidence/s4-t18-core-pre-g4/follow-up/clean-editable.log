@@ -1,0 +1,23 @@
+Started: 2026-10-30T10:42:55.498552+07:00
+Command: /private/tmp/s4-c05-early-20261030/.venv/bin/python -m pip install -e ./backend[dev] --no-deps
+Cwd: /private/tmp/s4-c05-early-20261030
+Obtaining file:///private/tmp/s4-c05-early-20261030/backend
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Checking if build backend supports build_editable: started
+  Checking if build backend supports build_editable: finished with status 'done'
+  Getting requirements to build editable: started
+  Getting requirements to build editable: finished with status 'done'
+  Preparing editable metadata (pyproject.toml): started
+  Preparing editable metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: ai-movie-recommendation-backend
+  Building editable for ai-movie-recommendation-backend (pyproject.toml): started
+  Building editable for ai-movie-recommendation-backend (pyproject.toml): finished with status 'done'
+  Created wheel for ai-movie-recommendation-backend: filename=ai_movie_recommendation_backend-0.1.0-0.editable-py3-none-any.whl size=3137 sha256=dc961ffedb99fd807a350d58c2b7fdcdf4622c2851f0aae2a9d146af940cd810
+  Stored in directory: /private/var/folders/k5/w77q5v455sqchk9vfs41w8_h0000gn/T/pip-ephem-wheel-cache-gyw9igp_/wheels/68/3e/9b/f53678986ac6d3b28b1c5b07280cb8161b5af5d01cda73f9f2
+Successfully built ai-movie-recommendation-backend
+Installing collected packages: ai-movie-recommendation-backend
+Successfully installed ai-movie-recommendation-backend-0.1.0
+
+Exit: 0
+Elapsed: 2.01s

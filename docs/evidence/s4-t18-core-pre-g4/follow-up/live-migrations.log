@@ -1,0 +1,8 @@
+Started: 2026-10-30T10:35:42.126652+07:00
+Command: /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/.venv/bin/python -m alembic -c backend/alembic.ini upgrade head
+Cwd: /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+
+Exit: 0
+Elapsed: 0.31s
