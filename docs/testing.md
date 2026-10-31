@@ -1,75 +1,34 @@
-# Sprint 4 C03 testing contract
+# Milestone 4 — Testing
 
-Status: expected contract for [S4-C03 #217](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/217),
-dated 2026-10-24, with the S03 execution amendment from
-[S4-T16 #211](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/211).
-S03 and the other five P0 Stories now have executable root pytest and
-separate interface tests. The [T05 acceptance record](evidence/s4-t05-acceptance.md)
-maps each Section 2 ID to its executed node and records the current run and
-review limits. This document does not certify independent review. The current implemented boundary is
-[api.md](api.md#1-conventions); planned additions are in its section 13.
-Historical M2/M3 evidence remains historical.
-
-S4-T16 presentation follow-up: Popular features its current page's first three
-movies, correct global ranks, edge arrows/dots/keyboard, image fallback and
-slide-preserving detail return. Popular, Search and My watchlist share compact
-headings. The T16/T05 browser suite now has 20 cases; its responsive case checks
-375/768/1440px in both themes. Captures and current execution are recorded in
-[carousel/heading evidence](evidence/s4-t16-spotlight.md). The summary DTO's
-nullable backdrop URL uses the existing server/client allowlists, with no
-runtime TMDb metadata request. Enrichment acceptance continues to compare all
-non-media response fields while checking each updated URL against details.
-
-The [T14/T16 reconciliation record](evidence/s4-t16-t14-reconciliation.md)
-documents the unified exact method/path/tag response gate, cancelled-request
-draining, Windows runner cleanup, and a real delayed Home-read/Start boundary.
-T14 reset invalidation and T16 half-star/Search/carousel behavior are verified
-together; earlier source fingerprints and counts remain historical.
-
-S4-T16 consumer amendment: rating feedback now accepts 0.5–5 in exact half
-steps; Search commits only on Enter/Search; setup imports 50 TMDb popular pages.
-Search additionally paginates every match, ten per page, with full-set ranking
-and revision-aware detail return. This supersedes integer-only rating and
-top-ten-total Search expectations in historical evidence.
-The T05 browser case also uses Chrome touch emulation at 375px to prove that a
-half-star tap remains draft until explicit Save, then survives reload.
-Current migration/API checks are in
-[rating migration tests](../backend/tests/test_rating_migration.py),
-[rating API tests](../backend/tests/test_ratings_api.py),
-[50-page import tests](../backend/tests/test_tmdb_import.py),
-[Search draft tests](../frontend/src/tests/movies.test.tsx), and
-[Chrome pointer/keyboard and submit-only checks](../frontend/e2e/s4-t16.detail-boundaries.ts).
-These retain the original S03 detail-return/account-boundary coverage.
+This report covers the six P0 Stories: S01, S02, S03, S04, S12 and S13.
+The [C05 verification record](evidence/s4-c05/compact-m4.md) identifies the
+tested candidate and actual results. C04 #218 owns final independent review,
+submission screenshots and manual export of the merged report.
 
 ## 1. What we test, and why
 
-| Layer | Production nodes | Test method and purpose |
+| Layer | Test | Purpose |
 |---|---|---|
-| Services | [recommendation service](../backend/app/recommendations/service.py), [ranker](../backend/app/recommendations/ranker.py), [security](../backend/app/security/) and later NLP/profile/watchlist services | Unit tests with controlled inputs/fake repository at service boundaries check decisions and ranking; real integration cases still assert production behaviour. |
-| Repository | [repositories](../backend/app/repositories/), [models](../backend/app/db/models.py) | Temporary migrated SQLite with foreign keys on checks uniqueness, account isolation, atomic replace/reset and rollback; no developer database. |
-| Routes | [FastAPI routes](../backend/app/main.py), [schemas](../backend/app/schemas/) | In-process FastAPI `TestClient` against migrated temporary SQLite checks exact HTTP status, DTO/error shape, cookie/origin/session and persistence. No running server. |
-| Interface | [React frontend](../frontend/src/) | Existing Vitest/React Testing Library and browser checks cover labels, navigation, both themes, keyboard, responsive states and stale requests. Python `TestClient` cannot verify rendered React or browser navigation; interface evidence is separately required. |
+| Services | Controlled inputs through production recommendation/auth/preference rules | Check ranking decisions, valid selections and business-rule refusals. |
+| Repository | Migrated temporary SQLite with foreign keys | Check committed rows, uniqueness, rollback and account isolation. |
+| Routes | In-process FastAPI TestClient | Check statuses, safe response bodies, cookies and persistence without a running server. |
+| Interface | Existing Vitest/browser checks, run separately when needed | Check rendered controls and navigation; these are outside the default M4 pytest suite. Python TestClient does not render React. |
 
-The highest risks are account leakage across sessions, partial reset/save
-transactions, and false success when catalogue or index data is unavailable;
-these get real-DB and route assertions before visual polish. Whole-set
-ranking/paging and stable error messages are next because a superficially
-correct first page can conceal missing movies or broken P0 journeys.
-Optional media is verified without real network in CI.
+Account isolation and rejected writes receive the most attention because a
+mistake can expose or change another user's data. Pagination, missing catalogue
+data and numeric limits are also covered because a successful first page can
+otherwise conceal broken results.
 
 ## 2. Test cases for every P0 story
 
-Each ID below specifies a root pytest case. T16 supplied the S03 rows; T05
-supplied the remaining root cases in `tests/test_p0_acceptance.py`.
-`Normal`,
-`Refusal`, `Boundary`, `Failure` and `Isolation` are case kinds, not
-claims of a run. The linked node is the production rule the assertion must
-exercise. One test may share setup, but every ID needs its own meaningful
-production assertion and appears in its test name or parameter ID. Mocked
-provider responses and deterministic seeded movie IDs are allowed; a
-hard-coded fake return value is not a substitute for the production rule.
-For a 400, assert `VALIDATION_ERROR`; for a source failure assert the
-actual 503 envelope rather than a business-rule refusal.
+Each ID maps to a passing pytest name or parameter in
+[the default P0 tests](../tests/test_p0_acceptance.py) or
+[the S03 tests](../tests/test_s03_details.py).
+The [case map](evidence/s4-t05-acceptance.md#p0-section-2-case-map) gives the
+exact nodes. Numeric boundaries include genre counts 0/1/2 and 4/5/6,
+password lengths 7/8/9 and page-size limits 9/10/11.
+The current table has 37 logical IDs and 40 collected pytest items because
+one S03 case also checks three combinations of missing optional fields.
 
 | ID | Story | Input | Expected result | Kind |
 |---|---|---|---|---|
@@ -104,205 +63,59 @@ actual 503 envelope rather than a business-rule refusal.
 | TC-P0-S12-003 | S12 #44 | Password length 9 | 201, no password/hash in response ([route](../backend/app/main.py), [passwords](../backend/app/security/passwords.py)). | Boundary above 8 |
 | TC-P0-S12-004 | S12 #44 | Existing email with case/whitespace variation | 409 `EMAIL_ALREADY_REGISTERED`, exact `This email is already registered`; one user row ([users repo](../backend/app/repositories/users.py), [route](../backend/app/main.py)). | Business refusal |
 | TC-P0-S12-005 | S12 #44 | Invalid email or injected commit fault | Invalid input 400; persistence failure 503; neither exposes secret or creates partial account ([route](../backend/app/main.py)). | Validation/infrastructure |
-| TC-P0-S13-001 | S13 #45 | Login valid A then GET `/api/auth/me` | 200 safe A DTO; opaque HttpOnly same-origin cookie, no token in body ([route](../backend/app/main.py), [sessions](../backend/app/security/sessions.py)). Browser companion `TC-S4-AUTH-001` verifies the amended Home landing. | Normal |
+| TC-P0-S13-001 | S13 #45 | Login valid A then GET `/api/auth/me` | 200 safe A DTO; opaque HttpOnly same-origin cookie, no token in body ([route](../backend/app/main.py), [sessions](../backend/app/security/sessions.py)). | Normal |
 | TC-P0-S13-002 | S13 #45 | Wrong password and unknown email | Both 401 `INVALID_CREDENTIALS`, exact `Email or password is incorrect` ([route](../backend/app/main.py)). | Auth refusal |
 | TC-P0-S13-003 | S13 #45 | Logout A, replay old cookie, login A again | Logout 204; replay gets 401; new session accesses persisted A preferences/ratings ([route](../backend/app/main.py), [sessions](../backend/app/security/sessions.py)). | Session lifecycle |
 | TC-P0-S13-004 | S13 #45 | Missing/expired/revoked cookie on protected reads/writes | Each 401; no personal rows leak or change ([route](../backend/app/main.py), [sessions](../backend/app/security/sessions.py)). | Session boundary |
 | TC-P0-S13-005 | S13 #45 | A and B have different genres/ratings; B forges A identity field | B sees and changes only B rows; malformed identity body is rejected where schema forbids it ([route](../backend/app/main.py), [repositories](../backend/app/repositories/)). | Account isolation |
 | TC-P0-S13-006 | S13 #45 | Cross-origin login/logout or protected write | 403 `ORIGIN_NOT_ALLOWED`; no session revocation/private mutation ([origin policy](../backend/app/security/origin.py), [route](../backend/app/main.py)). | CSRF refusal |
 
-The numeric boundaries above are a floor. Add named cases if the final
-contract gains a numeric/date/session rule; use a frozen clock for expiry and
-UTC `addedAt` assertions. Current page range is 1–10000 and `genreId`
-range is 1–2147483647: test below/on/above values where exposed, including
-unknown in-range ID versus invalid out-of-range ID. A final C04 #218 audit
-must map every row to its actual executed test node and assertion.
-
-Sprint 4 feature owners also need these named contract oracles, separate from
-the six-P0 floor:
-
-| ID | Owner | Input and production assertion |
-|---|---|---|
-| TC-S4-RANK-001 | #197/#198 | Two Action/Comedy candidates each raw 80: +1 related rating yields 81/80, -1 yields 79/80; raw values stay 80; title/ID tie is deterministic; a rated film with two shared genres contributes once. |
-| TC-S4-RANK-002 | #197/#198 | Neutral/no signals preserve Sprint 3 order; null popularity remains null; rating-only failure exposes truthful `rating_unavailable`; 401/core 503 are never disguised as fallback. |
-| TC-S4-RANK-003 | #198 | Rank 25 eligible movies before genre view filter/page; public Popular and cold-start/no-match have no personal boosts or fields. |
-| TC-S4-NLP-001 | T06 | Build once per `corpusDigest` + `configFingerprint`; changing normalized overview while keeping `catalogueRevision` fixed makes the index stale (503 until rebuild). A config-only change also stales it; a poster/backdrop-only change keeps text index ready without rebuild. Corrupt/missing artifact is 503; explicit empty vocabulary is ready and yields zero cosine. |
-| TC-S4-SIM-001 | T07/T08 | Shared-genre only, source excluded, unique max five; usable zero-cosine text before missing text; source missing vector triggers all-popularity fallback; unknown ID is 404. |
-| TC-S4-SEARCH-001 | T09/T10 | Static search route, trimmed length 1 rejected, literal `%`/`_` and `ZEBRA` title search, title priority, max ten; `Moon Rescue` precedes `City Robot` in positive overview fixture; separate all-zero fixture returns none. |
-| TC-S4-RESET-001 | #206/#207 | Real migrated DB rollback after first delete and at commit; A/B isolation, both ordered save/reset commit sequences, separate-process writer contention in DELETE and WAL modes, timeout reread, watchlist preserved and later-login persistence. |
-| TC-S4-WATCH-001 | #207 | Unique membership, immutable `addedAt`, GET/PUT `inWatchlist`, and repeated DELETE `200 {data:{movieId,inWatchlist:false}}`; list order/paging/revision/CSRF/401/404 and reset preservation. |
-| TC-S4-UI-001 | #195/#208 | Five integer draft/hover/keyboard/explicit-save semantics, null poster fallback, both themes, 320px layout and account/movie stale-response protection. |
-| TC-S4-AUTH-001 | T01 / Story #45 | Browser check: normal Home/direct login -> Home with authenticated header and no automatic preference/recommendation read or save; guest Start -> login/register -> Preferences; single navbar My recommendations -> cold-start without genres; unsafe return destination -> Home. |
-
-These rows define expected checks. Author-local T16 execution is recorded
-separately below and in its evidence; other rows are not accepted by implication.
-
 ## 3. Automated tests
 
-The **single repository-root default** is `pytest` (verbose:
-`python -m pytest -v`). The root suite executes every Section 2 ID using
-the migrated disposable SQLite fixture in `tests/test_s03_details.py`; existing
-`backend/tests/` and frontend Vitest/browser suites remain intact and
-useful. Do not delete or skip them to manufacture green results.
-Main CI keeps its backend suite and additionally runs `python -m pytest -v`
-followed by `python scripts/verify_s4_t05_trace.py` so the root P0 cases
-and their Section 2 mapping are checked on each branch push and PR run.
-
-Root fixtures create a fresh temporary SQLite file, run Alembic migrations,
-enable foreign keys, override `get_db` for in-process `TestClient`,
-seed deterministic synthetic provider/movie/account data and freeze clocks.
-Set a blank TMDb token and block live network/provider calls. No running
-FastAPI/Vite server, existing `data/app.db`, developer `.env`, provider
-account or token is required. Clean up fixtures after every case; avoid
-test-order dependence. Unit fake repositories may isolate service decisions,
-but status/DB assertions run the real production route/repository. Store
-deterministic expected order and exact HTTP errors, not snapshots of fake
-responses. Real live TMDb provenance smoke is separate and manual.
-
-Verified local commands:
+After the locked Python installation in [SETUP.md](SETUP.md), run from the
+repository root with the virtual environment active:
 
 ```text
 pytest
 python -m pytest -v
-python backend/scripts/run_isolated_tests.py -v
-npm --prefix frontend test
 ```
 
-The first two commands use the committed #219 `EARLY_TEST_SETUP` in root
-`pytest.ini` and `conftest.py`: discovery includes `tests/`, `backend/tests/`
-and the existing `scripts/` regressions,
-and `backend` is added to the import path. Before collection (and therefore
-before application/default-engine imports), pytest selects a new temporary
-SQLite file, blanks the provider token, disables live TMDb and selects a
-temporary index path, then applies Alembic migrations. Session cleanup disposes
-the engine, deletes temporary files and restores inherited environment even
-after migration/collection failure. Do not manually create/migrate a default
-test database or set `DATABASE_URL`/`PYTHONPATH` to make these commands pass.
-Per-case fixtures still own their synthetic data and dependency overrides.
-This early output does not close #219 or replace its independent review.
-
-The first two commands are the root acceptance gate; the third is
-the existing backend isolation runner; the fourth covers React. Record the
-actual root runtime in seconds and a screenshot of the **full** verbose
-output, with command, environment, candidate SHA, passed/failed/skipped count
-and date. A `TestClient` pass does not establish React rendering, keyboard
-behaviour, both themes or navigation. Browser/API/database evidence for those
-states is collected by the relevant feature owner and reconciled by #218.
-
-### S03 / S4-T16 scoped execution
-
-[tests/test_s03_details.py](../tests/test_s03_details.py) implements
-`TC-P0-S03-001` (normal plus three missing-year/summary variants), `002`
-(404), `003` (distinct 503 errors), `004` (public query/redirect boundary),
-`005` (real A/B sessions and preference preservation), and `006` (one ASGI
-loop with a real SQLite reader/writer): nine pytest
-items in total. After the documented editable backend installation, run
-from the repository root:
+On Windows without activating PowerShell scripts:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest tests/test_s03_details.py -v
-npm.cmd --prefix frontend run test:s4:t16:ui
+.\.venv\Scripts\pytest.exe
+.\.venv\Scripts\python.exe -m pytest -v
 ```
 
-The module configures its own migrated temporary SQLite, foreign keys,
-default engine and `get_db` before using production routes. It ignores
-dotenv loading, blanks the provider token and rejects real HTTP transports.
-It needs no service/browser/token for pytest. This scoped command does not
-claim the entire six-P0 default suite has been delivered; C05 retains shared
-discovery, fixtures, CI/default-command and independent clean-clone ownership.
-Existing backend and frontend CI tiers remain intact; T16 adds an explicit
-[S03/interface job](../.github/workflows/s4-t16-detail-boundaries.yml).
+Both commands select only `tests/test_p0_acceptance.py` and
+`tests/test_s03_details.py` through committed `pytest.ini`.
+The default suite and the Section 2 trace check run automatically in CI.
+`python scripts/verify_s4_t05_trace.py` verifies the actual default
+collection rather than a broader separately selected directory.
 
-If Windows denies an old pytest temp/cache directory, use a **new** path,
-without deleting or changing permissions on an existing directory:
+Root fixtures override inherited database/token/index settings before app
+imports, migrate temporary SQLite, block provider HTTP and remove owned
+temporary files afterward. No .env, real database, running service, browser,
+Node installation or live TMDb token/network is needed for these tests.
+Per-case fixtures exercise the real routes and persisted rows with synthetic
+accounts/movies; they do not merely compare hard-coded fake return values.
 
-```powershell
-$caseTemp = Join-Path $env:TEMP ('s03-' + [guid]::NewGuid().ToString('N'))
-.\.venv\Scripts\python.exe -m pytest tests/test_s03_details.py -v -p no:cacheprovider --basetemp "$caseTemp"
-```
-
-The browser command owns temporary servers on 8014/5174 and a separate
-migrated database/index. Release those ports before running; its parent
-runner removes its database on exit. `S04_BROWSER_CHANNEL=chrome` selects
-an installed Chrome; otherwise install Playwright Chromium as documented.
-This is separate from the old S3 `test:t16:integration` filter suite.
-
-Interface traceability for the current post-M3 S03 return AC:
-
-| Case ID | Executable assertion |
-|---|---|
-| TC-S4-T16-RET-001 | [Browser](../frontend/e2e/s4-t16.detail-boundaries.ts): Home Z-A and Popular page 2, app return and browser Back, dark desktop/light mobile; no guest private reads. |
-| TC-S4-T16-RET-002 | [Component](../frontend/src/tests/list-context-invalidation.test.tsx) and browser: old revision gets a real 409, returns to page 1 and drops the stale genre filter. |
-| TC-S4-T16-RET-003 | Browser: filtered recommendation page 2 survives confirmed rating save/refetch; preferences unchanged. Existing [rating refresh tests](../frontend/src/tests/rating-recommendation-refresh.test.tsx) also cover failure/draft semantics. |
-| TC-S4-T16-RET-004 | Browser: search query -> exact detail -> exact Similar -> original search query/fragment. |
-| TC-S4-T16-RET-005 | Browser and existing context tests: changed preferences invalidate a historical detail return without reverting saved genres. |
-| TC-S4-T16-WATCH-001 | [Component](../frontend/src/tests/detail-boundaries.test.tsx) and browser: B cannot inherit A's watchlist page/context, even when both have two valid pages. |
-| TC-S4-T16-WATCH-002 / WATCH-003 | Component: ignored-abort late membership success after movie/account/logout changes, and late 401 after movie/account changes. |
-| TC-S4-T16-WATCH-004 | Browser: exact Watchlist page 2 return; removal of its last row produces total 10/page 1 with ten actual cards. |
-| TC-S4-T16-WRITE-001 / WRITE-002 | Component: old membership 200/401/503 and old rating-save success cannot notify/invalidate the new movie/account. Existing rating cases retain stale 401/503 coverage. |
-| TC-S4-T16-ASYNC-001 / ASYNC-002 | Browser: hold real detail/rating/membership/similar responses, switch movie/account through the SPA and release; also release an old committed membership PUT after account switch. |
-| TC-S4-T16-FAIL-001 | Component/browser: a controlled membership 503 has Retry and does not hide source details, rating, Similar or the recommendation return. |
-| TC-S4-T16-PUBLIC-001 | Browser: actual `Information unavailable` and `Movie not found` labels; unsafe external return state falls back to the catalogue. |
-
-Contract publication has separate read-only structure and line-ending
-checks: `python scripts/verify_s4_c03_contract.py` and
-`python scripts/test_s4_c03_contract_line_endings.py`. Both use UTF-8
-text hashed after CRLF/CR -> LF normalization. They check this document
-and its traceability on independent LF/CRLF exports; neither is a substitute
-for future production P0 pytest or browser acceptance.
-
-Genuine feature TDD for #197/#198 means a rule test failed **before**
-production implementation, then passed after the implementation; keep dated
-RED/GREEN output and tested SHA. Test-effectiveness mutation is separate:
-temporarily change a relevant production business rule after a test exists,
-observe that its production assertion fails, restore the rule and rerun green.
-Syntax/import/setup failure is invalid mutation evidence. Every case must
-trace from TC-ID to a production function/route and its asserted outcome;
-test-only duplicate logic or a fake's hard-coded result does not satisfy
-that trace. #200 audits the P0/rating/ranking evidence later; #218 checks
-that the final documented cases actually execute and pass.
+Actual count, runtime, full verbose output and screenshot are linked from
+[the current C05 record](evidence/s4-c05/compact-m4.md).
+Existing backend/frontend/browser/script regressions remain available as
+[explicit optional checks](SETUP.md#optional-regressions); they are not part
+of the default command or an additional M4 report requirement.
 
 ## 4. What the tests found
 
-S4-T16 reproduced two return-context regressions against `486adab`:
-recommendation revision recovery retained a stale genre, and a historical
-Watchlist return could restore A's page for B. New assertions failed before
-the fixes (`2 failed, 18 passed`) and passed after the fixes. The
-[T16 evidence](evidence/s4-t16-detail-boundaries.md) records final runs,
-source identity, screenshots and the independent review/Story-checkbox
-handoff still required. A later Linux CI run reproduced membership 503 while
-seeding. A deterministic same-loop SQLite regression then proved the third
-bug: the async membership handler blocked the loop at COMMIT, preventing a
-concurrent read snapshot from being released. The DB handler now runs in the
-worker pool; async raw-body validation and all auth/transaction/DTO contracts
-remain unchanged. TC-P0-S03-006 failed with HTTP 503 before the fix and passed
-with HTTP 200 afterward. These are actual bug regressions, not setup failures
-or a claim of deliberate business-rule mutation. The following C03 paragraph
-is the historical baseline before feature implementation.
+T16 #211 found that the async watchlist membership handler blocked the event
+loop during SQLite COMMIT, preventing a concurrent reader from being released.
+`TC-P0-S03-006` reproduced HTTP 503 before the fix; running the DB work in the
+worker pool restored HTTP 200 and correct saved state. The guarding pytest
+remains in [test_s03_details.py](../tests/test_s03_details.py), and
+[PR #235](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/235)
+contains the T16 work.
 
-At C03 publication, no new root suite runtime, screenshot, mutation result,
-TDD RED/GREEN event, reviewer acceptance or bug-fix PR was claimed. The S03
-amendment above supersedes that pending execution status only for its own
-cases, not the entire M4 suite. Record further evidence here only from an actual
-run: candidate SHA, command, date/time, environment, measured seconds,
-expected/observed statuses and DB values, TC-ID-to-test-node mapping,
-full-output screenshot and independent non-coauthor reviewer.
-
-The [local C03 check](evidence/s4-c03-local-contract-check.md) observed
-`447 passed, 1 skipped` in the existing isolated backend suite on a
-temporary migrated SQLite database. That validates the inherited baseline
-only; it does not execute or pass the new Section 2 IDs.
-The [C03 acceptance matrix](evidence/s4-c03-acceptance-matrix.md) maps
-the supplied requirements to exact contract sections and records the
-reproducible local document checks.
-
-The [T05 record](evidence/s4-t05-acceptance.md) includes current root-case
-execution, independent rating/ranking API and browser verification, and
-labelled test-effectiveness mutations. It does not reclassify a mutation as
-T02/T03 feature TDD or assign reviewer credit before a review occurs.
-
-The final dossier needs at least one actual bug with fix/PR/guarding test,
-or a clearly labelled intentional **business-rule mutation** with the failing
-assertion output and restored green rerun. C04 #218 owns final compilation
-and consistency against the selected executable; C03 defines the expected
-evidence and does not certify it in advance.
+The [original T16 evidence](evidence/s4-t16-detail-boundaries.md) records the
+failure, correction and green result. This is a genuine regression finding,
+not a setup failure or a claim of test-before-feature TDD.

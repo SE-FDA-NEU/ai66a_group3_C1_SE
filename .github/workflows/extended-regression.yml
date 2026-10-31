@@ -1,0 +1,102 @@
+name: Optional extended regression
+
+# Expensive suites are explicit opt-ins. Mandatory M4 P0 stays in ci.yml.
+on:
+  workflow_dispatch:
+    inputs:
+      run_python:
+        description: Run optional full backend and root Python regressions
+        type: boolean
+        required: false
+        default: false
+      run_vitest:
+        description: Run optional full frontend Vitest regression
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scope:
+    name: Optional regression selection
+    runs-on: ubuntu-latest
+    env:
+      RUN_PYTHON: ${{ inputs.run_python }}
+      RUN_VITEST: ${{ inputs.run_vitest }}
+    steps:
+      - name: Report requested suites without claiming test success
+        run: |
+          echo "### Optional extended regression" >> "$GITHUB_STEP_SUMMARY"
+          for suite in PYTHON VITEST; do
+            flag="RUN_${suite}"
+            if [ "${!flag}" = "true" ]; then
+              echo "- ${suite}: requested; see the corresponding job result." >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "- ${suite}: not run (not selected)." >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+          echo "Browser and feature regressions: not run here. Dispatch the individual feature workflows to run them." >> "$GITHUB_STEP_SUMMARY"
+          echo "Mandatory M4 P0 remains automatic in CI / Python tests." >> "$GITHUB_STEP_SUMMARY"
+
+  python:
+    name: Optional full Python regression
+    if: inputs.run_python
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      TMDB_READ_ACCESS_TOKEN: ""
+      TMDB_NETWORK_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements.lock.txt
+      - name: Install locked Python dependencies
+        run: |
+          python -m pip install -r backend/requirements.lock.txt
+          python -m pip install -e './backend[dev]' --no-deps
+      - name: Run optional full backend regression on isolated SQLite
+        run: |
+          python backend/scripts/run_isolated_tests.py \
+            -c pytest.ini \
+            -v \
+            --cov=backend/app \
+            --cov-report=term-missing \
+            --junitxml=backend-extended.xml
+      - name: Run optional root and script regressions explicitly
+        run: python -m pytest tests scripts -v --junitxml=root-extended.xml
+      - name: Upload optional Python results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: optional-python-regression-${{ github.sha }}
+          path: |
+            backend-extended.xml
+            root-extended.xml
+          if-no-files-found: warn
+          retention-days: 14
+
+  vitest:
+    name: Optional full Vitest regression
+    if: inputs.run_vitest
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install locked frontend dependencies
+        run: npm --prefix frontend ci
+      - name: Run optional full Vitest regression
+        run: npm --prefix frontend test

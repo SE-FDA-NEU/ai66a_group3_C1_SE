@@ -1,11 +1,15 @@
-# S4-C05 local final-candidate rehearsal and S5 handoff
+# S4-C05 historical rehearsal and current verification
+
+Current compact-scope and journal-fix verification is in
+[the 1 November record](compact-m4.md). The 820-test runs below are historical
+results, not the default M4 command or fresh evidence for the revised candidate.
 
 Issue [#219](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/219).
 The approved EARLY_TEST_SETUP was already merged via PR #240 at `9f285a1`.
 This record concerns the later build/index/storage/recovery pass on
 `173a95988873579ca67d9e2a97f0f5905cdce1b0`, based on fetched main
-`b1e8c1e50cbbf21099dc424e481df065f9e6b99b`. The candidate is local
-and has not been pushed. The [manifest](manifest.json) names the executable
+`b1e8c1e50cbbf21099dc424e481df065f9e6b99b`. At that rehearsal the candidate was local
+and had not yet been pushed; PR #243 now tracks subsequent work. The [manifest](manifest.json) names the executable
 tree, locked dependencies, build artifacts, migration head, rehearsal and
 deployment status for C02/C04/S5-C02. Commit `acd9968` established the
 implementation; `173a959` tightened the HTTP Search/Similar rehearsal to
@@ -27,9 +31,9 @@ files.
 - [Release/storage runbook](../../s4-c05-release-storage.md) and
   [SETUP.md](../../SETUP.md) now give explicit build, import, index, startup,
   persistent-volume, backup, restore and rollback procedures. No M2 seed is
-  used for live acceptance. Existing CI already runs direct root pytest and
-  the extended backend/frontend tiers; the new test is selected by that root
-  command, and its provider boundary is offline.
+  used for live acceptance. At that baseline CI ran direct root pytest and
+  the extended backend/frontend tiers. The compact amendment now selects P0
+  by default and runs storage tests explicitly when relevant.
 
 ## Initial clean-clone rehearsal of `acd9968`
 
@@ -99,11 +103,13 @@ network blocker, not a successful live import; the empty DB was removed.
 earlier [S4-T19 live import evidence](../s4-t19-live-20261031.md) is a prior
 baseline, not re-labelled as this candidate's live import.
 
-No deployed volume/service/path exists for this local task, and no hosted CI
-run or independent non-author fresh-clone review can be claimed before the
-branch is pushed and reviewed. The named reviewer is @vu-huzy. They must
-rerun the final candidate, record their own expected/actual results, SHA,
-platform and full output, and verify deployment-specific persistent paths,
-restart, backup and restore before #219 can close. The failed live TMDb
+The historical author rehearsal did not provision a deployed volume/service
+and could not claim hosted CI or non-author review before the branch was
+pushed. The current record links actual hosted results separately; it does
+not claim an independent teammate approval. The named reviewer is @vu-huzy. They must
+review the revised candidate and record their own expected/actual results,
+SHA, platform and compact output. Verify the selected local release's
+persistent paths/restart/backup/restore; if deployed later, record that
+environment separately rather than treating local evidence as deployment. The failed live TMDb
 network check also remains explicit for the operator; do not substitute the
 synthetic fixture for mandatory live-catalogue provisioning.

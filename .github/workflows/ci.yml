@@ -8,6 +8,10 @@ on:
     branches:
       - main
       - develop
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 # Cancel an older run when a newer commit is pushed to the same branch.
 concurrency:
@@ -20,34 +24,54 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      python: ${{ steps.check.outputs.python }}
-      node: ${{ steps.check.outputs.node }}
+      storage: ${{ steps.check.outputs.storage }}
+      bootstrap: ${{ steps.check.outputs.bootstrap }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Detect project stack
+      - name: Detect focused storage and test-bootstrap changes
         id: check
-        shell: bash
+        env:
+          DIFF_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: |
-          if [ -f backend/pyproject.toml ]; then
-            echo "python=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "python=false" >> "$GITHUB_OUTPUT"
-          fi
+          python - <<'PY'
+          import os
+          import subprocess
 
-          if [ -f frontend/package.json ]; then
-            echo "node=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "node=false" >> "$GITHUB_OUTPUT"
-          fi
+          base = os.environ.get("DIFF_BASE", "")
+          if os.environ["GITHUB_EVENT_NAME"] == "workflow_dispatch":
+              changed = set()
+          elif base and set(base) != {"0"} and subprocess.run(
+              ["git", "cat-file", "-e", base], capture_output=True
+          ).returncode == 0:
+              changed = set(subprocess.check_output(
+                  ["git", "diff", "--name-only", base, "HEAD"], text=True
+              ).splitlines())
+          else:
+              # New branches or an unavailable pre-force-push commit: run only
+              # the small focused suites, never fall back to the full backend.
+              changed = set(subprocess.check_output(
+                  ["git", "ls-files"], text=True
+              ).splitlines())
+          test_config = {"pytest.ini", "conftest.py", "backend/pyproject.toml"}
+          storage = test_config | {
+              "backend/app/cli/storage_snapshot.py",
+              "backend/tests/test_storage_snapshot.py",
+          }
+          bootstrap = test_config | {"tests/test_pytest_setup.py"}
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              for name, paths in (("storage", storage), ("bootstrap", bootstrap)):
+                  print(f"{name}={str(bool(changed & paths)).lower()}", file=output)
+          PY
 
 
   python:
     name: Python tests
     needs: detect
-    if: needs.detect.outputs.python == 'true'
     runs-on: ubuntu-latest
 
     env:
@@ -75,24 +99,25 @@ jobs:
         run: |
           ruff check backend --output-format=github
 
-      - name: Run backend tests
-        run: |
-          python backend/scripts/run_isolated_tests.py \
-            -v \
-            --cov=backend/app \
-            --cov-report=term-missing \
-            --junitxml=junit.xml
-
-      - name: Run default pytest with automatic temporary database setup
-        run: python -m pytest -v
+      - name: Run mandatory M4 P0 with automatic temporary database setup
+        run: python -m pytest -v --junitxml=junit.xml
 
       - name: Verify S4-T05 P0 traceability
         run: python scripts/verify_s4_t05_trace.py
 
+      - name: Verify affected backup and restore paths
+        if: needs.detect.outputs.storage == 'true'
+        run: python -m pytest -c pytest.ini backend/tests/test_storage_snapshot.py -v
+
+      - name: Verify affected early pytest bootstrap
+        if: needs.detect.outputs.bootstrap == 'true'
+        run: python -m pytest -c pytest.ini tests/test_pytest_setup.py -v
+
       - name: Publish test summary
         if: always()
         run: |
-          echo "### Python test results" >> "$GITHUB_STEP_SUMMARY"
+          echo "### Mandatory M4 P0 test results" >> "$GITHUB_STEP_SUMMARY"
+          echo "Optional full Python regression: not run. Use the Optional extended regression workflow." >> "$GITHUB_STEP_SUMMARY"
 
           python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
           import pathlib
@@ -123,8 +148,6 @@ jobs:
 
   node:
     name: Node build and tests
-    needs: detect
-    if: needs.detect.outputs.node == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -144,11 +167,15 @@ jobs:
       - name: Lint frontend
         run: npm --prefix frontend run lint
 
-      - name: Run frontend tests
-        run: npm --prefix frontend test
-
       - name: Build frontend
         run: npm --prefix frontend run build
+
+      - name: Report optional frontend test scope
+        if: always()
+        run: |
+          echo "### Frontend validation scope" >> "$GITHUB_STEP_SUMMARY"
+          echo "Lint and build are automatic; see their step results above." >> "$GITHUB_STEP_SUMMARY"
+          echo "Optional full Vitest and browser regressions: not run. Dispatch Optional extended regression or the individual feature workflows to run them." >> "$GITHUB_STEP_SUMMARY"
 
 
   secrets:

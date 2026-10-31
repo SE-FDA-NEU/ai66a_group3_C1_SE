@@ -1,9 +1,11 @@
 # Setup
 
-From Sprint 3 these steps prepare the application with a required TMDb-imported
+From Sprint 3 the application setup steps prepare a required TMDb-imported
 catalogue. Running the importer needs a valid private Read Access Token and
 network access to TMDb. Automated checks use synthetic fixtures/mocks and no
-live token/provider network. The decision is in [design.md](design.md); manual
+live token/provider network. For the fast P0 tests, only the Python virtual
+environment and Python installs are needed; see [Verify](#verify). The decision
+is in [design.md](design.md); manual
 smoke/provenance and verification ownership are in the [runbook](tmdb-sprint3-runbook.md).
 
 Earlier clean-clone baseline tested by: Codex, Sprint 3, 2026-10-18, Windows PowerShell,
@@ -399,18 +401,69 @@ actual process restart and a fresh browser context, not merely a page reload.
 
 ## Verify
 
-With the virtual environment active:
+Run the fast P0 check from the repository root after creating the Python 3.12
+virtual environment, installing `backend/requirements.lock.txt`, and installing
+the editable backend with `python -m pip install -e "./backend[dev]" --no-deps`.
+That Python setup is sufficient: no npm install, running server, `.env`, real
+database, TMDb token or live network is needed to execute these tests.
+
+macOS/Linux (POSIX):
 
 ```bash
-python backend/scripts/run_isolated_tests.py -v
+source .venv/bin/activate
+python -m pytest -v
+```
+
+Windows PowerShell, without activating `Activate.ps1`:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest -v
+```
+
+Under the user-approved #219 amendment of 2026-11-01, both root `pytest` and
+`python -m pytest -v` run **40 P0 cases only**, from
+`tests/test_p0_acceptance.py` and `tests/test_s03_details.py`. Root `pytest.ini`
+selects exactly those two files. Extended backend/frontend/browser/script and
+volume regressions remain available explicitly; they are outside this default.
+
+Main CI's `Python tests`, `Node build and tests` and secrets jobs remain
+automatic: 40 P0 cases, a few affected storage/bootstrap tests, backend/frontend
+lint, frontend build and secrets checks. The effective main-branch rules
+require teammate approval only, with no required status contexts. Existing
+feature/browser workflows keep their names and run only via `workflow_dispatch`.
+The new `Optional extended regression` workflow uses `run_python` and
+`run_vitest` boolean inputs to select broad suites. These regressions are not
+mandatory on every push. Focused storage/startup
+acceptance remains part of the [C05 release checks](s4-c05-release-storage.md#offline-release-checks-and-review).
+
+For the local lint/build checks, install the locked frontend dependencies first
+(`npm --prefix frontend ci`); on Windows use `npm.cmd`:
+
+```bash
 python -m ruff check backend
-npm --prefix frontend test
 npm --prefix frontend run lint
 npm --prefix frontend run build
 ```
 
-For the S3-T33 rating UI/API/database acceptance journey, after installing both
-locked runtimes, also run from the repository root:
+### Optional regressions
+
+Choose these broader checks explicitly when needed; they are not prerequisites
+to the fast P0 command or mandatory on every push. From the repository root:
+
+```bash
+python -m pytest -c pytest.ini tests backend/tests scripts -v
+npm --prefix frontend test
+```
+
+For backend-only coverage, the retained helper is
+`python backend/scripts/run_isolated_tests.py -v`. Frontend/browser checks need
+the locked npm install and, where specified below, a browser installation.
+Use `npm.cmd` on Windows and the venv Python path if the venv is not active.
+Feature-specific checks later in this document are also explicit/manual
+regressions rather than additions to the root pytest default.
+
+For the optional S3-T33 rating UI/API/database acceptance journey, after
+installing both locked runtimes, run from the repository root:
 
 ```text
 npm --prefix frontend run test:t33:integration
@@ -441,7 +494,7 @@ It deletes the temporary database/profile and never touches the configured
 development database. Pass `--browser <absolute-path>` if Chrome/Chromium/Edge
 cannot be detected. See [T34 evidence](evidence/s3-t34-rating-acceptance/README.md).
 
-The backend command creates and migrates a temporary SQLite database, clears the
+The backend-only helper creates and migrates a temporary SQLite database, clears the
 token, disables real TMDb requests, runs pytest, and removes the database. It
 ignores the developer's `DATABASE_URL` and token from the root `.env`. Provider
 tests inject synthetic clients or HTTP mocks; CI never runs a live import. The
@@ -454,7 +507,7 @@ For the S04 real-browser suite, first install Playwright Chromium from the
 If Google Chrome is already installed locally, set `S04_BROWSER_CHANNEL=chrome`
 to use it instead. CI uses the Playwright Chromium installation.
 
-### S4-T20 trailer/backdrop acceptance
+#### S4-T20 trailer/backdrop acceptance
 
 After the locked installs above, install Playwright Chromium from `frontend`
 with `npx.cmd playwright install chromium` on Windows (`npx` on macOS/Linux).
@@ -485,10 +538,11 @@ Set `T20_SCREENSHOT_DIR` only when deliberately regenerating published evidence.
 
 ### Direct pytest / EARLY_TEST_SETUP (#219)
 
-After the locked Python installation and editable backend install above, run
-from the repository root with the virtual environment active:
+After the Python 3.12 venv, locked Python installation and editable backend
+install above, run from the repository root. On macOS/Linux (POSIX):
 
-```text
+```bash
+source .venv/bin/activate
 pytest
 python -m pytest -v
 ```
@@ -503,32 +557,45 @@ entry points work without activating `Activate.ps1`:
 
 To type the literal `pytest` command in a fresh Windows venv without changing
 the PowerShell execution policy, use its standard batch activator in one shell:
-`cmd /c "call .venv\Scripts\activate.bat && pytest"`. The same environment
-can run `python -m pytest -v` through `cmd /c`.
+
+```powershell
+cmd /c "call .venv\Scripts\activate.bat && pytest"
+```
+
+The same environment can run `python -m pytest -v` through `cmd /c`.
 
 No `.env`, application database, manual migration, provider token, live network,
-running server or `PYTHONPATH` export is required for these commands. Root
-`pytest.ini` discovers `tests/`, `backend/tests/` and existing script regressions,
-and configures imports.
+running server, npm install or `PYTHONPATH` export is required for these commands.
+Root `pytest.ini` configures imports and selects **only the 40 P0 cases** in
+`tests/test_p0_acceptance.py` and `tests/test_s03_details.py`. It does not discover
+the other `tests/`, `backend/tests/` or script regressions by default; use the
+[optional regression commands](#optional-regressions) to select them explicitly.
 Root `conftest.py` replaces inherited database/token/index configuration and
 migrates a temporary SQLite database **before collection/application imports**,
 including the default engine used by `/health`. It cleans up after the session;
-existing per-case fixtures retain their own isolation. CI executes the same
-default command and retains the extended backend/frontend tiers.
+existing per-case fixtures retain their own isolation. Main CI executes the
+same P0 default alongside automatic lint/build/secrets checks and a few affected
+storage/bootstrap tests. Broad regressions and feature/browser workflows are
+manual-only via `workflow_dispatch`; teammate approval is the main-branch
+requirement, with no required status contexts.
 
-This is the #219 early infrastructure output, not final #219 acceptance. The
-application setup/import/index steps above remain required for live catalogue
-verification and are separate from token-free automated tests. An earlier
+This documents the 2026-11-01 #219 scope; final acceptance results belong in the
+C05 evidence. The application setup/import/index steps above remain required
+for live catalogue verification and are separate from token-free automated
+tests. An earlier
 `test_health` 503 was a missing pytest bootstrap; manually migrating the
 developer DB is not an acceptable test workaround.
 
 For the Sprint 4 final build, persistent SQLite, consistent WAL backup,
 non-destructive restore, index readiness and restart sequence, follow the
 [S4-C05 release/storage runbook](s4-c05-release-storage.md). The offline
-rehearsal is `python -m pytest backend/tests/test_storage_snapshot.py -v`.
+focused rehearsal is `python -m pytest -c pytest.ini backend/tests/test_storage_snapshot.py -v`.
 `python -m app.cli.storage_snapshot backup <existing-db> <new-backup>` uses
 SQLite's online backup API; `restore <backup> <new-db>` never overwrites an
-existing database. Keep the resulting backup outside Git and the public site.
+existing database. Both operations must reject an existing destination DB or
+its `-wal`, `-shm` or `-journal` sidecars, even if the DB file itself is absent.
+Keep the destination unused during the operation and the resulting backup
+outside Git and the public site.
 
 ### Application health or movie requests fail after pulling code
 
@@ -613,7 +680,7 @@ Re-importing the same provider movie preserves its internal ID and membership.
 Offline verification uses synthetic temporary SQLite files and no TMDb token:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest backend/tests/test_s4_t12_watchlist.py backend/tests/test_s4_t12_watchlist_migration.py -q
+.\.venv\Scripts\python.exe -m pytest -c pytest.ini backend/tests/test_s4_t12_watchlist.py backend/tests/test_s4_t12_watchlist_migration.py -q
 cd frontend
 npm.cmd test -- src/tests/watchlist.test.tsx
 npm.cmd run build
@@ -644,7 +711,7 @@ accounts, needs no running server or TMDb token, and exercises DELETE/WAL plus
 a competing writer in a separate process:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest backend/tests/test_profile_reset_concurrency.py backend/tests/test_account_write_transactions.py backend/tests/test_profile_reset_api.py -v
+.\.venv\Scripts\python.exe -m pytest -c pytest.ini backend/tests/test_profile_reset_concurrency.py backend/tests/test_account_write_transactions.py backend/tests/test_profile_reset_api.py -v
 .\.venv\Scripts\python.exe backend/scripts/run_isolated_tests.py -q
 .\.venv\Scripts\python.exe -m ruff check backend
 ```
