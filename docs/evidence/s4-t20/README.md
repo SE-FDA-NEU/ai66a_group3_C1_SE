@@ -1,5 +1,8 @@
 # S4-T20 trailer/backdrop verification
 
+Current embedded-player and full-catalogue setup results:
+[2026-10-31 media/setup audit](media-setup-audit.md).
+
 > This record is frozen to the external-link executable commit named below.
 > The unpushed embedded-player revision is documented separately in
 > [the local preview record](embedded-preview.md).

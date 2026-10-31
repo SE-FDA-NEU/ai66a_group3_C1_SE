@@ -1,0 +1,26 @@
+{
+  "executableCommit": "23e655cd8a531f1662767838cc4cf1b6a9303185",
+  "backendFullRunCommit": "eb4ee332c08aa65e792616cbb99d61a91292811c",
+  "backendIdenticalAcrossThoseCommits": true,
+  "convention": "SHA-256 after CRLF/CR normalization to LF; Git blob/worktree/clean-checkout compared",
+  "files": {
+    ".github/workflows/s4-t20-trailer.yml": "d8a5e7ed7d6ca460870ba4e451e3c3ad7136c1c30b1962c54ddcf5cec7dee002",
+    "README.md": "e63c30e19b352966d65ea583a8b0f4995fcbcd4c609aca0ed551eb2e14f30a67",
+    "backend/app/catalogue/tmdb_import.py": "bc8046da6f9fb138e5830c53f86f74c2bd2cd3a9874a360cb61eeb374519b8bd",
+    "backend/app/cli/import_tmdb_catalogue.py": "57f929c4e3593e3c16c13a6b656791c14c3f3893a26502f851270011f25b2389",
+    "backend/requirements.lock.txt": "544977f3d8945cd074cb67f2ac4a73d1b4c64e1b063a34eed7c1cf1fee7ea83a",
+    "backend/tests/test_image_enrichment_all.py": "07c7112ec3ed2558e063d25a62008070315f1bba2f0372e08f8b3db0e63cacd0",
+    "backend/tests/test_setup_media_commands.py": "d3749239b15aafe273bb422e5f2db1a93c327aa1f296710c740d1d9c78c7cc4c",
+    "backend/tests/test_tmdb_import_cli.py": "37cb4de808eab43ec7aad9337f9bc82ff31336f3beb171cb8f3369464659db8c",
+    "docs/SETUP.md": "6e0ffc2a528d8e2532421afb527c64130bf9860485870f23e0b13b2da64c1e7f",
+    "frontend/e2e/s4-t20.trailer.ts": "e73995095cfdc2c8bf8142423f72b593f9ac00edf386959288e0216ae055e312",
+    "frontend/package-lock.json": "e0ba953c34e929a439d76eba60bec56457693e89826a35164ce493535bb3f014",
+    "frontend/src/components/MovieTrailer.tsx": "c7b12df7a9cbe4e72a6682eea34c5c97cb52bd8a85a55b8165a665d53d2a880e",
+    "frontend/src/index.css": "2e7ccbfbfce96a4c4182a2d109900876c4f75eece7311d513c1808a8000d49d4",
+    "frontend/src/pages/MovieDetailPage.tsx": "fcf5970e420b0bdd3e1377003310868d74d9a68a0ade577ad45438fd5b03810c",
+    "frontend/src/pages/SearchPage.tsx": "1a2deb36558966a8b82f331451ed554458d732c26d8bd650370517598c28f7ed",
+    "frontend/src/tests/movie-backdrop.test.tsx": "dde755c4591e780b964245ac010d662d8618b16a46a171ba0ce0c78f7316d56c",
+    "frontend/src/tests/movie-trailer.test.tsx": "597b8ea3d28f20ca515efcb3a24df9ffbba7486ed6d20cf35cd006f7cd407bb5",
+    "frontend/src/tests/search-navigation-transition.test.tsx": "662323b5184f01acb1f14516851ba562bbea3a3824bf6390c62d2215e41c83e4"
+  }
+}
