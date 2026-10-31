@@ -370,3 +370,11 @@ close/focus/scroll cleanup and Back during playback. These fixtures do not
 prove live YouTube playback. Historical results for the external-link version
 remain in [the frozen T20 record](evidence/s4-t20/README.md); the
 [local preview record](evidence/s4-t20/embedded-preview.md) records this revision.
+
+The setup/media audit also reproduced a pre-existing Search navigation race:
+BrowserRouter can update history before React commits the new route. A late
+Search reply in that gap must not stamp its old context or redirect away from
+Home/new query/page. Search now checks the browser's pathname/query/page scope
+as well as request cancellation before applying success or failure. Source/hash
+changes that do not change the data scope remain supported. Four deterministic
+transition tests cover this interval; the existing browser race assertion stays.
