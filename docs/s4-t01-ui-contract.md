@@ -329,3 +329,21 @@ Linux browser acceptance jobs pin Ubuntu 24.04 after the previous floating
 runner exceeded its installation budget. Assertions, test deadlines, retries
 and skips are unchanged. Current merged-candidate results are in the
 [integration evidence](evidence/s4-t16-t14-reconciliation.md).
+
+## S4-T20 official trailer detail integration (2026-10-31)
+
+`MovieTrailer` appears between Overview and the existing rating/watchlist
+widgets. It accepts only the local detail response's official YouTube Trailer
+with an 11-character key and a matching canonical HTTPS watch URL. A missing,
+null, invalid, mismatched or unofficial selection shows `Trailer unavailable`
+and no actionable link. The shared `ExternalTrailerLink` provides one keyboard
+focusable `Watch trailer` link with `target="_blank"`,
+`rel="noopener noreferrer"` and an accessible new-tab explanation. There is no
+iframe or playback request in the app.
+
+The media panel uses existing theme variables and button styles and wraps at
+mobile widths. The existing detail response guard removes the prior movie's
+panel while another ID loads, and ignores late responses. Backdrop image
+validation, failure fallback and rating/Similar/return controls are unchanged.
+No backend, migration, account or ranking interface changes are needed beyond
+the merged S4-T19 trailer DTO. See [T20 implementation and verification](evidence/s4-t20/README.md).
