@@ -1,0 +1,53 @@
+{
+  "issue": 219,
+  "status": "local-author-candidate; independent review and deployed verification pending",
+  "baseCommit": "b1e8c1e50cbbf21099dc424e481df065f9e6b99b",
+  "selectedExecutableCommit": "acd99688bd88a2a78fe3ec13b193febf6a538d4a",
+  "selectedTree": "d7209a43ab75da5374fab23e98704abfb111be54",
+  "environment": {
+    "platform": "Windows PowerShell",
+    "git": "2.53.0.windows.1",
+    "python": "3.12.10",
+    "node": "24.15.0",
+    "npm": "11.12.1",
+    "tmdbNetwork": "blocked: api.themoviedb.org resolves to loopback on this machine"
+  },
+  "lockedDependencies": {
+    "backend/requirements.lock.txt": "4584f1625d9fc7137b4f4c3ff29bb36ac39bddda28829dfbcf674bcb90a1c72e",
+    "frontend/package-lock.json": "f9dd904838f3dbcf92b910912e6bd4430984c265cbd3d79d98265fc32015da44"
+  },
+  "frontendArtifactsSha256": {
+    "frontend/dist/index.html": "f5d4cad62cb7b57fcc294501a4a3b5ea3f176eb16df3a676bddd9a1ca36ba980",
+    "frontend/dist/assets/index-BY2gnITW.css": "715d27127bedff43a272e52bad71aab18bafa52f6a586ec47714789bd10e53d3",
+    "frontend/dist/assets/index-IY8BVZI3.js": "8fafc89f798aedf8a91935c1f13bfbb1e0ef8f0cfc2d3360de8fd5f298a68480"
+  },
+  "migrationHead": "a3d1f8b72c44",
+  "syntheticOfflineRehearsal": {
+    "accounts": 2,
+    "preferenceRows": 2,
+    "ratingRows": 2,
+    "watchlistRows": 2,
+    "movieRows": 2,
+    "indexSha256": "5bbae58730064c8af73af516e4ea511344863a7e905172f3a2798b5edcc28c43",
+    "httpStartup": "passed",
+    "httpRestart": "passed"
+  },
+  "importedCataloguePreview": {
+    "source": "read-only SQLite backup of an existing imported local catalogue",
+    "sourceMigration": "c6f8a2d4e901",
+    "upgradedMigration": "a3d1f8b72c44",
+    "stableMovieIds": true,
+    "stableUserRows": true,
+    "movieRows": 252,
+    "indexReady": true,
+    "httpStartup": "passed",
+    "temporaryCopyRemoved": true
+  },
+  "deployment": {
+    "status": "not deployed by this task",
+    "persistentVolume": null,
+    "databasePath": null,
+    "serviceName": null
+  },
+  "handoff": "S4-C02, S4-C04 and S5-C02: use the selected executable commit and rerun after code/config/schema changes"
+}

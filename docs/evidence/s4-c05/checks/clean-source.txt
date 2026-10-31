@@ -1,0 +1,18 @@
+Clean local clone of committed source acd99688bd88a2a78fe3ec13b193febf6a538d4a.
+Clone began without .env, data/app.db, .venv or frontend/node_modules.
+The sandbox Git identity differed from the source checkout owner, so the
+local clone command used an explicit per-command safe.directory for that
+source .git path. This was not a repository/global config or app edit.
+Windows PowerShell, Git 2.53.0.windows.1, Python 3.12.10,
+Node 24.15.0, npm 11.12.1.
+The full installed Python 3.12 executable path was used because the Windows
+py launcher could not locate that runtime in this sandbox, as allowed by SETUP.
+Python 3.12 venv created. Locked requirements installed successfully;
+editable backend install succeeded. pip check: No broken requirements found.
+npm --prefix frontend ci: added 240 packages.
+scripts/verify_s4_t05_trace.py: 37 unique Section 2 IDs mapped to
+48 collected root nodes.
+The first editable install attempt in the restricted sandbox could not fetch
+its setuptools build dependency; repeating the same documented command with
+network access succeeded. pip --upgrade returned 0 but kept bundled pip 25.0.1
+because the restricted sandbox could not reach the package index.

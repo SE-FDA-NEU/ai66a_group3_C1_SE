@@ -493,6 +493,19 @@ pytest
 python -m pytest -v
 ```
 
+On Windows PowerShell with script execution disabled, the equivalent direct
+entry points work without activating `Activate.ps1`:
+
+```powershell
+.\.venv\Scripts\pytest.exe
+.\.venv\Scripts\python.exe -m pytest -v
+```
+
+To type the literal `pytest` command in a fresh Windows venv without changing
+the PowerShell execution policy, use its standard batch activator in one shell:
+`cmd /c "call .venv\Scripts\activate.bat && pytest"`. The same environment
+can run `python -m pytest -v` through `cmd /c`.
+
 No `.env`, application database, manual migration, provider token, live network,
 running server or `PYTHONPATH` export is required for these commands. Root
 `pytest.ini` discovers `tests/`, `backend/tests/` and existing script regressions,
