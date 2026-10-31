@@ -451,12 +451,22 @@ def test_TC_P0_S12_005_invalid_email_and_storage_failure_create_no_account(
         "VALIDATION_ERROR",
     )
 
-    def unavailable(*args, **kwargs):
-        raise OperationalError(
-            "synthetic account write", None, Exception("private failure")
-        )
+    create_user = main.create_user
 
-    monkeypatch.setattr(main, "create_user", unavailable)
+    def create_then_fail_commit(session, **kwargs):
+        user = create_user(session, **kwargs)
+        # Exercise a real flushed INSERT, then fail at the route's commit.
+        assert session.scalar(select(func.count()).select_from(User)) == 1
+
+        def unavailable():
+            raise OperationalError(
+                "synthetic account commit", None, Exception("private failure")
+            )
+
+        monkeypatch.setattr(session, "commit", unavailable)
+        return user
+
+    monkeypatch.setattr(main, "create_user", create_then_fail_commit)
     failed = error(
         details.http.post(
             "/api/auth/register", json={"email": "a@example.test", "password": PASSWORD}
@@ -471,6 +481,15 @@ def test_TC_P0_S12_005_invalid_email_and_storage_failure_create_no_account(
 
 def test_TC_P0_S13_001_login_me_cookie_and_safe_user(details):
     a = account(details)
+    login = a.post(
+        "/api/auth/login", json={"email": "a@example.test", "password": PASSWORD}
+    )
+    assert login.status_code == 200
+    assert set(login.json()) == {"data"}
+    assert set(login.json()["data"]["user"]) == {"id", "email"}
+    cookie = login.headers["set-cookie"].lower()
+    assert "httponly" in cookie and "samesite=lax" in cookie and "path=/" in cookie
+    assert a.cookies["ams_session"] not in login.text
     response = a.get("/api/auth/me")
     assert response.status_code == 200
     assert response.json()["data"]["user"]["email"] == "a@example.test"
@@ -519,23 +538,31 @@ def test_TC_P0_S13_003_logout_replay_and_later_login_restore_data(details):
 
 
 def test_TC_P0_S13_004_missing_expired_and_revoked_sessions_refused(details):
-    from app.db.models import AuthSession
+    from app.db.models import AuthSession, UserGenrePreference
 
     error(details.http.get(PREFERENCES), 401, "AUTHENTICATION_REQUIRED")
+    error(save(details.http, [35]), 401, "AUTHENTICATION_REQUIRED")
     a = account(details)
+    assert save(a, [28]).status_code == 200
     with details.sessions() as db:
         session = db.scalars(select(AuthSession)).one()
         session.expires_at = datetime.now(UTC) - timedelta(seconds=1)
         db.commit()
     error(a.get(PREFERENCES), 401, "AUTHENTICATION_REQUIRED")
+    error(save(a, [35]), 401, "AUTHENTICATION_REQUIRED")
     assert (
         a.post(
             "/api/auth/login", json={"email": "a@example.test", "password": PASSWORD}
         ).status_code
         == 200
     )
+    revoked_cookie = dict(a.cookies)
     assert a.post("/api/auth/logout").status_code == 204
+    a.cookies.update(revoked_cookie)
     error(a.get(PREFERENCES), 401, "AUTHENTICATION_REQUIRED")
+    error(save(a, [35]), 401, "AUTHENTICATION_REQUIRED")
+    with details.sessions() as db:
+        assert db.scalars(select(UserGenrePreference.genre_id)).all() == [28]
 
 
 def test_TC_P0_S13_005_account_isolation_and_forged_identity(details):
