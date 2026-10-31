@@ -57,17 +57,23 @@ def inspect_database(path: Path) -> dict[str, object]:
         raise SnapshotError("SQLite inspection failed") from exc
 
 
+def _require_unused_destination(destination: Path) -> None:
+    if destination.exists() or any(Path(str(destination) + suffix).exists()
+                                   for suffix in ("-wal", "-shm", "-journal")):
+        raise SnapshotError("destination already exists")
+
+
 def copy_consistent(source: Path, destination: Path) -> dict[str, object]:
     """Use SQLite's online backup API, including committed WAL pages.
 
     The destination is published with an exclusive hard link only after it
     passes integrity and foreign-key checks. Existing files are never replaced.
+    The caller must keep the destination unused throughout the copy: sidecar
+    checks cannot prevent another process creating a journal after the check.
     """
     if source.resolve() == destination.resolve():
         raise SnapshotError("source and destination must differ")
-    if destination.exists() or any(Path(str(destination) + suffix).exists()
-                                   for suffix in ("-wal", "-shm")):
-        raise SnapshotError("destination already exists")
+    _require_unused_destination(destination)
     if not destination.parent.is_dir():
         raise SnapshotError("destination directory does not exist")
     inspect_database(source)
@@ -91,6 +97,7 @@ def copy_consistent(source: Path, destination: Path) -> dict[str, object]:
             for block in iter(lambda: copied.read(1024 * 1024), b""):
                 digest.update(block)
         result["sha256"] = digest.hexdigest()
+        _require_unused_destination(destination)
         os.link(temporary, destination)
         return result
     except (OSError, sqlite3.Error) as exc:

@@ -10,6 +10,7 @@ from contextlib import closing
 from pathlib import Path
 
 import pytest
+from app.cli import storage_snapshot
 from app.cli.storage_snapshot import (
     SnapshotError,
     copy_consistent,
@@ -147,3 +148,73 @@ def test_snapshot_refuses_overwrite_or_corrupt_source(tmp_path: Path, capsys):
     with pytest.raises(SnapshotError, match="SQLite inspection failed"):
         copy_consistent(corrupt, tmp_path / "no-copy.db")
     assert not (tmp_path / "no-copy.db").exists()
+
+
+@pytest.mark.parametrize("journal_timing", ["before_copy", "before_publication"])
+def test_restore_refuses_hot_rollback_journal(
+    tmp_path: Path, capsys, monkeypatch, journal_timing: str,
+):
+    source = migrate_template(tmp_path / "source.db")
+    destination = migrate_template(tmp_path / "destination.db")
+    for path in (source, destination):
+        with closing(sqlite3.connect(path)) as db:
+            _seed(db)
+    with closing(sqlite3.connect(source)) as db:
+        db.execute("UPDATE users SET email_normalized='snapshot-a@example.test' WHERE id='a'")
+        db.commit()
+    source_before = source.read_bytes()
+
+    # Spill uncommitted pages to the main file, then exit without SQLite cleanup.
+    crash = subprocess.run(
+        [sys.executable, "-c", """import os
+import sqlite3
+import sys
+db = sqlite3.connect(sys.argv[1])
+assert db.execute('PRAGMA journal_mode=DELETE').fetchone() == ('delete',)
+db.execute('PRAGMA synchronous=FULL')
+db.execute('PRAGMA cache_size=1')
+db.execute('BEGIN IMMEDIATE')
+db.execute("UPDATE users SET email_normalized='uncommitted@example.test' WHERE id='a'")
+db.execute("UPDATE catalog_movies SET overview=? WHERE id='movie-a'", ('x' * 1024 * 1024,))
+os._exit(0)
+""", str(destination)],
+        cwd=ROOT, capture_output=True, text=True, timeout=30, check=False,
+    )
+    assert crash.returncode == 0, crash.stdout + crash.stderr
+    journal = Path(str(destination) + "-journal")
+    journal_before = journal.read_bytes()
+    assert len(journal_before) > 512
+    old_database = tmp_path / "old-database.db"
+    destination.rename(old_database)
+    old_before = old_database.read_bytes()
+
+    # Prove this is a hot journal: pairing it with the snapshot replays old data
+    # on the first open, overwriting the snapshot's distinct committed email.
+    replay = tmp_path / "unsafe-restore-control.db"
+    replay.write_bytes(source_before)
+    Path(str(replay) + "-journal").write_bytes(journal_before)
+    with closing(sqlite3.connect(replay)) as db:
+        assert db.execute(
+            "SELECT email_normalized FROM users WHERE id='a'"
+        ).fetchone() == ("a@example.test",)
+
+    if journal_timing == "before_publication":
+        held_journal = tmp_path / "held-journal"
+        journal.rename(held_journal)
+
+        def inspect_then_expose_journal(path: Path) -> dict[str, object]:
+            result = inspect_database(path)
+            if path != source:
+                held_journal.rename(journal)
+            return result
+
+        monkeypatch.setattr(storage_snapshot, "inspect_database", inspect_then_expose_journal)
+
+    assert main(["restore", str(source), str(destination)]) == 1
+    output = capsys.readouterr()
+    assert "destination already exists" in output.err
+    assert output.out == ""
+    assert not destination.exists()
+    assert journal.read_bytes() == journal_before
+    assert old_database.read_bytes() == old_before
+    assert source.read_bytes() == source_before
