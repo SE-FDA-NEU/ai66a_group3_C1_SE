@@ -443,4 +443,4 @@ owns final process evidence, formal report review and manual submission.
 
 | File | SHA-256 after UTF-8 LF normalization |
 |---|---|
-| `docs/testing.md` | `3ae53a54dcef330fc4169a859eddcd35e9dd92903e0dec8447d6499e7ce95ab5` |
+| `docs/testing.md` | `0b015cb4943c733d171afc00f3716fbd182e6c1391a5186c6346fcba7915ad6e` |

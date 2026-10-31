@@ -102,6 +102,9 @@ accounts/movies; they do not merely compare hard-coded fake return values.
 
 Actual count, runtime, full verbose output and screenshot are linked from
 [the current C05 record](evidence/s4-c05/compact-m4.md).
+
+![Full output of the 40-item clean-clone pytest run](evidence/s4-c05/checks/compact-verbose-output.png)
+
 Existing backend/frontend/browser/script regressions remain available as
 [explicit optional checks](SETUP.md#optional-regressions); they are not part
 of the default command or an additional M4 report requirement.
