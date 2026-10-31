@@ -29,7 +29,10 @@ async function fixture(page: Page, options: { delayed?: boolean } = {}) {
     if (pathname === "/api/auth/me")
       return route.fulfill({ status: 401, contentType: "application/json", body: "{}" });
     if (pathname.endsWith("/similar"))
-      return route.fulfill({ contentType: "application/json", body: '{"data":{"movies":[]}}' });
+      return route.fulfill({ contentType: "application/json", body: JSON.stringify({
+        data: { movies: pathname === "/api/movies/broken/similar"
+          ? [movie("next", false, false)] : [] },
+      }) });
     const match = /^\/api\/movies\/(both|backdrop|trailer|neither|broken|next)$/.exec(pathname);
     if (!match) throw new Error(`Unexpected API request: ${pathname}`);
     const id = match[1];
@@ -101,7 +104,7 @@ test("broken image and rapid navigation clear the previous trailer", async ({ pa
   await expect(page.getByRole("heading", { name: "Fixture broken" })).toBeVisible();
   await expect(page.locator(".movie-detail__hero-image")).toHaveCount(0);
   await expect(page.getByRole("link", { name: /Watch trailer/ })).toHaveCount(1);
-  await page.goto("/movies/next");
+  await page.getByRole("link", { name: "View details for Fixture next" }).click();
   await expect(page.getByText("Loading movie...")).toBeVisible();
   await expect(page.getByRole("link", { name: /Watch trailer/ })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "Fixture next" })).toBeVisible();
