@@ -128,7 +128,7 @@ describe("movie backdrop hero", () => {
 });
 
 describe("movie detail backdrop transitions", () => {
-  it("shows only a valid trailer link from the local detail response", async () => {
+  it("places the official trailer button below the poster", async () => {
     vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
       const url = String(input);
       if (url === "/api/movies/movie-a")
@@ -140,14 +140,14 @@ describe("movie detail backdrop transitions", () => {
       throw new Error(`Unexpected request: ${url}`);
     });
     render(<DetailRoutes />);
-    const link = await screen.findByRole("link", { name: /Watch trailer/ });
-    expect(link).toHaveAttribute("href", TRAILER.url);
-    expect(link).toHaveAttribute("target", "_blank");
-    expect(link).toHaveAttribute("rel", "noopener noreferrer");
-    expect(screen.getAllByRole("link", { name: /Watch trailer/ })).toHaveLength(1);
+    const button = await screen.findByRole("button", { name: /Watch trailer/ });
+    expect(button).toHaveAttribute("aria-haspopup", "dialog");
+    expect(button.closest(".movie-detail__poster")).not.toBeNull();
+    expect(document.querySelector("iframe")).toBeNull();
+    expect(screen.getAllByRole("button", { name: /Watch trailer/ })).toHaveLength(1);
     fireEvent.click(screen.getByRole("link", { name: "Open movie B" }));
     await screen.findByRole("heading", { name: "Title movie-b" });
-    expect(screen.queryByRole("link", { name: /Watch trailer/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Watch trailer/ })).not.toBeInTheDocument();
     expect(screen.getByText("Trailer unavailable")).toBeVisible();
   });
 
@@ -175,7 +175,7 @@ describe("movie detail backdrop transitions", () => {
     const { container } = render(<DetailRoutes />);
     await screen.findByRole("heading", { name: "Title movie-a" });
     const valid = trailer === TRAILER;
-    expect(screen.queryAllByRole("link", { name: /Watch trailer/ })).toHaveLength(valid ? 1 : 0);
+    expect(screen.queryAllByRole("button", { name: /Watch trailer/ })).toHaveLength(valid ? 1 : 0);
     expect(screen.queryByText("Trailer unavailable") !== null).toBe(!valid);
     expect(container.querySelector(".movie-detail__hero-image") !== null).toBe(backdropUrl !== null);
   });
@@ -239,10 +239,10 @@ describe("movie detail backdrop transitions", () => {
       throw new Error(`Unexpected request: ${url}`);
     });
     render(<DetailRoutes />);
-    await screen.findByRole("link", { name: /Watch trailer/ });
+    await screen.findByRole("button", { name: /Watch trailer/ });
     fireEvent.click(screen.getByRole("link", { name: "Open movie B" }));
     expect(screen.getByText("Loading movie...")).toBeVisible();
-    expect(screen.queryByRole("link", { name: /Watch trailer/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Watch trailer/ })).not.toBeInTheDocument();
     await act(async () => {
       nextMovie.resolve(new Response(JSON.stringify({ data: {
         movie: { ...detail("movie-b"), trailer: null },
@@ -275,6 +275,6 @@ describe("movie detail backdrop transitions", () => {
     });
     expect(screen.getByRole("heading", { name: "Title movie-b" })).toBeVisible();
     expect(container.querySelector("img")).toBeNull();
-    expect(screen.queryByRole("link", { name: /Watch trailer/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Watch trailer/ })).not.toBeInTheDocument();
   });
 });

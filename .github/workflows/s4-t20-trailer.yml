@@ -38,7 +38,7 @@ jobs:
           cd frontend
           npx playwright install --with-deps chromium
       - name: Verify P0, trailer selection, populated migration and media preservation
-        run: python -m pytest -c pytest.ini tests backend/tests/test_trailer_enrichment.py backend/tests/test_trailer_all.py backend/tests/test_backdrop_acceptance.py -q
+        run: python -m pytest -c pytest.ini tests backend/tests/test_trailer_enrichment.py backend/tests/test_trailer_all.py backend/tests/test_backdrop_acceptance.py backend/tests/test_image_enrichment_all.py backend/tests/test_tmdb_import_cli.py -q
       - name: Verify component safety and detail requests
         run: npm --prefix frontend test -- src/tests/movie-backdrop.test.tsx src/tests/movie-detail-return.test.tsx src/tests/movie-detail-rating.test.tsx
       - name: Verify T20 using real API, migrated SQLite and offline artwork

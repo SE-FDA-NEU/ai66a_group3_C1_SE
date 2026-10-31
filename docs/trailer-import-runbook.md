@@ -1,6 +1,7 @@
-# Optional TMDb trailer enrichment (#19)
+# TMDb trailer enrichment (S4-T19 #214 / S4-T20 #215)
 
-Run after the required TMDb catalogue import and migration. The command uses
+The standard setup now includes this step after the TMDb catalogue import and
+migration; importing popular movies alone does not fetch videos. The command uses
 the same private server-side `TMDB_READ_ACCESS_TOKEN`; it does not change the
 active revision, core catalogue rows or account data. Run from the repository
 root with the backend virtual environment active:
@@ -68,8 +69,12 @@ there has been no successful fetch). `trailer_attempted_at` and
 stored or printed.
 
 The public details response adds nullable `trailer` with site, key, name, type,
-official, language, publishedAt and a server-built YouTube URL. The browser
-shows a link only when a trailer is present. It never calls TMDb for details.
+official, language, publishedAt and a server-built YouTube URL. Details show a
+button beneath the poster for a valid official selection, or `Trailer unavailable`.
+Clicking opens an on-page YouTube modal without a new tab. The iframe is created
+only after clicking and removed on close or movie changes; autoplay is disabled.
+The browser never calls TMDb for details. YouTube controls playback/embedding
+availability for each video; app close controls remain usable.
 
 Offline verification, with a synthetic provider and isolated SQLite:
 
@@ -77,7 +82,8 @@ Offline verification, with a synthetic provider and isolated SQLite:
 python -m pytest backend/tests/test_trailer_enrichment.py backend/tests/test_tmdb_import_cli.py backend/tests/test_movies_api.py -q
 python -m ruff check backend
 cd frontend
-npm run test -- --run src/tests/visual-primitives.test.tsx
+npm test -- src/tests/movie-trailer.test.tsx src/tests/movie-backdrop.test.tsx
+npm run test:t20:ui
 npm run build
 ```
 

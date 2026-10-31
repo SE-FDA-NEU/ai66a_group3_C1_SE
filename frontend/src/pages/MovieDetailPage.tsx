@@ -139,8 +139,10 @@ function MovieDetailPage() {
         />
 
         <div className="movie-detail__body">
-          <div className="movie-detail__poster"><MoviePoster movieId={movie.id} title={movie.title}
-            posterUrl={movie.posterUrl} eager /></div>
+          <div className="movie-detail__poster">
+            <MoviePoster movieId={movie.id} title={movie.title} posterUrl={movie.posterUrl} eager />
+            <MovieTrailer movieId={movie.id} title={movie.title} trailer={movie.trailer} />
+          </div>
           <div className="movie-detail__information">
           <dl className="movie-detail__facts">
             <div>
@@ -165,7 +167,6 @@ function MovieDetailPage() {
             <h2>Overview</h2>
             <p>{movie.overview ?? INFORMATION_UNAVAILABLE}</p>
           </section>
-          <MovieTrailer trailer={movie.trailer} />
           <MovieRating movieId={movie.id} />
           <MovieWatchlist movieId={movie.id} />
           </div>

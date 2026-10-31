@@ -44,6 +44,10 @@ test.beforeEach(async ({ page, request }) => {
       : { contentType: "image/svg+xml", body: artwork });
   });
   await page.route("https://api.themoviedb.org/**", route => route.abort());
+  await page.route("https://www.youtube.com/embed/**", route => route.fulfill({
+    contentType: "text/html",
+    body: '<html><head><title>Offline player fixture</title></head><body><button>Play fixture</button></body></html>',
+  }));
   const prepared = await request.post(controls + "/scenario/trailer-media");
   expect(prepared.status()).toBe(200);
 });
@@ -101,19 +105,20 @@ test("real API/SQLite: four media combinations in both themes and responsive wid
               naturalWidth = await hero.evaluate(image => (image as HTMLImageElement).naturalWidth);
               expect(naturalWidth).toBeGreaterThan(0);
             } else await expect(hero).toHaveCount(0);
-            const link = page.getByRole("link", { name: /Watch trailer.*new tab/ });
+            const link = page.getByRole("button", { name: "Watch trailer" });
             const hasTrailer = label === "both" || label === "trailer";
             await expect(page.locator(".movie-trailer")).toBeVisible();
             await expect(link).toHaveCount(hasTrailer ? 1 : 0);
             if (hasTrailer) {
-              await expect(link).toHaveAttribute("href", trailerUrl);
-              await expect(link).toHaveAttribute("target", "_blank");
-              await expect(link).toHaveAttribute("rel", "noopener noreferrer");
+              await expect(link).toHaveAttribute("aria-haspopup", "dialog");
+              const poster = await page.locator(".movie-detail__poster .movie-poster").boundingBox();
+              const control = await link.boundingBox();
+              expect(control!.y).toBeGreaterThanOrEqual(poster!.y + poster!.height);
             } else await expect(page.getByText("Trailer unavailable", { exact: true })).toBeVisible();
             const overflow = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1);
             expect(overflow).toBe(false);
             matrix.push({ theme, width, label, backdropLoaded: hasBackdrop, naturalWidth,
-              trailerLink: hasTrailer, overflow });
+              trailerButton: hasTrailer, overflow });
             if ((theme === "dark" && width === 1440)
               || (theme === "light" && width === 375 && label === "neither")
               || (theme === "light" && width === 768 && label === "both"))
@@ -144,12 +149,12 @@ test("broken-image fallback and SPA movie change remove the former trailer",
     await page.goto(pagePath("broken"));
     await expect(page.getByRole("heading", { name: "Fixture broken", exact: true })).toBeVisible();
     await expect(page.locator(".movie-detail__hero-image")).toHaveCount(0);
-    await expect(page.getByRole("link", { name: /Watch trailer/ })).toHaveCount(1);
+    await expect(page.getByRole("button", { name: /Watch trailer/ })).toHaveCount(1);
     const endpoint = await holdDetail(page, request, "trailer-next", "next");
     await page.getByRole("link", { name: "View details for Fixture next", exact: true }).click();
     await waitForResponseGate(request, controls, "trailer-next", endpoint);
     await expect(page.getByText("Loading movie...", { exact: true })).toBeVisible();
-    await expect(page.getByRole("link", { name: /Watch trailer/ })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /Watch trailer/ })).toHaveCount(0);
     await releaseResponseGate(request, controls, "trailer-next");
     await expect(page.getByRole("heading", { name: "Fixture next", exact: true })).toBeVisible();
     await expect(page.getByText("Trailer unavailable", { exact: true })).toBeVisible();
@@ -167,27 +172,92 @@ test("late production detail response cannot restore another movie's trailer",
     await expect(page.getByRole("heading", { name: "Fixture neither", exact: true })).toBeVisible();
     await releaseResponseGate(request, controls, "trailer-old");
     await expect(page.getByRole("heading", { name: "Fixture neither", exact: true })).toBeVisible();
-    await expect(page.getByRole("link", { name: /Watch trailer/ })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /Watch trailer/ })).toHaveCount(0);
     const gate = await request.get(controls + "/gates/trailer-old");
     await record(info, "released-old-response", await gate.json());
   });
 
-test("keyboard opens the canonical YouTube destination in a separate tab",
+test("keyboard opens the in-page player, contains focus across the iframe and restores the trigger",
   async ({ page }) => {
-    await page.context().route("https://www.youtube.com/**", route =>
-      route.fulfill({ contentType: "text/html", body: "Offline navigation destination" }));
     await page.goto(pagePath("both"));
-    const link = page.getByRole("link", { name: /Watch trailer.*new tab/ });
-    await expect(link).toHaveCount(1);
+    const trigger = page.getByRole("button", { name: "Watch trailer" });
+    await expect(trigger).toBeVisible();
     for (let step = 0; step < 40; step++) {
       await page.keyboard.press("Tab");
-      if (await link.evaluate(node => node === document.activeElement)) break;
+      if (await trigger.evaluate(node => node === document.activeElement)) break;
     }
-    await expect(link).toBeFocused();
-    expect(await link.evaluate(node => getComputedStyle(node).outlineStyle)).not.toBe("none");
-    const popupPromise = page.waitForEvent("popup");
+    await expect(trigger).toBeFocused();
+    const url = page.url();
     await page.keyboard.press("Enter");
-    const popup = await popupPromise;
-    await expect(popup).toHaveURL(trailerUrl);
-    await popup.close();
+    const dialog = page.getByRole("dialog", { name: "Fixture both" });
+    await expect(dialog).toBeVisible();
+    const close = page.getByRole("button", { name: "Close trailer" });
+    await expect(close).toBeFocused();
+    const player = page.frameLocator(".trailer-dialog__frame").getByRole("button", { name: "Play fixture" });
+    await expect(player).toBeVisible();
+    await page.keyboard.press("Shift+Tab");
+    const done = page.getByRole("button", { name: "Back to details" });
+    await expect(done).toBeFocused();
+    await page.keyboard.press("Shift+Tab");
+    await expect(player).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(done).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(close).toBeFocused();
+    await page.keyboard.press("Escape");
+    await expect(dialog).toHaveCount(0);
+    await expect(page.locator("iframe")).toHaveCount(0);
+    await expect(trigger).toBeFocused();
+    expect(page.url()).toBe(url);
+    expect(page.context().pages()).toHaveLength(1);
+  });
+
+test("embedded player fits both themes and all three widths without navigation or autoplay",
+  async ({ page }) => {
+    await page.goto(pagePath("both"));
+    for (const theme of ["dark", "light"]) {
+      await page.evaluate(value => localStorage.setItem("cineai-theme", value), theme);
+      for (const width of [375, 768, 1440]) {
+        await page.setViewportSize({ width, height: 900 });
+        await page.goto(pagePath("both"));
+        const url = page.url();
+        const trigger = page.getByRole("button", { name: "Watch trailer" });
+        await trigger.click();
+        const dialog = page.getByRole("dialog", { name: "Fixture both" });
+        await expect(dialog).toBeVisible();
+        const frame = dialog.locator("iframe");
+        await expect(frame).toHaveAttribute("src", "https://www.youtube.com/embed/AbCdEf123_-?autoplay=0&playsinline=1&rel=0");
+        await expect(frame).toHaveAttribute("referrerpolicy", "strict-origin-when-cross-origin");
+        const box = (await frame.boundingBox())!;
+        expect(box.width).toBeGreaterThanOrEqual(200);
+        expect(box.height).toBeGreaterThanOrEqual(200);
+        const modal = (await dialog.boundingBox())!;
+        expect(modal.x).toBeGreaterThanOrEqual(0);
+        expect(modal.x + modal.width).toBeLessThanOrEqual(width);
+        expect(await page.evaluate(() => document.body.style.overflow)).toBe("hidden");
+        await capture(page, "player-" + theme + "-" + width);
+        expect(page.url()).toBe(url);
+        expect(page.context().pages()).toHaveLength(1);
+        if (width === 1440) await page.mouse.click(3, 3);
+        else await page.getByRole("button", { name: "Close trailer" }).click();
+        await expect(dialog).toHaveCount(0);
+        await expect(page.locator("iframe")).toHaveCount(0);
+        await expect(trigger).toBeFocused();
+        expect(await page.evaluate(() => document.body.style.overflow)).not.toBe("hidden");
+      }
+    }
+  });
+
+test("Back while the trailer is open removes the old movie and player",
+  async ({ page }) => {
+    await page.goto(pagePath("neither"));
+    await page.getByRole("link", { name: "View details for Fixture both", exact: true }).click();
+    await page.getByRole("button", { name: "Watch trailer" }).click();
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await page.goBack();
+    await expect(page.getByRole("heading", { name: "Fixture neither", exact: true })).toBeVisible();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(page.locator("iframe")).toHaveCount(0);
+    await expect(page.getByText("Trailer unavailable", { exact: true })).toBeVisible();
+    expect(await page.evaluate(() => document.body.style.overflow)).not.toBe("hidden");
   });

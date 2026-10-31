@@ -104,6 +104,7 @@ npm --prefix frontend ci
 
 python -m alembic -c backend/alembic.ini upgrade head
 python -m app.cli.import_tmdb_catalogue --pages 50
+python -m app.cli.import_tmdb_catalogue --enrich-trailers --all
 python -m app.cli.rebuild_overview_index rebuild
 python -m app.cli.rebuild_overview_index check
 python -m app.cli.create_review_account --confirm-local-demo
@@ -128,6 +129,7 @@ npm.cmd --prefix frontend ci
 
 .\.venv\Scripts\python.exe -m alembic -c backend/alembic.ini upgrade head
 .\.venv\Scripts\python.exe -m app.cli.import_tmdb_catalogue --pages 50
+.\.venv\Scripts\python.exe -m app.cli.import_tmdb_catalogue --enrich-trailers --all
 .\.venv\Scripts\python.exe -m app.cli.rebuild_overview_index rebuild
 .\.venv\Scripts\python.exe -m app.cli.rebuild_overview_index check
 .\.venv\Scripts\python.exe -m app.cli.create_review_account --confirm-local-demo
@@ -149,33 +151,45 @@ To add backdrops to an already imported active TMDb catalogue without changing
 its revision or accounts, use the bounded
 [backdrop enrichment command](backdrop-import-runbook.md#bounded-enrichment-for-an-existing-active-catalogue).
 
-### Sprint 4 T01 candidate: posters and themes (C03 reconciled)
+### Existing catalogues: migrate and enrich every movie
 
-The T01 branch adds nullable poster storage. Before starting this branch, back
-up valuable SQLite data consistently and apply `alembic upgrade head` as above.
-At the T01 stage, the head was `d8a4e6f20195` (parent `c6f8a2d4e901`). Merged C03 PR #222
-adds contracts/tests only, with no competing migration. Recheck the migration
-chain if a later schema PR merges before this candidate.
+After pulling changes, back up valuable SQLite data consistently and run
+`alembic upgrade head` before restarting the backend. Compare `alembic current`
+with `alembic heads`; use the actual repository head, not an old task's revision.
 
 Fresh `--pages 50` imports now also retain valid TMDb `poster_path` fields in
 the existing catalogue import. For an **existing** accepted catalogue, do not
 re-import or shrink its snapshot just to obtain posters. With the same root
-`.env`, run this optional, bounded **poster-only** backfill from the repo root:
+`.env`, run these media-only commands from the repo root as needed:
 
 ```powershell
-.\.venv\Scripts\python.exe -m app.cli.import_tmdb_catalogue --enrich-posters --limit 300
+.\.venv\Scripts\python.exe -m alembic -c backend/alembic.ini upgrade head
+.\.venv\Scripts\python.exe -m app.cli.import_tmdb_catalogue --enrich-posters --all
+.\.venv\Scripts\python.exe -m app.cli.import_tmdb_catalogue --enrich-backdrops --all
+.\.venv\Scripts\python.exe -m app.cli.import_tmdb_catalogue --enrich-trailers --all
 ```
 
-POSIX equivalent: `python -m app.cli.import_tmdb_catalogue --enrich-posters --limit 300`.
-This needs the server-side TMDb token. It visits at most 300 existing active
-TMDb movies, atomically updates poster paths and preserves catalogue revision,
-movie IDs, overview, popularity, genres, backdrops and account-owned data.
-Provider failure rolls back the entire pass; missing/invalid paths retain their
-old value, while an explicit provider `null` clears the poster. Repeating a small
-limit visits the same deterministic prefix, not the next batch. This optional
-repair is capped at 300 detail lookups and does not enrich the entire new
-1,000-movie catalogue. Fresh popular imports retain poster/backdrop paths for
-all valid returned movies without one detail lookup per movie. No image files are stored in SQLite.
+POSIX: replace `.\.venv\Scripts\python.exe` with `python` in those commands.
+These need the private server-side token. **300 is a batch limit, not a total
+catalogue limit when `--all` is present.** `--all --limit 50` optionally uses
+smaller committed batches while still processing the full selected catalogue.
+Poster/backdrop modes snapshot every active TMDb movie ID and visit each once
+per invocation. They preserve catalogue revision, IDs, core metadata, the other
+media field, trailers and account data. Missing/invalid paths retain old values;
+explicit null clears the selected image. A provider/database failure rolls back
+the current batch, stops with a nonzero exit and reports earlier committed
+progress. Re-running an image `--all` command refreshes the full snapshot again;
+images have no persistent attempt marker. Trailer `--all` instead resumes movies
+never attempted; see [the trailer runbook](trailer-import-runbook.md).
+
+Without `--all`, `--limit` intentionally selects only one bounded pass. Repeating
+a poster/backdrop pass repeats its deterministic prefix. Use `--all` for a
+catalogue larger than one batch. Fresh popular imports already retain available
+poster/backdrop paths for all returned movies, so image enrichment is an optional
+repair/refresh, not a prerequisite to every startup. The standard fresh setup
+above explicitly enriches trailers because the popular import does not fetch
+movie videos. A successful lookup can have no official trailer; that is not a
+failed import. No image/video files are stored in SQLite.
 
 Runtime pages use local API data and public image-CDN URLs; no metadata request
 or token is sent from the browser. A missing or failed poster shows a labelled
@@ -185,8 +199,8 @@ choice (`cineai-theme`), not credentials. Rating stars select 0.5–5 in 0.5 ste
 
 Detailed handoff, test commands and merge caveats:
 [reconciled T01 UI handoff](s4-t01-ui-contract.md) and
-[local evidence](evidence/s4-t01-ui.md). This is not a claim
-that unimplemented Watchlist/Search/Profile/Similar/trailer features exist.
+[historical T01 evidence](evidence/s4-t01-ui.md). Later feature verification is
+recorded separately, including [the current trailer/media handoff](evidence/s4-t20/embedded-preview.md).
 
 Home now has a compact Start / Explore Catalogue hero and a persistent
 **My recommendations** navbar entry. Ordinary sign-in from Home or direct
@@ -456,7 +470,7 @@ database and a separate Vite cache, then stops its servers and removes its
 temporary directory. Existing services on those ports cause a clear refusal.
 Production FastAPI routes read the synthetic fixture from real SQLite;
 metadata API responses are not intercepted. Only external artwork and the
-external YouTube navigation destination use deterministic offline fixtures.
+embedded YouTube player document use deterministic offline fixtures.
 No live import, token, developer database or YouTube playback is required.
 
 Chromium is the cross-platform default. To opt into installed Chrome in
@@ -495,28 +509,28 @@ verification and are separate from token-free automated tests. An earlier
 `test_health` 503 was a missing pytest bootstrap; manually migrating the
 developer DB is not an acceptable test workaround.
 
-### Application `/health` returns 503
+### Application health or movie requests fail after pulling code
 
-The database has no migration table, so the migrations have not been applied.
-The response is `503` with the code `SERVICE_UNAVAILABLE`. Apply migrations:
+`/health` reports database connectivity and its installed revision; HTTP 200
+alone does not prove that revision matches the current application models.
+For example, a pre-trailer database can answer health successfully while movie
+queries fail with `SERVICE_UNAVAILABLE` because `trailer_site` is missing.
+From the same repository root and `.env` as the running backend, compare and
+upgrade the schema before restarting the application:
 
 ```bash
+python -m alembic -c backend/alembic.ini current
+python -m alembic -c backend/alembic.ini heads
 python -m alembic -c backend/alembic.ini upgrade head
 ```
 
-Then open `/health` again. On the T01 branch, `migrationVersion` should be
-`d8a4e6f20195`. C03 does not introduce another migration head.
-
-This extends the Sprint 3 head `c6f8a2d4e901` with nullable poster storage.
-Existing checkouts must apply the upgrade before restarting
-the application with the new model. No dependency reinstall, token or catalogue
-reimport is needed for this storage-only upgrade; preserve the existing `.env`
-and back up valuable data consistently first. Existing backdrop values remain
-null until #130 imports them, so no image is expected on screen from T26 alone.
-See [the storage handoff](backdrop-storage-contract.md) for focused tests.
-Verify the actual head if later migrations are added. A healthy database alone does not
-prove catalogue readiness; dev/staging/demo still needs the successful TMDb
-import and provenance smoke.
+On Windows without an activated venv, use `.\.venv\Scripts\python.exe` instead
+of `python`. Back up existing data first. After the upgrade, `current` must match
+the single `heads` result and `/health` must report that same migration version.
+Verify the movie list and details through the frontend proxy as well. A schema
+upgrade preserves existing media/account rows but does not fetch missing media;
+use the appropriate enrichment command above. New catalogues still need the
+required TMDb import and overview-index rebuild/check.
 
 ### Missing token or failed TMDb import
 
@@ -635,8 +649,9 @@ See [the UI handoff and checks](evidence/s4-t16-spotlight.md).
 
 ## T16 consumer amendment: catalogue, half stars and explicit Search
 
-Current migration head is `f2c7e4a91b60`, following watchlist head
-`e9b6f0a42c17`. Existing users, rating IDs, values/timestamps, preferences and
+The T16 half-star migration is `f2c7e4a91b60`, following watchlist revision
+`e9b6f0a42c17`; later migrations extend it. Always resolve the current head with
+`alembic heads`. Existing users, rating IDs, values/timestamps, preferences and
 watchlists are preserved. Back up valuable SQLite databases before upgrading;
 use SQLite's backup API (or stop both servers before copying the file). A
 downgrade is deliberately refused while half-star ratings exist, rather than

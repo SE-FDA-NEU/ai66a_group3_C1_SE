@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
 from math import isfinite
@@ -84,6 +84,32 @@ class TmdbBackdropEnrichmentResult:
 @dataclass(frozen=True)
 class TmdbPosterEnrichmentResult(TmdbBackdropEnrichmentResult):
     """The same safe counts for an explicitly poster-only update."""
+
+
+@dataclass(frozen=True)
+class TmdbImageAllResult:
+    active_revision_id: str
+    media: str
+    eligible_movie_count: int
+    processed_movie_count: int = 0
+    updated_movie_count: int = 0
+    cleared_movie_count: int = 0
+    unchanged_movie_count: int = 0
+    missing_movie_count: int = 0
+    invalid_movie_count: int = 0
+
+    @property
+    def remaining_movie_count(self) -> int:
+        return self.eligible_movie_count - self.processed_movie_count
+
+
+class TmdbImageAllError(RuntimeError):
+    """Only earlier committed batches appear in the safe partial result."""
+
+    def __init__(self, partial_result: TmdbImageAllResult, reason: str) -> None:
+        self.partial_result = partial_result
+        self.reason = reason
+        super().__init__("image enrichment batch failed")
 
 
 @dataclass(frozen=True)
@@ -235,7 +261,8 @@ def import_tmdb_catalogue(
 
 
 def enrich_tmdb_backdrops(
-    session: Session, *, client: TmdbCatalogueGateway, limit: int = MAX_ENRICHMENT_MOVIES
+    session: Session, *, client: TmdbCatalogueGateway, limit: int = MAX_ENRICHMENT_MOVIES,
+    movie_ids: Sequence[str] | None = None,
 ) -> TmdbBackdropEnrichmentResult:
     """Fetch media for existing active TMDb movies without changing the revision.
 
@@ -255,14 +282,7 @@ def enrich_tmdb_backdrops(
         CatalogMovie.source == TMDB_SOURCE,
     )
     eligible = session.scalar(select(func.count()).select_from(CatalogMovie).where(*active_movies))
-    movies = list(
-        session.scalars(
-            select(CatalogMovie)
-            .where(*active_movies)
-            .order_by(CatalogMovie.source_id)
-            .limit(limit)
-        )
-    )
+    movies = _select_image_movies(session, active_movies, limit, movie_ids)
     updated = cleared = unchanged = missing = invalid = 0
     for movie in movies:
         # Source IDs are positive integers because the core importer validated
@@ -297,7 +317,8 @@ def enrich_tmdb_backdrops(
 
 
 def enrich_tmdb_posters(
-    session: Session, *, client: TmdbCatalogueGateway, limit: int = MAX_ENRICHMENT_MOVIES
+    session: Session, *, client: TmdbCatalogueGateway, limit: int = MAX_ENRICHMENT_MOVIES,
+    movie_ids: Sequence[str] | None = None,
 ) -> TmdbPosterEnrichmentResult:
     """Bounded poster-only backfill; caller atomically commits or rolls back.
 
@@ -311,8 +332,7 @@ def enrich_tmdb_posters(
         raise ValueError("an active TMDb catalogue is required for poster enrichment")
     active = (CatalogMovie.catalogue_revision_id == revision.id, CatalogMovie.source == TMDB_SOURCE)
     eligible = session.scalar(select(func.count()).select_from(CatalogMovie).where(*active))
-    movies = list(session.scalars(select(CatalogMovie).where(*active)
-                                  .order_by(CatalogMovie.source_id).limit(limit)))
+    movies = _select_image_movies(session, active, limit, movie_ids)
     updated = cleared = unchanged = missing = invalid = 0
     for movie in movies:
         if not movie.source_id.isdecimal() or int(movie.source_id) <= 0:
@@ -336,6 +356,70 @@ def enrich_tmdb_posters(
         updated_movie_count=updated, cleared_movie_count=cleared,
         unchanged_movie_count=unchanged, missing_movie_count=missing, invalid_movie_count=invalid,
     )
+
+
+def _select_image_movies(
+    session: Session, active: tuple, limit: int, movie_ids: Sequence[str] | None,
+) -> list[CatalogMovie]:
+    query = select(CatalogMovie).where(*active)
+    if movie_ids is not None:
+        if len(movie_ids) > limit or len(set(movie_ids)) != len(movie_ids):
+            raise ValueError("invalid image batch selection")
+        query = query.where(CatalogMovie.id.in_(movie_ids))
+    movies = list(session.scalars(query.order_by(CatalogMovie.source_id, CatalogMovie.id).limit(limit)))
+    if movie_ids is not None and len(movies) != len(movie_ids):
+        raise ValueError("selected catalogue movies changed during enrichment")
+    return movies
+
+
+def enrich_tmdb_images_all(
+    session_factory: Callable[[], Session], *, client: TmdbCatalogueGateway,
+    media: str, batch_size: int = MAX_ENRICHMENT_MOVIES,
+) -> TmdbImageAllResult:
+    """Visit one fixed active-ID snapshot exactly once, committing bounded batches.
+
+    Images have no persistent attempt marker. A new invocation deliberately
+    refreshes the full snapshot again, including valid null/missing results.
+    """
+    if media not in {"poster", "backdrop"}:
+        raise ValueError("unknown image enrichment mode")
+    if type(batch_size) is not int or not 1 <= batch_size <= MAX_ENRICHMENT_MOVIES:
+        raise ValueError(f"batch_size must be an integer from 1 to {MAX_ENRICHMENT_MOVIES}")
+    with session_factory() as session:
+        revision = get_active_catalogue_revision(session)
+        if revision is None or revision.provider != TMDB_SOURCE:
+            raise ValueError("an active TMDb catalogue is required for image enrichment")
+        revision_id = revision.id
+        movie_ids = list(session.scalars(select(CatalogMovie.id).where(
+            CatalogMovie.catalogue_revision_id == revision_id, CatalogMovie.source == TMDB_SOURCE,
+        ).order_by(CatalogMovie.source_id, CatalogMovie.id)))
+    totals = dict.fromkeys(("processed", "updated", "cleared", "unchanged", "missing", "invalid"), 0)
+
+    def snapshot() -> TmdbImageAllResult:
+        return TmdbImageAllResult(
+            active_revision_id=revision_id, media=media, eligible_movie_count=len(movie_ids),
+            **{key + "_movie_count": value for key, value in totals.items()},
+        )
+
+    enrich = enrich_tmdb_posters if media == "poster" else enrich_tmdb_backdrops
+    for offset in range(0, len(movie_ids), batch_size):
+        selected = movie_ids[offset:offset + batch_size]
+        try:
+            with session_factory() as session, session.begin():
+                revision = get_active_catalogue_revision(session)
+                if revision is None or revision.id != revision_id:
+                    raise ValueError("active catalogue changed during image enrichment")
+                batch = enrich(session, client=client, limit=batch_size, movie_ids=selected)
+        except TmdbImportError as exc:
+            raise TmdbImageAllError(snapshot(), "provider request failed") from exc
+        except SQLAlchemyError as exc:
+            raise TmdbImageAllError(snapshot(), "database write failed") from exc
+        except ValueError as exc:
+            raise TmdbImageAllError(snapshot(), "catalogue validation failed or changed") from exc
+        totals["processed"] += batch.fetched_movie_count
+        for key in ("updated", "cleared", "unchanged", "missing", "invalid"):
+            totals[key] += getattr(batch, key + "_movie_count")
+    return snapshot()
 
 
 def enrich_tmdb_trailers(

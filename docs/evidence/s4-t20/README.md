@@ -1,5 +1,9 @@
 # S4-T20 trailer/backdrop verification
 
+> This record is frozen to the external-link executable commit named below.
+> The unpushed embedded-player revision is documented separately in
+> [the local preview record](embedded-preview.md).
+
 Issue [#215](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/215),
 PR [#242](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/242),
 branch `feature/s4-t20-trailer-ui`.
