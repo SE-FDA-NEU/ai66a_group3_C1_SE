@@ -2,8 +2,8 @@
   "issue": 219,
   "status": "local-author-candidate; independent review and deployed verification pending",
   "baseCommit": "b1e8c1e50cbbf21099dc424e481df065f9e6b99b",
-  "selectedExecutableCommit": "acd99688bd88a2a78fe3ec13b193febf6a538d4a",
-  "selectedTree": "d7209a43ab75da5374fab23e98704abfb111be54",
+  "selectedExecutableCommit": "173a95988873579ca67d9e2a97f0f5905cdce1b0",
+  "selectedTree": "7acb790166781b392818ea6818f28601733fdd4f",
   "environment": {
     "platform": "Windows PowerShell",
     "git": "2.53.0.windows.1",
@@ -30,7 +30,17 @@
     "movieRows": 2,
     "indexSha256": "5bbae58730064c8af73af516e4ea511344863a7e905172f3a2798b5edcc28c43",
     "httpStartup": "passed",
-    "httpRestart": "passed"
+    "httpRestart": "passed",
+    "searchMatches": 1,
+    "similarMovies": 1
+  },
+  "finalCleanClone": {
+    "sourceCommit": "173a95988873579ca67d9e2a97f0f5905cdce1b0",
+    "literalPytest": "820 passed, 1 skipped, 1 warning in 409.48s",
+    "verbosePytest": "820 passed, 1 skipped, 1 warning, 210 subtests in 379.92s",
+    "frontendTests": "467 passed in 41 files",
+    "frontendLintAndBuild": "passed",
+    "startupAndRestart": "passed; 1 Search result and 1 Similar result"
   },
   "importedCataloguePreview": {
     "source": "read-only SQLite backup of an existing imported local catalogue",
