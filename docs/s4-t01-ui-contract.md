@@ -82,7 +82,7 @@ than being rewritten as newly executed Sprint 4 evidence.
 | `MoviePoster` | `{movieId,title,posterUrl?,eager?}`; strict w500 HTTPS CDN URL only; width/height 500/750 and fixed 2:3 region; lazy list images, eager detail poster; labelled missing/error fallback; failure state resets on movie or URL change. |
 | `StarRating` | Controlled half-step `RatingValue|null` (0.5–5); five visual stars with ten native labelled radios, Arrow/Space/touch; left half/midpoint selects the half step, right end the whole step; selection/hover/focus never writes. Consumer owns explicit Save, pending/error/retry and committed value. Existing `MovieRating` keeps account/movie isolation. |
 | `ConfirmDialog` | Consumer controls `open`, pending and real mutation. Label/description, focus trap, initial safe Cancel focus, Escape cancel when idle, restore trigger. Pending blocks duplicate/cancel actions. No reset API is wired by T01. |
-| `ExternalTrailerLink` | Example primitive only: validated YouTube watch URL or unavailable text; new tab with noopener/noreferrer; no iframe/autoplay/fake player. #215 owns real backend selection and live integration. |
+| `ExternalTrailerLink` | Legacy example primitive retained for compatibility tests; not mounted on details. Current details use `MovieTrailer` below the poster and the user-approved on-page modal described in the T20 section. |
 | `ProviderBadges` | Example primitive only: deduplicated non-clickable provider names. Future provider task owns region, missing data and JustWatch attribution before mounting it. |
 
 The new header keeps existing product naming within the page copy; CineAI is a
@@ -122,12 +122,14 @@ the later T16 carousel amendment below also exposes them on movie summaries.
 No token, source/provider ID or raw path is added to the browser DTO.
 
 Normal bounded TMDb imports retain the available poster field without adding
-one details call per card. `--enrich-posters --limit 300` is a separate bounded,
-atomic media-only pass for the current active TMDb catalogue. It preserves its
+one details call per card. `--enrich-posters --all` visits the full active TMDb
+catalogue in committed batches, with `--limit` setting a 1–300 batch budget.
+It preserves its
 revision, IDs, overview, popularity, genres, backdrops, preferences and ratings.
 Missing/invalid poster fields retain the old value; explicit null clears it;
-provider failure rolls back all writes. Repeating a small limit processes the
-same sorted prefix, not an implicit next page. Runtime API reads are local-only;
+provider failure rolls back the current batch and stops, retaining earlier
+commits. Without `--all`, a bounded pass still processes the same sorted prefix,
+not an implicit next page. Runtime API reads are local-only;
 the browser can fetch public image bytes, not TMDb metadata.
 
 Poster-only changes do not change NLP corpus/config/revision inputs. T01 does
@@ -329,3 +331,50 @@ Linux browser acceptance jobs pin Ubuntu 24.04 after the previous floating
 runner exceeded its installation budget. Assertions, test deadlines, retries
 and skips are unchanged. Current merged-candidate results are in the
 [integration evidence](evidence/s4-t16-t14-reconciliation.md).
+
+## S4-T20 official trailer detail integration (local embedded-player revision, 2026-10-31)
+
+The user-approved local preview replaces T20's earlier external-tab interaction.
+`MovieTrailer` sits directly below the poster in the detail page's media column.
+It accepts only the local detail response's official YouTube Trailer, validated
+11-character key and matching canonical HTTPS watch URL. Missing, invalid,
+mismatched, teaser or unofficial data shows `Trailer unavailable` in the same
+position, with no playback control.
+
+The `Watch trailer` button opens a native modal on the current page. The iframe
+URL is constructed from the validated video key on `https://www.youtube.com/embed/`;
+an arbitrary API URL is never used as an embed source. The frame is mounted only
+after the click, with autoplay disabled, inline/fullscreen controls and an
+origin-preserving referrer policy. No YouTube document is requested before
+opening; no TMDb metadata request is introduced in the browser.
+
+The modal has a labelled title, a close icon and a `Back to details` button.
+Native modal inertness and the two boundary controls keep page controls outside
+the tab sequence. Escape cancels the dialog when focus is in the parent dialog;
+keyboard events inside the cross-origin player are controlled by YouTube.
+Closing, changing movie/video or leaving details removes the iframe, restores
+the previous body scroll policy, and restores the trigger's focus if it remains
+mounted. Related route/filter/page/account/rating/watchlist behaviour is unchanged.
+
+The existing themes cover the media control and modal at 375/768/1440px.
+The frame remains at least 200px high on narrow screens. API/schema/importer
+contracts are unchanged. YouTube may still disallow embedding an individual
+video; its own player displays that restriction and the app's close controls
+remain available. No alternate or unapproved video is substituted.
+
+The T20 suite uses real production API/SQLite responses and offline artwork,
+response gates and a deterministic external player document. It checks all
+four media combinations, placement below the poster, responsive modal layout,
+no new tab, no pre-click frame/autoplay, keyboard cycling across the frame,
+close/focus/scroll cleanup and Back during playback. These fixtures do not
+prove live YouTube playback. Historical results for the external-link version
+remain in [the frozen T20 record](evidence/s4-t20/README.md); the
+[local preview record](evidence/s4-t20/embedded-preview.md) records this revision.
+
+The setup/media audit also reproduced a pre-existing Search navigation race:
+BrowserRouter can update history before React commits the new route. A late
+Search reply in that gap must not stamp its old context or redirect away from
+Home/new query/page. Search now checks the browser's pathname/query/page scope
+as well as request cancellation before applying success or failure. Source/hash
+changes that do not change the data scope remain supported. Four deterministic
+transition tests cover this interval; the existing browser race assertion stays.

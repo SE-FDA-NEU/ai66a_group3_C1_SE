@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "test": "vitest run",
     "test:t01:ui": "node scripts/run-s04-e2e.mjs --config playwright.t01.config.ts",
+    "test:t20:ui": "node scripts/run-t20-e2e.mjs",
     "test:t13:ui": "node scripts/run-s04-e2e.mjs --config playwright.t13.config.ts",
     "test:t15:ui": "node scripts/run-s04-e2e.mjs --config playwright.t15.config.ts",
     "test:s4:t16:ui": "node scripts/run-s04-e2e.mjs --config playwright.s4-t16.config.ts",

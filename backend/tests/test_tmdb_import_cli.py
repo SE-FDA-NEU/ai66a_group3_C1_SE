@@ -151,8 +151,8 @@ def test_enrichment_cli_prints_bounded_safe_counts(monkeypatch, capsys, media):
     ["--enrich-trailers", "--pages", "1"],
     ["--enrich-trailers", "--enrich-posters"],
     ["--all"],
-    ["--enrich-backdrops", "--all"],
-    ["--enrich-posters", "--all"],
+    ["--enrich-backdrops", "--all", "--pages", "1"],
+    ["--enrich-posters", "--all", "--pages", "1"],
     ["--enrich-trailers", "--all", "--pages", "1"],
 ])
 def test_enrichment_cli_rejects_invalid_or_mixed_budgets_before_io(monkeypatch, arguments):

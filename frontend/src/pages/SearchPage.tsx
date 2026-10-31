@@ -13,6 +13,12 @@ type Load = { key: string } & (
   | { status: "error"; message: string }
 );
 
+function browserSearchScope() {
+  return JSON.stringify([window.location.pathname,
+    new URLSearchParams(window.location.search).get("q")?.trim() ?? "",
+    readPage(window.location.search)]);
+}
+
 export default function SearchPage() {
   const location = useLocation();
   const latestLocation = useRef(location);
@@ -38,9 +44,13 @@ export default function SearchPage() {
     if (!valid) return;
     if (revision.current.query !== query) revision.current = { query };
     const controller = new AbortController();
+    // Browser history can advance before React commits a concurrent navigation.
+    // A response in that gap must not navigate back to the departing Search.
+    const browserScope = browserSearchScope();
+    const isCurrent = () => !controller.signal.aborted && browserSearchScope() === browserScope;
     const stored = readListViewState(latestLocation.current.state, "/search");
     searchMoviePage(query, page, stored?.catalogueRevision ?? revision.current.id, controller.signal).then(body => {
-      if (controller.signal.aborted) return;
+      if (!isCurrent()) return;
       const here = latestLocation.current;
       if (new URLSearchParams(here.search).get("q")?.trim() !== query || readPage(here.search) !== page) return;
       revision.current = { query, id: body.meta.catalogueRevision };
@@ -55,7 +65,7 @@ export default function SearchPage() {
           { replace: true, state: listViewState(context) });
       setLoad({ key, status: "ready", movies: body.data.movies, meta: body.meta });
     }).catch(error => {
-      if (controller.signal.aborted) return;
+      if (!isCurrent()) return;
       if (error instanceof MovieApiError && error.code === "CATALOGUE_CHANGED") {
         revision.current = { query };
         const here = latestLocation.current;

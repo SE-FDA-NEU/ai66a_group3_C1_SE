@@ -180,6 +180,20 @@ p { line-height: 1.65; }
 .movie-detail__facts > div { padding: .85rem; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-raised); }
 .movie-detail__facts dt { color: var(--muted); font-weight: 650; font-size: .72rem; }
 .movie-detail__facts dd { margin: .5rem 0 0; font-size: .85rem; line-height: 1.5; }
+.movie-trailer { margin-top: .75rem; }
+.movie-trailer__button { display: inline-flex; width: 100%; align-items: center; justify-content: center; gap: .45rem; padding: .85rem .5rem; font-size: .8rem; }
+.movie-trailer__unavailable { margin: 0; padding: .85rem .6rem; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-raised); color: var(--muted); text-align: center; font-size: .8rem; }
+.trailer-dialog { width: min(960px, calc(100% - 2rem)); max-width: none; max-height: calc(100svh - 2rem); margin: auto; padding: 0; overflow: auto; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+.trailer-dialog::backdrop { background: rgb(0 0 0 / 80%); }
+.trailer-dialog__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; padding: 1rem 1.25rem; }
+.trailer-dialog__header > div { min-width: 0; }
+.trailer-dialog__header .eyebrow { margin: 0 0 .25rem; }
+.trailer-dialog__header h2 { margin: 0; font-size: clamp(1rem, 2.5vw, 1.35rem); overflow-wrap: anywhere; }
+.trailer-dialog__close { flex: 0 0 44px; width: 44px; height: 44px; padding: 0; font-size: 1.6rem; }
+.trailer-dialog__frame { display: block; width: 100%; min-height: 200px; aspect-ratio: 16 / 9; border: 0; background: #000; }
+.trailer-dialog__footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; padding: .85rem 1.25rem; }
+.trailer-dialog__hint { flex: 1 1 180px; margin: 0; color: var(--muted); font-size: .8rem; line-height: 1.6; }
+.trailer-dialog__footer button { min-height: 44px; }
 .similar-movies { margin: 0 1.5rem; padding: 1.5rem 0 1.75rem; border-top: 1px solid var(--border); }
 .similar-movies h2 { margin-top: 0; }
 .movie-rating { margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid var(--border); }
@@ -248,7 +262,8 @@ p { line-height: 1.65; }
   .movie-detail__return { margin-inline: .75rem; }
   .similar-movies { margin-inline: .75rem; }
   .movie-detail__body { display: block; padding: 1.25rem .75rem; }
-  .movie-detail__poster { width: 130px; margin: 0 0 1.25rem; }
+  .movie-trailer > .button-link { width: 100%; }
+  .movie-detail__poster { width: min(100%, 190px); margin: 0 0 1.25rem; }
   .movie-detail__facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .genre-options { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6rem; }
   .genre-option { font-size: .8rem; padding: .65rem; }

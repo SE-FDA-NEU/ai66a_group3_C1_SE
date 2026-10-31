@@ -354,6 +354,7 @@ Running the M2 bootstrap is not a prerequisite:
 ```bash
 python -m alembic -c backend/alembic.ini upgrade head
 python -m app.cli.import_tmdb_catalogue --pages 50
+python -m app.cli.import_tmdb_catalogue --enrich-trailers --all
 python -m app.cli.rebuild_overview_index rebuild
 python -m app.cli.rebuild_overview_index check
 ```
@@ -381,6 +382,12 @@ accounts, preferences and ratings are not deleted. A later import without
 `--pages` uses the same 50-page default. Back up an existing database before
 refreshing it. Public and recommendation pages contain at most ten cards;
 pagination makes the complete eligible catalogue reachable.
+
+The setup also enriches trailers for all pending active movies. Existing
+catalogues can use `--enrich-posters --all` or `--enrich-backdrops --all` without
+re-importing or shrinking their snapshot. With `--all`, `--limit` is a per-batch
+budget (maximum 300), not a cap on the whole catalogue. See
+[the full setup and migration steps](docs/SETUP.md#existing-catalogues-migrate-and-enrich-every-movie).
 
 On success, the command prints a safe provenance summary: provider, opaque
 active revision ID, inserted/updated/rejected counts, movie/associated-genre/
@@ -463,7 +470,10 @@ Example response:
 }
 ```
 
-`migrationVersion` should contain the currently applied Alembic revision and should not be `null` after migrations have been applied.
+`migrationVersion` must match the single revision reported by `alembic heads`.
+After pulling schema changes, back up the database and apply `alembic upgrade head`
+before restarting the backend. Health checks connectivity; HTTP 200 with an older
+revision can still leave movie routes failing because model columns are missing.
 
 
 ## Run the Frontend

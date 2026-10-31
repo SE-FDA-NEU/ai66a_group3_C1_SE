@@ -12,6 +12,12 @@ import MovieDetailPage from "../pages/MovieDetailPage.tsx";
 
 const IMAGE_A = "https://image.tmdb.org/t/p/w780/movie-a.jpg";
 const IMAGE_B = "https://image.tmdb.org/t/p/w780/movie-b.webp";
+const TRAILER = {
+  site: "YouTube", key: "AbCdEf123_-", name: "Official trailer",
+  type: "Trailer", official: true, language: "en",
+  publishedAt: "2026-10-20T10:00:00Z",
+  url: "https://www.youtube.com/watch?v=AbCdEf123_-",
+};
 
 function response(body: unknown, status = 200) {
   return Promise.resolve(new Response(JSON.stringify(body), { status }));
@@ -122,17 +128,11 @@ describe("movie backdrop hero", () => {
 });
 
 describe("movie detail backdrop transitions", () => {
-  it("shows only a valid trailer link from the local detail response", async () => {
-    const trailer = {
-      site: "YouTube", key: "AbCdEf123_-", name: "Official trailer",
-      type: "Trailer", official: true, language: "en",
-      publishedAt: "2026-10-20T10:00:00Z",
-      url: "https://www.youtube.com/watch?v=AbCdEf123_-",
-    };
+  it("places the official trailer button below the poster", async () => {
     vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
       const url = String(input);
       if (url === "/api/movies/movie-a")
-        return response({ data: { movie: { ...detail("movie-a"), trailer } } });
+        return response({ data: { movie: { ...detail("movie-a"), trailer: TRAILER } } });
       if (url === "/api/movies/movie-b")
         return response({ data: { movie: { ...detail("movie-b"), trailer: null } } });
       if (url === "/api/auth/me") return response({}, 401);
@@ -140,12 +140,44 @@ describe("movie detail backdrop transitions", () => {
       throw new Error(`Unexpected request: ${url}`);
     });
     render(<DetailRoutes />);
-    const link = await screen.findByRole("link", { name: /Watch trailer/ });
-    expect(link).toHaveAttribute("href", trailer.url);
-    expect(link).toHaveAttribute("rel", "noopener noreferrer");
+    const button = await screen.findByRole("button", { name: /Watch trailer/ });
+    expect(button).toHaveAttribute("aria-haspopup", "dialog");
+    expect(button.closest(".movie-detail__poster")).not.toBeNull();
+    expect(document.querySelector("iframe")).toBeNull();
+    expect(screen.getAllByRole("button", { name: /Watch trailer/ })).toHaveLength(1);
     fireEvent.click(screen.getByRole("link", { name: "Open movie B" }));
     await screen.findByRole("heading", { name: "Title movie-b" });
-    expect(screen.queryByRole("link", { name: /Watch trailer/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Watch trailer/ })).not.toBeInTheDocument();
+    expect(screen.getByText("Trailer unavailable")).toBeVisible();
+  });
+
+  it.each([
+    ["null", null, null],
+    ["missing", undefined, null],
+    ["invalid URL", { ...TRAILER, url: "javascript:alert(1)" }, null],
+    ["mismatched key", { ...TRAILER, url: "https://www.youtube.com/watch?v=ABCDEFGHIJK" }, null],
+    ["teaser", { ...TRAILER, type: "Teaser" }, null],
+    ["unofficial", { ...TRAILER, official: false }, null],
+    ["backdrop and trailer", TRAILER, IMAGE_A],
+    ["backdrop only", null, IMAGE_A],
+    ["trailer only", TRAILER, null],
+    ["neither", null, null],
+  ])("renders safe media for %s", async (_case, trailer, backdropUrl) => {
+    vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+      const url = String(input);
+      if (url === "/api/movies/movie-a") return response({ data: {
+        movie: { ...detail("movie-a", backdropUrl), ...(trailer === undefined ? {} : { trailer }) },
+      } });
+      if (url === "/api/auth/me") return response({}, 401);
+      if (url.endsWith("/similar")) return response({ data: { movies: [] } });
+      throw new Error(`Unexpected request: ${url}`);
+    });
+    const { container } = render(<DetailRoutes />);
+    await screen.findByRole("heading", { name: "Title movie-a" });
+    const valid = trailer === TRAILER;
+    expect(screen.queryAllByRole("button", { name: /Watch trailer/ })).toHaveLength(valid ? 1 : 0);
+    expect(screen.queryByText("Trailer unavailable") !== null).toBe(!valid);
+    expect(container.querySelector(".movie-detail__hero-image") !== null).toBe(backdropUrl !== null);
   });
 
   it("cannot apply delayed old image events to the next movie", async () => {
@@ -195,13 +227,38 @@ describe("movie detail backdrop transitions", () => {
     ]);
   });
 
+  it("removes the previous trailer while the next detail is pending", async () => {
+    const nextMovie = deferredResponse();
+    vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+      const url = String(input);
+      if (url === "/api/movies/movie-a")
+        return response({ data: { movie: { ...detail("movie-a"), trailer: TRAILER } } });
+      if (url === "/api/movies/movie-b") return nextMovie.promise;
+      if (url === "/api/auth/me") return response({}, 401);
+      if (url.endsWith("/similar")) return response({ data: { movies: [] } });
+      throw new Error(`Unexpected request: ${url}`);
+    });
+    render(<DetailRoutes />);
+    await screen.findByRole("button", { name: /Watch trailer/ });
+    fireEvent.click(screen.getByRole("link", { name: "Open movie B" }));
+    expect(screen.getByText("Loading movie...")).toBeVisible();
+    expect(screen.queryByRole("button", { name: /Watch trailer/ })).not.toBeInTheDocument();
+    await act(async () => {
+      nextMovie.resolve(new Response(JSON.stringify({ data: {
+        movie: { ...detail("movie-b"), trailer: null },
+      } })));
+    });
+    await screen.findByRole("heading", { name: "Title movie-b" });
+    expect(screen.getByText("Trailer unavailable")).toBeVisible();
+  });
+
   it("ignores a delayed detail response from movie A after navigation to B", async () => {
     const oldMovie = deferredResponse();
     vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
       const url = String(input);
       if (url === "/api/movies/movie-a") return oldMovie.promise;
       if (url === "/api/movies/movie-b")
-        return response({ data: { movie: detail("movie-b", null) } });
+        return response({ data: { movie: { ...detail("movie-b", null), trailer: null } } });
       if (url === "/api/auth/me") return response({}, 401);
       throw new Error(`Unexpected request: ${url}`);
     });
@@ -212,9 +269,12 @@ describe("movie detail backdrop transitions", () => {
     expect(container.querySelector("img")).toBeNull();
 
     await act(async () => {
-      oldMovie.resolve(new Response(JSON.stringify({ data: { movie: detail("movie-a", IMAGE_A) } })));
+      oldMovie.resolve(new Response(JSON.stringify({ data: { movie: {
+        ...detail("movie-a", IMAGE_A), trailer: TRAILER,
+      } } })));
     });
     expect(screen.getByRole("heading", { name: "Title movie-b" })).toBeVisible();
     expect(container.querySelector("img")).toBeNull();
+    expect(screen.queryByRole("button", { name: /Watch trailer/ })).not.toBeInTheDocument();
   });
 });
