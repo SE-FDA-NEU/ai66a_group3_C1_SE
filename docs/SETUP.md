@@ -440,6 +440,33 @@ For the S04 real-browser suite, first install Playwright Chromium from the
 If Google Chrome is already installed locally, set `S04_BROWSER_CHANNEL=chrome`
 to use it instead. CI uses the Playwright Chromium installation.
 
+### S4-T20 trailer/backdrop acceptance
+
+After the locked installs above, install Playwright Chromium from `frontend`
+with `npx.cmd playwright install chromium` on Windows (`npx` on macOS/Linux).
+Run from the repository root:
+
+```powershell
+npm.cmd --prefix frontend run test:t20:ui
+npm.cmd --prefix frontend run test:t01:ui
+```
+
+T20 reuses the S04 runner: it owns ports **8014/5174**, a new migrated SQLite
+database and a separate Vite cache, then stops its servers and removes its
+temporary directory. Existing services on those ports cause a clear refusal.
+Production FastAPI routes read the synthetic fixture from real SQLite;
+metadata API responses are not intercepted. Only external artwork and the
+external YouTube navigation destination use deterministic offline fixtures.
+No live import, token, developer database or YouTube playback is required.
+
+Chromium is the cross-platform default. To opt into installed Chrome in
+PowerShell, use `$env:S04_BROWSER_CHANNEL='chrome'`; an explicit executable can
+instead be supplied with `$env:T20_BROWSER='C:\path\to\chrome.exe'`. There is
+no assumed Chrome installation path. `S04_PYTHON` may name another installed
+project venv when using a worktree; a normal clone uses its local `.venv`.
+The JSON report and screenshots default to ignored `frontend/test-results/`.
+Set `T20_SCREENSHOT_DIR` only when deliberately regenerating published evidence.
+
 ## Troubleshooting
 
 ### Direct pytest / EARLY_TEST_SETUP (#219)

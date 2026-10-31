@@ -176,6 +176,7 @@ def build_harness(path: Path, fixture: dict):
             "detail-boundaries",
             "detail-new-revision",
             "popular-spotlight",
+            "trailer-media",
         } | SIMILAR_SCENARIOS.keys():
             raise HTTPException(400, "Unknown fixture")
         with closing(sqlite3.connect(path)) as connection, connection:
@@ -203,6 +204,37 @@ def build_harness(path: Path, fixture: dict):
                 "poster_path = NULL, backdrop_path = NULL WHERE id = ?",
                 [(row["title"], row["id"]) for row in fixture["movies"]],
             )
+            connection.execute(
+                "UPDATE catalog_movies SET trailer_site=NULL, trailer_key=NULL, "
+                "trailer_name=NULL, trailer_type=NULL, trailer_official=NULL, "
+                "trailer_language=NULL, trailer_published_at=NULL, "
+                "trailer_attempted_at=NULL, trailer_succeeded_at=NULL, trailer_status=NULL"
+            )
+            if name == "trailer-media":
+                for row, label in zip(
+                    fixture["movies"], ("both", "backdrop", "trailer", "neither", "broken", "next")
+                ):
+                    has_trailer = label in {"both", "trailer", "broken"}
+                    backdrop = (
+                        "/t20-broken.jpg" if label == "broken" else
+                        "/t20-backdrop.jpg" if label in {"both", "backdrop"} else None
+                    )
+                    connection.execute(
+                        "UPDATE catalog_movies SET title=?, release_year=2026, "
+                        "overview='An astronaut rescue mission on the moon', backdrop_path=?, "
+                        "trailer_site=?, trailer_key=?, trailer_name=?, trailer_type=?, "
+                        "trailer_official=?, trailer_language=?, trailer_status=?, "
+                        "trailer_attempted_at=?, trailer_succeeded_at=? WHERE id=?",
+                        (f"Fixture {label}", backdrop,
+                         "YouTube" if has_trailer else None,
+                         "AbCdEf123_-" if has_trailer else None,
+                         "Official fixture trailer" if has_trailer else None,
+                         "Trailer" if has_trailer else None,
+                         True if has_trailer else None, "en" if has_trailer else None,
+                         "success", utc_timestamp(), utc_timestamp(), row["id"]),
+                    )
+                    connection.execute("DELETE FROM movie_genres WHERE movie_id=?", (row["id"],))
+                    connection.execute("INSERT INTO movie_genres VALUES (?, ?)", (row["id"], ACTION))
             if name == "popular-spotlight":
                 connection.executemany(
                     "UPDATE catalog_movies SET title=?, overview=?, popularity_score=?, "
@@ -310,7 +342,7 @@ def build_harness(path: Path, fixture: dict):
                     (SELECT active_revision_id FROM catalogue_state WHERE id = 1)"""
             ).fetchone()
         search_evidence = {}
-        if name.startswith("detail-") or name == "popular-spotlight":
+        if name.startswith("detail-") or name in {"popular-spotlight", "trailer-media"}:
             from app.db.database import SessionLocal
             from app.recommendations.overview_index import rebuild_active_index
 
