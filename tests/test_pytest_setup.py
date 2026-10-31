@@ -49,7 +49,15 @@ if os.environ["BOOTSTRAP_FAIL"] == "1":
 def test_default_engine():
     assert TestClient(app).get("/health").json()["migrationVersion"]
 '''
-    (tests / "test_probe.py").write_text(probe)
+    # Exercise the real default file selection; unrelated suites must remain
+    # runnable explicitly without being collected by the instructor's command.
+    (tests / "test_p0_acceptance.py").write_text(probe)
+    (tests / "test_s03_details.py").write_text("# No additional probe cases.\n")
+    for directory in (tests, export / "backend" / "tests", export / "scripts"):
+        directory.mkdir(parents=True, exist_ok=True)
+        (directory / "test_extended_only.py").write_text(
+            'raise AssertionError("extended regression collected by default")\n'
+        )
     environment = os.environ.copy()
     environment.pop("PYTHONPATH", None)
     environment.update(
@@ -61,7 +69,7 @@ def test_default_engine():
         BOOTSTRAP_FAIL="1" if invocation == "collection-failure" else "0",
     )
     command = (
-        [str(Path(sys.executable).with_name("pytest"))]
+        [str(Path(sys.executable).with_name("pytest.exe" if os.name == "nt" else "pytest"))]
         if invocation == "pytest" else [sys.executable, "-m", "pytest", "-v"]
     )
     result = subprocess.run(

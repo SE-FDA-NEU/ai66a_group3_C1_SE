@@ -1,12 +1,9 @@
 name: T33 rating UI and database acceptance
 
+# Optional extended regression: Run workflow is the explicit opt-in.
+# Keep existing workflow/job names and test steps for manual runs.
 on:
-  push:
-    branches: ["**"]
-    paths: ["backend/**", "frontend/**", ".github/workflows/t33-integration.yml"]
-  pull_request:
-    branches: [main, develop]
-    paths: ["backend/**", "frontend/**", ".github/workflows/t33-integration.yml"]
+  workflow_dispatch:
 
 permissions:
   contents: read

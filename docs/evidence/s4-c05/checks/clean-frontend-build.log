@@ -1,0 +1,18 @@
+
+> frontend@0.0.0 lint
+> eslint .
+
+
+> frontend@0.0.0 build
+> tsc -b && vite build
+
+vite v8.3.1 building client environment for production...
+transforming...
+✓ 79 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.81 kB │ gzip:   0.43 kB
+dist/assets/index-BY2gnITW.css   36.99 kB │ gzip:   8.10 kB
+dist/assets/index-IY8BVZI3.js   358.86 kB │ gzip: 107.24 kB
+
+✓ built in 207ms

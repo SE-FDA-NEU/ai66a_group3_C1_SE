@@ -1,0 +1,163 @@
+Regression against old PR executable 42a29d404079d3d21c4088ef50b9defffd79e77e
+New regression test applied to old production module; this is reproduction, not a test-before-feature TDD claim.
+Command: python -m pytest backend/tests/test_storage_snapshot.py -k hot_rollback_journal -q
+FF                                                                       [100%]
+================================== FAILURES ===================================
+___________ test_restore_refuses_hot_rollback_journal[before_copy] ____________
+
+tmp_path = WindowsPath('C:/Users/Admin/AppData/Local/Temp/pytest-of-Admin/pytest-242/test_restore_refuses_hot_rollb0')
+capsys = <_pytest.capture.CaptureFixture object at 0x0000017EC337F9E0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000017EC337FC20>
+journal_timing = 'before_copy'
+
+    @pytest.mark.parametrize("journal_timing", ["before_copy", "before_publication"])
+    def test_restore_refuses_hot_rollback_journal(
+        tmp_path: Path, capsys, monkeypatch, journal_timing: str,
+    ):
+        source = migrate_template(tmp_path / "source.db")
+        destination = migrate_template(tmp_path / "destination.db")
+        for path in (source, destination):
+            with closing(sqlite3.connect(path)) as db:
+                _seed(db)
+        with closing(sqlite3.connect(source)) as db:
+            db.execute("UPDATE users SET email_normalized='snapshot-a@example.test' WHERE id='a'")
+            db.commit()
+        source_before = source.read_bytes()
+    
+        # Spill uncommitted pages to the main file, then exit without SQLite cleanup.
+        crash = subprocess.run(
+            [sys.executable, "-c", """import os
+    import sqlite3
+    import sys
+    db = sqlite3.connect(sys.argv[1])
+    assert db.execute('PRAGMA journal_mode=DELETE').fetchone() == ('delete',)
+    db.execute('PRAGMA synchronous=FULL')
+    db.execute('PRAGMA cache_size=1')
+    db.execute('BEGIN IMMEDIATE')
+    db.execute("UPDATE users SET email_normalized='uncommitted@example.test' WHERE id='a'")
+    db.execute("UPDATE catalog_movies SET overview=? WHERE id='movie-a'", ('x' * 1024 * 1024,))
+    os._exit(0)
+    """, str(destination)],
+            cwd=ROOT, capture_output=True, text=True, timeout=30, check=False,
+        )
+        assert crash.returncode == 0, crash.stdout + crash.stderr
+        journal = Path(str(destination) + "-journal")
+        journal_before = journal.read_bytes()
+        assert len(journal_before) > 512
+        old_database = tmp_path / "old-database.db"
+        destination.rename(old_database)
+        old_before = old_database.read_bytes()
+    
+        # Prove this is a hot journal: pairing it with the snapshot replays old data
+        # on the first open, overwriting the snapshot's distinct committed email.
+        replay = tmp_path / "unsafe-restore-control.db"
+        replay.write_bytes(source_before)
+        Path(str(replay) + "-journal").write_bytes(journal_before)
+        with closing(sqlite3.connect(replay)) as db:
+            assert db.execute(
+                "SELECT email_normalized FROM users WHERE id='a'"
+            ).fetchone() == ("a@example.test",)
+    
+        if journal_timing == "before_publication":
+            held_journal = tmp_path / "held-journal"
+            journal.rename(held_journal)
+    
+            def inspect_then_expose_journal(path: Path) -> dict[str, object]:
+                result = inspect_database(path)
+                if path != source:
+                    held_journal.rename(journal)
+                return result
+    
+            monkeypatch.setattr(storage_snapshot, "inspect_database", inspect_then_expose_journal)
+    
+>       assert main(["restore", str(source), str(destination)]) == 1
+E       AssertionError: assert 0 == 1
+E        +  where 0 = main(['restore', 'C:\\Users\\Admin\\AppData\\Local\\Temp\\pytest-of-Admin\\pytest-242\\test_restore_refuses_hot_rollb0\\sou...'C:\\Users\\Admin\\AppData\\Local\\Temp\\pytest-of-Admin\\pytest-242\\test_restore_refuses_hot_rollb0\\destination.db'])
+
+backend\tests\test_storage_snapshot.py:213: AssertionError
+---------------------------- Captured stdout call -----------------------------
+{"action": "restore", "activeRevision": "r", "counts": {"catalog_movies": 2, "user_genre_preferences": 2, "user_movie_ratings": 2, "user_movie_watchlist": 2, "users": 2}, "migrationVersion": "a3d1f8b72c44", "sha256": "f2ba994b3896db7c46b28712e6ee7cb789485418f31a080f2ba134b9d72707ff"}
+________ test_restore_refuses_hot_rollback_journal[before_publication] ________
+
+tmp_path = WindowsPath('C:/Users/Admin/AppData/Local/Temp/pytest-of-Admin/pytest-242/test_restore_refuses_hot_rollb1')
+capsys = <_pytest.capture.CaptureFixture object at 0x0000017EC33C2240>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000017EC33C1D30>
+journal_timing = 'before_publication'
+
+    @pytest.mark.parametrize("journal_timing", ["before_copy", "before_publication"])
+    def test_restore_refuses_hot_rollback_journal(
+        tmp_path: Path, capsys, monkeypatch, journal_timing: str,
+    ):
+        source = migrate_template(tmp_path / "source.db")
+        destination = migrate_template(tmp_path / "destination.db")
+        for path in (source, destination):
+            with closing(sqlite3.connect(path)) as db:
+                _seed(db)
+        with closing(sqlite3.connect(source)) as db:
+            db.execute("UPDATE users SET email_normalized='snapshot-a@example.test' WHERE id='a'")
+            db.commit()
+        source_before = source.read_bytes()
+    
+        # Spill uncommitted pages to the main file, then exit without SQLite cleanup.
+        crash = subprocess.run(
+            [sys.executable, "-c", """import os
+    import sqlite3
+    import sys
+    db = sqlite3.connect(sys.argv[1])
+    assert db.execute('PRAGMA journal_mode=DELETE').fetchone() == ('delete',)
+    db.execute('PRAGMA synchronous=FULL')
+    db.execute('PRAGMA cache_size=1')
+    db.execute('BEGIN IMMEDIATE')
+    db.execute("UPDATE users SET email_normalized='uncommitted@example.test' WHERE id='a'")
+    db.execute("UPDATE catalog_movies SET overview=? WHERE id='movie-a'", ('x' * 1024 * 1024,))
+    os._exit(0)
+    """, str(destination)],
+            cwd=ROOT, capture_output=True, text=True, timeout=30, check=False,
+        )
+        assert crash.returncode == 0, crash.stdout + crash.stderr
+        journal = Path(str(destination) + "-journal")
+        journal_before = journal.read_bytes()
+        assert len(journal_before) > 512
+        old_database = tmp_path / "old-database.db"
+        destination.rename(old_database)
+        old_before = old_database.read_bytes()
+    
+        # Prove this is a hot journal: pairing it with the snapshot replays old data
+        # on the first open, overwriting the snapshot's distinct committed email.
+        replay = tmp_path / "unsafe-restore-control.db"
+        replay.write_bytes(source_before)
+        Path(str(replay) + "-journal").write_bytes(journal_before)
+        with closing(sqlite3.connect(replay)) as db:
+            assert db.execute(
+                "SELECT email_normalized FROM users WHERE id='a'"
+            ).fetchone() == ("a@example.test",)
+    
+        if journal_timing == "before_publication":
+            held_journal = tmp_path / "held-journal"
+            journal.rename(held_journal)
+    
+            def inspect_then_expose_journal(path: Path) -> dict[str, object]:
+                result = inspect_database(path)
+                if path != source:
+                    held_journal.rename(journal)
+                return result
+    
+            monkeypatch.setattr(storage_snapshot, "inspect_database", inspect_then_expose_journal)
+    
+>       assert main(["restore", str(source), str(destination)]) == 1
+E       AssertionError: assert 0 == 1
+E        +  where 0 = main(['restore', 'C:\\Users\\Admin\\AppData\\Local\\Temp\\pytest-of-Admin\\pytest-242\\test_restore_refuses_hot_rollb1\\sou...'C:\\Users\\Admin\\AppData\\Local\\Temp\\pytest-of-Admin\\pytest-242\\test_restore_refuses_hot_rollb1\\destination.db'])
+
+backend\tests\test_storage_snapshot.py:213: AssertionError
+---------------------------- Captured stdout call -----------------------------
+{"action": "restore", "activeRevision": "r", "counts": {"catalog_movies": 2, "user_genre_preferences": 2, "user_movie_ratings": 2, "user_movie_watchlist": 2, "users": 2}, "migrationVersion": "a3d1f8b72c44", "sha256": "1b08e8273b8b84e899d720dd42bc155ceb98358e96c483e8470238e82fbb9c3d"}
+============================== warnings summary ===============================
+..\..\..\..\Desktop\Ki 1 Nam 3\Kỹ thuật phần mềm - Software Engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\Admin\Desktop\Ki 1 Nam 3\Kỹ thuật phần mềm - Software Engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED backend\tests\test_storage_snapshot.py::test_restore_refuses_hot_rollback_journal[before_copy]
+FAILED backend\tests\test_storage_snapshot.py::test_restore_refuses_hot_rollback_journal[before_publication]
+2 failed, 2 deselected, 1 warning in 5.64s

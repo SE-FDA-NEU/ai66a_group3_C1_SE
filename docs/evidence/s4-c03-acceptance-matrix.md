@@ -433,3 +433,14 @@ change the C03 acceptance decision.
 | File | SHA-256 after UTF-8 LF normalization |
 |---|---|
 | `docs/api.md` | `28322e8f3a504d9b380ad9a3b72b8cc49eeb185cc992c24f644f04346d8886a1` |
+
+## C05 compact M4 execution amendment — 1 November 2026
+
+The PO-approved amendment removes optional feature matrices from the primary
+report and selects the existing P0 pytest files by default. The 37 logical
+case IDs are retained. Earlier hashes/results remain historical. C04 still
+owns final process evidence, formal report review and manual submission.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/testing.md` | `3ae53a54dcef330fc4169a859eddcd35e9dd92903e0dec8447d6499e7ce95ab5` |
