@@ -54,7 +54,8 @@ def seed(path: Path) -> None:
                 'YouTube','AbCdEf123_-','Trailer',1,'2026-10-24'),
               ('movie-b','c05','tmdb','102','B','Drama at sea','/b.jpg','/b-back.jpg',
                 NULL,NULL,NULL,NULL,'2026-10-24');
-            INSERT INTO movie_genres(movie_id,genre_id) VALUES ('movie-a',28),('movie-b',18);
+            INSERT INTO movie_genres(movie_id,genre_id) VALUES
+              ('movie-a',28),('movie-b',18),('movie-b',28);
             INSERT INTO user_genre_preferences(user_id,genre_id) VALUES ('a',28),('b',18);
             INSERT INTO user_movie_ratings(id,user_id,movie_id,rating,created_at,updated_at)
               VALUES ('ra','a','movie-a',5,'2026-10-24','2026-10-24'),
@@ -110,7 +111,8 @@ def serve_once(environment: dict[str, str], expected_head: str) -> dict[str, obj
             raise RuntimeError("catalogue or detail changed after restart")
         if detail["data"]["movie"]["trailer"]["url"] != "https://www.youtube.com/watch?v=AbCdEf123_-":
             raise RuntimeError("stored official trailer was not restored")
-        if search["meta"]["total"] < 1 or "movies" not in similar["data"]:
+        if ([movie["id"] for movie in search["data"]["movies"]] != ["movie-a"]
+                or [movie["id"] for movie in similar["data"]["movies"]] != ["movie-b"]):
             raise RuntimeError("index-dependent routes did not become ready")
         return {"health": health, "movies": listing["meta"]["total"],
                 "searchMatches": search["meta"]["total"],
