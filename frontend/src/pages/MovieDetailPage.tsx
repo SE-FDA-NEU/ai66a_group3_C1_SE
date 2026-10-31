@@ -7,7 +7,7 @@ import { resolveMovieDetailReturn } from "../navigation/movieDetailReturn.ts";
 import MovieBackdropHero from "../components/MovieBackdropHero.tsx";
 import MovieRating from "../components/MovieRating.tsx";
 import MoviePoster from "../components/MoviePoster.tsx";
-import { ExternalTrailerLink } from "../components/MediaPatterns.tsx";
+import { MovieTrailer } from "../components/MovieTrailer.tsx";
 import MovieWatchlist from "../components/MovieWatchlist.tsx";
 import SimilarMovies from "../components/SimilarMovies.tsx";
 
@@ -165,7 +165,7 @@ function MovieDetailPage() {
             <h2>Overview</h2>
             <p>{movie.overview ?? INFORMATION_UNAVAILABLE}</p>
           </section>
-          {movie.trailer && <ExternalTrailerLink url={movie.trailer.url} />}
+          <MovieTrailer trailer={movie.trailer} />
           <MovieRating movieId={movie.id} />
           <MovieWatchlist movieId={movie.id} />
           </div>
