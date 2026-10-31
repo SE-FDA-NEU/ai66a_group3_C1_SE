@@ -422,3 +422,14 @@ independent review or final acceptance of #219.
 | File | SHA-256 (normalized LF) |
 |---|---|
 | `docs/testing.md` | `3358ac14a0e71af42958265f72c2194b501dda11e7be9f5f1a22e3248211474b` |
+
+### T19 movie-details trailer DTO follow-up (2026-10-30)
+
+The optional trailer field updated `docs/api.md` after the previous C03
+fingerprints. Earlier rows remain the hashes of their historical candidates.
+This row records the current UTF-8, normalized-LF API document; it does not
+change the C03 acceptance decision.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/api.md` | `28322e8f3a504d9b380ad9a3b72b8cc49eeb185cc992c24f644f04346d8886a1` |

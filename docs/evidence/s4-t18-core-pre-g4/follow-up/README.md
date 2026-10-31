@@ -1,5 +1,11 @@
 # T18 correction and EARLY_TEST_SETUP follow-up
 
+**31 October 2026 status note:** the requester reports that the PO confirmed
+G4 Go after this preflight snapshot. The Pending/Defer entries below describe
+the 30 October state and remain as historical evidence; they are not the
+current T19 gate status. The later [T19 live smoke](../../s4-t19-live-20261031.md)
+records the optional trailer implementation and its remaining CI/review gates.
+
 30 October 2026, Asia/Ho_Chi_Minh. Runner: **Codex, author verification**.
 Tested committed source: **`641f48a09a4a0bd057a73e05f6455a61e816150a`**,
 [EARLY_TEST_SETUP PR #240](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/240).

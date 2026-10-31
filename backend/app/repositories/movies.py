@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from datetime import datetime
+from datetime import UTC, datetime
 from math import isfinite
 from typing import Literal
 
@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.catalogue.backdrops import backdrop_url
 from app.catalogue.posters import poster_url
+from app.catalogue.trailers import youtube_url
 from app.db.models import (
     CatalogMovie,
     CatalogueRevision,
@@ -22,7 +23,7 @@ from app.db.models import (
     utc_now,
 )
 from app.recommendations.overview_index import normalize_text
-from app.schemas.movies import GenreDto, MovieDetailDto, MovieSummaryDto
+from app.schemas.movies import GenreDto, MovieDetailDto, MovieSummaryDto, TrailerDto
 
 ACTIVE_CATALOGUE_STATE_ID = 1
 CatalogueSort = Literal["title_asc", "title_desc"]
@@ -386,6 +387,23 @@ def to_movie_detail_dto(movie: CatalogMovie) -> MovieDetailDto:
         voteCount=movie.vote_count,
         backdropUrl=backdrop_url(movie.backdrop_path),
         posterUrl=poster_url(movie.poster_path),
+        trailer=_trailer_dto(movie),
+    )
+
+
+def _trailer_dto(movie: CatalogMovie) -> TrailerDto | None:
+    url = youtube_url(movie.trailer_key)
+    if (url is None or movie.trailer_site != "YouTube"
+            or movie.trailer_type != "Trailer" or movie.trailer_official is not True):
+        return None
+    published = movie.trailer_published_at
+    return TrailerDto(
+        site="YouTube", key=movie.trailer_key, name=movie.trailer_name,
+        type="Trailer", official=True, language=movie.trailer_language,
+        publishedAt=(published.replace(tzinfo=UTC).isoformat().replace("+00:00", "Z")
+                     if published and published.tzinfo is None else
+                     published.astimezone(UTC).isoformat().replace("+00:00", "Z")
+                     if published else None), url=url,
     )
 
 

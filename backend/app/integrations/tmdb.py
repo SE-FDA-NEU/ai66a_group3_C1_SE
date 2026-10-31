@@ -18,6 +18,14 @@ TMDB_SOURCE = "tmdb"
 DEFAULT_TIMEOUT_SECONDS = 10.0
 DEFAULT_POPULAR_PAGES = 50
 MAX_POPULAR_PAGES = 50
+# Movie videos default to en-US. A live TMDb probe showed that a broad ISO
+# 639-1 list can return an empty videos array even when the default request
+# has videos. This bounded fallback set was checked against the live endpoint.
+# Keep one HTTP request per movie so a batch remains within 300 requests.
+VIDEO_LANGUAGES = (
+    "en,ko,fr,vi,ja,es,zh,hi,de,it,pt,ru,ar,th,id,tr,nl,sv,pl,uk,bn,"
+    "fa,ta,te,ml,ur,he,el,da,fi,no,cs,hu,ro,null"
+)
 
 
 class TmdbImportError(RuntimeError):
@@ -118,6 +126,15 @@ class TmdbClient:
         return self._get_json(
             f"/movie/{movie_id}",
             params={"language": "en-US"},
+        )
+
+    def fetch_movie_videos(self, movie_id: int) -> Mapping[str, Any]:
+        """Fetch English and other tagged videos in one bounded request."""
+        if type(movie_id) is not int or movie_id <= 0:
+            raise ValueError("movie_id must be positive")
+        return self._get_json(
+            f"/movie/{movie_id}/videos",
+            params={"language": "en-US", "include_video_language": VIDEO_LANGUAGES},
         )
 
     def _get_json(

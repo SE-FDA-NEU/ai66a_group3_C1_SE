@@ -404,9 +404,10 @@ including at least ten distinct finite-popularity movies for the public popular
 list. This live smoke is outside CI; it is not evidence that planned Sprint 3
 routes or media features are already implemented.
 
-The browser reads movie data through the local backend/SQLite API. Backdrop,
-trailer and VN provider enrichment remain separate feature tasks; requiring
-TMDb catalogue import does not make those enhancements Sprint 3 commitments.
+The browser reads movie data through the local backend/SQLite API. Optional
+trailer enrichment is a separate Sprint 4 step documented in the
+[trailer runbook](docs/trailer-import-runbook.md); requiring TMDb catalogue
+import did not make that enhancement a Sprint 3 commitment.
 
 Verify the automated boundary with synthetic provider responses, isolated test
 databases and no real credential or provider network request:
