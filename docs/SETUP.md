@@ -509,6 +509,14 @@ verification and are separate from token-free automated tests. An earlier
 `test_health` 503 was a missing pytest bootstrap; manually migrating the
 developer DB is not an acceptable test workaround.
 
+For the Sprint 4 final build, persistent SQLite, consistent WAL backup,
+non-destructive restore, index readiness and restart sequence, follow the
+[S4-C05 release/storage runbook](s4-c05-release-storage.md). The offline
+rehearsal is `python -m pytest backend/tests/test_storage_snapshot.py -v`.
+`python -m app.cli.storage_snapshot backup <existing-db> <new-backup>` uses
+SQLite's online backup API; `restore <backup> <new-db>` never overwrites an
+existing database. Keep the resulting backup outside Git and the public site.
+
 ### Application health or movie requests fail after pulling code
 
 `/health` reports database connectivity and its installed revision; HTTP 200
@@ -571,8 +579,9 @@ python -m pip install -e "./backend[dev]" --no-deps
 
 ## S4-T12 watchlist setup, backup and recovery
 
-Apply the single new Alembic head `e9b6f0a42c17` before starting a server with
-this code. On an existing SQLite database, stop writes and make a consistent
+Apply the current single Alembic head reported by `alembic heads` before
+starting a server with this code; `e9b6f0a42c17` was the historical T12 head,
+not the current release head. On an existing SQLite database, stop writes and make a consistent
 backup using SQLite's online backup API (or copy the database plus any `-wal`
 and `-shm` files while writes are stopped), then run:
 
