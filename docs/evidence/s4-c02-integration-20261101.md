@@ -1,5 +1,11 @@
 # C02 integration after merged C05 — 1 November 2026
 
+Historical integration record for `ba7d8f9` / `186deb5`. The later
+[C02 finalization](s4-c02-finalization-20261101.md) supersedes the Pending
+Planning/commitment, event, PO acceptance, identity and member-test statements
+below. Earlier counts/results remain tied to this original source snapshot.
+PR #244 now proposes `Closes #196` after its remaining independent gates.
+
 Refs [C02 #196](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/196),
 PR [#244](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/244).
 Tester: Codex assisting implementation, Windows, Python 3.12.6. This is author
@@ -81,5 +87,6 @@ The previously reported PO G4 Go remains recorded in T19/T20 history; missing
 dated repository/capacity evidence is separate, not a request to approve Go
 again. C04's PDF/submission/receipt is not a dependency of C02 closure.
 
-This PR remains `Refs #196` while human completion records are outstanding.
-No issue/Story is automatically closed or credited by this evidence update.
+At this historical integration cutoff the delivery used `Refs #196`.
+The later finalization records the PO's actual decisions and current closing
+intent; no old receipt or test result is relabelled as that later execution.
