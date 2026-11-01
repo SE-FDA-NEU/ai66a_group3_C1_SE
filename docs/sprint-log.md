@@ -544,8 +544,9 @@ another person's behalf.
 Closed at 11:14:26 UTC, C01 #216 at 12:36:56 UTC and C05 #219 at 12:39:10 UTC.
 The Open/merge-pending entries below describe the earlier C02 source cutoff,
 not their present issue states. C04 #218 still owns manual report submission.
-Its [handoff](evidence/s4-c04/README.md) separates Closed status from any
-independent-acceptance receipt still needing factual reconciliation.
+Its [handoff](evidence/s4-c04/README.md) records the PO's later confirmation
+of Hoang's independent C05 check on 1 November and the instructor-approved
+late board substitute. Existing command logs remain attributed to their runners.
 
 **Status: PO acceptance and reported Review/Retro/handoff recorded; final
 independent gates remain.** SM4 is **@anotify-vie**, PO and SM5 are

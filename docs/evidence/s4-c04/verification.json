@@ -1,0 +1,595 @@
+{
+  "schema_version": 1,
+  "recorded_date_local": "2026-11-01",
+  "timezone": "Asia/Saigon",
+  "pr": 246,
+  "issue": 218,
+  "base_main": "a9cfdb3601e1ab75b87cd0859b6e829b022c2a2a",
+  "tested_integration": "1a993f35f0c8cd2e7472822017f5350630b93ac7",
+  "runner": "Codex, author verification on Windows using existing locked Python 3.12.6 environment. Not a new independent clean-clone or Hoang's execution.",
+  "command": "python -m pytest -v --junitxml=docs/evidence/s4-c04/pytest-v.xml",
+  "report_scope": "Six P0 Stories, four report sections, 37 logical IDs and 40 default items. No broad backend/Vitest/browser suite.",
+  "po_confirmations": {
+    "source": "Explicit replies in the project conversation on 2026-11-01",
+    "instructor_exception": "PO confirms instructor permits the supplied late board image as the M4 Planning-image substitute. It is not labelled as captured at Planning.",
+    "c05_independent_checker": "Tran Minh Hoang (@hoang3003)",
+    "c05_check_date": "2026-11-01",
+    "c05_check_scope": "PO reports independent clean clone/setup and recovery completed.",
+    "c05_raw_command_details_provided": false,
+    "c05_note": "No tested SHA, machine/runtime or raw Hoang log supplied. Existing C05 author results are not attributed to him."
+  },
+  "source_images": [
+    {
+      "destination": "docs/evidence/s4-c04/user-pytest-partial.png",
+      "source_file": "codex-clipboard-3d126e3b-a0b0-4b33-b479-0eb5c0f7b2ae.png",
+      "role": "Supplemental actual native terminal result, 40 passed / 11.62s; starts at 42%, not full output.",
+      "sha256": "505153d72465982726630dff92b96e51ea0454b3fa215a31a166d72ccb4aaa5d",
+      "png_size": [
+        1291,
+        852
+      ]
+    },
+    {
+      "destination": "docs/evidence/s4-c04/board-late-iteration.png",
+      "source_file": "codex-clipboard-f7e6f70b-27d9-4135-9d69-6cc12f8c8bdb.png",
+      "role": "Late Sprint 4 iteration view. Instructor-approved Planning substitute, per PO confirmation; capture date unverified.",
+      "sha256": "59aee18482ff80a0f22cd48c73ca09215c998b5f4137ece75e353f547049e863",
+      "png_size": [
+        1916,
+        912
+      ]
+    },
+    {
+      "destination": "docs/evidence/s4-c04/board-end-sprint.png",
+      "source_file": "codex-clipboard-cb3b24e4-27bf-4849-964c-e55d93f9489c.png",
+      "role": "User-reported end-of-Sprint snapshot. Project Done=117 is not S4 velocity. C04 native issue Open despite board Done; manual submission still pending.",
+      "sha256": "f67a466d844ab413c00732906495f1611184083d269a571e794de89b62ab6f4c",
+      "png_size": [
+        1917,
+        906
+      ]
+    }
+  ],
+  "full_output_image": {
+    "path": "docs/evidence/s4-c02-integration-pytest-20261101.png",
+    "raw_output": "docs/evidence/s4-c02-integration-pytest-20261101.log",
+    "tested_source": "ba7d8f9b01a2d26680205991e7f980d1d45d22cd",
+    "runtime": 13.74,
+    "type": "Browser screenshot of complete saved real output; not a native terminal screenshot.",
+    "visual_review": "All 40 test names, the command and final result visible. Reuse retains original SHA/runtime.",
+    "sha256": "799ab6fe55e3efda00db3c0fb0bbccb18fedc5216c2883776242ec7760f69d50",
+    "png_size": [
+      1900,
+      1404
+    ]
+  },
+  "portable_link_map": [
+    {
+      "original": "evidence/s4-c02-finalization-20261101.md",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/docs/evidence/s4-c02-finalization-20261101.md"
+    },
+    {
+      "original": "evidence/s4-c04/README.md",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/docs/evidence/s4-c04/README.md"
+    },
+    {
+      "original": "../tests/test_p0_acceptance.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/tests/test_p0_acceptance.py"
+    },
+    {
+      "original": "../tests/test_s03_details.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/tests/test_s03_details.py"
+    },
+    {
+      "original": "evidence/s4-t05-acceptance.md#p0-section-2-case-map",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/docs/evidence/s4-t05-acceptance.md#p0-section-2-case-map"
+    },
+    {
+      "original": "../backend/app/main.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/main.py"
+    },
+    {
+      "original": "../backend/app/repositories/preferences.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/repositories/preferences.py"
+    },
+    {
+      "original": "../backend/app/schemas/preferences.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/schemas/preferences.py"
+    },
+    {
+      "original": "../backend/app/repositories/preferences.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/repositories/preferences.py"
+    },
+    {
+      "original": "../backend/app/main.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/main.py"
+    },
+    {
+      "original": "../backend/app/repositories/preferences.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/repositories/preferences.py"
+    },
+    {
+      "original": "../backend/app/repositories/preferences.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/repositories/preferences.py"
+    },
+    {
+      "original": "../backend/app/repositories/preferences.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/repositories/preferences.py"
+    },
+    {
+      "original": "../backend/app/schemas/preferences.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/schemas/preferences.py"
+    },
+    {
+      "original": "../backend/app/schemas/preferences.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/schemas/preferences.py"
+    },
+    {
+      "original": "../backend/app/repositories/preferences.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/repositories/preferences.py"
+    },
+    {
+      "original": "../backend/app/main.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/main.py"
+    },
+    {
+      "original": "../backend/app/security/origin.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/security/origin.py"
+    },
+    {
+      "original": "../backend/app/recommendations/service.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/recommendations/service.py"
+    },
+    {
+      "original": "../backend/app/repositories/recommendations.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/repositories/recommendations.py"
+    },
+    {
+      "original": "../backend/app/recommendations/ranker.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/recommendations/ranker.py"
+    },
+    {
+      "original": "../backend/app/recommendations/service.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/recommendations/service.py"
+    },
+    {
+      "original": "../backend/app/recommendations/service.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/recommendations/service.py"
+    },
+    {
+      "original": "../backend/app/main.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/main.py"
+    },
+    {
+      "original": "../backend/app/security/sessions.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/security/sessions.py"
+    },
+    {
+      "original": "../backend/app/main.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/main.py"
+    },
+    {
+      "original": "../backend/app/recommendations/service.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/recommendations/service.py"
+    },
+    {
+      "original": "../backend/app/main.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/main.py"
+    },
+    {
+      "original": "../backend/app/main.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/main.py"
+    },
+    {
+      "original": "../backend/app/schemas/movies.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/schemas/movies.py"
+    },
+    {
+      "original": "../backend/app/main.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/main.py"
+    },
+    {
+      "original": "../frontend/src/pages/MovieDetailPage.tsx",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/frontend/src/pages/MovieDetailPage.tsx"
+    },
+    {
+      "original": "../backend/app/main.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/main.py"
+    },
+    {
+      "original": "../backend/app/main.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/main.py"
+    },
+    {
+      "original": "../frontend/src/navigation/movieDetailReturn.ts",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/frontend/src/navigation/movieDetailReturn.ts"
+    },
+    {
+      "original": "../backend/app/main.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/main.py"
+    },
+    {
+      "original": "../tests/test_s03_details.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/tests/test_s03_details.py"
+    },
+    {
+      "original": "../backend/app/main.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/main.py"
+    },
+    {
+      "original": "../tests/test_s03_details.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/tests/test_s03_details.py"
+    },
+    {
+      "original": "../backend/app/repositories/movies.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/repositories/movies.py"
+    },
+    {
+      "original": "../backend/app/main.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/main.py"
+    },
+    {
+      "original": "../backend/app/recommendations/service.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/recommendations/service.py"
+    },
+    {
+      "original": "../backend/app/main.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/main.py"
+    },
+    {
+      "original": "../backend/app/main.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/main.py"
+    },
+    {
+      "original": "../backend/app/repositories/movies.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/repositories/movies.py"
+    },
+    {
+      "original": "../backend/app/main.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/main.py"
+    },
+    {
+      "original": "../backend/app/main.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/main.py"
+    },
+    {
+      "original": "../backend/app/main.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/main.py"
+    },
+    {
+      "original": "../backend/app/repositories/users.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/repositories/users.py"
+    },
+    {
+      "original": "../backend/app/schemas/auth.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/schemas/auth.py"
+    },
+    {
+      "original": "../backend/app/main.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/main.py"
+    },
+    {
+      "original": "../backend/app/main.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/main.py"
+    },
+    {
+      "original": "../backend/app/security/passwords.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/security/passwords.py"
+    },
+    {
+      "original": "../backend/app/repositories/users.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/repositories/users.py"
+    },
+    {
+      "original": "../backend/app/main.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/main.py"
+    },
+    {
+      "original": "../backend/app/main.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/main.py"
+    },
+    {
+      "original": "../backend/app/main.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/main.py"
+    },
+    {
+      "original": "../backend/app/security/sessions.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/security/sessions.py"
+    },
+    {
+      "original": "../backend/app/main.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/main.py"
+    },
+    {
+      "original": "../backend/app/main.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/main.py"
+    },
+    {
+      "original": "../backend/app/security/sessions.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/security/sessions.py"
+    },
+    {
+      "original": "../backend/app/main.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/main.py"
+    },
+    {
+      "original": "../backend/app/security/sessions.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/security/sessions.py"
+    },
+    {
+      "original": "../backend/app/main.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/main.py"
+    },
+    {
+      "original": "../backend/app/repositories/",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/tree/main/backend/app/repositories"
+    },
+    {
+      "original": "../backend/app/security/origin.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/security/origin.py"
+    },
+    {
+      "original": "../backend/app/main.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/backend/app/main.py"
+    },
+    {
+      "original": "SETUP.md",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/docs/SETUP.md"
+    },
+    {
+      "original": "evidence/s4-c05/compact-m4.md",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/docs/evidence/s4-c05/compact-m4.md"
+    },
+    {
+      "original": "evidence/s4-c02-integration-pytest-20261101.log",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/docs/evidence/s4-c02-integration-pytest-20261101.log"
+    },
+    {
+      "original": "evidence/s4-c02-finalization-20261101.md",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/docs/evidence/s4-c02-finalization-20261101.md"
+    },
+    {
+      "original": "evidence/s4-c04/pytest-v.log",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/docs/evidence/s4-c04/pytest-v.log"
+    },
+    {
+      "original": "evidence/s4-c04/verification.json",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/docs/evidence/s4-c04/verification.json"
+    },
+    {
+      "original": "evidence/s4-c04/README.md",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/docs/evidence/s4-c04/README.md"
+    },
+    {
+      "original": "SETUP.md#optional-regressions",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/docs/SETUP.md#optional-regressions"
+    },
+    {
+      "original": "../tests/test_s03_details.py",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/tests/test_s03_details.py"
+    },
+    {
+      "original": "evidence/s4-t16-detail-boundaries.md",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/docs/evidence/s4-t16-detail-boundaries.md"
+    }
+  ],
+  "remaining": [
+    "Substantive final non-contributor review and approval on the updated PR.",
+    "Technical CI and actual report merge into main.",
+    "Manual PDF export with cover, approved/truthful board captions, full-output screenshot, four report sections and legible GitHub links.",
+    "Actual LMS submission/receipt, then close #218. No PDF/tool is committed."
+  ],
+  "validations": {
+    "compact_pytest": "PASS: 40 passed, zero failed/skipped/xfail; 12.48s",
+    "default_trace": "PASS: 37 Section 2 IDs map to 40 default M4 nodes",
+    "contract_structure": "PASS: four required sections; six P0 Stories; 146 local document links valid",
+    "line_endings": "PASS: LF and CRLF export normalized hashes identical",
+    "current_handoff_links": "PASS: 103 current-report/handoff links and anchors; all 77 portable main URLs map to targets in the PR tree",
+    "source_reuse": "PASS: five selected test/config/fixture files match the original full C02 screenshot source; source hashes unchanged",
+    "image_originals": "PASS: all three copies byte-identical to supplied PNGs",
+    "git_diff_check": "PASS",
+    "production_tests_workflows": "Unchanged against merged main"
+  },
+  "run": {
+    "count": 40,
+    "passed": 40,
+    "failed": 0,
+    "skipped": 0,
+    "xfail": 0,
+    "pytest_seconds": 12.48,
+    "started_at_local": "2026-11-01T20:03:01.450699+07:00",
+    "log_sha256": "902bbc29473e819023067e54498580363e64917cdd91966cb2be2c0826ab6cba",
+    "junit_sha256": "f4ee8fa5231253cd6d266d53473218b7c0f33dca9c100f5710e96afba9443d82",
+    "cases": [
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S01_001_canonical_genres_and_empty_selection",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S01_002_zero_preserves_previous_rows",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-003]",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-004]",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-005]",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-006]",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S01_007_invalid_sets_preserve_previous_selection",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S01_008_guest_forgery_and_origin_leave_accounts_intact",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S02_001_full_set_paging_has_25_distinct_movies",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S02_002_rating_free_order_and_reasons",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S02_003_no_match_uses_unboosted_popular",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S02_004_guest_and_expired_cookie_are_private",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S02_005_core_failure_then_retry_preserves_preferences",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S02_006_filter_after_whole_set_ranking",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S04_001_public_catalogue_pages_include_null_popularity",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S04_002_cold_start_has_no_personal_score",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S04_003_limit_9_and_10_keep_full_total",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S04_004_limit_and_page_refusals",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S04_005_empty_active_versus_missing_revision",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S04_006_stale_catalogue_revision_is_409",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S12_001_eight_char_normalized_hashed_registration",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S12_002_seven_char_password_has_no_row",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S12_003_nine_char_password_has_safe_dto",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S12_004_duplicate_normalized_email_is_conflict",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S12_005_invalid_email_and_storage_failure_create_no_account",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S13_001_login_me_cookie_and_safe_user",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S13_002_wrong_and_unknown_credentials_same_public_error",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S13_003_logout_replay_and_later_login_restore_data",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S13_004_missing_expired_and_revoked_sessions_refused",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S13_005_account_isolation_and_forged_identity",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S13_006_cross_origin_auth_and_write_refused",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_s03_details.py::test_TC_P0_S03_001_public_known_id",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_s03_details.py::test_TC_P0_S03_002_unknown_id_refused",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[year]",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[summary]",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[both]",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_s03_details.py::test_TC_P0_S03_003_catalogue_and_database_failures_are_distinct",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_s03_details.py::test_TC_P0_S03_004_return_query_cannot_redirect_or_change_public_movie",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_s03_details.py::test_TC_P0_S03_005_detail_widgets_preserve_both_accounts_preferences",
+        "result": "passed"
+      },
+      {
+        "node": "tests/test_s03_details.py::test_TC_P0_S03_006_membership_commit_allows_read_snapshot_cleanup",
+        "result": "passed"
+      }
+    ]
+  },
+  "selected_source": [
+    {
+      "path": "pytest.ini",
+      "sha256_lf": "29994bb63a3c835981dc95cf8f425699fc25b4d2be0bf0ea84908182e642160d",
+      "matches_full_screenshot_source": true
+    },
+    {
+      "path": "conftest.py",
+      "sha256_lf": "8f133a85bad2969d09798e269e97debf7b70aa4fb3b3957a12abdec164fd427b",
+      "matches_full_screenshot_source": true
+    },
+    {
+      "path": "tests/conftest.py",
+      "sha256_lf": "d2b071114ae42227afb0d8ea4f4bfa2298c6d276adf1aeeae7c075cbf344b849",
+      "matches_full_screenshot_source": true
+    },
+    {
+      "path": "tests/test_p0_acceptance.py",
+      "sha256_lf": "c2b14f61617ae19e354e55096cfb04c511aa1859a60253d09a77b02c4fb0e136",
+      "matches_full_screenshot_source": true
+    },
+    {
+      "path": "tests/test_s03_details.py",
+      "sha256_lf": "5ec72229c2a3e4e169358c5892c3056e561cf1d69ff58ae6115c069861eeef51",
+      "matches_full_screenshot_source": true
+    }
+  ],
+  "report_sha256_lf": "1df2f74e688aaaca0f9934a351ae5723669ae8678069de860a8de880ad11bf31",
+  "production_test_workflow_diff_vs_main": "Empty"
+}

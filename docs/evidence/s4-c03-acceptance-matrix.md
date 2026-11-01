@@ -499,3 +499,14 @@ image with its own 13.74s caption. Manual process/image gaps are tracked separat
 | File | SHA-256 after UTF-8 LF normalization |
 |---|---|
 | `docs/testing.md` | `76e5f9552d46865cbcc15b8f69ddfc033ef84ba62385773f4e0363c2a4d9eac9` |
+
+### C04 executed-source and portable PDF links
+
+The integrated C04 candidate `1a993f3` passed the actual 40-item suite in
+12.48s. The report now links its raw output/receipt and uses full GitHub main
+hyperlinks for PDF portability, while retaining the original full C02 image
+and its 13.74s attribution. Four sections and all 37 IDs remain unchanged.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/testing.md` | `1df2f74e688aaaca0f9934a351ae5723669ae8678069de860a8de880ad11bf31` |

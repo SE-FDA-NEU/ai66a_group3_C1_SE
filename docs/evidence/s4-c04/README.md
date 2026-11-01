@@ -44,10 +44,24 @@ selected name and its own actual command/result/runtime.
 
 [Supplied terminal image](user-pytest-partial.png).
 
-C04 compact execution and structural checks are recorded in
-`verification.json` and `pytest-v.log` after they actually run. They are
-author verification by Codex, not a separate member's independent rehearsal.
-No full backend/Vitest/browser regression is required for this report.
+On committed integration `1a993f35f0c8cd2e7472822017f5350630b93ac7`, the
+actual C04 command was:
+
+```text
+python -m pytest -v --junitxml=docs/evidence/s4-c04/pytest-v.xml
+```
+
+**40 passed, zero failed/skipped/xfail, 12.48 seconds**, with one inherited
+Starlette/httpx warning. [Full output](pytest-v.log), [JUnit](pytest-v.xml)
+and the [verification receipt](verification.json) record the source/count and
+result. This run is Codex author verification; Hoang's independently reported
+C05 check remains a separate process confirmation below. No full
+backend/Vitest/browser regression was run for C04.
+
+Default 37-ID/40-node traceability, four-section contract/fingerprints,
+LF/CRLF export equivalence, 146 structural local links and 103 current
+report/handoff links/anchors passed. All 77 portable main hyperlinks map to
+targets in the proposed PR tree. Git diff checks are clean.
 
 ## Supplied board images and provenance
 
@@ -56,26 +70,30 @@ The user supplied them on 1 November; no unverified capture date is asserted.
 
 | Original | Observed content | Permitted description / remaining action |
 |---|---|---|
-| [Iteration view](board-late-iteration.png) | Sprint 4 contains T17/T20/C02 already Done, including PR #244 | Late Sprint 4 iteration snapshot. It does not establish the state immediately after Planning on 20 October. Historical Planning image or an explicit instructor exception remains to be supplied/confirmed. |
+| [Iteration view](board-late-iteration.png) | Sprint 4 contains T17/T20/C02 already Done, including PR #244 | Late Sprint 4 iteration snapshot. On 1 November the PO explicitly reported that the instructor permitted this late image instead of an immediate Planning screenshot for M4. Use that exception caption; do not label it as captured on 20 October. |
 | [End snapshot](board-end-sprint.png) | Project-wide Done=117; C04 is in Done while its issue icon is Open | User-reported end-of-Sprint snapshot. 117 is project-wide, not Sprint 4 velocity/item count. It does not prove C04 submitted/Closed; use an honest cutoff caption, and reconcile the card status with remaining submission work. |
 
 The final board need not show every item Done. A screenshot of the true
 submission-day state is acceptable while C04's actual submission is still
 pending. No current image is renamed as historical Planning proof.
-An exception, if actually granted by the instructor, must name what was
-allowed and the factual source; it is not inferred from exceptions in earlier
-sprints.
+The M4 exception was confirmed explicitly by the PO in the project conversation
+on 1 November: the instructor allowed the late board image. This is the factual
+source of the exception; no instructor quotation or historical capture date is
+invented, and permission is not inferred from an earlier Sprint.
 
 ## C05 independent acceptance boundary
 
-C05 #219 is Closed and has formal approvals. Its committed compact record
-still states that independent teammate reproduction/acceptance is required;
-the visible approvals say `ok` and no independent command/result receipt
-was found. The C04 author cannot fill that factual gap by changing the word
-Pending. Link the actual eligible reviewer's dated commands/results if the
-team performed the check, or complete the remaining acceptance honestly.
-Existing author clean-clone/TMDb/recovery evidence can be reused with its
-original source identity; no new 800-test run is required.
+C05 #219 is Closed and has formal approvals. On 1 November the PO confirmed
+that **Tran Minh Hoang (@hoang3003) independently checked clean clone/setup
+and recovery on 1 November**. This named/date confirmation reconciles the
+earlier Pending process entry with the Closed state. Hoang also formally
+approved C05's final head on GitHub.
+
+The PO did not supply Hoang's exact command log, machine, runtime or tested SHA;
+none is manufactured. Existing C05 technical tables/logs remain Codex's author
+verification at their original source identity. They are reused as technical
+evidence and are not relabelled as Hoang's output. See the dated follow-up in
+[C05's record](../s4-c05/compact-m4.md#c04-process-follow-up--1-november-2026).
 
 ## Cover information for manual export
 
@@ -96,16 +114,19 @@ Repository: [group repository](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE)
 Project board: [Project 9](https://github.com/orgs/SE-FDA-NEU/projects/9).
 Setup guide: [SETUP on main](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/docs/SETUP.md).
 Use these full GitHub destinations in the PDF, not local Windows paths.
+The report's non-image hyperlinks also use full GitHub main URLs; its one
+relative image stays embedded from the committed PNG. These new main URLs
+become available after the report PR is merged, before manual PDF export.
 
 ## Completion checklist for #218
 
 - [x] Report remains four sections with all six P0 Stories and linked root tests.
 - [x] C01/C02 closures and merged member-test evidence are acknowledged.
 - [x] Original user images are preserved with accurate descriptions.
-- [ ] C04 compact/trace/contract/link checks have actually passed; see receipt.
-- [ ] Authentic Planning screenshot or explicit instructor-approved exception.
-- [ ] Actual submission-day board selected with a truthful cutoff caption/status.
-- [ ] C05 independent acceptance receipt reconciled with its Closed state.
+- [x] C04 compact execution passed (40 items); the receipt records structural/trace checks separately.
+- [x] PO confirms instructor-approved use of the supplied late Planning-board substitute for M4; caption records the exception.
+- [x] Original end-of-Sprint board selected with a truthful cutoff caption; verify it is still the submission-day state during manual export.
+- [x] C05 independent checker/date confirmed by PO and reconciled with Closed state; original author logs remain attributed correctly.
 - [ ] Final non-contributor review has a substantive comment and approval.
 - [ ] Report PR merged into main with technical CI passing.
 - [ ] Manually export merged report to Team03_M4.pdf and inspect layout/links.
