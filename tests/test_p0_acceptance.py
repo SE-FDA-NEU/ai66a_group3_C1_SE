@@ -174,6 +174,12 @@ def test_TC_P0_S02_001_full_set_paging_has_25_distinct_movies(details):
     assert len(ids) == len(set(ids)) == 25
     assert all(response.json()["meta"]["total"] == 25 for response in pages)
     assert all(response.json()["meta"]["totalPages"] == 3 for response in pages)
+    # TC-P0-S02-001: exercise this route's below/on/above page-size limit.
+    for limit in (9, 10):
+        response = a.get(RECOMMENDATIONS, params={"limit": limit})
+        assert len(movies(response)) == limit
+        assert response.json()["meta"]["total"] == 25
+    error(a.get(RECOMMENDATIONS, params={"limit": 11}), 400, "VALIDATION_ERROR")
 
 
 def test_TC_P0_S02_002_rating_free_order_and_reasons(details):
