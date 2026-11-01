@@ -1,18 +1,9 @@
 name: T34 browser rating protection acceptance
 
+# Optional extended regression: Run workflow is the explicit opt-in.
+# Keep existing workflow/job names and test steps for manual runs.
 on:
-  push:
-    branches: ["**"]
-    paths:
-      - "backend/**"
-      - "frontend/**"
-      - ".github/workflows/t34-browser-acceptance.yml"
-  pull_request:
-    branches: [main, develop]
-    paths:
-      - "backend/**"
-      - "frontend/**"
-      - ".github/workflows/t34-browser-acceptance.yml"
+  workflow_dispatch:
 
 permissions:
   contents: read

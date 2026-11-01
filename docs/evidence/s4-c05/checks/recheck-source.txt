@@ -1,0 +1,20 @@
+Final local author recheck, 2026-11-01, Windows PowerShell.
+Fresh local clone from committed candidate 173a95988873579ca67d9e2a97f0f5905cdce1b0.
+Tree: 7acb790166781b392818ea6818f28601733fdd4f.
+Fetched upstream/main and origin/main remained b1e8c1e50cbbf21099dc424e481df065f9e6b99b.
+Clone began without .env, data/app.db, .venv or frontend/node_modules.
+The new clone used Python 3.12.10, Node 24.15.0, npm 11.12.1 and Git 2.53.0.windows.1.
+Created a new Python venv, installed locked backend requirements and editable backend per SETUP.
+Ran npm.cmd --prefix frontend ci: 240 packages installed.
+Ran pip check: no broken requirements.
+Ran npm.cmd --prefix frontend run lint: exit 0.
+Ran npm.cmd --prefix frontend run build: exit 0, same artifact hashes as manifest.
+Ran npm.cmd --prefix frontend test -- --maxWorkers=4: 467 tests passed in 41 files.
+Ran .\.venv\Scripts\python.exe -m ruff check backend: all checks passed.
+Ran scripts/verify_s4_t05_trace.py: 37 unique Section 2 IDs mapped to 48 root nodes.
+Ran backend/scripts/verify_s4_c05_startup.py: exit 0; see recheck-startup-rehearsal.log.
+Ran cmd /c "call .venv\Scripts\activate.bat && pytest": exit 0; 820 passed, 1 skipped,
+one inherited deprecation warning in 409.48 seconds; see recheck-literal-pytest.log.
+Ran .\.venv\Scripts\python.exe -m pytest -v: exit 0; 820 passed, 1 skipped,
+one warning and 210 subtests passed in 379.92 seconds; see the full verbose log.
+No TMDb token, real application DB, running server or frontend browser was required for pytest.

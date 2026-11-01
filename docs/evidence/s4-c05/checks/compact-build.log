@@ -1,0 +1,36 @@
+===== ruff =====
+Command: C:\Users\Admin\AppData\Local\Temp\codex-c05-clean-anycqcue\.venv\Scripts\python.exe -m ruff check backend scripts/verify_s4_t05_trace.py tests/test_pytest_setup.py
+All checks passed!
+
+
+===== p0-ruff =====
+Candidate: 132394c57a12b81bf889227f96370f39531bbb08
+Command: C:\Users\Admin\AppData\Local\Temp\codex-c05-clean-anycqcue\.venv\Scripts\python.exe -m ruff check tests/test_p0_acceptance.py
+All checks passed!
+
+
+===== frontend-lint =====
+Command: npm.cmd --prefix frontend run lint
+
+> frontend@0.0.0 lint
+> eslint .
+
+
+
+===== frontend-build =====
+Command: npm.cmd --prefix frontend run build
+
+> frontend@0.0.0 build
+> tsc -b && vite build
+
+vite v8.3.1 building client environment for production...
+transforming...
+✓ 79 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.81 kB │ gzip:   0.43 kB
+dist/assets/index-BY2gnITW.css   36.99 kB │ gzip:   8.10 kB
+dist/assets/index-IY8BVZI3.js   358.86 kB │ gzip: 107.24 kB
+
+✓ built in 216ms
+

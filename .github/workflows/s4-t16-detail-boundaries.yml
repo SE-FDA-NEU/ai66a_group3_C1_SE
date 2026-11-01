@@ -1,10 +1,9 @@
 name: S4 T16 detail boundaries
 
+# Optional extended regression: Run workflow is the explicit opt-in.
+# Keep existing workflow/job names and test steps for manual runs.
 on:
-  push:
-    paths: ["backend/**", "frontend/**", "tests/**", ".github/workflows/s4-t16-detail-boundaries.yml"]
-  pull_request:
-    paths: ["backend/**", "frontend/**", "tests/**", ".github/workflows/s4-t16-detail-boundaries.yml"]
+  workflow_dispatch:
 
 permissions:
   contents: read

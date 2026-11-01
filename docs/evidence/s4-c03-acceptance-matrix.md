@@ -434,6 +434,17 @@ change the C03 acceptance decision.
 |---|---|
 | `docs/api.md` | `28322e8f3a504d9b380ad9a3b72b8cc49eeb185cc992c24f644f04346d8886a1` |
 
+## C05 compact M4 execution amendment — 1 November 2026
+
+The PO-approved amendment removes optional feature matrices from the primary
+report and selects the existing P0 pytest files by default. The 37 logical
+case IDs are retained. Earlier hashes/results remain historical. C04 still
+owns final process evidence, formal report review and manual submission.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/testing.md` | `0b015cb4943c733d171afc00f3716fbd182e6c1391a5186c6346fcba7915ad6e` |
+
 ## 1 November wrap-up assertion-description amendment
 
 Section 2 now describes the assertions actually executed in the compact run;
@@ -445,3 +456,13 @@ Earlier document fingerprints above remain historical.
 | File | SHA-256 after UTF-8 LF normalization |
 |---|---|
 | `docs/testing.md` | `3d8a836fc4f747a5932f1421c28c50a6abfb077529ba570a2ac08f7316e94554` |
+
+## C02 integration with merged C05 — 1 November 2026
+
+The four-section C05 report/default selection and stronger authentication/rollback
+assertions are retained. C02 adds only recommendation page-size 9/10/11 checks
+to the existing case. All earlier candidate fingerprints remain historical.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/testing.md` | `61b054d8d7b840c528369644ec04a046eb9a47e7699420baba5157b5baef73d9` |

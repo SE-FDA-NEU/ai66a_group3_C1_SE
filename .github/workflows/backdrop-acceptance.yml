@@ -1,11 +1,9 @@
 name: T28 independent backdrop acceptance
 
+# Optional extended regression: Run workflow is the explicit opt-in.
+# Keep existing workflow/job names and test steps for manual runs.
 on:
-  push:
-    paths: ["backend/**", "frontend/**", ".github/workflows/backdrop-acceptance.yml"]
-  pull_request:
-    branches: [main, develop]
-    paths: ["backend/**", "frontend/**", ".github/workflows/backdrop-acceptance.yml"]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -38,7 +36,7 @@ jobs:
           cd frontend
           npx playwright install --with-deps chromium
       - name: Independent populated DB and API verification
-        run: python -m pytest backend/tests/test_backdrop_acceptance.py backend/tests/test_backdrop_storage.py -q
+        run: python -m pytest -c pytest.ini backend/tests/test_backdrop_acceptance.py backend/tests/test_backdrop_storage.py -q
       - name: Offline real browser API and DB acceptance
         run: npm --prefix frontend run test:t28:acceptance
       - uses: actions/upload-artifact@v4

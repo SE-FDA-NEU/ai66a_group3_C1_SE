@@ -1,4 +1,4 @@
-"""Map every docs/testing.md Section 2 ID to a collected root pytest node."""
+"""Map every Section 2 ID to a node selected by the default M4 pytest command."""
 
 from __future__ import annotations
 
@@ -16,10 +16,12 @@ END = "<!-- TC-MAP-END -->"
 def main() -> int:
     contract = (ROOT / "docs/testing.md").read_text(encoding="utf-8")
     ids = re.findall(r"^\| (TC-P0-S\d{2}-\d{3}) \|", contract, re.MULTILINE)
+    if not ids:
+        raise RuntimeError("Section 2 has no P0 case IDs")
     if len(ids) != len(set(ids)):
         raise RuntimeError("Section 2 has duplicate IDs")
     result = subprocess.run(
-        [sys.executable, "-m", "pytest", "--collect-only", "-q", "tests"],
+        [sys.executable, "-m", "pytest", "--collect-only", "-q"],
         cwd=ROOT,
         capture_output=True,
         text=True,
@@ -33,7 +35,7 @@ def main() -> int:
         plain = [node for node in nodes if case_id.replace("-", "_") in node]
         matches = parameter or plain
         if not matches:
-            raise RuntimeError(f"No root pytest node for {case_id}")
+            raise RuntimeError(f"No default M4 pytest node for {case_id}")
         rows.append(
             f"| `{case_id}` | " + "<br>".join(f"`{node}`" for node in matches) + " |"
         )
@@ -50,7 +52,7 @@ def main() -> int:
     else:
         print(table)
     print(
-        f"Mapped {len(ids)} unique Section 2 IDs to {len(nodes)} collected root nodes",
+        f"Mapped {len(ids)} unique Section 2 IDs to {len(nodes)} default M4 nodes",
         file=sys.stderr,
     )
     return 0
