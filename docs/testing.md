@@ -2,8 +2,7 @@
 
 This report covers the six P0 Stories: S01, S02, S03, S04, S12 and S13.
 The [C05 verification record](evidence/s4-c05/compact-m4.md) identifies the
-tested candidate and actual results. C04 #218 owns final independent review,
-submission screenshots and manual export of the merged report.
+clean-clone candidate and its actual results.
 
 ## 1. What we test, and why
 
@@ -100,8 +99,15 @@ Node installation or live TMDb token/network is needed for these tests.
 Per-case fixtures exercise the real routes and persisted rows with synthetic
 accounts/movies; they do not merely compare hard-coded fake return values.
 
-Actual count, runtime, full verbose output and screenshot are linked from
-[the current C05 record](evidence/s4-c05/compact-m4.md).
+| Run | Executable SHA | Result | Runtime |
+|---|---|---|---|
+| Clean clone, new venv, plain `pytest` and `python -m pytest -v` | `132394c57a12b81bf889227f96370f39531bbb08` | 40 passed, 0 skipped | 15.25 s / 15.28 s |
+| Rerun on main after PR #243, `python -m pytest -v`, 1 November 2026 | `0d2378d5f0c44889ca93c8cff7c8bc9c568b43c5` | 40 passed, 0 skipped, 1 inherited Starlette/httpx deprecation warning | 14.65 s |
+
+Backend, test and workflow files are unchanged between the two SHAs; later
+commits only add documentation. The full test names and output are in
+[the C05 record](evidence/s4-c05/compact-m4.md) and
+[verbose log](evidence/s4-c05/checks/compact-verbose-pytest.log).
 
 ![Full output of the 40-item clean-clone pytest run](evidence/s4-c05/checks/compact-verbose-output.png)
 

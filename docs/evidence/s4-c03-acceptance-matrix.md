@@ -444,3 +444,14 @@ owns final process evidence, formal report review and manual submission.
 | File | SHA-256 after UTF-8 LF normalization |
 |---|---|
 | `docs/testing.md` | `0b015cb4943c733d171afc00f3716fbd182e6c1391a5186c6346fcba7915ad6e` |
+
+## C04 #218 final report — 1 November 2026
+
+Section 3 of the report now states the tested executable SHAs, the 40-item
+result and the runtime, and the intro no longer describes C04 as pending. The
+37 logical case IDs and 40 collected items are unchanged. Earlier rows remain
+historical.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/testing.md` | `9361899a58e8bce900ee711062531fe08f10a364cbb820ddd992333f529314ff` |
