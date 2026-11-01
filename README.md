@@ -85,6 +85,7 @@ and account-isolation checks are also created in that same database.
 - [M2 auth, catalogue, and recommendation API contract](docs/api.md)
 - [Definition of Done](docs/definition-of-done.md)
 - [Sprint log](docs/sprint-log.md)
+- [Sprint 4 Planning, commitment and current scope](docs/sprint4-backlog-refinement.md)
 
 ## Definition of Done
 
