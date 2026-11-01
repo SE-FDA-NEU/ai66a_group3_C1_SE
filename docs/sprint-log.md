@@ -540,6 +540,14 @@ another person's behalf.
 
 ## Sprint 4 — wrap-up cutoff 1 November 2026
 
+**C04 closure-state reconciliation, 1 November:** GitHub now records C02 #196
+Closed at 11:14:26 UTC, C01 #216 at 12:36:56 UTC and C05 #219 at 12:39:10 UTC.
+The Open/merge-pending entries below describe the earlier C02 source cutoff,
+not their present issue states. C04 #218 still owns manual report submission.
+Its [handoff](evidence/s4-c04/README.md) records the PO's later confirmation
+of Hoang's independent C05 check on 1 November and the instructor-approved
+late board substitute. Existing command logs remain attributed to their runners.
+
 **Status: PO acceptance and reported Review/Retro/handoff recorded; final
 independent gates remain.** SM4 is **@anotify-vie**, PO and SM5 are
 **@kietxuan**, SM3 remains **@vu-huzy**. C01 Planning is PO-owned and C02

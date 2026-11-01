@@ -486,3 +486,27 @@ this row identifies the updated API documentation, not a new functional run.
 | File | SHA-256 after UTF-8 LF normalization |
 |---|---|
 | `docs/api.md` | `fa0e363e866e650461d1169f21622d9e4dd54d6b46bd01e36c23474758fd6631` |
+
+## C04 report integration with merged C01/C02 — 1 November 2026
+
+The earlier C04 draft at `6f030f3` had normalized-LF testing.md hash
+`9361899a58e8bce900ee711062531fe08f10a364cbb820ddd992333f529314ff`.
+It is historical draft identity, not an assertion that its unsupported runtime
+row was verified. The integrated report keeps main's accurate case descriptions,
+records only linked C05/C02 execution results and uses the complete C02 output
+image with its own 13.74s caption. Manual process/image gaps are tracked separately.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/testing.md` | `76e5f9552d46865cbcc15b8f69ddfc033ef84ba62385773f4e0363c2a4d9eac9` |
+
+### C04 executed-source and portable PDF links
+
+The integrated C04 candidate `1a993f3` passed the actual 40-item suite in
+12.48s. The report now links its raw output/receipt and uses full GitHub main
+hyperlinks for PDF portability, while retaining the original full C02 image
+and its 13.74s attribution. Four sections and all 37 IDs remain unchanged.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/testing.md` | `1df2f74e688aaaca0f9934a351ae5723669ae8678069de860a8de880ad11bf31` |

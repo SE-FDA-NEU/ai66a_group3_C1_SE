@@ -97,3 +97,16 @@ release rehearsal does not claim a cloud deployment. Independent teammate
 review/approval and its own reproduction remain required before C05 closes.
 C04 owns final board/verbose-output screenshots, report approval and manual PDF
 submission; no generated PDF/export tool is added here.
+
+## C04 process follow-up — 1 November 2026
+
+GitHub records #219 Closed on 1 November. During C04 reconciliation, the PO
+explicitly confirmed Tran Minh Hoang (@hoang3003) independently checked clean
+clone/setup and recovery on 1 November; Hoang has also formally approved C05's
+final head. This records the reported human completion after the original
+author-only record, without changing its historical source or results.
+
+No separate Hoang command log, machine, runtime or tested SHA was supplied.
+The tables/logs above remain Codex author verification and must not be cited
+as Hoang's output. The [C04 handoff](../s4-c04/README.md) records the PO's
+confirmation and the remaining report review/manual submission steps.

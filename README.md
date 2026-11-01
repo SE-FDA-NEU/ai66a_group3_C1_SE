@@ -11,6 +11,8 @@ Scrum Master: @vu-huzy.** The PO confirmed these dates; the board's older
 iteration-date labels have not been updated. SM3 differs from SM1 (@hoang3003)
 and SM2 (@NguyenTuanAnh0608).
 
+**Sprint 4 Scrum Master (SM4): @anotify-vie**, distinct from SM3 (@vu-huzy).
+
 Begin at the home page (`/`) and use visible controls; feature URLs do not need
 to be entered by hand. Follow [SETUP](docs/SETUP.md) first, including its
 explicit account-provisioning step on the same TMDb-imported database. The
