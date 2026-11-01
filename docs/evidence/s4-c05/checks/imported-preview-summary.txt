@@ -1,0 +1,16 @@
+S4-C05 imported-catalogue preview; Windows PowerShell; 2026-11-01.
+Source data/app.db was inspected and backed up read-only with storage_snapshot.
+Source remained at c6f8a2d4e901, 252 movies and 7 users. No source migration ran.
+Disposable copy upgraded c6f8a2d4e901 -> d8a4e6f20195 -> e9b6f0a42c17
+-> f2c7e4a91b60 -> a3d1f8b72c44 (head).
+After upgrade: 252 movies, 7 users, 0 preference rows, 0 rating rows,
+0 watchlist rows. Source/copy movie-ID sets and user counts matched; FK check empty.
+A second disposable audit copy confirmed exact users rows, movie-ID sets,
+preference rows and rating rows equal before/after migration; FK check empty.
+Overview index rebuild/check: ready=true, movies=252, usableDocuments=252,
+vocabularyTerms=3381, active revision unchanged.
+Loopback Uvicorn against migrated copy: /health ok, migrationVersion=a3d1f8b72c44;
+/api/movies total=252; one detail ID matched the list ID; description Search
+returned 2 matches; Similar returned 5 results. All endpoints returned 200.
+The disposable copied DB, temporary index and failed empty smoke DB were removed.
+No account values, token, .env, database copy or raw provider payload is committed.

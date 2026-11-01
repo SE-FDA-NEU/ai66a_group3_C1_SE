@@ -136,7 +136,7 @@ workflow explicitly runs the root S03 cases and T16 component/browser cases.
 
 Root S03 supplies nine items for `TC-P0-S03-001` through `006`, including three
 missing-field variants. Full TC-ID/production-node/interface mapping is in
-[testing.md](../testing.md#s03--s4-t16-scoped-execution). TestClient proves HTTP,
+[testing.md](../testing.md#2-test-cases-for-every-p0-story). TestClient proves HTTP,
 DTOs and persistence; actual React labels and navigation are proven separately.
 
 ## Reviewer walkthrough and expected outcomes

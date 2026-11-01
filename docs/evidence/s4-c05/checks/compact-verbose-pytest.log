@@ -1,0 +1,59 @@
+Candidate: 132394c57a12b81bf889227f96370f39531bbb08
+Command: C:\Users\Admin\AppData\Local\Temp\codex-c05-clean-anycqcue\.venv\Scripts\python.exe -m pytest -v
+============================= test session starts =============================
+platform win32 -- Python 3.12.6, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\Admin\AppData\Local\Temp\codex-c05-clean-anycqcue\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\Admin\AppData\Local\Temp\codex-c05-clean-anycqcue
+configfile: pytest.ini
+testpaths: tests/test_p0_acceptance.py, tests/test_s03_details.py
+plugins: anyio-4.15.1, cov-7.1.0
+collecting ... collected 40 items
+
+tests/test_p0_acceptance.py::test_TC_P0_S01_001_canonical_genres_and_empty_selection PASSED [  2%]
+tests/test_p0_acceptance.py::test_TC_P0_S01_002_zero_preserves_previous_rows PASSED [  5%]
+tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-003] PASSED [  7%]
+tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-004] PASSED [ 10%]
+tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-005] PASSED [ 12%]
+tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-006] PASSED [ 15%]
+tests/test_p0_acceptance.py::test_TC_P0_S01_007_invalid_sets_preserve_previous_selection PASSED [ 17%]
+tests/test_p0_acceptance.py::test_TC_P0_S01_008_guest_forgery_and_origin_leave_accounts_intact PASSED [ 20%]
+tests/test_p0_acceptance.py::test_TC_P0_S02_001_full_set_paging_has_25_distinct_movies PASSED [ 22%]
+tests/test_p0_acceptance.py::test_TC_P0_S02_002_rating_free_order_and_reasons PASSED [ 25%]
+tests/test_p0_acceptance.py::test_TC_P0_S02_003_no_match_uses_unboosted_popular PASSED [ 27%]
+tests/test_p0_acceptance.py::test_TC_P0_S02_004_guest_and_expired_cookie_are_private PASSED [ 30%]
+tests/test_p0_acceptance.py::test_TC_P0_S02_005_core_failure_then_retry_preserves_preferences PASSED [ 32%]
+tests/test_p0_acceptance.py::test_TC_P0_S02_006_filter_after_whole_set_ranking PASSED [ 35%]
+tests/test_p0_acceptance.py::test_TC_P0_S04_001_public_catalogue_pages_include_null_popularity PASSED [ 37%]
+tests/test_p0_acceptance.py::test_TC_P0_S04_002_cold_start_has_no_personal_score PASSED [ 40%]
+tests/test_p0_acceptance.py::test_TC_P0_S04_003_limit_9_and_10_keep_full_total PASSED [ 42%]
+tests/test_p0_acceptance.py::test_TC_P0_S04_004_limit_and_page_refusals PASSED [ 45%]
+tests/test_p0_acceptance.py::test_TC_P0_S04_005_empty_active_versus_missing_revision PASSED [ 47%]
+tests/test_p0_acceptance.py::test_TC_P0_S04_006_stale_catalogue_revision_is_409 PASSED [ 50%]
+tests/test_p0_acceptance.py::test_TC_P0_S12_001_eight_char_normalized_hashed_registration PASSED [ 52%]
+tests/test_p0_acceptance.py::test_TC_P0_S12_002_seven_char_password_has_no_row PASSED [ 55%]
+tests/test_p0_acceptance.py::test_TC_P0_S12_003_nine_char_password_has_safe_dto PASSED [ 57%]
+tests/test_p0_acceptance.py::test_TC_P0_S12_004_duplicate_normalized_email_is_conflict PASSED [ 60%]
+tests/test_p0_acceptance.py::test_TC_P0_S12_005_invalid_email_and_storage_failure_create_no_account PASSED [ 62%]
+tests/test_p0_acceptance.py::test_TC_P0_S13_001_login_me_cookie_and_safe_user PASSED [ 65%]
+tests/test_p0_acceptance.py::test_TC_P0_S13_002_wrong_and_unknown_credentials_same_public_error PASSED [ 67%]
+tests/test_p0_acceptance.py::test_TC_P0_S13_003_logout_replay_and_later_login_restore_data PASSED [ 70%]
+tests/test_p0_acceptance.py::test_TC_P0_S13_004_missing_expired_and_revoked_sessions_refused PASSED [ 72%]
+tests/test_p0_acceptance.py::test_TC_P0_S13_005_account_isolation_and_forged_identity PASSED [ 75%]
+tests/test_p0_acceptance.py::test_TC_P0_S13_006_cross_origin_auth_and_write_refused PASSED [ 77%]
+tests/test_s03_details.py::test_TC_P0_S03_001_public_known_id PASSED     [ 80%]
+tests/test_s03_details.py::test_TC_P0_S03_002_unknown_id_refused PASSED  [ 82%]
+tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[year] PASSED [ 85%]
+tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[summary] PASSED [ 87%]
+tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[both] PASSED [ 90%]
+tests/test_s03_details.py::test_TC_P0_S03_003_catalogue_and_database_failures_are_distinct PASSED [ 92%]
+tests/test_s03_details.py::test_TC_P0_S03_004_return_query_cannot_redirect_or_change_public_movie PASSED [ 95%]
+tests/test_s03_details.py::test_TC_P0_S03_005_detail_widgets_preserve_both_accounts_preferences PASSED [ 97%]
+tests/test_s03_details.py::test_TC_P0_S03_006_membership_commit_allows_read_snapshot_cleanup PASSED [100%]
+
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\Admin\AppData\Local\Temp\codex-c05-clean-anycqcue\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= 40 passed, 1 warning in 15.28s ========================

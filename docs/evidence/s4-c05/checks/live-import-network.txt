@@ -1,0 +1,9 @@
+S4-C05 live import attempt; Windows PowerShell; 2026-11-01.
+Target: new isolated data/c05-live-smoke-20261101.db, not data/app.db.
+Fresh Alembic upgrade reached a3d1f8b72c44.
+Command: python -m app.cli.import_tmdb_catalogue --pages 1
+Actual: exit 1, "TMDb catalogue import failed: TMDb request failed; check
+network/DNS access to api.themoviedb.org".
+DNS diagnostic: api.themoviedb.org resolved to ::1 and 127.0.0.1;
+TCP 443 connection to 127.0.0.1 failed. No token value was printed.
+No live-provider success is claimed. The isolated failed smoke DB was removed.
