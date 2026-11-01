@@ -81,13 +81,13 @@ actual 503 envelope rather than a business-rule refusal.
 | TC-P0-S01-006 | S01 #17 | A saves exactly 5 valid IDs | 200 and exactly 5 distinct committed rows ([preference schema](../backend/app/schemas/preferences.py)). | Boundary 5 |
 | TC-P0-S01-007 | S01 #17 | A saves 6 IDs, duplicate IDs or boolean/string ID | Each 400; previous selection preserved, no partial delete ([schema](../backend/app/schemas/preferences.py), [repo](../backend/app/repositories/preferences.py)). | Boundary above 5/refusal |
 | TC-P0-S01-008 | S01 #17 | Guest PUT or forged `userId`/cross-origin PUT | 401/400/403 as applicable; A/B selections unchanged ([route](../backend/app/main.py), [origin policy](../backend/app/security/origin.py)). | Auth refusal |
-| TC-P0-S02-001 | S02 #18 | A has one saved genre and 25 distinct matching movies, request pages 1/2/3 with limit 10 | Personalised page IDs are 10/10/5, no duplicates; `total=25,totalPages=3`, rank whole set before slice ([service](../backend/app/recommendations/service.py), [repo](../backend/app/repositories/recommendations.py)). | Normal/paging |
-| TC-P0-S02-002 | S02 #18 | One genre match among several, rating-free baseline | Matching movie precedes lower-popularity match by finite popularity/title/ID; each reason contains actual matched genres ([ranker](../backend/app/recommendations/ranker.py), [service](../backend/app/recommendations/service.py)). | Normal/ranking |
+| TC-P0-S02-001 | S02 #18 | A has one saved genre and 25 distinct matching movies, request pages 1/2/3; also request limits 9/10/11 | Page IDs are 10/10/5 without duplicates; `total=25,totalPages=3`. Limits 9/10 return 9/10 items with total 25; 11 returns 400 `VALIDATION_ERROR` ([service](../backend/app/recommendations/service.py), [repo](../backend/app/repositories/recommendations.py)). | Normal/paging/boundary 9/10/11 |
+| TC-P0-S02-002 | S02 #18 | Saved Action genre, rating-free baseline | Matching movies have descending popularity; each reason contains matched genre Action and `basis=baseline` ([ranker](../backend/app/recommendations/ranker.py), [service](../backend/app/recommendations/service.py)). | Normal/ranking |
 | TC-P0-S02-003 | S02 #18 | A's saved genres match none of active movies | 200 `mode=popular,personalised=false,noMatch=true`; only finite-popularity alternatives; preferences unchanged ([service](../backend/app/recommendations/service.py)). | Business boundary |
 | TC-P0-S02-004 | S02 #18 | Guest/expired cookie requests recommendations | 401 `AUTHENTICATION_REQUIRED`, no private DTO ([route](../backend/app/main.py), [sessions](../backend/app/security/sessions.py)). | Auth refusal |
-| TC-P0-S02-005 | S02 #18 | Inject catalogue/preference query failure, then restore it | First 503 with requestId and no success `data`; retry returns current results, no preference rewrite ([route](../backend/app/main.py)). | Infrastructure failure |
+| TC-P0-S02-005 | S02 #18 | Inject active-catalogue lookup failure, then restore it | First 503 with requestId and no success `data`; retry returns current results, no preference rewrite ([route](../backend/app/main.py)). | Infrastructure failure |
 | TC-P0-S02-006 | S02 #18 | 12 filtered matches occur across a 35-item ranked base, including matches outside page 1 | Filtered pages 10/2, `total=12,unfilteredTotal=35`; base mode and ranking remain, DB preferences unchanged ([service](../backend/app/recommendations/service.py), [route](../backend/app/main.py)). | Whole-set boundary |
-| TC-P0-S03-001 | S03 #19 | Public GET for active movie with genres, nullable year/overview/backdrop | 200 stable opaque ID, genres and JSON nulls, no private rating read ([route](../backend/app/main.py), [movie schema](../backend/app/schemas/movies.py)). | Normal |
+| TC-P0-S03-001 | S03 #19 | Public GET for active movie with genres and nullable year/overview | 200 stable opaque ID, title, genres, year/overview values or JSON nulls; no private rating fields ([route](../backend/app/main.py), [movie schema](../backend/app/schemas/movies.py)). | Normal |
 | TC-P0-S03-002 | S03 #19 | Public GET unknown opaque movie ID | 404 `MOVIE_NOT_FOUND`, never a blank success; UI return target is separately verified in React ([route](../backend/app/main.py), [detail page](../frontend/src/pages/MovieDetailPage.tsx)). | Business refusal |
 | TC-P0-S03-003 | S03 #19 | Missing active catalogue versus injected DB fault | Both 503 with correct `CATALOGUE_UNAVAILABLE` or `SERVICE_UNAVAILABLE`, never false 404 ([route](../backend/app/main.py)). | Infrastructure boundary |
 | TC-P0-S03-004 | S03 #19 | Guest opens a valid detail ID with a list-context query, then with an external-looking query | In both cases production detail GET remains public 200 with the same movie and no redirect/private data; separate React/browser test must reject unsafe return URLs and restore safe page/filter/revision ([route](../backend/app/main.py), [navigation](../frontend/src/navigation/movieDetailReturn.ts)). | Safe return boundary |
@@ -103,13 +103,13 @@ actual 503 envelope rather than a business-rule refusal.
 | TC-P0-S12-002 | S12 #44 | Password length 7 | 400 `VALIDATION_ERROR`; no user row ([registration schema](../backend/app/schemas/auth.py), [route](../backend/app/main.py)). | Boundary below 8 |
 | TC-P0-S12-003 | S12 #44 | Password length 9 | 201, no password/hash in response ([route](../backend/app/main.py), [passwords](../backend/app/security/passwords.py)). | Boundary above 8 |
 | TC-P0-S12-004 | S12 #44 | Existing email with case/whitespace variation | 409 `EMAIL_ALREADY_REGISTERED`, exact `This email is already registered`; one user row ([users repo](../backend/app/repositories/users.py), [route](../backend/app/main.py)). | Business refusal |
-| TC-P0-S12-005 | S12 #44 | Invalid email or injected commit fault | Invalid input 400; persistence failure 503; neither exposes secret or creates partial account ([route](../backend/app/main.py)). | Validation/infrastructure |
-| TC-P0-S13-001 | S13 #45 | Login valid A then GET `/api/auth/me` | 200 safe A DTO; opaque HttpOnly same-origin cookie, no token in body ([route](../backend/app/main.py), [sessions](../backend/app/security/sessions.py)). Browser companion `TC-S4-AUTH-001` verifies the amended Home landing. | Normal |
+| TC-P0-S12-005 | S12 #44 | Invalid email or injected account-creation failure before insertion | Invalid input 400; creation failure 503 with no private error detail; no user row is created ([route](../backend/app/main.py)). A flushed-insert/commit rollback needs separate evidence. | Validation/infrastructure |
+| TC-P0-S13-001 | S13 #45 | Login valid A then GET `/api/auth/me` | 200 A DTO with expected email and no password/passwordHash/token fields; session cookie present ([route](../backend/app/main.py), [sessions](../backend/app/security/sessions.py)). Cookie attributes and browser landing use separate evidence. | Normal |
 | TC-P0-S13-002 | S13 #45 | Wrong password and unknown email | Both 401 `INVALID_CREDENTIALS`, exact `Email or password is incorrect` ([route](../backend/app/main.py)). | Auth refusal |
 | TC-P0-S13-003 | S13 #45 | Logout A, replay old cookie, login A again | Logout 204; replay gets 401; new session accesses persisted A preferences/ratings ([route](../backend/app/main.py), [sessions](../backend/app/security/sessions.py)). | Session lifecycle |
-| TC-P0-S13-004 | S13 #45 | Missing/expired/revoked cookie on protected reads/writes | Each 401; no personal rows leak or change ([route](../backend/app/main.py), [sessions](../backend/app/security/sessions.py)). | Session boundary |
+| TC-P0-S13-004 | S13 #45 | Missing/expired/revoked cookie on GET preferences | Each preference read returns 401 `AUTHENTICATION_REQUIRED` ([route](../backend/app/main.py), [sessions](../backend/app/security/sessions.py)). Refused writes use separate evidence. | Session boundary |
 | TC-P0-S13-005 | S13 #45 | A and B have different genres/ratings; B forges A identity field | B sees and changes only B rows; malformed identity body is rejected where schema forbids it ([route](../backend/app/main.py), [repositories](../backend/app/repositories/)). | Account isolation |
-| TC-P0-S13-006 | S13 #45 | Cross-origin login/logout or protected write | 403 `ORIGIN_NOT_ALLOWED`; no session revocation/private mutation ([origin policy](../backend/app/security/origin.py), [route](../backend/app/main.py)). | CSRF refusal |
+| TC-P0-S13-006 | S13 #45 | Cross-origin login/logout | Both return 403 `ORIGIN_NOT_ALLOWED`; A can still read unchanged saved preferences. Protected-write origin refusal is TC-P0-S01-008 ([origin policy](../backend/app/security/origin.py), [route](../backend/app/main.py)). | CSRF refusal |
 
 The numeric boundaries above are a floor. Add named cases if the final
 contract gains a numeric/date/session rule; use a frozen clock for expiry and
@@ -138,6 +138,13 @@ These rows define expected checks. Author-local T16 execution is recorded
 separately below and in its evidence; other rows are not accepted by implication.
 
 ## 3. Automated tests
+
+For the 1 November wrap-up on merged baseline `b1e8c1e`, use the explicit compact
+selection `.venv/bin/python -m pytest tests/test_p0_acceptance.py tests/test_s03_details.py -v`.
+The [current execution/assertion map](evidence/s4-t05-acceptance.md#compact-m4-wrap-up-execution--1-november-2026)
+records the tested-file amendment and actual output. The default-discovery
+description below is the merged historical setup; compact defaults/CI in
+unmerged C05 PR #243 remain Pending. C04 #218 owns the final four-section report.
 
 The **single repository-root default** is `pytest` (verbose:
 `python -m pytest -v`). The root suite executes every Section 2 ID using

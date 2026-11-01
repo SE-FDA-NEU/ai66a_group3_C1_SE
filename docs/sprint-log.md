@@ -4,6 +4,8 @@ This log records only facts supported by the repository, Git history, and the
 saved Project-board evidence. Meeting details that are not present in those
 sources are marked as not recorded rather than reconstructed as facts.
 
+Current: [Sprint 4 wrap-up and Sprint 5 handoff](#sprint-4--wrap-up-cutoff-1-november-2026).
+
 ---
 
 ## Sprint 1 - repository activity recorded 2026-09-08 to 2026-09-20
@@ -533,3 +535,272 @@ retrospective outcomes, next-SM handoff, board-access check and LMS receipt are
 not manufactured. The current follow-up must receive substantive review from
 a non-contributor before merge; approval or submission is not generated on
 another person's behalf.
+
+---
+
+## Sprint 4 — wrap-up cutoff 1 November 2026
+
+**Status: prepared for PO review; not finally accepted.** SM4 is
+`@anotify-vie`; independent PO reviewer and agreed SM5 is `@kietxuan`.
+SM3 remains `@vu-huzy`. C01 Planning (#216) stays PO-owned; C02 (#196)
+stays SM-owned. This author-assisted reconciliation does not close either issue.
+Git records the delivery merges on 24–31 October; official Sprint dates and
+the actual Planning event/date are **Not verified**.
+
+Evidence cutoff: public GitHub REST reads on 1 November 2026, Asia/Ho_Chi_Minh,
+and local `main`/`origin/main` at
+**`b1e8c1e50cbbf21099dc424e481df065f9e6b99b`**. The saved
+[audit receipt](evidence/s4-wrap-up-20261101.json) records source URLs,
+issue states, PR authors/merges, formal reviews and source comparisons.
+These reads establish current state, not historical board transitions or attendance.
+No Sprint 4 Planning/cutoff board screenshot was found; both remain **Pending**.
+
+### Commitment, completion and velocity
+
+[C01 #216](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/216)
+retains the historical **25-item plan: 18 core Tasks, five Chores and two
+G4-gated trailer Tasks**. Core Tasks are T01 #195 and T02–T18 #197–#213;
+Chores are C02 #196 and C01/C03/C04/C05 #216–#219; gated Tasks are
+T19/T20 #214/#215. Tasks and Chores have **no Story Points**.
+The original Planning snapshot, whole-Story closure commitment and member-confirmed
+capacity were not supplied. The 18-point Story envelope below is not proof that
+18 points were originally committed for closure; PO confirmation remains required.
+
+| Reconciliation | Verified result at cutoff |
+|---|---|
+| Original work-item commitment | 23 core items plus two conditional trailer items, as retained by C01; original contemporaneous board/Planning record **Not verified** |
+| Delivered / Closed | All 20 Tasks (#195, #197–#215) and C03 #217: **21/25 Closed items**; closure alone does not prove every AC/DoD or independent execution |
+| Unfinished Chores | **4/25 Open**: C01 #216, C02 #196, C04 #218, C05 #219 |
+| Newly accepted Stories / completed points | **0 Stories / 0 points**: #22/#24/#30/#33 remain Open, with all AC checkboxes unchecked and no acceptance comments |
+| Velocity | **0 newly accepted Story Points**; potential maximum 18 only after Story AC/DoD acceptance |
+| Carry-over awaiting planning | The four unaccepted Stories and unfinished C01/C02/C05 outputs; transfer/owner/new issue/date **Pending PO replan**, not silently assigned to Sprint 5 |
+| Submission work | C04 #218 remains Pending in its own workflow; no points and no reverse dependency from C02 |
+| Explicit deferrals | C01 retains VN providers and previously transferred release revalidation in Sprint 5. No additional C01-approved deferral of unfinished Sprint 4 work was found |
+
+| Story / estimate | Merged delivery and acceptance evidence candidates | Whole-Story result / newly counted points |
+|---|---|---|
+| [S05b #22](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/22), 5 | [#223](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/223), [#226](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/226), [#231](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/231), [#237](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/237); [T05 audit](evidence/s4-t05-acceptance.md) | Implemented/test evidence available; **Pending PO/reviewer acceptance**, 0 |
+| [S07 #24](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/24), 5 | [#229](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/229), [#233](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/233); [five-AC author evidence](evidence/s4-t08-similar-ui/README.md) | No known unimplemented AC in that author record; **Pending whole-Story acceptance**, 0 |
+| [S08 #30](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/30), 5 | [#228](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/228), [#232](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/232), [#235](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/235), [#242](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/242); [Search evidence](evidence/s4-t10-search/README.md) | Later pagination/submit-only/race fixes delivered; **Pending whole-Story acceptance**, 0 |
+| [S11 #33](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/33), 3 | [#221](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/221), [#227](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/227), [#230](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/230), [#234](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/234), [#238](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/238); [reset evidence](evidence/s4-t15-reset-acceptance/README.md) | Functional evidence exists; **Pending whole-Story acceptance**, 0 |
+
+Accepted historical Stories remain S01 #17, S02 #18, S03 #19, S04 #20,
+S12 #44, S13 #45 and S05a #21, per the Sprint 3 acceptance ledger and current
+Closed states. **None earns points again.** No accepted Sprint 4 whole-Story
+link is available; merged delivery PR links above must not be labelled PO acceptance.
+
+Approved changes recorded by C01: preserve half-star ratings, paginated Search
+and embedded trailers where accepted; on 1 November replace repeated exhaustive
+regression/report requirements with the compact six-P0 scope. C01 says this is
+a scope amendment, not proof of earlier events or completion. Original approval
+timestamps/capacity for the earlier feature amendments remain **Not verified**.
+
+### Compact M4 execution and reuse of feature evidence
+
+Executed using the selected merged product baseline and its existing C05
+EARLY_TEST_SETUP. The initial run used the exact committed tests; the final run
+includes six added S02 boundary-assertion lines pinned in the audit receipt:
+
+```text
+.venv/bin/python -m pytest tests/test_p0_acceptance.py tests/test_s03_details.py -v
+```
+
+**Final: 40 collected, 40 passed, 0 failed, 0 skipped, 0 xfailed; 5.70 s pytest
+runtime, 6.646 s measured process time**, 1 November 2026,
+08:55:29–08:55:35 +07:00. Initial exact-SHA baseline: 40 passed in 5.94 s
+(6.887 s process time). At execution, the amended tests were uncommitted;
+the wrap-up change delivers that exact patch without claiming a merge.
+One inherited Starlette/httpx deprecation warning. This is Codex execution in
+the existing macOS environment, not an independent human/fresh-clone run.
+[Full actual output](evidence/s4-t05-compact-20261101.log) and
+[37-ID / 40-node expected-versus-actual mapping](evidence/s4-t05-acceptance.md#compact-m4-wrap-up-execution--1-november-2026)
+cover all six P0 Stories (8/6/9/6/5/6 items respectively).
+Temporary migrated SQLite, in-process TestClient, blocked live HTTP and blank
+provider token require no running server, real account database or live service.
+
+**C05 gap:** merged `pytest.ini` still discovers `tests/`, `backend/tests/`
+and `scripts/`; plain `pytest` is not yet the approved compact default.
+[Unmerged PR #243](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/243)
+supplies that change, revised CI/report/storage tooling and author clean-clone
+results at executable `132394c57a12b81bf889227f96370f39531bbb08`
+(evidence head `97d99d224db36871056dccee4fb835667ded2879`). Its
+[compact record](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/97d99d224db36871056dccee4fb835667ded2879/docs/evidence/s4-c05/compact-m4.md)
+reports 40 passes in 15.25/15.28 s for plain/verbose invocation and focused
+storage/startup/live-recovery outputs. These are **different-candidate author
+results**, not our merged-SHA runs or accepted final C05 evidence. A formal
+`ok` approval from @kietxuan exists on #243's head; its record supplies no
+substantive independent reproduction. Do not infer that gate from the PR body's
+checked boxes; its evidence/manifest explicitly say independent review is pending.
+
+Product/discovery/workflows are unchanged. TC-P0-S02-001 gained focused
+recommendation-endpoint limits 9/10/11 assertions; report descriptions were
+corrected where they exceeded actual assertions. No test was deleted or skipped.
+The [latest T20 media/setup audit](evidence/s4-t20/media-setup-audit.md)
+is the applicable merged executable evidence: `git diff 23e655c HEAD` is empty
+for backend, frontend, tests, scripts, workflows and root pytest setup, and
+all 18 final source-manifest entries match the committed candidate.
+Its existing 818-pass backend / 467-pass frontend / build / clean-checkout
+results are reused with their original SHAs, not claimed rerun here.
+
+| Area | Reuse boundary |
+|---|---|
+| Rating/ranking | T03 manifest: 585/668 entries unchanged, including ranker/service/index; entire old candidate differs. Reuse rule-specific history plus T05 and later T20 regression, not the old tree as final acceptance |
+| Similar | T08 manifest: 13/28 unchanged, including Similar service/widget/index. Main route/detail shell changed; retain original five-AC results with their candidate and later regression evidence |
+| Search / pagination | T10 manifest: 9/26 unchanged; Search service/page changed. Old top-ten-total/auto-submit expectations are superseded; use T16 pagination/submit-only and T20's final Search race RED/GREEN evidence |
+| Reset/profile | T15: 9/11 entries unchanged, including production reset/profile files. Package scripts and acceptance harness differ; old browser execution remains historical, not a fresh same-tree run |
+| Watchlist / stars / half stars | Reuse [T12](evidence/s4-t12-watchlist/README.md), [T14/T16](evidence/s4-t16-t14-reconciliation.md), [T05](evidence/s4-t05-acceptance.md), later T20 regressions. Watchlist survives reset; ratings accept 0.5–5 in exact half steps |
+| Build / storage / recovery | Merged T20 build/clean-checkout evidence applies to unchanged executable. [SETUP recovery](SETUP.md#s4-t12-watchlist-setup-backup-and-recovery) is present. New automated WAL/schema-aware recovery and compact CI in #243 remain unmerged/unaccepted |
+
+Source equality supports reuse; it does not establish a missing PO decision,
+reviewer execution, deployed environment or fresh live import. No additional
+feature regression was needed: product code is unchanged and the strengthened
+root case passed in the final compact rerun.
+
+### Review, Retrospective and outcomes
+
+**Review:** Pending team Review event. **Retrospective:** Pending team
+Retrospective event. No dated event record, confirmed attendance, actual meeting
+feedback or acceptance decision was accessible. Git/PR activity is not attendance.
+
+| Member | Review attendance | Retro attendance |
+|---|---|---|
+| @kietxuan | Pending confirmed attendance | Pending confirmed attendance |
+| @hoang3003 | Pending confirmed attendance | Pending confirmed attendance |
+| @anotify-vie | Pending confirmed attendance | Pending confirmed attendance |
+| @vu-huzy | Pending confirmed attendance | Pending confirmed attendance |
+| @NguyenTuanAnh0608 | Pending confirmed attendance | Pending confirmed attendance |
+
+Repository outcomes available for Review: rating-aware ranking; local-index
+Similar/Search; account-owned watchlist/profile/reset; half-star draft/save;
+full-set pagination and safe detail return; optional embedded trailers; all six
+P0 regression journeys. The four new Stories still require explicit AC/DoD decisions.
+
+Evidence-derived lessons proposed for the Retro: passing author tests and a merge
+do not prove independent reproduction or whole-Story acceptance; source manifests
+need comparison before reuse; planned test stewardship does not establish authorship.
+These are audit findings, **not recorded team-agreed Retro outcomes**.
+
+**Concrete proposed improvement:** before SM5 accepts a release candidate,
+attach one dated receipt containing executable SHA, TC-ID/node, actual result,
+test-author evidence and independent review link for each outstanding gate.
+**Proposed accountable owner: SM4 @anotify-vie**, transferring the receipt to
+SM5 @kietxuan. Team agreement, due date and actual completion remain **Pending**.
+The team must fill real event dates, attendance, feedback, Story decisions,
+agreed lesson/action/owner/date and the actual handoff acknowledgement here.
+
+### Contribution audit
+
+Scope: Sprint 4 delivery PRs #220–#242 and currently Closed issues attributed
+by **native assignee**, not by an inferred closer. All 23 PRs are merged in
+local Git and the GitHub snapshot, with a pre-merge formal `APPROVED` review
+by someone other than the PR author. Fifteen have such approval on the final
+head; eight (#220/#221/#224/#235/#236/#237/#239/#240) only on older heads.
+Many review bodies are `ok` or empty. This meets the observable formal-review
+count, not a claim of substantive independent verification or final acceptance.
+
+| Member | S4 merged PRs reviewed by another person (minimum 4) | S4 Closed assigned issues | Repository-wide Closed assigned issues (minimum 5) | Sample formal review given |
+|---|---|---|---|---|
+| @kietxuan | **5, met**: [#220](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/220), [#221](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/221), [#224](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/224), [#230](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/230), [#235](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/235) | 4: #195/#206/#208/#211 | **25, met**; examples [#195](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/195), #206/#208/#211 and historical #139 | [Approve #222](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/222#pullrequestreview-5637256620) |
+| @hoang3003 | **5, met**: [#222](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/222), [#223](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/223), [#227](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/227), [#234](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/234), [#241](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/241) | 5: #197/#207/#209/#214/#217 | **21, met**; example [#197](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/197) plus the other four S4 issues | [Approve #220](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/220#pullrequestreview-5636903087) |
+| @anotify-vie | **5, met**: [#226](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/226), [#232](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/232), [#236](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/236), [#239](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/239), [#240](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/240) | 4: #198/#205/#212/#213 | **22, met**; examples [#198](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/198), #205/#212/#213 and historical #189 | [Approve #220](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/220#pullrequestreview-5637095862) |
+| @vu-huzy | **4, met**: [#229](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/229), [#231](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/231), [#233](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/233), [#238](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/238) | 4: #199/#202/#203/#210 | **20, met**; examples [#199](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/199), #202/#203/#210 and historical #168 | [Approve #220](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/220#pullrequestreview-5637501944) |
+| @NguyenTuanAnh0608 | **4, met**: [#225](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/225), [#228](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/228), [#237](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/237), [#242](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/242) | 4: #200/#201/#204/#215 | **21, met**; examples [#200](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/200), #201/#204/#215 and historical #193 | [Approve #220](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/220#pullrequestreview-5637104039) |
+
+If five Closed issues are required **within Sprint 4 alone**, only @hoang3003
+currently meets that interpretation; the other four have four each. Do not
+close extra issues merely to satisfy a count. Repository-wide counts above
+include prior sprints and are explicitly separate.
+
+Root-test authorship was checked with file history, function-line blame and
+GitHub commit-author records, not PR ownership or C01 stewardship:
+
+| Member | Root pytest file / function / TC-ID | Authorship evidence and status |
+|---|---|---|
+| @kietxuan | `tests/test_s03_details.py::test_TC_P0_S03_001_public_known_id`; TC-P0-S03-001 | **Verified**: introduction/blame [31c5bf7](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/31c5bf7b9e8b006809a1bb2fcb69338589246421) in merged #235; GitHub author login `kietxuan`; test passed in this compact run |
+| @hoang3003 | Pending verification | No authored root pytest established; planned S13 stewardship does not supply authorship |
+| @anotify-vie | Pending verification | No authored root pytest established; #239/#240 PR ownership does not transfer Codex-authored bootstrap tests to this member |
+| @vu-huzy | Pending verification | No authored root pytest established; planned S03 stewardship does not transfer Kiet's authored tests |
+| @NguyenTuanAnh0608 | Candidate: `tests/test_p0_acceptance.py::test_TC_P0_S12_001_eight_char_normalized_hashed_registration`; TC-P0-S12-001 | **Pending identity verification**: blame/introduction [f0b56b7](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/f0b56b790f2edaa2bac8830c17d8cc6f1922756b) in merged #237 says `Tuan Anh <nguyentuananh0608tuananh@gmail.com>`; GitHub maps the commit to **@TuanAnh0608**, whereas PR author is @NguyenTuanAnh0608. Test passed; account/person equivalence is not established |
+
+The only other root-test author is `Codex <codex@openai.com>` for setup probes;
+it supplies no human contribution credit. Thus the all-member pytest requirement
+is **not demonstrated**. Team members should first link any existing qualifying
+authored case/commit/review or confirm the account discrepancy; no dedicated
+extra test PR or invented coauthor credit is required by this audit.
+
+### G4, scope outcomes, defects and capacity
+
+**G4 decision: Pending PO/SM confirmation.** Preserve the recorded history:
+the [30 October preflight](evidence/s4-t18-core-pre-g4/follow-up/README.md)
+recommended Defer with capacity/independent-execution gaps; the
+[31 October T19 record](evidence/s4-t19-live-20261031.md) reports that the
+requester said the PO confirmed Go, without a separate PO decision URL.
+The [T20 amendment](evidence/s4-t20/media-setup-audit.md) also records user
+authorization of embedded playback. Do not erase those reported decisions or
+promote them into a verified signed PO/SM gate/capacity record.
+
+Actual trailer outcome: **implemented and merged**, T19 #214 / PR #241 and
+T20 #215 / PR #242 are Closed/merged. Current UI has a button below the poster,
+an on-page player, and an unavailable caption for null data. Old external-tab
+evidence is historical. Admission/embedded-scope confirmation and independent
+functional acceptance remain human follow-ups; trailer work is not implemented
+or newly deferred by this wrap-up.
+
+Core delivery includes watchlist, explicit-save stars/half stars, title-first
+and description Search, complete-set pagination, ranking, Similar and reset
+that preserves watchlist. Closed implementation Tasks and prior P0 acceptance
+are established; final acceptance of the four new parent Stories is still Pending.
+No new product failure was observed in the compact P0 run.
+
+Known limitations/work: C05 compact defaults/CI and automated schema-aware
+WAL recovery are unmerged; #243's hot rollback-journal recovery defect/fix is
+evidence for that unmerged tooling, not a demonstrated defect in a merged CLI
+(the merged candidate has no `storage_snapshot` CLI). Legacy Story issue text
+and implementation contract differences still need PO reconciliation; the T05
+record lists integer-star/login-destination amendments. Existing T20 evidence
+records 18 development dependency advisories (4 high; earlier production-only
+audit 0) and the inherited Starlette warning; neither was re-audited here.
+No verified remaining-defect count or release deployment exists in this audit.
+
+| Member | Outstanding responsibility from current evidence | Confirmed remaining hours / capacity |
+|---|---|---|
+| @kietxuan | C01 #216, PO acceptance, G4/capacity confirmation and SM5 receipt | **Pending member confirmation** |
+| @anotify-vie | C02 #196, actual Review/Retro record and handoff; independent reviews as eligible | **Pending member confirmation** |
+| @NguyenTuanAnh0608 | C05 #219, #243 final independent setup/recovery acceptance | **Pending member confirmation** |
+| @vu-huzy | C04 #218 report/submission and C05 independent review if eligible | **Pending member confirmation** |
+| @hoang3003 | Confirm contribution evidence and remaining eligible review work | **Pending member confirmation** |
+
+Recorded historical estimates are C01 3h + 0.5h review, C02 3h author,
+C04 7h + 1h review, C05 6h + 1h review. They are **not** current remaining
+hours, actual time spent or proof of G4 capacity. Final correction/review buffer
+and any additional deferral require a C01 PO decision with owner/new issue/date.
+
+### Sprint 5 handoff to SM5 @kietxuan
+
+**Selected merged baseline:** `main` / local `origin/main`,
+`b1e8c1e50cbbf21099dc424e481df065f9e6b99b` (PR #242 merge).
+No tag points at it. Proposed SM5 acknowledgement/date: **Pending**.
+This is an executable baseline with remaining acceptance/process gates, not a
+claim of an accepted production release. #243 is not part of it.
+
+| Handoff field | Verified value / follow-up |
+|---|---|
+| Migration | Single repository Alembic head **`a3d1f8b72c44`**, observed with `.venv/bin/python -m alembic -c backend/alembic.ini heads`; installed release DB revision **Not verified** |
+| Search/index revision | Model **`overview-tfidf-v1`**, artifact version **1**; index implementation last changed at `ceec4426366d4635dfb3a7f620ed131141f7b47a` |
+| Index config revision | Observed `config_fingerprint()` = **`41785781f34ba44091ac64f3b1c0503402ee760c518af1429d0acb94bbc31c99`** |
+| App config revision | Committed config at selected SHA; `.env.example` last changed at `cbd7d55f25df28c8eb1484d54a4ce6299da403f3`. Private runtime environment/paths **Not verified**, never copied into evidence |
+| Actual release catalogue/index | **Pending operator selection/check**. T18's 964-movie revision `00a9831b-1c3a-489b-a8cf-51d36424e702`, T19's 831-movie revision `3cb8f1aa-61cc-4df6-8da6-1205ddc21da6` and unmerged C05's 951-movie revision are separate historical snapshots, not the current release DB |
+| Setup | Follow [SETUP](SETUP.md#steps): locked Python/backend and npm installs; one explicit DB for migrate/import `--pages 50`/trailer enrichment `--all`; rebuild/check index, provision review account, start backend/frontend; verify health migration plus catalogue/details/Search/Similar. Live import needs a private server-side operator token; runtime uses local data |
+| Recovery | Existing [SETUP backup/recovery](SETUP.md#s4-t12-watchlist-setup-backup-and-recovery) and [index readiness](overview-index.md#build-and-readiness). Stop writes and use a consistent SQLite online backup; preserve original data, restore to a separate unused path, migrate to head and rebuild/check index. Final independently rehearsed schema-aware/WAL recovery remains C05 work |
+| Future recovery tooling | [#243 runbook at its exact unmerged head](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/97d99d224db36871056dccee4fb835667ded2879/docs/s4-c05-release-storage.md). Do not run its absent `storage_snapshot` command on the selected baseline; approve/merge/reselect and rerun compact P0 after executable changes |
+| Evidence packet | Compact raw log and 37-ID map; [T20 final source/build/Search fix](evidence/s4-t20/media-setup-audit.md); scoped Similar/Search/reset/ranking histories above; contribution receipt. Formal approvals are linked, substantive independent whole-Story/recovery acceptance **Pending** |
+| Known unfinished scope | #22/#24/#30/#33 AC/DoD acceptance; C01 Planning/board/capacity, C02 events/PO approval, C05 final setup/recovery/compact CI, root-test contribution gaps. Proposed carry-over needs explicit C01 approval |
+| Explicit Sprint 5 work | **VN providers and release revalidation**, plus any explicitly approved deferred/unaccepted scope. PO must identify owners/new issue links for unrecorded transfers; this audit creates none |
+| Separate dossier/submission work | C04 #218 **Open / Pending**. Consume this log/mapping/audit now; actual final report review, manual `Team03_M4.pdf`, board/test-output screenshots and LMS receipt stay with C04. No PDF, submission screenshot, LMS/instructor acceptance or receipt is claimed |
+
+No extra backend/frontend/browser suite, live import, storage rehearsal or
+deployment was run for this documentation and focused-test change. Matching
+existing evidence is reused; the initial and amended compact runs are the only
+product-test executions claimed here. Lightweight document/link/hash/trace checks are recorded in the
+audit receipt. PO @kietxuan must substantively review the actual wrap-up and
+accept it; Review/Retro, capacity, authorship and C05 gates remain visible.

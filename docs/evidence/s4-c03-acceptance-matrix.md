@@ -27,7 +27,7 @@ review has passed.
 
 | ID | Requirement in supplied C03 issue | Local contract evidence | Author result |
 |---|---|---|---|
-| C03-01 | Reuse protected rating/reset and popularity contracts without duplicate API/storage. | [Existing rating/reset](../api.md#9-sprint-3-rating-contract-implemented-under-s3-t31), [S4 routes](../api.md#13-sprint-4-c03-implementation-contract-planned-not-delivered), [module ownership](../architecture.md#9-sprint-4-c03-runtime-and-storage-contract-planned) | Specified; Sprint 3 stays labelled implemented, S4 planned. |
+| C03-01 | Reuse protected rating/reset and popularity contracts without duplicate API/storage. | [Existing rating/reset](../api.md#9-sprint-3-rating-contract-implemented-under-s3-t31), [S4 routes](../api.md#13-sprint-4-c03-implementation-contract-delivery-status-below), [module ownership](../architecture.md#9-sprint-4-c03-runtime-and-storage-contract-planned) | Specified; Sprint 3 stays labelled implemented, S4 planned. |
 | C03-02 | 1/2=-1, 3=0, 4/5=+1; one contribution per rated movie; adjusted-score/title/ID order. | [Score contract and 80/80 oracle](../api.md#131-recommendation-score-transparency), [rank cases](../testing.md#2-test-cases-for-every-p0-story) | Specified, including replacement and shared-genre de-duplication. |
 | C03-03 | Separate raw popularity, personal adjustment, adjusted score and basis; public DTOs private-free. | [API score fields](../api.md#131-recommendation-score-transparency), [visible labels](../design.md#122-state-ordering-and-truthful-labels) | Specified, including null and rating-read degradation. |
 | C03-04 | Preserve S10's exact three steps and existing public error messages. | [Existing explanation copy](../recommendation-explanation.md), [design rule](../design.md#122-state-ordering-and-truthful-labels), [error envelope](../api.md#1-conventions) | Existing copy retained; no fourth step added. |
@@ -433,3 +433,15 @@ change the C03 acceptance decision.
 | File | SHA-256 after UTF-8 LF normalization |
 |---|---|
 | `docs/api.md` | `28322e8f3a504d9b380ad9a3b72b8cc49eeb185cc992c24f644f04346d8886a1` |
+
+## 1 November wrap-up assertion-description amendment
+
+Section 2 now describes the assertions actually executed in the compact run;
+TC-P0-S02-001 additionally checks recommendation limits 9/10/11. The 37 IDs
+and four report sections remain. Execution and tested-file identity are in
+[s4-t05-acceptance.md](s4-t05-acceptance.md#compact-m4-wrap-up-execution--1-november-2026).
+Earlier document fingerprints above remain historical.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/testing.md` | `3d8a836fc4f747a5932f1421c28c50a6abfb077529ba570a2ac08f7316e94554` |

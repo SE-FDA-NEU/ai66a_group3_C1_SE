@@ -1,5 +1,8 @@
 # S4-T05 #200: P0, rating and ranking acceptance audit
 
+Current wrap-up: [1 November compact execution and assertion map](#compact-m4-wrap-up-execution--1-november-2026).
+The 28 October record below retains its original candidate and execution scope.
+
 Date: 2026-10-28 (Asia/Saigon). Branch:
 `test/s4-t05-p0-rating-ranking-acceptance`, based on fetched `origin/main`
 `0feafb3295e22a76e1f624dcf086ec93ddd206d3`. All automated fixtures are
@@ -192,3 +195,104 @@ specific protected action. The exact issue amendment text is recorded in
 [the Story update draft](s4-t05-story-issue-updates.md). Those GitHub issue
 bodies require synchronization before final acceptance; this local document
 does not claim that they have been edited.
+
+
+## Compact M4 wrap-up execution — 1 November 2026
+
+Selected **merged product baseline**: `b1e8c1e50cbbf21099dc424e481df065f9e6b99b`,
+`main`, PR #242 merge. Runner: **Codex, existing checkout**, not an independent
+teammate or clean-clone run. The first run executed the exact committed tests:
+40/40 passed in **5.94 s** (6.887 s process time).
+
+Assertion inspection then found no explicit S02 limit 9/10/11 check in root
+`tests/`. Six assertions/setup lines were added to the existing
+`test_TC_P0_S02_001_full_set_paging_has_25_distinct_movies`; no case was removed,
+skipped, renamed or credited to another person. Product code is unchanged.
+The **final run tested that merged baseline plus the test amendment, uncommitted
+at execution and delivered with this wrap-up change**;
+[the receipt](s4-wrap-up-20261101.json) includes its exact patch and test/setup
+SHA-256 values, so the amended test run is not misrepresented as the original SHA.
+
+```text
+.venv/bin/python -m pytest tests/test_p0_acceptance.py tests/test_s03_details.py -v
+```
+
+Final: **40 collected, 40 passed, 0 failed, 0 skipped, 0 xfailed in 5.70 s**;
+**6.646 s** measured process time, 08:55:29–08:55:35 +07:00. One inherited
+Starlette/httpx deprecation warning. [Actual full output for both runs](s4-t05-compact-20261101.log).
+macOS 26.2 arm64; Python 3.12.4, SQLite 3.45.3, pytest 9.1.1,
+FastAPI 0.141.1, Starlette 1.7.0, SQLAlchemy 2.1.1, Alembic 1.20.0,
+httpx 0.28.1. Existing venv/dependencies were reused. Early bootstrap and per-case
+fixtures own temporary migrated databases/indexes, blank tokens and blocked live
+HTTP; TestClient does not start a server. No production database was used.
+
+Merged C05 EARLY_TEST_SETUP works for this explicit selection. Its default
+`pytest.ini` still discovers extended suites; the approved compact default/CI,
+new storage CLI and independent final rehearsal in **unmerged #243 remain Pending**.
+Its `132394c` clean-clone results are separate author evidence, not this run.
+No plain/default pytest, extended backend/frontend/browser/mutation suite, live
+import, build or recovery rehearsal was rerun for wrap-up. Existing matching
+[T20 evidence](s4-t20/media-setup-audit.md) is reused at its own tested SHAs.
+
+All **37 Section 2 IDs map to the 40 executed passing nodes below**, including
+all four S03-001 variants. Item counts by Story: S01 8, S02 6, S03 9, S04 6,
+S12 5, S13 6. S01 covers 0/1/2 and 4/5/6 genres; S02/S04 cover limits 9/10/11;
+S12 covers password lengths 7/8/9. S03's identifier/null/error boundaries and
+S13's session/auth boundaries have no invented numeric quota. Test IDs occur
+in the test function or parameter ID. This table reports asserted API/DB behaviour,
+not React rendering, browser navigation or PO acceptance.
+
+The corresponding Section 2 descriptions were corrected to match the assertions:
+S02-002 does not assert title/ID ties; S02-005 injects catalogue lookup failure;
+S03-001 checks year/overview nulls and excludes private fields; S12-005 injects
+failure before user insertion rather than proving commit rollback; S13-001 checks
+cookie presence but not attributes; S13-004 tests reads; S13-006 tests auth-origin
+refusal, while protected-write origin refusal is S01-008. These descriptions do
+not remove any production requirement or substitute for stronger separate
+security/functional acceptance. C05 #243 contains later assertion strengthening
+which is not part of the selected merged baseline.
+
+| Story | TC-ID | Executed pytest node | Expected assertion | Actual |
+|---|---|---|---|---|
+| S01 #17 | `TC-P0-S01-001` | `tests/test_p0_acceptance.py::test_TC_P0_S01_001_canonical_genres_and_empty_selection` | Canonical local genres 28/35; empty saved selection. | **PASSED** (1 item) |
+| S01 #17 | `TC-P0-S01-002` | `tests/test_p0_acceptance.py::test_TC_P0_S01_002_zero_preserves_previous_rows` | 0 genres refused with 400; prior two selections preserved. | **PASSED** (1 item) |
+| S01 #17 | `TC-P0-S01-003` | `tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-003]` | 1 genre saved; B unchanged; persisted row count checked. | **PASSED** (1 item) |
+| S01 #17 | `TC-P0-S01-004` | `tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-004]` | 2 genres saved; B unchanged; persisted row count checked. | **PASSED** (1 item) |
+| S01 #17 | `TC-P0-S01-005` | `tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-005]` | 4 genres saved; B unchanged; persisted row count checked. | **PASSED** (1 item) |
+| S01 #17 | `TC-P0-S01-006` | `tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-006]` | 5 genres saved; B unchanged; persisted row count checked. | **PASSED** (1 item) |
+| S01 #17 | `TC-P0-S01-007` | `tests/test_p0_acceptance.py::test_TC_P0_S01_007_invalid_sets_preserve_previous_selection` | 6/duplicate/boolean/string IDs refused; prior selection preserved. | **PASSED** (1 item) |
+| S01 #17 | `TC-P0-S01-008` | `tests/test_p0_acceptance.py::test_TC_P0_S01_008_guest_forgery_and_origin_leave_accounts_intact` | Guest 401, forged identity 400, cross-origin write 403; A/B unchanged. | **PASSED** (1 item) |
+| S02 #18 | `TC-P0-S02-001` | `tests/test_p0_acceptance.py::test_TC_P0_S02_001_full_set_paging_has_25_distinct_movies` | 25 distinct IDs on 10/10/5 pages; limits 9/10 accepted, 11 refused with 400. | **PASSED** (1 item) |
+| S02 #18 | `TC-P0-S02-002` | `tests/test_p0_acceptance.py::test_TC_P0_S02_002_rating_free_order_and_reasons` | Descending baseline popularity; Action in each reason; basis=baseline. | **PASSED** (1 item) |
+| S02 #18 | `TC-P0-S02-003` | `tests/test_p0_acceptance.py::test_TC_P0_S02_003_no_match_uses_unboosted_popular` | No-match popular fallback; no personal scores; saved genre preserved. | **PASSED** (1 item) |
+| S02 #18 | `TC-P0-S02-004` | `tests/test_p0_acceptance.py::test_TC_P0_S02_004_guest_and_expired_cookie_are_private` | Guest and expired session return 401 on recommendations. | **PASSED** (1 item) |
+| S02 #18 | `TC-P0-S02-005` | `tests/test_p0_acceptance.py::test_TC_P0_S02_005_core_failure_then_retry_preserves_preferences` | Catalogue lookup fault returns 503/requestId/no data; retry 200; genres preserved. | **PASSED** (1 item) |
+| S02 #18 | `TC-P0-S02-006` | `tests/test_p0_acceptance.py::test_TC_P0_S02_006_filter_after_whole_set_ranking` | Full-set filtered 10/2 pages out of 35, 12 unique matches; invalid genre bounds refused. | **PASSED** (1 item) |
+| S03 #19 | `TC-P0-S03-001` | `tests/test_s03_details.py::test_TC_P0_S03_001_public_known_id`<br>`tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[year]`<br>`tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[summary]`<br>`tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[both]` | Known public DTO and health 200; nullable year/summary variants; no private rating fields. | **PASSED** (4 items) |
+| S03 #19 | `TC-P0-S03-002` | `tests/test_s03_details.py::test_TC_P0_S03_002_unknown_id_refused` | Unknown opaque movie ID returns 404 MOVIE_NOT_FOUND, no data. | **PASSED** (1 item) |
+| S03 #19 | `TC-P0-S03-003` | `tests/test_s03_details.py::test_TC_P0_S03_003_catalogue_and_database_failures_are_distinct` | Missing catalogue and injected DB error yield distinct 503 codes. | **PASSED** (1 item) |
+| S03 #19 | `TC-P0-S03-004` | `tests/test_s03_details.py::test_TC_P0_S03_004_return_query_cannot_redirect_or_change_public_movie` | Safe/external-looking return query leaves public DTO unchanged, no redirect. | **PASSED** (1 item) |
+| S03 #19 | `TC-P0-S03-005` | `tests/test_s03_details.py::test_TC_P0_S03_005_detail_widgets_preserve_both_accounts_preferences` | Detail/Similar/rating/watchlist preserve A/B genres; B sees no A private state. | **PASSED** (1 item) |
+| S03 #19 | `TC-P0-S03-006` | `tests/test_s03_details.py::test_TC_P0_S03_006_membership_commit_allows_read_snapshot_cleanup` | Concurrent real SQLite read cleanup permits membership COMMIT to return 200/true. | **PASSED** (1 item) |
+| S04 #20 | `TC-P0-S04-001` | `tests/test_p0_acceptance.py::test_TC_P0_S04_001_public_catalogue_pages_include_null_popularity` | Alphabetical 10/10/5 catalogue pages, 25 distinct IDs; null popularity retained. | **PASSED** (1 item) |
+| S04 #20 | `TC-P0-S04-002` | `tests/test_p0_acceptance.py::test_TC_P0_S04_002_cold_start_has_no_personal_score` | Cold start returns A90/B80/C80, popular mode, no personal scores. | **PASSED** (1 item) |
+| S04 #20 | `TC-P0-S04-003` | `tests/test_p0_acceptance.py::test_TC_P0_S04_003_limit_9_and_10_keep_full_total` | Limits 9 and 10 accepted, total stays 25. | **PASSED** (1 item) |
+| S04 #20 | `TC-P0-S04-004` | `tests/test_p0_acceptance.py::test_TC_P0_S04_004_limit_and_page_refusals` | Limits 0/11 and pages 0/10001/bad refused; page 10000 valid and empty. | **PASSED** (1 item) |
+| S04 #20 | `TC-P0-S04-005` | `tests/test_p0_acceptance.py::test_TC_P0_S04_005_empty_active_versus_missing_revision` | Active empty catalogue returns 200/total 0; missing revision returns 503. | **PASSED** (1 item) |
+| S04 #20 | `TC-P0-S04-006` | `tests/test_p0_acceptance.py::test_TC_P0_S04_006_stale_catalogue_revision_is_409` | Changed catalogue revision returns 409 CATALOGUE_CHANGED. | **PASSED** (1 item) |
+| S12 #44 | `TC-P0-S12-001` | `tests/test_p0_acceptance.py::test_TC_P0_S12_001_eight_char_normalized_hashed_registration` | 8-character registration returns 201; normalized email/Argon2id persisted; no session. | **PASSED** (1 item) |
+| S12 #44 | `TC-P0-S12-002` | `tests/test_p0_acceptance.py::test_TC_P0_S12_002_seven_char_password_has_no_row` | 7-character password returns 400; no user row. | **PASSED** (1 item) |
+| S12 #44 | `TC-P0-S12-003` | `tests/test_p0_acceptance.py::test_TC_P0_S12_003_nine_char_password_has_safe_dto` | 9-character password returns 201; safe user DTO. | **PASSED** (1 item) |
+| S12 #44 | `TC-P0-S12-004` | `tests/test_p0_acceptance.py::test_TC_P0_S12_004_duplicate_normalized_email_is_conflict` | Duplicate normalized email returns exact 409 error; one user row. | **PASSED** (1 item) |
+| S12 #44 | `TC-P0-S12-005` | `tests/test_p0_acceptance.py::test_TC_P0_S12_005_invalid_email_and_storage_failure_create_no_account` | Bad email returns 400; injected create-user failure 503; no partial account. | **PASSED** (1 item) |
+| S13 #45 | `TC-P0-S13-001` | `tests/test_p0_acceptance.py::test_TC_P0_S13_001_login_me_cookie_and_safe_user` | Login/me returns safe A user/email; session cookie present. | **PASSED** (1 item) |
+| S13 #45 | `TC-P0-S13-002` | `tests/test_p0_acceptance.py::test_TC_P0_S13_002_wrong_and_unknown_credentials_same_public_error` | Wrong/unknown credentials return identical 401 message. | **PASSED** (1 item) |
+| S13 #45 | `TC-P0-S13-003` | `tests/test_p0_acceptance.py::test_TC_P0_S13_003_logout_replay_and_later_login_restore_data` | Logout 204, old-cookie replay 401; later login restores genres/rating. | **PASSED** (1 item) |
+| S13 #45 | `TC-P0-S13-004` | `tests/test_p0_acceptance.py::test_TC_P0_S13_004_missing_expired_and_revoked_sessions_refused` | Missing/expired/revoked preference reads return 401. | **PASSED** (1 item) |
+| S13 #45 | `TC-P0-S13-005` | `tests/test_p0_acceptance.py::test_TC_P0_S13_005_account_isolation_and_forged_identity` | A/B saved genres separate; forged identity refused; B has no A rating. | **PASSED** (1 item) |
+| S13 #45 | `TC-P0-S13-006` | `tests/test_p0_acceptance.py::test_TC_P0_S13_006_cross_origin_auth_and_write_refused` | Cross-origin login/logout 403; existing authenticated preferences unchanged. | **PASSED** (1 item) |
+
+C04 #218 can consume this map/log now; final report approval, authentic full-output
+screenshot, PDF and submission remain its own Pending deliverables. Sprint Review,
+Retro, G4 confirmation and PO acceptance are recorded in the
+[Sprint log](../sprint-log.md#sprint-4--wrap-up-cutoff-1-november-2026).
