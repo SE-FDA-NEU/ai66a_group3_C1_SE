@@ -477,3 +477,12 @@ name that run; earlier candidate hashes remain historical.
 | File | SHA-256 after UTF-8 LF normalization |
 |---|---|
 | `docs/testing.md` | `c40b507c9ed151833e375a96c97a711dd757b2ba65adeafb19ae28885c1a3b99` |
+### C02 root-test relocation — 1 November 2026
+
+The current Similar API test path is now `tests/test_similar_movies_api.py`.
+Existing test bodies and earlier execution/fingerprint records are preserved;
+this row identifies the updated API documentation, not a new functional run.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/api.md` | `fa0e363e866e650461d1169f21622d9e4dd54d6b46bd01e36c23474758fd6631` |

@@ -1049,7 +1049,7 @@ are ranked by `rank_similar_movies` in
 de-duplicated before ranking. A source or candidate ID absent from the loaded
 index mapping is also `INDEX_UNAVAILABLE`. Cosine, popularity, title and ID
 ties use the shared `score_title_id_ordering` comparator. Focused synthetic
-API/DB checks are in `backend/tests/test_similar_movies_api.py`. T08 adds the
+API/DB checks are in `tests/test_similar_movies_api.py`. T08 adds the
 public Similar movies section to `/movies/:movieId` through the shared typed
 movies client. It keeps the server's order and at most five distinct movies
 other than the source, never reads the account or rating APIs, and carries the
