@@ -1,0 +1,561 @@
+{
+  "issues": [
+    {
+      "number": 22,
+      "state": "open",
+      "title": "[Story] S05b - Use movie ratings to improve recommendations",
+      "closed_at": null,
+      "comments": 0,
+      "assignees": [
+        "hoang3003"
+      ],
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/22"
+    },
+    {
+      "number": 24,
+      "state": "open",
+      "title": "[Story] S07 - Find content-similar movies from the details page",
+      "closed_at": null,
+      "comments": 0,
+      "assignees": [
+        "vu-huzy"
+      ],
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/24"
+    },
+    {
+      "number": 30,
+      "state": "open",
+      "title": "[Story] S08 - Search movies by title or description",
+      "closed_at": null,
+      "comments": 0,
+      "assignees": [
+        "anotify-vie"
+      ],
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/30"
+    },
+    {
+      "number": 33,
+      "state": "open",
+      "title": "[Story] S11 - Reset my personalisation profile",
+      "closed_at": null,
+      "comments": 0,
+      "assignees": [
+        "vu-huzy"
+      ],
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/33"
+    },
+    {
+      "number": 195,
+      "state": "closed",
+      "title": "[Task] S4-T01 \u2014 Complete existing-page UI, shared light/dark components, posters and five-star rating",
+      "closed_at": "2026-10-24T09:35:57Z",
+      "comments": 0,
+      "assignees": [
+        "kietxuan"
+      ],
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/195"
+    },
+    {
+      "number": 196,
+      "state": "open",
+      "title": "[Chore] S4-C02 \u2014 Sprint 4 wrap-up",
+      "closed_at": null,
+      "comments": 0,
+      "assignees": [
+        "anotify-vie"
+      ],
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/196"
+    },
+    {
+      "number": 197,
+      "state": "closed",
+      "title": "[Task] S4-T02 \u2014 Specify ranking oracles and implement current-account rating signals",
+      "closed_at": "2026-10-24T17:03:31Z",
+      "comments": 0,
+      "assignees": [
+        "hoang3003"
+      ],
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/197"
+    },
+    {
+      "number": 198,
+      "state": "closed",
+      "title": "[Task] S4-T03 \u2014 Integrate personalised ranking, safe fallback and score metadata",
+      "closed_at": "2026-10-25T09:52:17Z",
+      "comments": 0,
+      "assignees": [
+        "anotify-vie"
+      ],
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/198"
+    },
+    {
+      "number": 199,
+      "state": "closed",
+      "title": "[Task] S4-T04 \u2014 Refresh recommendations after rating saves and display ranking explanations",
+      "closed_at": "2026-10-27T04:07:19Z",
+      "comments": 0,
+      "assignees": [
+        "vu-huzy"
+      ],
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/199"
+    },
+    {
+      "number": 200,
+      "state": "closed",
+      "title": "[Task] S4-T05 \u2014 Verify P0 regression, rating/ranking acceptance and test effectiveness",
+      "closed_at": "2026-10-28T12:15:59Z",
+      "comments": 0,
+      "assignees": [
+        "NguyenTuanAnh0608"
+      ],
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/200"
+    },
+    {
+      "number": 201,
+      "state": "closed",
+      "title": "[Task] S4-T06 \u2014 Build the shared versioned TF-IDF overview index",
+      "closed_at": "2026-10-24T18:02:00Z",
+      "comments": 0,
+      "assignees": [
+        "NguyenTuanAnh0608"
+      ],
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/201"
+    },
+    {
+      "number": 202,
+      "state": "closed",
+      "title": "[Task] S4-T07 \u2014 Implement shared-genre similar ranking and its public API",
+      "closed_at": "2026-10-26T05:48:16Z",
+      "comments": 0,
+      "assignees": [
+        "vu-huzy"
+      ],
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/202"
+    },
+    {
+      "number": 203,
+      "state": "closed",
+      "title": "[Task] S4-T08 \u2014 Integrate similar-movie UI and verify all five acceptance criteria",
+      "closed_at": "2026-10-27T06:43:51Z",
+      "comments": 0,
+      "assignees": [
+        "vu-huzy"
+      ],
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/203"
+    },
+    {
+      "number": 204,
+      "state": "closed",
+      "title": "[Task] S4-T09 \u2014 Implement title-first and positive-cosine description search API",
+      "closed_at": "2026-10-25T17:32:08Z",
+      "comments": 0,
+      "assignees": [
+        "NguyenTuanAnh0608"
+      ],
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/204"
+    },
+    {
+      "number": 205,
+      "state": "closed",
+      "title": "[Task] S4-T10 \u2014 Build search UI and verify all five title-and-description criteria",
+      "closed_at": "2026-10-27T03:51:37Z",
+      "comments": 0,
+      "assignees": [
+        "anotify-vie"
+      ],
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/205"
+    },
+    {
+      "number": 206,
+      "state": "closed",
+      "title": "[Task] S4-T11 \u2014 Specify reset semantics and harden concurrent account writes",
+      "closed_at": "2026-10-24T09:35:58Z",
+      "comments": 0,
+      "assignees": [
+        "kietxuan"
+      ],
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/206"
+    },
+    {
+      "number": 207,
+      "state": "closed",
+      "title": "[Task] S4-T12 \u2014 Implement account profile and persistent watchlist; verify reset ownership and rollback",
+      "closed_at": "2026-10-25T12:37:50Z",
+      "comments": 0,
+      "assignees": [
+        "hoang3003"
+      ],
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/207"
+    },
+    {
+      "number": 208,
+      "state": "closed",
+      "title": "[Task] S4-T13 \u2014 Build profile UI with reset confirmation, cancellation and recovery",
+      "closed_at": "2026-10-26T11:27:01Z",
+      "comments": 0,
+      "assignees": [
+        "kietxuan"
+      ],
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/208"
+    },
+    {
+      "number": 209,
+      "state": "closed",
+      "title": "[Task] S4-T14 \u2014 Invalidate account personalisation state after confirmed reset",
+      "closed_at": "2026-10-27T14:06:23Z",
+      "comments": 0,
+      "assignees": [
+        "hoang3003"
+      ],
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/209"
+    },
+    {
+      "number": 210,
+      "state": "closed",
+      "title": "[Task] S4-T15 \u2014 Verify full reset, later-login persistence and accessible recovery",
+      "closed_at": "2026-10-29T06:17:29Z",
+      "comments": 0,
+      "assignees": [
+        "vu-huzy"
+      ],
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/210"
+    },
+    {
+      "number": 211,
+      "state": "closed",
+      "title": "[Task] S4-T16 \u2014 Verify detail return and widget request boundaries",
+      "closed_at": "2026-10-28T00:38:36Z",
+      "comments": 0,
+      "assignees": [
+        "kietxuan"
+      ],
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/211"
+    },
+    {
+      "number": 212,
+      "state": "closed",
+      "title": "[Task] S4-T17 \u2014 Verify paginated view filtering after ranking changes",
+      "closed_at": "2026-10-28T04:15:31Z",
+      "comments": 0,
+      "assignees": [
+        "anotify-vie"
+      ],
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/212"
+    },
+    {
+      "number": 213,
+      "state": "closed",
+      "title": "[Task] S4-T18 \u2014 Verify fallback/account isolation and complete core preflight",
+      "closed_at": "2026-10-30T10:03:12Z",
+      "comments": 0,
+      "assignees": [
+        "anotify-vie"
+      ],
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/213"
+    },
+    {
+      "number": 214,
+      "state": "closed",
+      "title": "[Task] S4-T19 \u2014 Import one official YouTube trailer with safe selection",
+      "closed_at": "2026-10-31T06:50:30Z",
+      "comments": 0,
+      "assignees": [
+        "hoang3003"
+      ],
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/214"
+    },
+    {
+      "number": 215,
+      "state": "closed",
+      "title": "[Task] S4-T20 \u2014 Integrate trailer UI and independently verify trailer and backdrop behaviour",
+      "closed_at": "2026-10-31T15:50:13Z",
+      "comments": 0,
+      "assignees": [
+        "NguyenTuanAnh0608"
+      ],
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/215"
+    },
+    {
+      "number": 216,
+      "state": "open",
+      "title": "[Chore] S4-C01 \u2014 Refine Sprint 4 backlog and commitment",
+      "closed_at": null,
+      "comments": 0,
+      "assignees": [
+        "kietxuan"
+      ],
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/216"
+    },
+    {
+      "number": 217,
+      "state": "closed",
+      "title": "[Chore] S4-C03 \u2014 Finalize Sprint 4 API, schema, UI and testing contracts",
+      "closed_at": "2026-10-24T08:50:51Z",
+      "comments": 0,
+      "assignees": [
+        "hoang3003"
+      ],
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/217"
+    },
+    {
+      "number": 218,
+      "state": "open",
+      "title": "[Chore] S4-C04 \u2014 Audit final UI/contracts, compile M4 dossier and submit",
+      "closed_at": null,
+      "comments": 0,
+      "assignees": [
+        "vu-huzy"
+      ],
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/218"
+    },
+    {
+      "number": 219,
+      "state": "open",
+      "title": "[Chore] S4-C05 \u2014 Prepare build and index startup with persistent storage and tested recovery",
+      "closed_at": null,
+      "comments": 0,
+      "assignees": [
+        "NguyenTuanAnh0608"
+      ],
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/219"
+    }
+  ],
+  "c05": {
+    "state": "closed",
+    "merged": true,
+    "merge_commit_sha": "0d2378d5f0c44889ca93c8cff7c8bc9c568b43c5",
+    "merged_at": "2026-11-01T04:26:24Z",
+    "author": "NguyenTuanAnh0608",
+    "head": "97d99d224db36871056dccee4fb835667ded2879",
+    "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/243",
+    "reviews": [
+      {
+        "user": "kietxuan",
+        "state": "APPROVED",
+        "commit": "97d99d224db36871056dccee4fb835667ded2879",
+        "body": "ok",
+        "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/243#pullrequestreview-5724953852"
+      }
+    ]
+  },
+  "profiles": [
+    {
+      "login": "TuanAnh0608",
+      "id": 247933931,
+      "name": null,
+      "html_url": "https://github.com/TuanAnh0608"
+    },
+    {
+      "login": "NguyenTuanAnh0608",
+      "id": 224349508,
+      "name": null,
+      "html_url": "https://github.com/NguyenTuanAnh0608"
+    }
+  ],
+  "snapshotDateLocal": "2026-11-01",
+  "timezone": "Asia/Saigon",
+  "mergedMain": "0d2378d5f0c44889ca93c8cff7c8bc9c568b43c5",
+  "testedIntegrationCommit": "ba7d8f9b01a2d26680205991e7f980d1d45d22cd",
+  "historicalReceipt": "s4-wrap-up-20261101.json",
+  "minimums": {
+    "team": {
+      "reviewedMergedSprint4PRs": 4,
+      "closedSprint4Issues": 5
+    },
+    "perMember": {
+      "mergedPR": 1,
+      "reviewGiven": 1,
+      "closedIssue": 1,
+      "authoredPytestInRootTests": 1
+    }
+  },
+  "verification": {
+    "status": "passed",
+    "runner": "Codex, isolated source export, existing locked Python dependencies",
+    "command": "python -m pytest -v",
+    "candidate": "ba7d8f9b01a2d26680205991e7f980d1d45d22cd",
+    "passed": 40,
+    "failed": 0,
+    "skipped": 0,
+    "warnings": 1,
+    "pytestSeconds": 13.74,
+    "processSeconds": 15.719,
+    "log": "s4-c02-integration-pytest-20261101.log",
+    "caseMap": {
+      "TC-P0-S01-001": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S01_001_canonical_genres_and_empty_selection"
+      ],
+      "TC-P0-S01-002": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S01_002_zero_preserves_previous_rows"
+      ],
+      "TC-P0-S01-003": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-003]"
+      ],
+      "TC-P0-S01-004": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-004]"
+      ],
+      "TC-P0-S01-005": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-005]"
+      ],
+      "TC-P0-S01-006": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-006]"
+      ],
+      "TC-P0-S01-007": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S01_007_invalid_sets_preserve_previous_selection"
+      ],
+      "TC-P0-S01-008": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S01_008_guest_forgery_and_origin_leave_accounts_intact"
+      ],
+      "TC-P0-S02-001": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S02_001_full_set_paging_has_25_distinct_movies"
+      ],
+      "TC-P0-S02-002": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S02_002_rating_free_order_and_reasons"
+      ],
+      "TC-P0-S02-003": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S02_003_no_match_uses_unboosted_popular"
+      ],
+      "TC-P0-S02-004": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S02_004_guest_and_expired_cookie_are_private"
+      ],
+      "TC-P0-S02-005": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S02_005_core_failure_then_retry_preserves_preferences"
+      ],
+      "TC-P0-S02-006": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S02_006_filter_after_whole_set_ranking"
+      ],
+      "TC-P0-S03-001": [
+        "tests/test_s03_details.py::test_TC_P0_S03_001_public_known_id",
+        "tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[year]",
+        "tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[summary]",
+        "tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[both]"
+      ],
+      "TC-P0-S03-002": [
+        "tests/test_s03_details.py::test_TC_P0_S03_002_unknown_id_refused"
+      ],
+      "TC-P0-S03-003": [
+        "tests/test_s03_details.py::test_TC_P0_S03_003_catalogue_and_database_failures_are_distinct"
+      ],
+      "TC-P0-S03-004": [
+        "tests/test_s03_details.py::test_TC_P0_S03_004_return_query_cannot_redirect_or_change_public_movie"
+      ],
+      "TC-P0-S03-005": [
+        "tests/test_s03_details.py::test_TC_P0_S03_005_detail_widgets_preserve_both_accounts_preferences"
+      ],
+      "TC-P0-S03-006": [
+        "tests/test_s03_details.py::test_TC_P0_S03_006_membership_commit_allows_read_snapshot_cleanup"
+      ],
+      "TC-P0-S04-001": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S04_001_public_catalogue_pages_include_null_popularity"
+      ],
+      "TC-P0-S04-002": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S04_002_cold_start_has_no_personal_score"
+      ],
+      "TC-P0-S04-003": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S04_003_limit_9_and_10_keep_full_total"
+      ],
+      "TC-P0-S04-004": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S04_004_limit_and_page_refusals"
+      ],
+      "TC-P0-S04-005": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S04_005_empty_active_versus_missing_revision"
+      ],
+      "TC-P0-S04-006": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S04_006_stale_catalogue_revision_is_409"
+      ],
+      "TC-P0-S12-001": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S12_001_eight_char_normalized_hashed_registration"
+      ],
+      "TC-P0-S12-002": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S12_002_seven_char_password_has_no_row"
+      ],
+      "TC-P0-S12-003": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S12_003_nine_char_password_has_safe_dto"
+      ],
+      "TC-P0-S12-004": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S12_004_duplicate_normalized_email_is_conflict"
+      ],
+      "TC-P0-S12-005": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S12_005_invalid_email_and_storage_failure_create_no_account"
+      ],
+      "TC-P0-S13-001": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S13_001_login_me_cookie_and_safe_user"
+      ],
+      "TC-P0-S13-002": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S13_002_wrong_and_unknown_credentials_same_public_error"
+      ],
+      "TC-P0-S13-003": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S13_003_logout_replay_and_later_login_restore_data"
+      ],
+      "TC-P0-S13-004": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S13_004_missing_expired_and_revoked_sessions_refused"
+      ],
+      "TC-P0-S13-005": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S13_005_account_isolation_and_forged_identity"
+      ],
+      "TC-P0-S13-006": [
+        "tests/test_p0_acceptance.py::test_TC_P0_S13_006_cross_origin_auth_and_write_refused"
+      ]
+    },
+    "normalizedLfSha256": {
+      "tests/test_p0_acceptance.py": "c2b14f61617ae19e354e55096cfb04c511aa1859a60253d09a77b02c4fb0e136",
+      "tests/test_s03_details.py": "5ec72229c2a3e4e169358c5892c3056e561cf1d69ff58ae6115c069861eeef51",
+      "tests/conftest.py": "d2b071114ae42227afb0d8ea4f4bfa2298c6d276adf1aeeae7c075cbf344b849",
+      "conftest.py": "8f133a85bad2969d09798e269e97debf7b70aa4fb3b3957a12abdec164fd427b",
+      "pytest.ini": "29994bb63a3c835981dc95cf8f425699fc25b4d2be0bf0ea84908182e642160d"
+    },
+    "notRun": [
+      "full backend/frontend/browser/script regression",
+      "new live import/build/storage rehearsal",
+      "independent human review"
+    ]
+  },
+  "recordedAtUtc": "2026-11-01T07:35:40.930644+00:00",
+  "environment": {
+    "python": "3.12.6",
+    "verification": "existing project venv; no dependency changes or new-venv claim"
+  },
+  "sourceComparison": {
+    "productionAndConfigDiffAgainstMergedMain": "",
+    "testDiffNumstat": "6\t0\ttests/test_p0_acceptance.py",
+    "historicalT20ManifestComparisons": {
+      "b1e8c1e50cbbf21099dc424e481df065f9e6b99b": {
+        "matched": 18,
+        "total": 18
+      },
+      "6fbea7221093116d84450e587d2ffd6caabb72f9": {
+        "matched": 17,
+        "total": 18
+      }
+    }
+  },
+  "sprint4TeamTotals": {
+    "mergedPRs": 24,
+    "closedWorkItems": 21,
+    "openChores": [
+      216,
+      196,
+      218,
+      219
+    ],
+    "newAcceptedStoryPoints": 0,
+    "originalCommittedStoryPoints": "Pending actual Planning record",
+    "maximumPossiblePointsForFourNewStories": 18
+  },
+  "humanRecords": {
+    "reviewRetro": "Pending actual event/attendance/decisions",
+    "poAcceptance": "Pending",
+    "memberPytestEvidence": "See sprint log; no fabricated credit",
+    "sm5Acknowledgement": "Pending",
+    "c05IssueAcceptance": "Issue219 Open despite PR243 merged",
+    "submissionOwnedByC04": true,
+    "g4Decision": "User-confirmed reported Go; dated repo/capacity record separate"
+  },
+  "documentChecks": {
+    "localLinksAndAnchors": 205,
+    "missing": 0,
+    "fourSectionStructure": "passed",
+    "normalizedLfCrLf": "passed",
+    "focusedRuff": "passed"
+  }
+}

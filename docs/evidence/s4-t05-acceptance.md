@@ -1,5 +1,11 @@
 # S4-T05 #200: P0, rating and ranking acceptance audit
 
+Current integration after merged C05 is recorded in
+[the C02 follow-up](s4-c02-integration-20261101.md). It retains all 37 IDs/40
+items and verifies the stronger C05 authentication/commit-failure assertions
+plus C02's S02 limit checks. The dated runs below remain historical; their
+old source/discovery descriptions are not the current merged setup.
+
 Current wrap-up: [1 November compact execution and assertion map](#compact-m4-wrap-up-execution--1-november-2026).
 The 28 October record below retains its original candidate and execution scope.
 

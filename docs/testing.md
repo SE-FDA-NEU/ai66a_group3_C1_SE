@@ -1,8 +1,9 @@
 # Milestone 4 — Testing
 
 This report covers the six P0 Stories: S01, S02, S03, S04, S12 and S13.
-The [C05 verification record](evidence/s4-c05/compact-m4.md) identifies the
-tested candidate and actual results. C04 #218 owns final independent review,
+The [C02 integration record](evidence/s4-c02-integration-20261101.md) identifies
+the tested candidate after merging C05 and adding S02 limit assertions.
+C04 #218 owns final independent review,
 submission screenshots and manual export of the merged report.
 
 ## 1. What we test, and why
@@ -101,9 +102,9 @@ Per-case fixtures exercise the real routes and persisted rows with synthetic
 accounts/movies; they do not merely compare hard-coded fake return values.
 
 Actual count, runtime, full verbose output and screenshot are linked from
-[the current C05 record](evidence/s4-c05/compact-m4.md).
+[the current C02 integration record](evidence/s4-c02-integration-20261101.md).
 
-![Full output of the 40-item clean-clone pytest run](evidence/s4-c05/checks/compact-verbose-output.png)
+![Full output of the 40-item C02 integration pytest run](evidence/s4-c02-integration-pytest-20261101.png)
 
 Existing backend/frontend/browser/script regressions remain available as
 [explicit optional checks](SETUP.md#optional-regressions); they are not part

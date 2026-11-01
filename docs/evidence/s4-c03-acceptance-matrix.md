@@ -466,3 +466,14 @@ to the existing case. All earlier candidate fingerprints remain historical.
 | File | SHA-256 after UTF-8 LF normalization |
 |---|---|
 | `docs/testing.md` | `61b054d8d7b840c528369644ec04a046eb9a47e7699420baba5157b5baef73d9` |
+
+### Final C02 report/output link fingerprint
+
+The source-tested integration is recorded in
+[s4-c02-integration-20261101.md](s4-c02-integration-20261101.md). Its 40 P0
+items include all C05 assertions plus S02 bounds. Report/output links below
+name that run; earlier candidate hashes remain historical.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/testing.md` | `c40b507c9ed151833e375a96c97a711dd757b2ba65adeafb19ae28885c1a3b99` |
