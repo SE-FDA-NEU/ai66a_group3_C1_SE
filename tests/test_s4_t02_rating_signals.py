@@ -25,7 +25,10 @@ from sqlalchemy.orm import Session
 
 ACCOUNT_A = "10000000-0000-0000-0000-000000000001"
 ACCOUNT_B = "10000000-0000-0000-0000-000000000002"
-ORACLE_PATH = Path(__file__).parent / "fixtures" / "s4_t02_ranking_handoff.json"
+ORACLE_PATH = (
+    Path(__file__).resolve().parents[1]
+    / "backend" / "tests" / "fixtures" / "s4_t02_ranking_handoff.json"
+)
 
 
 @pytest.fixture

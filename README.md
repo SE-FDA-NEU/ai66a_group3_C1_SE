@@ -69,6 +69,9 @@ and account-isolation checks are also created in that same database.
 
 ## Project management
 
+- Scrum Master rotation: **SM3 = @vu-huzy; SM4 = @anotify-vie;
+  SM5 = @kietxuan**. C01 Planning remains PO-owned; C02 wrap-up remains
+  SM-owned. See the [Sprint 4 wrap-up and Sprint 5 handoff](docs/sprint-log.md#sprint-4--wrap-up-cutoff-1-november-2026).
 - Repository: [SE-FDA-NEU/ai66a_group3_C1_SE](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE)
 - Project board: [@group3_c1_se — Project 9](https://github.com/orgs/SE-FDA-NEU/projects/9)
 - Product backlog: 14 Story Issues, #17–#24, #30–#33, #44 and #45 (54 points).
@@ -84,6 +87,7 @@ and account-isolation checks are also created in that same database.
 - [M2 auth, catalogue, and recommendation API contract](docs/api.md)
 - [Definition of Done](docs/definition-of-done.md)
 - [Sprint log](docs/sprint-log.md)
+- [Sprint 4 Planning, commitment and current scope](docs/sprint4-backlog-refinement.md)
 
 ## Definition of Done
 

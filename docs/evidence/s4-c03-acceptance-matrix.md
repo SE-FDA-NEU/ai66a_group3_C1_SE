@@ -27,7 +27,7 @@ review has passed.
 
 | ID | Requirement in supplied C03 issue | Local contract evidence | Author result |
 |---|---|---|---|
-| C03-01 | Reuse protected rating/reset and popularity contracts without duplicate API/storage. | [Existing rating/reset](../api.md#9-sprint-3-rating-contract-implemented-under-s3-t31), [S4 routes](../api.md#13-sprint-4-c03-implementation-contract-planned-not-delivered), [module ownership](../architecture.md#9-sprint-4-c03-runtime-and-storage-contract-planned) | Specified; Sprint 3 stays labelled implemented, S4 planned. |
+| C03-01 | Reuse protected rating/reset and popularity contracts without duplicate API/storage. | [Existing rating/reset](../api.md#9-sprint-3-rating-contract-implemented-under-s3-t31), [S4 routes](../api.md#13-sprint-4-c03-implementation-contract-delivery-status-below), [module ownership](../architecture.md#9-sprint-4-c03-runtime-and-storage-contract-planned) | Specified; Sprint 3 stays labelled implemented, S4 planned. |
 | C03-02 | 1/2=-1, 3=0, 4/5=+1; one contribution per rated movie; adjusted-score/title/ID order. | [Score contract and 80/80 oracle](../api.md#131-recommendation-score-transparency), [rank cases](../testing.md#2-test-cases-for-every-p0-story) | Specified, including replacement and shared-genre de-duplication. |
 | C03-03 | Separate raw popularity, personal adjustment, adjusted score and basis; public DTOs private-free. | [API score fields](../api.md#131-recommendation-score-transparency), [visible labels](../design.md#122-state-ordering-and-truthful-labels) | Specified, including null and rating-read degradation. |
 | C03-04 | Preserve S10's exact three steps and existing public error messages. | [Existing explanation copy](../recommendation-explanation.md), [design rule](../design.md#122-state-ordering-and-truthful-labels), [error envelope](../api.md#1-conventions) | Existing copy retained; no fourth step added. |
@@ -445,13 +445,57 @@ owns final process evidence, formal report review and manual submission.
 |---|---|
 | `docs/testing.md` | `0b015cb4943c733d171afc00f3716fbd182e6c1391a5186c6346fcba7915ad6e` |
 
-## C04 #218 final report — 1 November 2026
+## 1 November wrap-up assertion-description amendment
 
-Section 3 of the report now states the tested executable SHAs, the 40-item
-result and the runtime, and the intro no longer describes C04 as pending. The
-37 logical case IDs and 40 collected items are unchanged. Earlier rows remain
-historical.
+Section 2 now describes the assertions actually executed in the compact run;
+TC-P0-S02-001 additionally checks recommendation limits 9/10/11. The 37 IDs
+and four report sections remain. Execution and tested-file identity are in
+[s4-t05-acceptance.md](s4-t05-acceptance.md#compact-m4-wrap-up-execution--1-november-2026).
+Earlier document fingerprints above remain historical.
 
 | File | SHA-256 after UTF-8 LF normalization |
 |---|---|
-| `docs/testing.md` | `9361899a58e8bce900ee711062531fe08f10a364cbb820ddd992333f529314ff` |
+| `docs/testing.md` | `3d8a836fc4f747a5932f1421c28c50a6abfb077529ba570a2ac08f7316e94554` |
+
+## C02 integration with merged C05 — 1 November 2026
+
+The four-section C05 report/default selection and stronger authentication/rollback
+assertions are retained. C02 adds only recommendation page-size 9/10/11 checks
+to the existing case. All earlier candidate fingerprints remain historical.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/testing.md` | `61b054d8d7b840c528369644ec04a046eb9a47e7699420baba5157b5baef73d9` |
+
+### Final C02 report/output link fingerprint
+
+The source-tested integration is recorded in
+[s4-c02-integration-20261101.md](s4-c02-integration-20261101.md). Its 40 P0
+items include all C05 assertions plus S02 bounds. Report/output links below
+name that run; earlier candidate hashes remain historical.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/testing.md` | `c40b507c9ed151833e375a96c97a711dd757b2ba65adeafb19ae28885c1a3b99` |
+### C02 root-test relocation — 1 November 2026
+
+The current Similar API test path is now `tests/test_similar_movies_api.py`.
+Existing test bodies and earlier execution/fingerprint records are preserved;
+this row identifies the updated API documentation, not a new functional run.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/api.md` | `fa0e363e866e650461d1169f21622d9e4dd54d6b46bd01e36c23474758fd6631` |
+
+## C04 report integration with merged C01/C02 — 1 November 2026
+
+The earlier C04 draft at `6f030f3` had normalized-LF testing.md hash
+`9361899a58e8bce900ee711062531fe08f10a364cbb820ddd992333f529314ff`.
+It is historical draft identity, not an assertion that its unsupported runtime
+row was verified. The integrated report keeps main's accurate case descriptions,
+records only linked C05/C02 execution results and uses the complete C02 output
+image with its own 13.74s caption. Manual process/image gaps are tracked separately.
+
+| File | SHA-256 after UTF-8 LF normalization |
+|---|---|
+| `docs/testing.md` | `76e5f9552d46865cbcc15b8f69ddfc033ef84ba62385773f4e0363c2a4d9eac9` |
