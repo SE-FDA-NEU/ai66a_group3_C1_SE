@@ -4,7 +4,7 @@ This log records only facts supported by the repository, Git history, and the
 saved Project-board evidence. Meeting details that are not present in those
 sources are marked as not recorded rather than reconstructed as facts.
 
-Current: [Sprint 4 wrap-up and Sprint 5 handoff](#sprint-4--wrap-up-cutoff-1-november-2026).
+Current: [Sprint 5 Planning](#sprint-5---2026-11-05-to-2026-11-12).
 
 ---
 
@@ -743,3 +743,53 @@ C04 #218 owns final report review, authentic submission-day board, manual
 disclosed under C01/C04; no staged/backdated screenshot is introduced.
 C02's `Closes #196` is conditional on the actual remaining review/acceptance
 gates, not a claim that all Sprint work is already Closed.
+
+---
+
+## Sprint 5 - 2026-11-05 to 2026-11-12
+
+### Planning and commitment
+
+Planning occurred on **6 November 2026**, during the confirmed Sprint of
+**5–12 November 2026**. The PO confirmed all five members participated and
+accepted two work issues each. PO and SM5 are **@kietxuan**.
+
+The delivery plan is prepared under
+[C01 #247](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/247).
+The [full Planning record](sprint5-backlog-refinement.md) contains the decisions,
+ownership/review map, 23 dependency edges, delivery targets, operator handoff
+and [dated issue/image inventory](evidence/s5-c01-planning.json).
+
+**Sprint goal** is a public CineAI HTTPS release with persistent TMDb/account
+data, every P0 usable from Home, deployment after green CI, recovery and an
+identifiable v1.0 release.
+
+| Planning measure | Value |
+|---|---|
+| Committed engineering work | **10 items**, eight Tasks and two Chores, #247–#256 |
+| Allocation | **2 accepted issues per member**, confirmed by the PO |
+| Committed new product Story Points | **0**, with this Sprint committed to release Tasks/Chores |
+| Completed engineering items at the captured baseline | **0**, all ten native issues Open |
+| Completed Story Points at the captured baseline | **0** |
+| Final velocity and throughput | C02 records final Story Point velocity for the selected scope and actual Closed technical items |
+
+The selected implementation is Render Free and Neon Free PostgreSQL 17 in
+Singapore, using one HTTPS origin. T02 provisions a fresh TMDb catalogue with
+`--pages 50`, dedicated public review accounts and recoverable index startup.
+The ten-item M5 release commitment moves VN watch providers to a future
+enhancement decision.
+
+Project 9 was aligned to **Sprint 5, Nov 05–Nov 12** on 6 November. C01 is
+In Progress, the other nine work items are Todo and formal planning PR review
+is pending at capture. The Planning record includes authentic table and saved
+iteration screenshots.
+
+The selected minimum availability date is **12 December 2026**. The maintenance
+policy also covers at least one calendar month after the actual v1.0 release
+and continues until grades are published, using the latest deadline.
+@kietxuan is the retention owner, with @anotify-vie as backup.
+
+T02/T03/T04 verify actual cloud/repository access for their named operators.
+C02 owns the final Review/Retro, PO acceptance, member contribution audit,
+committed/completed/velocity reconciliation, five-Sprint table, exact deployed
+v1.0 SHA, manual submission receipt and maintenance handoff.
