@@ -5,7 +5,7 @@
 Refs #248
 
 Keep `Refs #248` until PostgreSQL 18 acceptance, CI, independent review and
-required merge gates are complete. Then change it to `Closes #248`.
+required merge gates are complete. Then use a closing reference for #248.
 
 ## What changed
 
