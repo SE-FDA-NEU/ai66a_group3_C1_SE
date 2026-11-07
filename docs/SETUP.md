@@ -51,6 +51,9 @@ instead of `py -3.12` for the virtual-environment creation command below.
 
 `.env.example` contains two settings:
 
+For the PostgreSQL 17 deployment path, see the [connection, migration and
+account-provisioning instructions](s5-t01-postgresql.md).
+
 ```env
 DATABASE_URL=sqlite:///./data/app.db
 TMDB_READ_ACCESS_TOKEN=
