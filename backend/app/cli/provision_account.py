@@ -35,6 +35,11 @@ def provision_account(
         raise ProvisioningError("A PostgreSQL psycopg target is required")
     if not expected_host or not expected_database or not operator.strip():
         raise ProvisioningError("Target host, database and operator are required")
+    # SQLAlchemy merges URL query values into libpq connection parameters. A
+    # query dbname, host or port can supersede the authority/path checked below.
+    target_overrides = {"host", "hostaddr", "port", "dbname", "service", "servicefile"}
+    if target_overrides.intersection(url.query):
+        raise ProvisioningError("Target overrides in database URL are not allowed")
     if url.host != expected_host or url.database != expected_database:
         raise ProvisioningError("Configured database does not match the opted-in target")
     if not password:

@@ -40,6 +40,18 @@ from sqlalchemy.orm import Session
 ROOT = Path(__file__).resolve().parents[2]
 
 
+class SecretDatabaseURL(str):
+    """Keep pytest's fixture display from printing the subprocess DSN."""
+
+    def __repr__(self) -> str:
+        return "<PostgreSQL test URL (redacted)>"
+
+
+def sanitized_stderr(stderr: str, database_url: str) -> str:
+    password = make_url(database_url).password
+    return stderr.replace(password, "[REDACTED]") if password else stderr
+
+
 def test_postgresql_engine_enforces_production_tls(monkeypatch):
     url = "postgresql+psycopg://app@db.example.com/movie_app"
     engine = create_database_engine(url)
@@ -51,6 +63,18 @@ def test_postgresql_engine_enforces_production_tls(monkeypatch):
     monkeypatch.setenv("APP_ENV", "production")
     with pytest.raises(ValueError, match="verify-full"):
         create_database_engine(url + "?sslmode=disable")
+
+
+@pytest.mark.parametrize("parameter", [
+    "host", "hostaddr", "port", "dbname", "service", "servicefile",
+])
+def test_provisioning_rejects_query_target_overrides(parameter):
+    with pytest.raises(ProvisioningError, match="Target overrides"):
+        provision_account(
+            f"postgresql+psycopg://app@db.example.com/movie_app?{parameter}=other",
+            expected_host="db.example.com", expected_database="movie_app",
+            operator="t01-test", email="viewer@example.com", password="secret123",
+        )
 
 
 @pytest.fixture
@@ -65,13 +89,15 @@ def pg_engine():
     admin = create_database_engine(raw_url)
     with admin.connect() as connection:
         actual_major = int(connection.exec_driver_sql("SHOW server_version_num").scalar()) // 10000
-    expected_major = int(os.environ.get("TEST_POSTGRES_MAJOR", "17"))
+    expected_major = int(os.environ.get("TEST_POSTGRES_MAJOR", "18"))
     if actual_major != expected_major:
         admin.dispose()
         pytest.fail(f"Expected PostgreSQL {expected_major}, got PostgreSQL {actual_major}")
     with admin.begin() as connection:
         connection.exec_driver_sql(f'CREATE SCHEMA "{schema}"')
-    test_url = str(url.update_query_dict({"options": f"-csearch_path={schema}"}))
+    test_url = url.update_query_dict({
+        "options": f"-csearch_path={schema}",
+    }).render_as_string(hide_password=False)
     try:
         migration = subprocess.run(
             [sys.executable, "-m", "alembic", "-c", "backend/alembic.ini",
@@ -79,10 +105,10 @@ def pg_engine():
             cwd=ROOT, env=os.environ | {"DATABASE_URL": test_url},
             capture_output=True, text=True, check=False,
         )
-        assert migration.returncode == 0, migration.stderr
+        assert migration.returncode == 0, sanitized_stderr(migration.stderr, test_url)
         engine = create_database_engine(test_url)
         try:
-            yield engine, test_url
+            yield engine, SecretDatabaseURL(test_url)
         finally:
             engine.dispose()
     finally:
@@ -151,6 +177,21 @@ def test_empty_postgresql_migration_schema_constraints_and_provisioning(pg_engin
         item["sqltext"] for item in inspector.get_check_constraints("user_movie_ratings")
         if item["name"] == "ck_user_movie_ratings_rating_range"
     )
+    # Before the guard, libpq's query dbname redirected this URL to the
+    # migrated test database even though the operator confirmed another name.
+    redirected_url = make_url(url).set(database="operator_confirmed").update_query_dict({
+        "dbname": make_url(url).database,
+    }).render_as_string(hide_password=False)
+    with pytest.raises(ProvisioningError, match="Target overrides"):
+        provision_account(
+            redirected_url, expected_host=make_url(url).host,
+            expected_database="operator_confirmed", operator="t01-test",
+            email="redirected@example.com", password="secret123",
+        )
+    with Session(engine) as session:
+        assert session.scalar(select(User.id).where(
+            User.email_normalized == "redirected@example.com"
+        )) is None
     assert provision_account(
         url, expected_host=make_url(url).host, expected_database=make_url(url).database,
         operator="t01-test", email="  Viewer@Example.com ", password="secret123",
@@ -197,7 +238,7 @@ def test_postgresql_rating_migration_keeps_identity(pg_engine):
             cwd=ROOT, env=os.environ | {"DATABASE_URL": url},
             capture_output=True, text=True, check=False,
         )
-        assert result.returncode == 0, result.stderr
+        assert result.returncode == 0, sanitized_stderr(result.stderr, url)
     with Session(engine) as session:
         row = session.get(UserMovieRating, rating_id)
         assert row is not None and (row.user_id, row.movie_id, row.rating) == (

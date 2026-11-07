@@ -1,6 +1,6 @@
-# S5-T01 PostgreSQL 17 connection and account provisioning
+# S5-T01 PostgreSQL 18 connection and account provisioning
 
-The synchronous backend targets PostgreSQL 17 through the pinned `psycopg`
+The synchronous backend targets PostgreSQL 18 through the pinned `psycopg`
 driver. Install `backend/requirements.lock.txt` and set `DATABASE_URL` to a
 `postgresql+psycopg://` URL. Run migrations from the repository root:
 
@@ -36,6 +36,10 @@ an application password from a secret manager; this command never creates a
 PostgreSQL role or stores a plaintext password. Run from `backend` after the
 target has reached Alembic head:
 
+URL query parameters that can redirect the connection target (`host`,
+`hostaddr`, `port`, `dbname`, `service`, and `servicefile`) are refused. Put the
+confirmed host and database in the URL authority and path instead.
+
 ```powershell
 $env:DATABASE_URL = '<PostgreSQL URL supplied by the secret manager>'
 # APP_ACCOUNT_PASSWORD is injected by the secret manager.
@@ -52,15 +56,15 @@ Keep the URL and password out of shell history and logs.
 
 ## PostgreSQL integration proof
 
-Set `TEST_POSTGRES_URL` to a disposable PostgreSQL 17 database where the test
+Set `TEST_POSTGRES_URL` to a disposable PostgreSQL 18 database where the test
 role may create schemas. The test fixture creates and drops only its own random
-schema; it runs the full Alembic path in that schema. It expects PostgreSQL 17
+schema; it runs the full Alembic path in that schema. It expects PostgreSQL 18
 by default so the selected-major gate cannot pass accidentally on another
 version.
 
 ```powershell
-$env:TEST_POSTGRES_URL = '<disposable PostgreSQL 17 URL>'
-.\.venv\Scripts\python.exe -m pytest -q backend/tests/test_postgresql_t01.py
+$env:TEST_POSTGRES_URL = '<disposable password-authenticated PostgreSQL 18 URL>'
+.\.venv\Scripts\python.exe -m pytest -c pytest.ini -q backend/tests/test_postgresql_t01.py
 ```
 
 The local acceptance path remains SQLite and does not need PostgreSQL:
