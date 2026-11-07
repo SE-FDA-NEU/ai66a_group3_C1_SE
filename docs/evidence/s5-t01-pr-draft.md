@@ -50,9 +50,13 @@ From a clean clone in Windows PowerShell, with Docker running:
 
 ## Evidence
 
-See [PostgreSQL 18 local verification](https://github.com/kietxuan/ai66a_group3_C1_SE/blob/feat/s5-t01-postgresql/docs/evidence/s5-t01-postgresql-local.md)
+See [PostgreSQL 18 local verification](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/feat/s5-t01-postgresql/docs/evidence/s5-t01-postgresql-local.md)
 for the tested commit SHA, commands and results. The earlier PostgreSQL 18.1
 run is retained there as historical evidence only.
+
+On PR #258, Python, Node, secret and reviewability checks passed for the pushed
+head. The `Someone else must review` check remains failing until an eligible
+teammate submits a substantive formal approval via Review changes.
 
 ## Definition of Done
 
