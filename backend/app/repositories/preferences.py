@@ -31,9 +31,9 @@ def replace_user_preference_genres(
     currently uses them, as specified by the preference-write contract.
     """
 
-    # Canonical IDs are SQLite INTEGERs. Treat unrepresentable JSON integers
-    # as unknown IDs rather than leaking a driver OverflowError as HTTP 500.
-    if any(genre_id < -(2**63) or genre_id >= 2**63 for genre_id in genre_ids):
+    # Both databases use 32-bit genre IDs. Reject unrepresentable JSON values
+    # before a driver can leak an overflow error.
+    if any(genre_id < -(2**31) or genre_id >= 2**31 for genre_id in genre_ids):
         raise GenreNotFoundError("Genre not found")
 
     genres = list(
