@@ -24,7 +24,8 @@ def upgrade() -> None:
         sa.Column("id", sa.String(length=36), nullable=False),
         sa.Column(
             "email_normalized",
-            sa.String(length=320, collation="NOCASE"),
+            sa.String(length=320, collation="NOCASE")
+            if op.get_bind().dialect.name == "sqlite" else sa.String(length=320),
             nullable=False,
         ),
         sa.Column("password_hash", sa.String(length=255), nullable=False),

@@ -53,9 +53,9 @@ reset, filtering/pagination and trailer outcomes are release acceptance inputs.
 | Decision | Selected plan | Delivery owner |
 |---|---|---|
 | Public runtime | Render Free serves the React build, FastAPI `/api` and `/health` through one HTTPS origin | T03 |
-| Public database | Neon Free, **PostgreSQL 17**, with TLS and an appropriately bounded connection pool | T01/T02 |
+| Public database | Neon Free, **PostgreSQL 18**, with TLS and an appropriately bounded connection pool | T01/T02 |
 | Region | **Singapore** for Render and Neon AWS `aws-ap-southeast-1` | T02/T03 |
-| Version alignment | PostgreSQL 17 for Neon, integration development and the isolated CI service | T01/T04 |
+| Version alignment | PostgreSQL 18 for Neon, integration development and the isolated CI service | T01/T02/T03/T04 |
 | Catalogue | A fresh PostgreSQL catalogue imported from TMDb using `--pages 50`, targeting about 1,000 valid movies after validation/deduplication | T02 |
 | Account data | Dedicated public application-review accounts, with persisted sessions, preferences, half-star ratings and watchlists | T01/T02 |
 | Media | Stored validated metadata/paths for posters, backdrops and official trailers, enriched across the active catalogue | T02 |
@@ -63,12 +63,17 @@ reset, filtering/pagination and trailer outcomes are release acceptance inputs.
 | Release path | Reviewed PR, required checks, merge to main, green main CI, then deployment of that SHA | T04/T03 |
 | Release identity | Final wrap-up content is merged before the deployed commit is tagged v1.0 | C02 |
 
-PostgreSQL 17 and Singapore are selected implementation defaults under the PO's
+PostgreSQL 18 and Singapore are selected implementation defaults under the PO's
 delegated planning request. Platform documentation supports these choices.
 The provisioning owner verifies their availability in the account before
-creating resources. [Neon versions](https://api-docs.neon.tech/reference/createproject),
+creating resources. [Neon PostgreSQL 18 availability](https://neon.com/blog/postgres-18),
+[Neon versions API](https://api-docs.neon.tech/reference/createproject),
 [Neon regions](https://neon.com/docs/introduction/regions),
 [Render regions](https://render.com/docs/regions).
+
+T02 should provision the Neon database on major 18. T03 should use major 18
+for the isolated CI PostgreSQL service and deployment checks. The older C01
+planning record and sprint log retain the superseded major-17 decision as history.
 
 Catalogue import/enrichment is an explicit operator action. Startup uses the
 stored catalogue and prepares its derived index. T02 records actual imported

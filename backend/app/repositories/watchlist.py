@@ -59,4 +59,5 @@ def list_user_movies(session: Session, *, user_id: str, page: int, limit: int) -
 
 def utc_iso(value: datetime) -> str:
     # SQLite reads DateTime(timezone=True) without tzinfo; stored values are UTC.
-    return value.replace(tzinfo=UTC).isoformat().replace("+00:00", "Z")
+    utc_value = value.replace(tzinfo=UTC) if value.tzinfo is None else value.astimezone(UTC)
+    return utc_value.isoformat().replace("+00:00", "Z")

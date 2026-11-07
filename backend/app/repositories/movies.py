@@ -298,15 +298,30 @@ def search_active_movie_titles(session: Session, *, query: str) -> list[CatalogM
     """Return all ordered literal title hits from the active catalogue."""
 
     connection = session.connection()
+    if connection.dialect.name == "postgresql":
+        # PostgreSQL lower()/collation differs from Python NFKC casefold.
+        query_key = normalize_text(query)
+        title_rows = session.execute(
+            select(CatalogMovie.id, CatalogMovie.title)
+            .join(CatalogueState, CatalogueState.active_revision_id == CatalogMovie.catalogue_revision_id)
+            .where(CatalogueState.id == ACTIVE_CATALOGUE_STATE_ID)
+        )
+        matched_ids = [movie_id for movie_id, title in title_rows
+                       if query_key in normalize_text(title)]
+        if not matched_ids:
+            return []
+        movies = session.scalars(
+            select(CatalogMovie).where(CatalogMovie.id.in_(matched_ids))
+            .options(selectinload(CatalogMovie.genres))
+        )
+        return sorted(movies.unique(),
+                      key=lambda movie: (normalize_text(movie.title), movie.id))
     if connection.dialect.name == "sqlite":
         connection.connection.driver_connection.create_function(
             "movie_title_casefold", 1, normalize_text, deterministic=True
         )
         title_key = func.movie_title_casefold(CatalogMovie.title)
         query_key = normalize_text(query)
-    else:
-        title_key = func.lower(CatalogMovie.title)
-        query_key = query.lower()
     escaped = (
         query_key.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
     )

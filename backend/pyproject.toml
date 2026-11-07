@@ -16,6 +16,7 @@ dependencies = [
     "httpx",
     "argon2-cffi",
     "python-dotenv",
+    "psycopg[binary]==3.2.12",
 ]
 
 [project.optional-dependencies]
