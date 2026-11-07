@@ -9,7 +9,7 @@ from sqlalchemy import func, select, text
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from app.db.account_writes import begin_account_write
+from app.db.account_writes import begin_account_write, resolve_account_write_user
 from app.db.database import SessionLocal, engine
 from app.db.models import Genre, User, UserMovieRating
 from app.recommendations.overview_index import IndexUnavailable, load_active_index
@@ -185,7 +185,7 @@ def current_account_write_user(
     database_session: Session = Depends(get_account_write_db),  # noqa: B008
 ) -> User:
     """Rating writes keep auth-before-payload validation under the reservation."""
-    user = resolve_session(database_session, request.cookies.get(SESSION_COOKIE))
+    user = resolve_account_write_user(database_session, request.cookies.get(SESSION_COOKIE))
     if user is None:
         raise AuthenticationRequiredError
     return user
@@ -507,7 +507,7 @@ def put_preferences(
     database_session: Session = Depends(get_account_write_db),  # noqa: B008
 ):
     try:
-        user = resolve_session(database_session, request.cookies.get(SESSION_COOKIE))
+        user = resolve_account_write_user(database_session, request.cookies.get(SESSION_COOKIE))
         if user is None:
             return _error("AUTHENTICATION_REQUIRED", "Authentication required", 401)
 
@@ -556,7 +556,7 @@ def reset_profile(
     database_session: Session = Depends(get_account_write_db),  # noqa: B008
 ):
     try:
-        user = resolve_session(
+        user = resolve_account_write_user(
             database_session,
             request.cookies.get(SESSION_COOKIE),
         )

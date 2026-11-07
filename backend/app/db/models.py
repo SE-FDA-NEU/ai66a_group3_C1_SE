@@ -82,7 +82,8 @@ class User(Base):
         String(36), primary_key=True, default=new_opaque_id
     )
     email_normalized: Mapped[str] = mapped_column(
-        String(320, collation="NOCASE"), nullable=False, unique=True
+        String(320).with_variant(String(320, collation="NOCASE"), "sqlite"),
+        nullable=False, unique=True,
     )
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     created_at: Mapped[datetime] = mapped_column(
@@ -270,8 +271,7 @@ class UserMovieRating(Base):
             name="uq_user_movie_ratings_user_movie",
         ),
         CheckConstraint(
-            "typeof(rating) IN ('integer', 'real') AND rating BETWEEN 0.5 AND 5 "
-            "AND rating * 2 = CAST(rating * 2 AS INTEGER)",
+            "rating IN (0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5)",
             name="ck_user_movie_ratings_rating_range",
         ),
     )

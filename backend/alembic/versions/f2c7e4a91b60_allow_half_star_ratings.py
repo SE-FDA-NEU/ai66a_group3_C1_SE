@@ -16,13 +16,12 @@ CONSTRAINT = "ck_user_movie_ratings_rating_range"
 
 
 def upgrade() -> None:
-    with op.batch_alter_table("user_movie_ratings", recreate="always") as batch:
+    with op.batch_alter_table("user_movie_ratings", recreate="auto") as batch:
         batch.drop_constraint(CONSTRAINT, type_="check")
         batch.alter_column("rating", existing_type=sa.Integer(), type_=sa.Float(), existing_nullable=False)
         batch.create_check_constraint(
             CONSTRAINT,
-            "typeof(rating) IN ('integer', 'real') AND rating BETWEEN 0.5 AND 5 "
-            "AND rating * 2 = CAST(rating * 2 AS INTEGER)",
+            "rating IN (0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5)",
         )
 
 
@@ -36,7 +35,7 @@ def downgrade() -> None:
             "Cannot downgrade while half-star ratings exist; preserve/export them "
             "and explicitly resolve them before restoring the integer-only schema."
         )
-    with op.batch_alter_table("user_movie_ratings", recreate="always") as batch:
+    with op.batch_alter_table("user_movie_ratings", recreate="auto") as batch:
         batch.drop_constraint(CONSTRAINT, type_="check")
         batch.alter_column("rating", existing_type=sa.Float(), type_=sa.Integer(), existing_nullable=False)
-        batch.create_check_constraint(CONSTRAINT, "typeof(rating) = 'integer' AND rating BETWEEN 1 AND 5")
+        batch.create_check_constraint(CONSTRAINT, "rating BETWEEN 1 AND 5")
