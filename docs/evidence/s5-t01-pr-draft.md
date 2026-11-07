@@ -28,8 +28,8 @@ From a clean clone in Windows PowerShell, with Docker running:
    ```powershell
    py -3.12 -m venv .venv
    .\.venv\Scripts\python.exe -m pip install -r backend/requirements.lock.txt
-   # Inject PG_TEST_PASSWORD from a secret manager; do not put it in shell history.
-   docker run --rm -d --name s5-t01-pg18 -p 127.0.0.1:55418:5432 -e POSTGRES_PASSWORD=$env:PG_TEST_PASSWORD -e POSTGRES_DB=s5_t01_test postgres:18
+   # Inject POSTGRES_PASSWORD from a secret manager; use a URL-safe value.
+   docker run --rm -d --name s5-t01-pg18 -p 127.0.0.1:55418:5432 -e POSTGRES_PASSWORD -e POSTGRES_DB=s5_t01_test postgres:18
    docker exec s5-t01-pg18 pg_isready -U postgres -d s5_t01_test
    ```
 
@@ -39,7 +39,7 @@ From a clean clone in Windows PowerShell, with Docker running:
 2. Run migrations and tests:
 
    ```powershell
-   $env:TEST_POSTGRES_URL = "postgresql+psycopg://postgres:$env:PG_TEST_PASSWORD@127.0.0.1:55418/s5_t01_test?sslmode=disable"
+   $env:TEST_POSTGRES_URL = "postgresql+psycopg://postgres:$env:POSTGRES_PASSWORD@127.0.0.1:55418/s5_t01_test?sslmode=disable"
    $env:DATABASE_URL = $env:TEST_POSTGRES_URL
    .\.venv\Scripts\python.exe -m alembic -c backend/alembic.ini upgrade head
    .\.venv\Scripts\python.exe -m alembic -c backend/alembic.ini check

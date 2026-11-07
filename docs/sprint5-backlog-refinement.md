@@ -66,7 +66,8 @@ reset, filtering/pagination and trailer outcomes are release acceptance inputs.
 PostgreSQL 18 and Singapore are selected implementation defaults under the PO's
 delegated planning request. Platform documentation supports these choices.
 The provisioning owner verifies their availability in the account before
-creating resources. [Neon versions](https://api-docs.neon.tech/reference/createproject),
+creating resources. [Neon PostgreSQL 18 availability](https://neon.com/blog/postgres-18),
+[Neon versions API](https://api-docs.neon.tech/reference/createproject),
 [Neon regions](https://neon.com/docs/introduction/regions),
 [Render regions](https://render.com/docs/regions).
 
