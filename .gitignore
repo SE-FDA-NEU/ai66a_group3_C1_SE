@@ -22,6 +22,7 @@ data/overview-tfidf-*.json
 *.sqlite
 *.sqlite3
 *.sql
+!scripts/s5_t02_readiness.sql
 *.dump
 
 # Frontend

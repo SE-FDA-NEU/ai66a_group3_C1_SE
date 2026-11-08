@@ -158,6 +158,11 @@ its revision or accounts, use the bounded
 
 ### Existing catalogues: migrate and enrich every movie
 
+For Sprint 5 PostgreSQL 18/Neon provisioning, explicit 50-page import, public
+review-account setup and restart/index verification, follow the
+[S5-T02 operator runbook](s5-t02-neon-provisioning.md). Its live evidence fields
+must be completed from actual Neon/Render commands, not local SQLite results.
+
 After pulling changes, back up valuable SQLite data consistently and run
 `alembic upgrade head` before restarting the backend. Compare `alembic current`
 with `alembic heads`; use the actual repository head, not an old task's revision.

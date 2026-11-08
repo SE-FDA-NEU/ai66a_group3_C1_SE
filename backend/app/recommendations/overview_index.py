@@ -55,7 +55,11 @@ def resolve_index_path(path: Path | None = None) -> Path:
     if path is not None:
         return path
     configured = os.environ.get("NLP_INDEX_PATH")
-    return Path(configured) if configured and configured.strip() else DEFAULT_INDEX_PATH
+    if configured and configured.strip():
+        return Path(configured)
+    if os.getenv("APP_ENV", "").lower() in {"production", "prod"}:
+        return Path(tempfile.gettempdir()) / "ai66a-overview-tfidf-v1.json"
+    return DEFAULT_INDEX_PATH
 
 
 def _canonical(value: object) -> bytes:

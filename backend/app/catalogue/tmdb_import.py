@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import Counter
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
@@ -63,6 +64,7 @@ class TmdbImportResult:
     source_fetched_at: datetime
     imported_at: datetime
     sample_source_ids: tuple[str, ...]
+    rejection_reasons: tuple[tuple[str, int], ...] = ()
 
 
 MAX_ENRICHMENT_MOVIES = 300
@@ -186,12 +188,13 @@ def import_tmdb_catalogue(
 
     source_fetched_at = _normalise_timestamp(fetched_at or utc_now())
     genres_by_id = _prepare_genres(client.fetch_genres())
-    prepared_movies, rejected_movie_count = _prepare_movies(
+    prepared_movies, rejection_reasons = _prepare_movies(
         client=client,
         genres_by_id=genres_by_id,
         source_fetched_at=source_fetched_at,
         pages=pages,
     )
+    rejected_movie_count = sum(rejection_reasons.values())
     if not prepared_movies:
         raise TmdbPayloadError("TMDb did not return any usable movies")
 
@@ -257,6 +260,7 @@ def import_tmdb_catalogue(
         source_fetched_at=source_fetched_at,
         imported_at=revision.created_at,
         sample_source_ids=tuple(movie.source_id for movie in prepared_movies[:3]),
+        rejection_reasons=tuple(sorted(rejection_reasons.items())),
     )
 
 
@@ -591,10 +595,10 @@ def _prepare_movies(
     genres_by_id: Mapping[int, str],
     source_fetched_at: datetime,
     pages: int,
-) -> tuple[list[_PreparedMovie], int]:
+) -> tuple[list[_PreparedMovie], Counter[str]]:
     prepared_movies: list[_PreparedMovie] = []
     seen_source_ids: set[str] = set()
-    rejected_movie_count = 0
+    rejection_reasons: Counter[str] = Counter()
 
     for page in range(1, pages + 1):
         for raw_movie in client.fetch_popular_movies(page):
@@ -605,17 +609,17 @@ def _prepare_movies(
                     genres_by_id=genres_by_id,
                     source_fetched_at=source_fetched_at,
                 )
-            except _RejectedMovie:
-                rejected_movie_count += 1
+            except _RejectedMovie as exc:
+                rejection_reasons[str(exc)] += 1
                 continue
 
             if prepared_movie.source_id in seen_source_ids:
-                rejected_movie_count += 1
+                rejection_reasons["duplicate TMDb ID across popular pages"] += 1
                 continue
             seen_source_ids.add(prepared_movie.source_id)
             prepared_movies.append(prepared_movie)
 
-    return prepared_movies, rejected_movie_count
+    return prepared_movies, rejection_reasons
 
 
 def _prepare_movie(

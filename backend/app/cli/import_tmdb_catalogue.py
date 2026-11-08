@@ -159,6 +159,8 @@ def main(argv: list[str] | None = None) -> int:
     print(f"inserted={result.inserted_movie_count}")
     print(f"updated={result.updated_movie_count}")
     print(f"rejected={result.rejected_movie_count}")
+    for reason, count in result.rejection_reasons:
+        print(f"rejection_reason[{reason}]={count}")
     print(f"movies={result.movie_count}")
     print(f"associated_genres={result.associated_genre_count}")
     print(f"finite_popularity_movies={result.finite_popularity_movie_count}")
