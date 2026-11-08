@@ -15,7 +15,9 @@ from app.recommendations.overview_index import (
 )
 from app.repositories.movies import get_active_catalogue_revision
 
-logger = logging.getLogger(__name__)
+# Uvicorn configures this logger at INFO in the documented backend command, so
+# the measured startup result is visible to the Neon-backed operator.
+logger = logging.getLogger("uvicorn.error")
 
 
 def prepare_startup_index(session_factory: Callable[[], Session]) -> None:
