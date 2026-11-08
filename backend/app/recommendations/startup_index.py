@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import logging
 import time
+from collections.abc import Callable
 
-from app.db.database import SessionLocal
+from sqlalchemy.orm import Session
+
 from app.recommendations.overview_index import (
     load_active_index,
     rebuild_active_index,
@@ -16,7 +18,7 @@ from app.repositories.movies import get_active_catalogue_revision
 logger = logging.getLogger(__name__)
 
 
-def prepare_startup_index() -> None:
+def prepare_startup_index(session_factory: Callable[[], Session]) -> None:
     """Reuse or rebuild only derived data; an empty baseline can start before import.
 
     A second database snapshot checks that the active corpus still matches the
@@ -26,14 +28,14 @@ def prepare_startup_index() -> None:
     """
 
     started = time.monotonic()
-    with SessionLocal() as session:
+    with session_factory() as session:
         if get_active_catalogue_revision(session) is None:
             logger.info("NLP index skipped: no active catalogue")
             return
         path = resolve_index_path()
         existed = path.is_file()
         index = rebuild_active_index(session, path)
-    with SessionLocal() as session:
+    with session_factory() as session:
         index = load_active_index(session, path)
     logger.info(
         "NLP index ready: revision=%s movies=%d usable=%d digest=%s "

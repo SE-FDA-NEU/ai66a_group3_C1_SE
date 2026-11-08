@@ -6,7 +6,7 @@ This runbook supplies the operator sequence for [#249](https://github.com/SE-FDA
 
 1. In Neon, create a project with PostgreSQL **18** in the available Singapore region. Record the actual region identifier and `server_version`. If a PostgreSQL 17 target already contains useful data, stop and arrange a verified backup/migration with its owner before changing connections.
 2. Create separate development and test database targets. Keep the public runtime target separate from tests. Create a least-privilege runtime role and identify the primary and backup operators with migration/import and backup access. Configure TLS with certificate verification. Store each private URL in a secret manager; the app uses `DATABASE_URL` (`postgresql+psycopg://...?...sslmode=verify-full`). The operator's `psql` URL uses the normal `postgresql://` scheme and is supplied separately as `NEON_OPERATOR_PSQL_URL`.
-3. On each intended target, run `psql "$env:NEON_OPERATOR_PSQL_URL" -v ON_ERROR_STOP=1 -f scripts/s5_t02_readiness.sql` in PowerShell. The first row identifies the effective role, database, server version and TLS status. Repeat the connection check with the backup operator's private URL. Confirm both actual identities and access in private operations records. Do not treat a role name in a document as proof of access.
+3. On each intended target, run `psql "$env:NEON_OPERATOR_PSQL_URL" -v ON_ERROR_STOP=1 -f scripts/s5_t02_readiness.psql` in PowerShell. The first row identifies the effective role, database, server version and TLS status. Repeat the connection check with the backup operator's private URL. Confirm both actual identities and access in private operations records. Do not treat a role name in a document as proof of access.
 4. Run the schema upgrade with the migration role and the **same** intended target selected as `DATABASE_URL`:
 
    ```powershell
@@ -28,7 +28,7 @@ Use a private `TMDB_READ_ACCESS_TOKEN` with `DATABASE_URL` set to the selected d
 .\.venv\Scripts\python.exe -m app.cli.import_tmdb_catalogue --enrich-trailers --all
 .\.venv\Scripts\python.exe -m app.cli.rebuild_overview_index rebuild
 .\.venv\Scripts\python.exe -m app.cli.rebuild_overview_index check
-psql "$env:NEON_OPERATOR_PSQL_URL" -v ON_ERROR_STOP=1 -f scripts/s5_t02_readiness.sql
+psql "$env:NEON_OPERATOR_PSQL_URL" -v ON_ERROR_STOP=1 -f scripts/s5_t02_readiness.psql
 ```
 
 Record `inserted`, `updated`, `rejected`, each `rejection_reason[...]`, `movies` and `active_revision` from the import. The import validates and deduplicates all 50 fetched pages before activation. A repeated import creates a new revision while preserving stable TMDb to app movie IDs; compare the SQL sample and account-owned row counts before/after. Each media `--all` traverses the active catalogue in batches of at most 300; the batch size is not a catalogue cap. Record eligible/processed/remaining and the final SQL availability counts. Trailer `--all` may resume earlier attempts; a legitimate movie may have no official trailer.

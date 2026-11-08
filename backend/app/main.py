@@ -94,7 +94,7 @@ from app.security.sessions import (
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     try:
-        prepare_startup_index()
+        prepare_startup_index(SessionLocal)
     except (IndexUnavailable, OSError, SQLAlchemyError):
         raise RuntimeError("NLP index preparation failed; check database and writable index path") from None
     yield

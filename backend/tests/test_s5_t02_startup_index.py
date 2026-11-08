@@ -17,7 +17,6 @@ from app.db.models import (
     UserMovieWatchlist,
 )
 from app.main import app, get_db
-from app.recommendations import startup_index
 from app.recommendations.overview_index import load_active_index, resolve_index_path
 from app.repositories.movies import (
     activate_catalogue_revision,
@@ -36,7 +35,7 @@ def test_restart_rebuilds_missing_and_stale_index_without_touching_accounts(
     sessions = sessionmaker(bind=engine, autoflush=False)
     artifact = tmp_path / "writable" / "index.json"
     monkeypatch.setenv("NLP_INDEX_PATH", str(artifact))
-    monkeypatch.setattr(startup_index, "SessionLocal", sessions)
+    monkeypatch.setattr("app.main.SessionLocal", sessions)
 
     with sessions() as session, session.begin():
         revision = create_catalogue_revision(session, provider="tmdb")
