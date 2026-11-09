@@ -1,9 +1,11 @@
 -- Read-only PostgreSQL 18 handoff. Run with psql against the intended Neon target.
 \pset pager off
+\echo 'client connection and TLS (Neon may terminate TLS before the PostgreSQL backend)'
+\conninfo
 \echo 'connection'
 SELECT current_user AS role_name, current_database() AS database_name,
        current_setting('server_version') AS server_version,
-       (SELECT ssl FROM pg_stat_ssl WHERE pid = pg_backend_pid()) AS tls_active;
+       (SELECT ssl FROM pg_stat_ssl WHERE pid = pg_backend_pid()) AS backend_tls_active;
 \echo 'schema and active revision'
 SELECT version_num AS migration_version FROM alembic_version;
 SELECT r.id AS active_revision, r.provider, r.inserted_movie_count,

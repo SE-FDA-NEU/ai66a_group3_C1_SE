@@ -1,0 +1,492 @@
+S5-T02 live verification on 2026-11-09, Asia/Ho_Chi_Minh
+App source 96d4f3b9c799838f8b657d424ca17ded830222b2 plus the readiness/runbook changes in this delivery.
+
+=== Client TLS and actual target roles ===
+{"role": "neondb_owner", "database": "neondb", "server_version": "18.6 (ac70818)", "backend_tls_active": false, "client_tls_in_use": true, "sslmode": "verify-full", "channel_binding": "require"}
+{"databases": [{"datname": "cineai_development"}, {"datname": "cineai_test"}, {"datname": "neondb"}]}
+{"existing_public_tables": [{"tablename": "alembic_version"}, {"tablename": "auth_sessions"}, {"tablename": "catalog_movies"}, {"tablename": "catalogue_revisions"}, {"tablename": "catalogue_state"}, {"tablename": "genres"}, {"tablename": "movie_genres"}, {"tablename": "user_genre_preferences"}, {"tablename": "user_movie_ratings"}, {"tablename": "user_movie_watchlist"}, {"tablename": "users"}]}
+{"roles": [{"rolname": "cineai_runtime", "rolcanlogin": true, "rolcreatedb": false}, {"rolname": "neondb_owner", "rolcanlogin": true, "rolcreatedb": true}]}
+
+=== alembic heads, current and check on Neon ===
+a3d1f8b72c44 (head)
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+a3d1f8b72c44 (head)
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.schemas
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.tables
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.types
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.constraints
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.defaults
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.comments
+INFO  [alembic.ddl.postgresql] Detected sequence named 'catalogue_state_id_seq' as owned by integer column 'catalogue_state(id)', assuming SERIAL and omitting
+No new upgrade operations detected.
+
+=== python -m app.cli.import_tmdb_catalogue --pages 50, first run ===
+TMDb catalogue import complete
+provider=tmdb
+active_revision=d98e3532-4dcb-4b95-afea-00e0720fe3b9
+inserted=989
+updated=0
+rejected=11
+rejection_reason[duplicate TMDb ID across popular pages]=11
+movies=989
+associated_genres=19
+finite_popularity_movies=989
+source_fetched_at=2026-11-09T11:28:12.069345Z
+imported_at=2026-11-09T11:28:27.684344Z
+sample_source_ids=687163,155,1423191
+
+=== python -m app.cli.import_tmdb_catalogue --pages 50, repeated run ===
+TMDb catalogue import complete
+provider=tmdb
+active_revision=1ee08003-bc00-4888-b35c-8c6cbe599062
+inserted=0
+updated=989
+rejected=11
+rejection_reason[duplicate TMDb ID across popular pages]=11
+movies=989
+associated_genres=19
+finite_popularity_movies=989
+source_fetched_at=2026-11-09T11:37:08.544120Z
+imported_at=2026-11-09T11:37:20.960180Z
+sample_source_ids=687163,155,1423191
+
+=== Repeated import identity and account comparison ===
+{
+  "comparison": {
+    "before_movies": 989,
+    "after_movies": 989,
+    "common_identities": 989,
+    "stable_common_identities": true,
+    "account_snapshot_identical": true
+  },
+  "baseline": {
+    "users": {
+      "count": 2,
+      "sha256": "933d861a4dc8ac00c23b534b78bd70ca38124469bb20c46313f61a62ac01041c"
+    },
+    "auth_sessions": {
+      "count": 4,
+      "sha256": "6303fd62c7db14f14209d35114ed884189e67839481e2c14ea631faccf81de6d"
+    },
+    "user_genre_preferences": {
+      "count": 4,
+      "sha256": "3f9e580cb34af93237c22e636ce9d624d83a260943fd7764930e2873b550ce5a"
+    },
+    "user_movie_ratings": {
+      "count": 2,
+      "sha256": "577c44f6305b3dea0f6ed901e8875aebd4e64b859e1306bd1c5b158f5dc4d74b"
+    },
+    "user_movie_watchlist": {
+      "count": 2,
+      "sha256": "609f2568d4cff6983739d8f15aad1bc8c63323eeb106e0d9579c75fe61d4f22f"
+    }
+  },
+  "identity_sample": [
+    {
+      "app_movie_id": "9019559c-b02f-4651-a834-cd660a7a1150",
+      "tmdb_id": "687163"
+    },
+    {
+      "app_movie_id": "8068d3c1-fff1-49ce-95ce-87a92275db03",
+      "tmdb_id": "155"
+    },
+    {
+      "app_movie_id": "fdbd60f6-fe64-466d-bfec-8b579c4758a5",
+      "tmdb_id": "1423191"
+    },
+    {
+      "app_movie_id": "b5a66cac-0c97-405f-b4d0-742567d4efda",
+      "tmdb_id": "1368337"
+    },
+    {
+      "app_movie_id": "fea48a48-5368-42f3-b99e-0944ee73af50",
+      "tmdb_id": "1263337"
+    },
+    {
+      "app_movie_id": "37725a61-8347-4e83-b78b-13d2406e227b",
+      "tmdb_id": "1507696"
+    },
+    {
+      "app_movie_id": "8f6d0a96-3a5d-4ec9-ae99-7cd34b86c858",
+      "tmdb_id": "1058424"
+    },
+    {
+      "app_movie_id": "2918ac64-6e82-40e5-b572-76c84f110a1b",
+      "tmdb_id": "969681"
+    },
+    {
+      "app_movie_id": "4a055741-fd59-4a6b-af3b-5d23b95dcf60",
+      "tmdb_id": "1813355"
+    },
+    {
+      "app_movie_id": "46a7b927-6320-463f-aeba-46d5d11f88b7",
+      "tmdb_id": "11308"
+    }
+  ]
+}
+
+=== python -m app.cli.import_tmdb_catalogue --enrich-posters --all ===
+TMDb poster enrichment all complete
+active_revision=1ee08003-bc00-4888-b35c-8c6cbe599062
+eligible=989
+processed=989
+updated=1
+cleared=0
+unchanged=988
+missing=0
+invalid=0
+remaining=0
+
+=== python -m app.cli.import_tmdb_catalogue --enrich-backdrops --all ===
+TMDb backdrop enrichment all complete
+active_revision=1ee08003-bc00-4888-b35c-8c6cbe599062
+eligible=989
+processed=989
+updated=0
+cleared=0
+unchanged=989
+missing=0
+invalid=0
+remaining=0
+
+=== python -m app.cli.import_tmdb_catalogue --enrich-trailers --all ===
+TMDb trailer enrichment all complete
+active_revision=1ee08003-bc00-4888-b35c-8c6cbe599062
+eligible=989
+processed=989
+with_trailer=882
+without_trailer=107
+failed=0
+remaining=0
+
+=== Restricted runtime permissions and operator DDL rollback probe ===
+{"role": "cineai_runtime", "can_create_tables": false, "can_read_catalogue": true, "can_update_catalogue": false, "can_write_ratings": true, "can_write_watchlist": true, "client_tls_in_use": true, "operator_ddl_rollback_probe": true}
+
+=== Actual Uvicorn listener-PID startup measurements and live API verification ===
+{"review_accounts_provisioned": ["A", "B"]}
+{"stage": "valid", "startup_to_health_seconds": 3.203, "resources": {"Id": 14384, "CPU": 0.96875, "WorkingSet64": 97030144, "PeakWorkingSet64": 103235584, "launcher_pid": 24044}, "description_query": "mysterious", "search_returned": 10, "search_total": 73, "second_page_returned": 10, "similar_returned": 5, "account_rows_and_existing_sessions_preserved": true}
+{"stage": "missing", "startup_to_health_seconds": 3.25, "resources": {"Id": 27244, "CPU": 1.1875, "WorkingSet64": 97439744, "PeakWorkingSet64": 105689088, "launcher_pid": 1844}, "description_query": "mysterious", "search_returned": 10, "search_total": 73, "second_page_returned": 10, "similar_returned": 5, "account_rows_and_existing_sessions_preserved": true}
+{"stage": "stale", "startup_to_health_seconds": 3.766, "resources": {"Id": 26484, "CPU": 1.40625, "WorkingSet64": 99078144, "PeakWorkingSet64": 105250816, "launcher_pid": 19848}, "description_query": "mysterious", "search_returned": 10, "search_total": 73, "second_page_returned": 10, "similar_returned": 5, "account_rows_and_existing_sessions_preserved": true}
+
+=== Uvicorn startup valid ===
+INFO:     Started server process [14384]
+INFO:     Waiting for application startup.
+INFO:     NLP index ready: revision=1ee08003-bc00-4888-b35c-8c6cbe599062 movies=989 usable=988 digest=714148f40f7c7788af159a2707804e23a5de47fc7b44e187a9aaa183a4ad2ec4 config=41785781f34ba44091ac64f3b1c0503402ee760c518af1429d0acb94bbc31c99 artifact_existed=True elapsed_seconds=1.875
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+
+=== Uvicorn startup missing ===
+INFO:     Started server process [27244]
+INFO:     Waiting for application startup.
+INFO:     NLP index ready: revision=1ee08003-bc00-4888-b35c-8c6cbe599062 movies=989 usable=988 digest=714148f40f7c7788af159a2707804e23a5de47fc7b44e187a9aaa183a4ad2ec4 config=41785781f34ba44091ac64f3b1c0503402ee760c518af1429d0acb94bbc31c99 artifact_existed=False elapsed_seconds=2.078
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+
+=== Uvicorn startup stale ===
+INFO:     Started server process [26484]
+INFO:     Waiting for application startup.
+INFO:     NLP index ready: revision=1ee08003-bc00-4888-b35c-8c6cbe599062 movies=989 usable=988 digest=714148f40f7c7788af159a2707804e23a5de47fc7b44e187a9aaa183a4ad2ec4 config=41785781f34ba44091ac64f3b1c0503402ee760c518af1429d0acb94bbc31c99 artifact_existed=True elapsed_seconds=2.234
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+
+=== Expected stale-index refusal before restart, exit 1 ===
+overview index unavailable: index is stale
+
+=== Index check after stale startup recovery ===
+ready=true
+catalogueRevision=1ee08003-bc00-4888-b35c-8c6cbe599062
+corpusDigest=714148f40f7c7788af159a2707804e23a5de47fc7b44e187a9aaa183a4ad2ec4
+configFingerprint=41785781f34ba44091ac64f3b1c0503402ee760c518af1429d0acb94bbc31c99
+movies=989
+usableDocuments=988
+vocabularyTerms=7762
+
+=== Final public readiness before browser login checks ===
+Pager usage is off.
+client connection and TLS (Neon may terminate TLS before the PostgreSQL backend)
+                            Connection Information
+      Parameter       |                         Value
+----------------------+-------------------------------------------------------
+ Database             | neondb
+ Client User          | neondb_owner
+ Host                 | <NEON_ENDPOINT>
+ Host Address         | <NEON_ENDPOINT_ADDRESS>
+ Server Port          | 5432
+ Options              |
+ Protocol Version     | 3.0
+ Password Used        | true
+ GSSAPI Authenticated | false
+ Backend PID          | -1223010662
+ SSL Connection       | true
+ SSL Library          | OpenSSL
+ SSL Protocol         | TLSv1.3
+ SSL Key Bits         | 256
+ SSL Cipher           | TLS_AES_256_GCM_SHA384
+ SSL Compression      | false
+ ALPN                 | postgresql
+ Superuser            | off
+ Hot Standby          | off
+(19 rows)
+
+connection
+  role_name   | database_name | server_version | backend_tls_active
+--------------+---------------+----------------+--------------------
+ neondb_owner | neondb        | 18.6 (ac70818) | f
+(1 row)
+
+schema and active revision
+ migration_version
+-------------------
+ a3d1f8b72c44
+(1 row)
+
+           active_revision            | provider | inserted_movie_count | updated_movie_count | rejected_movie_count
+--------------------------------------+----------+----------------------+---------------------+----------------------
+ 1ee08003-bc00-4888-b35c-8c6cbe599062 | tmdb     |                    0 |                 989 |                   11
+(1 row)
+
+active catalogue and media availability
+ movies | with_poster | with_backdrop | with_official_trailer | trailer_checked | tmdb_movies | distinct_source_ids
+--------+-------------+---------------+-----------------------+-----------------+-------------+---------------------
+    989 |         989 |           986 |                   882 |             989 |         989 |                 989
+(1 row)
+
+sample real TMDb identities for T04
+             app_movie_id             | tmdb_id
+--------------------------------------+---------
+ 4382a48a-1b88-4d35-9ad7-193bda7dcf13 | 10020
+ 3c8cd908-33ac-415c-85d0-6bf4bded7ff6 | 1003596
+ e1bdaf3f-4065-491e-914f-a01fb8e9c024 | 100402
+ ae19c35c-0894-4493-8cb1-0bb63db7aeae | 1007757
+ e7761185-8ae1-4a0d-a8df-9739f91ee736 | 1008042
+ 1c58be25-ed8e-4a54-a100-061bfc982378 | 101
+ ab1dc2ab-fc11-4e0e-ba82-1f492be12a22 | 1010581
+ 0027c078-1f25-48ea-88a9-45ff07103ca5 | 1011477
+ 70165c03-fb15-4254-ac6c-2411e178a18b | 1011985
+ d52d1e4d-6b4f-457e-810a-d602b0de6de0 | 101299
+(10 rows)
+
+account-owned row counts; no emails or session tokens
+ users | sessions | preferences | ratings | watchlist
+-------+----------+-------------+---------+-----------
+     2 |        8 |           4 |       2 |         2
+(1 row)
+
+=== Post-enrichment account comparison, captured operator assertion ===
+{"whole_media_account_fingerprints_preserved": true}
+
+=== Development public catalogue copy whitelist ===
+{"development_public_catalogue_rows": {"catalogue_revisions": 2, "genres": 19, "catalog_movies": 989, "movie_genres": 2756, "catalogue_state": 1}, "development_account_tables_empty": true, "copied_table_whitelist": ["catalogue_revisions", "genres", "catalog_movies", "movie_genres", "catalogue_state"]}
+
+=== Separate target and test fixture cleanup checks ===
+{"development": {"movies": 989, "users": 0, "sessions": 0, "preferences": 0, "ratings": 0, "watchlist": 0}}
+{"test_cleanup": {"remaining_fixture_schemas": 0}}
+
+=== Fresh remote clone backend with a fresh index ===
+{
+  "clean_remote_clone": true,
+  "locked_backend_install": true,
+  "imported_package_from_clean_clone": true,
+  "fresh_index_created": true,
+  "health": {
+    "status": "ok",
+    "database": "connected",
+    "migrationVersion": "a3d1f8b72c44"
+  },
+  "catalogue_total": 989,
+  "description_search_total": 73,
+  "similar_returned": 5,
+  "tmdb_network_disabled": true
+}
+
+=== Fresh remote clone frontend build ===
+Run `npm audit` for details.
+
+> frontend@0.0.0 build
+> tsc -b && vite build
+
+vite v8.3.1 building client environment for production...
+transforming...
+✓ 79 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.81 kB │ gzip:   0.43 kB
+dist/assets/index-BY2gnITW.css   36.99 kB │ gzip:   8.10 kB
+dist/assets/index-IY8BVZI3.js   358.86 kB │ gzip: 107.24 kB
+
+✓ built in 183ms
+
+=== Real browser verification against the local Neon-backed app ===
+{
+  "accountAStoredPreferences": true,
+  "popular989AndRealPoster": true,
+  "accountASavedHalfStarRating": true,
+  "officialTrailerModal": true,
+  "descriptionSearch73AndExplicitSubmit": true,
+  "missingOfficialTrailerFallback": true,
+  "accountAWatchlist": true,
+  "accountBIsolation": true,
+  "noPageErrors": true,
+  "runtimeMetadataRequestsToTmdb": 0
+}
+
+=== Six affected Python suites ===
+........................................................................ [ 62%]
+............................................                             [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  <LOCAL_REPOSITORY>\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+116 passed, 1 warning in 11.74s
+
+=== Default python -m pytest -v P0 suite ===
+============================= test session starts =============================
+platform win32 -- Python 3.12.6, pytest-9.1.1, pluggy-1.6.0 -- <LOCAL_REPOSITORY>\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: <LOCAL_REPOSITORY>
+configfile: pytest.ini
+testpaths: tests/test_p0_acceptance.py, tests/test_s03_details.py
+plugins: anyio-4.15.1, cov-7.1.0
+collecting ... collected 40 items
+
+tests/test_p0_acceptance.py::test_TC_P0_S01_001_canonical_genres_and_empty_selection PASSED [  2%]
+tests/test_p0_acceptance.py::test_TC_P0_S01_002_zero_preserves_previous_rows PASSED [  5%]
+tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-003] PASSED [  7%]
+tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-004] PASSED [ 10%]
+tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-005] PASSED [ 12%]
+tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-006] PASSED [ 15%]
+tests/test_p0_acceptance.py::test_TC_P0_S01_007_invalid_sets_preserve_previous_selection PASSED [ 17%]
+tests/test_p0_acceptance.py::test_TC_P0_S01_008_guest_forgery_and_origin_leave_accounts_intact PASSED [ 20%]
+tests/test_p0_acceptance.py::test_TC_P0_S02_001_full_set_paging_has_25_distinct_movies PASSED [ 22%]
+tests/test_p0_acceptance.py::test_TC_P0_S02_002_rating_free_order_and_reasons PASSED [ 25%]
+tests/test_p0_acceptance.py::test_TC_P0_S02_003_no_match_uses_unboosted_popular PASSED [ 27%]
+tests/test_p0_acceptance.py::test_TC_P0_S02_004_guest_and_expired_cookie_are_private PASSED [ 30%]
+tests/test_p0_acceptance.py::test_TC_P0_S02_005_core_failure_then_retry_preserves_preferences PASSED [ 32%]
+tests/test_p0_acceptance.py::test_TC_P0_S02_006_filter_after_whole_set_ranking PASSED [ 35%]
+tests/test_p0_acceptance.py::test_TC_P0_S04_001_public_catalogue_pages_include_null_popularity PASSED [ 37%]
+tests/test_p0_acceptance.py::test_TC_P0_S04_002_cold_start_has_no_personal_score PASSED [ 40%]
+tests/test_p0_acceptance.py::test_TC_P0_S04_003_limit_9_and_10_keep_full_total PASSED [ 42%]
+tests/test_p0_acceptance.py::test_TC_P0_S04_004_limit_and_page_refusals PASSED [ 45%]
+tests/test_p0_acceptance.py::test_TC_P0_S04_005_empty_active_versus_missing_revision PASSED [ 47%]
+tests/test_p0_acceptance.py::test_TC_P0_S04_006_stale_catalogue_revision_is_409 PASSED [ 50%]
+tests/test_p0_acceptance.py::test_TC_P0_S12_001_eight_char_normalized_hashed_registration PASSED [ 52%]
+tests/test_p0_acceptance.py::test_TC_P0_S12_002_seven_char_password_has_no_row PASSED [ 55%]
+tests/test_p0_acceptance.py::test_TC_P0_S12_003_nine_char_password_has_safe_dto PASSED [ 57%]
+tests/test_p0_acceptance.py::test_TC_P0_S12_004_duplicate_normalized_email_is_conflict PASSED [ 60%]
+tests/test_p0_acceptance.py::test_TC_P0_S12_005_invalid_email_and_storage_failure_create_no_account PASSED [ 62%]
+tests/test_p0_acceptance.py::test_TC_P0_S13_001_login_me_cookie_and_safe_user PASSED [ 65%]
+tests/test_p0_acceptance.py::test_TC_P0_S13_002_wrong_and_unknown_credentials_same_public_error PASSED [ 67%]
+tests/test_p0_acceptance.py::test_TC_P0_S13_003_logout_replay_and_later_login_restore_data PASSED [ 70%]
+tests/test_p0_acceptance.py::test_TC_P0_S13_004_missing_expired_and_revoked_sessions_refused PASSED [ 72%]
+tests/test_p0_acceptance.py::test_TC_P0_S13_005_account_isolation_and_forged_identity PASSED [ 75%]
+tests/test_p0_acceptance.py::test_TC_P0_S13_006_cross_origin_auth_and_write_refused PASSED [ 77%]
+tests/test_s03_details.py::test_TC_P0_S03_001_public_known_id PASSED     [ 80%]
+tests/test_s03_details.py::test_TC_P0_S03_002_unknown_id_refused PASSED  [ 82%]
+tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[year] PASSED [ 85%]
+tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[summary] PASSED [ 87%]
+tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[both] PASSED [ 90%]
+tests/test_s03_details.py::test_TC_P0_S03_003_catalogue_and_database_failures_are_distinct PASSED [ 92%]
+tests/test_s03_details.py::test_TC_P0_S03_004_return_query_cannot_redirect_or_change_public_movie PASSED [ 95%]
+tests/test_s03_details.py::test_TC_P0_S03_005_detail_widgets_preserve_both_accounts_preferences PASSED [ 97%]
+tests/test_s03_details.py::test_TC_P0_S03_006_membership_commit_allows_read_snapshot_cleanup PASSED [100%]
+
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  <LOCAL_REPOSITORY>\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= 40 passed, 1 warning in 12.65s ========================
+
+=== Default P0 suite repeated with private Neon .env configured ===
+============================= test session starts =============================
+platform win32 -- Python 3.12.6, pytest-9.1.1, pluggy-1.6.0 -- <LOCAL_REPOSITORY>\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: <LOCAL_REPOSITORY>
+configfile: pytest.ini
+testpaths: tests/test_p0_acceptance.py, tests/test_s03_details.py
+plugins: anyio-4.15.1, cov-7.1.0
+collecting ... collected 40 items
+
+tests/test_p0_acceptance.py::test_TC_P0_S01_001_canonical_genres_and_empty_selection PASSED [  2%]
+tests/test_p0_acceptance.py::test_TC_P0_S01_002_zero_preserves_previous_rows PASSED [  5%]
+tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-003] PASSED [  7%]
+tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-004] PASSED [ 10%]
+tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-005] PASSED [ 12%]
+tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-006] PASSED [ 15%]
+tests/test_p0_acceptance.py::test_TC_P0_S01_007_invalid_sets_preserve_previous_selection PASSED [ 17%]
+tests/test_p0_acceptance.py::test_TC_P0_S01_008_guest_forgery_and_origin_leave_accounts_intact PASSED [ 20%]
+tests/test_p0_acceptance.py::test_TC_P0_S02_001_full_set_paging_has_25_distinct_movies PASSED [ 22%]
+tests/test_p0_acceptance.py::test_TC_P0_S02_002_rating_free_order_and_reasons PASSED [ 25%]
+tests/test_p0_acceptance.py::test_TC_P0_S02_003_no_match_uses_unboosted_popular PASSED [ 27%]
+tests/test_p0_acceptance.py::test_TC_P0_S02_004_guest_and_expired_cookie_are_private PASSED [ 30%]
+tests/test_p0_acceptance.py::test_TC_P0_S02_005_core_failure_then_retry_preserves_preferences PASSED [ 32%]
+tests/test_p0_acceptance.py::test_TC_P0_S02_006_filter_after_whole_set_ranking PASSED [ 35%]
+tests/test_p0_acceptance.py::test_TC_P0_S04_001_public_catalogue_pages_include_null_popularity PASSED [ 37%]
+tests/test_p0_acceptance.py::test_TC_P0_S04_002_cold_start_has_no_personal_score PASSED [ 40%]
+tests/test_p0_acceptance.py::test_TC_P0_S04_003_limit_9_and_10_keep_full_total PASSED [ 42%]
+tests/test_p0_acceptance.py::test_TC_P0_S04_004_limit_and_page_refusals PASSED [ 45%]
+tests/test_p0_acceptance.py::test_TC_P0_S04_005_empty_active_versus_missing_revision PASSED [ 47%]
+tests/test_p0_acceptance.py::test_TC_P0_S04_006_stale_catalogue_revision_is_409 PASSED [ 50%]
+tests/test_p0_acceptance.py::test_TC_P0_S12_001_eight_char_normalized_hashed_registration PASSED [ 52%]
+tests/test_p0_acceptance.py::test_TC_P0_S12_002_seven_char_password_has_no_row PASSED [ 55%]
+tests/test_p0_acceptance.py::test_TC_P0_S12_003_nine_char_password_has_safe_dto PASSED [ 57%]
+tests/test_p0_acceptance.py::test_TC_P0_S12_004_duplicate_normalized_email_is_conflict PASSED [ 60%]
+tests/test_p0_acceptance.py::test_TC_P0_S12_005_invalid_email_and_storage_failure_create_no_account PASSED [ 62%]
+tests/test_p0_acceptance.py::test_TC_P0_S13_001_login_me_cookie_and_safe_user PASSED [ 65%]
+tests/test_p0_acceptance.py::test_TC_P0_S13_002_wrong_and_unknown_credentials_same_public_error PASSED [ 67%]
+tests/test_p0_acceptance.py::test_TC_P0_S13_003_logout_replay_and_later_login_restore_data PASSED [ 70%]
+tests/test_p0_acceptance.py::test_TC_P0_S13_004_missing_expired_and_revoked_sessions_refused PASSED [ 72%]
+tests/test_p0_acceptance.py::test_TC_P0_S13_005_account_isolation_and_forged_identity PASSED [ 75%]
+tests/test_p0_acceptance.py::test_TC_P0_S13_006_cross_origin_auth_and_write_refused PASSED [ 77%]
+tests/test_s03_details.py::test_TC_P0_S03_001_public_known_id PASSED     [ 80%]
+tests/test_s03_details.py::test_TC_P0_S03_002_unknown_id_refused PASSED  [ 82%]
+tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[year] PASSED [ 85%]
+tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[summary] PASSED [ 87%]
+tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[both] PASSED [ 90%]
+tests/test_s03_details.py::test_TC_P0_S03_003_catalogue_and_database_failures_are_distinct PASSED [ 92%]
+tests/test_s03_details.py::test_TC_P0_S03_004_return_query_cannot_redirect_or_change_public_movie PASSED [ 95%]
+tests/test_s03_details.py::test_TC_P0_S03_005_detail_widgets_preserve_both_accounts_preferences PASSED [ 97%]
+tests/test_s03_details.py::test_TC_P0_S03_006_membership_commit_allows_read_snapshot_cleanup PASSED [100%]
+
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  <LOCAL_REPOSITORY>\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= 40 passed, 1 warning in 12.12s ========================
+
+=== PostgreSQL integration tests on cineai_test ===
+============================= test session starts =============================
+platform win32 -- Python 3.12.6, pytest-9.1.1, pluggy-1.6.0 -- <LOCAL_REPOSITORY>\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: <LOCAL_REPOSITORY>
+configfile: pytest.ini
+plugins: anyio-4.15.1, cov-7.1.0
+collecting ... collected 11 items
+
+backend/tests/test_postgresql_t01.py::test_postgresql_engine_enforces_production_tls PASSED [  9%]
+backend/tests/test_postgresql_t01.py::test_provisioning_rejects_query_target_overrides[host] PASSED [ 18%]
+backend/tests/test_postgresql_t01.py::test_provisioning_rejects_query_target_overrides[hostaddr] PASSED [ 27%]
+backend/tests/test_postgresql_t01.py::test_provisioning_rejects_query_target_overrides[port] PASSED [ 36%]
+backend/tests/test_postgresql_t01.py::test_provisioning_rejects_query_target_overrides[dbname] PASSED [ 45%]
+backend/tests/test_postgresql_t01.py::test_provisioning_rejects_query_target_overrides[service] PASSED [ 54%]
+backend/tests/test_postgresql_t01.py::test_provisioning_rejects_query_target_overrides[servicefile] PASSED [ 63%]
+backend/tests/test_postgresql_t01.py::test_empty_postgresql_migration_schema_constraints_and_provisioning PASSED [ 72%]
+backend/tests/test_postgresql_t01.py::test_postgresql_rating_migration_keeps_identity PASSED [ 81%]
+backend/tests/test_postgresql_t01.py::test_postgresql_api_isolation_reset_and_catalogue_pages PASSED [ 90%]
+backend/tests/test_postgresql_t01.py::test_postgresql_account_lock_and_catalogue_snapshot PASSED [100%]
+
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  <LOCAL_REPOSITORY>\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================== 11 passed, 1 warning in 69.15s (0:01:09) ===================
