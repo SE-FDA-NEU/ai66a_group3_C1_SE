@@ -165,6 +165,11 @@ def test_bounded_idempotent_success_clear_and_safe_details(database, monkeypatch
                 "genres": [{"id": 28, "name": "Action"}], "overview": None,
                 "popularityScore": None, "voteAverage": None, "voteCount": None,
                 "backdropUrl": None, "posterUrl": None,
+                "providers": {
+                    "country": "VN", "status": "not_checked", "attemptedAt": None, "checkedAt": None,
+                    "groups": {"flatrate": [], "rent": [], "buy": [], "free": [], "ads": []},
+                },
+                "watchOptionsUrl": None,
                 "trailer": {"site": "YouTube", "key": "AbCdEf123_-", "name": "Official trailer",
                             "type": "Trailer", "official": True, "language": "en",
                             "publishedAt": "2026-10-20T10:00:00Z",

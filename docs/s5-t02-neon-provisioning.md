@@ -118,3 +118,24 @@ Actual results and the final-review status for this delivery are recorded in the
 | T03 Render recheck | Separate downstream T03 evidence |
 
 Attach the actual commands and redacted output to the evidence record. Local synthetic tests and a local PostgreSQL 18 fixture establish code behaviour only; they do not fill the Neon-backed results above. T02 hands the results to T03/T04/T08, then checks CI and obtains substantive approval from an eligible non-contributing reviewer before closure.
+
+## Downstream T04 provider schema and operator handoff
+
+T02's results above retain their tested `a3d1f8b72c44` schema head. T04 adds
+`b8e4d2c96f10` for VN provider checks/memberships; it does not re-import the core
+catalogue or change the NLP corpus. Before using the revised Details API,
+apply the current migrations to the independently confirmed target with the
+migration role. Confirm `heads`, `current` and `check` agree, then ensure the
+restricted runtime role can read the new tables:
+
+```sql
+GRANT SELECT ON TABLE movie_provider_checks, movie_watch_providers TO cineai_runtime;
+```
+
+Runtime requests do not need write access to these tables or a TMDb token.
+The explicit importer uses the approved operator role, serial authenticated
+TMDb requests and bounded retries. The [T04 API/operator contract](api.md#14-s5-t04-vn-providers-and-tmdb-watch-options-251)
+defines exact commands, full-catalogue versus resume semantics, count
+reconciliation, VN URL validation, T05/T06/T08 DTO/attribution handoff and
+PostgreSQL recovery requirements. Real T04 enrichment is **Manual/operator
+enrichment required** until its own target-specific results are captured.

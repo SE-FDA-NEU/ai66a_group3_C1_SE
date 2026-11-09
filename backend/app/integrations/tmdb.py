@@ -9,6 +9,9 @@ from __future__ import annotations
 
 import os
 from collections.abc import Mapping
+from datetime import UTC, datetime
+from email.utils import parsedate_to_datetime
+from time import sleep
 from typing import Any, Self
 
 import httpx
@@ -137,24 +140,39 @@ class TmdbClient:
             params={"language": "en-US", "include_video_language": VIDEO_LANGUAGES},
         )
 
+    def fetch_movie_watch_providers(self, movie_id: int) -> Mapping[str, Any]:
+        """At most three timed requests per movie, including transient retries."""
+        if type(movie_id) is not int or movie_id <= 0:
+            raise ValueError("movie_id must be positive")
+        return self._get_json(f"/movie/{movie_id}/watch/providers", params={}, retries=2)
+
     def _get_json(
-        self, path: str, *, params: Mapping[str, str | int]
+        self, path: str, *, params: Mapping[str, str | int], retries: int = 0
     ) -> Mapping[str, Any]:
-        try:
-            response = self._http_client.get(
-                path,
-                params=params,
-                headers=self._headers,
-            )
-        except httpx.TimeoutException as exc:
-            raise TmdbImportError("TMDb request timed out") from exc
-        except httpx.ConnectError as exc:
-            raise TmdbImportError(
-                "TMDb request failed; check network/DNS access to "
-                "api.themoviedb.org"
-            ) from exc
-        except httpx.HTTPError as exc:
-            raise TmdbImportError("TMDb request failed") from exc
+        for attempt in range(retries + 1):
+            try:
+                response = self._http_client.get(path, params=params, headers=self._headers)
+            except httpx.TimeoutException as exc:
+                if attempt < retries:
+                    sleep(2 ** attempt)
+                    continue
+                raise TmdbImportError("TMDb request timed out") from exc
+            except httpx.ConnectError as exc:
+                if attempt < retries:
+                    sleep(2 ** attempt)
+                    continue
+                raise TmdbImportError(
+                    "TMDb request failed; check network/DNS access to api.themoviedb.org"
+                ) from exc
+            except httpx.HTTPError as exc:
+                if attempt < retries:
+                    sleep(2 ** attempt)
+                    continue
+                raise TmdbImportError("TMDb request failed") from exc
+            if response.status_code in {408, 429, 500, 502, 503, 504} and attempt < retries:
+                sleep(_retry_delay(response.headers.get("Retry-After"), attempt))
+                continue
+            break
 
         if response.status_code == 401:
             raise TmdbAuthenticationError("TMDb authentication failed")
@@ -171,6 +189,20 @@ class TmdbClient:
         if not isinstance(payload, Mapping):
             raise TmdbPayloadError("TMDb returned an invalid response")
         return payload
+
+
+def _retry_delay(retry_after: str | None, attempt: int) -> float:
+    """Honor numeric/HTTP-date Retry-After within a bounded 30-second wait."""
+    delay = float(2 ** attempt)
+    if retry_after:
+        try:
+            delay = float(retry_after)
+        except ValueError:
+            try:
+                delay = (parsedate_to_datetime(retry_after) - datetime.now(UTC)).total_seconds()
+            except (ValueError, TypeError, OverflowError):
+                pass
+    return max(0.0, min(delay, 30.0))
 
 
 def _required_object_list(

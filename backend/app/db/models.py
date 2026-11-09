@@ -17,6 +17,7 @@ from sqlalchemy import (
     DateTime,
     Float,
     ForeignKey,
+    ForeignKeyConstraint,
     Integer,
     String,
     Text,
@@ -227,6 +228,54 @@ class CatalogMovie(Base):
     watchlist: Mapped[list[UserMovieWatchlist]] = relationship(
         back_populates="movie", cascade="all, delete-orphan"
     )
+    provider_checks: Mapped[list[MovieProviderCheck]] = relationship(
+        cascade="all, delete-orphan"
+    )
+
+
+class MovieProviderCheck(Base):
+    """Last regional TMDb/JustWatch check, separate from core catalogue data."""
+
+    __tablename__ = "movie_provider_checks"
+    __table_args__ = (
+        CheckConstraint("country = 'VN'", name="ck_movie_provider_checks_country"),
+        CheckConstraint("status IN ('success', 'no_data', 'error', 'stale')",
+                        name="ck_movie_provider_checks_status"),
+        CheckConstraint("link_status IS NULL OR link_status IN ('valid', 'missing', 'invalid')",
+                        name="ck_movie_provider_checks_link_status"),
+    )
+
+    movie_id: Mapped[str] = mapped_column(
+        ForeignKey("catalog_movies.id", ondelete="CASCADE"), primary_key=True
+    )
+    country: Mapped[str] = mapped_column(String(2), primary_key=True)
+    status: Mapped[str] = mapped_column(String(16), nullable=False)
+    attempted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    checked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    watch_options_url: Mapped[str | None] = mapped_column(Text, nullable=True)
+    link_status: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    providers: Mapped[list[MovieWatchProvider]] = relationship(cascade="all, delete-orphan")
+
+
+class MovieWatchProvider(Base):
+    """One provider membership; the same provider can occur in several groups."""
+
+    __tablename__ = "movie_watch_providers"
+    __table_args__ = (
+        ForeignKeyConstraint(["movie_id", "country"],
+                             ["movie_provider_checks.movie_id", "movie_provider_checks.country"],
+                             ondelete="CASCADE"),
+        CheckConstraint("provider_id > 0", name="ck_movie_watch_providers_identity"),
+        CheckConstraint("availability_type IN ('flatrate', 'rent', 'buy', 'free', 'ads')",
+                        name="ck_movie_watch_providers_group"),
+    )
+
+    movie_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    country: Mapped[str] = mapped_column(String(2), primary_key=True)
+    availability_type: Mapped[str] = mapped_column(String(16), primary_key=True)
+    provider_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=False)
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    logo_path: Mapped[str | None] = mapped_column(Text, nullable=True)
 
 
 class Genre(Base):

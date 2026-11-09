@@ -15,7 +15,7 @@ import pytest
 from app.cli.provision_account import ProvisioningError, provision_account
 from app.db.account_writes import begin_account_write
 from app.db.database import create_database_engine
-from app.db.models import User, UserMovieRating
+from app.db.models import MovieProviderCheck, MovieWatchProvider, User, UserMovieRating
 from app.main import app, get_db
 from app.repositories.movies import (
     activate_catalogue_revision,
@@ -169,7 +169,8 @@ def test_empty_postgresql_migration_schema_constraints_and_provisioning(pg_engin
     engine, url = pg_engine
     inspector = inspect(engine)
     assert {"users", "auth_sessions", "catalog_movies", "user_movie_ratings",
-            "user_movie_watchlist", "catalogue_state"} <= set(inspector.get_table_names())
+            "user_movie_watchlist", "catalogue_state", "movie_provider_checks",
+            "movie_watch_providers"} <= set(inspector.get_table_names())
     assert {"poster_path", "backdrop_path", "trailer_key", "trailer_published_at"} <= {
         column["name"] for column in inspector.get_columns("catalog_movies")
     }
@@ -220,6 +221,29 @@ def test_empty_postgresql_migration_schema_constraints_and_provisioning(pg_engin
             "id": str(uuid4()), "email": "viewer@example.com", "hash": "hash",
             "created": datetime.now(UTC),
         })
+
+
+def test_postgresql_vn_provider_memberships_and_constraints(pg_engine):
+    engine, _ = pg_engine
+    _, movie_ids = seed_catalogue(engine, count=1)
+    with Session(engine) as session, session.begin():
+        session.add(MovieProviderCheck(movie_id=movie_ids[0], country="VN", status="success",
+                                      attempted_at=datetime.now(UTC), checked_at=datetime.now(UTC)))
+        session.flush()
+        session.add_all(MovieWatchProvider(
+            movie_id=movie_ids[0], country="VN", availability_type=group, provider_id=8, name="Synthetic",
+        ) for group in ("flatrate", "rent", "buy", "free", "ads"))
+    with Session(engine) as session:
+        assert len(session.scalars(select(MovieWatchProvider)).all()) == 5
+    with pytest.raises(IntegrityError), Session(engine) as session, session.begin():
+        session.add(MovieWatchProvider(movie_id=movie_ids[0], country="VN", availability_type="rent",
+                                       provider_id=8, name="Duplicate"))
+    with pytest.raises(IntegrityError), Session(engine) as session, session.begin():
+        session.add(MovieProviderCheck(movie_id="missing", country="VN", status="success",
+                                      attempted_at=datetime.now(UTC)))
+    with pytest.raises(IntegrityError), Session(engine) as session, session.begin():
+        session.add(MovieProviderCheck(movie_id=movie_ids[0], country="US", status="success",
+                                      attempted_at=datetime.now(UTC)))
 
 
 def test_postgresql_rating_migration_keeps_identity(pg_engine):

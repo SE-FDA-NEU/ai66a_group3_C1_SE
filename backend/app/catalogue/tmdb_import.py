@@ -15,8 +15,9 @@ from sqlalchemy.orm import Session
 
 from app.catalogue.backdrops import valid_backdrop_path
 from app.catalogue.posters import valid_poster_path
+from app.catalogue.providers import select_vn_providers
 from app.catalogue.trailers import Trailer, select_trailer
-from app.db.models import CatalogMovie, utc_now
+from app.db.models import CatalogMovie, MovieProviderCheck, MovieWatchProvider, utc_now
 from app.integrations.tmdb import (
     DEFAULT_POPULAR_PAGES,
     MAX_POPULAR_PAGES,
@@ -48,6 +49,8 @@ class TmdbCatalogueGateway(Protocol):
     def fetch_movie_details(self, movie_id: int) -> Mapping[str, Any]: ...
 
     def fetch_movie_videos(self, movie_id: int) -> Mapping[str, Any]: ...
+
+    def fetch_movie_watch_providers(self, movie_id: int) -> Mapping[str, Any]: ...
 
 
 @dataclass(frozen=True)
@@ -146,6 +149,30 @@ class TmdbTrailerAllDatabaseError(SQLAlchemyError):
     def __init__(self, partial_result: TmdbTrailerAllResult) -> None:
         self.partial_result = partial_result
         super().__init__("trailer enrichment batch failed")
+
+
+@dataclass(frozen=True)
+class TmdbProviderAllResult:
+    active_revision_id: str
+    eligible_movie_count: int
+    already_checked_movie_count: int
+    processed_movie_count: int = 0
+    with_vn_data_movie_count: int = 0
+    no_vn_data_movie_count: int = 0
+    failed_movie_count: int = 0
+    valid_link_movie_count: int = 0
+    missing_link_movie_count: int = 0
+    invalid_link_movie_count: int = 0
+    remaining_movie_count: int = 0
+    authentication_stopped: bool = False
+
+
+class TmdbProviderAllError(RuntimeError):
+    """Safe partial counts include only batches committed before the failure."""
+
+    def __init__(self, partial_result: TmdbProviderAllResult) -> None:
+        self.partial_result = partial_result
+        super().__init__("provider batch failed or active catalogue changed")
 
 
 @dataclass(frozen=True)
@@ -545,6 +572,96 @@ def enrich_tmdb_trailers_all(
         remaining = batch.remaining_movie_count
         authentication_stopped = batch.authentication_stopped
         if authentication_stopped:
+            break
+    return snapshot()
+
+
+def enrich_tmdb_providers_all(
+    session_factory: Callable[[], Session], *, client: TmdbCatalogueGateway,
+    batch_size: int = MAX_ENRICHMENT_MOVIES, refresh: bool = False,
+) -> TmdbProviderAllResult:
+    """Resume pending/failed VN checks across the whole active catalogue.
+
+    A refresh deliberately visits even previously successful/no-data checks.
+    Each selected movie is attempted once per invocation; transient HTTP retries
+    are bounded in the shared adapter. Only provider tables are written.
+    """
+    if type(batch_size) is not int or not 1 <= batch_size <= MAX_ENRICHMENT_MOVIES:
+        raise ValueError(f"batch_size must be an integer from 1 to {MAX_ENRICHMENT_MOVIES}")
+    with session_factory() as session:
+        revision = get_active_catalogue_revision(session)
+        if revision is None or revision.provider != TMDB_SOURCE:
+            raise ValueError("an active TMDb catalogue is required for provider enrichment")
+        revision_id = revision.id
+        rows = session.execute(select(CatalogMovie.id, MovieProviderCheck.status).outerjoin(
+            MovieProviderCheck, (MovieProviderCheck.movie_id == CatalogMovie.id)
+            & (MovieProviderCheck.country == "VN"),
+        ).where(CatalogMovie.catalogue_revision_id == revision_id,
+                CatalogMovie.source == TMDB_SOURCE).order_by(CatalogMovie.source_id, CatalogMovie.id)).all()
+        movie_ids = [movie_id for movie_id, status in rows if refresh or status not in {"success", "no_data"}]
+    totals = Counter()
+    stopped = False
+
+    def snapshot() -> TmdbProviderAllResult:
+        return TmdbProviderAllResult(
+            active_revision_id=revision_id, eligible_movie_count=len(rows),
+            already_checked_movie_count=len(rows) - len(movie_ids),
+            remaining_movie_count=len(movie_ids) - totals["processed"], authentication_stopped=stopped,
+            **{key + "_movie_count": totals[key] for key in (
+                "processed", "with_vn_data", "no_vn_data", "failed", "valid_link", "missing_link", "invalid_link",
+            )},
+        )
+
+    for offset in range(0, len(movie_ids), batch_size):
+        selected = movie_ids[offset:offset + batch_size]
+        batch = Counter()
+        try:
+            with session_factory() as session, session.begin():
+                current = get_active_catalogue_revision(session)
+                if current is None or current.id != revision_id:
+                    raise ValueError("active catalogue changed during provider enrichment")
+                movies = _select_image_movies(session, (
+                    CatalogMovie.catalogue_revision_id == revision_id, CatalogMovie.source == TMDB_SOURCE,
+                ), batch_size, selected)
+                for movie in movies:
+                    if not movie.source_id.isascii() or not movie.source_id.isdecimal() or int(movie.source_id) <= 0:
+                        raise ValueError("active TMDb catalogue contains an invalid source ID")
+                    check = session.get(MovieProviderCheck, (movie.id, "VN"))
+                    attempted_at = utc_now()
+                    if check is None:
+                        check = MovieProviderCheck(movie_id=movie.id, country="VN", status="error",
+                                                  attempted_at=attempted_at)
+                        session.add(check)
+                    check.attempted_at = attempted_at
+                    batch["processed"] += 1
+                    try:
+                        providers, link, link_status = select_vn_providers(
+                            client.fetch_movie_watch_providers(int(movie.source_id)), int(movie.source_id),
+                        )
+                    except TmdbImportError as exc:
+                        check.status = "stale" if check.checked_at else "error"
+                        batch["failed"] += 1
+                        if isinstance(exc, TmdbAuthenticationError):
+                            stopped = True
+                            break
+                        continue
+                    check.status = "success" if providers else "no_data"
+                    check.checked_at = utc_now()
+                    check.watch_options_url, check.link_status = link, link_status
+                    # Flush deletions before inserting the same composite keys.
+                    check.providers.clear()
+                    session.flush()
+                    check.providers.extend(MovieWatchProvider(
+                        movie_id=movie.id, country="VN", availability_type=provider.group,
+                        provider_id=provider.provider_id, name=provider.name, logo_path=provider.logo_path,
+                    ) for provider in providers)
+                    batch["with_vn_data" if providers else "no_vn_data"] += 1
+                    batch[link_status + "_link"] += 1
+                session.flush()
+        except (SQLAlchemyError, ValueError) as exc:
+            raise TmdbProviderAllError(snapshot()) from exc
+        totals.update(batch)
+        if stopped:
             break
     return snapshot()
 
