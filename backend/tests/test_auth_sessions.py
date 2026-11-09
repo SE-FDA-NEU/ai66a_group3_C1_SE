@@ -13,6 +13,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
+from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 
 
 @pytest.fixture
@@ -313,3 +314,50 @@ def test_cross_origin_logout_cannot_revoke_the_current_session(
     assert response.status_code == 403
     assert response.json()["error"]["code"] == "ORIGIN_NOT_ALLOWED"
     assert http.get("/api/auth/me").status_code == 200
+
+
+def test_https_session_restore_and_writes_behind_trusted_proxy(client, monkeypatch):
+    _, database_session = client
+
+    def request_session():
+        with Session(database_session.get_bind()) as session:
+            yield session
+
+    monkeypatch.setitem(app.dependency_overrides, get_db, request_session)
+    monkeypatch.setenv("APP_ENV", "production")
+    # Production must stay Secure even with an accidental development override.
+    monkeypatch.setenv("SESSION_COOKIE_SECURE", "false")
+    proxy = ProxyHeadersMiddleware(app, trusted_hosts=["127.0.0.1"])
+
+    async def http_hop(scope, receive, send):
+        # Simulate the plain HTTP hop at the proxy boundary. The wrapper restores HTTPS.
+        if scope["type"] == "http":
+            scope["scheme"] = "http"
+        await proxy(scope, receive, send)
+
+    with TestClient(http_hop, base_url="https://app.example.test", client=("127.0.0.1", 1234)) as http:
+        headers = {"origin": "https://app.example.test", "x-forwarded-proto": "https"}
+        login = http.post("/api/auth/login", json={
+            "email": "viewer@example.com", "password": "movie123",
+        }, headers=headers)
+        assert login.status_code == 200
+        cookie = login.headers["set-cookie"]
+        assert "Secure" in cookie and "HttpOnly" in cookie and "SameSite=lax" in cookie
+        assert http.get("/api/auth/me", headers=headers).status_code == 200
+        assert http.post("/api/me/profile/reset", json={"confirm": True}, headers=headers).status_code == 200
+        assert http.post("/api/auth/logout", headers={
+            **headers, "origin": "https://attacker.example",
+        }).status_code == 403
+        logout = http.post("/api/auth/logout", headers=headers)
+        assert logout.status_code == 204
+        assert "Secure" in logout.headers["set-cookie"]
+        assert http.get("/api/auth/me", headers=headers).status_code == 401
+
+
+def test_untrusted_forwarded_https_cannot_change_origin_policy(client):
+    proxy = ProxyHeadersMiddleware(app, trusted_hosts=["127.0.0.1"])
+    with TestClient(proxy, base_url="http://app.example.test", client=("192.0.2.1", 1234)) as http:
+        response = http.post("/api/auth/login", json={
+            "email": "viewer@example.com", "password": "movie123",
+        }, headers={"origin": "https://app.example.test", "x-forwarded-proto": "https"})
+    assert response.status_code == 403

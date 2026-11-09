@@ -433,6 +433,8 @@ python -m ruff check backend
 
 ## Run the Backend
 
+For one-origin React/FastAPI production serving, Render settings, required CI checks and operator acceptance steps, see the [S5-T03 deployment runbook](docs/s5-t03-deployment.md).
+
 From the repository root with the Python virtual environment activated:
 
 ```bash

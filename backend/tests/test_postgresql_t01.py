@@ -81,6 +81,8 @@ def test_provisioning_rejects_query_target_overrides(parameter):
 def pg_engine():
     raw_url = os.environ.get("TEST_POSTGRES_URL")
     if not raw_url:
+        if os.environ.get("REQUIRE_POSTGRES_TESTS") == "1":
+            pytest.fail("Required PostgreSQL integration needs TEST_POSTGRES_URL")
         pytest.skip("Set TEST_POSTGRES_URL to a disposable PostgreSQL database")
     url = make_url(raw_url)
     if url.drivername != "postgresql+psycopg" or not url.database:
