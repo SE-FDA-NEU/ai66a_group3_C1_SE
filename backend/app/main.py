@@ -1,5 +1,6 @@
 import os
 from collections.abc import Generator
+from contextlib import asynccontextmanager
 from uuid import uuid4
 
 from fastapi import Depends, FastAPI, Query, Request, Response
@@ -16,6 +17,7 @@ from app.recommendations.overview_index import IndexUnavailable, load_active_ind
 from app.recommendations.search import rank_description_matches
 from app.recommendations.service import build_account_recommendations
 from app.recommendations.similar import rank_similar_movies
+from app.recommendations.startup_index import prepare_startup_index
 from app.repositories.movies import (
     CatalogueSort,
     count_active_movies,
@@ -88,8 +90,19 @@ from app.security.sessions import (
     revoke_session,
 )
 
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    try:
+        prepare_startup_index(SessionLocal)
+    except (IndexUnavailable, OSError, SQLAlchemyError):
+        raise RuntimeError("NLP index preparation failed; check database and writable index path") from None
+    yield
+
+
 app = FastAPI(
     title="AI Movie Recommendation System",
+    lifespan=lifespan,
 )
 
 _SAME_ORIGIN_WRITES = frozenset(

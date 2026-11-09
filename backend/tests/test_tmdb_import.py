@@ -313,6 +313,10 @@ def test_successful_import_records_counts_and_maps_provider_fields(
         assert revision.inserted_movie_count == 2
         assert revision.updated_movie_count == 0
         assert revision.rejected_movie_count == 2
+        assert dict(result.rejection_reasons) == {
+            "value must be non-empty text": 1,
+            "duplicate TMDb ID across popular pages": 1,
+        }
         assert result.movie_count == 2
         assert result.associated_genre_count == 2
         assert result.finite_popularity_movie_count == 1
@@ -627,6 +631,7 @@ def test_multi_page_import_deduplicates_and_preserves_personal_data(database, pa
     assert result.inserted_movie_count == pages * 20 - 20
     assert result.updated_movie_count == 20
     assert result.rejected_movie_count == 1
+    assert dict(result.rejection_reasons) == {"duplicate TMDb ID across popular pages": 1}
     assert client.calls == [
         "genres",
         *[f"popular:{page}" for page in range(1, pages + 1)],

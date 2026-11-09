@@ -158,6 +158,13 @@ its revision or accounts, use the bounded
 
 ### Existing catalogues: migrate and enrich every movie
 
+The Sprint 5 PostgreSQL 18/Neon operator sequence covers explicit 50-page import,
+public review-account setup and restart/index verification. Live acceptance
+records the target, imported catalogue, account persistence and startup recovery
+from actual Neon-backed checks. T03 records the Render startup check after
+deployment. [S5-T02 operator runbook](s5-t02-neon-provisioning.md),
+[9 November live acceptance](evidence/s5-t02-neon/README.md).
+
 After pulling changes, back up valuable SQLite data consistently and run
 `alembic upgrade head` before restarting the backend. Compare `alembic current`
 with `alembic heads`; use the actual repository head, not an old task's revision.
@@ -752,7 +759,7 @@ just to test the migration.
 
 After every successful import, rebuild and check the shared overview index
 as shown above before starting/restarting the backend. A changed catalogue
-revision makes the old artifact stale. Runtime Search/Similar use this local
+corpus or NLP configuration makes the old artifact stale. Runtime Search/Similar use this local
 index; Next/Previous never import TMDb movies.
 
 Search keeps typed text local. Press Enter or choose Search to commit the

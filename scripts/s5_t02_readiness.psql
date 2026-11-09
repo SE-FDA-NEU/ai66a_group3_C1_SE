@@ -1,0 +1,39 @@
+-- Read-only PostgreSQL 18 handoff. Run with psql against the intended Neon target.
+\pset pager off
+\echo 'client connection and TLS (Neon may terminate TLS before the PostgreSQL backend)'
+\conninfo
+\echo 'connection'
+SELECT current_user AS role_name, current_database() AS database_name,
+       current_setting('server_version') AS server_version,
+       (SELECT ssl FROM pg_stat_ssl WHERE pid = pg_backend_pid()) AS backend_tls_active;
+\echo 'schema and active revision'
+SELECT version_num AS migration_version FROM alembic_version;
+SELECT r.id AS active_revision, r.provider, r.inserted_movie_count,
+       r.updated_movie_count, r.rejected_movie_count
+FROM catalogue_state AS s
+JOIN catalogue_revisions AS r ON r.id = s.active_revision_id
+WHERE s.id = 1;
+\echo 'active catalogue and media availability'
+SELECT count(*) AS movies,
+       count(*) FILTER (WHERE m.poster_path IS NOT NULL) AS with_poster,
+       count(*) FILTER (WHERE m.backdrop_path IS NOT NULL) AS with_backdrop,
+       count(*) FILTER (WHERE m.trailer_site = 'YouTube' AND m.trailer_key IS NOT NULL
+                        AND m.trailer_official IS TRUE) AS with_official_trailer,
+       count(*) FILTER (WHERE m.trailer_attempted_at IS NOT NULL) AS trailer_checked,
+       count(*) FILTER (WHERE m.source = 'tmdb') AS tmdb_movies,
+       count(DISTINCT m.source_id) AS distinct_source_ids
+FROM catalogue_state AS s
+JOIN catalog_movies AS m ON m.catalogue_revision_id = s.active_revision_id
+WHERE s.id = 1;
+\echo 'sample real TMDb identities for T04'
+SELECT m.id AS app_movie_id, m.source_id AS tmdb_id
+FROM catalogue_state AS s
+JOIN catalog_movies AS m ON m.catalogue_revision_id = s.active_revision_id
+WHERE s.id = 1 AND m.source = 'tmdb'
+ORDER BY m.source_id LIMIT 10;
+\echo 'account-owned row counts; no emails or session tokens'
+SELECT (SELECT count(*) FROM users) AS users,
+       (SELECT count(*) FROM auth_sessions) AS sessions,
+       (SELECT count(*) FROM user_genre_preferences) AS preferences,
+       (SELECT count(*) FROM user_movie_ratings) AS ratings,
+       (SELECT count(*) FROM user_movie_watchlist) AS watchlist;

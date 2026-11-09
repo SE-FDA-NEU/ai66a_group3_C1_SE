@@ -49,6 +49,7 @@ def test_success_output_records_safe_provenance_counts(
         source_fetched_at=datetime(2026, 10, 9, 9, 30, tzinfo=UTC),
         imported_at=datetime(2026, 10, 9, 9, 31, tzinfo=UTC),
         sample_source_ids=("101", "202", "303"),
+        rejection_reasons=(("duplicate TMDb ID across popular pages", 1),),
     )
 
     monkeypatch.setattr(
@@ -80,6 +81,7 @@ def test_success_output_records_safe_provenance_counts(
         "inserted=20\n"
         "updated=0\n"
         "rejected=1\n"
+        "rejection_reason[duplicate TMDb ID across popular pages]=1\n"
         "movies=20\n"
         "associated_genres=12\n"
         "finite_popularity_movies=19\n"
