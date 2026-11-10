@@ -165,6 +165,11 @@ from actual Neon-backed checks. T03 records the Render startup check after
 deployment. [S5-T02 operator runbook](s5-t02-neon-provisioning.md),
 [9 November live acceptance](evidence/s5-t02-neon/README.md).
 
+For the Render Free public service, follow the [S5-T03 deployment runbook](s5-t03-deployment.md).
+Its build command produces `frontend/dist` and its start command uses the installed
+`certifi` CA bundle with verified Neon TLS. Deploy the reviewed frontend-serving
+change from green `main` before expecting the public root URL to render React.
+
 After pulling changes, back up valuable SQLite data consistently and run
 `alembic upgrade head` before restarting the backend. Compare `alembic current`
 with `alembic heads`; use the actual repository head, not an old task's revision.

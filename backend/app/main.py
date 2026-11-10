@@ -1,17 +1,23 @@
+import logging
 import os
+import time
 from collections.abc import Generator
 from contextlib import asynccontextmanager
+from contextvars import ContextVar
 from uuid import uuid4
 
+from alembic.config import Config
+from alembic.script import ScriptDirectory
 from fastapi import Depends, FastAPI, Query, Request, Response
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 from sqlalchemy import func, select, text
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
+from starlette.exceptions import HTTPException
 
 from app.db.account_writes import begin_account_write, resolve_account_write_user
-from app.db.database import SessionLocal, engine
+from app.db.database import PROJECT_ROOT, Base, SessionLocal, engine
 from app.db.models import Genre, User, UserMovieRating
 from app.recommendations.overview_index import IndexUnavailable, load_active_index
 from app.recommendations.search import rank_description_matches
@@ -90,12 +96,25 @@ from app.security.sessions import (
     revoke_session,
 )
 
+logger = logging.getLogger("uvicorn.error")
+request_id: ContextVar[str | None] = ContextVar("request_id", default=None)
+FRONTEND_DIST = PROJECT_ROOT / "frontend" / "dist"
+MIGRATION_HEADS = set(ScriptDirectory.from_config(
+    Config(str(PROJECT_ROOT / "backend" / "alembic.ini"))
+).get_heads())
+
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     try:
         prepare_startup_index(SessionLocal)
-    except (IndexUnavailable, OSError, SQLAlchemyError):
+    except (IndexUnavailable, OSError, SQLAlchemyError) as exc:
+        cause = getattr(exc, "orig", exc)
+        logger.error(
+            "NLP index preparation failed: error_type=%s sqlstate=%s errno=%s",
+            type(cause).__name__, getattr(cause, "sqlstate", None),
+            getattr(cause, "errno", None),
+        )
         raise RuntimeError("NLP index preparation failed; check database and writable index path") from None
     yield
 
@@ -137,6 +156,35 @@ async def same_origin_account_writes(request: Request, call_next):
             403,
         )
     return await call_next(request)
+
+
+@app.middleware("http")
+async def request_logging(request: Request, call_next):
+    correlation = f"req_{uuid4().hex}"
+    context = request_id.set(correlation)
+    started = time.monotonic()
+    try:
+        try:
+            response = await call_next(request)
+        except Exception:  # noqa: BLE001 -- public boundary must suppress sensitive exception text
+            # Exception text/tracebacks can contain SQL parameters or secrets.
+            response = _error("INTERNAL_ERROR", "Service is temporarily unavailable", 500)
+        response.headers["X-Request-ID"] = correlation
+        route = request.scope.get("route")
+        log = logger.error if response.status_code >= 500 else logger.info
+        log("request_id=%s method=%s route=%s status=%d latency_ms=%.2f",
+            correlation, request.method, getattr(route, "path", "unmatched"),
+            response.status_code, (time.monotonic() - started) * 1000)
+        return response
+    finally:
+        request_id.reset(context)
+
+
+@app.exception_handler(HTTPException)
+async def http_error_handler(_request: Request, exc: HTTPException):
+    if exc.status_code == 404:
+        return _error("NOT_FOUND", "Resource not found", 404)
+    return JSONResponse({"detail": exc.detail}, status_code=exc.status_code, headers=exc.headers)
 
 
 class AuthenticationRequiredError(Exception):
@@ -227,7 +275,7 @@ def _error(code: str, message: str, status_code: int) -> JSONResponse:
             "error": {
                 "code": code,
                 "message": message,
-                "requestId": f"req_{uuid4().hex}",
+                "requestId": request_id.get() or f"req_{uuid4().hex}",
             }
         },
     )
@@ -276,6 +324,8 @@ def _begin_read_snapshot(session: Session) -> None:
 
 
 def _secure_cookie(request: Request) -> bool:
+    if os.getenv("APP_ENV", "").lower() in {"production", "prod"}:
+        return True
     configured = os.getenv("SESSION_COOKIE_SECURE")
     if configured is not None:
         return configured.lower() == "true"
@@ -310,12 +360,17 @@ def health():
     with engine.connect() as connection:
         migration_version = connection.execute(
             text("SELECT version_num FROM alembic_version")
-        ).scalar_one_or_none()
+        ).scalars().all()
+        if set(migration_version) != MIGRATION_HEADS:
+            return _error("SERVICE_UNAVAILABLE", "Service is temporarily unavailable", 503)
+        # Probe required tables and columns without reading account data.
+        for table in Base.metadata.sorted_tables:
+            connection.execute(select(table).limit(0))
 
     return {
         "status": "ok",
         "database": "connected",
-        "migrationVersion": migration_version,
+        "migrationVersion": migration_version[0],
     }
 
 
@@ -913,3 +968,26 @@ _DUMMY_PASSWORD_HASH = (
     "h6qrQH9mnU2BlE5+zY3mHA$"
     "OmtsPKfE9439waS1s/YJ6431AUHunXUiorIfT7qcbRA"
 )
+
+
+@app.api_route("/{path:path}", methods=["GET", "HEAD"], include_in_schema=False)
+def frontend(path: str):
+    # Keep the API/health namespaces separate from the SPA, including unknown paths.
+    if path.split("/", 1)[0] in {"api", "health"}:
+        return _error("NOT_FOUND", "Resource not found", 404)
+    root = FRONTEND_DIST.resolve()
+    asset = (root / path).resolve()
+    if asset.is_relative_to(root) and asset.is_file():
+        return FileResponse(asset)
+    spa_routes = {
+        "", "about-recommendations", "popular", "search", "login", "register",
+        "recommendations", "preferences", "profile", "watchlist",
+    }
+    segments = path.strip("/").split("/")
+    is_movie = len(segments) == 2 and segments[0] == "movies" and bool(segments[1])
+    if path.strip("/") in spa_routes or is_movie:
+        index = (root / "index.html").resolve()
+        if index.is_relative_to(root) and index.is_file():
+            return FileResponse(index, headers={"Cache-Control": "no-cache"})
+        return _error("SERVICE_UNAVAILABLE", "Application build is unavailable", 503)
+    return _error("NOT_FOUND", "Resource not found", 404)
