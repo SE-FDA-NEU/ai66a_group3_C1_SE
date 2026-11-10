@@ -1,19 +1,26 @@
-"""VN-only TMDb/JustWatch payload and URL validation; no network access."""
+"""Regional TMDb/JustWatch payload and URL validation."""
 
 import re
 from collections.abc import Mapping
 from dataclasses import dataclass
+from typing import Literal
 from urllib.parse import parse_qsl, urlsplit
 
 from app.catalogue.backdrops import IMAGE_BASE_URL, valid_backdrop_path
 from app.integrations.tmdb import TmdbPayloadError
 
 PROVIDER_GROUPS = ("flatrate", "rent", "buy", "free", "ads")
+ProviderCountry = Literal["US", "GB", "SG"]
+SUPPORTED_COUNTRIES: tuple[ProviderCountry, ...] = ("US", "GB", "SG")
+DEFAULT_PROVIDER_COUNTRY: ProviderCountry = "US"
 
 
-def watch_options_url(value: object, movie_id: int) -> str | None:
-    """Accept only TMDb's supplied watch page for this movie and VN locale."""
-    if not isinstance(value, str) or any(ord(char) <= 32 or ord(char) == 127 for char in value):
+def watch_options_url(
+    value: object, movie_id: int, country: ProviderCountry = DEFAULT_PROVIDER_COUNTRY,
+) -> str | None:
+    """Accept TMDb's supplied watch page for the exact movie and country."""
+    if (country not in SUPPORTED_COUNTRIES or not isinstance(value, str)
+            or any(ord(char) <= 32 or ord(char) == 127 for char in value)):
         return None
     try:
         parsed = urlsplit(value)
@@ -22,7 +29,7 @@ def watch_options_url(value: object, movie_id: int) -> str | None:
         if (parsed.scheme != "https" or host not in {"themoviedb.org", "www.themoviedb.org"}
                 or parsed.username is not None or parsed.password is not None
                 or parsed.port not in {None, 443} or parsed.netloc.lower() not in {host, f"{host}:443"}
-                or parsed.fragment or query != [("locale", "VN")]
+                or parsed.fragment or query != [("locale", country)]
                 or re.fullmatch(rf"/movie/{movie_id}(?:-[A-Za-z0-9-]+)?/watch", parsed.path) is None):
             return None
     except ValueError:
@@ -42,18 +49,22 @@ class Provider:
     logo_path: str | None
 
 
-def select_vn_providers(payload: Mapping, movie_id: int) -> tuple[list[Provider], str | None, str]:
-    """Malformed data is a failed check; a missing VN key is valid no-data."""
+def select_regional_providers(
+    payload: Mapping, movie_id: int, country: ProviderCountry = DEFAULT_PROVIDER_COUNTRY,
+) -> tuple[list[Provider], str | None, str]:
+    """Validate one region independently, treating an absent region as no-data."""
+    if country not in SUPPORTED_COUNTRIES:
+        raise ValueError("Supported provider countries are US, GB and SG")
     if type(payload.get("id")) is not int or payload["id"] != movie_id:
         raise TmdbPayloadError("TMDb provider movie identity mismatch")
     results = payload.get("results")
     if not isinstance(results, Mapping):
         raise TmdbPayloadError("TMDb returned invalid provider results")
-    if "VN" not in results:
+    if country not in results:
         return [], None, "missing"
-    regional = results["VN"]
+    regional = results[country]
     if not isinstance(regional, Mapping):
-        raise TmdbPayloadError("TMDb returned invalid VN provider data")
+        raise TmdbPayloadError("TMDb returned invalid regional provider data")
     providers = {}
     for group in PROVIDER_GROUPS:
         entries = regional.get(group, [])
@@ -72,6 +83,6 @@ def select_vn_providers(payload: Mapping, movie_id: int) -> tuple[list[Provider]
             if previous is None or (provider.name, provider.logo_path or "") < (previous.name, previous.logo_path or ""):
                 providers[key] = provider
     raw_link = regional.get("link")
-    link = watch_options_url(raw_link, movie_id)
+    link = watch_options_url(raw_link, movie_id, country)
     link_status = "valid" if link else "missing" if raw_link in (None, "") else "invalid"
     return [providers[key] for key in sorted(providers)], link, link_status

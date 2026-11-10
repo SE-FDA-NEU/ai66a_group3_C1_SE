@@ -8,6 +8,7 @@ from datetime import UTC, datetime
 
 from sqlalchemy.exc import SQLAlchemyError
 
+from app.catalogue.providers import SUPPORTED_COUNTRIES
 from app.catalogue.tmdb_import import (
     MAX_ENRICHMENT_MOVIES,
     TmdbImageAllError,
@@ -60,8 +61,10 @@ def main(argv: list[str] | None = None) -> int:
     )
     enrichment.add_argument(
         "--enrich-providers", action="store_true",
-        help="Check VN providers and supplied TMDb watch links across the active catalogue.",
+        help="Check regional providers and supplied TMDb watch links across the active catalogue.",
     )
+    parser.add_argument("--countries", nargs="+", choices=SUPPORTED_COUNTRIES,
+                        help="Provider countries (default: US GB SG). Requires --enrich-providers --all.")
     parser.add_argument(
         "--refresh", action="store_true",
         help="Recheck successful/no-data movies too (requires --enrich-providers --all).",
@@ -89,6 +92,10 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--enrich-providers requires --all; --limit controls committed batch size")
     if args.refresh and not args.enrich_providers:
         parser.error("--refresh requires --enrich-providers --all")
+    if args.countries and not args.enrich_providers:
+        parser.error("--countries requires --enrich-providers --all")
+    if args.countries and len(set(args.countries)) != len(args.countries):
+        parser.error("--countries must contain unique country codes")
 
     try:
         client = TmdbClient.from_environment()
@@ -102,6 +109,7 @@ def main(argv: list[str] | None = None) -> int:
                 result = enrich_tmdb_providers_all(
                     SessionLocal, client=client, batch_size=args.limit or MAX_ENRICHMENT_MOVIES,
                     refresh=args.refresh,
+                    countries=tuple(args.countries or SUPPORTED_COUNTRIES),
                 )
             elif args.all and args.enrich_trailers:
                 result = enrich_tmdb_trailers_all(
@@ -199,11 +207,18 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def _print_provider_all_result(result: TmdbProviderAllResult, status: str) -> None:
-    print(f"TMDb VN provider enrichment all {status}")
+    print(f"TMDb regional provider enrichment all {status}")
     print(f"active_revision={result.active_revision_id}")
-    for key in ("eligible", "already_checked", "processed", "with_vn_data", "no_vn_data", "failed",
-                "valid_link", "missing_link", "invalid_link", "remaining"):
+    fields = ("eligible", "already_checked", "processed", "with_data", "no_data", "failed",
+              "valid_link", "missing_link", "invalid_link", "remaining")
+    for key in fields:
         print(f"{key}={getattr(result, key + '_movie_count')}")
+    print(f"movie_fetches={result.movie_fetch_count}")
+    print(f"http_requests={result.http_request_count}")
+    print(f"http_retries={max(0, result.http_request_count - result.movie_fetch_count)}")
+    for region in result.regions:
+        for key in fields:
+            print(f"{region.country}.{key}={getattr(region, key + '_movie_count')}")
     if result.retry_after_seconds is not None:
         print(f"retry_after_seconds={result.retry_after_seconds}")
 

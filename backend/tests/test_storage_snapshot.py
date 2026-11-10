@@ -61,10 +61,10 @@ def _seed(db: sqlite3.Connection) -> None:
           VALUES ('wa','a','movie-a','2026-10-24'),('wb','b','movie-b','2026-10-24');
         INSERT INTO movie_provider_checks(movie_id,country,status,attempted_at,checked_at,
           watch_options_url,link_status) VALUES
-          ('movie-a','VN','success','2026-11-09','2026-11-09',
-           'https://www.themoviedb.org/movie/101/watch?locale=VN','valid');
+          ('movie-a','US','success','2026-11-09','2026-11-09',
+           'https://www.themoviedb.org/movie/101/watch?locale=US','valid');
         INSERT INTO movie_watch_providers(movie_id,country,availability_type,provider_id,name,logo_path)
-          VALUES ('movie-a','VN','flatrate',8,'Synthetic Stream','/provider.jpg');
+          VALUES ('movie-a','US','flatrate',8,'Synthetic Stream','/provider.jpg');
     """)
     db.commit()
 
@@ -117,7 +117,7 @@ def test_online_wal_backup_restore_and_account_index_recovery(tmp_path: Path):
             assert db.execute(text("SELECT count(*) FROM user_movie_ratings WHERE user_id='b'")).scalar_one() == 1
             assert db.execute(text("SELECT poster_path,backdrop_path,trailer_key FROM catalog_movies WHERE id='movie-a'")).one() == ("/a.jpg", "/a-back.jpg", "AbCdEf123_-")
             assert db.execute(text("SELECT country,status,watch_options_url FROM movie_provider_checks WHERE movie_id='movie-a'")).one() == (
-                "VN", "success", "https://www.themoviedb.org/movie/101/watch?locale=VN",
+                "US", "success", "https://www.themoviedb.org/movie/101/watch?locale=US",
             )
             assert db.execute(text("SELECT availability_type,provider_id FROM movie_watch_providers WHERE movie_id='movie-a'")).all() == [("flatrate", 8)]
         with Session(engine) as session:
@@ -134,7 +134,7 @@ assert c.get('/api/movies/search?q=moon&mode=description').status_code == 200
 movie = c.get('/api/movies/movie-a').json()['data']['movie']
 assert movie['providers']['status'] == 'success'
 assert movie['providers']['groups']['flatrate'][0]['id'] == 8
-assert movie['watchOptionsUrl'] == 'https://www.themoviedb.org/movie/101/watch?locale=VN'
+assert movie['watchOptionsUrl'] == 'https://www.themoviedb.org/movie/101/watch?locale=US'
 """
     probe = subprocess.run(
         [sys.executable, "-c", probe_code],

@@ -86,6 +86,7 @@ class TmdbClient:
             "Accept": "application/json",
         }
         self._owns_http_client = http_client is None
+        self.request_count = 0
         self._http_client = http_client or httpx.Client(
             base_url=TMDB_BASE_URL,
             timeout=DEFAULT_TIMEOUT_SECONDS,
@@ -161,6 +162,7 @@ class TmdbClient:
     ) -> Mapping[str, Any]:
         for attempt in range(retries + 1):
             try:
+                self.request_count += 1
                 response = self._http_client.get(path, params=params, headers=self._headers)
             except httpx.TimeoutException as exc:
                 if attempt < retries:

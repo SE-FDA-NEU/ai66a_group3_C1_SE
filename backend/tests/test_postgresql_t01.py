@@ -226,7 +226,16 @@ def test_empty_postgresql_migration_schema_constraints_and_provisioning(pg_engin
 
 
 def test_postgresql_vn_provider_memberships_and_constraints(pg_engine):
-    engine, _ = pg_engine
+    engine, url = pg_engine
+    def migrate(*action):
+        result = subprocess.run(
+            [sys.executable, "-m", "alembic", "-c", "backend/alembic.ini", *action],
+            cwd=ROOT, env=os.environ | {"DATABASE_URL": url},
+            capture_output=True, text=True, check=False, timeout=30,
+        )
+        assert result.returncode == 0, sanitized_stderr(result.stderr, url)
+
+    migrate("downgrade", "b8e4d2c96f10")
     _, movie_ids = seed_catalogue(engine, count=1)
     with Session(engine) as session, session.begin():
         session.add(MovieProviderCheck(movie_id=movie_ids[0], country="VN", status="success",
@@ -237,6 +246,16 @@ def test_postgresql_vn_provider_memberships_and_constraints(pg_engine):
         ) for group in ("flatrate", "rent", "buy", "free", "ads"))
     with Session(engine) as session:
         assert len(session.scalars(select(MovieWatchProvider)).all()) == 5
+    migrate("upgrade", "head")
+    with Session(engine) as session, session.begin():
+        assert len(session.scalars(select(MovieWatchProvider)).all()) == 5
+        for country in ("US", "GB", "SG"):
+            session.add(MovieProviderCheck(movie_id=movie_ids[0], country=country, status="success",
+                attempted_at=datetime.now(UTC), providers=[MovieWatchProvider(
+                    movie_id=movie_ids[0], country=country, availability_type="flatrate", provider_id=8, name=country,
+                )]))
+    with Session(engine) as session:
+        assert len(session.scalars(select(MovieWatchProvider)).all()) == 8
     with pytest.raises(IntegrityError), Session(engine) as session, session.begin():
         session.add(MovieWatchProvider(movie_id=movie_ids[0], country="VN", availability_type="rent",
                                        provider_id=8, name="Duplicate"))
@@ -244,7 +263,7 @@ def test_postgresql_vn_provider_memberships_and_constraints(pg_engine):
         session.add(MovieProviderCheck(movie_id="missing", country="VN", status="success",
                                       attempted_at=datetime.now(UTC)))
     with pytest.raises(IntegrityError), Session(engine) as session, session.begin():
-        session.add(MovieProviderCheck(movie_id=movie_ids[0], country="US", status="success",
+        session.add(MovieProviderCheck(movie_id=movie_ids[0], country="CA", status="success",
                                       attempted_at=datetime.now(UTC)))
 
 

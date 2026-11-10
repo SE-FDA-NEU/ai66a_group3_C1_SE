@@ -105,8 +105,8 @@ jobs:
       - name: Verify S4-T05 P0 traceability
         run: python scripts/verify_s4_t05_trace.py
 
-      - name: Verify VN provider enrichment and CLI offline
-        run: python -m pytest -c pytest.ini backend/tests/test_provider_enrichment.py backend/tests/test_tmdb_import_cli.py -v
+      - name: Verify regional provider enrichment and CLI offline
+        run: python -m pytest -c pytest.ini backend/tests/test_provider_enrichment.py backend/tests/test_regional_providers.py backend/tests/test_tmdb_import_cli.py -v
 
       - name: Verify affected backup and restore paths
         if: needs.detect.outputs.storage == 'true'

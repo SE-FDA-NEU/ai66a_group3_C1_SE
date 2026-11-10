@@ -4,6 +4,8 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.catalogue.providers import DEFAULT_PROVIDER_COUNTRY, ProviderCountry
+
 
 class GenreDto(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
@@ -67,7 +69,7 @@ class ProviderGroupsDto(BaseModel):
 class MovieProvidersDto(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    country: Literal["VN"] = "VN"
+    country: ProviderCountry = DEFAULT_PROVIDER_COUNTRY
     status: Literal["not_checked", "success", "no_data", "error", "stale"] = "not_checked"
     attemptedAt: str | None = None
     checkedAt: str | None = None

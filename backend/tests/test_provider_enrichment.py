@@ -11,7 +11,7 @@ from alembic.config import Config
 from alembic.script import ScriptDirectory
 from app.catalogue.providers import (
     PROVIDER_GROUPS,
-    select_vn_providers,
+    select_regional_providers,
     watch_options_url,
 )
 from app.catalogue.tmdb_import import (
@@ -58,7 +58,7 @@ def provider(identity=8, name="Synthetic Stream", logo="/provider.jpg"):
     return {"provider_id": identity, "provider_name": name, "logo_path": logo}
 
 
-def payload(movie_id=101, *, region="VN", link="default", **groups):
+def payload(movie_id=101, *, region="US", link="default", **groups):
     regional = groups or {"flatrate": [provider()]}
     if link == "default":
         link = f"https://www.themoviedb.org/movie/{movie_id}/watch?locale={region}"
@@ -76,34 +76,34 @@ class ProviderGateway(Gateway):
 
 
 @pytest.mark.parametrize("link", [
-    "https://www.themoviedb.org/movie/101/watch?locale=VN",
-    "https://themoviedb.org/movie/101/watch?locale=VN",
-    "https://www.themoviedb.org:443/movie/101/watch?locale=VN",
-    "https://www.themoviedb.org/movie/101-a-movie-title/watch?locale=VN",
+    "https://www.themoviedb.org/movie/101/watch?locale=US",
+    "https://themoviedb.org/movie/101/watch?locale=US",
+    "https://www.themoviedb.org:443/movie/101/watch?locale=US",
+    "https://www.themoviedb.org/movie/101-a-movie-title/watch?locale=US",
 ])
 def test_supplied_watch_page_contract(link):
     assert watch_options_url(link, 101) == link
 
 
 @pytest.mark.parametrize("link", [
-    None, "", "http://www.themoviedb.org/movie/101/watch?locale=VN",
-    "javascript:alert(1)", "https://netflix.com/movie/101/watch?locale=VN",
-    "https://www.themoviedb.org.attacker.test/movie/101/watch?locale=VN",
-    "https://fake.themoviedb.org/movie/101/watch?locale=VN",
-    "https://user@www.themoviedb.org/movie/101/watch?locale=VN",
-    "https://user:password@www.themoviedb.org/movie/101/watch?locale=VN",
-    "https://www.themoviedb.org:444/movie/101/watch?locale=VN",
-    "https://www.themoviedb.org:/movie/101/watch?locale=VN",
-    "https://www.themoviedb.org:bad/movie/101/watch?locale=VN",
-    "https://www.themoviedb.org/movie/102/watch?locale=VN",
-    "https://www.themoviedb.org/movie/101/watch?locale=US",
-    "https://www.themoviedb.org/movie/101/watch?locale=VN&locale=US",
-    "https://www.themoviedb.org/movie/101/watch?locale=VN&redirect=https://attacker.test",
-    "https://www.themoviedb.org/movie/101/watch", "https://www.themoviedb.org/movie/101?locale=VN",
+    None, "", "http://www.themoviedb.org/movie/101/watch?locale=US",
+    "javascript:alert(1)", "https://netflix.com/movie/101/watch?locale=US",
+    "https://www.themoviedb.org.attacker.test/movie/101/watch?locale=US",
+    "https://fake.themoviedb.org/movie/101/watch?locale=US",
+    "https://user@www.themoviedb.org/movie/101/watch?locale=US",
+    "https://user:password@www.themoviedb.org/movie/101/watch?locale=US",
+    "https://www.themoviedb.org:444/movie/101/watch?locale=US",
+    "https://www.themoviedb.org:/movie/101/watch?locale=US",
+    "https://www.themoviedb.org:bad/movie/101/watch?locale=US",
+    "https://www.themoviedb.org/movie/102/watch?locale=US",
+    "https://www.themoviedb.org/movie/101/watch?locale=GB",
+    "https://www.themoviedb.org/movie/101/watch?locale=US&locale=GB",
+    "https://www.themoviedb.org/movie/101/watch?locale=US&redirect=https://attacker.test",
+    "https://www.themoviedb.org/movie/101/watch", "https://www.themoviedb.org/movie/101?locale=US",
     "https://www.themoviedb.org/movie/101/watch?watch_region=VN",
-    "https://www.themoviedb.org/movie/101/../102/watch?locale=VN",
-    "https://www.themoviedb.org/movie/101/watch?locale=VN#private",
-    " https://www.themoviedb.org/movie/101/watch?locale=VN",
+    "https://www.themoviedb.org/movie/101/../102/watch?locale=US",
+    "https://www.themoviedb.org/movie/101/watch?locale=US#private",
+    " https://www.themoviedb.org/movie/101/watch?locale=US",
     "https://www.themoviedb.org/movie/101/watch?locale=V\nN",
 ])
 def test_invalid_or_other_region_links_are_null(link):
@@ -113,45 +113,45 @@ def test_invalid_or_other_region_links_are_null(link):
 def test_groups_deduplicate_without_collapsing_membership_and_link_is_independent():
     data = payload(**{group: [provider(), provider()] for group in PROVIDER_GROUPS},
                    link="https://attacker.test/movie/101")
-    data["results"]["US"] = {"flatrate": [provider(99, "US only")]}
-    selected, link, link_status = select_vn_providers(data, 101)
+    data["results"]["GB"] = {"flatrate": [provider(99, "US only")]}
+    selected, link, link_status = select_regional_providers(data, 101)
     assert len(selected) == 5
     assert {row.group for row in selected} == set(PROVIDER_GROUPS)
     assert {row.provider_id for row in selected} == {8}
     assert link is None and link_status == "invalid"
     reordered = payload(**{group: [provider(8, "Z"), provider(8, "A")] for group in PROVIDER_GROUPS})
-    first = select_vn_providers(reordered, 101)[0]
+    first = select_regional_providers(reordered, 101)[0]
     for group in PROVIDER_GROUPS:
-        reordered["results"]["VN"][group].reverse()
-    assert first == select_vn_providers(reordered, 101)[0]
+        reordered["results"]["US"][group].reverse()
+    assert first == select_regional_providers(reordered, 101)[0]
 
 
 @pytest.mark.parametrize("data", [
     {}, {"id": 102, "results": {}}, {"id": True, "results": {}},
-    {"id": 101, "results": None}, {"id": 101, "results": {"VN": None}},
+    {"id": 101, "results": None}, {"id": 101, "results": {"US": None}},
     payload(flatrate=None), payload(flatrate=[None]),
     payload(flatrate=[provider(True)]), payload(flatrate=[provider(-1)]),
     payload(flatrate=[provider(name=" ")]),
 ])
 def test_malformed_checks_are_failures_rather_than_empty_availability(data):
     with pytest.raises(TmdbPayloadError):
-        select_vn_providers(data, 101)
+        select_regional_providers(data, 101)
 
 
 @pytest.mark.parametrize("data,expected_status", [
-    (payload(region="US"), "missing"),
+    (payload(region="GB"), "missing"),
     ({"id": 101, "results": {}}, "missing"),
     (payload(flatrate=[], link=None), "missing"),
 ])
 def test_no_vn_and_missing_links_do_not_borrow_other_countries(data, expected_status):
-    selected, link, status = select_vn_providers(data, 101)
+    selected, link, status = select_regional_providers(data, 101)
     assert selected == [] and link is None and status == expected_status
 
 
 def test_empty_groups_can_have_a_valid_link_and_bad_logos_are_null():
-    selected, link, status = select_vn_providers(payload(flatrate=[]), 101)
-    assert selected == [] and link.endswith("locale=VN") and status == "valid"
-    selected, link, status = select_vn_providers(payload(link=None, flatrate=[provider(logo="https://evil.test/logo.jpg")]), 101)
+    selected, link, status = select_regional_providers(payload(flatrate=[]), 101)
+    assert selected == [] and link.endswith("locale=US") and status == "valid"
+    selected, link, status = select_regional_providers(payload(link=None, flatrate=[provider(logo="https://evil.test/logo.jpg")]), 101)
     assert selected[0].logo_path is None
     assert link is None and status == "missing"
 
@@ -178,6 +178,7 @@ def test_shared_adapter_uses_auth_and_bounded_retry(monkeypatch, statuses, expec
                 client.fetch_movie_watch_providers(101)
             assert "synthetic-token" not in str(error.value)
     assert len(calls) == expected_requests and waits == expected_waits
+    assert client.request_count == expected_requests
     assert all(request.url.path == "/3/movie/101/watch/providers" for request in calls)
     assert all(request.headers["Authorization"] == "Bearer synthetic-token" for request in calls)
 
@@ -241,55 +242,55 @@ def test_exhausted_rate_limit_defers_instead_of_calling_next_movie(monkeypatch):
 
 def test_deferred_refresh_preserves_success_and_resumes(database):
     gateway = ProviderGateway()
-    enrich_tmdb_providers_all(database, client=gateway)
+    enrich_tmdb_providers_all(database, countries=("US",), client=gateway)
     first_id = rows(database)[0].id
     with database() as session:
-        before = session.get(MovieProviderCheck, (first_id, "VN"))
+        before = session.get(MovieProviderCheck, (first_id, "US"))
         previous = (before.checked_at, before.watch_options_url)
     gateway.calls.clear()
     gateway.fail_at, gateway.failure = 101, TmdbRetryDeferredError(120)
-    result = enrich_tmdb_providers_all(database, client=gateway, refresh=True)
+    result = enrich_tmdb_providers_all(database, countries=("US",), client=gateway, refresh=True)
     assert gateway.calls == [101]
     assert result.retry_after_seconds == 120 and not result.authentication_stopped
     assert result.processed_movie_count == result.failed_movie_count == result.remaining_movie_count == 1
     with database() as session:
-        after = session.get(MovieProviderCheck, (first_id, "VN"))
+        after = session.get(MovieProviderCheck, (first_id, "US"))
         assert after.status == "stale"
         assert (after.checked_at, after.watch_options_url) == previous
         assert len(after.providers) == 1
     gateway.fail_at = None
-    resumed = enrich_tmdb_providers_all(database, client=gateway)
+    resumed = enrich_tmdb_providers_all(database, countries=("US",), client=gateway)
     assert resumed.processed_movie_count == 1 and resumed.already_checked_movie_count == 1
     assert resumed.failed_movie_count == resumed.remaining_movie_count == 0
 
 
 def test_persistence_reruns_and_last_success_survives_failure(database):
     gateway = ProviderGateway()
-    first = enrich_tmdb_providers_all(database, client=gateway, batch_size=1)
+    first = enrich_tmdb_providers_all(database, countries=("US",), client=gateway, batch_size=1)
     assert (first.eligible_movie_count, first.processed_movie_count, first.remaining_movie_count) == (2, 2, 0)
-    assert (first.with_vn_data_movie_count, first.no_vn_data_movie_count, first.failed_movie_count) == (1, 1, 0)
+    assert (first.with_data_movie_count, first.no_data_movie_count, first.failed_movie_count) == (1, 1, 0)
     assert (first.valid_link_movie_count, first.missing_link_movie_count, first.invalid_link_movie_count) == (1, 1, 0)
-    resume = enrich_tmdb_providers_all(database, client=gateway)
+    resume = enrich_tmdb_providers_all(database, countries=("US",), client=gateway)
     assert resume.processed_movie_count == 0 and resume.already_checked_movie_count == 2
     assert gateway.calls == [101, 102]
     movie_id = rows(database)[0].id
     with database() as session:
-        checked_at = session.get(MovieProviderCheck, (movie_id, "VN")).checked_at
+        checked_at = session.get(MovieProviderCheck, (movie_id, "US")).checked_at
     gateway.fail_at = 101
-    failed = enrich_tmdb_providers_all(database, client=gateway, refresh=True)
-    assert failed.failed_movie_count == 1 and failed.no_vn_data_movie_count == 1
+    failed = enrich_tmdb_providers_all(database, countries=("US",), client=gateway, refresh=True)
+    assert failed.failed_movie_count == 1 and failed.no_data_movie_count == 1
     with database() as session:
-        check = session.get(MovieProviderCheck, (movie_id, "VN"))
+        check = session.get(MovieProviderCheck, (movie_id, "US"))
         assert check.status == "stale" and check.checked_at == checked_at
-        assert check.watch_options_url.endswith("/101/watch?locale=VN")
+        assert check.watch_options_url.endswith("/101/watch?locale=US")
         assert len(check.providers) == 1
     gateway.fail_at = None
-    retry = enrich_tmdb_providers_all(database, client=gateway)
+    retry = enrich_tmdb_providers_all(database, countries=("US",), client=gateway)
     assert retry.processed_movie_count == 1 and retry.already_checked_movie_count == 1
-    enrich_tmdb_providers_all(database, client=gateway, refresh=True)
+    enrich_tmdb_providers_all(database, countries=("US",), client=gateway, refresh=True)
     with database() as session:
         assert session.scalar(select(func.count()).select_from(MovieWatchProvider)) == 1
-        assert session.get(MovieProviderCheck, (movie_id, "VN")).status == "success"
+        assert session.get(MovieProviderCheck, (movie_id, "US")).status == "success"
 
 
 def test_all_groups_persist_and_successful_empty_response_clears_previous(database, monkeypatch):
@@ -297,11 +298,11 @@ def test_all_groups_persist_and_successful_empty_response_clears_previous(databa
     monkeypatch.setattr(gateway, "fetch_movie_watch_providers", lambda movie_id: payload(
         movie_id, **{group: [provider(), provider()] for group in PROVIDER_GROUPS},
     ))
-    enrich_tmdb_providers_all(database, client=gateway)
+    enrich_tmdb_providers_all(database, countries=("US",), client=gateway)
     with database() as session:
         assert session.scalar(select(func.count()).select_from(MovieWatchProvider)) == 10
     monkeypatch.setattr(gateway, "fetch_movie_watch_providers", lambda movie_id: {"id": movie_id, "results": {}})
-    enrich_tmdb_providers_all(database, client=gateway, refresh=True)
+    enrich_tmdb_providers_all(database, countries=("US",), client=gateway, refresh=True)
     with database() as session:
         assert session.scalar(select(func.count()).select_from(MovieWatchProvider)) == 0
         assert all(check.status == "no_data" and check.watch_options_url is None
@@ -317,11 +318,11 @@ def test_authentication_stop_then_resume_visits_more_than_300_movies(database):
         ) for identity in range(103, 404))
     gateway = ProviderGateway()
     gateway.fail_at, gateway.failure = 101, TmdbAuthenticationError("TMDb authentication failed")
-    stopped = enrich_tmdb_providers_all(database, client=gateway, batch_size=2)
+    stopped = enrich_tmdb_providers_all(database, countries=("US",), client=gateway, batch_size=2)
     assert stopped.authentication_stopped and stopped.processed_movie_count == 1
     assert stopped.failed_movie_count == 1 and stopped.remaining_movie_count == 302
     gateway.fail_at = None
-    result = enrich_tmdb_providers_all(database, client=gateway, batch_size=100)
+    result = enrich_tmdb_providers_all(database, countries=("US",), client=gateway, batch_size=100)
     assert result.eligible_movie_count == result.processed_movie_count == 303
     assert result.remaining_movie_count == result.failed_movie_count == 0
     assert len(set(gateway.calls)) == 303
@@ -333,19 +334,19 @@ def test_batch_database_failure_rolls_back_and_resumes(database, batch_size, com
     second_id = rows(database)[1].id
 
     def fail(_connection, _cursor, statement, parameters, _context, _many):
-        if statement.startswith("INSERT INTO movie_provider_checks") and parameters[0] == second_id:
+        if statement.startswith("INSERT INTO movie_provider_checks") and second_id in repr(parameters):
             raise SQLAlchemyError("private-database-url")
 
     event.listen(engine, "before_cursor_execute", fail)
     try:
         with pytest.raises(TmdbProviderAllError) as error:
-            enrich_tmdb_providers_all(database, client=ProviderGateway(), batch_size=batch_size)
+            enrich_tmdb_providers_all(database, countries=("US",), client=ProviderGateway(), batch_size=batch_size)
         assert error.value.partial_result.processed_movie_count == committed
         assert error.value.partial_result.remaining_movie_count == 2 - committed
         assert "private" not in str(error.value)
     finally:
         event.remove(engine, "before_cursor_execute", fail)
-    result = enrich_tmdb_providers_all(database, client=ProviderGateway())
+    result = enrich_tmdb_providers_all(database, countries=("US",), client=ProviderGateway())
     assert result.processed_movie_count == 2 - committed
     assert result.already_checked_movie_count == committed
 
@@ -360,7 +361,7 @@ def test_provider_and_link_persistence_are_independent(database, monkeypatch, li
     monkeypatch.setattr(gateway, "fetch_movie_watch_providers", lambda movie_id: payload(
         movie_id, flatrate=entries, link=link,
     ))
-    result = enrich_tmdb_providers_all(database, client=gateway)
+    result = enrich_tmdb_providers_all(database, countries=("US",), client=gateway)
     assert result.processed_movie_count == 2 and result.failed_movie_count == 0
     with database() as session:
         for check in session.scalars(select(MovieProviderCheck)):
@@ -371,16 +372,16 @@ def test_provider_and_link_persistence_are_independent(database, monkeypatch, li
 
 def test_malformed_refresh_preserves_last_good_check(database, monkeypatch):
     gateway = ProviderGateway()
-    enrich_tmdb_providers_all(database, client=gateway)
+    enrich_tmdb_providers_all(database, countries=("US",), client=gateway)
     movie_id = rows(database)[0].id
     with database() as session:
-        check = session.get(MovieProviderCheck, (movie_id, "VN"))
+        check = session.get(MovieProviderCheck, (movie_id, "US"))
         previous = (check.checked_at, check.watch_options_url, check.link_status)
     monkeypatch.setattr(gateway, "fetch_movie_watch_providers", lambda movie_id: {"id": movie_id, "results": None})
-    result = enrich_tmdb_providers_all(database, client=gateway, refresh=True)
+    result = enrich_tmdb_providers_all(database, countries=("US",), client=gateway, refresh=True)
     assert result.failed_movie_count == 2
     with database() as session:
-        check = session.get(MovieProviderCheck, (movie_id, "VN"))
+        check = session.get(MovieProviderCheck, (movie_id, "US"))
         assert check.status == "stale"
         assert (check.checked_at, check.watch_options_url, check.link_status) == previous
         assert len(check.providers) == 1
@@ -400,22 +401,22 @@ def test_details_switch_movies_and_never_fetch_tmdb(database, monkeypatch):
     with TestClient(app) as http:
         first = http.get(f"/api/movies/{first_id}").json()["data"]["movie"]
         assert first["providers"]["status"] == "not_checked" and first["watchOptionsUrl"] is None
-        enrich_tmdb_providers_all(database, client=ProviderGateway())
+        enrich_tmdb_providers_all(database, countries=("US",), client=ProviderGateway())
         first = http.get(f"/api/movies/{first_id}").json()["data"]["movie"]
         second = http.get(f"/api/movies/{second_id}").json()["data"]["movie"]
-        assert first["providers"]["country"] == second["providers"]["country"] == "VN"
+        assert first["providers"]["country"] == second["providers"]["country"] == "US"
         assert first["providers"]["status"] == "success"
         assert first["providers"]["groups"]["flatrate"] == [
             {"id": 8, "name": "Synthetic Stream", "logoUrl": "https://image.tmdb.org/t/p/w92/provider.jpg"},
         ]
-        assert first["watchOptionsUrl"].endswith("/101/watch?locale=VN")
+        assert first["watchOptionsUrl"].endswith("/101/watch?locale=US")
         assert first["providers"]["attemptedAt"].endswith("Z") and first["providers"]["checkedAt"].endswith("Z")
         assert second["watchOptionsUrl"] is None and second["providers"]["status"] == "no_data"
         assert all(not group for group in second["providers"]["groups"].values())
         assert http.get(f"/api/movies/{first_id}").json()["data"]["movie"] == first
         assert http.get("/api/movies").status_code == 200
     with database() as session, session.begin():
-        session.get(MovieProviderCheck, (first_id, "VN")).watch_options_url = "https://evil.test"
+        session.get(MovieProviderCheck, (first_id, "US")).watch_options_url = "https://evil.test"
     with database() as session:
         assert to_movie_detail_dto(get_active_movie_by_id(session, movie_id=first_id)).watchOptionsUrl is None
 
@@ -448,9 +449,9 @@ def test_provider_refresh_preserves_exact_accounts_media_identity_and_nlp(databa
         corpus = active_corpus(session)
     before = _core_rows(database)
     gateway = ProviderGateway()
-    enrich_tmdb_providers_all(database, client=gateway)
+    enrich_tmdb_providers_all(database, countries=("US",), client=gateway)
     gateway.fail_at = 101
-    enrich_tmdb_providers_all(database, client=gateway, refresh=True)
+    enrich_tmdb_providers_all(database, countries=("US",), client=gateway, refresh=True)
     assert _core_rows(database) == before
     with database() as session:
         assert active_corpus(session) == corpus
@@ -459,7 +460,8 @@ def test_provider_refresh_preserves_exact_accounts_media_identity_and_nlp(databa
 
 def test_migration_fresh_current_constraints_and_single_head(tmp_path):
     scripts = ScriptDirectory.from_config(Config(str(ROOT / "backend/alembic.ini")))
-    assert scripts.get_heads() == ["b8e4d2c96f10"]
+    assert scripts.get_heads() == ["d9a6f2c1e508"]
+    assert scripts.get_revision("d9a6f2c1e508").down_revision == "b8e4d2c96f10"
     assert scripts.get_revision("b8e4d2c96f10").down_revision == "a3d1f8b72c44"
     for populated in (False, True):
         url = f"sqlite:///{tmp_path / ('populated.db' if populated else 'fresh.db')}"
@@ -495,7 +497,7 @@ def test_migration_fresh_current_constraints_and_single_head(tmp_path):
                     session.add(MovieProviderCheck(movie_id="missing", country="VN", status="success",
                                                   attempted_at=datetime.now(UTC)))
                 with pytest.raises(IntegrityError), factory() as session, session.begin():
-                    session.add(MovieProviderCheck(movie_id="movie-b", country="US", status="success",
+                    session.add(MovieProviderCheck(movie_id="movie-b", country="CA", status="success",
                                                   attempted_at=datetime.now(UTC)))
             _alembic(url, "downgrade", "a3d1f8b72c44")
             assert "movie_provider_checks" not in inspect(engine).get_table_names()
@@ -507,7 +509,7 @@ def test_migration_fresh_current_constraints_and_single_head(tmp_path):
 def test_provider_migration_compiles_for_postgresql_without_connecting():
     result = subprocess.run(
         [sys.executable, "-m", "alembic", "-c", "backend/alembic.ini", "upgrade",
-         "a3d1f8b72c44:b8e4d2c96f10", "--sql"],
+         "a3d1f8b72c44:head", "--sql"],
         cwd=ROOT, env=os.environ | {
             "DATABASE_URL": "postgresql+psycopg://app@db.example.test/disposable",
             "TMDB_READ_ACCESS_TOKEN": "", "TMDB_NETWORK_DISABLED": "1",
@@ -516,4 +518,5 @@ def test_provider_migration_compiles_for_postgresql_without_connecting():
     assert result.returncode == 0, result.stderr
     assert "CREATE TABLE movie_provider_checks" in result.stdout
     assert "CREATE TABLE movie_watch_providers" in result.stdout
+    assert "country IN ('VN', 'US', 'GB', 'SG')" in result.stdout
     assert "FOREIGN KEY(movie_id, country) REFERENCES movie_provider_checks (movie_id, country) ON DELETE CASCADE" in result.stdout

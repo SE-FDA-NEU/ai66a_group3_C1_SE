@@ -238,7 +238,7 @@ class MovieProviderCheck(Base):
 
     __tablename__ = "movie_provider_checks"
     __table_args__ = (
-        CheckConstraint("country = 'VN'", name="ck_movie_provider_checks_country"),
+        CheckConstraint("country IN ('VN', 'US', 'GB', 'SG')", name="ck_movie_provider_checks_country"),
         CheckConstraint("status IN ('success', 'no_data', 'error', 'stale')",
                         name="ck_movie_provider_checks_status"),
         CheckConstraint("link_status IS NULL OR link_status IN ('valid', 'missing', 'invalid')",

@@ -13,7 +13,9 @@ from sqlalchemy.orm import Session, selectinload
 from app.catalogue.backdrops import backdrop_url
 from app.catalogue.posters import poster_url
 from app.catalogue.providers import (
+    DEFAULT_PROVIDER_COUNTRY,
     PROVIDER_GROUPS,
+    ProviderCountry,
     provider_logo_url,
     watch_options_url,
 )
@@ -403,14 +405,16 @@ def to_movie_summary_dto(movie: CatalogMovie) -> MovieSummaryDto:
     )
 
 
-def to_movie_detail_dto(movie: CatalogMovie) -> MovieDetailDto:
+def to_movie_detail_dto(
+    movie: CatalogMovie, country: ProviderCountry = DEFAULT_PROVIDER_COUNTRY,
+) -> MovieDetailDto:
     """Project a catalogue movie to the safe public detail shape."""
 
-    check = next((check for check in movie.provider_checks if check.country == "VN"), None)
+    check = next((check for check in movie.provider_checks if check.country == country), None)
     groups = {group: [] for group in PROVIDER_GROUPS}
     if check:
         for provider in sorted(check.providers, key=lambda row: (row.availability_type, row.provider_id)):
-            if provider.country == "VN" and provider.availability_type in groups:
+            if provider.country == country and provider.availability_type in groups:
                 groups[provider.availability_type].append(WatchProviderDto(
                     id=provider.provider_id, name=provider.name, logoUrl=provider_logo_url(provider.logo_path),
                 ))
@@ -427,12 +431,13 @@ def to_movie_detail_dto(movie: CatalogMovie) -> MovieDetailDto:
         posterUrl=poster_url(movie.poster_path),
         trailer=_trailer_dto(movie),
         providers=MovieProvidersDto(
+            country=country,
             status=check.status if check else "not_checked",
             attemptedAt=_provider_timestamp(check.attempted_at) if check else None,
             checkedAt=_provider_timestamp(check.checked_at) if check else None,
             groups=ProviderGroupsDto(**groups),
         ),
-        watchOptionsUrl=(watch_options_url(check.watch_options_url, int(movie.source_id))
+        watchOptionsUrl=(watch_options_url(check.watch_options_url, int(movie.source_id), country)
                          if check and movie.source == "tmdb" and movie.source_id.isascii()
                          and movie.source_id.isdecimal() else None),
     )

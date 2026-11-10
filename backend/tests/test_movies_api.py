@@ -227,7 +227,7 @@ def test_movie_detail_has_exact_safe_backdrop_shape_and_never_fetches_tmdb(
             "posterUrl": None,
             "trailer": None,
             "providers": {
-                "country": "VN", "status": "not_checked", "attemptedAt": None, "checkedAt": None,
+                "country": "US", "status": "not_checked", "attemptedAt": None, "checkedAt": None,
                 "groups": {"flatrate": [], "rent": [], "buy": [], "free": [], "ads": []},
             },
             "watchOptionsUrl": None,
