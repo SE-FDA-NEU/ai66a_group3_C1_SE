@@ -4,7 +4,10 @@ import logging
 
 import pytest
 from app import main
+from app.recommendations.overview_index import IndexUnavailable
 from fastapi.testclient import TestClient
+from psycopg.errors import InsufficientPrivilege
+from sqlalchemy.exc import OperationalError
 
 
 @pytest.fixture
@@ -110,4 +113,30 @@ def test_unexpected_errors_are_safe_and_logged(frontend, caplog):
     assert "route=/api/me/ratings/{movie_id}" in records[0].getMessage()
     assert "status=500" in records[0].getMessage()
     assert "private" not in response.text + records[0].getMessage()
+    assert records[0].exc_info is None
+
+
+@pytest.mark.parametrize("failure, expected", [
+    (PermissionError(13, "private-path private-password"),
+     "error_type=PermissionError sqlstate=None errno=13"),
+    (OperationalError("private-sql", {}, InsufficientPrivilege("private-password")),
+     "error_type=InsufficientPrivilege sqlstate=42501 errno=None"),
+    (IndexUnavailable("private-corpus private-token"),
+     "error_type=IndexUnavailable sqlstate=None errno=None"),
+])
+def test_startup_failure_logs_safe_diagnostics(monkeypatch, caplog, failure, expected):
+    def fail_preparation(_sessions):
+        raise failure
+
+    monkeypatch.setattr(main, "prepare_startup_index", fail_preparation)
+    with (
+        caplog.at_level(logging.ERROR, logger="uvicorn.error"),
+        pytest.raises(RuntimeError, match="NLP index preparation failed"),
+        TestClient(main.app),
+    ):
+        pass
+    records = [record for record in caplog.records if record.name == "uvicorn.error"]
+    assert len(records) == 1
+    assert expected in records[0].getMessage()
+    assert "private" not in records[0].getMessage()
     assert records[0].exc_info is None

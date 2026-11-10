@@ -1,5 +1,9 @@
 # AI Movie Recommendation System
 
+[CineAI public baseline](https://cineai-o9tf.onrender.com/) — the backend is reachable.
+The frontend deployment is pending the reviewed S5-T03 merge and green-main deploy.
+See the [deployment and acceptance record](docs/s5-t03-deployment.md).
+
 For university students facing choice overload, this system turns a small set of
 genre preferences and optional ratings into transparent movie recommendations,
 rather than giving every viewer the same generic popularity list.

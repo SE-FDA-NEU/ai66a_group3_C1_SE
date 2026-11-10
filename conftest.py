@@ -17,6 +17,8 @@ def pytest_configure(config: pytest.Config) -> None:
     environment.setenv("DATABASE_URL", f"sqlite:///{Path(directory.name) / 'tests.db'}")
     environment.setenv("TMDB_READ_ACCESS_TOKEN", "")
     environment.setenv("TMDB_NETWORK_DISABLED", "1")
+    environment.setenv("APP_ENV", "test")
+    environment.setenv("SESSION_COOKIE_SECURE", "false")
     environment.setenv("NLP_INDEX_PATH", str(Path(directory.name) / "overview-index.json"))
 
     def cleanup() -> None:

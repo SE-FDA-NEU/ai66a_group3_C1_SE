@@ -108,7 +108,13 @@ MIGRATION_HEADS = set(ScriptDirectory.from_config(
 async def lifespan(_app: FastAPI):
     try:
         prepare_startup_index(SessionLocal)
-    except (IndexUnavailable, OSError, SQLAlchemyError):
+    except (IndexUnavailable, OSError, SQLAlchemyError) as exc:
+        cause = getattr(exc, "orig", exc)
+        logger.error(
+            "NLP index preparation failed: error_type=%s sqlstate=%s errno=%s",
+            type(cause).__name__, getattr(cause, "sqlstate", None),
+            getattr(cause, "errno", None),
+        )
         raise RuntimeError("NLP index preparation failed; check database and writable index path") from None
     yield
 
