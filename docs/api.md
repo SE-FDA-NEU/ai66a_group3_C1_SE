@@ -1332,10 +1332,18 @@ two provider tables.
 
 ### Operator enrichment and resume
 
-**Manual/operator enrichment required.** The current local environment has
-no configured T02 PostgreSQL target. No real T04 whole-catalogue counts have
-been produced. Obtain the confirmed database and TMDb credential through the
-existing private T02 handoff. Do not put them in commands, logs or Git.
+Use the confirmed target and private T02 PostgreSQL/TMDb handoff. The
+[T04 acceptance record](evidence/s5-t04-providers/README.md) distinguishes
+Neon development verification from the public runtime rollout. Keep credentials
+in private environment settings.
+
+Coordinate migration with the reviewed code deployment. T03 health requires
+the database's migration revision to equal the running code's Alembic head.
+Upgrading the public database while the old deployment still runs makes its
+health fail. First rehearse on the separate Neon development target, then
+schedule the public migration and green-main deployment together. The
+`/health` endpoint, Details and runtime SELECT grants must pass before marking
+the public rollout complete.
 
 Use the approved migration/import role and confirmed target from the
 [T02 runbook](s5-t02-neon-provisioning.md), with private environment variables
@@ -1355,9 +1363,14 @@ checked and failed/stale checks. Repeat it to resume after interruption or
 retry failures; successful and no-data checks are retained. Each selected
 movie is attempted once per invocation. Requests run serially with the shared
 10-second HTTP timeout and at most two retries for network/transient errors
-and 408/429/500/502/503/504. Numeric/HTTP-date Retry-After is honored within a
-30-second maximum wait; otherwise backoff is 1 then 2 seconds. Authentication
-failure records that attempt and stops before another movie.
+and 408/429/500/502/503/504. Numeric/HTTP-date Retry-After retains its full
+valid delay. The process waits up to 30 seconds per retry. A longer delay
+stops this invocation before another request, preserving committed progress
+and reporting `retry_after_seconds`; wait at least that delay after the stop
+before resuming without `--refresh`. An exhausted 429 also stops before the
+next movie instead of continuing to hit the same rate limit. Without a valid
+Retry-After, retry backoff is 1 then 2 seconds. Authentication failure records
+that attempt and stops before another movie.
 
 For a fresh full-catalogue check, including already checked movies:
 
@@ -1389,6 +1402,7 @@ On a full `--refresh` run capture these safe stdout fields:
 | `with_vn_data`, `no_vn_data`, `failed` | Disjoint outcome counts for committed attempts. |
 | `valid_link`, `missing_link`, `invalid_link` | Disjoint link outcomes for successful checks only. Failed refreshes may retain old valid links, which are not counted as a new link success. |
 | `remaining` | Selected movies not visited/committed because of a stop or batch failure. |
+| `retry_after_seconds` | Present only on a deferred retry. Wait at least this many seconds after the stop before the next invocation. The command returns nonzero and retains previous successful data. |
 
 Reconcile `eligible = already_checked + processed + remaining`,
 `processed = with_vn_data + no_vn_data + failed`, and

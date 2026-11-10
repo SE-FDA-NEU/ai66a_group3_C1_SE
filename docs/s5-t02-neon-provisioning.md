@@ -137,5 +137,7 @@ The explicit importer uses the approved operator role, serial authenticated
 TMDb requests and bounded retries. The [T04 API/operator contract](api.md#14-s5-t04-vn-providers-and-tmdb-watch-options-251)
 defines exact commands, full-catalogue versus resume semantics, count
 reconciliation, VN URL validation, T05/T06/T08 DTO/attribution handoff and
-PostgreSQL recovery requirements. Real T04 enrichment is **Manual/operator
-enrichment required** until its own target-specific results are captured.
+PostgreSQL recovery requirements. The [T04 verification record](evidence/s5-t04-providers/README.md)
+contains real whole-catalogue results on `cineai_development`. Public runtime
+migration/enrichment remains coordinated with the reviewed T04 deployment
+because T03 health requires the running code and database heads to agree.
