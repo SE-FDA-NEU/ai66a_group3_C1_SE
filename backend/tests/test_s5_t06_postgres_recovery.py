@@ -8,18 +8,24 @@ import sys
 from pathlib import Path
 
 import pytest
+from app.cli import compare_recovery
 from app.cli.compare_recovery import _validate_url
 from app.db.database import create_database_engine
 from app.integrations.tmdb import TmdbClient
 from app.main import app, get_db
 from app.security.passwords import hash_password
 from fastapi.testclient import TestClient
-from sqlalchemy import inspect, text
+from sqlalchemy import MetaData, inspect, text
 from sqlalchemy.engine import make_url
 from sqlalchemy.orm import Session, sessionmaker
 
 ROOT = Path(__file__).resolve().parents[2]
 HEAD = "d9a6f2c1e508"
+APPLICATION_TABLES = {
+    "users", "auth_sessions", "user_genre_preferences", "user_movie_ratings",
+    "user_movie_watchlist", "catalogue_revisions", "catalogue_state", "catalog_movies",
+    "genres", "movie_genres", "movie_provider_checks", "movie_watch_providers",
+}
 
 
 def _run(command: list[str], *, env: dict[str, str] | None = None) -> subprocess.CompletedProcess[str]:
@@ -50,6 +56,27 @@ def test_comparator_refuses_redirected_or_misidentified_database():
         _validate_url("postgresql+psycopg://u@db.example.test/other", "confirmed")
 
 
+def test_comparator_registers_every_model_in_a_fresh_process():
+    script = ("from app.cli.compare_recovery import Base\n"
+              f"assert set(Base.metadata.tables) == {APPLICATION_TABLES!r}\n")
+    result = _run([sys.executable, "-c", script])
+    _assert_success(result, "standalone model registration")
+
+
+@pytest.mark.parametrize("missing_table", [None, "users"])
+def test_comparator_refuses_empty_or_incomplete_metadata(monkeypatch, missing_table):
+    metadata = MetaData()
+    if missing_table:
+        for table in compare_recovery.Base.metadata.tables.values():
+            if table.name != missing_table:
+                table.to_metadata(metadata)
+    monkeypatch.setattr(compare_recovery.Base, "metadata", metadata)
+    monkeypatch.setattr(compare_recovery, "create_database_engine",
+                        lambda *_args: pytest.fail("incomplete metadata must fail before connection"))
+    with pytest.raises(ValueError, match="Application table metadata"):
+        compare_recovery._inspect("postgresql+psycopg://u@db.example.test/confirmed", "confirmed")
+
+
 @pytest.mark.skipif(not (os.getenv("RECOVERY_TEST_SOURCE_URL") and
                          os.getenv("RECOVERY_TEST_TARGET_URL")),
                     reason="Two disposable PostgreSQL 18 URLs are required")
@@ -71,7 +98,7 @@ def test_dump_restore_regional_account_index_and_rollback_refusal(tmp_path, monk
             with engine.connect() as connection:
                 assert int(connection.exec_driver_sql("SHOW server_version_num").scalar()) // 10000 == 18
                 assert connection.exec_driver_sql("SELECT current_database()").scalar() == engine.url.database
-            assert "alembic_version" not in inspect(engine).get_table_names()
+            assert inspect(engine).get_table_names() == [], "Recovery rehearsal requires empty databases"
         _assert_success(_run([sys.executable, "-m", "alembic", "-c", "backend/alembic.ini",
                               "upgrade", "head"], env={"DATABASE_URL": source_url}), "alembic")
 
@@ -142,13 +169,46 @@ def test_dump_restore_regional_account_index_and_rollback_refusal(tmp_path, monk
         target_args, target_env = _client_args(target_url)
         _assert_success(_run(["pg_restore", "--exit-on-error", "--no-owner", "--no-privileges",
                               *target_args, str(archive)], env=target_env), "pg_restore")
-        comparison = _run([sys.executable, "-m", "app.cli.compare_recovery",
-                           "--source-database", source_name, "--target-database", target_name],
-                          env={"RECOVERY_SOURCE_URL": source_url,
-                               "RECOVERY_TARGET_URL": target_url,
-                               "PYTHONPATH": str(ROOT / "backend")})
+        def compare():
+            return _run([sys.executable, "-m", "app.cli.compare_recovery",
+                         "--source-database", source_name, "--target-database", target_name],
+                        env={"RECOVERY_SOURCE_URL": source_url,
+                             "RECOVERY_TARGET_URL": target_url,
+                             "PYTHONPATH": str(ROOT / "backend")})
+
+        comparison = compare()
         _assert_success(comparison, "compare_recovery")
         assert "region_status_and_link_states_equal=true" in comparison.stdout
+        assert {line.split()[0].removeprefix("table=") for line in comparison.stdout.splitlines()
+                if line.startswith("table=")} == APPLICATION_TABLES
+        mutations = [
+            ("UPDATE user_movie_ratings SET rating=4 WHERE user_id='a'",
+             "UPDATE user_movie_ratings SET rating=3.5 WHERE user_id='a'", "user_movie_ratings"),
+            (("UPDATE movie_provider_checks SET watch_options_url="
+              "'https://www.themoviedb.org/movie/999/watch?locale=US' WHERE movie_id='movie-a' AND country='US'"),
+             ("UPDATE movie_provider_checks SET watch_options_url="
+              "'https://www.themoviedb.org/movie/101/watch?locale=US' WHERE movie_id='movie-a' AND country='US'"),
+             "movie_provider_checks"),
+            (("UPDATE movie_provider_checks SET checked_at=checked_at + interval '1 second' "
+              "WHERE movie_id='movie-a' AND country='US'"),
+             ("UPDATE movie_provider_checks SET checked_at=checked_at - interval '1 second' "
+              "WHERE movie_id='movie-a' AND country='US'"), "movie_provider_checks"),
+            ("UPDATE movie_watch_providers SET name='Changed' WHERE movie_id='movie-a' AND country='US'",
+             "UPDATE movie_watch_providers SET name='Synthetic US' WHERE movie_id='movie-a' AND country='US'",
+             "movie_watch_providers"),
+        ]
+        for change, restore, table in mutations:
+            with target.begin() as connection:
+                connection.execute(text(change))
+            try:
+                mismatch = compare()
+                assert mismatch.returncode == 1, f"comparator missed changed {table}"
+                assert any(line.startswith(f"table={table} ") and line.endswith("equal=false")
+                           for line in mismatch.stdout.splitlines())
+            finally:
+                with target.begin() as connection:
+                    connection.execute(text(restore))
+            _assert_success(compare(), "comparison after undoing mutation")
         _assert_success(_run([sys.executable, "-m", "alembic", "-c", "backend/alembic.ini",
                               "check"], env={"DATABASE_URL": target_url}), "alembic check")
         with target.connect() as connection:
@@ -159,20 +219,12 @@ def test_dump_restore_regional_account_index_and_rollback_refusal(tmp_path, monk
         duplicate = _run(["pg_restore", "--exit-on-error", "--no-owner", "--no-privileges",
                           *target_args, str(archive)], env=target_env)
         assert duplicate.returncode != 0
-        _assert_success(_run([sys.executable, "-m", "app.cli.compare_recovery",
-                              "--source-database", source_name, "--target-database", target_name],
-                             env={"RECOVERY_SOURCE_URL": source_url,
-                                  "RECOVERY_TARGET_URL": target_url,
-                                  "PYTHONPATH": str(ROOT / "backend")}), "post-refusal comparison")
+        _assert_success(compare(), "post-refusal comparison")
         downgrade = _run([sys.executable, "-m", "alembic", "-c", "backend/alembic.ini",
                           "downgrade", "b8e4d2c96f10"], env={"DATABASE_URL": target_url})
         assert downgrade.returncode != 0
         assert "Regional provider data must be preserved" in downgrade.stderr
-        _assert_success(_run([sys.executable, "-m", "app.cli.compare_recovery",
-                              "--source-database", source_name, "--target-database", target_name],
-                             env={"RECOVERY_SOURCE_URL": source_url,
-                                  "RECOVERY_TARGET_URL": target_url,
-                                  "PYTHONPATH": str(ROOT / "backend")}), "post-downgrade comparison")
+        _assert_success(compare(), "post-downgrade comparison")
         with target.connect() as connection:
             assert connection.execute(text("SELECT version_num FROM alembic_version")).scalar() == HEAD
 
@@ -238,6 +290,9 @@ def test_dump_restore_regional_account_index_and_rollback_refusal(tmp_path, monk
             assert restored_a.get("/api/me/watchlist").json()["meta"]["total"] == 1
             assert restored_b.get("/api/me/watchlist").json()["meta"]["total"] == 1
             assert restored_b.get("/api/me/ratings/movie-b").json()["data"]["rating"] == 4.5
+            assert [genre["id"] for genre in restored_b.get("/api/me/preferences").json()["data"]["genres"]] == [18]
+            assert [movie["id"] for movie in restored_a.get("/api/me/watchlist").json()["data"]["movies"]] == ["movie-a"]
+            assert [movie["id"] for movie in restored_b.get("/api/me/watchlist").json()["data"]["movies"]] == ["movie-b"]
             with target.begin() as connection:
                 connection.execute(text("UPDATE alembic_version SET version_num='b8e4d2c96f10'"))
             assert restored_a.get("/health").status_code == 503

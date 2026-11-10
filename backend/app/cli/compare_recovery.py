@@ -16,6 +16,7 @@ from sqlalchemy import select, text
 from sqlalchemy.engine import make_url
 from sqlalchemy.orm import Session
 
+import app.db.models  # noqa: F401 -- register every model in standalone CLI processes
 from app.db.database import Base, create_database_engine
 
 CODE_HEADS = set(ScriptDirectory.from_config(Config(str(
@@ -59,9 +60,13 @@ def _table_fingerprint(session: Session, table) -> tuple[int, str]:
 
 
 def _inspect(raw_url: str, expected_database: str):
+    required_tables = {mapper.local_table.name for mapper in Base.registry.mappers}
+    if not required_tables or not required_tables.issubset(Base.metadata.tables):
+        raise ValueError("Application table metadata is empty or incomplete")
     engine = create_database_engine(raw_url)
     try:
         with Session(engine) as session:
+            session.execute(text("SET TRANSACTION READ ONLY"))
             identity = session.execute(text("SELECT current_database(), current_user, "
                                             "current_setting('server_version_num')")).one()
             if identity[0] != expected_database or int(identity[2]) // 10000 != 18:

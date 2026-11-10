@@ -204,6 +204,42 @@ jobs:
           assert all(len(case) == 0 for case in cases), "DB checks must pass without skips"
           PY
 
+      - name: Install matching PostgreSQL 18 recovery clients
+        run: |
+          if [ ! -x /usr/lib/postgresql/18/bin/pg_dump ]; then
+            sudo apt-get update
+            sudo apt-get install --yes postgresql-common
+            sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+            sudo apt-get update
+            sudo apt-get install --yes postgresql-client-18
+          fi
+          echo /usr/lib/postgresql/18/bin >> "$GITHUB_PATH"
+
+      - name: Rehearse isolated native recovery and comparator refusals
+        env:
+          RECOVERY_TEST_SOURCE_URL: postgresql+psycopg://ci:disposable-ci-only@127.0.0.1:5432/s5_t06_ci_source?sslmode=disable&connect_timeout=5
+          RECOVERY_TEST_TARGET_URL: postgresql+psycopg://ci:disposable-ci-only@127.0.0.1:5432/s5_t06_ci_target?sslmode=disable&connect_timeout=5
+        run: |
+          python - <<'PY'
+          import os
+          import psycopg
+          from psycopg import sql
+          from sqlalchemy.engine import make_url
+          for variable in ("RECOVERY_TEST_SOURCE_URL", "RECOVERY_TEST_TARGET_URL"):
+              url = make_url(os.environ[variable])
+              with psycopg.connect(host=url.host, port=url.port, user=url.username,
+                                  password=url.password, dbname="movie_test",
+                                  autocommit=True) as connection:
+                  connection.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(url.database)))
+          PY
+          python -m pytest -c pytest.ini backend/tests/test_s5_t06_postgres_recovery.py -v --junitxml=recovery.xml
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          cases = ET.parse("recovery.xml").findall(".//testcase")
+          assert len(cases) >= 5, "Focused recovery cases did not execute"
+          assert all(len(case) == 0 for case in cases), "Recovery cases must pass without skips"
+          PY
+
   node:
     name: Node build and tests
     runs-on: ubuntu-latest
