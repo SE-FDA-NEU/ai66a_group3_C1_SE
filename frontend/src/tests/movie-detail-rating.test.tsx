@@ -6,6 +6,7 @@ import {
   fireEvent,
   render,
   screen,
+  waitFor,
 } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
 import App from "../App.tsx";
@@ -50,6 +51,9 @@ it("restores a saved rating on a direct detail load without changing preferences
     if (path === "/api/auth/me") return json({ data: { user } });
     if (path === "/api/me/ratings/movie-a")
       return json({ data: { movieId: "movie-a", rating: 5 } });
+    if (path === "/api/me/watchlist/movie-a")
+      return json({ data: { movieId: "movie-a", inWatchlist: false, addedAt: null } });
+    if (path === "/api/movies/movie-a/similar") return json({ data: { movies: [] } });
     throw new Error(`Unexpected request: ${path}`);
   });
   render(<App />);
@@ -58,7 +62,9 @@ it("restores a saved rating on a direct detail load without changing preferences
   expect(calls).toEqual([
     "/api/movies/movie-a",
     "/api/auth/me",
+    "/api/movies/movie-a/similar",
     "/api/me/ratings/movie-a",
+    "/api/me/watchlist/movie-a",
   ]);
 });
 
@@ -68,17 +74,18 @@ it("public content stays visible while session checking waits without private re
   const fetch = vi
     .spyOn(globalThis, "fetch")
     .mockResolvedValueOnce(json({ data: { movie: movie() } }))
-    .mockReturnValueOnce(session.promise);
+    .mockReturnValueOnce(session.promise)
+    .mockResolvedValueOnce(json({ data: { movies: [] } }));
   render(<App />);
   await screen.findByText("Public overview");
   expect(screen.getByText("Checking sign-in status...")).toBeInTheDocument();
-  expect(fetch).toHaveBeenCalledTimes(2);
+  await waitFor(() => expect(fetch).toHaveBeenCalledTimes(3));
   await act(async () => {
     session.resolve(json({}, 401));
   });
   await screen.findByRole("link", { name: "Sign in to rate this movie" });
   expect(window.location.pathname).toBe("/movies/movie-a");
-  expect(fetch).toHaveBeenCalledTimes(2);
+  expect(fetch).toHaveBeenCalledTimes(3);
 });
 
 it("a failed session check has retry without hiding details or faking unrated", async () => {
@@ -86,8 +93,10 @@ it("a failed session check has retry without hiding details or faking unrated", 
   vi.spyOn(globalThis, "fetch")
     .mockResolvedValueOnce(json({ data: { movie: movie() } }))
     .mockResolvedValueOnce(json({ error: { message: "Unavailable" } }, 503))
+    .mockResolvedValueOnce(json({ data: { movies: [] } }))
     .mockResolvedValueOnce(json({ data: { user } }))
-    .mockResolvedValueOnce(json({ data: { movieId: "movie-a", rating: 3 } }));
+    .mockResolvedValueOnce(json({ data: { movieId: "movie-a", rating: 3 } }))
+    .mockResolvedValueOnce(json({ data: { movieId: "movie-a", inWatchlist: false, addedAt: null } }));
   render(<App />);
   await screen.findByRole("button", { name: "Retry session check" });
   expect(screen.getByText("Public overview")).toBeInTheDocument();
@@ -116,7 +125,7 @@ it("unmounts the previous private widget while a new movie is loading", async ()
   });
   render(<App />);
   await screen.findByText("Your saved rating: 3/5");
-  fireEvent.change(screen.getByRole("combobox"), { target: { value: "5" } });
+  fireEvent.click(screen.getByRole("radio", { name: "5 stars" }));
   fireEvent.click(screen.getByRole("button", { name: "Save rating" }));
   await act(async () => {
     window.history.pushState({}, "", "/movies/movie-b");

@@ -1,0 +1,20 @@
+S4 / T04 ranking score UI acceptance
+run_at=2026-10-27T10:56:14+07:00
+base_commit=32fc79a068dce9d746914e289ca8592efee4062e
+working_tree=local changes present
+python=3.12.10
+node=v24.21.0
+browser_product=Chrome/155.0.8059.85
+browser_executable=C:\Program Files\Google\Chrome\Application\chrome.exe
+database=migrated temporary file-backed SQLite
+catalogue=deterministic synthetic fixture, raw popularity 80/80 plus one null
+baseline_and_missing_score=PASS
+rating_5_81_over_80_with_context_kept=PASS
+themes_and_375_768_1440_layout_contrast=PASS
+keyboard_focus_visible_and_enter_opens_detail=PASS
+rating_1_79_below_80=PASS
+rating_source_failure_is_disclosed=PASS
+popular_mode_has_no_private_score_and_account_switch_isolated=PASS
+database_integrity=ok
+independent_review=pending pull-request reviewer
+result=PASS

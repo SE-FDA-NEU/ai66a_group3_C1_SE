@@ -1,0 +1,23 @@
+{
+  "metadata": {
+    "testedCommit": "23e655cd8a531f1662767838cc4cf1b6a9303185",
+    "workingTree": "",
+    "node": "v24.19.0",
+    "python": "Python 3.12.6",
+    "t01Mode": "isolated-fixture",
+    "t01SourceSha256": {
+      "playwright.t01.config.ts": "9b8a0ed395ff150c29525c635c81f447470800939cabfe3c52668a56ba7c6057",
+      "e2e/t01.visual.ts": "c4795802129727be7c743808b8a016af7143f53ae6552600736a1f4983a67586"
+    },
+    "actualWorkers": 1
+  },
+  "stats": {
+    "startTime": "2026-10-31T12:38:54.076Z",
+    "duration": 12805.585000000001,
+    "expected": 5,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "errors": []
+}

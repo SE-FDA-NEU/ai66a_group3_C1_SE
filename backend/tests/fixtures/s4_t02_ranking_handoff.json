@@ -1,0 +1,53 @@
+{
+  "neutral90_80": {
+    "selectedGenreIds": [1, 2],
+    "ratedSource": {"sourceId": "action-signal", "title": "Action Signal", "popularityScore": 1, "genreIds": [1], "rating": 3},
+    "candidates": [
+      {"sourceId": "zulu-action", "title": "Zulu Action", "popularityScore": 90, "genreIds": [1]},
+      {"sourceId": "alpha-comedy", "title": "Alpha Comedy", "popularityScore": 80, "genreIds": [2]}
+    ],
+    "expectedAdjustments": {"Zulu Action": 0, "Alpha Comedy": 0, "Action Signal": 0},
+    "expectedOrderedTitles": ["Zulu Action", "Alpha Comedy", "Action Signal"]
+  },
+  "wholeSet25": {
+    "selectedGenreIds": [1],
+    "limit": 10,
+    "ratedSource": {"sourceId": "comedy-signal", "title": "Comedy Signal", "popularityScore": 1, "genreIds": [2], "rating": 5},
+    "candidates": [
+      {"sourceId": "action-01", "title": "Action 01", "popularityScore": 100, "genreIds": [1]},
+      {"sourceId": "action-02", "title": "Action 02", "popularityScore": 99, "genreIds": [1]},
+      {"sourceId": "action-03", "title": "Action 03", "popularityScore": 98, "genreIds": [1]},
+      {"sourceId": "action-04", "title": "Action 04", "popularityScore": 97, "genreIds": [1]},
+      {"sourceId": "action-05", "title": "Action 05", "popularityScore": 96, "genreIds": [1]},
+      {"sourceId": "action-06", "title": "Action 06", "popularityScore": 95, "genreIds": [1]},
+      {"sourceId": "action-07", "title": "Action 07", "popularityScore": 94, "genreIds": [1]},
+      {"sourceId": "action-08", "title": "Action 08", "popularityScore": 93, "genreIds": [1]},
+      {"sourceId": "action-09", "title": "Action 09", "popularityScore": 92, "genreIds": [1]},
+      {"sourceId": "action-10", "title": "Action 10", "popularityScore": 91, "genreIds": [1]},
+      {"sourceId": "action-11", "title": "Action 11", "popularityScore": 90, "genreIds": [1]},
+      {"sourceId": "action-12", "title": "Action 12", "popularityScore": 89, "genreIds": [1]},
+      {"sourceId": "action-13", "title": "Action 13", "popularityScore": 88, "genreIds": [1]},
+      {"sourceId": "action-14", "title": "Action 14", "popularityScore": 87, "genreIds": [1]},
+      {"sourceId": "action-15", "title": "Action 15", "popularityScore": 86, "genreIds": [1]},
+      {"sourceId": "action-16", "title": "Action 16", "popularityScore": 85, "genreIds": [1]},
+      {"sourceId": "action-17", "title": "Action 17", "popularityScore": 84, "genreIds": [1]},
+      {"sourceId": "action-18", "title": "Action 18", "popularityScore": 83, "genreIds": [1]},
+      {"sourceId": "action-19", "title": "Action 19", "popularityScore": 82, "genreIds": [1]},
+      {"sourceId": "action-20", "title": "Action 20", "popularityScore": 81, "genreIds": [1]},
+      {"sourceId": "action-21", "title": "Action 21", "popularityScore": 80, "genreIds": [1]},
+      {"sourceId": "action-22", "title": "Action 22", "popularityScore": 79, "genreIds": [1]},
+      {"sourceId": "action-23", "title": "Action 23", "popularityScore": 78, "genreIds": [1]},
+      {"sourceId": "action-24", "title": "Action 24", "popularityScore": 77, "genreIds": [1]},
+      {"sourceId": "target", "title": "Target", "popularityScore": 90.5, "genreIds": [1, 2]}
+    ],
+    "expectedAdjustment": {"Target": 1, "otherCandidates": 0},
+    "expectedBeforePage1": ["Action 01", "Action 02", "Action 03", "Action 04", "Action 05", "Action 06", "Action 07", "Action 08", "Action 09", "Action 10"],
+    "expectedAfterPages": [
+      ["Action 01", "Action 02", "Action 03", "Action 04", "Action 05", "Action 06", "Action 07", "Action 08", "Action 09", "Target"],
+      ["Action 10", "Action 11", "Action 12", "Action 13", "Action 14", "Action 15", "Action 16", "Action 17", "Action 18", "Action 19"],
+      ["Action 20", "Action 21", "Action 22", "Action 23", "Action 24"]
+    ],
+    "expectedPageMeta": {"total": 25, "totalPages": 3, "unfilteredTotal": 25, "pageLengths": [10, 10, 5]},
+    "expectedGenre2View": {"titles": ["Target"], "total": 1, "totalPages": 1, "unfilteredTotal": 25}
+  }
+}

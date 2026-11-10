@@ -1,0 +1,7 @@
+checked_at=2026-10-30T00:10:41.369080+07:00
+tested_commit=24e8086f23e7567f20a9e9c237400bf15adf12b1
+git_diff_check_exit=0
+source_manifest=316/316 OK
+evidence_links_readme_whitespace_story_nodes_result_counts_bearer_jwt_scan=PASS (separate executed Python check)
+git_status_short:
+?? docs/evidence/s4-core-pre-g4/

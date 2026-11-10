@@ -49,7 +49,7 @@ def upgrade() -> None:
             nullable=False,
         ),
         sa.CheckConstraint(
-            "typeof(rating) = 'integer' AND rating BETWEEN 1 AND 5",
+            "rating BETWEEN 1 AND 5",
             name="ck_user_movie_ratings_rating_range",
         ),
         sa.ForeignKeyConstraint(

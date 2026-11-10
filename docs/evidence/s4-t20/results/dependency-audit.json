@@ -1,0 +1,26 @@
+{
+  "observedDate": "2026-10-31",
+  "allDependencies": {
+    "info": 0,
+    "low": 0,
+    "moderate": 14,
+    "high": 4,
+    "critical": 0,
+    "total": 18
+  },
+  "productionOnly": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0,
+    "total": 0
+  },
+  "highSeverityPackages": [
+    "source-map-js",
+    "undici",
+    "vite",
+    "zod"
+  ],
+  "lockfileUnchangedFromMain": true
+}

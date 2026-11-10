@@ -1,0 +1,40 @@
+Mapped 37 unique Section 2 IDs to 45 collected root nodes
+| Section 2 ID | Collected pytest node |
+|---|---|
+| `TC-P0-S01-001` | `tests/test_p0_acceptance.py::test_TC_P0_S01_001_canonical_genres_and_empty_selection` |
+| `TC-P0-S01-002` | `tests/test_p0_acceptance.py::test_TC_P0_S01_002_zero_preserves_previous_rows` |
+| `TC-P0-S01-003` | `tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-003]` |
+| `TC-P0-S01-004` | `tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-004]` |
+| `TC-P0-S01-005` | `tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-005]` |
+| `TC-P0-S01-006` | `tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-006]` |
+| `TC-P0-S01-007` | `tests/test_p0_acceptance.py::test_TC_P0_S01_007_invalid_sets_preserve_previous_selection` |
+| `TC-P0-S01-008` | `tests/test_p0_acceptance.py::test_TC_P0_S01_008_guest_forgery_and_origin_leave_accounts_intact` |
+| `TC-P0-S02-001` | `tests/test_p0_acceptance.py::test_TC_P0_S02_001_full_set_paging_has_25_distinct_movies` |
+| `TC-P0-S02-002` | `tests/test_p0_acceptance.py::test_TC_P0_S02_002_rating_free_order_and_reasons` |
+| `TC-P0-S02-003` | `tests/test_p0_acceptance.py::test_TC_P0_S02_003_no_match_uses_unboosted_popular` |
+| `TC-P0-S02-004` | `tests/test_p0_acceptance.py::test_TC_P0_S02_004_guest_and_expired_cookie_are_private` |
+| `TC-P0-S02-005` | `tests/test_p0_acceptance.py::test_TC_P0_S02_005_core_failure_then_retry_preserves_preferences` |
+| `TC-P0-S02-006` | `tests/test_p0_acceptance.py::test_TC_P0_S02_006_filter_after_whole_set_ranking` |
+| `TC-P0-S03-001` | `tests/test_s03_details.py::test_TC_P0_S03_001_public_known_id`<br>`tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[year]`<br>`tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[summary]`<br>`tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[both]` |
+| `TC-P0-S03-002` | `tests/test_s03_details.py::test_TC_P0_S03_002_unknown_id_refused` |
+| `TC-P0-S03-003` | `tests/test_s03_details.py::test_TC_P0_S03_003_catalogue_and_database_failures_are_distinct` |
+| `TC-P0-S03-004` | `tests/test_s03_details.py::test_TC_P0_S03_004_return_query_cannot_redirect_or_change_public_movie` |
+| `TC-P0-S03-005` | `tests/test_s03_details.py::test_TC_P0_S03_005_detail_widgets_preserve_both_accounts_preferences` |
+| `TC-P0-S03-006` | `tests/test_s03_details.py::test_TC_P0_S03_006_membership_commit_allows_read_snapshot_cleanup` |
+| `TC-P0-S04-001` | `tests/test_p0_acceptance.py::test_TC_P0_S04_001_public_catalogue_pages_include_null_popularity` |
+| `TC-P0-S04-002` | `tests/test_p0_acceptance.py::test_TC_P0_S04_002_cold_start_has_no_personal_score` |
+| `TC-P0-S04-003` | `tests/test_p0_acceptance.py::test_TC_P0_S04_003_limit_9_and_10_keep_full_total` |
+| `TC-P0-S04-004` | `tests/test_p0_acceptance.py::test_TC_P0_S04_004_limit_and_page_refusals` |
+| `TC-P0-S04-005` | `tests/test_p0_acceptance.py::test_TC_P0_S04_005_empty_active_versus_missing_revision` |
+| `TC-P0-S04-006` | `tests/test_p0_acceptance.py::test_TC_P0_S04_006_stale_catalogue_revision_is_409` |
+| `TC-P0-S12-001` | `tests/test_p0_acceptance.py::test_TC_P0_S12_001_eight_char_normalized_hashed_registration` |
+| `TC-P0-S12-002` | `tests/test_p0_acceptance.py::test_TC_P0_S12_002_seven_char_password_has_no_row` |
+| `TC-P0-S12-003` | `tests/test_p0_acceptance.py::test_TC_P0_S12_003_nine_char_password_has_safe_dto` |
+| `TC-P0-S12-004` | `tests/test_p0_acceptance.py::test_TC_P0_S12_004_duplicate_normalized_email_is_conflict` |
+| `TC-P0-S12-005` | `tests/test_p0_acceptance.py::test_TC_P0_S12_005_invalid_email_and_storage_failure_create_no_account` |
+| `TC-P0-S13-001` | `tests/test_p0_acceptance.py::test_TC_P0_S13_001_login_me_cookie_and_safe_user` |
+| `TC-P0-S13-002` | `tests/test_p0_acceptance.py::test_TC_P0_S13_002_wrong_and_unknown_credentials_same_public_error` |
+| `TC-P0-S13-003` | `tests/test_p0_acceptance.py::test_TC_P0_S13_003_logout_replay_and_later_login_restore_data` |
+| `TC-P0-S13-004` | `tests/test_p0_acceptance.py::test_TC_P0_S13_004_missing_expired_and_revoked_sessions_refused` |
+| `TC-P0-S13-005` | `tests/test_p0_acceptance.py::test_TC_P0_S13_005_account_isolation_and_forged_identity` |
+| `TC-P0-S13-006` | `tests/test_p0_acceptance.py::test_TC_P0_S13_006_cross_origin_auth_and_write_refused` |

@@ -1,0 +1,21 @@
+{
+  "base": "e8e319e39b19f9775fc54066a963961ef0e76581",
+  "normalization": "UTF-8 text with LF",
+  "sha256": {
+    "backend/app/main.py": "1e06a45c525e51746a3b6066076d8f8f61b66f6856f5836a66f76325c2dfca70",
+    "backend/app/recommendations/search.py": "99d594ec7f08b6c2fdc32fb512890ce5f133f436036eb5e208533323adb85c39",
+    "backend/app/repositories/movies.py": "044d9a9b2d12dd3c3e68070fa8e849c279d8f6c64d7223c658acfced5b955b59",
+    "backend/app/schemas/movies.py": "7e34b1b383d8c7a59d21fa0d6e20550e474ca334828c7f144390c956cd268fa8",
+    "backend/tests/test_movie_search_api.py": "362e552d7e44a92ef9416b11f1f1f54fa66b0ac290a0d758e52a0bf5960f5358",
+    "docs/SETUP.md": "40471942de288932cfe6890ca39af9af80f2416fd883fce30ee61afcb724bcc3",
+    "docs/api.md": "90072c21ed9d6e51352f67f08c5c3f9cc03b0c0397329a6270497a512d4d7302",
+    "docs/requirements.md": "ab8a653d7a36d31e83bdce6f2fd243b8156746e224cee665abd34de1cd574101",
+    "docs/s4-t01-ui-contract.md": "24643d373d7a1eee00c078ac0cce2211c70f45b53911cf28e0d3a786ea34560b",
+    "docs/testing.md": "2779ffb946f083ba1e7af23a2ebc1ef86953a49cb82662a1eb0d698bc160124c",
+    "frontend/e2e/s4-t16.detail-boundaries.ts": "6a114a91c4e5ed4942566fbc0b1eafe12966fb4b445f9803634ad5e1a90de285",
+    "frontend/src/api/movies.ts": "00a8843e345268d35645fe68584e3edcff66017f60da2e69fffa55aad152ec2a",
+    "frontend/src/navigation/listViewState.ts": "ddd7fd2c52c7411375f8b0de87e25fba47352ab9a72ec6ab92a529486b886118",
+    "frontend/src/pages/SearchPage.tsx": "816f91d276f62db280e7e060d968591160a889d093b768d932707c9f7e2108bb",
+    "frontend/src/tests/movies.test.tsx": "988d3c7cba70801bb0527d1df25cdd125e67bd8a38d8f78a953fd438b5240329"
+  }
+}

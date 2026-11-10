@@ -1,0 +1,36 @@
+
+> frontend@0.0.0 test:t01:ui
+> node scripts/run-s04-e2e.mjs --config playwright.t01.config.ts
+
+[WebServer] INFO:     Started server process [7535]
+[WebServer] INFO:     Waiting for application startup.
+[WebServer] INFO:     Application startup complete.
+[WebServer] INFO:     Uvicorn running on http://127.0.0.1:8014 (Press CTRL+C to quit)
+[WebServer] (node:7539) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 17 tests using 1 worker
+
+(node:7540) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 e2e/t01.visual.ts:103:1 › S08 search uses real API/index across themes, sizes, states and safe return (10.1s)
+  ✓   2 e2e/t01.visual.ts:242:1 › S08 delayed real search response cannot replace a newer query or return after unmount (1.2s)
+  ✓   3 e2e/t01.visual.ts:295:1 › S07 similar movies satisfy all five criteria with the real API, index and DB (10.1s)
+  ✓   4 e2e/t01.visual.ts:463:1 › S07 similar results are public, identical across accounts, independent of ratings and keep the return context (1.6s)
+  ✓   5 e2e/t01.visual.ts:522:1 › S07 delayed real similar response for movie A cannot fill movie B (697ms)
+  ✓   6 e2e/t01.visual.ts:558:1 › Home title sort precedes paging and button links preserve detail return in both themes (3.6s)
+  ✓   7 e2e/t01.visual.ts:611:1 › personal navigation actions use shared buttons without changing saved genres (2.5s)
+  ✓   8 e2e/t01.visual.ts:660:1 › existing public pages, both themes and 375/768/1440 layouts (2.9s)
+  ✓   9 e2e/t01.visual.ts:692:1 › native star keyboard draft, save and theme preserve real state (1.6s)
+  ✓  10 e2e/t01.visual.ts:747:1 › Home hero and navbar leave personalisation entirely user initiated (1.6s)
+  ✓  11 e2e/t01.visual.ts:797:1 › guest Start survives the registration detour and opens real Preferences after sign-in (781ms)
+  ✓  12 e2e/t01.visual.ts:823:1 › theme toggle preserves a real paginated URL and its ordered results (630ms)
+  ✓  13 e2e/t01.visual.ts:838:1 › blocked browser storage still renders and switches theme (740ms)
+  ✓  14 e2e/t01.visual.ts:854:1 › reference auth layouts stay concise, responsive and fully functional in both themes (1.5s)
+  ✓  15 e2e/t01.visual.ts:881:1 › centered action feedback reflects real login/save/logout acknowledgements without blocking the page (1.5s)
+  ✓  16 e2e/t01.visual.ts:953:1 › genre cards expose descriptions, native keyboard state and no implicit writes (780ms)
+  -  17 e2e/t01.visual.ts:986:1 › read-only imported TMDb catalogue screenshots, real poster loading and themes
+
+  1 skipped
+  16 passed (45.7s)
+s04_temporary_database_removed=true

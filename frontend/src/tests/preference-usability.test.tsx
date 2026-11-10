@@ -122,7 +122,7 @@ describe("S3-T24 preference and recommendation controls", () => {
 
       const start = await screen.findByRole("link", { name: "Start" });
       expect(start).toHaveAccessibleDescription(
-        /pick up to 5 favourite genres and get recommendations/i,
+        /choose your favourite genres for personalised recommendations/i,
       );
 
       fireEvent.click(screen.getByRole("link", { name: "My recommendations" }));

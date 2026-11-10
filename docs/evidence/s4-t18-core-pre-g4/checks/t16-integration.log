@@ -1,0 +1,13 @@
+
+> frontend@0.0.0 test:t16:integration
+> vitest run --config vitest.t16.config.ts
+
+
+ RUN  v5.0.2 /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/frontend
+
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  23:51:33
+   Duration  4.35s (tests 77%, transform 11%, environment 9%, import 3%)
+

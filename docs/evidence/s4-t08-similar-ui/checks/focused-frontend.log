@@ -1,0 +1,13 @@
+
+> frontend@0.0.0 test
+> vitest run src/tests/similar-movies.test.tsx
+
+
+ RUN  v5.0.2 F:/1 tài liệu học tập/SE/ai66a_group3_C1_SE/frontend
+
+
+ Test Files  1 passed (1)
+      Tests  10 passed (10)
+   Start at  12:46:28
+   Duration  4.10s (environment 45%, tests 29%, import 18%, transform 8%)
+

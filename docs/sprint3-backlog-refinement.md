@@ -204,6 +204,16 @@ attacks/reset rollback use API/DB tests; this does not imply a completed reset U
 
 ### Story result reconciliation
 
+**Historical C01 snapshot below.** It records the state when C01 was authored,
+not the current acceptance decision. During PR #191, the PO confirmed the
+six-P0 commitment (24) and accepted the delivered capabilities against the
+checked Issues and existing AC evidence. Current six-P0 and S06/S09 status is
+`works`; the closed eight-Story delivery ledger totals 30 completed points,
+excluding previously delivered S12. See the
+[current C02 reconciliation](evidence/s3-c02-reconciliation.md) and
+[Sprint 3 log](sprint-log.md). Original snapshot JSON, AC and timestamps are
+preserved rather than rewritten as if the later decision existed at Planning.
+
 | Story | Points | GitHub issue state | M3 acceptance status | Boundary |
 |---|---:|---|---|---|
 | [#17](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/17) S01 - Select favorite genres to start choosing a movie | 3 | open | partly works | Functional assertions recorded; final AC + DoD/human review gates remain explicit |
@@ -230,6 +240,12 @@ Trang's unaided walkthrough was confirmed by the PO, but session version/date
 and per-journey results remain unspecified in the linked T25 human record.
 
 ## 6. Points, capacity and admission changes
+
+The following table is the **original C01 evidence boundary**. Its then-unknown
+metrics have subsequently been clarified by the PO in PR #191: committed 24,
+completed 30, velocity 30. The [C02 ledger](evidence/s3-c02-reconciliation.md)
+explains the 21-point new P0 delivery, previously delivered 3-point S12 and
+9-point P1 addition. This clarification supplies no original capacity hours.
 
 | Measure | Recorded value |
 |---|---|

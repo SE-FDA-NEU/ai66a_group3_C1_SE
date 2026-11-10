@@ -1,0 +1,14 @@
+{
+  "testedCommit": "eb4ee332c08aa65e792616cbb99d61a91292811c",
+  "belowPoster": true,
+  "noInitialIframe": true,
+  "playback": {
+    "currentTime": 0.520832,
+    "paused": false,
+    "readyState": 4
+  },
+  "stayedOnDetails": true,
+  "tabs": 1,
+  "removedOnClose": true,
+  "noTrailerCaption": true
+}

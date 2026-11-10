@@ -1,0 +1,16 @@
+
+> frontend@0.0.0 test
+> vitest run --maxWorkers=4
+
+
+ RUN  v5.0.2 <repository>/frontend
+
+
+ Test Files  39 passed (39)
+      Tests  451 passed (451)
+   Start at  17:30:35
+   Duration  19.02s (environment 49%, tests 36%, import 12%, transform 3%)
+
+    Isolate  39 workers spawned · ~1.01s startup each (spawn + environment, per file)
+             at least ~8.82s faster with isolate: false — reuses workers across files instead of one per file
+

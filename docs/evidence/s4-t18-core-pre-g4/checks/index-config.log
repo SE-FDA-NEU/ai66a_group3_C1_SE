@@ -1,0 +1,5 @@
+Python: 3.12.4
+SQLite: 3.45.3
+modelVersion: overview-tfidf-v1
+artifactVersion: 1
+configFingerprint: 41785781f34ba44091ac64f3b1c0503402ee760c518af1429d0acb94bbc31c99

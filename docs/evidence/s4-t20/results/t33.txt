@@ -1,0 +1,13 @@
+
+> frontend@0.0.0 test:t33:integration
+> vitest run --config vitest.t33.config.ts
+
+
+ RUN  v5.0.2 <repository>/frontend
+
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  17:32:13
+   Duration  6.91s (tests 76%, environment 13%, transform 7%, import 4%)
+

@@ -1,5 +1,9 @@
 # AI Movie Recommendation System
 
+[CineAI public baseline](https://cineai-o9tf.onrender.com/) — the backend is reachable.
+The frontend deployment is pending the reviewed S5-T03 merge and green-main deploy.
+See the [deployment and acceptance record](docs/s5-t03-deployment.md).
+
 For university students facing choice overload, this system turns a small set of
 genre preferences and optional ratings into transparent movie recommendations,
 rather than giving every viewer the same generic popularity list.
@@ -11,10 +15,14 @@ Scrum Master: @vu-huzy.** The PO confirmed these dates; the board's older
 iteration-date labels have not been updated. SM3 differs from SM1 (@hoang3003)
 and SM2 (@NguyenTuanAnh0608).
 
+**Sprint 4 Scrum Master (SM4): @anotify-vie**, distinct from SM3 (@vu-huzy).
+
 Begin at the home page (`/`) and use visible controls; feature URLs do not need
-to be entered by hand. Follow [SETUP](docs/SETUP.md) first. Its disposable-account
-procedure uses registration, not published real passwords. Confirm the review
-machine's TMDb token/network arrangement before the session.
+to be entered by hand. Follow [SETUP](docs/SETUP.md) first, including its
+explicit account-provisioning step on the same TMDb-imported database. The
+public app-only review login is documented there; no real service password
+or TMDb token is published. Confirm the review machine's private TMDb
+token/network arrangement before the session.
 
 | P0 Story | Start from the home page and use | Screen / route | Issue |
 |---|---|---|---|
@@ -37,10 +45,11 @@ for actual issue/acceptance states, planning images and outstanding handoffs.
 - [Local setup and clean-clone guide](docs/SETUP.md)
 - [Required TMDb catalogue setup from Sprint 3](docs/tmdb-sprint3-runbook.md)
 
-For a disposable review account, create one through the local registration
-screen after setup. The [setup guide](docs/SETUP.md#disposable-test-account-and-p0-journey)
-gives the full test-account and restart procedure; no shared password is kept
-in this repository.
+The [setup guide](docs/SETUP.md#disposable-test-account-and-p0-journey)
+contains the PO-authorized application-only review account, the opt-in creation
+command, and the full P0/restart procedure. Provisioning uses the configured
+TMDb database, not a separate demo database. Fresh test users for registration
+and account-isolation checks are also created in that same database.
 
 ## Team and Sprint 1 roles
 
@@ -64,6 +73,9 @@ in this repository.
 
 ## Project management
 
+- Scrum Master rotation: **SM3 = @vu-huzy; SM4 = @anotify-vie;
+  SM5 = @kietxuan**. C01 Planning remains PO-owned; C02 wrap-up remains
+  SM-owned. See the [Sprint 4 wrap-up and Sprint 5 handoff](docs/sprint-log.md#sprint-4--wrap-up-cutoff-1-november-2026).
 - Repository: [SE-FDA-NEU/ai66a_group3_C1_SE](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE)
 - Project board: [@group3_c1_se — Project 9](https://github.com/orgs/SE-FDA-NEU/projects/9)
 - Product backlog: 14 Story Issues, #17–#24, #30–#33, #44 and #45 (54 points).
@@ -79,6 +91,7 @@ in this repository.
 - [M2 auth, catalogue, and recommendation API contract](docs/api.md)
 - [Definition of Done](docs/definition-of-done.md)
 - [Sprint log](docs/sprint-log.md)
+- [Sprint 4 Planning, commitment and current scope](docs/sprint4-backlog-refinement.md)
 
 ## Definition of Done
 
@@ -350,28 +363,41 @@ Running the M2 bootstrap is not a prerequisite:
 
 ```bash
 python -m alembic -c backend/alembic.ini upgrade head
-python -m app.cli.import_tmdb_catalogue
+python -m app.cli.import_tmdb_catalogue --pages 50
+python -m app.cli.import_tmdb_catalogue --enrich-trailers --all
+python -m app.cli.rebuild_overview_index rebuild
+python -m app.cli.rebuild_overview_index check
 ```
 
 Set `TMDB_READ_ACCESS_TOKEN` only in the server environment or in the local,
-gitignored `.env` file. By default, the importer reads one page of TMDb popular movies and
+gitignored `.env` file. The CLI default reads 50 pages of TMDb popular movies and
 the official movie genre list; it requests a movie-detail record only when a
 popular result omits `genre_ids`. It never runs as part of browser requests,
 automated tests, or the M2 bootstrap command.
 
-For a larger local catalogue (roughly 260 movies), explicitly opt into 13 pages:
+The standard review setup imports 50 pages, targeting about 1,000 distinct
+active TMDb movies in the configured database. The CLI default is also 50
+pages; explicit smaller budgets are intended for targeted smoke tests. The review command is:
 
 ```bash
-python -m app.cli.import_tmdb_catalogue --pages 13
+python -m app.cli.import_tmdb_catalogue --pages 50
+python -m app.cli.rebuild_overview_index rebuild
+python -m app.cli.rebuild_overview_index check
 ```
 
-The allowed budget is 1–15 pages (roughly 20–300 results before validation and
+The allowed budget is 1–50 pages (roughly 20–1,000 results before validation and
 deduplication). Live counts can vary. Each import activates a new snapshot; it
 does not append blindly. Retained TMDb movies keep their internal IDs, and
 accounts, preferences and ratings are not deleted. A later import without
-`--pages 13` returns to the one-page default. Back up an existing database before
-refreshing it. Public and recommendation list limits remain at most ten cards;
-the larger catalogue expands the candidate pool, not the number shown at once.
+`--pages` uses the same 50-page default. Back up an existing database before
+refreshing it. Public and recommendation pages contain at most ten cards;
+pagination makes the complete eligible catalogue reachable.
+
+The setup also enriches trailers for all pending active movies. Existing
+catalogues can use `--enrich-posters --all` or `--enrich-backdrops --all` without
+re-importing or shrinking their snapshot. With `--all`, `--limit` is a per-batch
+budget (maximum 300), not a cap on the whole catalogue. See
+[the full setup and migration steps](docs/SETUP.md#existing-catalogues-migrate-and-enrich-every-movie).
 
 On success, the command prints a safe provenance summary: provider, opaque
 active revision ID, inserted/updated/rejected counts, movie/associated-genre/
@@ -395,9 +421,10 @@ including at least ten distinct finite-popularity movies for the public popular
 list. This live smoke is outside CI; it is not evidence that planned Sprint 3
 routes or media features are already implemented.
 
-The browser reads movie data through the local backend/SQLite API. Backdrop,
-trailer and VN provider enrichment remain separate feature tasks; requiring
-TMDb catalogue import does not make those enhancements Sprint 3 commitments.
+The browser reads movie data through the local backend/SQLite API. Optional
+trailer enrichment is a separate Sprint 4 step documented in the
+[trailer runbook](docs/trailer-import-runbook.md); requiring TMDb catalogue
+import did not make that enhancement a Sprint 3 commitment.
 
 Verify the automated boundary with synthetic provider responses, isolated test
 databases and no real credential or provider network request:
@@ -409,6 +436,8 @@ python -m ruff check backend
 
 
 ## Run the Backend
+
+For one-origin React/FastAPI production serving, Render settings, required CI checks and operator acceptance steps, see the [S5-T03 deployment runbook](docs/s5-t03-deployment.md).
 
 From the repository root with the Python virtual environment activated:
 
@@ -453,7 +482,10 @@ Example response:
 }
 ```
 
-`migrationVersion` should contain the currently applied Alembic revision and should not be `null` after migrations have been applied.
+`migrationVersion` must match the single revision reported by `alembic heads`.
+After pulling schema changes, back up the database and apply `alembic upgrade head`
+before restarting the backend. Health checks connectivity; HTTP 200 with an older
+revision can still leave movie routes failing because model columns are missing.
 
 
 ## Run the Frontend

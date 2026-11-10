@@ -1,0 +1,16 @@
+
+> frontend@0.0.0 test
+> vitest run
+
+
+ RUN  v5.0.2 /private/tmp/s4-pre-g4-24e8086-clean/frontend
+
+
+ Test Files  39 passed (39)
+      Tests  439 passed (439)
+   Start at  00:04:09
+   Duration  15.54s (tests 44%, environment 42%, import 11%, transform 2%)
+
+    Isolate  39 workers spawned · ~372ms startup each (spawn + environment, per file)
+             at least ~6.89s faster with isolate: false — reuses workers across files instead of one per file
+

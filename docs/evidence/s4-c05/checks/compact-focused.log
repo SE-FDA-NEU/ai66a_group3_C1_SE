@@ -1,0 +1,29 @@
+Command: C:\Users\Admin\AppData\Local\Temp\codex-c05-clean-anycqcue\.venv\Scripts\python.exe -m pytest -c pytest.ini backend/tests/test_storage_snapshot.py tests/test_pytest_setup.py backend/tests/test_setup_media_commands.py -v
+============================= test session starts =============================
+platform win32 -- Python 3.12.6, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\Admin\AppData\Local\Temp\codex-c05-clean-anycqcue\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\Admin\AppData\Local\Temp\codex-c05-clean-anycqcue
+configfile: pytest.ini
+plugins: anyio-4.15.1, cov-7.1.0
+collecting ... collected 12 items
+
+backend/tests/test_storage_snapshot.py::test_online_wal_backup_restore_and_account_index_recovery PASSED [  8%]
+backend/tests/test_storage_snapshot.py::test_snapshot_refuses_overwrite_or_corrupt_source PASSED [ 16%]
+backend/tests/test_storage_snapshot.py::test_restore_refuses_hot_rollback_journal[before_copy] PASSED [ 25%]
+backend/tests/test_storage_snapshot.py::test_restore_refuses_hot_rollback_journal[before_publication] PASSED [ 33%]
+tests/test_pytest_setup.py::test_early_setup_isolates_collection_and_cleans_up[pytest] PASSED [ 41%]
+tests/test_pytest_setup.py::test_early_setup_isolates_collection_and_cleans_up[module] PASSED [ 50%]
+tests/test_pytest_setup.py::test_early_setup_isolates_collection_and_cleans_up[collection-failure] PASSED [ 58%]
+backend/tests/test_setup_media_commands.py::test_both_fresh_setup_sequences_migrate_import_then_enrich_trailers PASSED [ 66%]
+backend/tests/test_setup_media_commands.py::test_documented_import_commands_are_accepted_by_the_real_cli[README.md] PASSED [ 75%]
+backend/tests/test_setup_media_commands.py::test_documented_import_commands_are_accepted_by_the_real_cli[docs/SETUP.md] PASSED [ 83%]
+backend/tests/test_setup_media_commands.py::test_documented_import_commands_are_accepted_by_the_real_cli[docs/backdrop-import-runbook.md] PASSED [ 91%]
+backend/tests/test_setup_media_commands.py::test_documented_import_commands_are_accepted_by_the_real_cli[docs/trailer-import-runbook.md] PASSED [100%]
+
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\Admin\AppData\Local\Temp\codex-c05-clean-anycqcue\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= 12 passed, 1 warning in 16.43s ========================

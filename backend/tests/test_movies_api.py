@@ -84,6 +84,10 @@ def test_list_movies_defaults_to_ten_deterministic_items(
     assert body["meta"] == {
         "count": 10,
         "limit": 10,
+        "page": 1,
+        "total": 12,
+        "totalPages": 2,
+        "unfilteredTotal": 12,
         "catalogueRevision": body["meta"]["catalogueRevision"],
     }
     assert body["data"]["movies"][0]["genres"] == [{"id": 28, "name": "Action"}]
@@ -220,6 +224,13 @@ def test_movie_detail_has_exact_safe_backdrop_shape_and_never_fetches_tmdb(
             "voteAverage": None,
             "voteCount": None,
             "backdropUrl": "https://image.tmdb.org/t/p/w780/sample-backdrop.jpg",
+            "posterUrl": None,
+            "trailer": None,
+            "providers": {
+                "country": "US", "status": "not_checked", "attemptedAt": None, "checkedAt": None,
+                "groups": {"flatrate": [], "rent": [], "buy": [], "free": [], "ads": []},
+            },
+            "watchOptionsUrl": None,
         }},
         "meta": {"catalogueRevision": response.json()["meta"]["catalogueRevision"]},
     }

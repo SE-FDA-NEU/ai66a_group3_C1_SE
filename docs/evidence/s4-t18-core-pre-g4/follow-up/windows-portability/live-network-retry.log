@@ -1,0 +1,17 @@
+Started: 2026-10-30T13:58:14.069344+07:00
+Command: /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/.venv/bin/python -c 
+import httpx
+print("Unauthenticated HTTPS probe; no token/header used", flush=True)
+try:
+    response = httpx.get("https://api.themoviedb.org/3/genre/movie/list", timeout=20)
+    print("HTTP status:", response.status_code)
+except httpx.RequestError as exc:
+    print(type(exc).__name__ + ": " + str(exc))
+    raise SystemExit(1)
+
+Cwd: /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE
+Unauthenticated HTTPS probe; no token/header used
+HTTP status: 401
+
+Exit: 0
+Elapsed: 2.58s

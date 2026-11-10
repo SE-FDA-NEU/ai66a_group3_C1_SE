@@ -1,0 +1,7 @@
+Started: 2026-10-30T13:59:18.861114+07:00
+Command: /private/tmp/s4-c05-early-20261030/.venv/bin/python -m app.cli.import_tmdb_catalogue --pages 50
+Cwd: /private/tmp/s4-c05-early-20261030
+TMDb catalogue import failed: TMDb request timed out
+
+Exit: 1
+Elapsed: 51.36s

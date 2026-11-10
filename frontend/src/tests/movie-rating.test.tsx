@@ -58,6 +58,7 @@ function mount(state: AuthState = A, movieId = "movie-a", strict = false) {
       signOut: vi.fn(),
       handleUnauthorized: unauthorized,
       recommendationVersion: 0,
+      recommendationScope: "test-scope",
       invalidateRecommendations: vi.fn(),
     };
     const content = (
@@ -85,12 +86,12 @@ function mount(state: AuthState = A, movieId = "movie-a", strict = false) {
   };
 }
 const picker = () =>
-  screen.getByRole("combobox", { name: "Your rating (1 to 5)" });
+  screen.getByRole("group", { name: "Your rating (0.5 to 5)" });
 async function ready() {
-  await screen.findByRole("combobox", { name: "Your rating (1 to 5)" });
+  await screen.findByRole("group", { name: "Your rating (0.5 to 5)" });
 }
 function choose(value: number) {
-  fireEvent.change(picker(), { target: { value: String(value) } });
+  fireEvent.click(screen.getByRole("radio", { name: `${value} ${value === 1 ? "star" : "stars"}` }));
 }
 afterEach(() => {
   cleanup();
@@ -127,7 +128,7 @@ it("distinguishes unrated from zero and does not require a rating", async () => 
   mount();
   await ready();
   expect(screen.getByText("Not rated yet")).toBeInTheDocument();
-  expect(picker()).toHaveValue("");
+  expect(picker().querySelector("input:checked")).toBeNull();
   expect(screen.getByRole("button", { name: "Save rating" })).toBeDisabled();
   expect(screen.getByText(/Ratings are optional/)).toBeInTheDocument();
 });
@@ -148,7 +149,7 @@ it.each([1, 3, 5])(
     fireEvent.click(button);
     expect(screen.getByText("Not rated yet")).toBeInTheDocument();
     expect(screen.queryByText("Rating saved.")).not.toBeInTheDocument();
-    expect(picker()).toBeDisabled();
+    expect(screen.getByRole("radio", { name: "1 star" })).toBeDisabled();
     expect(fetch).toHaveBeenCalledTimes(2);
     await act(async () => {
       put.resolve(json(value));
@@ -174,7 +175,7 @@ it("preserves committed 3 and draft 5 after failure, then retries the same PUT",
   expect(await screen.findByRole("alert")).toHaveTextContent(
     "not confirmed as saved",
   );
-  expect(picker()).toHaveValue("5");
+  expect(screen.getByRole("radio", { name: "5 stars" })).toBeChecked();
   expect(screen.getByText("Your saved rating: 3/5")).toBeInTheDocument();
   expect(screen.queryByText("Rating saved.")).not.toBeInTheDocument();
   fireEvent.click(screen.getByRole("button", { name: "Retry save" }));
@@ -208,7 +209,7 @@ it("does not report a network failure or malformed acknowledgement as success", 
     expect(screen.getByRole("alert")).toHaveTextContent("rating response"),
   );
   expect(screen.getByText("Your saved rating: 3/5")).toBeInTheDocument();
-  expect(picker()).toHaveValue("5");
+  expect(screen.getByRole("radio", { name: "5 stars" })).toBeChecked();
   expect(screen.queryByText("Rating saved.")).not.toBeInTheDocument();
 });
 
@@ -234,7 +235,7 @@ it.each([400, 403, 404])(
     choose(5);
     fireEvent.click(screen.getByRole("button", { name: "Save rating" }));
     await screen.findByRole("alert");
-    expect(picker()).toHaveValue("5");
+    expect(screen.getByRole("radio", { name: "5 stars" })).toBeChecked();
     expect(screen.getByText("Your saved rating: 3/5")).toBeInTheDocument();
   },
 );
@@ -310,7 +311,7 @@ it.each([
       old.resolve(status === 200 ? json(5) : failure(status));
     });
     expect(screen.getByText("Not rated yet")).toBeInTheDocument();
-    expect(picker()).toHaveValue("");
+    expect(picker().querySelector("input:checked")).toBeNull();
     expect(screen.queryByText("Rating saved.")).not.toBeInTheDocument();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     expect(view.unauthorized).not.toHaveBeenCalled();
@@ -349,7 +350,7 @@ it("clears private state on logout, even when the same account signs in again", 
   choose(5);
   fireEvent.click(screen.getByRole("button", { name: "Save rating" }));
   view.change({ status: "unauthenticated" });
-  expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
+  expect(screen.queryByRole("radio")).not.toBeInTheDocument();
   view.change(A);
   await screen.findByText("Your saved rating: 1/5");
   await act(async () => {

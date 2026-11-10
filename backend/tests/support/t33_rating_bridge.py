@@ -73,7 +73,17 @@ def main():
                     ).status_code
                     == 200
                 )
-            movie = client.get("/api/movies?limit=10").json()["data"]["movies"][0]
+            # The public Home page is alphabetical; choose a movie from A's
+            # actual recommendation set for the navigation/rating journey.
+            assert (
+                setup.post(
+                    "/api/auth/login",
+                    json={"email": "t33-a@example.com", "password": "movie123"},
+                    headers=origin,
+                ).status_code
+                == 200
+            )
+            movie = setup.get("/api/me/recommendations?limit=10").json()["data"]["movies"][0]
             fail_next_save = False
             reply(
                 {

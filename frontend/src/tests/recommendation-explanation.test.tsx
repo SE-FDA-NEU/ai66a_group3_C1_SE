@@ -147,6 +147,7 @@ describe("S2-T19 recommendation explanation verification", () => {
     ).toBeInTheDocument();
     expect(window.location.pathname).toBe("/");
     expect(fetchSpy.mock.calls.map(([request]) => request)).toEqual([
+      "/api/auth/me",
       "/api/movies?limit=10",
       "/api/movies?limit=10",
     ]);

@@ -290,6 +290,7 @@ class RatingBrowser(BrowserPage):
               search: location.search,
               hash: location.hash,
               mainText: document.querySelector('main')?.innerText || '',
+              headerText: document.querySelector('.app-header')?.innerText || '',
               headings: [...document.querySelectorAll('h1, h2, h3')]
                 .map(node => node.textContent.trim()),
               cards: [...document.querySelectorAll('article.movie-card')]
@@ -305,6 +306,8 @@ class RatingBrowser(BrowserPage):
               })),
               fields: [...document.querySelectorAll('input, select')].map(node => ({
                 tag: node.tagName,
+                type: node.type,
+                checked: node.checked,
                 id: node.id,
                 name: node.name,
                 value: node.value,
@@ -387,14 +390,10 @@ class RatingBrowser(BrowserPage):
     def select_rating(self, value: int) -> None:
         changed = self.evaluate(
             f"""(() => {{
-              const node = document.querySelector('.rating-form select');
-              if (!(node instanceof HTMLSelectElement) || node.disabled) return false;
-              const setter = Object.getOwnPropertyDescriptor(
-                HTMLSelectElement.prototype, 'value'
-              ).set;
-              setter.call(node, {json.dumps(str(value))});
-              node.dispatchEvent(new Event('change', {{ bubbles: true }}));
-              return node.value === {json.dumps(str(value))};
+              const node = document.querySelector('.rating-form input[type="radio"][value="{value}"]');
+              if (!(node instanceof HTMLInputElement) || node.matches(':disabled')) return false;
+              node.click();
+              return node.checked;
             }})()"""
         )
         assert changed, f"Could not select rating {value}"
@@ -408,13 +407,24 @@ class RatingBrowser(BrowserPage):
 
 def login_in_browser(page: RatingBrowser, email: str) -> dict:
     page.wait_for(lambda state: state["path"] == "/login", "login page")
+    intent = page.evaluate("window.history.state?.usr?.signInReturnTo || '/' ")
+    destination = intent.split("?", 1)[0].split("#", 1)[0]
+    if destination not in {"/preferences", "/recommendations", "/profile"}:
+        destination = "/"
     page.fill("#email", email)
     page.fill("#password", PASSWORD)
     page.click_text("button", "Sign in")
+    page.wait_for(
+        lambda state: state["path"] == destination and email in state["headerText"],
+        f"{email} authenticated landing",
+    )
+    # Explicit navigation replaces the historical automatic recommendation landing.
+    page.click_href("/recommendations")
     return page.wait_for(
         lambda state: (
             state["path"] == "/recommendations"
-            and email in state["mainText"]
+            and "Recommendations" in state["headings"]
+            and email in state["headerText"]
             and bool(state["cards"])
         ),
         f"{email} recommendations",
@@ -680,10 +690,12 @@ def main() -> int:
                         ),
                         "failed update with retry",
                     )
-                    rating_field = next(
-                        field for field in failed["fields"] if field["tag"] == "SELECT"
-                    )
-                    assert rating_field["value"] == "5"
+                    selected_stars = [
+                        field for field in failed["fields"]
+                        if field["type"] == "radio" and field["checked"]
+                    ]
+                    assert len(selected_stars) == 1
+                    assert selected_stars[0]["value"] == "5"
                     assert "Your saved rating: 3/5" in failed["mainText"]
                     assert account_rating(database_path, account_a_id, MOVIE_A) == 3
                     page.screenshot(evidence_dir / "t34-02-save-failure.png")
@@ -764,14 +776,14 @@ def main() -> int:
                 stable_b = page.wait_for(
                     lambda state: (
                         "account" in state["released"]
-                        and ACCOUNT_B_EMAIL in state["mainText"]
+                        and ACCOUNT_B_EMAIL in state["headerText"]
                         and bool(state["cards"])
                     ),
                     "B remains current after delayed A response",
                 )
                 time.sleep(0.4)
                 stable_b = page.snapshot()
-                assert ACCOUNT_A_EMAIL not in stable_b["mainText"]
+                assert ACCOUNT_A_EMAIL not in stable_b["mainText"] + stable_b["headerText"]
                 assert stable_b["cards"][0] == MOVIE_B_TITLE
                 page.spa_navigate(f"/movies/{MOVIE_A}")
                 b_still_private = page.wait_for(

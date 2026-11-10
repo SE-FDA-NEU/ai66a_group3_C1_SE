@@ -1,0 +1,365 @@
+{
+  "formatVersion": 1,
+  "capturedOn": "2026-11-06",
+  "sourceBaselineMain": "16ff4cc4927315a32b6864281faa80f8e52a58e5",
+  "issue": 247,
+  "issueUrl": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/247",
+  "milestone": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/milestone/1",
+  "planning": {
+    "date": "2026-11-06",
+    "sprintStart": "2026-11-05",
+    "sprintEnd": "2026-11-12",
+    "po": "kietxuan",
+    "scrumMaster": "kietxuan",
+    "participants": [
+      "Nguyen Xuan Kiet",
+      "Tran Minh Hoang",
+      "Tran Tuan Anh",
+      "Vu Quoc Huy",
+      "Nguyen Tuan Anh"
+    ],
+    "factsSource": "PO confirmations in the project conversation on 6 November 2026",
+    "capacityConfirmation": "PO confirmed that all five members accepted two issues each",
+    "committedWorkItems": 10,
+    "committedNewStoryPoints": 0,
+    "completedNativeIssuesAtCapture": 0,
+    "capacityUnit": "accepted work items per member"
+  },
+  "technicalDecisions": {
+    "application": "Render Free, one HTTPS origin for built React, FastAPI API and health",
+    "database": "Neon Free PostgreSQL 17",
+    "region": {
+      "render": "Singapore",
+      "neon": "aws-ap-southeast-1"
+    },
+    "catalogue": "fresh TMDb import with --pages 50, about 1,000 valid movies",
+    "accounts": "dedicated public application-only review users",
+    "nlp": "startup fingerprint check and rebuild from PostgreSQL when the derived artifact is missing or stale",
+    "decisionAuthority": "PO delegated the detailed planning implementation after approving the architecture"
+  },
+  "retention": {
+    "poRequest": "giữ trong 1 tháng là được hơn cũng được",
+    "minimumCalendarDate": "2026-12-12",
+    "additionalRules": [
+      "at least one calendar month after the actual v1.0 release",
+      "continue until grades are published"
+    ],
+    "effectiveDeadline": "the latest applicable deadline",
+    "gradePublicationDate": null,
+    "owner": "kietxuan",
+    "backup": "anotify-vie"
+  },
+  "operatorAccess": {
+    "status": "pending implementation evidence",
+    "owners": [
+      "T02 #249",
+      "T03 #250",
+      "T04 #251"
+    ],
+    "backupDestination": "private operator storage outside Render and Git, recorded and replicated by T06 #253"
+  },
+  "project": {
+    "url": "https://github.com/orgs/SE-FDA-NEU/projects/9",
+    "fieldName": "Sprint",
+    "iteration": "Sprint 5",
+    "startDate": "2026-11-05",
+    "endDate": "2026-11-12",
+    "inclusiveDays": 8,
+    "observationSource": "authenticated GitHub UI with saved iteration confirmation and all ten table rows",
+    "issueStatus": {
+      "247": "In Progress",
+      "248": "Todo",
+      "249": "Todo",
+      "250": "Todo",
+      "251": "Todo",
+      "252": "Todo",
+      "253": "Todo",
+      "254": "Todo",
+      "255": "Todo",
+      "256": "Todo"
+    },
+    "nativeIssueState": "open",
+    "savedViewFilter": "temporary is:open filter discarded after capture"
+  },
+  "issues": [
+    {
+      "number": 247,
+      "title": "[Chore] S5-C01 — Confirm M5 release scope, ownership and delivery plan",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/247",
+      "owner": "kietxuan",
+      "type": "chore",
+      "reviewer": "hoang3003",
+      "state": "open",
+      "blockedBy": []
+    },
+    {
+      "number": 248,
+      "title": "[Task] S5-T01 — Make schema and account transactions compatible with PostgreSQL",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/248",
+      "owner": "hoang3003",
+      "type": "task",
+      "reviewer": "kietxuan",
+      "state": "open",
+      "blockedBy": [
+        247
+      ]
+    },
+    {
+      "number": 249,
+      "title": "[Task] S5-T02 — Provision Neon TMDb data, review accounts and recoverable NLP index",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/249",
+      "owner": "NguyenTuanAnh0608",
+      "type": "task",
+      "reviewer": "hoang3003",
+      "state": "open",
+      "blockedBy": [
+        248
+      ]
+    },
+    {
+      "number": 250,
+      "title": "[Task] S5-T03 — Deploy CineAI on Render Free with one public HTTPS origin",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/250",
+      "owner": "anotify-vie",
+      "type": "task",
+      "reviewer": "NguyenTuanAnh0608",
+      "state": "open",
+      "blockedBy": [
+        249,
+        251
+      ]
+    },
+    {
+      "number": 251,
+      "title": "[Task] S5-T04 — Gate main deployments on CI and verify branch protection",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/251",
+      "owner": "anotify-vie",
+      "type": "task",
+      "reviewer": "kietxuan",
+      "state": "open",
+      "blockedBy": [
+        248
+      ]
+    },
+    {
+      "number": 252,
+      "title": "[Task] S5-T05 — Verify public health checks, safe logs and monitoring",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/252",
+      "owner": "vu-huzy",
+      "type": "task",
+      "reviewer": "anotify-vie",
+      "state": "open",
+      "blockedBy": [
+        250
+      ]
+    },
+    {
+      "number": 253,
+      "title": "[Task] S5-T06 — Rehearse PostgreSQL backup, restore and application rollback",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/253",
+      "owner": "hoang3003",
+      "type": "task",
+      "reviewer": "NguyenTuanAnh0608",
+      "state": "open",
+      "blockedBy": [
+        250
+      ]
+    },
+    {
+      "number": 254,
+      "title": "[Task] S5-T07 — Accept public P0 journeys and rehearse the final demo",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/254",
+      "owner": "NguyenTuanAnh0608",
+      "type": "task",
+      "reviewer": "vu-huzy",
+      "state": "open",
+      "blockedBy": [
+        250,
+        252,
+        253
+      ]
+    },
+    {
+      "number": 255,
+      "title": "[Task] S5-T08 — Publish M5 operations notes and the README first screen",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/255",
+      "owner": "vu-huzy",
+      "type": "task",
+      "reviewer": "hoang3003",
+      "state": "open",
+      "blockedBy": [
+        251,
+        252,
+        253,
+        254
+      ]
+    },
+    {
+      "number": 256,
+      "title": "[Chore] S5-C02 — Sprint 5 wrap-up, v1.0 release and final submission",
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/256",
+      "owner": "kietxuan",
+      "type": "chore",
+      "reviewer": "anotify-vie",
+      "state": "open",
+      "blockedBy": [
+        247,
+        248,
+        249,
+        250,
+        251,
+        252,
+        253,
+        254,
+        255
+      ]
+    }
+  ],
+  "dependencyEdgeCount": 23,
+  "existingStoryInventory": [
+    {
+      "title": "[Story] S01 - Select favorite genres to start choosing a movie",
+      "state": "closed",
+      "number": 17,
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/17"
+    },
+    {
+      "title": "[Story] S02 - Get a movie list based on preferences",
+      "state": "closed",
+      "number": 18,
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/18"
+    },
+    {
+      "title": "[Story] S03 - View movie details before deciding",
+      "state": "closed",
+      "number": 19,
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/19"
+    },
+    {
+      "title": "[Story] S04 - Explore movies without preferences",
+      "state": "closed",
+      "number": 20,
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/20"
+    },
+    {
+      "title": "[Story] S05a - Rate a movie and save feedback",
+      "state": "closed",
+      "number": 21,
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/21"
+    },
+    {
+      "title": "[Story] S05b - Use movie ratings to improve recommendations",
+      "state": "closed",
+      "number": 22,
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/22"
+    },
+    {
+      "title": "[Story] S06 - Filter recommendations by genre",
+      "state": "closed",
+      "number": 23,
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/23"
+    },
+    {
+      "title": "[Story] S07 - Find content-similar movies from the details page",
+      "state": "closed",
+      "number": 24,
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/24"
+    },
+    {
+      "title": "[Story] S08 - Search movies by title or description",
+      "state": "closed",
+      "number": 30,
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/30"
+    },
+    {
+      "title": "[Story] S09 - Browse popular movies",
+      "state": "closed",
+      "number": 31,
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/31"
+    },
+    {
+      "title": "[Story] S10 - Learn how recommendations are personalised",
+      "state": "closed",
+      "number": 32,
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/32"
+    },
+    {
+      "title": "[Story] S11 - Reset my personalisation profile",
+      "state": "closed",
+      "number": 33,
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/33"
+    },
+    {
+      "title": "[Story] S12 - Register an account to save personalisation",
+      "state": "closed",
+      "number": 44,
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/44"
+    },
+    {
+      "title": "[Story] S13 - Sign in and sign out of my account",
+      "state": "closed",
+      "number": 45,
+      "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/45"
+    }
+  ],
+  "screenshots": [
+    {
+      "path": "docs/images/sprint5/c01/iteration-dates.jpg",
+      "bytes": 43239,
+      "sha256": "63c926e9988c6121842da6656c6ba92722562231e135b54251950d55ebebf8f2",
+      "format": "JPEG",
+      "provenance": "actual GitHub browser screenshot, 6 November 2026"
+    },
+    {
+      "path": "docs/images/sprint5/c01/planning-board.jpg",
+      "bytes": 113493,
+      "sha256": "ebb0a81868935e790b3e55ebb632f5cc33503a50bb491aead16adf308d44c56a",
+      "format": "JPEG",
+      "provenance": "actual GitHub browser screenshot, 6 November 2026"
+    },
+    {
+      "path": "docs/images/sprint5/c01/planning-sprint-column.jpg",
+      "bytes": 72688,
+      "sha256": "6a0091e401ce1bb658c18eafa6e5b9f6b61f9ccf24c50913589a72b404ead425",
+      "format": "JPEG",
+      "provenance": "actual GitHub browser screenshot, 6 November 2026"
+    }
+  ],
+  "pendingCompletion": [
+    "formal independent final PR review",
+    "green PR checks and merge",
+    "operator account/access verification by T02/T03/T04",
+    "instructor clarification of seven-versus-six operations sections",
+    "instructor grade-publication date"
+  ],
+  "validation": {
+    "status": "passed",
+    "runner": "Codex author verification on Windows, Python 3.12.6, pytest 9.1.1",
+    "codeBaselineMain": "16ff4cc4927315a32b6864281faa80f8e52a58e5",
+    "checks": [
+      {
+        "command": "python -m pytest -v",
+        "exitCode": 0,
+        "result": "40 passed",
+        "durationSeconds": 13.78,
+        "warnings": 1,
+        "warningDetail": "inherited Starlette/httpx deprecation warning"
+      },
+      {
+        "command": "python scripts/verify_s4_t05_trace.py",
+        "exitCode": 0,
+        "result": "37 unique Section 2 IDs mapped to 40 default M4 nodes"
+      },
+      {
+        "command": "read-only Markdown/JSON/image/dependency audit",
+        "exitCode": 0,
+        "result": "53 local links/anchors, 10 issues, 5 owners with 2 items each, 23 acyclic dependencies, 3 JPEG hashes and 14 Closed Story states verified"
+      },
+      {
+        "command": "git diff --check",
+        "exitCode": 0,
+        "result": "passed"
+      }
+    ]
+  }
+}

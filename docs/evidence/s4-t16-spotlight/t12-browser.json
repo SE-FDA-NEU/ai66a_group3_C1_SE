@@ -1,0 +1,37 @@
+{
+  "scope": "Author-local Chrome; isolated synthetic SQLite; final source identified by source-hashes.json",
+  "stats": {
+    "startTime": "2026-10-27T13:23:08.505Z",
+    "duration": 9619.842,
+    "expected": 2,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "cases": [
+    {
+      "title": "detail add, reload, account separation, return context and removal",
+      "file": "t12.watchlist.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 2848
+        }
+      ]
+    },
+    {
+      "title": "saved list remains usable at mobile, tablet and desktop in both themes",
+      "file": "t12.watchlist.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 2703
+        }
+      ]
+    }
+  ]
+}

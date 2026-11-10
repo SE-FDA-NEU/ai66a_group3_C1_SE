@@ -1,0 +1,25 @@
+{
+  "runner": "Codex author verification",
+  "date": "2026-10-30T08:14:11.738Z",
+  "testedCommit": "6aa1941dd506f6ce6a3c683f4580c748f75125f4",
+  "activeRevision": "00a9831b-1c3a-489b-a8cf-51d36424e702",
+  "activeCount": 964,
+  "browserVersion": "156.0.8078.4",
+  "checks": [
+    "Home SQL/API total, active revision, pagination and real poster",
+    "Popular pages 1/2, current carousel, real backdrop",
+    "Description Search via submit, non-title query, detail return",
+    "Detail and local-index Similar on tablet"
+  ],
+  "screenshots": [
+    "live-home-1440-dark.png",
+    "live-home-375-light.png",
+    "live-popular-375-light.png",
+    "live-description-search-375-light.png",
+    "live-detail-similar-768-light.png"
+  ],
+  "pageErrors": [],
+  "metadataRequests": [],
+  "status": "FAIL",
+  "failure": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('link', { name: 'Change my genres', exact: true })\u001b[22m\n\n    at /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/docs/evidence/s4-t18-core-pre-g4/follow-up/windows-portability/verify_live_browser.cjs:140:77"
+}

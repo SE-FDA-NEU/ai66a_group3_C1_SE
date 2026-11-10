@@ -1,21 +1,28 @@
 """Public request/response shapes for account-owned movie ratings."""
 
-from pydantic import BaseModel, ConfigDict, Field, StrictInt
+from pydantic import BaseModel, ConfigDict, Field, StrictFloat, field_validator
 
 
 class RatingRequest(BaseModel):
-    """Save one strict integer rating; no identity field is accepted."""
+    """Save one numeric half-star rating; no identity field is accepted."""
 
     model_config = ConfigDict(extra="forbid")
 
-    rating: StrictInt = Field(ge=1, le=5)
+    rating: StrictFloat = Field(ge=0.5, le=5, multiple_of=0.5)
+
+    @field_validator("rating")
+    @classmethod
+    def exact_half_star(cls, value: float) -> float:
+        if not (value * 2).is_integer():
+            raise ValueError("rating must use exact half-star steps")
+        return value
 
 
 class RatingData(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     movieId: str
-    rating: int | None
+    rating: float | None
 
 
 class RatingResponse(BaseModel):

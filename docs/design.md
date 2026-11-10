@@ -1,9 +1,13 @@
-# Sprint 3 design and contract reconciliation
+# Design contract: Sprint 3 evidence and Sprint 4 extensions
 
 This document was reconciled on 2026-10-18 against Sprint 3 `main` SHA
 `bf18ab860fc3e486b57fc3b5ccac4db94c283995`. Tables, endpoints, modules, and
-evidence below reflect that source. Profile/reset UI, rating-adjusted ranking,
-and NLP product scope remain explicitly unfinished.
+evidence below reflect that source. Profile/reset UI and NLP product scope
+remain separate work. S4-T03 adds the backend rating-aware ranking described
+in section 12.5 and [its evidence](evidence/s4-t03-rating-ranking/README.md).
+Section 12 is the proposed Sprint 4 C03 design contract dated 2026-10-24;
+its implementation status is stated by the feature amendments, including
+section 12.5. It does not establish independent review of those features.
 Request and response shapes are in
 [api.md](api.md), UI state is in [ui.md](ui.md), and ownership/persistence is
 in [architecture.md](architecture.md).
@@ -16,6 +20,15 @@ readiness and verification are recorded under
 Historical M2 seed screenshots/test results below remain M2 evidence, not a
 substitute for the separate Sprint 3 live-import/acceptance records. See the tracked
 [TMDb Sprint 3 runbook](tmdb-sprint3-runbook.md).
+
+Post-M3 amendment (2026-10-19): Home, Popular and Recommendations use
+database-backed pages of at most ten. Their page controls use API totals;
+Home orders every active movie by title (A–Z default, optional Z–A), Popular ranks every eligible
+finite-popularity movie, and recommendation view filters apply to the complete
+selected base mode before slicing. Page, Home sort and view genre live in the URL, while
+the existing AuthProvider owns session identity and shared navigation. These
+current rules supersede the Sprint 3 single-page UI descriptions below without
+changing recorded Sprint 3 acceptance evidence.
 
 ## 1. Architecture
 
@@ -38,10 +51,10 @@ read the local database and never call the TMDb metadata API.
 
 | Component | Technology | Responsibility |
 |---|---|---|
-| Browser frontend | React, TypeScript, Vite, React Router | Renders public and signed-in experiences, including preferences, recommendations, rating controls, and backdrop fallback. Calls relative `/api` paths; a detail backdrop loads only from the allowlisted public image CDN URL returned by the API. |
+| Browser frontend | React, TypeScript, Vite, React Router | Renders public and signed-in experiences, including preferences, recommendations, rating controls, posters and backdrop fallback. Calls relative `/api` paths; imagery loads only from allowlisted public image CDN URLs returned by the API (T16 also exposes nullable backdrops on summaries). |
 | Backend API | Python 3.12, FastAPI, Pydantic | Validates input, resolves the session cookie to an account, applies the business rules, and returns DTOs and error envelopes. |
 | SQLite database | SQLite, SQLAlchemy, Alembic | Stores all nine application tables, including preferences, ratings, and nullable backdrop paths. The backend turns on `PRAGMA foreign_keys` for every connection. |
-| TMDb importer | Python command, httpx | Required catalogue preparation for Sprint 3 dev/staging/demo. Fetches genres and a bounded number of popular pages (default 1; `--pages` accepts 1–15), writes a new revision, and activates it only after every write succeeds. |
+| TMDb importer | Python command, httpx | Required catalogue preparation for Sprint 3 dev/staging/demo. Fetches genres and a bounded number of popular pages (default 50; `--pages` accepts 1–50), writes a new revision, and activates it only after every write succeeds. |
 | TMDb API | External service | Source of movie, genre, and backdrop-path metadata for the importer only. It is not called when a user opens a page. |
 | TMDb image CDN | External public CDN | Serves backdrop image bytes to the browser without exposing or requiring the metadata API token. |
 
@@ -73,7 +86,7 @@ implemented under Sprint 3 T19 (#121).
 | Registration and sign-in forms: `RegisterPage.tsx`, `LoginPage.tsx` | Forms that call the auth endpoints. | `@NguyenTuanAnh0608` (#50), `@anotify-vie` (#55) |
 | Route guards and stale-account state: `frontend/src/auth/`, `frontend/src/protectedRoutes.tsx` | Redirects unsigned visitors to `/login` and clears account state on sign-out. | `@vu-huzy` (#56) |
 | Recommendation landing and explanation pages: `RecommendationsPage.tsx`, `RecommendationExplanationPage.tsx` | The signed-in landing page and the public `/about-recommendations` page. | `@hoang3003` (#59, #64) |
-| Preference and recommendation state: `PreferencesPage.tsx`, `RecommendationsPage.tsx`, `RecommendationFilter.tsx` | Saves/restores current-account genres; renders personalised, cold-start, no-match, empty, error/retry, and snapshot-filter states with generation checks. | S3-T11/T13/T15 and T12/T14/T16/T22 acceptance |
+| Preference and recommendation state: `PreferencesPage.tsx`, `RecommendationsPage.tsx`, `RecommendationFilter.tsx` | Saves/restores current-account genres; renders personalised, cold-start, no-match, filtered-empty and error/retry states. The post-M3 view genre and page live in the URL; backend filtering precedes page slicing. | S3-T11/T13/T15 baseline; post-M3 amendment |
 | Backdrop import/API/UI: `tmdb_import.py`, `backdrops.py`, `MovieBackdropHero.tsx`, `backdropUrl.ts` | Stores/imports validated paths, exposes nullable safe detail URLs, and renders responsive image/fallback without metadata calls from the browser. | S3-T26/T27/T37 and T28/#131 acceptance |
 
 ## 2. Data model
@@ -91,7 +104,7 @@ current head and creates no additional table.
 
 The current ERD shows all nine application tables (excluding the Alembic
 bookkeeping table), both account-owned relations, nullable
-`catalog_movies.backdrop_path`, unique rating ownership, and the strict integer
+`catalog_movies.backdrop_path`, unique rating ownership, and the numeric half-step
 rating range. The seven-table M2 baseline remains available as
 [erd-m2.png](images/erd-m2.png) with [source](images/erd-m2.puml).
 
@@ -99,8 +112,8 @@ Genre preferences are stored in `user_genre_preferences` (S3-T01), and current
 account/movie ratings are stored in `user_movie_ratings` (S3-T30). The rating
 HTTP API is implemented under T31, its UI and acceptance under T33/T34, and the
 reset backend under T35. Only the profile/reset UI remains pending here.
-Rating-adjusted ranking (Story #22 / S05b) is planned Sprint 4 rather than
-Sprint 3.
+Rating-adjusted ranking (Story #22 / S05b) extends that Sprint 3 foundation
+under S4-T02/S4-T03; section 12.5 describes the implemented backend flow.
 
 A trailing `?` marks a column that allows NULL. Every other column is NOT NULL.
 
@@ -114,7 +127,7 @@ A trailing `?` marks a column that allows NULL. Every other column is NOT NULL.
 | `genres` | Genres, keyed by the provider's genre ID | `id` INTEGER (not auto-incremented), `name` VARCHAR(100) | `id` | None | None |
 | `movie_genres` | Links each movie to its genres | `movie_id` VARCHAR(36), `genre_id` INTEGER | (`movie_id`, `genre_id`) | `movie_id` to `catalog_movies.id`, ON DELETE CASCADE; `genre_id` to `genres.id`, ON DELETE RESTRICT | None |
 | `user_genre_preferences` | Current genre choices owned by an account | `user_id` VARCHAR(36), `genre_id` INTEGER | (`user_id`, `genre_id`) | `user_id` to `users.id`, ON DELETE CASCADE; `genre_id` to `genres.id`, ON DELETE RESTRICT | None |
-| `user_movie_ratings` | One current rating per account/movie pair | `id` VARCHAR(36), `user_id` VARCHAR(36), `movie_id` VARCHAR(36), `rating` INTEGER, `created_at` DATETIME, `updated_at` DATETIME | `id` | `user_id` to `users.id`, ON DELETE CASCADE; `movie_id` to `catalog_movies.id`, ON DELETE CASCADE | UNIQUE (`user_id`, `movie_id`); CHECK strict integer `rating` from 1 through 5 |
+| `user_movie_ratings` | One current rating per account/movie pair | `id` VARCHAR(36), `user_id` VARCHAR(36), `movie_id` VARCHAR(36), `rating` FLOAT (SQLite REAL), `created_at` DATETIME, `updated_at` DATETIME | `id` | `user_id` to `users.id`, ON DELETE CASCADE; `movie_id` to `catalog_movies.id`, ON DELETE CASCADE | UNIQUE (`user_id`, `movie_id`); CHECK numeric `rating` from 0.5 through 5 in exact half steps |
 
 Multiplicities:
 
@@ -131,14 +144,14 @@ key plus a unique `(user_id, movie_id)` pair. Migration `9d2f5a1c3b84` (S3-T01)
 creates preferences; migration `b7e4c2d91f30` (S3-T30) creates ratings. The
 current head `c6f8a2d4e901` (S3-T26) adds only nullable backdrop storage. The
 rating migration continues to enforce account/movie foreign keys,
-cascading deletes, and a strict integer database check from 1 through 5.
+cascading deletes, and a numeric database check from 0.5 through 5 in exact half steps.
 
 ### Business rules enforced through Sprint 3
 
 | Rule | Database | Service or query | Tests |
 |---|---|---|---|
 | S04 public catalogue ordering | None | `GET /api/movies` may include null/missing popularity; when popularity ordering is used, those entries sort after finite values, then by title and ID. | `test_movies_api.py` |
-| BR5: dedicated popular and recommendation fallback lists sort by popularity descending, then title A-Z, at most 10 | None | `GET /api/movies/popular` filters to finite popularity before deterministic popularity/title/ID ordering. The recommendation repository also excludes null popularity. | `test_popular_recommendations.py`, `test_movies_api.py` |
+| BR5: dedicated popular and recommendation fallback sets sort globally by popularity descending, title then ID, with at most 10 per page | None | `GET /api/movies/popular` filters to finite popularity before deterministic ordering and database pagination. | `test_popular_recommendations.py`, `test_catalogue_pagination.py` |
 | BR6: an unknown movie ID never shows another movie | `catalog_movies.id` is the primary key | Lookup by ID inside the active revision; a miss returns `404 MOVIE_NOT_FOUND` | `test_unknown_movie_id_returns_404` |
 | BR13: the explanation lists exactly 3 steps | None | Page content in `RecommendationExplanationPage.tsx` | `test_recommendation_explanation_content.py`, `recommendation-explanation.test.tsx` |
 | BR16: an email is unique after case-insensitive normalisation | UNIQUE `email_normalized` with NOCASE collation | The email is trimmed and lowercased; a duplicate returns `409 EMAIL_ALREADY_REGISTERED` | `test_registration.py`, `test_registration_verification.py`, `test_account_migration.py` |
@@ -149,11 +162,11 @@ cascading deletes, and a strict integer database check from 1 through 5.
 Preference validation and account-scoped replacement are implemented under
 T02. T30 implements account-scoped rating storage/repository operations, T31
 implements the protected rating API, and T35 implements the reset backend.
-Profile/reset UI, rating-adjusted ranking, search, and similarity remain
-incomplete. Rating UI is implemented and verified under T33/T34.
+Profile/reset UI, search, and similarity remain separate work. Rating UI is
+implemented and verified under T33/T34; S4-T03 implements backend ranking.
 
 Committed Sprint 3 delivery is narrower than that historical rule list:
-BR1-BR4 use saved genres and local popularity, BR7 stores an optional 1-5
+BR1-BR4 use saved genres and local popularity, BR7 stores an optional 0.5-5
 rating without using it for ranking, and BR14 freezes the authenticated reset
 backend transaction. BR9 rating-adjusted ranking remains Sprint 4.
 
@@ -186,7 +199,7 @@ Conventions:
 | S01 | `GET /api/me/preferences` | Signed in | None | `200` with the saved genres | `401 AUTHENTICATION_REQUIRED`, `503 SERVICE_UNAVAILABLE` | Implemented in Sprint 3 (S3-T01) |
 | S01 | `PUT /api/me/preferences` | Signed in, same-origin | `genreIds`: 1 to 5 distinct genre IDs | `200` with the saved genres after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 GENRE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | Implemented in Sprint 3 (S3-T02) |
 | S05a | `GET /api/me/ratings/{movieId}` | Signed in | Opaque movie ID | `200` with committed `rating` or `null` | `401 AUTHENTICATION_REQUIRED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | Implemented in Sprint 3 (S3-T31) |
-| S05a | `PUT /api/me/ratings/{movieId}` | Signed in, same-origin | Strict `{ "rating": 1..5 }` | `200` only after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | Implemented in Sprint 3 (S3-T31) |
+| S05a | `PUT /api/me/ratings/{movieId}` | Signed in, same-origin | Strict numeric `{ "rating": 0.5..5 }` in 0.5 steps | `200` only after commit | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `404 MOVIE_NOT_FOUND`, `503 SERVICE_UNAVAILABLE` | Implemented in Sprint 3 (S3-T31) |
 | S11 | `POST /api/me/profile/reset` | Signed in, same-origin | Exact `{ "confirm": true }` | `200` only after preferences/ratings delete transaction commits | `400 VALIDATION_ERROR`, `401 AUTHENTICATION_REQUIRED`, `403 ORIGIN_NOT_ALLOWED`, `503 SERVICE_UNAVAILABLE` | Backend implemented in Sprint 3 (S3-T35); UI pending |
 
 All six P0 Stories appear in the table: S01 (genres and preferences), S02 and
@@ -425,7 +438,9 @@ Sprint 3 personalised ranking uses only saved genres and local catalogue
 popularity. It preserves `data.movies`, `mode` (`personalised` or `popular`),
 `personalised`, `noMatch`, and per-movie `reason.matchedGenres`. Ratings may be
 stored by S05a but do not alter recommendation order in Sprint 3.
-Rating-adjusted ranking belongs to Story #22 / S05b and is planned Sprint 4.
+Rating-adjusted ranking belongs to Story #22 / S05b. The S4-T03 extension in
+section 12.5 now implements that backend behaviour, preserving this ADR's
+Sprint 3 baseline for neutral/no signals and popular fallbacks.
 
 ## 8. UI-driven design changes with repository evidence
 
@@ -636,10 +651,19 @@ are made only where merged source and repository evidence now exist.
 | UI-driven asynchronous-state design | Implemented in recommendation, preference, auth, detail, and rating code; final C03/C05 documentation review still required | `docs/ui.md` and this section must be in the same reviewed PR for [#134](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/134) / [#136](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/136) |
 | Backdrop storage → importer → API → UI → acceptance | Implemented and merged through PRs #180–#183 | [storage](evidence/s3-t26-backdrop-storage.md), [enrichment](backdrop-import-runbook.md), [T37 UI](evidence/s3-t37-backdrop-ui/README.md), and [T28 acceptance](evidence/s3-t28-backdrop-acceptance/README.md) |
 | Database/diagrams | Nine application tables; head `c6f8a2d4e901`; current PNGs regenerated from current PlantUML | `backend/alembic/versions`, `docs/images/erd.puml`, and preserved M2 diagram assets |
-| Deliberately unfinished product scope | Not implemented | Profile/reset UI, rating-adjusted ranking (S05b), and NLP product behaviour remain future work; no completion is claimed |
+| S4 personalised rating ranking (S05b) | Backend implemented under S4-T03 | Full eligible set ranked before slicing; exact C03 private score fields; [executed evidence](evidence/s4-t03-rating-ranking/README.md); score presentation UI remains separate |
+| Deliberately unfinished product scope | Not implemented | Profile/reset UI, personal-score presentation UI, and NLP product behaviour remain separate work; no completion is claimed |
 | C03 publication / C05 integration | C03 PR #187 merged at `bf18ab860fc3e486b57fc3b5ccac4db94c283995`; #134 closed | C05 preserves the merged contracts and current diagrams; its dossier review, approval and merge remain separate |
 
 ### C05 dossier integration after C03 merge
+
+Subsequent C02/PO reconciliation in PR #191 supersedes the pending acceptance
+and merge wording in this historical integration note: six P0 and separate
+S06/S09 are PO-accepted `works`; dossier PR #188 and C04 follow-up #190 are
+merged. See the [current acceptance ledger](evidence/s3-c02-reconciliation.md).
+This is a later acceptance decision, not a rerun or replacement of the
+original executable evidence. PDF/LMS and substantive wrap-up review remain
+separate; no human-session details are manufactured.
 
 C03 PR #187 is now merged into main. This C05 merge resolution preserves its
 current architecture/ERD images, nine-table model, API errors and corrected
@@ -652,3 +676,244 @@ submission assets. The T25 matrix still reports all eight Stories as
 `partly works`; C03 contract publication is not new Story acceptance.
 Current C05 review/merge/PDF/LMS steps remain pending. Exact executed T25/C04
 snapshots and later real prerequisite approvals are linked in the dossier.
+
+## 12. Sprint 4 C03 UI and interaction contract (planned)
+
+This is the design handoff for [#217](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/217).
+The PO-provided `stitch_cinematic_ai_movie_discovery_platform.zip` is a
+**visual reference only**. Reviewed examples include
+`cineai_home_movie_catalogue/screen.png`,
+`cineai_movie_details_interstellar/screen.png` and
+`nocturne_cinema/DESIGN.md`. The ZIP is supplied outside this repository;
+T01 #195 author and reviewer need the actual ZIP/screenshots from the PO,
+not only this description. No HTML, fabricated movie rows, calculated match
+percentages or interaction logic from the ZIP is accepted as production code.
+
+### 12.1 Visual tokens and shared component interfaces
+
+T01 owns the compact CineAI shell and tokens. The T01 branch
+`feature/s4-t01-cinematic-ui` supplies the integration names below;
+they are a handoff from that branch, not components already present in this
+C03 checkout. Dark is the initial theme; light/dark choice is stored
+**only in browser-local theme preference**, never in account/API fields.
+Theme choice has no effect on auth, list ordering or request identity.
+Use T01's existing names when integrating, instead of creating a second
+token or component system from the earlier visual-reference labels.
+
+| Role | Dark reference | Light reference | Use |
+|---|---|---|---|
+| `--page-bg` / `--surface` | `#10111b` / `#191b29` | `#f6f4fb` / `#ffffff` | Page and elevated cards |
+| `--text` / `--muted` | `#f5f2ff` / `#b7b4ca` | `#211b34` / `#625a76` | Primary and secondary readable text |
+| `--primary` / `--primary-hover` | `#7650db` / `#6540c8` | `#6d3bc8` / `#5629a4` | Primary action and hover |
+| `--accent` / `--focus` | `#ad8aff` / `#c8adff` | `#6532ba` / `#6532ba` | Link/accent and visible keyboard focus |
+| `--border` / `--error` | `#39374f` / `#ffb4ae` | `#cfc7df` / `#a32135` | Dividers and errors |
+| Typography | Syne display; Plus Jakarta Sans body, with local sans-serif fallback | Same | 16px minimum body target; headings scale responsively |
+| Shape/spacing | 4/8/16/24/40px rhythm; 8/12/16px radii | Same | Clear focus, card and form structure |
+
+The old C03 label `--canvas` maps to T01 `--page-bg`. T01 has no
+`--accent-text` token: primary buttons use `--primary` and explicit
+white text. `--accent` is for links/accents, not a substitute for the
+primary button token. Values above describe the T01 branch's CSS and
+remain subject to both-theme accessibility review.
+
+Verify WCAG AA contrast for actual text/control combinations in **both**
+themes, visible keyboard focus, reduced-motion support and image-independent
+readability. At <768px use a single-column content flow and wrapped or
+scrollable navigation without clipping; 768–1279px uses a flexible 2–3 card
+grid; ≥1280px may use a wider grid. At 320px no horizontal page overflow,
+overlapping controls or hidden primary action is acceptable. Do not require
+hover to discover an action. Posters keep a 2:3 media box; the existing
+backdrop remains a separate detail hero with text overlay/fallback.
+
+| Interface | Inputs | Owner-facing behaviour |
+|---|---|---|
+| `ThemeProvider` / `ThemeToggle` (T01) | browser-local `cineai-theme` | Apply dark/light CSS token set; never persist theme to account/API. |
+| `AppFrame` / `SessionNavigation` (T01) | auth state, active route, theme | One navbar `My recommendations` link; no duplicate account-area link; guest/signed-in state reflects `/api/auth/me`. |
+| `MovieCard` (T01) | public summary, optional recommendation reason/score, explicit caller actions | Uses `MoviePoster`; title/details work with null poster/popularity; no personal badge on public cards. |
+| `MovieBackdropHero` | detail title, nullable `backdropUrl` | Keep title readable on null, unsafe URL and image load failure. |
+| `MoviePoster` (T01) | `movieId`, `title`, nullable `posterUrl`, optional `eager` | Safe image or labelled fallback; movie/URL key prevents stale image events. |
+| `MovieRating` with `StarRating` (T01) | account/movie key; `StarRating(value,onChange,disabled)` | Radio stars change draft; `MovieRating` owns existing GET/PUT, committed value and explicit Save. |
+| Watchlist feature control (planned T12) | account/movie key, `inWatchlist`, pending/error | Integrate with T01 shell without inventing a second shared component until T12 exports one. |
+| `PageControls` | API `meta`, current URL state | Ten per page by default, only API totals, revision-aware navigation. |
+| Provider slot (planned style only) | static label and deferred state | No `ProviderSlot` export exists in T01. If shown, use muted non-clickable text `Availability information is not yet available`; no live VN offer claim before S5. |
+
+Feature owners own the actual API/state integration for their pages. Shared
+shell/CSS/router/schema changes use T01/route/migration ownership; the
+contract is not permission to replace existing React components with ZIP
+HTML. Existing `frontend/src/components/`, `pages/`,
+`navigation/listViewState.ts` and `auth/AuthContext.tsx` are the current
+interfaces to extend.
+
+### 12.2 State, ordering and truthful labels
+
+The T01 Home is a compact cinematic catalogue hero; omit the visible
+`Choose Start…` instruction. A normal successful sign-in from Home or a
+direct `/login` visit opens Home with authenticated navigation and does
+not auto-open or save preferences/recommendations. Start and Preferences
+are deliberate actions. A signed-out Start action attempts
+`/preferences`, goes through login or a registration detour, and returns
+to Preferences after successful authentication. A signed-out explicit
+`My recommendations` request may return to that protected route; without
+saved genres it uses the existing cold-start list. `My recommendations`
+appears once in the fixed navbar. T01's `signInReturnTo` accepts only
+validated internal protected destinations; absent, external, malformed or
+unsafe paths open Home. This replaces the earlier automatic
+`/recommendations` login landing in the local
+[S13 AC](requirements.md#s13-sign-in-and-sign-out-securely-p0-5-points);
+GitHub Story #45 needs the same AC replacement before merge.
+
+Home shows active-catalogue movies in API title order, with a labelled A–Z/Z–A
+selector. Both directions sort the complete catalogue before paging. Changing
+sort resets page 1; URL sort survives pagination, reload, retry and detail return.
+Navigation actions (View details, Return to catalogue, Change my genres,
+Back to recommendations and equivalent CTAs) use shared button styling while
+remaining real links, with their routes and return state intact.
+Popular shows finite-popularity results only. Recommendations preserve
+saved-genre eligibility, whole-set ranking before optional view filter and
+ten-item paging. URL retains page, filter and accepted catalogue revision;
+detail return restores a safe internal list context. A 409 revision mismatch
+clears old cards and restarts at page 1. Account/movie/query generations
+prevent late old responses, including stale 401, from replacing newer state.
+Loading, empty, recoverable error and retry are separate states. A 503 must
+never render as a valid empty list.
+
+In either theme, `TMDb popularity` labels raw `popularityScore`;
+`Your rating` labels only this account's committed 1–5 rating (or
+`Not rated yet` after a successful read); `Ranking score for you`
+labels only the personalised candidate's `adjustedScore`, followed by a
+short reason chosen from its `basis`. A related rated film may change rank without making the
+candidate appear rated. Null popularity/score displays
+`Information unavailable`, not 0 or NaN. If rating signals cannot be
+read but the allowed baseline response succeeds, disclose that limitation
+and never imply that the account has no ratings. Public/cold-start/no-match
+cards have no adjusted-score badge. Recommendation reasons say which saved
+genres matched; they must not invent AI confidence percentages.
+
+Search accepts a trimmed query of at least two characters; keyboard Enter
+submits and a labelled search control works without mouse. It shows title
+matches first under the server contract, or positive overview matches when
+no titles match. It distinguishes `No movies found`, invalid query, index
+error and loading/retry. Query generation rejects delayed previous results.
+Similar cards remain on the public detail page, exclude the source, and do
+not require auth. Unknown source retains the established 404/detail return
+behaviour. The public explanation keeps exactly the three steps in
+[recommendation-explanation.md](recommendation-explanation.md); no fourth
+step or invented NLP claim is added.
+
+### 12.3 Five-star, profile and watchlist interactions
+
+The rating control has five visual stars and ten labelled radio options from
+0.5–5 in half steps. Hover and focus may preview a value; pointer leave/blur restores the
+draft/committed display. Click or keyboard arrows/Space/Enter changes only
+the **draft** half-step number. `Save rating` explicitly sends one existing PUT;
+pending prevents duplicate submission. Only a validated committed
+acknowledgement updates `Your rating` and shows success. A failed write
+preserves the last committed value and the draft for retry. A failed initial
+GET is `unavailable`, not `Not rated yet`. Account switch, logout or movie
+change resets the private widget and invalidates old responses. The ZIP's
+`Rate (AI Learn)` prompt is not a persistence acknowledgement.
+
+S4-T13 implements guarded `/profile` with the server summary of saved genres,
+rating count and watchlist count. The signed-in navbar links to this page.
+The shared confirmation dialog names the genres/ratings that will be cleared
+and the account/watchlist that will be kept. Cancel/Escape sends no POST and
+restores focus. Only `200 {data:{reset:true}}` acknowledges a committed reset;
+show exactly `Your personalisation profile was reset.` and refetch this page's
+summary. Authentication and watchlist membership stay intact.
+
+The client bounds reads/writes to 15 seconds. A documented rejection/rollback
+keeps the shown summary with an error and explicit retry. Network loss, gateway
+errors, malformed acknowledgements and timeouts are ambiguous: reread Profile
+before allowing a newly confirmed attempt, never replay the POST or infer that
+the prior operation succeeded from a zero summary. If reconciliation fails,
+label displayed values as last-confirmed and block reset until a fresh read
+succeeds. Failure of a summary read after an acknowledged reset does not undo
+that acknowledgement. Requests are aborted/generation-guarded on unmount and
+account change; owned pending feedback is dismissed without touching a newer
+action's notice. Reload/later login reads the real persisted state.
+
+S4-T14 (#209) owns the subsequent shared preferences/rating/recommendation
+invalidation and stale cross-page snapshot barriers; S4-T15 (#210) owns full
+Story S11 acceptance. T13 refreshes its own summary and does not claim those
+downstream outputs. Feature tests and real browser screenshots are recorded in
+[T13 evidence](evidence/s4-t13-profile-reset.md).
+
+`/watchlist` is guarded and uses the account list API with page controls,
+added-time ordering, active-catalogue revision and empty/error/retry states.
+The detail control has clear `Add to watchlist` / `Remove from watchlist`
+labels, pending state and retry; it changes only after a committed
+acknowledgement. Repeated actions are idempotent, account changes remove old
+private status immediately, and reset leaves membership intact. Watchlist
+never alters ranking or raw popularity. Feature owners and #213 verify the
+working behaviour; this design section is no implementation evidence.
+
+### 12.4 Reference-only exclusions
+
+The ZIP's fixed titles/posters, 15,000+ movies, real-time TMDb syncing,
+match percentages, neural/vector claims, IMDb/director/runtime facts, 4K or
+full-film playback, clickable VN provider badges, fake account avatar and
+production company claims are sample content. Only imported local catalogue
+data and approved application API fields may appear as factual product data.
+VN provider slots may be styled as non-clickable placeholders for S5, with
+no live availability claim. Trailer support is only admitted through
+T19/T20 if those tasks are accepted; no full film, autoplay or invented
+provider link enters this C03 contract.
+
+### 12.5 S4-T03 implemented personalised ranking
+
+The existing recommendation service and repository remain the single entry
+point. They resolve the current account from the authenticated session, read
+the active catalogue and saved preferences, and determine the same three
+Sprint 3 modes. Cold-start and no-match alternatives continue to use the
+shared SQL popularity comparator, finite-popularity eligibility and original
+envelope; neither reads rating signals nor exposes personal score fields.
+
+For `mode="personalised"` / `personalised=true`, the existing genre-match
+query uses `EXISTS` to return every eligible movie once, with canonical genres
+loaded and no page limit. The optional S4-T02 `load_account_genre_signals`
+reads only current committed `user_movie_ratings` owned by that session's
+account, including retained historical rated movies. Its existing
+`adjustment_for_candidate` adds one sign per related rated movie: 1/2 gives
+-1, 3 gives 0, 4/5 gives +1. Overlapping genres do not multiply a contribution;
+updating a rating replaces its sign. Eligibility never depends on ratings.
+
+`ranker.py` computes an immutable result per candidate containing the movie,
+adjustment, adjusted score and basis. It reuses the shared score/title/ID
+comparator for descending adjusted score, then ascending title/internal ID,
+with missing scores last. The service ranks the complete eligible set before
+the optional view genre filter and page slice (at most ten). The same computed
+values populate the protected personalised DTO: `ratingAdjustment: int`,
+`adjustedScore: float | null`, and
+`basis: rating_signals | baseline | rating_unavailable`. Raw
+`popularityScore` is never changed. Null popularity yields null adjusted
+score even with a real nonzero adjustment; it never receives an invented base
+score. Finite zero and negative adjusted scores still precede nulls.
+
+Only the rating query's database exceptions are caught, after core inputs
+have been read successfully. Degradation computes the valid baseline with
+adjustment 0 and `basis=rating_unavailable`; a finite adjusted score equals
+raw popularity and a missing one stays null. Successful reads with a nonzero
+net adjustment use `rating_signals`; no effective signal uses `baseline`.
+Core catalogue, preference and candidate/genre failures propagate as their
+existing errors. Invalid sessions remain 401 and cannot reach this fallback.
+
+No server ranking cache or caller-selected account ID is introduced. Every
+request reloads the session owner's committed state, so reset, logout and
+account switch cannot reuse another account's previous scores. Public
+catalogue/detail DTOs and the shared Search/Similar movie shapes contain no
+personal fields. Frontend recommendation types admit the finalized C03
+fields; S4-T04 renders them on personalised cards only, as `Ranking score for
+you` beside `TMDb popularity`, with the basis-driven reason and the
+`rating_unavailable` disclosure. These backend tests do not claim completion of all Story #22 UI or
+independent S4-T05 (#200) verification criteria.
+
+### S4-T16 current storage amendment
+
+The current Alembic head is `f2c7e4a91b60`, following watchlist migration
+`e9b6f0a42c17`. It rebuilds only the ratings table as REAL with an exact
+half-step check, preserving row identities, ownership, unique pairs and
+timestamps. Old integer-only ERD imagery describes the historical S3 baseline;
+the current table/constraint contract above supersedes its rating column.
+Downgrade refuses fractional rows instead of silently rounding. Setup now
+imports 50 popular pages (about 1,000 raw rows), then rebuilds/checks the
+shared overview index for the active revision.

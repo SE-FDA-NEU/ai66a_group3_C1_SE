@@ -1,0 +1,13 @@
+
+> frontend@0.0.0 test
+> vitest run src/tests/search-navigation-transition.test.tsx src/tests/movies.test.tsx
+
+
+ RUN  v5.0.2 <repository>/frontend
+
+
+ Test Files  2 passed (2)
+      Tests  31 passed (31)
+   Start at  19:34:51
+   Duration  2.84s (environment 46%, tests 29%, transform 13%, import 12%)
+

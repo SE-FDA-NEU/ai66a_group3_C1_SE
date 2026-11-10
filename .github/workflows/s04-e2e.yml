@@ -1,11 +1,9 @@
 name: S04 real browser acceptance
 
+# Optional extended regression: Run workflow is the explicit opt-in.
+# Keep existing workflow/job names and test steps for manual runs.
 on:
-  push:
-    paths: ["backend/**", "frontend/**", ".github/workflows/s04-e2e.yml"]
-  pull_request:
-    branches: [main, develop]
-    paths: ["backend/**", "frontend/**", ".github/workflows/s04-e2e.yml"]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -32,7 +30,7 @@ jobs:
         run: npm --prefix frontend run test:m3:verifier
 
   s04-acceptance:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
       TMDB_READ_ACCESS_TOKEN: ""

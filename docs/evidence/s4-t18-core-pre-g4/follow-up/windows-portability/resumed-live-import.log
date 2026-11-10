@@ -1,0 +1,18 @@
+Started: 2026-10-30T15:06:15.476503+07:00
+Command: ['.venv/bin/python', '-m', 'app.cli.import_tmdb_catalogue', '--pages', '50']
+Cwd: /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE
+TMDb catalogue import complete
+provider=tmdb
+active_revision=00a9831b-1c3a-489b-a8cf-51d36424e702
+inserted=964
+updated=0
+rejected=36
+movies=964
+associated_genres=19
+finite_popularity_movies=964
+source_fetched_at=2026-10-30T08:06:16.043516Z
+imported_at=2026-10-30T08:06:43.080794Z
+sample_source_ids=155,1058424,969681
+
+Exit: 0
+Elapsed: 29.98s

@@ -1,0 +1,13 @@
+{
+  "baseCommit": "660c2162f8b8a5a4422a0df6b781073e5cf9d409",
+  "convention": "SHA-256 of UTF-8 text after CRLF/CR to LF",
+  "files": {
+    "frontend/src/components/MovieTrailer.tsx": "c7b12df7a9cbe4e72a6682eea34c5c97cb52bd8a85a55b8165a665d53d2a880e",
+    "frontend/src/pages/MovieDetailPage.tsx": "fcf5970e420b0bdd3e1377003310868d74d9a68a0ade577ad45438fd5b03810c",
+    "frontend/src/index.css": "2e7ccbfbfce96a4c4182a2d109900876c4f75eece7311d513c1808a8000d49d4",
+    "frontend/src/tests/movie-backdrop.test.tsx": "dde755c4591e780b964245ac010d662d8618b16a46a171ba0ce0c78f7316d56c",
+    "frontend/src/tests/movie-trailer.test.tsx": "597b8ea3d28f20ca515efcb3a24df9ffbba7486ed6d20cf35cd006f7cd407bb5",
+    "frontend/e2e/s4-t20.trailer.ts": "e73995095cfdc2c8bf8142423f72b593f9ac00edf386959288e0216ae055e312"
+  },
+  "recordType": "UI source snapshot before setup/media integration"
+}

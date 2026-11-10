@@ -1,0 +1,5 @@
+{"url": "http://127.0.0.1:8029/health", "status": 200, "body": {"status": "ok", "database": "connected", "migrationVersion": "f2c7e4a91b60"}}
+{"url": "http://127.0.0.1:5179/", "status": 200, "viteReactEntry": true}
+Fresh unimported catalogue: 503 CATALOGUE_UNAVAILABLE; no fabricated movies
+startup_health=PASS; live provider import/index population not executed
+owned_startup_processes_stopped=true

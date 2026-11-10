@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from math import isfinite
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -29,16 +31,16 @@ def set_user_movie_rating(
     *,
     user_id: str,
     movie_id: str,
-    rating: int,
+    rating: float,
 ) -> UserMovieRating:
     """Insert or update one account-owned rating in the caller's transaction."""
 
-    if isinstance(rating, bool) or not isinstance(rating, int):
-        raise TypeError("rating must be an integer from 1 to 5")
+    if isinstance(rating, bool) or not isinstance(rating, (int, float)):
+        raise TypeError("rating must be a number from 0.5 to 5 in half-star steps")
 
-    if not 1 <= rating <= 5:
-        raise ValueError("rating must be an integer from 1 to 5")
-    
+    if not 0.5 <= rating <= 5 or not isfinite(rating) or not float(rating * 2).is_integer():
+        raise ValueError("rating must be a number from 0.5 to 5 in half-star steps")
+
     movie_exists = session.scalar(
         select(CatalogMovie.id).where(
             CatalogMovie.id == movie_id,

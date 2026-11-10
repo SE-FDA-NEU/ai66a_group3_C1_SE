@@ -1,0 +1,33 @@
+
+> frontend@0.0.0 test:t01:ui
+> node scripts/run-s04-e2e.mjs --config playwright.t01.config.ts
+
+[WebServer] INFO:     Started server process [16248]
+[WebServer] INFO:     Waiting for application startup.
+[WebServer] INFO:     Application startup complete.
+[WebServer] INFO:     Uvicorn running on http://127.0.0.1:8014 (Press CTRL+C to quit)
+
+Running 17 tests using 1 worker
+
+  ok  1 e2e\t01.visual.ts:59:1 › S08 search uses real API/index across themes, sizes, states and safe return (12.9s)
+  ok  2 e2e\t01.visual.ts:188:1 › S08 delayed real search response cannot replace a newer query or return after unmount (1.5s)
+  ok  3 e2e\t01.visual.ts:235:1 › S07 similar movies satisfy all five criteria with the real API, index and DB (29.4s)
+  ok  4 e2e\t01.visual.ts:391:1 › S07 similar results are public, identical across accounts, independent of ratings and keep the return context (3.4s)
+  ok  5 e2e\t01.visual.ts:450:1 › S07 delayed real similar response for movie A cannot fill movie B (1.7s)
+  ok  6 e2e\t01.visual.ts:482:1 › Home title sort precedes paging and button links preserve detail return in both themes (6.4s)
+  ok  7 e2e\t01.visual.ts:535:1 › personal navigation actions use shared buttons without changing saved genres (3.9s)
+  ok  8 e2e\t01.visual.ts:582:1 › existing public pages, both themes and 375/768/1440 layouts (8.9s)
+  ok  9 e2e\t01.visual.ts:614:1 › native star keyboard draft, save and theme preserve real state (3.5s)
+  ok 10 e2e\t01.visual.ts:665:1 › Home hero and navbar leave personalisation entirely user initiated (2.2s)
+  ok 11 e2e\t01.visual.ts:715:1 › guest Start survives the registration detour and opens real Preferences after sign-in (1.9s)
+  ok 12 e2e\t01.visual.ts:741:1 › theme toggle preserves a real paginated URL and its ordered results (1.3s)
+  ok 13 e2e\t01.visual.ts:756:1 › blocked browser storage still renders and switches theme (1.4s)
+  ok 14 e2e\t01.visual.ts:772:1 › reference auth layouts stay concise, responsive and fully functional in both themes (2.7s)
+  ok 15 e2e\t01.visual.ts:799:1 › centered action feedback reflects real login/save/logout acknowledgements without blocking the page (3.2s)
+  ok 16 e2e\t01.visual.ts:863:1 › genre cards expose descriptions, native keyboard state and no implicit writes (1.8s)
+  -  17 e2e\t01.visual.ts:893:1 › read-only imported TMDb catalogue screenshots, real poster loading and themes
+
+  1 skipped
+  16 passed (1.6m)
+s04_temporary_database_removed=true
+t01 exit=0

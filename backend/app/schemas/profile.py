@@ -4,6 +4,8 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, StrictBool, field_validator
 
+from app.schemas.movies import GenreDto
+
 
 class ProfileResetRequest(BaseModel):
     """Require an explicit strict-boolean confirmation and no extra fields."""
@@ -32,3 +34,17 @@ class ProfileResetResponse(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     data: ProfileResetData
+
+
+class ProfileSummaryData(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    genres: list["GenreDto"]
+    ratingCount: int
+    watchlistCount: int
+
+
+class ProfileSummaryResponse(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    data: ProfileSummaryData

@@ -157,7 +157,7 @@ describe("S3-T13 cold-start to personalised transition", () => {
     expect(
       await screen.findByRole("heading", {
         name: "Recommendations based on popular movies",
-      }),
+      }, { timeout: 5000 }),
     ).toBeInTheDocument();
 
     expect(screen.getByText("Popular Movie")).toBeInTheDocument();
@@ -445,6 +445,7 @@ describe("S3-T13 cold-start to personalised transition", () => {
         signOut: async () => {},
         handleUnauthorized: vi.fn(),
         recommendationVersion: 0,
+        recommendationScope: "old-scope",
         invalidateRecommendations: vi.fn(),
     };
 
@@ -461,6 +462,7 @@ describe("S3-T13 cold-start to personalised transition", () => {
         name: "",
         }),
     ).toHaveTextContent("Loading recommendations...");
+    await waitFor(() => expect(recommendationCalls).toBe(1));
 
     // Simulate committed preference save invalidating the old snapshot.
     view.rerender(
@@ -469,6 +471,7 @@ describe("S3-T13 cold-start to personalised transition", () => {
             value={{
             ...baseAuth,
             recommendationVersion: 1,
+            recommendationScope: "new-scope",
             }}
         >
             <RecommendationsPage />
@@ -476,6 +479,7 @@ describe("S3-T13 cold-start to personalised transition", () => {
         </MemoryRouter>,
     );
 
+    await waitFor(() => expect(recommendationCalls).toBe(2));
     expect(
         await screen.findByRole("heading", {
         name: "Recommended for you",

@@ -1,0 +1,19 @@
+
+> frontend@0.0.0 test:t20:ui
+> node scripts/run-t20-e2e.mjs
+
+s04_managed_servers=true
+
+Running 6 tests using 1 worker
+
+(node:33404) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 1 e2e\s4-t20.trailer.ts:66:1 › real API/SQLite: four media combinations in both themes and responsive widths (11.4s)
+  ok 2 e2e\s4-t20.trailer.ts:147:1 › broken-image fallback and SPA movie change remove the former trailer (998ms)
+  ok 3 e2e\s4-t20.trailer.ts:163:1 › late production detail response cannot restore another movie's trailer (908ms)
+  ok 4 e2e\s4-t20.trailer.ts:180:1 › keyboard opens the in-page player, contains focus across the iframe and restores the trigger (1.0s)
+  ok 5 e2e\s4-t20.trailer.ts:215:1 › embedded player fits both themes and all three widths without navigation or autoplay (4.5s)
+  ok 6 e2e\s4-t20.trailer.ts:251:1 › Back while the trailer is open removes the old movie and player (975ms)
+
+  6 passed (23.0s)
+s04_temporary_database_removed=true

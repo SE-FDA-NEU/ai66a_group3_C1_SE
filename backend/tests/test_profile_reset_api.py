@@ -51,7 +51,11 @@ def database_session() -> Iterator[Session]:
     session = sessionmaker(bind=engine, autoflush=False, autocommit=False)()
 
     def override_get_db() -> Iterator[Session]:
-        yield session
+        try:
+            yield session
+        finally:
+            # Match production's per-request close/rollback for read snapshots.
+            session.rollback()
 
     app.dependency_overrides[get_db] = override_get_db
     try:
@@ -85,6 +89,7 @@ def profile_state(
 ) -> Iterator[dict[str, object]]:
     action = upsert_genre(database_session, genre_id=28, name="Action")
     comedy = upsert_genre(database_session, genre_id=35, name="Comedy")
+    science_fiction = upsert_genre(database_session, genre_id=878, name="Science Fiction")
     revision = create_catalogue_revision(database_session, provider="test")
     action_movie = upsert_catalogue_movie(
         database_session,
@@ -121,7 +126,7 @@ def profile_state(
     replace_user_preference_genres(
         database_session,
         user_id=user_a,
-        genre_ids=[action.id],
+        genre_ids=[action.id, comedy.id, science_fiction.id],
     )
     replace_user_preference_genres(
         database_session,
@@ -139,6 +144,9 @@ def profile_state(
         user_id=user_b,
         movie_id=comedy_movie.id,
         rating=2,
+    )
+    set_user_movie_rating(
+        database_session, user_id=user_a, movie_id=comedy_movie.id, rating=4,
     )
     database_session.commit()
 
@@ -237,6 +245,11 @@ def test_confirmed_reset_is_account_scoped_and_preserves_shared_state(
     assert isinstance(user_a, str)
     assert isinstance(user_b, str)
     preserved_before = _preserved_counts(database_session)
+    genres_before, ratings_before = _personalisation_rows(database_session, user_a)
+    assert genres_before == [28, 35, 878]
+    assert dict(ratings_before) == {
+        profile_state["action_movie"]: 5, profile_state["comedy_movie"]: 4,
+    }
 
     response = http.post(
         RESET_PATH,

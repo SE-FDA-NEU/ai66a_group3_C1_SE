@@ -1,0 +1,13 @@
+
+> frontend@0.0.0 test:t04:integration
+> vitest run --config vitest.t04.config.ts
+
+
+ RUN  v5.0.2 <repository>/frontend
+
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  17:32:01
+   Duration  5.10s (tests 61%, environment 22%, transform 10%, import 6%)
+

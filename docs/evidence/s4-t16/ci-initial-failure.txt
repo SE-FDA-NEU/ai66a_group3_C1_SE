@@ -1,0 +1,54 @@
+Actual Linux CI failure on 34ba7b488ba18b6d211c5121d21de99835646065
+https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/40487936557/job/122134327129
+
+2026-10-27T10:23:15.4018794Z > frontend@0.0.0 test:s4:t16:ui
+2026-10-27T10:23:15.4019347Z > node scripts/run-s04-e2e.mjs --config playwright.s4-t16.config.ts
+2026-10-27T10:23:15.4019660Z
+2026-10-27T10:23:17.4068730Z [WebServer] INFO:     Started server process [3339]
+2026-10-27T10:23:17.4070595Z [WebServer] INFO:     Waiting for application startup.
+2026-10-27T10:23:17.4071289Z [WebServer] INFO:     Application startup complete.
+2026-10-27T10:23:17.4078062Z [WebServer] INFO:     Uvicorn running on http://127.0.0.1:8014 (Press CTRL+C to quit)
+2026-10-27T10:23:18.6428376Z
+2026-10-27T10:23:18.6429204Z Running 12 tests using 1 worker
+2026-10-27T10:23:18.6429586Z
+2026-10-27T10:23:21.3749285Z   ✓   1 e2e/s4-t16.detail-boundaries.ts:66:3 › TC-S4-T16-RET-001 catalogue page 2 survives app return and browser Back in both themes (1.5s)
+2026-10-27T10:23:22.4769552Z   ✓   2 e2e/s4-t16.detail-boundaries.ts:66:3 › TC-S4-T16-RET-001 popular page 2 survives app return and browser Back in both themes (1.1s)
+2026-10-27T10:23:23.6293518Z   ✓   3 e2e/s4-t16.detail-boundaries.ts:103:1 › TC-S4-T16-PUBLIC-001 actual missing-field and not-found labels, with a safe return (1.1s)
+2026-10-27T10:23:25.2804109Z   ✓   4 e2e/s4-t16.detail-boundaries.ts:125:1 › TC-S4-T16-RET-003 recommendation page/filter survive rating save and preferences remain unchanged (1.6s)
+2026-10-27T10:23:26.5978350Z   ✓   5 e2e/s4-t16.detail-boundaries.ts:153:1 › TC-S4-T16-RET-002 a changed catalogue clears the old recommendation filter on return (1.3s)
+2026-10-27T10:23:27.4592504Z   ✓   6 e2e/s4-t16.detail-boundaries.ts:174:1 › TC-S4-T16-RET-004 search to details to similar keeps the original safe search query (848ms)
+2026-10-27T10:23:29.0883095Z   ✓   7 e2e/s4-t16.detail-boundaries.ts:192:1 › TC-S4-T16-RET-005 changed preferences invalidate a historical detail-return filter (1.6s)
+2026-10-27T10:23:35.9675636Z   ✘   8 e2e/s4-t16.detail-boundaries.ts:216:1 › TC-S4-T16-WATCH-001 account B cannot restore account A's page through historical details (6.8s)
+2026-10-27T10:23:38.0294052Z   ✓   9 e2e/s4-t16.detail-boundaries.ts:251:1 › TC-S4-T16-WATCH-004 watchlist page 2 returns exactly and last-row removal reconciles totals (1.5s)
+2026-10-27T10:23:39.3853353Z   ✓  10 e2e/s4-t16.detail-boundaries.ts:277:1 › TC-S4-T16-FAIL-001 membership service outage leaves real details, rating, similar and recommendations usable (1.3s)
+2026-10-27T10:23:42.5406099Z   ✓  11 e2e/s4-t16.detail-boundaries.ts:301:1 › TC-S4-T16-ASYNC-001 delayed detail, rating, membership and similar for A cannot fill B (3.1s)
+2026-10-27T10:23:46.1258849Z   ✓  12 e2e/s4-t16.detail-boundaries.ts:327:1 › TC-S4-T16-ASYNC-002 delayed private reads and a committed write cannot leak after account switch (3.6s)
+2026-10-27T10:23:46.2073870Z
+2026-10-27T10:23:46.2078915Z
+2026-10-27T10:23:46.2088686Z   1) e2e/s4-t16.detail-boundaries.ts:216:1 › TC-S4-T16-WATCH-001 account B cannot restore account A's page through historical details
+2026-10-27T10:23:46.2089588Z
+2026-10-27T10:23:46.2090589Z     Error: expect(received).toBe(expected) // Object.is equality
+2026-10-27T10:23:46.2091082Z
+2026-10-27T10:23:46.2091234Z     Expected: 200
+2026-10-27T10:23:46.2091595Z     Received: 503
+2026-10-27T10:23:46.2091799Z
+2026-10-27T10:23:46.2092107Z       232 |   await signIn(page, request, "watch-new");
+2026-10-27T10:23:46.2092928Z       233 |   // B also has two valid pages: a total-page clamp alone would miss this bug.
+2026-10-27T10:23:46.2094125Z     > 234 |   for (const movieId of ids) expect((await page.request.put(`/api/me/watchlist/${movieId}`)).status()).toBe(200);
+2026-10-27T10:23:46.2095266Z           |                                                                                                        ^
+2026-10-27T10:23:46.2096057Z       235 |   for (let step = 0; step < 4 && new URL(page.url()).pathname !== href; step++) {
+2026-10-27T10:23:46.2097454Z       236 |     const previousIndex = await page.evaluate(() => window.history.state?.idx);
+2026-10-27T10:23:46.2098234Z       237 |     await page.goBack();
+2026-10-27T10:23:46.2099186Z         at /home/runner/work/ai66a_group3_C1_SE/ai66a_group3_C1_SE/frontend/e2e/s4-t16.detail-boundaries.ts:234:104
+2026-10-27T10:23:46.2099873Z
+2026-10-27T10:23:46.2100619Z     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+2026-10-27T10:23:46.2101901Z     test-results/s4-t16/browser/s4-t16.detail-boundaries.t-65566--through-historical-details/test-failed-1.png
+2026-10-27T10:23:46.2103243Z     ────────────────────────────────────────────────────────────────────────────────────────────────
+2026-10-27T10:23:46.2103753Z
+2026-10-27T10:23:46.2104531Z     Error Context: test-results/s4-t16/browser/s4-t16.detail-boundaries.t-65566--through-historical-details/error-context.md
+2026-10-27T10:23:46.2105339Z
+2026-10-27T10:23:46.2105497Z   1 failed
+2026-10-27T10:23:46.2107030Z     e2e/s4-t16.detail-boundaries.ts:216:1 › TC-S4-T16-WATCH-001 account B cannot restore account A's page through historical details
+2026-10-27T10:23:46.2108168Z   11 passed (30.0s)
+2026-10-27T10:23:46.2370851Z s04_temporary_database_removed=true
+2026-10-27T10:23:46.2512385Z ##[error]Process completed with exit code 1.

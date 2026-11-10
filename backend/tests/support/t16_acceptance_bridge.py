@@ -32,7 +32,7 @@ def main():
         )
 
         migrate_database(path)
-        with filter_scenario(path) as state:
+        with filter_scenario(path, rating_ties=True) as state:
             reply({"ready": True})
             for line in sys.stdin:
                 request = json.loads(line)
@@ -44,7 +44,8 @@ def main():
                 if operation == "preferences":
                     result = preference_rows(path)
                 elif operation == "request":
-                    response = state.account_a.request(
+                    http = state.account_b if request.get("account") == "b" else state.account_a
+                    response = http.request(
                         request["method"],
                         request["url"],
                         headers={"Origin": "http://testserver"},

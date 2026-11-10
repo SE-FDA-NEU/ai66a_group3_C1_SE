@@ -1,0 +1,483 @@
+{
+  "schema_version": 1,
+  "record_date_local": "2026-11-01",
+  "timezone": "Asia/Saigon",
+  "base_before_followup": "186deb5ab93ce3525863a4ba34ea2efb914a8090",
+  "tested_source_commit": "6ca4760befe135a1083bc3793b92d9db21018c89",
+  "selected_merged_production_sha": "0d2378d5f0c44889ca93c8cff7c8bc9c568b43c5",
+  "runner": "Codex assisting the author; not independent human execution or five separate member runs.",
+  "po_confirmations": {
+    "source": "Explicit user/PO replies in the project conversation on 2026-11-01",
+    "planning_date": "2026-10-20",
+    "original_committed_points": 18,
+    "accepted_story_issues": [
+      22,
+      24,
+      30,
+      33
+    ],
+    "accepted_points": 18,
+    "review_date": "2026-11-01",
+    "retrospective_date": "2026-11-01",
+    "attendees": [
+      "kietxuan",
+      "hoang3003",
+      "anotify-vie",
+      "vu-huzy",
+      "NguyenTuanAnh0608"
+    ],
+    "feedback": "UI improvement was the main focus, together with adding persistent Add to watchlist.",
+    "improvement_implementation_owners": [
+      {
+        "issue": 195,
+        "member": "kietxuan"
+      },
+      {
+        "issue": 207,
+        "member": "hoang3003"
+      }
+    ],
+    "owner_basis": "Existing native issue assignments for the UI/watchlist improvement, not invented meeting assignments or deadlines.",
+    "sm5_handoff_acknowledged_by": "kietxuan",
+    "sm5_acknowledgement_reported_on": "2026-11-01",
+    "nguyen_account_identity": "PO confirms TuanAnh0608 and NguyenTuanAnh0608 are the same Nguyen Tuan Anh.",
+    "capacity": "No hour totals, per explicit PO instruction."
+  },
+  "members": [
+    {
+      "member": "kietxuan",
+      "name": "Nguyen Xuan Kiet",
+      "node": "tests/test_s03_details.py::test_TC_P0_S03_001_public_known_id",
+      "tc_id": "TC-P0-S03-001",
+      "source_commit": "31c5bf7b9e8b006809a1bb2fcb69338589246421",
+      "source_path": "tests/test_s03_details.py",
+      "source_pr": 235,
+      "authorship": "GitHub commit author kietxuan introduced the production detail API case; subsequent changes retain its meaningful assertions.",
+      "merge_boundary": "Original contribution already merged.",
+      "execution": {
+        "node": "tests/test_s03_details.py::test_TC_P0_S03_001_public_known_id",
+        "result": "passed",
+        "seconds": 0.35
+      },
+      "source_commit_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/31c5bf7b9e8b006809a1bb2fcb69338589246421"
+    },
+    {
+      "member": "hoang3003",
+      "name": "Tran Minh Hoang",
+      "node": "tests/test_s4_t02_rating_signals.py::test_s4_t02_account_isolation_and_no_ratings_baseline",
+      "source_commit": "8f313bc7e3d7c84671e26f13367cf07850d0f9f5",
+      "source_path": "backend/tests/test_s4_t02_rating_signals.py",
+      "source_pr": 223,
+      "authorship": "Original member-authored function retained verbatim in AST; whole module relocated under root tests, with fixture-path repair only.",
+      "merge_boundary": "Original test merged; root relocation awaits PR #244 merge.",
+      "execution": {
+        "node": "tests/test_s4_t02_rating_signals.py::test_s4_t02_account_isolation_and_no_ratings_baseline",
+        "result": "passed",
+        "seconds": 0.087
+      },
+      "source_commit_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/8f313bc7e3d7c84671e26f13367cf07850d0f9f5"
+    },
+    {
+      "member": "anotify-vie",
+      "name": "Tran Tuan Anh",
+      "node": "tests/test_p0_acceptance.py::test_TC_P0_S02_001_full_set_paging_has_25_distinct_movies",
+      "tc_id": "TC-P0-S02-001",
+      "source_commit": "6fbea7221093116d84450e587d2ffd6caabb72f9",
+      "source_path": "tests/test_p0_acceptance.py",
+      "source_pr": 244,
+      "authorship": "Git author Tran Tuan Anh in PR authored by anotify-vie added six meaningful lines for limit 9/10 success and limit 11 refusal. This is a shared case; initial function authored by Nguyen Tuan Anh.",
+      "merge_boundary": "Boundary contribution is in open PR #244; becomes merged at this PR's merge.",
+      "execution": {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S02_001_full_set_paging_has_25_distinct_movies",
+        "result": "passed",
+        "seconds": 0.642
+      },
+      "source_commit_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/6fbea7221093116d84450e587d2ffd6caabb72f9"
+    },
+    {
+      "member": "vu-huzy",
+      "name": "Vu Quoc Huy",
+      "node": "tests/test_similar_movies_api.py::test_comparator_oracle_usable_source_is_a_b_c_and_missing_source_is_c_b_a",
+      "source_commit": "76c4b7f69b0fc4f26ea0155d86b3b98e3ea0a72f",
+      "source_path": "backend/tests/test_similar_movies_api.py",
+      "source_pr": 229,
+      "authorship": "Original member-authored comparator function retained verbatim in AST; whole module relocated without content changes.",
+      "merge_boundary": "Original test merged; root relocation awaits PR #244 merge.",
+      "execution": {
+        "node": "tests/test_similar_movies_api.py::test_comparator_oracle_usable_source_is_a_b_c_and_missing_source_is_c_b_a",
+        "result": "passed",
+        "seconds": 0.002
+      },
+      "source_commit_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/76c4b7f69b0fc4f26ea0155d86b3b98e3ea0a72f"
+    },
+    {
+      "member": "NguyenTuanAnh0608",
+      "name": "Nguyen Tuan Anh",
+      "node": "tests/test_p0_acceptance.py::test_TC_P0_S12_004_duplicate_normalized_email_is_conflict",
+      "tc_id": "TC-P0-S12-004",
+      "source_commit": "f0b56b790f2edaa2bac8830c17d8cc6f1922756b",
+      "source_path": "tests/test_p0_acceptance.py",
+      "source_pr": 237,
+      "authorship": "GitHub commit author TuanAnh0608; PR owner NguyenTuanAnh0608. PO explicitly confirmed both accounts belong to the same team member.",
+      "merge_boundary": "Original contribution already merged.",
+      "execution": {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S12_004_duplicate_normalized_email_is_conflict",
+        "result": "passed",
+        "seconds": 0.46
+      },
+      "source_commit_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/f0b56b790f2edaa2bac8830c17d8cc6f1922756b"
+    }
+  ],
+  "relocation_proof": [
+    {
+      "member": "hoang3003",
+      "original_path": "backend/tests/test_s4_t02_rating_signals.py",
+      "source_commit": "8f313bc7e3d7c84671e26f13367cf07850d0f9f5",
+      "source_blob": "1e9cdea7c890a51fcdb321be1e2f10f5023de6fe",
+      "source_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/8f313bc7e3d7c84671e26f13367cf07850d0f9f5",
+      "function_name": "test_s4_t02_account_isolation_and_no_ratings_baseline",
+      "new_path": "tests/test_s4_t02_rating_signals.py",
+      "original_function_ast_matches": true,
+      "function_ast_sha256": "0e766d9a27ef406c3da6a7b3ba092f9aed7ca0c01b648bf0d489e47f41b7b34e",
+      "all_relocated_function_and_class_bodies_unchanged": true
+    },
+    {
+      "member": "vu-huzy",
+      "original_path": "backend/tests/test_similar_movies_api.py",
+      "source_commit": "76c4b7f69b0fc4f26ea0155d86b3b98e3ea0a72f",
+      "source_blob": "edd78e3d456d01df7002dbd97be1e07138dc98e0",
+      "source_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/commit/76c4b7f69b0fc4f26ea0155d86b3b98e3ea0a72f",
+      "function_name": "test_comparator_oracle_usable_source_is_a_b_c_and_missing_source_is_c_b_a",
+      "new_path": "tests/test_similar_movies_api.py",
+      "original_function_ast_matches": true,
+      "function_ast_sha256": "ea77972913bd802caf0159e9ff7da1272f9253669a791d133ac45809a7496e9c",
+      "all_relocated_function_and_class_bodies_unchanged": true
+    }
+  ],
+  "source_boundary": "Production backend/frontend, root bootstrap, default selection and workflows are unchanged. Existing functions/classes in both moved modules are unchanged; only the rating oracle fixture path and current API documentation/fingerprint change.",
+  "default_run_boundary": "The 40-item run began before the relocation commit was created; its selected test/config bytes match commit 6ca4760. The seven-node contribution run executed after that commit. Source hashes below identify the tested files; no later documentation change is claimed as a new test run.",
+  "infrastructure_note": "The first sandboxed invocation could not clean its sandbox temporary folder (Windows Access denied) before a usable test run. The permitted non-sandbox invocation below completed. This is an execution-environment failure, not a business-rule red test.",
+  "outstanding": [
+    "C01 #216/PR #245 independent review and merge (open at source read).",
+    "C05 #219 independent non-author setup/build/storage/recovery acceptance; author proof is already available in merged PR #243.",
+    "Substantive independent non-contributor review of final C02. Current approval by kietxuan is formal PO review, but he authored follow-up commits.",
+    "Four PO-accepted parent Stories remain Open at source read; synchronize their closure at the reviewed wrap-up merge."
+  ],
+  "not_required_for_c02": [
+    "C04 final/submission-day board screenshot",
+    "PDF export/upload or LMS receipt",
+    "New full backend/frontend/browser regression run"
+  ],
+  "repository": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE",
+  "compact_run": {
+    "log": "docs/evidence/s4-c02-finalization-pytest-20261101.log",
+    "junit": "docs/evidence/s4-c02-finalization-pytest-20261101.xml",
+    "count": 40,
+    "pytest_seconds": 22.21,
+    "junit_seconds": 22.131,
+    "started_at_local": "2026-11-01T15:39:59.140281+07:00",
+    "failed": 0,
+    "skipped": 0,
+    "log_sha256": "e7d51a7941848b3bfa3ad2c99ccde9aee79fde0dc300c10319ac127c2707ad80",
+    "junit_sha256": "275ae0e7568e2b14b2dcdb562a5eb3ca2af9ecdd148d673ad7942e5ef0114c6e",
+    "cases": [
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S01_001_canonical_genres_and_empty_selection",
+        "result": "passed",
+        "seconds": 1.103
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S01_002_zero_preserves_previous_rows",
+        "result": "passed",
+        "seconds": 0.554
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-003]",
+        "result": "passed",
+        "seconds": 0.716
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-004]",
+        "result": "passed",
+        "seconds": 0.805
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-005]",
+        "result": "passed",
+        "seconds": 0.874
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-006]",
+        "result": "passed",
+        "seconds": 0.724
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S01_007_invalid_sets_preserve_previous_selection",
+        "result": "passed",
+        "seconds": 0.598
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S01_008_guest_forgery_and_origin_leave_accounts_intact",
+        "result": "passed",
+        "seconds": 0.744
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S02_001_full_set_paging_has_25_distinct_movies",
+        "result": "passed",
+        "seconds": 0.635
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S02_002_rating_free_order_and_reasons",
+        "result": "passed",
+        "seconds": 0.506
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S02_003_no_match_uses_unboosted_popular",
+        "result": "passed",
+        "seconds": 0.519
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S02_004_guest_and_expired_cookie_are_private",
+        "result": "passed",
+        "seconds": 0.613
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S02_005_core_failure_then_retry_preserves_preferences",
+        "result": "passed",
+        "seconds": 0.514
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S02_006_filter_after_whole_set_ranking",
+        "result": "passed",
+        "seconds": 0.718
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S04_001_public_catalogue_pages_include_null_popularity",
+        "result": "passed",
+        "seconds": 0.416
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S04_002_cold_start_has_no_personal_score",
+        "result": "passed",
+        "seconds": 0.553
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S04_003_limit_9_and_10_keep_full_total",
+        "result": "passed",
+        "seconds": 0.378
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S04_004_limit_and_page_refusals",
+        "result": "passed",
+        "seconds": 0.325
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S04_005_empty_active_versus_missing_revision",
+        "result": "passed",
+        "seconds": 0.271
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S04_006_stale_catalogue_revision_is_409",
+        "result": "passed",
+        "seconds": 0.268
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S12_001_eight_char_normalized_hashed_registration",
+        "result": "passed",
+        "seconds": 0.493
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S12_002_seven_char_password_has_no_row",
+        "result": "passed",
+        "seconds": 0.296
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S12_003_nine_char_password_has_safe_dto",
+        "result": "passed",
+        "seconds": 0.386
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S12_004_duplicate_normalized_email_is_conflict",
+        "result": "passed",
+        "seconds": 0.422
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S12_005_invalid_email_and_storage_failure_create_no_account",
+        "result": "passed",
+        "seconds": 0.35
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S13_001_login_me_cookie_and_safe_user",
+        "result": "passed",
+        "seconds": 0.584
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S13_002_wrong_and_unknown_credentials_same_public_error",
+        "result": "passed",
+        "seconds": 0.637
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S13_003_logout_replay_and_later_login_restore_data",
+        "result": "passed",
+        "seconds": 0.718
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S13_004_missing_expired_and_revoked_sessions_refused",
+        "result": "passed",
+        "seconds": 0.725
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S13_005_account_isolation_and_forged_identity",
+        "result": "passed",
+        "seconds": 0.928
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S13_006_cross_origin_auth_and_write_refused",
+        "result": "passed",
+        "seconds": 0.532
+      },
+      {
+        "node": "tests/test_s03_details.py::test_TC_P0_S03_001_public_known_id",
+        "result": "passed",
+        "seconds": 0.271
+      },
+      {
+        "node": "tests/test_s03_details.py::test_TC_P0_S03_002_unknown_id_refused",
+        "result": "passed",
+        "seconds": 0.306
+      },
+      {
+        "node": "tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[year]",
+        "result": "passed",
+        "seconds": 0.297
+      },
+      {
+        "node": "tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[summary]",
+        "result": "passed",
+        "seconds": 0.256
+      },
+      {
+        "node": "tests/test_s03_details.py::test_TC_P0_S03_001_missing_optional_fields[both]",
+        "result": "passed",
+        "seconds": 0.282
+      },
+      {
+        "node": "tests/test_s03_details.py::test_TC_P0_S03_003_catalogue_and_database_failures_are_distinct",
+        "result": "passed",
+        "seconds": 0.25
+      },
+      {
+        "node": "tests/test_s03_details.py::test_TC_P0_S03_004_return_query_cannot_redirect_or_change_public_movie",
+        "result": "passed",
+        "seconds": 0.275
+      },
+      {
+        "node": "tests/test_s03_details.py::test_TC_P0_S03_005_detail_widgets_preserve_both_accounts_preferences",
+        "result": "passed",
+        "seconds": 0.826
+      },
+      {
+        "node": "tests/test_s03_details.py::test_TC_P0_S03_006_membership_commit_allows_read_snapshot_cleanup",
+        "result": "passed",
+        "seconds": 0.57
+      }
+    ]
+  },
+  "member_run": {
+    "log": "docs/evidence/s4-c02-member-tests-20261101.log",
+    "junit": "docs/evidence/s4-c02-member-tests-20261101.xml",
+    "count": 7,
+    "pytest_seconds": 2.54,
+    "junit_seconds": 2.495,
+    "started_at_local": "2026-11-01T15:41:34.800897+07:00",
+    "failed": 0,
+    "skipped": 0,
+    "log_sha256": "ef3e65f9ea6f274652a59ef19ebd7cfe56b1d27503ca5734dda08559df05f9b1",
+    "junit_sha256": "3aea86d7e13e774fff88f4076686bb425fbd306ff4309c8acfcac71443cbb9ba",
+    "cases": [
+      {
+        "node": "tests/test_s03_details.py::test_TC_P0_S03_001_public_known_id",
+        "result": "passed",
+        "seconds": 0.35
+      },
+      {
+        "node": "tests/test_s4_t02_rating_signals.py::test_s4_t02_account_isolation_and_no_ratings_baseline",
+        "result": "passed",
+        "seconds": 0.087
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S02_001_full_set_paging_has_25_distinct_movies",
+        "result": "passed",
+        "seconds": 0.642
+      },
+      {
+        "node": "tests/test_similar_movies_api.py::test_comparator_oracle_usable_source_is_a_b_c_and_missing_source_is_c_b_a",
+        "result": "passed",
+        "seconds": 0.002
+      },
+      {
+        "node": "tests/test_p0_acceptance.py::test_TC_P0_S12_004_duplicate_normalized_email_is_conflict",
+        "result": "passed",
+        "seconds": 0.46
+      },
+      {
+        "node": "tests/test_s4_t02_rating_signals.py::test_s4_t02_whole_set_handoff_oracle_is_explicit",
+        "result": "passed",
+        "seconds": 0.001
+      },
+      {
+        "node": "tests/test_similar_movies_api.py::test_usable_source_orders_cosine_then_appends_missing_text_candidate",
+        "result": "passed",
+        "seconds": 0.111
+      }
+    ]
+  },
+  "source_files": [
+    {
+      "path": "pytest.ini",
+      "sha256_lf": "29994bb63a3c835981dc95cf8f425699fc25b4d2be0bf0ea84908182e642160d"
+    },
+    {
+      "path": "conftest.py",
+      "sha256_lf": "8f133a85bad2969d09798e269e97debf7b70aa4fb3b3957a12abdec164fd427b"
+    },
+    {
+      "path": "tests/conftest.py",
+      "sha256_lf": "d2b071114ae42227afb0d8ea4f4bfa2298c6d276adf1aeeae7c075cbf344b849"
+    },
+    {
+      "path": "tests/test_p0_acceptance.py",
+      "sha256_lf": "c2b14f61617ae19e354e55096cfb04c511aa1859a60253d09a77b02c4fb0e136"
+    },
+    {
+      "path": "tests/test_s03_details.py",
+      "sha256_lf": "5ec72229c2a3e4e169358c5892c3056e561cf1d69ff58ae6115c069861eeef51"
+    },
+    {
+      "path": "tests/test_s4_t02_rating_signals.py",
+      "sha256_lf": "cdb8cb6c20052085167f3b613c0454853307d70bf9fccbb17d5da1968a379d29"
+    },
+    {
+      "path": "tests/test_similar_movies_api.py",
+      "sha256_lf": "d8ddc024add9a689d38e2560f3d058f8613d92666ea6a64c5e001e4cd198e2bb"
+    }
+  ],
+  "validation": {
+    "c03_document_structure": "PASS; 217 local links, 37 logical P0 IDs, four report sections",
+    "line_endings": "PASS; LF and CRLF exports have identical normalized hashes",
+    "focused_ruff": "PASS on both relocated root modules",
+    "changed_scope_links": "PASS; 32 local links/anchors across current Sprint 4 and follow-up records",
+    "sprint_1_to_3": "Unchanged against 186deb5 prefix",
+    "default_trace": "PASS; 37 documented P0 IDs map to 40 default collected nodes",
+    "source_hashes": "All recorded tested source hashes match",
+    "git_diff_check": "PASS"
+  },
+  "github_status_before_push": {
+    "read_at_utc": "2026-11-01T08:50:25.8770573+00:00",
+    "main": "0d2378d5f0c44889ca93c8cff7c8bc9c568b43c5",
+    "c02_head": "186deb5ab93ce3525863a4ba34ea2efb914a8090",
+    "c01_pr_state": "open",
+    "c01_pr_merged": false,
+    "c05_issue_state": "open"
+  }
+}

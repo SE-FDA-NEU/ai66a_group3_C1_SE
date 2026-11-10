@@ -2,21 +2,32 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections import Counter
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
 from math import isfinite
 from typing import Any, Protocol
 
 from sqlalchemy import func, select
-from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session, selectinload
 
 from app.catalogue.backdrops import valid_backdrop_path
-from app.db.models import CatalogMovie, utc_now
+from app.catalogue.posters import valid_poster_path
+from app.catalogue.providers import (
+    SUPPORTED_COUNTRIES,
+    ProviderCountry,
+    select_regional_providers,
+)
+from app.catalogue.trailers import Trailer, select_trailer
+from app.db.models import CatalogMovie, MovieProviderCheck, MovieWatchProvider, utc_now
 from app.integrations.tmdb import (
     DEFAULT_POPULAR_PAGES,
     MAX_POPULAR_PAGES,
     TMDB_SOURCE,
+    TmdbAuthenticationError,
+    TmdbImportError,
     TmdbPayloadError,
 )
 from app.repositories.movies import (
@@ -26,6 +37,7 @@ from app.repositories.movies import (
     get_movie_by_source_id,
     replace_movie_genres,
     set_movie_backdrop_path,
+    set_movie_poster_path,
     upsert_catalogue_movie,
     upsert_genre,
 )
@@ -39,6 +51,10 @@ class TmdbCatalogueGateway(Protocol):
     def fetch_popular_movies(self, page: int) -> list[Mapping[str, Any]]: ...
 
     def fetch_movie_details(self, movie_id: int) -> Mapping[str, Any]: ...
+
+    def fetch_movie_videos(self, movie_id: int) -> Mapping[str, Any]: ...
+
+    def fetch_movie_watch_providers(self, movie_id: int) -> Mapping[str, Any]: ...
 
 
 @dataclass(frozen=True)
@@ -55,6 +71,7 @@ class TmdbImportResult:
     source_fetched_at: datetime
     imported_at: datetime
     sample_source_ids: tuple[str, ...]
+    rejection_reasons: tuple[tuple[str, int], ...] = ()
 
 
 MAX_ENRICHMENT_MOVIES = 300
@@ -74,6 +91,114 @@ class TmdbBackdropEnrichmentResult:
 
 
 @dataclass(frozen=True)
+class TmdbPosterEnrichmentResult(TmdbBackdropEnrichmentResult):
+    """The same safe counts for an explicitly poster-only update."""
+
+
+@dataclass(frozen=True)
+class TmdbImageAllResult:
+    active_revision_id: str
+    media: str
+    eligible_movie_count: int
+    processed_movie_count: int = 0
+    updated_movie_count: int = 0
+    cleared_movie_count: int = 0
+    unchanged_movie_count: int = 0
+    missing_movie_count: int = 0
+    invalid_movie_count: int = 0
+
+    @property
+    def remaining_movie_count(self) -> int:
+        return self.eligible_movie_count - self.processed_movie_count
+
+
+class TmdbImageAllError(RuntimeError):
+    """Only earlier committed batches appear in the safe partial result."""
+
+    def __init__(self, partial_result: TmdbImageAllResult, reason: str) -> None:
+        self.partial_result = partial_result
+        self.reason = reason
+        super().__init__("image enrichment batch failed")
+
+
+@dataclass(frozen=True)
+class TmdbTrailerEnrichmentResult:
+    eligible_movie_count: int
+    fetched_movie_count: int
+    updated_movie_count: int
+    cleared_movie_count: int
+    unchanged_movie_count: int
+    failed_movie_count: int
+    authentication_stopped: bool
+    remaining_movie_count: int = 0
+    with_trailer_movie_count: int = 0
+    without_trailer_movie_count: int = 0
+
+
+@dataclass(frozen=True)
+class TmdbTrailerAllResult:
+    active_revision_id: str
+    eligible_movie_count: int
+    processed_movie_count: int
+    with_trailer_movie_count: int
+    without_trailer_movie_count: int
+    failed_movie_count: int
+    remaining_movie_count: int
+    authentication_stopped: bool
+
+
+class TmdbTrailerAllDatabaseError(SQLAlchemyError):
+    """A failed batch rolled back; earlier committed batches remain resumable."""
+
+    def __init__(self, partial_result: TmdbTrailerAllResult) -> None:
+        self.partial_result = partial_result
+        super().__init__("trailer enrichment batch failed")
+
+
+@dataclass(frozen=True)
+class TmdbProviderRegionResult:
+    country: ProviderCountry
+    eligible_movie_count: int
+    already_checked_movie_count: int
+    processed_movie_count: int = 0
+    with_data_movie_count: int = 0
+    no_data_movie_count: int = 0
+    failed_movie_count: int = 0
+    valid_link_movie_count: int = 0
+    missing_link_movie_count: int = 0
+    invalid_link_movie_count: int = 0
+    remaining_movie_count: int = 0
+
+
+@dataclass(frozen=True)
+class TmdbProviderAllResult:
+    active_revision_id: str
+    eligible_movie_count: int
+    already_checked_movie_count: int
+    processed_movie_count: int = 0
+    with_data_movie_count: int = 0
+    no_data_movie_count: int = 0
+    failed_movie_count: int = 0
+    valid_link_movie_count: int = 0
+    missing_link_movie_count: int = 0
+    invalid_link_movie_count: int = 0
+    remaining_movie_count: int = 0
+    movie_fetch_count: int = 0
+    http_request_count: int = 0
+    authentication_stopped: bool = False
+    retry_after_seconds: float | None = None
+    regions: tuple[TmdbProviderRegionResult, ...] = ()
+
+
+class TmdbProviderAllError(RuntimeError):
+    """Safe partial counts include only batches committed before the failure."""
+
+    def __init__(self, partial_result: TmdbProviderAllResult) -> None:
+        self.partial_result = partial_result
+        super().__init__("provider batch failed or active catalogue changed")
+
+
+@dataclass(frozen=True)
 class _PreparedMovie:
     source_id: str
     title: str
@@ -86,6 +211,8 @@ class _PreparedMovie:
     source_fetched_at: datetime
     backdrop_fetched: bool
     backdrop_path: str | None
+    poster_fetched: bool
+    poster_path: str | None
 
 
 class _RejectedMovie(ValueError):
@@ -111,12 +238,13 @@ def import_tmdb_catalogue(
 
     source_fetched_at = _normalise_timestamp(fetched_at or utc_now())
     genres_by_id = _prepare_genres(client.fetch_genres())
-    prepared_movies, rejected_movie_count = _prepare_movies(
+    prepared_movies, rejection_reasons = _prepare_movies(
         client=client,
         genres_by_id=genres_by_id,
         source_fetched_at=source_fetched_at,
         pages=pages,
     )
+    rejected_movie_count = sum(rejection_reasons.values())
     if not prepared_movies:
         raise TmdbPayloadError("TMDb did not return any usable movies")
 
@@ -157,6 +285,10 @@ def import_tmdb_catalogue(
             set_movie_backdrop_path(
                 session, movie_id=movie.id, backdrop_path=prepared_movie.backdrop_path
             )
+        if prepared_movie.poster_fetched:
+            set_movie_poster_path(
+                session, movie_id=movie.id, poster_path=prepared_movie.poster_path
+            )
         if existing_movie is None:
             inserted_movie_count += 1
         else:
@@ -178,11 +310,13 @@ def import_tmdb_catalogue(
         source_fetched_at=source_fetched_at,
         imported_at=revision.created_at,
         sample_source_ids=tuple(movie.source_id for movie in prepared_movies[:3]),
+        rejection_reasons=tuple(sorted(rejection_reasons.items())),
     )
 
 
 def enrich_tmdb_backdrops(
-    session: Session, *, client: TmdbCatalogueGateway, limit: int = MAX_ENRICHMENT_MOVIES
+    session: Session, *, client: TmdbCatalogueGateway, limit: int = MAX_ENRICHMENT_MOVIES,
+    movie_ids: Sequence[str] | None = None,
 ) -> TmdbBackdropEnrichmentResult:
     """Fetch media for existing active TMDb movies without changing the revision.
 
@@ -202,14 +336,7 @@ def enrich_tmdb_backdrops(
         CatalogMovie.source == TMDB_SOURCE,
     )
     eligible = session.scalar(select(func.count()).select_from(CatalogMovie).where(*active_movies))
-    movies = list(
-        session.scalars(
-            select(CatalogMovie)
-            .where(*active_movies)
-            .order_by(CatalogMovie.source_id)
-            .limit(limit)
-        )
-    )
+    movies = _select_image_movies(session, active_movies, limit, movie_ids)
     updated = cleared = unchanged = missing = invalid = 0
     for movie in movies:
         # Source IDs are positive integers because the core importer validated
@@ -243,6 +370,401 @@ def enrich_tmdb_backdrops(
     )
 
 
+def enrich_tmdb_posters(
+    session: Session, *, client: TmdbCatalogueGateway, limit: int = MAX_ENRICHMENT_MOVIES,
+    movie_ids: Sequence[str] | None = None,
+) -> TmdbPosterEnrichmentResult:
+    """Bounded poster-only backfill; caller atomically commits or rolls back.
+
+    This never activates a new revision or touches overview/genres/popularity,
+    user data, backdrop paths or NLP text/config revision inputs.
+    """
+    if type(limit) is not int or not 1 <= limit <= MAX_ENRICHMENT_MOVIES:
+        raise ValueError(f"limit must be an integer from 1 to {MAX_ENRICHMENT_MOVIES}")
+    revision = get_active_catalogue_revision(session)
+    if revision is None or revision.provider != TMDB_SOURCE:
+        raise ValueError("an active TMDb catalogue is required for poster enrichment")
+    active = (CatalogMovie.catalogue_revision_id == revision.id, CatalogMovie.source == TMDB_SOURCE)
+    eligible = session.scalar(select(func.count()).select_from(CatalogMovie).where(*active))
+    movies = _select_image_movies(session, active, limit, movie_ids)
+    updated = cleared = unchanged = missing = invalid = 0
+    for movie in movies:
+        if not movie.source_id.isdecimal() or int(movie.source_id) <= 0:
+            raise ValueError("active TMDb catalogue contains an invalid source ID")
+        details = client.fetch_movie_details(int(movie.source_id))
+        if "poster_path" not in details:
+            missing += 1
+            continue
+        path = details["poster_path"]
+        if path is not None and not valid_poster_path(path):
+            invalid += 1
+            continue
+        if movie.poster_path == path:
+            unchanged += 1
+            continue
+        set_movie_poster_path(session, movie_id=movie.id, poster_path=path)
+        updated += 1
+        cleared += path is None
+    return TmdbPosterEnrichmentResult(
+        eligible_movie_count=eligible or 0, fetched_movie_count=len(movies),
+        updated_movie_count=updated, cleared_movie_count=cleared,
+        unchanged_movie_count=unchanged, missing_movie_count=missing, invalid_movie_count=invalid,
+    )
+
+
+def _select_image_movies(
+    session: Session, active: tuple, limit: int, movie_ids: Sequence[str] | None,
+) -> list[CatalogMovie]:
+    query = select(CatalogMovie).where(*active)
+    if movie_ids is not None:
+        if len(movie_ids) > limit or len(set(movie_ids)) != len(movie_ids):
+            raise ValueError("invalid image batch selection")
+        query = query.where(CatalogMovie.id.in_(movie_ids))
+    movies = list(session.scalars(query.order_by(CatalogMovie.source_id, CatalogMovie.id).limit(limit)))
+    if movie_ids is not None and len(movies) != len(movie_ids):
+        raise ValueError("selected catalogue movies changed during enrichment")
+    return movies
+
+
+def enrich_tmdb_images_all(
+    session_factory: Callable[[], Session], *, client: TmdbCatalogueGateway,
+    media: str, batch_size: int = MAX_ENRICHMENT_MOVIES,
+) -> TmdbImageAllResult:
+    """Visit one fixed active-ID snapshot exactly once, committing bounded batches.
+
+    Images have no persistent attempt marker. A new invocation deliberately
+    refreshes the full snapshot again, including valid null/missing results.
+    """
+    if media not in {"poster", "backdrop"}:
+        raise ValueError("unknown image enrichment mode")
+    if type(batch_size) is not int or not 1 <= batch_size <= MAX_ENRICHMENT_MOVIES:
+        raise ValueError(f"batch_size must be an integer from 1 to {MAX_ENRICHMENT_MOVIES}")
+    with session_factory() as session:
+        revision = get_active_catalogue_revision(session)
+        if revision is None or revision.provider != TMDB_SOURCE:
+            raise ValueError("an active TMDb catalogue is required for image enrichment")
+        revision_id = revision.id
+        movie_ids = list(session.scalars(select(CatalogMovie.id).where(
+            CatalogMovie.catalogue_revision_id == revision_id, CatalogMovie.source == TMDB_SOURCE,
+        ).order_by(CatalogMovie.source_id, CatalogMovie.id)))
+    totals = dict.fromkeys(("processed", "updated", "cleared", "unchanged", "missing", "invalid"), 0)
+
+    def snapshot() -> TmdbImageAllResult:
+        return TmdbImageAllResult(
+            active_revision_id=revision_id, media=media, eligible_movie_count=len(movie_ids),
+            **{key + "_movie_count": value for key, value in totals.items()},
+        )
+
+    enrich = enrich_tmdb_posters if media == "poster" else enrich_tmdb_backdrops
+    for offset in range(0, len(movie_ids), batch_size):
+        selected = movie_ids[offset:offset + batch_size]
+        try:
+            with session_factory() as session, session.begin():
+                revision = get_active_catalogue_revision(session)
+                if revision is None or revision.id != revision_id:
+                    raise ValueError("active catalogue changed during image enrichment")
+                batch = enrich(session, client=client, limit=batch_size, movie_ids=selected)
+        except TmdbImportError as exc:
+            raise TmdbImageAllError(snapshot(), "provider request failed") from exc
+        except SQLAlchemyError as exc:
+            raise TmdbImageAllError(snapshot(), "database write failed") from exc
+        except ValueError as exc:
+            raise TmdbImageAllError(snapshot(), "catalogue validation failed or changed") from exc
+        totals["processed"] += batch.fetched_movie_count
+        for key in ("updated", "cleared", "unchanged", "missing", "invalid"):
+            totals[key] += getattr(batch, key + "_movie_count")
+    return snapshot()
+
+
+def enrich_tmdb_trailers(
+    session: Session, *, client: TmdbCatalogueGateway, limit: int = MAX_ENRICHMENT_MOVIES,
+    only_unattempted: bool = False,
+) -> TmdbTrailerEnrichmentResult:
+    """Backfill active TMDb movies, with one bounded videos request per movie.
+
+    Provider failures retain the last successful trailer and persist only a safe
+    status. Database failures roll back the caller's whole transaction.
+    """
+    if type(limit) is not int or not 1 <= limit <= MAX_ENRICHMENT_MOVIES:
+        raise ValueError(f"limit must be an integer from 1 to {MAX_ENRICHMENT_MOVIES}")
+    revision = get_active_catalogue_revision(session)
+    if revision is None or revision.provider != TMDB_SOURCE:
+        raise ValueError("an active TMDb catalogue is required for trailer enrichment")
+    active = (CatalogMovie.catalogue_revision_id == revision.id, CatalogMovie.source == TMDB_SOURCE)
+    eligible = session.scalar(select(func.count()).select_from(CatalogMovie).where(*active)) or 0
+    # A null attempt is a movie this command has never visited. Once every
+    # movie has been visited, refresh the oldest attempt first.
+    query = select(CatalogMovie).where(*active)
+    if only_unattempted:
+        query = query.where(CatalogMovie.trailer_attempted_at.is_(None))
+    movies = list(session.scalars(query.order_by(
+        CatalogMovie.trailer_attempted_at.asc().nullsfirst(), CatalogMovie.source_id
+    ).limit(limit)))
+    fetched = updated = cleared = unchanged = failed = 0
+    authentication_stopped = False
+    for movie in movies:
+        if not movie.source_id.isdecimal() or int(movie.source_id) <= 0:
+            raise ValueError("active TMDb catalogue contains an invalid source ID")
+        fetched += 1
+        attempted_at = utc_now()
+        try:
+            trailer = select_trailer(client.fetch_movie_videos(int(movie.source_id)))
+        except TmdbImportError as exc:
+            movie.trailer_attempted_at = attempted_at
+            movie.trailer_status = "stale" if movie.trailer_succeeded_at else "error"
+            session.flush()
+            failed += 1
+            if isinstance(exc, TmdbAuthenticationError):
+                authentication_stopped = True
+                break
+            continue
+
+        before = (movie.trailer_site, movie.trailer_key, movie.trailer_name,
+                  movie.trailer_type, movie.trailer_official, movie.trailer_language,
+                  _sqlite_utc(movie.trailer_published_at))
+        _set_movie_trailer(session, movie, trailer, attempted_at)
+        after = (movie.trailer_site, movie.trailer_key, movie.trailer_name,
+                 movie.trailer_type, movie.trailer_official, movie.trailer_language,
+                 _sqlite_utc(movie.trailer_published_at))
+        if before == after:
+            unchanged += 1
+        else:
+            updated += 1
+            cleared += trailer is None and before[1] is not None
+    remaining = session.scalar(select(func.count()).select_from(CatalogMovie).where(
+        *active, CatalogMovie.trailer_attempted_at.is_(None))) or 0
+    with_trailer = sum(movie.trailer_key is not None for movie in movies[:fetched])
+    return TmdbTrailerEnrichmentResult(
+        eligible_movie_count=eligible, fetched_movie_count=fetched,
+        remaining_movie_count=remaining,
+        with_trailer_movie_count=with_trailer,
+        without_trailer_movie_count=fetched - with_trailer,
+        updated_movie_count=updated, cleared_movie_count=cleared,
+        unchanged_movie_count=unchanged, failed_movie_count=failed,
+        authentication_stopped=authentication_stopped,
+    )
+
+
+def enrich_tmdb_trailers_all(
+    session_factory: Callable[[], Session], *, client: TmdbCatalogueGateway,
+    batch_size: int = MAX_ENRICHMENT_MOVIES,
+) -> TmdbTrailerAllResult:
+    """Commit each pending-only batch; a later invocation resumes unfinished work."""
+    if type(batch_size) is not int or not 1 <= batch_size <= MAX_ENRICHMENT_MOVIES:
+        raise ValueError(f"batch_size must be an integer from 1 to {MAX_ENRICHMENT_MOVIES}")
+    with session_factory() as session:
+        revision = get_active_catalogue_revision(session)
+        if revision is None or revision.provider != TMDB_SOURCE:
+            raise ValueError("an active TMDb catalogue is required for trailer enrichment")
+        revision_id = revision.id
+        active = (CatalogMovie.catalogue_revision_id == revision_id,
+                  CatalogMovie.source == TMDB_SOURCE)
+        eligible = session.scalar(select(func.count()).select_from(CatalogMovie).where(*active)) or 0
+        remaining = session.scalar(select(func.count()).select_from(CatalogMovie).where(
+            *active, CatalogMovie.trailer_attempted_at.is_(None))) or 0
+
+    processed = with_trailer = without_trailer = failed = 0
+    authentication_stopped = False
+
+    def snapshot() -> TmdbTrailerAllResult:
+        return TmdbTrailerAllResult(
+            active_revision_id=revision_id, eligible_movie_count=eligible,
+            processed_movie_count=processed, with_trailer_movie_count=with_trailer,
+            without_trailer_movie_count=without_trailer, failed_movie_count=failed,
+            remaining_movie_count=remaining, authentication_stopped=authentication_stopped,
+        )
+
+    while remaining:
+        try:
+            with session_factory() as session, session.begin():
+                current = get_active_catalogue_revision(session)
+                if current is None or current.id != revision_id:
+                    raise ValueError("active TMDb catalogue changed during trailer enrichment")
+                batch = enrich_tmdb_trailers(
+                    session, client=client, limit=min(batch_size, remaining),
+                    only_unattempted=True,
+                )
+        except SQLAlchemyError as exc:
+            raise TmdbTrailerAllDatabaseError(snapshot()) from exc
+        if batch.fetched_movie_count == 0:
+            raise ValueError("pending trailer movies changed during enrichment")
+        processed += batch.fetched_movie_count
+        with_trailer += batch.with_trailer_movie_count
+        without_trailer += batch.without_trailer_movie_count
+        failed += batch.failed_movie_count
+        remaining = batch.remaining_movie_count
+        authentication_stopped = batch.authentication_stopped
+        if authentication_stopped:
+            break
+    return snapshot()
+
+
+def enrich_tmdb_providers_all(
+    session_factory: Callable[[], Session], *, client: TmdbCatalogueGateway,
+    batch_size: int = MAX_ENRICHMENT_MOVIES, refresh: bool = False,
+    countries: Sequence[ProviderCountry] = SUPPORTED_COUNTRIES,
+) -> TmdbProviderAllResult:
+    """Fetch each pending movie once and update its selected regional checks."""
+    if type(batch_size) is not int or not 1 <= batch_size <= MAX_ENRICHMENT_MOVIES:
+        raise ValueError(f"batch_size must be an integer from 1 to {MAX_ENRICHMENT_MOVIES}")
+    countries = tuple(countries)
+    if not countries or len(set(countries)) != len(countries) or any(
+        country not in SUPPORTED_COUNTRIES for country in countries
+    ):
+        raise ValueError("Choose unique provider countries from US, GB and SG")
+    with session_factory() as session:
+        revision = get_active_catalogue_revision(session)
+        if revision is None or revision.provider != TMDB_SOURCE:
+            raise ValueError("an active TMDb catalogue is required for provider enrichment")
+        revision_id = revision.id
+        active = (CatalogMovie.catalogue_revision_id == revision_id, CatalogMovie.source == TMDB_SOURCE)
+        all_ids = list(session.scalars(select(CatalogMovie.id).where(*active).order_by(
+            CatalogMovie.source_id, CatalogMovie.id,
+        )))
+        statuses = {(movie_id, country): status for movie_id, country, status in session.execute(
+            select(MovieProviderCheck.movie_id, MovieProviderCheck.country, MovieProviderCheck.status)
+            .join(CatalogMovie, CatalogMovie.id == MovieProviderCheck.movie_id)
+            .where(*active, MovieProviderCheck.country.in_(countries))
+        )}
+    pending = {movie_id: tuple(country for country in countries if refresh or
+               statuses.get((movie_id, country)) not in {"success", "no_data"}) for movie_id in all_ids}
+    movie_ids = [movie_id for movie_id in all_ids if pending[movie_id]]
+    eligible = {country: sum(country in pending[movie_id] for movie_id in all_ids) for country in countries}
+    totals = Counter()
+    region_totals = {country: Counter() for country in countries}
+    stopped = False
+    retry_after_seconds = None
+    fetches = 0
+    initial_requests = getattr(client, "request_count", 0)
+
+    def snapshot() -> TmdbProviderAllResult:
+        regions = tuple(TmdbProviderRegionResult(
+            country=country, eligible_movie_count=len(all_ids),
+            already_checked_movie_count=len(all_ids) - eligible[country],
+            remaining_movie_count=eligible[country] - region_totals[country]["processed"],
+            **{key + "_movie_count": region_totals[country][key] for key in (
+                "processed", "with_data", "no_data", "failed", "valid_link", "missing_link", "invalid_link",
+            )},
+        ) for country in countries)
+        return TmdbProviderAllResult(
+            active_revision_id=revision_id, eligible_movie_count=len(all_ids),
+            already_checked_movie_count=len(all_ids) - len(movie_ids),
+            remaining_movie_count=len(movie_ids) - totals["processed"],
+            authentication_stopped=stopped, retry_after_seconds=retry_after_seconds,
+            movie_fetch_count=fetches,
+            http_request_count=getattr(client, "request_count", initial_requests + fetches) - initial_requests,
+            regions=regions,
+            **{key + "_movie_count": totals[key] for key in (
+                "processed", "with_data", "no_data", "failed", "valid_link", "missing_link", "invalid_link",
+            )},
+        )
+
+    for offset in range(0, len(movie_ids), batch_size):
+        selected = movie_ids[offset:offset + batch_size]
+        batch = Counter()
+        regional_batch = {country: Counter() for country in countries}
+        try:
+            with session_factory() as session, session.begin():
+                current = get_active_catalogue_revision(session)
+                if current is None or current.id != revision_id:
+                    raise ValueError("active catalogue changed during provider enrichment")
+                movies = _select_image_movies(session, active, batch_size, selected)
+                checks = {(check.movie_id, check.country): check for check in session.scalars(
+                    select(MovieProviderCheck).where(MovieProviderCheck.movie_id.in_(selected),
+                        MovieProviderCheck.country.in_(countries)).options(selectinload(MovieProviderCheck.providers))
+                )}
+                for movie in movies:
+                    if not movie.source_id.isascii() or not movie.source_id.isdecimal() or int(movie.source_id) <= 0:
+                        raise ValueError("active TMDb catalogue contains an invalid source ID")
+                    attempted_at = utc_now()
+                    request_error = None
+                    fetches += 1
+                    try:
+                        payload = client.fetch_movie_watch_providers(int(movie.source_id))
+                    except TmdbImportError as exc:
+                        request_error = exc
+                        stopped = isinstance(exc, TmdbAuthenticationError)
+                        retry_after_seconds = getattr(exc, "retry_after_seconds", None)
+                    outcomes = Counter()
+                    for country in pending[movie.id]:
+                        check = checks.get((movie.id, country))
+                        if check is None:
+                            check = MovieProviderCheck(movie_id=movie.id, country=country,
+                                status="error", attempted_at=attempted_at, providers=[])
+                            session.add(check)
+                        check.attempted_at = attempted_at
+                        regional_batch[country]["processed"] += 1
+                        try:
+                            if request_error is not None:
+                                raise request_error
+                            providers, link, link_status = select_regional_providers(
+                                payload, int(movie.source_id), country,
+                            )
+                        except TmdbImportError:
+                            check.status = "stale" if check.checked_at else "error"
+                            regional_batch[country]["failed"] += 1
+                            outcomes["failed"] += 1
+                            continue
+                        check.status = "success" if providers else "no_data"
+                        check.checked_at = utc_now()
+                        check.watch_options_url, check.link_status = link, link_status
+                        if check.providers:
+                            check.providers.clear()
+                            session.flush()  # Delete old composite keys before inserting replacements.
+                        check.providers.extend(MovieWatchProvider(
+                            movie_id=movie.id, country=country, availability_type=provider.group,
+                            provider_id=provider.provider_id, name=provider.name, logo_path=provider.logo_path,
+                        ) for provider in providers)
+                        outcome = "with_data" if providers else "no_data"
+                        regional_batch[country][outcome] += 1
+                        regional_batch[country][link_status + "_link"] += 1
+                        outcomes[outcome] += 1
+                        outcomes[link_status + "_link"] += 1
+                    batch["processed"] += 1
+                    if outcomes["failed"]:
+                        batch["failed"] += 1
+                    else:
+                        batch["with_data" if outcomes["with_data"] else "no_data"] += 1
+                        link_outcome = "invalid_link" if outcomes["invalid_link"] else (
+                            "valid_link" if outcomes["valid_link"] else "missing_link"
+                        )
+                        batch[link_outcome] += 1
+                    if stopped or retry_after_seconds is not None:
+                        break
+                session.flush()
+        except (SQLAlchemyError, ValueError) as exc:
+            raise TmdbProviderAllError(snapshot()) from exc
+        totals.update(batch)
+        for country in countries:
+            region_totals[country].update(regional_batch[country])
+        if stopped or retry_after_seconds is not None:
+            break
+    return snapshot()
+
+
+def _set_movie_trailer(
+    session: Session, movie: CatalogMovie, trailer: Trailer | None, attempted_at: datetime
+) -> None:
+    movie.trailer_site = trailer.site if trailer else None
+    movie.trailer_key = trailer.key if trailer else None
+    movie.trailer_name = trailer.name if trailer else None
+    movie.trailer_type = trailer.type if trailer else None
+    movie.trailer_official = trailer.official if trailer else None
+    movie.trailer_language = trailer.language if trailer else None
+    movie.trailer_published_at = trailer.published_at if trailer else None
+    movie.trailer_attempted_at = attempted_at
+    movie.trailer_succeeded_at = attempted_at
+    movie.trailer_status = "success"
+    session.flush()
+
+
+def _sqlite_utc(value: datetime | None) -> datetime | None:
+    """SQLite drops timezone metadata; compare UTC instants consistently."""
+    if value is None:
+        return None
+    return value.replace(tzinfo=UTC) if value.tzinfo is None else value.astimezone(UTC)
+
+
 def _prepare_genres(raw_genres: list[Mapping[str, Any]]) -> dict[int, str]:
     genres_by_id: dict[int, str] = {}
     for raw_genre in raw_genres:
@@ -266,10 +788,10 @@ def _prepare_movies(
     genres_by_id: Mapping[int, str],
     source_fetched_at: datetime,
     pages: int,
-) -> tuple[list[_PreparedMovie], int]:
+) -> tuple[list[_PreparedMovie], Counter[str]]:
     prepared_movies: list[_PreparedMovie] = []
     seen_source_ids: set[str] = set()
-    rejected_movie_count = 0
+    rejection_reasons: Counter[str] = Counter()
 
     for page in range(1, pages + 1):
         for raw_movie in client.fetch_popular_movies(page):
@@ -280,17 +802,17 @@ def _prepare_movies(
                     genres_by_id=genres_by_id,
                     source_fetched_at=source_fetched_at,
                 )
-            except _RejectedMovie:
-                rejected_movie_count += 1
+            except _RejectedMovie as exc:
+                rejection_reasons[str(exc)] += 1
                 continue
 
             if prepared_movie.source_id in seen_source_ids:
-                rejected_movie_count += 1
+                rejection_reasons["duplicate TMDb ID across popular pages"] += 1
                 continue
             seen_source_ids.add(prepared_movie.source_id)
             prepared_movies.append(prepared_movie)
 
-    return prepared_movies, rejected_movie_count
+    return prepared_movies, rejection_reasons
 
 
 def _prepare_movie(
@@ -314,6 +836,12 @@ def _prepare_movie(
     if backdrop_path is not None and not valid_backdrop_path(backdrop_path):
         backdrop_fetched = False
         backdrop_path = None
+    poster_media = raw_movie if "poster_path" in raw_movie else details
+    poster_fetched = poster_media is not None and "poster_path" in poster_media
+    poster_path = poster_media["poster_path"] if poster_fetched else None
+    if poster_path is not None and not valid_poster_path(poster_path):
+        poster_fetched = False
+        poster_path = None
     return _PreparedMovie(
         source_id=str(movie_id),
         title=title,
@@ -326,6 +854,8 @@ def _prepare_movie(
         source_fetched_at=source_fetched_at,
         backdrop_fetched=backdrop_fetched,
         backdrop_path=backdrop_path,
+        poster_fetched=poster_fetched,
+        poster_path=poster_path,
     )
 
 

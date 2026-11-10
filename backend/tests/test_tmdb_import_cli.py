@@ -7,7 +7,16 @@ from datetime import UTC, datetime
 from typing import Self
 
 import pytest
-from app.catalogue.tmdb_import import TmdbBackdropEnrichmentResult, TmdbImportResult
+from app.catalogue.tmdb_import import (
+    TmdbBackdropEnrichmentResult,
+    TmdbImportResult,
+    TmdbPosterEnrichmentResult,
+    TmdbProviderAllError,
+    TmdbProviderAllResult,
+    TmdbTrailerAllDatabaseError,
+    TmdbTrailerAllResult,
+    TmdbTrailerEnrichmentResult,
+)
 from app.cli import import_tmdb_catalogue as command
 
 
@@ -27,7 +36,7 @@ def test_blank_token_exits_nonzero_with_safe_actionable_guidance(
     )
 
 
-@pytest.mark.parametrize("pages", [1, 13, 15])
+@pytest.mark.parametrize("pages", [1, 13, 15, 50])
 def test_success_output_records_safe_provenance_counts(
     monkeypatch, capsys, pages
 ) -> None:
@@ -42,6 +51,7 @@ def test_success_output_records_safe_provenance_counts(
         source_fetched_at=datetime(2026, 10, 9, 9, 30, tzinfo=UTC),
         imported_at=datetime(2026, 10, 9, 9, 31, tzinfo=UTC),
         sample_source_ids=("101", "202", "303"),
+        rejection_reasons=(("duplicate TMDb ID across popular pages", 1),),
     )
 
     monkeypatch.setattr(
@@ -62,7 +72,7 @@ def test_success_output_records_safe_provenance_counts(
         import_snapshot,
     )
 
-    exit_code = command.main([] if pages == 1 else ["--pages", str(pages)])
+    exit_code = command.main([] if pages == 50 else ["--pages", str(pages)])
 
     assert exit_code == 0
     assert received_pages == [pages]
@@ -73,6 +83,7 @@ def test_success_output_records_safe_provenance_counts(
         "inserted=20\n"
         "updated=0\n"
         "rejected=1\n"
+        "rejection_reason[duplicate TMDb ID across popular pages]=1\n"
         "movies=20\n"
         "associated_genres=12\n"
         "finite_popularity_movies=19\n"
@@ -82,7 +93,7 @@ def test_success_output_records_safe_provenance_counts(
     )
 
 
-@pytest.mark.parametrize("pages", ["0", "16", "-1", "1.5", "many"])
+@pytest.mark.parametrize("pages", ["0", "51", "-1", "1.5", "many"])
 def test_invalid_page_budget_exits_before_client_or_database(monkeypatch, pages):
     def forbidden(*_args, **_kwargs):
         raise AssertionError("invalid arguments must not open a client or database")
@@ -94,8 +105,10 @@ def test_invalid_page_budget_exits_before_client_or_database(monkeypatch, pages)
     assert error.value.code == 2
 
 
-def test_enrichment_cli_prints_bounded_safe_counts(monkeypatch, capsys):
-    result = TmdbBackdropEnrichmentResult(
+@pytest.mark.parametrize("media", ["backdrops", "posters"])
+def test_enrichment_cli_prints_bounded_safe_counts(monkeypatch, capsys, media):
+    result_type = TmdbPosterEnrichmentResult if media == "posters" else TmdbBackdropEnrichmentResult
+    result = result_type(
         eligible_movie_count=255,
         fetched_movie_count=2,
         updated_movie_count=1,
@@ -112,11 +125,11 @@ def test_enrichment_cli_prints_bounded_safe_counts(monkeypatch, capsys):
         received.append(limit)
         return result
 
-    monkeypatch.setattr(command, "enrich_tmdb_backdrops", enrich)
-    assert command.main(["--enrich-backdrops", "--limit", "2"]) == 0
+    monkeypatch.setattr(command, f"enrich_tmdb_{media}", enrich)
+    assert command.main([f"--enrich-{media}", "--limit", "2"]) == 0
     assert received == [2]
     assert capsys.readouterr().out == (
-        "TMDb backdrop enrichment complete\n"
+        f"TMDb {media[:-1]} enrichment complete\n"
         "eligible=255\n"
         "fetched=2\n"
         "remaining=253\n"
@@ -133,6 +146,28 @@ def test_enrichment_cli_prints_bounded_safe_counts(monkeypatch, capsys):
     ["--enrich-backdrops", "--limit", "301"],
     ["--enrich-backdrops", "--pages", "1"],
     ["--limit", "2"],
+    ["--enrich-posters", "--limit", "0"],
+    ["--enrich-posters", "--limit", "301"],
+    ["--enrich-posters", "--pages", "15"],
+    ["--enrich-posters", "--enrich-backdrops"],
+    ["--enrich-trailers", "--limit", "0"],
+    ["--enrich-trailers", "--limit", "301"],
+    ["--enrich-trailers", "--pages", "1"],
+    ["--enrich-trailers", "--enrich-posters"],
+    ["--all"],
+    ["--enrich-backdrops", "--all", "--pages", "1"],
+    ["--enrich-posters", "--all", "--pages", "1"],
+    ["--enrich-trailers", "--all", "--pages", "1"],
+    ["--enrich-providers"],
+    ["--enrich-providers", "--all", "--pages", "1"],
+    ["--enrich-providers", "--all", "--limit", "301"],
+    ["--enrich-providers", "--all", "--limit", "0"],
+    ["--enrich-providers", "--enrich-trailers", "--all"],
+    ["--refresh"],
+    ["--countries", "US"],
+    ["--enrich-providers", "--all", "--countries", "VN"],
+    ["--enrich-providers", "--all", "--countries", "US", "US"],
+    ["--enrich-trailers", "--all", "--refresh"],
 ])
 def test_enrichment_cli_rejects_invalid_or_mixed_budgets_before_io(monkeypatch, arguments):
     def forbidden(*_args, **_kwargs):
@@ -143,6 +178,115 @@ def test_enrichment_cli_rejects_invalid_or_mixed_budgets_before_io(monkeypatch, 
     with pytest.raises(SystemExit) as error:
         command.main(arguments)
     assert error.value.code == 2
+
+
+@pytest.mark.parametrize("failed,stopped,exit_code", [(0, False, 0), (1, False, 1), (1, True, 1)])
+def test_trailer_cli_prints_safe_counts_and_failure_exit(monkeypatch, capsys, failed, stopped, exit_code):
+    monkeypatch.setattr(command.TmdbClient, "from_environment", lambda *_args: _FakeClient())
+    monkeypatch.setattr(command, "SessionLocal", lambda: _FakeSession())
+    limits = []
+
+    def enrich(_session, *, client, limit):
+        limits.append(limit)
+        return TmdbTrailerEnrichmentResult(3, 2, 1, 0, 1 - failed, failed, stopped,
+                                           remaining_movie_count=1)
+
+    monkeypatch.setattr(command, "enrich_tmdb_trailers", enrich)
+    assert command.main(["--enrich-trailers", "--limit", "2"]) == exit_code
+    assert limits == [2]
+    output = capsys.readouterr().out
+    assert output.startswith("TMDb trailer enrichment stopped\n" if stopped else
+                             "TMDb trailer enrichment complete\n")
+    assert "eligible=3\nfetched=2\nremaining=1\nupdated=1\n" in output
+    assert f"failed={failed}\n" in output
+
+
+def test_all_cli_reports_only_committed_batches_after_database_failure(monkeypatch, capsys):
+    partial = TmdbTrailerAllResult(
+        active_revision_id="revision-opaque-id", eligible_movie_count=5,
+        processed_movie_count=2, with_trailer_movie_count=1,
+        without_trailer_movie_count=1, failed_movie_count=0,
+        remaining_movie_count=3, authentication_stopped=False,
+    )
+    monkeypatch.setattr(command.TmdbClient, "from_environment", lambda: _FakeClient())
+
+    def fail(_factory, *, client, batch_size):
+        assert batch_size == 2
+        raise TmdbTrailerAllDatabaseError(partial)
+
+    monkeypatch.setattr(command, "enrich_tmdb_trailers_all", fail)
+    assert command.main(["--enrich-trailers", "--all", "--limit", "2"]) == 1
+    captured = capsys.readouterr()
+    assert "processed=2\nwith_trailer=1\nwithout_trailer=1\nfailed=0\nremaining=3\n" in captured.out
+    assert captured.err == "TMDb trailer enrichment failed: current batch rolled back\n"
+
+
+@pytest.mark.parametrize("failed,stopped,exit_code", [(0, False, 0), (1, False, 1), (1, True, 1)])
+@pytest.mark.parametrize("countries", [None, ["SG", "GB"]])
+def test_provider_cli_uses_whole_catalogue_and_prints_reconciled_counts(
+    monkeypatch, capsys, failed, stopped, exit_code, countries,
+):
+    monkeypatch.setattr(command.TmdbClient, "from_environment", lambda: _FakeClient())
+    calls = []
+
+    def enrich(_factory, *, client, batch_size, refresh, countries):
+        calls.append((batch_size, refresh, countries))
+        processed = 1 if stopped else 5
+        return TmdbProviderAllResult(
+            active_revision_id="revision-opaque-id", eligible_movie_count=5,
+            already_checked_movie_count=0, processed_movie_count=processed,
+            with_data_movie_count=processed - failed, failed_movie_count=failed,
+            valid_link_movie_count=processed - failed, remaining_movie_count=5 - processed,
+            authentication_stopped=stopped,
+        )
+
+    monkeypatch.setattr(command, "enrich_tmdb_providers_all", enrich)
+    arguments = ["--enrich-providers", "--all", "--limit", "2", "--refresh"]
+    if countries:
+        arguments.extend(["--countries", *countries])
+    assert command.main(arguments) == exit_code
+    assert calls == [(2, True, tuple(countries or ("US", "GB", "SG")))]
+    captured = capsys.readouterr()
+    assert captured.err == ""
+    assert "eligible=5\nalready_checked=0\n" in captured.out
+    assert f"failed={failed}\n" in captured.out
+    assert captured.out.startswith("TMDb regional provider enrichment all stopped\n" if stopped else
+                                   "TMDb regional provider enrichment all complete\n")
+    for field in ("with_data", "no_data", "valid_link", "missing_link", "invalid_link", "remaining"):
+        assert f"{field}=" in captured.out
+
+
+def test_provider_cli_database_failure_reports_committed_counts_only(monkeypatch, capsys):
+    monkeypatch.setattr(command.TmdbClient, "from_environment", lambda: _FakeClient())
+
+    def fail(_factory, **_kwargs):
+        raise TmdbProviderAllError(TmdbProviderAllResult(
+            active_revision_id="revision-id", eligible_movie_count=5, already_checked_movie_count=0,
+            processed_movie_count=2, no_data_movie_count=2, missing_link_movie_count=2,
+            remaining_movie_count=3,
+        ))
+
+    monkeypatch.setattr(command, "enrich_tmdb_providers_all", fail)
+    assert command.main(["--enrich-providers", "--all"]) == 1
+    captured = capsys.readouterr()
+    assert "processed=2\nwith_data=0\nno_data=2\n" in captured.out
+    assert "remaining=3\n" in captured.out
+    assert captured.err == "TMDb provider enrichment failed: current batch rolled back or catalogue changed\n"
+
+
+def test_provider_cli_deferred_retry_reports_delay_and_remaining(monkeypatch, capsys):
+    monkeypatch.setattr(command.TmdbClient, "from_environment", lambda: _FakeClient())
+    monkeypatch.setattr(command, "enrich_tmdb_providers_all", lambda *_args, **_kwargs: TmdbProviderAllResult(
+        active_revision_id="revision-id", eligible_movie_count=2, already_checked_movie_count=0,
+        processed_movie_count=1, failed_movie_count=1, remaining_movie_count=1,
+        retry_after_seconds=120,
+    ))
+    assert command.main(["--enrich-providers", "--all"]) == 1
+    captured = capsys.readouterr()
+    assert captured.out.startswith("TMDb regional provider enrichment all stopped\n")
+    assert "failed=1\n" in captured.out and "remaining=1\n" in captured.out
+    assert "retry_after_seconds=120\n" in captured.out
+    assert captured.err == ""
 
 
 class _FakeClient:

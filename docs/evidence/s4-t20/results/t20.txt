@@ -1,0 +1,17 @@
+
+> frontend@0.0.0 test:t20:ui
+> node scripts/run-t20-e2e.mjs
+
+s04_managed_servers=true
+
+Running 4 tests using 1 worker
+
+(node:11728) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 1 e2e\s4-t20.trailer.ts:62:1 › real API/SQLite: four media combinations in both themes and responsive widths (6.1s)
+  ok 2 e2e\s4-t20.trailer.ts:142:1 › broken-image fallback and SPA movie change remove the former trailer (659ms)
+  ok 3 e2e\s4-t20.trailer.ts:158:1 › late production detail response cannot restore another movie's trailer (698ms)
+  ok 4 e2e\s4-t20.trailer.ts:175:1 › keyboard opens the canonical YouTube destination in a separate tab (672ms)
+
+  4 passed (9.7s)
+s04_temporary_database_removed=true

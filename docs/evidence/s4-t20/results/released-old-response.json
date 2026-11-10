@@ -1,0 +1,52 @@
+{
+  "responses": [
+    {
+      "method": "GET",
+      "path": "/api/movies/20000000-0000-0000-0000-000000000001",
+      "requestTag": "t20-5de1f845-9f07-4550-b187-1ae24d5d6244",
+      "status": 200,
+      "body": {
+        "data": {
+          "movie": {
+            "id": "20000000-0000-0000-0000-000000000001",
+            "title": "Fixture both",
+            "releaseYear": 2026,
+            "genres": [
+              {
+                "id": 8101,
+                "name": "Action"
+              }
+            ],
+            "overview": "An astronaut rescue mission on the moon",
+            "popularityScore": 90,
+            "voteAverage": null,
+            "voteCount": null,
+            "backdropUrl": "https://image.tmdb.org/t/p/w780/t20-backdrop.jpg",
+            "posterUrl": null,
+            "trailer": {
+              "site": "YouTube",
+              "key": "AbCdEf123_-",
+              "name": "Official fixture trailer",
+              "type": "Trailer",
+              "official": true,
+              "language": "en",
+              "publishedAt": null,
+              "url": "https://www.youtube.com/watch?v=AbCdEf123_-"
+            }
+          }
+        },
+        "meta": {
+          "catalogueRevision": "s04-browser-main"
+        }
+      }
+    }
+  ],
+  "completed": 1,
+  "aborted": 0,
+  "pending": 0,
+  "match": {
+    "method": "GET",
+    "path": "/api/movies/20000000-0000-0000-0000-000000000001",
+    "requestTag": "t20-5de1f845-9f07-4550-b187-1ae24d5d6244"
+  }
+}

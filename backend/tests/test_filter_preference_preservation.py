@@ -78,3 +78,52 @@ def test_read_flow_preserves_committed_rows_for_both_accounts_and_catalogue(scen
         )
         assert connection.execute("PRAGMA foreign_key_check").fetchall() == []
         assert connection.execute("PRAGMA integrity_check").fetchone() == ("ok",)
+
+
+def test_exact_two_action_three_comedy_filter_and_clear_after_real_rating(
+    migrated_template: Path, tmp_path: Path,
+):
+    path = tmp_path / "reranked-filter.db"
+    shutil.copyfile(migrated_template, path)
+    with filter_scenario(path, rating_ties=True) as state:
+        before = preference_rows(path)
+        http = state.account_a
+        base = http.get("/api/me/recommendations").json()
+        revision = base["meta"]["catalogueRevision"]
+        original = base["data"]["movies"]
+        assert [movie["title"] for movie in original] == EXPECTED_TITLES
+        other = state.account_b.get("/api/me/recommendations").json()
+        assert [m["title"] for m in other["data"]["movies"]] == ["Outside snapshot"]
+
+        def check_views(expected):
+            for genre_id, count in [(28, 2), (35, 3), (27, 0), (None, 5)]:
+                params = {"page": 1, "catalogueRevision": revision}
+                if genre_id is not None:
+                    params["genreId"] = genre_id
+                response = http.get("/api/me/recommendations", params=params)
+                assert response.status_code == 200
+                body = response.json()
+                selected = [m for m in expected if genre_id is None or
+                            any(g["id"] == genre_id for g in m["genres"])]
+                assert body["data"]["movies"] == selected
+                assert body["data"]["personalised"] and not body["data"]["noMatch"]
+                assert body["meta"] == {
+                    "count": count, "limit": 10, "page": 1, "total": count,
+                    "totalPages": int(count > 0), "unfilteredTotal": 5,
+                    "catalogueRevision": revision,
+                }
+                assert preference_rows(path) == before
+                assert state.account_b.get("/api/me/recommendations").json() == other
+
+        check_views(original)
+        for rating, expected_titles in [
+            (1, ["Comedy C", "Action Z", "Action A", "Comedy A", "Comedy B"]),
+            (5, EXPECTED_TITLES),
+        ]:
+            saved = http.put(f"/api/me/ratings/{original[0]['id']}",
+                             json={"rating": rating}, headers={"Origin": "http://testserver"})
+            assert saved.status_code == 200
+            latest = http.get("/api/me/recommendations").json()["data"]["movies"]
+            assert [m["title"] for m in latest] == expected_titles
+            assert latest != original  # Clear must restore current scores too.
+            check_views(latest)

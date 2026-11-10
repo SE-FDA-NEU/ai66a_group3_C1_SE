@@ -1,0 +1,1166 @@
+{
+  "runner": "Codex author verification",
+  "date": "2026-10-30T15:19:05.772838+07:00",
+  "testedCommit": "6aa1941dd506f6ce6a3c683f4580c748f75125f4",
+  "database": "/private/tmp/s4-t18-live-resume-20261030/catalogue.db",
+  "checks": [
+    {
+      "method": "GET",
+      "path": "/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=1&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=2&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=3&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=4&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=5&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=6&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=7&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=8&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=9&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=10&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=11&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=12&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=13&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=14&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=15&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=16&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=17&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=18&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=19&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=20&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=21&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=22&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=23&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=24&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=25&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=26&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=27&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=28&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=29&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=30&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=31&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=32&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=33&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=34&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=35&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=36&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=37&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=38&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=39&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=40&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=41&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=42&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=43&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=44&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=45&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=46&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=47&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=48&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=49&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=50&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=51&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=52&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=53&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=54&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=55&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=56&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=57&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=58&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=59&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=60&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=61&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=62&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=63&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=64&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=65&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=66&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=67&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=68&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=69&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=70&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=71&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=72&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=73&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=74&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=75&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=76&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=77&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=78&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=79&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=80&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=81&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=82&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=83&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=84&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=85&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=86&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=87&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=88&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=89&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=90&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=91&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=92&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=93&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=94&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=95&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=96&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=97&sort=title_asc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=1&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=2&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=3&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=4&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=5&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=6&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=7&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=8&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=9&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=10&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=11&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=12&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=13&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=14&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=15&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=16&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=17&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=18&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=19&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=20&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=21&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=22&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=23&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=24&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=25&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=26&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=27&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=28&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=29&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=30&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=31&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=32&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=33&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=34&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=35&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=36&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=37&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=38&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=39&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=40&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=41&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=42&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=43&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=44&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=45&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=46&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=47&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=48&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=49&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=50&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=51&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=52&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=53&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=54&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=55&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=56&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=57&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=58&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=59&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=60&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=61&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=62&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=63&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=64&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=65&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=66&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=67&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=68&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=69&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=70&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=71&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=72&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=73&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=74&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=75&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=76&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=77&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=78&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=79&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=80&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=81&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=82&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=83&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=84&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=85&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=86&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=87&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=88&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=89&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=90&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=91&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=92&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=93&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=94&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=95&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=96&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies?limit=10&page=97&sort=title_desc&catalogueRevision=00a9831b-1c3a-489b-a8cf-51d36424e702",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies/popular?limit=10",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies/eacab369-a9e2-49ea-98b1-ff4679159e42",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies/eacab369-a9e2-49ea-98b1-ff4679159e42/similar",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies/search",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/movies/search",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/watchlist",
+      "status": 401
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/recommendations",
+      "status": 401
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/register",
+      "status": 201
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/recommendations",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "path": "/api/me/preferences",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/recommendations",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/ratings/eacab369-a9e2-49ea-98b1-ff4679159e42",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "path": "/api/me/ratings/eacab369-a9e2-49ea-98b1-ff4679159e42",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/ratings/eacab369-a9e2-49ea-98b1-ff4679159e42",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "path": "/api/me/watchlist/eacab369-a9e2-49ea-98b1-ff4679159e42",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/me/profile/reset",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/preferences",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/ratings/eacab369-a9e2-49ea-98b1-ff4679159e42",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/watchlist/eacab369-a9e2-49ea-98b1-ff4679159e42",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/recommendations",
+      "status": 200
+    }
+  ],
+  "migrationHead": "f2c7e4a91b60",
+  "revision": {
+    "id": "00a9831b-1c3a-489b-a8cf-51d36424e702",
+    "provider": "tmdb",
+    "created_at": "2026-10-30 08:06:43.080794",
+    "inserted_movie_count": 964,
+    "updated_movie_count": 0,
+    "rejected_movie_count": 36
+  },
+  "activeCount": 964,
+  "distinctSourceIds": 964,
+  "sources": [
+    "tmdb"
+  ],
+  "finitePopularityCount": 964,
+  "associatedGenres": 19,
+  "fetchTimestampCount": 964,
+  "firstFetchedAt": "2026-10-30 08:06:16.043516",
+  "lastFetchedAt": "2026-10-30 08:06:16.043516",
+  "sampleProvenance": [
+    {
+      "id": "a6e353af-f46a-4697-a0b8-ee8a58f4f9ed",
+      "source": "tmdb",
+      "source_id": "10020",
+      "source_fetched_at": "2026-10-30 08:06:16.043516"
+    },
+    {
+      "id": "b161d5bb-12a1-41e6-ac48-fe821857ec4b",
+      "source": "tmdb",
+      "source_id": "1003596",
+      "source_fetched_at": "2026-10-30 08:06:16.043516"
+    },
+    {
+      "id": "b714d15a-5e9c-4405-8b80-6490e0bcabad",
+      "source": "tmdb",
+      "source_id": "100402",
+      "source_fetched_at": "2026-10-30 08:06:16.043516"
+    }
+  ],
+  "index": {
+    "ready": true,
+    "catalogueRevision": "00a9831b-1c3a-489b-a8cf-51d36424e702",
+    "corpusDigest": "3ac90bf45649bba63965b0ff9b723d9588c00a64c58a7a204029aa80a19aca1e",
+    "configFingerprint": "41785781f34ba44091ac64f3b1c0503402ee760c518af1429d0acb94bbc31c99",
+    "movies": 964,
+    "usableDocuments": 962
+  },
+  "topMovie": {
+    "id": "eacab369-a9e2-49ea-98b1-ff4679159e42",
+    "title": "The Dark Knight",
+    "releaseYear": 2008,
+    "genres": [
+      {
+        "id": 28,
+        "name": "Action"
+      },
+      {
+        "id": 53,
+        "name": "Thriller"
+      },
+      {
+        "id": 80,
+        "name": "Crime"
+      }
+    ],
+    "popularityScore": 2410.1551,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/w780/9FE5eD92WfVCiivM9Pq9GVSrlWk.jpg"
+  },
+  "descriptionQuery": "the stakes in",
+  "descriptionTitleMatchesInSql": 0,
+  "descriptionResultTotal": 16,
+  "status": "PASS"
+}

@@ -13,7 +13,7 @@ function response(rating: unknown, movieId = "movie-a", status = 200) {
 }
 afterEach(() => vi.restoreAllMocks());
 
-it.each([null, 1, 2, 3, 4, 5])(
+it.each([null, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5])(
   "reads committed rating %s with cookies and cancellation",
   async (rating) => {
     const fetch = vi
@@ -31,7 +31,7 @@ it.each([null, 1, 2, 3, 4, 5])(
   },
 );
 
-it.each([1, 2, 3, 4, 5] as const)(
+it.each([0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5] as const)(
   "writes strict rating %s without account identifiers",
   async (rating) => {
     const fetch = vi
@@ -53,7 +53,7 @@ it.each([1, 2, 3, 4, 5] as const)(
   },
 );
 
-it.each([0, 6, -1, 3.5, "5", true, false, null, undefined, NaN, Infinity])(
+it.each([0, 6, -1, 3.25, "5", true, false, null, undefined, NaN, Infinity])(
   "rejects invalid draft %s before a request",
   async (value) => {
     const fetch = vi.spyOn(globalThis, "fetch");
@@ -64,7 +64,7 @@ it.each([0, 6, -1, 3.5, "5", true, false, null, undefined, NaN, Infinity])(
   },
 );
 
-it.each([0, 6, 3.5, "5", true, undefined])(
+it.each([0, 6, 3.25, "5", true, undefined])(
   "rejects an invalid successful read %s",
   async (value) => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(response(value));

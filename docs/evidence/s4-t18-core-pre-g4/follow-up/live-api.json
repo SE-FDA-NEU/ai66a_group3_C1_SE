@@ -1,0 +1,40 @@
+{
+  "/health": {
+    "status": 200,
+    "body": {
+      "status": "ok",
+      "database": "connected",
+      "migrationVersion": "f2c7e4a91b60"
+    }
+  },
+  "/api/movies?limit=10": {
+    "status": 503,
+    "body": {
+      "error": {
+        "code": "CATALOGUE_UNAVAILABLE",
+        "message": "Movie catalogue is unavailable",
+        "requestId": "req_c3f807e1ec174a20bc11f4c099bd44ed"
+      }
+    }
+  },
+  "/api/movies/popular?limit=10": {
+    "status": 503,
+    "body": {
+      "error": {
+        "code": "CATALOGUE_UNAVAILABLE",
+        "message": "Movie catalogue is unavailable",
+        "requestId": "req_7ec9fef48c6d4da3951fd5620a3e0104"
+      }
+    }
+  },
+  "/api/movies/search?q=space&mode=description": {
+    "status": 503,
+    "body": {
+      "error": {
+        "code": "CATALOGUE_UNAVAILABLE",
+        "message": "Movie catalogue is unavailable",
+        "requestId": "req_c3cf3657064e4dee8543f7857a519953"
+      }
+    }
+  }
+}

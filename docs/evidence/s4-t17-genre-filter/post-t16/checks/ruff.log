@@ -1,0 +1,8 @@
+Captured: 2026-10-28T10:36:58.539283+07:00
+HEAD: af50498bd2c7326760497c864cd542e47f533de8
+Command: .venv/bin/python -m ruff check backend
+Environment: TMDB_READ_ACCESS_TOKEN=empty TMDB_NETWORK_DISABLED=1
+
+All checks passed!
+
+Exit code: 0

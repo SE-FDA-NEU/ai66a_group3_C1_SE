@@ -122,6 +122,7 @@ def build_app(path: Path, live: bool):
         if live or payload.get("path") not in {
             "/api/movies/t28-movie-a",
             "/api/me/ratings/t28-movie-a",
+            "/api/me/recommendations",
         }:
             raise HTTPException(400)
         name = payload["path"]

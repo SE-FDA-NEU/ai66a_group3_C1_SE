@@ -1,0 +1,218 @@
+[
+  {
+    "theme": "dark",
+    "width": 375,
+    "label": "both",
+    "backdropLoaded": true,
+    "naturalWidth": 1600,
+    "trailerLink": true,
+    "overflow": false
+  },
+  {
+    "theme": "dark",
+    "width": 375,
+    "label": "backdrop",
+    "backdropLoaded": true,
+    "naturalWidth": 1600,
+    "trailerLink": false,
+    "overflow": false
+  },
+  {
+    "theme": "dark",
+    "width": 375,
+    "label": "trailer",
+    "backdropLoaded": false,
+    "naturalWidth": 0,
+    "trailerLink": true,
+    "overflow": false
+  },
+  {
+    "theme": "dark",
+    "width": 375,
+    "label": "neither",
+    "backdropLoaded": false,
+    "naturalWidth": 0,
+    "trailerLink": false,
+    "overflow": false
+  },
+  {
+    "theme": "dark",
+    "width": 768,
+    "label": "both",
+    "backdropLoaded": true,
+    "naturalWidth": 1600,
+    "trailerLink": true,
+    "overflow": false
+  },
+  {
+    "theme": "dark",
+    "width": 768,
+    "label": "backdrop",
+    "backdropLoaded": true,
+    "naturalWidth": 1600,
+    "trailerLink": false,
+    "overflow": false
+  },
+  {
+    "theme": "dark",
+    "width": 768,
+    "label": "trailer",
+    "backdropLoaded": false,
+    "naturalWidth": 0,
+    "trailerLink": true,
+    "overflow": false
+  },
+  {
+    "theme": "dark",
+    "width": 768,
+    "label": "neither",
+    "backdropLoaded": false,
+    "naturalWidth": 0,
+    "trailerLink": false,
+    "overflow": false
+  },
+  {
+    "theme": "dark",
+    "width": 1440,
+    "label": "both",
+    "backdropLoaded": true,
+    "naturalWidth": 1600,
+    "trailerLink": true,
+    "overflow": false
+  },
+  {
+    "theme": "dark",
+    "width": 1440,
+    "label": "backdrop",
+    "backdropLoaded": true,
+    "naturalWidth": 1600,
+    "trailerLink": false,
+    "overflow": false
+  },
+  {
+    "theme": "dark",
+    "width": 1440,
+    "label": "trailer",
+    "backdropLoaded": false,
+    "naturalWidth": 0,
+    "trailerLink": true,
+    "overflow": false
+  },
+  {
+    "theme": "dark",
+    "width": 1440,
+    "label": "neither",
+    "backdropLoaded": false,
+    "naturalWidth": 0,
+    "trailerLink": false,
+    "overflow": false
+  },
+  {
+    "theme": "light",
+    "width": 375,
+    "label": "both",
+    "backdropLoaded": true,
+    "naturalWidth": 1600,
+    "trailerLink": true,
+    "overflow": false
+  },
+  {
+    "theme": "light",
+    "width": 375,
+    "label": "backdrop",
+    "backdropLoaded": true,
+    "naturalWidth": 1600,
+    "trailerLink": false,
+    "overflow": false
+  },
+  {
+    "theme": "light",
+    "width": 375,
+    "label": "trailer",
+    "backdropLoaded": false,
+    "naturalWidth": 0,
+    "trailerLink": true,
+    "overflow": false
+  },
+  {
+    "theme": "light",
+    "width": 375,
+    "label": "neither",
+    "backdropLoaded": false,
+    "naturalWidth": 0,
+    "trailerLink": false,
+    "overflow": false
+  },
+  {
+    "theme": "light",
+    "width": 768,
+    "label": "both",
+    "backdropLoaded": true,
+    "naturalWidth": 1600,
+    "trailerLink": true,
+    "overflow": false
+  },
+  {
+    "theme": "light",
+    "width": 768,
+    "label": "backdrop",
+    "backdropLoaded": true,
+    "naturalWidth": 1600,
+    "trailerLink": false,
+    "overflow": false
+  },
+  {
+    "theme": "light",
+    "width": 768,
+    "label": "trailer",
+    "backdropLoaded": false,
+    "naturalWidth": 0,
+    "trailerLink": true,
+    "overflow": false
+  },
+  {
+    "theme": "light",
+    "width": 768,
+    "label": "neither",
+    "backdropLoaded": false,
+    "naturalWidth": 0,
+    "trailerLink": false,
+    "overflow": false
+  },
+  {
+    "theme": "light",
+    "width": 1440,
+    "label": "both",
+    "backdropLoaded": true,
+    "naturalWidth": 1600,
+    "trailerLink": true,
+    "overflow": false
+  },
+  {
+    "theme": "light",
+    "width": 1440,
+    "label": "backdrop",
+    "backdropLoaded": true,
+    "naturalWidth": 1600,
+    "trailerLink": false,
+    "overflow": false
+  },
+  {
+    "theme": "light",
+    "width": 1440,
+    "label": "trailer",
+    "backdropLoaded": false,
+    "naturalWidth": 0,
+    "trailerLink": true,
+    "overflow": false
+  },
+  {
+    "theme": "light",
+    "width": 1440,
+    "label": "neither",
+    "backdropLoaded": false,
+    "naturalWidth": 0,
+    "trailerLink": false,
+    "overflow": false
+  }
+]

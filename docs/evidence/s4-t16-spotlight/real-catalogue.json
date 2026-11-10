@@ -1,0 +1,62 @@
+{
+  "capturedAt": "2026-10-27T13:30:40.511Z",
+  "source": "Read-only SQLite backup of user TMDb-imported catalogue; no import, account mutation or source database write",
+  "artwork": "Real TMDb image CDN; no fixture routes",
+  "checks": [
+    {
+      "page": 1,
+      "slide": 1,
+      "rank": 1,
+      "movieId": "18ae3a02-bbb5-4dbd-b038-057441fb77a5",
+      "title": "Spider-Man: Brand New Day",
+      "backdropLoaded": true,
+      "total": 980
+    },
+    {
+      "page": 1,
+      "slide": 2,
+      "rank": 2,
+      "movieId": "daaa88f1-0f10-43eb-a117-e6d3b4d05dcc",
+      "title": "Hope",
+      "backdropLoaded": true,
+      "total": 980
+    },
+    {
+      "page": 1,
+      "slide": 3,
+      "rank": 3,
+      "movieId": "b0981331-4924-481b-8f94-bd73378e9ebc",
+      "title": "Fall 2: Deadpoint",
+      "backdropLoaded": true,
+      "total": 980
+    },
+    {
+      "page": 2,
+      "slide": 1,
+      "rank": 11,
+      "movieId": "a3a39c21-a0e9-4eb2-bf92-72faee429721",
+      "title": "Pinocchio: Unstrung",
+      "backdropLoaded": true,
+      "total": 980
+    },
+    {
+      "page": 2,
+      "slide": 2,
+      "rank": 12,
+      "movieId": "2359f608-b800-4b65-852b-649bd0bbcfca",
+      "title": "Masterplan",
+      "backdropLoaded": true,
+      "total": 980
+    },
+    {
+      "page": 2,
+      "slide": 3,
+      "rank": 13,
+      "movieId": "7ac706a5-90bf-4e87-b9a5-54a456a5addd",
+      "title": "The Fix",
+      "backdropLoaded": true,
+      "total": 980
+    }
+  ],
+  "searchCards": 10
+}

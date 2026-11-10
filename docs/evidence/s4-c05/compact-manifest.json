@@ -1,0 +1,213 @@
+{
+  "selectedExecutableCommit": "132394c57a12b81bf889227f96370f39531bbb08",
+  "tester": "Codex assisting implementation; not an independent teammate approval",
+  "date": "2026-11-01",
+  "environment": {
+    "platform": "Windows-11-10.0.26300-SP0",
+    "python": "Python 3.12.6",
+    "node": "v24.19.0"
+  },
+  "defaultSuite": {
+    "logicalP0Ids": 37,
+    "collectedItems": 40,
+    "files": [
+      "tests/test_p0_acceptance.py",
+      "tests/test_s03_details.py"
+    ]
+  },
+  "checks": {
+    "venv": {
+      "exitCode": 0,
+      "seconds": 5.2
+    },
+    "pip-upgrade": {
+      "exitCode": 0,
+      "seconds": 5.38
+    },
+    "locked-install": {
+      "exitCode": 0,
+      "seconds": 16.41
+    },
+    "editable-install": {
+      "exitCode": 0,
+      "seconds": 5.25
+    },
+    "pip-check": {
+      "exitCode": 0,
+      "seconds": 0.53
+    },
+    "literal-pytest": {
+      "exitCode": 0,
+      "seconds": 17.62
+    },
+    "verbose-pytest": {
+      "exitCode": 0,
+      "seconds": 17.44
+    },
+    "focused": {
+      "exitCode": 0,
+      "seconds": 18.22
+    },
+    "trace": {
+      "exitCode": 0,
+      "seconds": 2.31
+    },
+    "contract": {
+      "exitCode": 0,
+      "seconds": 0.09
+    },
+    "line-endings": {
+      "exitCode": 0,
+      "seconds": 0.61
+    },
+    "ruff": {
+      "exitCode": 0,
+      "seconds": 0.19
+    },
+    "startup": {
+      "exitCode": 0,
+      "seconds": 7.22
+    },
+    "npm-ci": {
+      "exitCode": 0,
+      "seconds": 8.16
+    },
+    "frontend-lint": {
+      "exitCode": 0,
+      "seconds": 8.51
+    },
+    "frontend-build": {
+      "exitCode": 0,
+      "seconds": 5.24
+    },
+    "p0-ruff": {
+      "exitCode": 0,
+      "seconds": 0.16
+    }
+  },
+  "lockfilesSha256": {
+    "backend/requirements.lock.txt": "4584f1625d9fc7137b4f4c3ff29bb36ac39bddda28829dfbcf674bcb90a1c72e",
+    "frontend/package-lock.json": "f9dd904838f3dbcf92b910912e6bd4430984c265cbd3d79d98265fc32015da44"
+  },
+  "frontendArtifactsSha256": {
+    "frontend/dist/index.html": "f5d4cad62cb7b57fcc294501a4a3b5ea3f176eb16df3a676bddd9a1ca36ba980",
+    "frontend/dist/assets/index-BY2gnITW.css": "715d27127bedff43a272e52bad71aab18bafa52f6a586ec47714789bd10e53d3",
+    "frontend/dist/assets/index-IY8BVZI3.js": "8fafc89f798aedf8a91935c1f13bfbb1e0ef8f0cfc2d3360de8fd5f298a68480"
+  },
+  "liveProvisioning": {
+    "status": "passed",
+    "checks": {
+      "live-heads": {
+        "exitCode": 0,
+        "seconds": 1.22
+      },
+      "live-upgrade": {
+        "exitCode": 0,
+        "seconds": 1.11
+      },
+      "live-current": {
+        "exitCode": 0,
+        "seconds": 0.86
+      },
+      "live-import": {
+        "exitCode": 0,
+        "seconds": 18.59
+      },
+      "live-trailers": {
+        "exitCode": 0,
+        "seconds": 283.17
+      },
+      "live-index-rebuild": {
+        "exitCode": 0,
+        "seconds": 1.06
+      },
+      "live-index-check": {
+        "exitCode": 0,
+        "seconds": 0.91
+      },
+      "live-review-account": {
+        "exitCode": 0,
+        "seconds": 1.12
+      }
+    },
+    "result": "951 valid movies from50 pages;858 with trailer,93 without,0failed/remaining",
+    "recoveryEvidence": "checks/compact-live-recovery.json",
+    "runtimeTokenBlank": true,
+    "userOriginalDatabaseTouched": false
+  },
+  "deployment": "local release rehearsal only; no cloud deployment claimed",
+  "independentTeammateReview": "pending",
+  "freshCloneInitialCommit": "21bd245069c25d52edcebb7367b66e9fddf28068",
+  "candidateAmendment": "Only assertions in three existing P0 cases and an evidence anchor changed after initial clean installation; default remains40.",
+  "liveRecovery": {
+    "selectedExecutableCommit": "132394c57a12b81bf889227f96370f39531bbb08",
+    "liveProvisioningExecutedAt": "21bd245069c25d52edcebb7367b66e9fddf28068",
+    "productionAndLockfilesEquivalent": true,
+    "environment": "fresh-clone local release; original user database untouched",
+    "migrationHead": "a3d1f8b72c44",
+    "catalogue": {
+      "movies": 951,
+      "posters": 951,
+      "backdrops": 947,
+      "trailers": 858,
+      "accounts": 2,
+      "watchlistRows": 2
+    },
+    "publicHTTP": "health/catalogue/detail/description-search/similar passed",
+    "descriptionSearchMatches": 5,
+    "similarMovies": 5,
+    "twoAccountsAfterRestart": "preferences, half-star ratings and watchlists retained separately",
+    "backupRestore": {
+      "allLogicalTableRowsEqual": true,
+      "logicalSnapshotSHA256": "1711b2c6a7e90012b3faf8c50c642c243aab3c540f4c0b34d83f340184094beb",
+      "backup": {
+        "action": "backup",
+        "activeRevision": "aa27fb2a-dea6-404a-afbc-8b655492f7aa",
+        "counts": {
+          "catalog_movies": 951,
+          "user_genre_preferences": 2,
+          "user_movie_ratings": 2,
+          "user_movie_watchlist": 2,
+          "users": 2
+        },
+        "migrationVersion": "a3d1f8b72c44",
+        "sha256": "f6b5278c6008d77ac069b5792147bc124c786cf4a06c3e1f8e7d83f1866aa6a1"
+      },
+      "restore": {
+        "action": "restore",
+        "activeRevision": "aa27fb2a-dea6-404a-afbc-8b655492f7aa",
+        "counts": {
+          "catalog_movies": 951,
+          "user_genre_preferences": 2,
+          "user_movie_ratings": 2,
+          "user_movie_watchlist": 2,
+          "users": 2
+        },
+        "migrationVersion": "a3d1f8b72c44",
+        "sha256": "f6b5278c6008d77ac069b5792147bc124c786cf4a06c3e1f8e7d83f1866aa6a1"
+      }
+    },
+    "resetOnRecoveredCopy": "A genres/ratings cleared; A/B watchlists and B profile unchanged; catalogue/index retained",
+    "servers": "three owned ephemeral-port backends stopped; user ports untouched",
+    "secrets": "runtime token blank/network disabled; private token used only by prior CLI import/enrichment",
+    "probeCorrection": "Initial harness attempted guest /api/genres; corrected to authenticated read. No product change was needed."
+  },
+  "sourceEquivalence": "Backend/frontend/workflows/lockfiles unchanged between initial clean clone21bd245 and final executable132394c; only three existing P0 assertions and an evidence anchor were amended.",
+  "logs": {
+    "installation": "checks/compact-install.log",
+    "lintAndBuild": "checks/compact-build.log",
+    "traceAndContract": "checks/compact-contracts.log",
+    "liveProvisioning": "checks/compact-live-provision.log",
+    "plain": "checks/compact-literal-pytest.log",
+    "verbose": "checks/compact-verbose-pytest.log",
+    "focused": "checks/compact-focused.log",
+    "startup": "checks/compact-startup.log",
+    "regressionRed": "checks/compact-storage-red.log"
+  },
+  "screenshot": {
+    "path": "checks/compact-verbose-output.png",
+    "description": "Browser screenshot displaying the complete saved real verbose output;40 PASSED names; not a native terminal capture"
+  },
+  "fullRegressions": "not run for this amendment; retained as explicit optional workflows/commands",
+  "cleanup": "passed: all owned disposable clone, databases, backups, index, venv and browser profile removed; owned backends stopped"
+}

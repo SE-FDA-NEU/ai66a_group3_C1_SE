@@ -81,7 +81,7 @@ class FilterScenario:
 
 
 @contextmanager
-def filter_scenario(path: Path) -> Iterator[FilterScenario]:
+def filter_scenario(path: Path, *, rating_ties: bool = False) -> Iterator[FilterScenario]:
     """Seed six synthetic movies and two accounts, not a developer database."""
     engine = create_engine(
         f"sqlite:///{path.as_posix()}", connect_args={"check_same_thread": False}
@@ -113,7 +113,9 @@ def filter_scenario(path: Path) -> Iterator[FilterScenario]:
                     source="synthetic-t16",
                     source_id=source_id,
                     title=title,
-                    popularity_score=popularity,
+                    # Preserve the five-title oracle while allowing one committed
+                    # rating to move Action Z across Comedy C's score of 90.
+                    popularity_score=90 if rating_ties and source_id == "action-z" else popularity,
                 )
                 replace_movie_genres(session, movie=movie, genre_ids=[genre_id])
             activate_catalogue_revision(session, revision_id=revision.id)

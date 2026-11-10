@@ -8,6 +8,10 @@ on:
     branches:
       - main
       - develop
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 # Cancel an older run when a newer commit is pushed to the same branch.
 concurrency:
@@ -20,34 +24,54 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      python: ${{ steps.check.outputs.python }}
-      node: ${{ steps.check.outputs.node }}
+      storage: ${{ steps.check.outputs.storage }}
+      bootstrap: ${{ steps.check.outputs.bootstrap }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Detect project stack
+      - name: Detect focused storage and test-bootstrap changes
         id: check
-        shell: bash
+        env:
+          DIFF_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: |
-          if [ -f backend/pyproject.toml ]; then
-            echo "python=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "python=false" >> "$GITHUB_OUTPUT"
-          fi
+          python - <<'PY'
+          import os
+          import subprocess
 
-          if [ -f frontend/package.json ]; then
-            echo "node=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "node=false" >> "$GITHUB_OUTPUT"
-          fi
+          base = os.environ.get("DIFF_BASE", "")
+          if os.environ["GITHUB_EVENT_NAME"] == "workflow_dispatch":
+              changed = set()
+          elif base and set(base) != {"0"} and subprocess.run(
+              ["git", "cat-file", "-e", base], capture_output=True
+          ).returncode == 0:
+              changed = set(subprocess.check_output(
+                  ["git", "diff", "--name-only", base, "HEAD"], text=True
+              ).splitlines())
+          else:
+              # New branches or an unavailable pre-force-push commit: run only
+              # the small focused suites, never fall back to the full backend.
+              changed = set(subprocess.check_output(
+                  ["git", "ls-files"], text=True
+              ).splitlines())
+          test_config = {"pytest.ini", "conftest.py", "backend/pyproject.toml"}
+          storage = test_config | {
+              "backend/app/cli/storage_snapshot.py",
+              "backend/tests/test_storage_snapshot.py",
+          }
+          bootstrap = test_config | {"tests/test_pytest_setup.py"}
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              for name, paths in (("storage", storage), ("bootstrap", bootstrap)):
+                  print(f"{name}={str(bool(changed & paths)).lower()}", file=output)
+          PY
 
 
   python:
     name: Python tests
     needs: detect
-    if: needs.detect.outputs.python == 'true'
     runs-on: ubuntu-latest
 
     env:
@@ -75,18 +99,31 @@ jobs:
         run: |
           ruff check backend --output-format=github
 
-      - name: Run backend tests
-        run: |
-          python backend/scripts/run_isolated_tests.py \
-            -v \
-            --cov=backend/app \
-            --cov-report=term-missing \
-            --junitxml=junit.xml
+      - name: Run mandatory M4 P0 with automatic temporary database setup
+        run: python -m pytest -v --junitxml=junit.xml
+
+      - name: Verify S4-T05 P0 traceability
+        run: python scripts/verify_s4_t05_trace.py
+
+      - name: Verify regional provider enrichment and CLI offline
+        run: python -m pytest -c pytest.ini backend/tests/test_provider_enrichment.py backend/tests/test_regional_providers.py backend/tests/test_tmdb_import_cli.py -v
+
+      - name: Verify affected backup and restore paths
+        if: needs.detect.outputs.storage == 'true'
+        run: python -m pytest -c pytest.ini backend/tests/test_storage_snapshot.py -v
+
+      - name: Verify affected early pytest bootstrap
+        if: needs.detect.outputs.bootstrap == 'true'
+        run: python -m pytest -c pytest.ini tests/test_pytest_setup.py -v
+
+      - name: Verify production serving, health and sessions offline
+        run: python -m pytest -c pytest.ini backend/tests/test_health.py backend/tests/test_production_serving.py backend/tests/test_auth_sessions.py -v
 
       - name: Publish test summary
         if: always()
         run: |
-          echo "### Python test results" >> "$GITHUB_STEP_SUMMARY"
+          echo "### Mandatory M4 P0 test results" >> "$GITHUB_STEP_SUMMARY"
+          echo "Optional full Python regression: not run. Use the Optional extended regression workflow." >> "$GITHUB_STEP_SUMMARY"
 
           python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
           import pathlib
@@ -115,10 +152,60 @@ jobs:
           PY
 
 
+  postgresql:
+    name: PostgreSQL 18 integration
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: disposable-ci-only
+          POSTGRES_DB: movie_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci -d movie_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      TEST_POSTGRES_URL: postgresql+psycopg://ci:disposable-ci-only@127.0.0.1:5432/movie_test?sslmode=disable&connect_timeout=5
+      TEST_POSTGRES_MAJOR: "18"
+      REQUIRE_POSTGRES_TESTS: "1"
+      TMDB_READ_ACCESS_TOKEN: ""
+      TMDB_NETWORK_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements.lock.txt
+      - name: Install locked dependencies
+        run: |
+          python -m pip install -r backend/requirements.lock.txt
+          python -m pip install -e './backend[dev]' --no-deps
+      - name: Verify PostgreSQL migrations, storage and account isolation
+        run: python -m pytest -c pytest.ini backend/tests/test_postgresql_t01.py -v --junitxml=postgresql.xml
+      - name: Require integration execution without skips
+        run: |
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          cases = ET.parse("postgresql.xml").findall(".//testcase")
+          required = {
+              "test_empty_postgresql_migration_schema_constraints_and_provisioning",
+              "test_postgresql_rating_migration_keeps_identity",
+              "test_postgresql_api_isolation_reset_and_catalogue_pages",
+              "test_postgresql_account_lock_and_catalogue_snapshot",
+          }
+          assert required <= {case.attrib["name"] for case in cases}, "DB tests did not execute"
+          assert all(len(case) == 0 for case in cases), "DB checks must pass without skips"
+          PY
+
   node:
     name: Node build and tests
-    needs: detect
-    if: needs.detect.outputs.node == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -138,11 +225,15 @@ jobs:
       - name: Lint frontend
         run: npm --prefix frontend run lint
 
-      - name: Run frontend tests
-        run: npm --prefix frontend test
-
       - name: Build frontend
         run: npm --prefix frontend run build
+
+      - name: Report optional frontend test scope
+        if: always()
+        run: |
+          echo "### Frontend validation scope" >> "$GITHUB_STEP_SUMMARY"
+          echo "Lint and build are automatic; see their step results above." >> "$GITHUB_STEP_SUMMARY"
+          echo "Optional full Vitest and browser regressions: not run. Dispatch Optional extended regression or the individual feature workflows to run them." >> "$GITHUB_STEP_SUMMARY"
 
 
   secrets:

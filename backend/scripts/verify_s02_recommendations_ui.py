@@ -18,6 +18,7 @@ import sys
 import tempfile
 import time
 from contextlib import closing
+from http.client import HTTPException
 from pathlib import Path
 from urllib.request import urlopen
 
@@ -297,22 +298,45 @@ class BrowserPage:
 
 
 def browser_websocket(profile_path: Path, browser: subprocess.Popen) -> str:
+    """Wait for an actual page target, tolerating partial Chromium startup.
+
+    DevToolsActivePort can appear before its HTTP endpoint or page target is
+    ready. Retry transport/partial-response failures within the same deadline;
+    never retry failed application assertions or accept an absent page.
+    """
     port_file = profile_path / "DevToolsActivePort"
     deadline = time.monotonic() + 30
+    last_error = None
     while time.monotonic() < deadline:
         if browser.poll() is not None:
             raise RuntimeError(f"Chromium exited with {browser.returncode}")
-        if port_file.is_file():
-            port = port_file.read_text(encoding="utf-8").splitlines()[0]
-            with urlopen(f"http://127.0.0.1:{port}/json/list", timeout=2) as reply:
-                pages = json.load(reply)
-            return next(
-                page["webSocketDebuggerUrl"]
-                for page in pages
-                if page.get("type") == "page"
-            )
-        time.sleep(0.25)
-    raise TimeoutError("Chromium did not open its DevTools page")
+        try:
+            if port_file.is_file():
+                lines = port_file.read_text(encoding="utf-8").splitlines()
+                if lines:
+                    port = int(lines[0])
+                    if not 1 <= port <= 65535:
+                        raise ValueError("DevTools port is not valid yet")
+                    remaining = deadline - time.monotonic()
+                    if remaining <= 0:
+                        break
+                    with urlopen(
+                        f"http://127.0.0.1:{port}/json/list", timeout=min(2, remaining)
+                    ) as reply:
+                        pages = json.load(reply)
+                    if isinstance(pages, list):
+                        for page in pages:
+                            if not isinstance(page, dict) or page.get("type") != "page":
+                                continue
+                            websocket = page.get("webSocketDebuggerUrl")
+                            if isinstance(websocket, str) and websocket.startswith(("ws://", "wss://")):
+                                return websocket
+        except (OSError, ValueError, HTTPException) as error:
+            last_error = error
+        remaining = deadline - time.monotonic()
+        if remaining > 0:
+            time.sleep(min(0.25, remaining))
+    raise TimeoutError("Chromium did not open its DevTools page within 30 seconds") from last_error
 
 
 def assert_cards(snapshot: dict, movies: list, fixture: dict, *, reasons: bool) -> None:

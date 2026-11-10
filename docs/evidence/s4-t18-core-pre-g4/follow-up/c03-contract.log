@@ -1,0 +1,14 @@
+S4-C03 local document structure: PASS
+Hash convention: SHA-256 of UTF-8 text after CRLF/CR -> LF
+Document final newlines/trailing whitespace: PASS
+Local link targets: 231 checked, 0 missing
+Testing sections: 1, 2, 3, 4
+P0 case IDs: 37 unique; S01=8, S02=6, S03=6, S04=6, S12=5, S13=6
+S4 feature oracle IDs: 10 unique
+sha256-lf docs/api.md 5fabac42cea87cc1a7b22845924cb4cd873e63fe39b45995934b57f815cbba36
+sha256-lf docs/architecture.md 3d23d7ddf48f789e55518c41787c4034d7d8d5eb9c24ec2b0033edcfca91c843
+sha256-lf docs/design.md aaed16ff142183eafc3457faf84f96c42cf21b8092a6bd2fd594a3ccc0981e47
+sha256-lf docs/requirements.md ab8a653d7a36d31e83bdce6f2fd243b8156746e224cee665abd34de1cd574101
+sha256-lf docs/testing.md 3358ac14a0e71af42958265f72c2194b501dda11e7be9f5f1a22e3248211474b
+sha256-lf scripts/verify_s4_c03_contract.py 4484c9cad834fcf88ce9d91cbfe31b7a89d797ff666c0e73b794e5e7ae2e6142
+sha256-lf scripts/test_s4_c03_contract_line_endings.py 86fb7656efa33f1582d23d8b5c8a17737569a5fee006363e1926b4e69ea8f918

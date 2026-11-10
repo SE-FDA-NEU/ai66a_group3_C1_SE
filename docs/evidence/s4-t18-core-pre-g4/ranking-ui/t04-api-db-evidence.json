@@ -1,0 +1,395 @@
+{
+  "api": {
+    "1-baseline": {
+      "account": "t04-account-a@example.test",
+      "catalogueRevision": "fixture-revision-s4-t04",
+      "movies": [
+        {
+          "adjustedScore": 80.0,
+          "backdropUrl": null,
+          "basis": "baseline",
+          "genres": [
+            {
+              "id": 35,
+              "name": "Comedy"
+            }
+          ],
+          "id": "40000000-0000-0000-0000-000000000002",
+          "popularityScore": 80.0,
+          "posterUrl": null,
+          "ratingAdjustment": 0,
+          "reason": {
+            "matchedGenres": [
+              {
+                "id": 35,
+                "name": "Comedy"
+              }
+            ]
+          },
+          "releaseYear": 2041,
+          "title": "Alpha Comedy"
+        },
+        {
+          "adjustedScore": 80.0,
+          "backdropUrl": null,
+          "basis": "baseline",
+          "genres": [
+            {
+              "id": 28,
+              "name": "Action"
+            }
+          ],
+          "id": "40000000-0000-0000-0000-000000000001",
+          "popularityScore": 80.0,
+          "posterUrl": null,
+          "ratingAdjustment": 0,
+          "reason": {
+            "matchedGenres": [
+              {
+                "id": 28,
+                "name": "Action"
+              }
+            ]
+          },
+          "releaseYear": 2040,
+          "title": "Zulu Action"
+        },
+        {
+          "adjustedScore": null,
+          "backdropUrl": null,
+          "basis": "baseline",
+          "genres": [
+            {
+              "id": 35,
+              "name": "Comedy"
+            }
+          ],
+          "id": "40000000-0000-0000-0000-000000000003",
+          "popularityScore": null,
+          "posterUrl": null,
+          "ratingAdjustment": 0,
+          "reason": {
+            "matchedGenres": [
+              {
+                "id": 35,
+                "name": "Comedy"
+              }
+            ]
+          },
+          "releaseYear": 2042,
+          "title": "Silent Comedy"
+        }
+      ]
+    },
+    "2-rated-5": {
+      "account": "t04-account-a@example.test",
+      "catalogueRevision": "fixture-revision-s4-t04",
+      "movies": [
+        {
+          "adjustedScore": 81.0,
+          "backdropUrl": null,
+          "basis": "rating_signals",
+          "genres": [
+            {
+              "id": 28,
+              "name": "Action"
+            }
+          ],
+          "id": "40000000-0000-0000-0000-000000000001",
+          "popularityScore": 80.0,
+          "posterUrl": null,
+          "ratingAdjustment": 1,
+          "reason": {
+            "matchedGenres": [
+              {
+                "id": 28,
+                "name": "Action"
+              }
+            ]
+          },
+          "releaseYear": 2040,
+          "title": "Zulu Action"
+        },
+        {
+          "adjustedScore": 80.0,
+          "backdropUrl": null,
+          "basis": "baseline",
+          "genres": [
+            {
+              "id": 35,
+              "name": "Comedy"
+            }
+          ],
+          "id": "40000000-0000-0000-0000-000000000002",
+          "popularityScore": 80.0,
+          "posterUrl": null,
+          "ratingAdjustment": 0,
+          "reason": {
+            "matchedGenres": [
+              {
+                "id": 35,
+                "name": "Comedy"
+              }
+            ]
+          },
+          "releaseYear": 2041,
+          "title": "Alpha Comedy"
+        },
+        {
+          "adjustedScore": null,
+          "backdropUrl": null,
+          "basis": "baseline",
+          "genres": [
+            {
+              "id": 35,
+              "name": "Comedy"
+            }
+          ],
+          "id": "40000000-0000-0000-0000-000000000003",
+          "popularityScore": null,
+          "posterUrl": null,
+          "ratingAdjustment": 0,
+          "reason": {
+            "matchedGenres": [
+              {
+                "id": 35,
+                "name": "Comedy"
+              }
+            ]
+          },
+          "releaseYear": 2042,
+          "title": "Silent Comedy"
+        }
+      ]
+    },
+    "3-rated-1": {
+      "account": "t04-account-a@example.test",
+      "catalogueRevision": "fixture-revision-s4-t04",
+      "movies": [
+        {
+          "adjustedScore": 80.0,
+          "backdropUrl": null,
+          "basis": "baseline",
+          "genres": [
+            {
+              "id": 35,
+              "name": "Comedy"
+            }
+          ],
+          "id": "40000000-0000-0000-0000-000000000002",
+          "popularityScore": 80.0,
+          "posterUrl": null,
+          "ratingAdjustment": 0,
+          "reason": {
+            "matchedGenres": [
+              {
+                "id": 35,
+                "name": "Comedy"
+              }
+            ]
+          },
+          "releaseYear": 2041,
+          "title": "Alpha Comedy"
+        },
+        {
+          "adjustedScore": 79.0,
+          "backdropUrl": null,
+          "basis": "rating_signals",
+          "genres": [
+            {
+              "id": 28,
+              "name": "Action"
+            }
+          ],
+          "id": "40000000-0000-0000-0000-000000000001",
+          "popularityScore": 80.0,
+          "posterUrl": null,
+          "ratingAdjustment": -1,
+          "reason": {
+            "matchedGenres": [
+              {
+                "id": 28,
+                "name": "Action"
+              }
+            ]
+          },
+          "releaseYear": 2040,
+          "title": "Zulu Action"
+        },
+        {
+          "adjustedScore": null,
+          "backdropUrl": null,
+          "basis": "baseline",
+          "genres": [
+            {
+              "id": 35,
+              "name": "Comedy"
+            }
+          ],
+          "id": "40000000-0000-0000-0000-000000000003",
+          "popularityScore": null,
+          "posterUrl": null,
+          "ratingAdjustment": 0,
+          "reason": {
+            "matchedGenres": [
+              {
+                "id": 35,
+                "name": "Comedy"
+              }
+            ]
+          },
+          "releaseYear": 2042,
+          "title": "Silent Comedy"
+        }
+      ]
+    },
+    "4-rating-read-unavailable": {
+      "account": "t04-account-a@example.test",
+      "catalogueRevision": "fixture-revision-s4-t04",
+      "movies": [
+        {
+          "adjustedScore": 80.0,
+          "backdropUrl": null,
+          "basis": "rating_unavailable",
+          "genres": [
+            {
+              "id": 35,
+              "name": "Comedy"
+            }
+          ],
+          "id": "40000000-0000-0000-0000-000000000002",
+          "popularityScore": 80.0,
+          "posterUrl": null,
+          "ratingAdjustment": 0,
+          "reason": {
+            "matchedGenres": [
+              {
+                "id": 35,
+                "name": "Comedy"
+              }
+            ]
+          },
+          "releaseYear": 2041,
+          "title": "Alpha Comedy"
+        },
+        {
+          "adjustedScore": 80.0,
+          "backdropUrl": null,
+          "basis": "rating_unavailable",
+          "genres": [
+            {
+              "id": 28,
+              "name": "Action"
+            }
+          ],
+          "id": "40000000-0000-0000-0000-000000000001",
+          "popularityScore": 80.0,
+          "posterUrl": null,
+          "ratingAdjustment": 0,
+          "reason": {
+            "matchedGenres": [
+              {
+                "id": 28,
+                "name": "Action"
+              }
+            ]
+          },
+          "releaseYear": 2040,
+          "title": "Zulu Action"
+        },
+        {
+          "adjustedScore": null,
+          "backdropUrl": null,
+          "basis": "rating_unavailable",
+          "genres": [
+            {
+              "id": 35,
+              "name": "Comedy"
+            }
+          ],
+          "id": "40000000-0000-0000-0000-000000000003",
+          "popularityScore": null,
+          "posterUrl": null,
+          "ratingAdjustment": 0,
+          "reason": {
+            "matchedGenres": [
+              {
+                "id": 35,
+                "name": "Comedy"
+              }
+            ]
+          },
+          "releaseYear": 2042,
+          "title": "Silent Comedy"
+        }
+      ]
+    }
+  },
+  "finalDatabase": {
+    "integrityCheck": "ok",
+    "preferences": [
+      {
+        "account": "t04-account-a@example.test",
+        "genre_id": 28
+      },
+      {
+        "account": "t04-account-a@example.test",
+        "genre_id": 35
+      }
+    ],
+    "ratings": [
+      {
+        "account": "t04-account-a@example.test",
+        "movie_id": "40000000-0000-0000-0000-000000000001",
+        "rating": 1.0
+      }
+    ],
+    "sessionCounts": [
+      {
+        "account": "t04-account-a@example.test",
+        "expired": 0,
+        "revoked": 1,
+        "valid": 1
+      },
+      {
+        "account": "t04-account-b@example.test",
+        "expired": 0,
+        "revoked": 0,
+        "valid": 1
+      }
+    ]
+  },
+  "fixture": "S4-T04 deterministic synthetic catalogue (raw popularity 80/80, one null)",
+  "layouts": [
+    {
+      "minContrast": 6.39,
+      "theme": "dark",
+      "viewport": "375"
+    },
+    {
+      "minContrast": 6.39,
+      "theme": "dark",
+      "viewport": "768"
+    },
+    {
+      "minContrast": 6.39,
+      "theme": "dark",
+      "viewport": "1440"
+    },
+    {
+      "minContrast": 6.47,
+      "theme": "light",
+      "viewport": "375"
+    },
+    {
+      "minContrast": 6.47,
+      "theme": "light",
+      "viewport": "768"
+    },
+    {
+      "minContrast": 6.47,
+      "theme": "light",
+      "viewport": "1440"
+    }
+  ]
+}

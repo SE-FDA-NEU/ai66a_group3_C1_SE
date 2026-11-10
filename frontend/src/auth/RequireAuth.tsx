@@ -1,12 +1,16 @@
-import { Fragment, useEffect, type ReactNode } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Fragment, useEffect, useRef, type ReactNode } from "react";
+import { Link, Navigate, useLocation } from "react-router-dom";
 
 import { useAuth } from "./authState.ts";
+import { useFeedback } from "../feedback.ts";
 
 function RequireAuth({ children }: { children: ReactNode }) {
   const auth = useAuth();
+  const location = useLocation();
   const needsCheck = auth.status === "unknown";
   const { refresh } = auth;
+  const feedback = useFeedback();
+  const notifiedLocation = useRef<string | null>(null);
 
   useEffect(() => {
     if (needsCheck) {
@@ -14,8 +18,21 @@ function RequireAuth({ children }: { children: ReactNode }) {
     }
   }, [needsCheck, refresh]);
 
+  useEffect(() => {
+    if (auth.status !== "unauthenticated" || auth.justSignedOut || notifiedLocation.current === location.key) return;
+    notifiedLocation.current = location.key;
+    feedback.announce({ kind: "info", title: "Sign in to continue",
+      message: location.pathname === "/preferences" ? "Your movie preferences belong to your account." :
+        location.pathname === "/watchlist" ? "Your watchlist belongs to your account." :
+        location.pathname === "/profile" ? "Your personalisation profile belongs to your account." :
+        "Sign in to see your own recommendations." });
+  }, [auth, location.key, location.pathname, feedback]);
+
   if (auth.status === "unauthenticated") {
-    return <Navigate to={auth.justSignedOut ? "/" : "/login"} replace />;
+    return <Navigate to={auth.justSignedOut ? "/" : "/login"} replace
+      state={auth.justSignedOut ? undefined : {
+        signInReturnTo: `${location.pathname}${location.search}${location.hash}`,
+      }} />;
   }
 
   if (auth.status === "error") {

@@ -1,0 +1,36 @@
+Started: 2026-10-30T15:19:16.939538+07:00
+Command: ['node', 'docs/evidence/s4-t18-core-pre-g4/follow-up/windows-portability/verify_live_browser.cjs', '/private/tmp/s4-t18-live-resume-20261030/browser.db', '/private/tmp/s4-t18-live-resume-20261030/overview-index.json', 'docs/evidence/s4-t18-core-pre-g4/follow-up/windows-portability/resumed-live-provenance-api.json', 'docs/evidence/s4-t18-core-pre-g4/follow-up/windows-portability']
+Cwd: /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE
+{
+  "runner": "Codex author verification",
+  "date": "2026-10-30T08:19:17.446Z",
+  "testedCommit": "6aa1941dd506f6ce6a3c683f4580c748f75125f4",
+  "activeRevision": "00a9831b-1c3a-489b-a8cf-51d36424e702",
+  "activeCount": 964,
+  "browserVersion": "156.0.8078.4",
+  "checks": [
+    "Home SQL/API total, active revision, pagination and real poster",
+    "Popular pages 1/2, current carousel, real backdrop",
+    "Description Search via submit, non-title query, detail return",
+    "Detail and local-index Similar on tablet",
+    "A: real UI cold-start, saved genre, personalised ranking, 4.5 stars, watchlist",
+    "B: independent session sees no A genres/ratings/watchlist",
+    "Backend restart and logout/login preserve A session-owned data",
+    "Confirmed Profile reset clears A genres/ratings, preserves watchlist and returns popular"
+  ],
+  "screenshots": [
+    "live-home-1440-dark.png",
+    "live-home-375-light.png",
+    "live-popular-375-light.png",
+    "live-description-search-375-light.png",
+    "live-detail-similar-768-light.png",
+    "live-watchlist-768-light.png",
+    "live-profile-after-reset-768-light.png"
+  ],
+  "pageErrors": [],
+  "metadataRequests": [],
+  "status": "PASS"
+}
+
+Exit: 0
+Elapsed: 11.40s

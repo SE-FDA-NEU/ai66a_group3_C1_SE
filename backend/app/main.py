@@ -1,21 +1,38 @@
+import logging
 import os
+import time
 from collections.abc import Generator
+from contextlib import asynccontextmanager
+from contextvars import ContextVar
 from uuid import uuid4
 
+from alembic.config import Config
+from alembic.script import ScriptDirectory
 from fastapi import Depends, FastAPI, Query, Request, Response
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
-from sqlalchemy import text
+from fastapi.responses import FileResponse, JSONResponse
+from sqlalchemy import func, select, text
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
+from starlette.exceptions import HTTPException
 
-from app.db.database import SessionLocal, engine
-from app.db.models import User
+from app.catalogue.providers import DEFAULT_PROVIDER_COUNTRY, ProviderCountry
+from app.db.account_writes import begin_account_write, resolve_account_write_user
+from app.db.database import PROJECT_ROOT, Base, SessionLocal, engine
+from app.db.models import Genre, User, UserMovieRating
+from app.recommendations.overview_index import IndexUnavailable, load_active_index
+from app.recommendations.search import rank_description_matches
 from app.recommendations.service import build_account_recommendations
+from app.recommendations.similar import rank_similar_movies
+from app.recommendations.startup_index import prepare_startup_index
 from app.repositories.movies import (
+    CatalogueSort,
+    count_active_movies,
     get_active_catalogue_revision,
     get_active_movie_by_id,
     list_active_movies,
+    list_active_movies_for_text_search,
+    search_active_movie_titles,
     to_movie_detail_dto,
     to_movie_summary_dto,
 )
@@ -27,8 +44,20 @@ from app.repositories.preferences import (
 )
 from app.repositories.profile import reset_user_personalisation
 from app.repositories.ratings import get_user_movie_rating, set_user_movie_rating
-from app.repositories.recommendations import list_popular_recommendation_movies
+from app.repositories.recommendations import (
+    count_popular_recommendation_movies,
+    list_genre_matched_movies,
+    list_popular_recommendation_movies,
+)
 from app.repositories.users import create_user, get_user_by_email, to_user_dto
+from app.repositories.watchlist import (
+    add_movie,
+    count_user_movies,
+    list_user_movies,
+    membership,
+    remove_movie,
+    utc_iso,
+)
 from app.schemas.auth import (
     AuthData,
     AuthResponse,
@@ -36,7 +65,12 @@ from app.schemas.auth import (
     RegisterRequest,
     RegisterResponse,
 )
-from app.schemas.movies import MovieDetailResponse, MovieListResponse
+from app.schemas.movies import (
+    MovieDetailResponse,
+    MovieListResponse,
+    MovieSearchResponse,
+    MovieSimilarResponse,
+)
 from app.schemas.preferences import (
     GenreListData,
     GenreListResponse,
@@ -47,9 +81,12 @@ from app.schemas.profile import (
     ProfileResetData,
     ProfileResetRequest,
     ProfileResetResponse,
+    ProfileSummaryData,
+    ProfileSummaryResponse,
 )
 from app.schemas.ratings import RatingData, RatingRequest, RatingResponse
 from app.schemas.recommendations import RecommendationResponse
+from app.schemas.watchlist import MembershipData, MembershipResponse, WatchlistResponse
 from app.security.origin import same_origin_write_allowed
 from app.security.passwords import normalize_email, verify_password
 from app.security.sessions import (
@@ -60,8 +97,32 @@ from app.security.sessions import (
     revoke_session,
 )
 
+logger = logging.getLogger("uvicorn.error")
+request_id: ContextVar[str | None] = ContextVar("request_id", default=None)
+FRONTEND_DIST = PROJECT_ROOT / "frontend" / "dist"
+MIGRATION_HEADS = set(ScriptDirectory.from_config(
+    Config(str(PROJECT_ROOT / "backend" / "alembic.ini"))
+).get_heads())
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    try:
+        prepare_startup_index(SessionLocal)
+    except (IndexUnavailable, OSError, SQLAlchemyError) as exc:
+        cause = getattr(exc, "orig", exc)
+        logger.error(
+            "NLP index preparation failed: error_type=%s sqlstate=%s errno=%s",
+            type(cause).__name__, getattr(cause, "sqlstate", None),
+            getattr(cause, "errno", None),
+        )
+        raise RuntimeError("NLP index preparation failed; check database and writable index path") from None
+    yield
+
+
 app = FastAPI(
     title="AI Movie Recommendation System",
+    lifespan=lifespan,
 )
 
 _SAME_ORIGIN_WRITES = frozenset(
@@ -73,12 +134,15 @@ _SAME_ORIGIN_WRITES = frozenset(
     }
 )
 _RATING_WRITE_PREFIX = "/api/me/ratings/"
+_WATCHLIST_WRITE_PREFIX = "/api/me/watchlist/"
 
 
 def _requires_same_origin(request: Request) -> bool:
     path = request.url.path
     return (request.method, path) in _SAME_ORIGIN_WRITES or (
         request.method == "PUT" and path.startswith(_RATING_WRITE_PREFIX)
+    ) or (
+        request.method in {"PUT", "DELETE"} and path.startswith(_WATCHLIST_WRITE_PREFIX)
     )
 
 
@@ -95,6 +159,35 @@ async def same_origin_account_writes(request: Request, call_next):
     return await call_next(request)
 
 
+@app.middleware("http")
+async def request_logging(request: Request, call_next):
+    correlation = f"req_{uuid4().hex}"
+    context = request_id.set(correlation)
+    started = time.monotonic()
+    try:
+        try:
+            response = await call_next(request)
+        except Exception:  # noqa: BLE001 -- public boundary must suppress sensitive exception text
+            # Exception text/tracebacks can contain SQL parameters or secrets.
+            response = _error("INTERNAL_ERROR", "Service is temporarily unavailable", 500)
+        response.headers["X-Request-ID"] = correlation
+        route = request.scope.get("route")
+        log = logger.error if response.status_code >= 500 else logger.info
+        log("request_id=%s method=%s route=%s status=%d latency_ms=%.2f",
+            correlation, request.method, getattr(route, "path", "unmatched"),
+            response.status_code, (time.monotonic() - started) * 1000)
+        return response
+    finally:
+        request_id.reset(context)
+
+
+@app.exception_handler(HTTPException)
+async def http_error_handler(_request: Request, exc: HTTPException):
+    if exc.status_code == 404:
+        return _error("NOT_FOUND", "Resource not found", 404)
+    return JSONResponse({"detail": exc.detail}, status_code=exc.status_code, headers=exc.headers)
+
+
 class AuthenticationRequiredError(Exception):
     """Raised when a protected route has no valid session."""
 
@@ -107,7 +200,13 @@ async def authentication_required_handler(
 
 
 @app.exception_handler(RequestValidationError)
-async def validation_error_handler(_request: Request, _exc: RequestValidationError):
+async def validation_error_handler(_request: Request, exc: RequestValidationError):
+    if any(error.get("loc") == ("query", "genreId") for error in exc.errors()):
+        return _error(
+            "VALIDATION_ERROR",
+            "genreId must be an integer from 1 to 2147483647",
+            400,
+        )
     return _error("VALIDATION_ERROR", "Please correct the highlighted fields", 400)
 
 
@@ -128,6 +227,30 @@ def get_db() -> Generator[Session, None, None]:
         yield database_session
     finally:
         database_session.close()
+
+
+def get_account_write_db(
+    database_session: Session = Depends(get_db),  # noqa: B008
+) -> Generator[Session, None, None]:
+    """Reserve before reads and release on every non-committed request exit."""
+    try:
+        begin_account_write(database_session)
+        yield database_session
+    finally:
+        # Also covers validation/auth/unknown-movie exits and acquisition errors.
+        # Successful handlers already committed; rollback is then a no-op.
+        database_session.rollback()
+
+
+def current_account_write_user(
+    request: Request,
+    database_session: Session = Depends(get_account_write_db),  # noqa: B008
+) -> User:
+    """Rating writes keep auth-before-payload validation under the reservation."""
+    user = resolve_account_write_user(database_session, request.cookies.get(SESSION_COOKIE))
+    if user is None:
+        raise AuthenticationRequiredError
+    return user
 
 
 def current_session_user(
@@ -153,13 +276,57 @@ def _error(code: str, message: str, status_code: int) -> JSONResponse:
             "error": {
                 "code": code,
                 "message": message,
-                "requestId": f"req_{uuid4().hex}",
+                "requestId": request_id.get() or f"req_{uuid4().hex}",
             }
         },
     )
 
 
+def _page_meta(*, count: int, limit: int, page: int, total: int,
+               unfiltered_total: int, revision_id: str) -> dict:
+    return {
+        "count": count,
+        "limit": limit,
+        "page": page,
+        "total": total,
+        "totalPages": (total + limit - 1) // limit,
+        "unfilteredTotal": unfiltered_total,
+        "catalogueRevision": revision_id,
+    }
+
+
+def _revision_error(expected: str | None, actual: str) -> JSONResponse | None:
+    if expected is not None and expected != actual:
+        return _error("CATALOGUE_CHANGED", "Movie catalogue changed; reload page 1", 409)
+    return None
+
+
+def _unexpected_selectors(request: Request, allowed: frozenset[str] = frozenset()) -> bool:
+    """Account-target fields are never accepted by current-account endpoints."""
+    return any(key not in allowed or len(request.query_params.getlist(key)) != 1
+               for key in request.query_params) or any(
+        key in request.headers for key in ("x-user-id", "x-account-id", "x-owner-id")
+    )
+
+
+def _begin_read_snapshot(session: Session) -> None:
+    """Keep a multi-query response on one SQLite read snapshot.
+
+    Python's sqlite3 legacy transaction mode does not start a database
+    transaction for SELECT. Explicit BEGIN keeps resets and imports from
+    changing data between separate response queries. Test fixtures may
+    already have an open DBAPI transaction, which is safe to reuse.
+    """
+    connection = session.connection()
+    if connection.dialect.name == "sqlite":
+        dbapi_connection = connection.connection.driver_connection
+        if not dbapi_connection.in_transaction:
+            connection.exec_driver_sql("BEGIN")
+
+
 def _secure_cookie(request: Request) -> bool:
+    if os.getenv("APP_ENV", "").lower() in {"production", "prod"}:
+        return True
     configured = os.getenv("SESSION_COOKIE_SECURE")
     if configured is not None:
         return configured.lower() == "true"
@@ -194,12 +361,17 @@ def health():
     with engine.connect() as connection:
         migration_version = connection.execute(
             text("SELECT version_num FROM alembic_version")
-        ).scalar_one_or_none()
+        ).scalars().all()
+        if set(migration_version) != MIGRATION_HEADS:
+            return _error("SERVICE_UNAVAILABLE", "Service is temporarily unavailable", 503)
+        # Probe required tables and columns without reading account data.
+        for table in Base.metadata.sorted_tables:
+            connection.execute(select(table).limit(0))
 
     return {
         "status": "ok",
         "database": "connected",
-        "migrationVersion": migration_version,
+        "migrationVersion": migration_version[0],
     }
 
 
@@ -296,8 +468,12 @@ def logout(
 def recommendations(
     request: Request,
     limit: int = Query(default=10, ge=1, le=10),
+    page: int = Query(default=1, ge=1, le=10000),
+    genre_id: int | None = Query(default=None, alias="genreId", ge=1, le=2147483647),
+    catalogue_revision: str | None = Query(default=None, alias="catalogueRevision"),
     database_session: Session = Depends(get_db),  # noqa: B008
 ):
+    _begin_read_snapshot(database_session)
     user = resolve_session(
         database_session,
         request.cookies.get(SESSION_COOKIE),
@@ -319,10 +495,17 @@ def recommendations(
             503,
         )
 
+    if error := _revision_error(catalogue_revision, revision.id):
+        return error
+    if genre_id is not None and database_session.get(Genre, genre_id) is None:
+        return _error("GENRE_NOT_FOUND", "Genre not found", 400)
+
     result = build_account_recommendations(
         database_session,
         user_id=user.id,
         limit=limit,
+        page=page,
+        genre_id=genre_id,
     )
 
     return {
@@ -332,11 +515,9 @@ def recommendations(
             "personalised": result.personalised,
             "noMatch": result.no_match,
         },
-        "meta": {
-            "count": len(result.movies),
-            "limit": limit,
-            "catalogueRevision": revision.id,
-        },
+        "meta": _page_meta(count=len(result.movies), limit=limit, page=page,
+                           total=result.total, unfiltered_total=result.unfiltered_total,
+                           revision_id=revision.id),
     }
 
 @app.get("/api/genres", response_model=GenreListResponse, status_code=200)
@@ -392,10 +573,10 @@ def get_preferences(
 def put_preferences(
     payload: PreferenceRequest,
     request: Request,
-    database_session: Session = Depends(get_db),  # noqa: B008
+    database_session: Session = Depends(get_account_write_db),  # noqa: B008
 ):
     try:
-        user = resolve_session(database_session, request.cookies.get(SESSION_COOKIE))
+        user = resolve_account_write_user(database_session, request.cookies.get(SESSION_COOKIE))
         if user is None:
             return _error("AUTHENTICATION_REQUIRED", "Authentication required", 401)
 
@@ -414,6 +595,25 @@ def put_preferences(
     return response
 
 
+@app.get("/api/me/profile", response_model=ProfileSummaryResponse)
+def get_profile(
+    request: Request,
+    user: User = Depends(current_session_user),  # noqa: B008
+    database_session: Session = Depends(get_db),  # noqa: B008
+):
+    if _unexpected_selectors(request):
+        return _error("VALIDATION_ERROR", "Please correct the highlighted fields", 400)
+    _begin_read_snapshot(database_session)
+    genres = list_user_preference_genres(database_session, user_id=user.id)
+    rating_count = database_session.scalar(select(func.count()).select_from(UserMovieRating).where(
+        UserMovieRating.user_id == user.id
+    )) or 0
+    return ProfileSummaryResponse(data=ProfileSummaryData(
+        genres=genres, ratingCount=rating_count,
+        watchlistCount=count_user_movies(database_session, user_id=user.id),
+    ))
+
+
 @app.post(
     "/api/me/profile/reset",
     response_model=ProfileResetResponse,
@@ -422,10 +622,10 @@ def put_preferences(
 def reset_profile(
     payload: ProfileResetRequest,
     request: Request,
-    database_session: Session = Depends(get_db),  # noqa: B008
+    database_session: Session = Depends(get_account_write_db),  # noqa: B008
 ):
     try:
-        user = resolve_session(
+        user = resolve_account_write_user(
             database_session,
             request.cookies.get(SESSION_COOKIE),
         )
@@ -453,6 +653,89 @@ def reset_profile(
         )
 
     return response
+
+
+@app.get("/api/me/watchlist", response_model=WatchlistResponse)
+def get_watchlist(
+    request: Request,
+    page: int = Query(default=1, ge=1, le=10000),
+    limit: int = Query(default=10, ge=1, le=10),
+    catalogue_revision: str | None = Query(default=None, alias="catalogueRevision"),
+    user: User = Depends(current_session_user),  # noqa: B008
+    database_session: Session = Depends(get_db),  # noqa: B008
+):
+    if _unexpected_selectors(request, frozenset({"page", "limit", "catalogueRevision"})):
+        return _error("VALIDATION_ERROR", "Please correct the highlighted fields", 400)
+    _begin_read_snapshot(database_session)
+    revision = get_active_catalogue_revision(database_session)
+    if revision is None:
+        return _error("CATALOGUE_UNAVAILABLE", "Movie catalogue is unavailable", 503)
+    if error := _revision_error(catalogue_revision, revision.id):
+        return error
+    total = count_user_movies(database_session, user_id=user.id, active_only=True)
+    rows = list_user_movies(database_session, user_id=user.id, page=page, limit=limit)
+    movies = [to_movie_summary_dto(movie).model_dump() | {"addedAt": utc_iso(row.added_at)}
+              for row, movie in rows]
+    return {"data": {"movies": movies}, "meta": _page_meta(
+        count=len(movies), limit=limit, page=page, total=total,
+        unfiltered_total=total, revision_id=revision.id,
+    )}
+
+
+@app.get("/api/me/watchlist/{movie_id}", response_model=MembershipResponse)
+def get_watchlist_membership(
+    movie_id: str,
+    request: Request,
+    user: User = Depends(current_session_user),  # noqa: B008
+    database_session: Session = Depends(get_db),  # noqa: B008
+):
+    if _unexpected_selectors(request):
+        return _error("VALIDATION_ERROR", "Please correct the highlighted fields", 400)
+    movie = get_active_movie_by_id(database_session, movie_id=movie_id)
+    if movie is None:
+        return _error("MOVIE_NOT_FOUND", "Movie not found", 404)
+    row = membership(database_session, user_id=user.id, movie_id=movie.id)
+    return MembershipResponse(data=MembershipData(
+        movieId=movie.id, inWatchlist=row is not None,
+        addedAt=utc_iso(row.added_at) if row is not None else None,
+    ))
+
+
+async def _watchlist_body_present(request: Request) -> bool:
+    return bool(await request.body())
+
+
+@app.put("/api/me/watchlist/{movie_id}", response_model=MembershipResponse)
+@app.delete("/api/me/watchlist/{movie_id}", response_model=MembershipResponse, response_model_exclude_none=True)
+def write_watchlist_membership(
+    movie_id: str,
+    request: Request,
+    user: User = Depends(current_account_write_user),  # noqa: B008
+    database_session: Session = Depends(get_account_write_db),  # noqa: B008
+    has_body: bool = Depends(_watchlist_body_present),
+):
+    # SQLite COMMIT can wait for a list's read snapshot. Run this synchronous DB
+    # work in FastAPI's worker pool so the ASGI loop can finish other requests
+    # and release their snapshots instead of creating a self-induced busy 503.
+    if _unexpected_selectors(request) or has_body:
+        return _error("VALIDATION_ERROR", "Please correct the highlighted fields", 400)
+    movie = get_active_movie_by_id(database_session, movie_id=movie_id)
+    if movie is None:
+        return _error("MOVIE_NOT_FOUND", "Movie not found", 404)
+    try:
+        if request.method == "PUT":
+            row = add_movie(database_session, user_id=user.id, movie_id=movie.id)
+            result = MembershipResponse(data=MembershipData(
+                movieId=movie.id, inWatchlist=True, addedAt=utc_iso(row.added_at),
+            ))
+        else:
+            remove_movie(database_session, user_id=user.id, movie_id=movie.id)
+            result = {"data": {"movieId": movie.id, "inWatchlist": False}}
+        database_session.commit()
+    except SQLAlchemyError:
+        database_session.rollback()
+        return _error("SERVICE_UNAVAILABLE", "Service is temporarily unavailable", 503)
+    return result
 
 
 @app.get(
@@ -488,8 +771,8 @@ def get_rating(
 def put_rating(
     movie_id: str,
     payload: RatingRequest,
-    user: User = Depends(current_session_user),  # noqa: B008
-    database_session: Session = Depends(get_db),  # noqa: B008
+    user: User = Depends(current_account_write_user),  # noqa: B008
+    database_session: Session = Depends(get_account_write_db),  # noqa: B008
 ):
     movie = get_active_movie_by_id(database_session, movie_id=movie_id)
     if movie is None:
@@ -516,24 +799,29 @@ def put_rating(
 @app.get("/api/movies", response_model=MovieListResponse, status_code=200)
 def list_movies(
     limit: int = Query(default=10, ge=1, le=10),
+    page: int = Query(default=1, ge=1, le=10000),
+    sort: CatalogueSort = "title_asc",
+    catalogue_revision: str | None = Query(default=None, alias="catalogueRevision"),
     database_session: Session = Depends(get_db),  # noqa: B008
 ):
+    _begin_read_snapshot(database_session)
     revision = get_active_catalogue_revision(database_session)
     if revision is None:
         return _error(
             "CATALOGUE_UNAVAILABLE", "Movie catalogue is unavailable", 503
         )
 
-    movies = list_active_movies(database_session, limit=limit)
+    if error := _revision_error(catalogue_revision, revision.id):
+        return error
+
+    total = count_active_movies(database_session)
+    movies = list_active_movies(database_session, limit=limit, page=page, sort=sort)
     return {
         "data": {
             "movies": [to_movie_summary_dto(movie).model_dump() for movie in movies]
         },
-        "meta": {
-            "count": len(movies),
-            "limit": limit,
-            "catalogueRevision": revision.id,
-        },
+        "meta": _page_meta(count=len(movies), limit=limit, page=page,
+                           total=total, unfiltered_total=total, revision_id=revision.id),
     }
 
 @app.get(
@@ -543,8 +831,11 @@ def list_movies(
 )
 def list_popular_movies(
     limit: int = Query(default=10, ge=1, le=10),
+    page: int = Query(default=1, ge=1, le=10000),
+    catalogue_revision: str | None = Query(default=None, alias="catalogueRevision"),
     database_session: Session = Depends(get_db),  # noqa: B008
 ):
+    _begin_read_snapshot(database_session)
     revision = get_active_catalogue_revision(database_session)
 
     if revision is None:
@@ -554,9 +845,14 @@ def list_popular_movies(
             503,
         )
 
+    if error := _revision_error(catalogue_revision, revision.id):
+        return error
+
+    total = count_popular_recommendation_movies(database_session)
     movies = list_popular_recommendation_movies(
         database_session,
         limit=limit,
+        page=page,
     )
 
     return {
@@ -566,18 +862,55 @@ def list_popular_movies(
                 for movie in movies
             ]
         },
-        "meta": {
-            "count": len(movies),
-            "limit": limit,
-            "catalogueRevision": revision.id,
-        },
+        "meta": _page_meta(count=len(movies), limit=limit, page=page,
+                           total=total, unfiltered_total=total, revision_id=revision.id),
     }
+
+@app.get("/api/movies/search", response_model=MovieSearchResponse, status_code=200)
+def search_movies(
+    q: str | None = Query(default=None),
+    page: int = Query(default=1, ge=1, le=10000),
+    limit: int = Query(default=10, ge=1, le=10),
+    catalogue_revision: str | None = Query(default=None, alias="catalogueRevision"),
+    database_session: Session = Depends(get_db),  # noqa: B008
+):
+    query = (q or "").strip()
+    if len(query) < 2:
+        return _error("VALIDATION_ERROR", "Enter at least 2 characters", 400)
+
+    _begin_read_snapshot(database_session)
+    revision = get_active_catalogue_revision(database_session)
+    if revision is None:
+        return _error("CATALOGUE_UNAVAILABLE", "Movie catalogue is unavailable", 503)
+
+    if error := _revision_error(catalogue_revision, revision.id):
+        return error
+
+    movies = search_active_movie_titles(database_session, query=query)
+    if not movies:
+        try:
+            index = load_active_index(database_session)
+            candidates = list_active_movies_for_text_search(database_session)
+            movies = rank_description_matches(index, query=query, movies=candidates)
+        except IndexUnavailable:
+            return _error(
+                "INDEX_UNAVAILABLE", "Search index is temporarily unavailable", 503
+            )
+    total = len(movies)
+    movies = movies[(page - 1) * limit:page * limit]
+    return {"data": {"movies": [to_movie_summary_dto(movie).model_dump()
+                                for movie in movies]},
+            "meta": _page_meta(count=len(movies), limit=limit, page=page,
+                               total=total, unfiltered_total=total, revision_id=revision.id)}
+
 
 @app.get("/api/movies/{movie_id}", response_model=MovieDetailResponse, status_code=200)
 def get_movie(
     movie_id: str,
+    country: ProviderCountry = DEFAULT_PROVIDER_COUNTRY,
     database_session: Session = Depends(get_db),  # noqa: B008
 ):
+    _begin_read_snapshot(database_session)
     revision = get_active_catalogue_revision(database_session)
     if revision is None:
         return _error(
@@ -589,8 +922,45 @@ def get_movie(
         return _error("MOVIE_NOT_FOUND", "Movie not found", 404)
 
     return {
-        "data": {"movie": to_movie_detail_dto(movie).model_dump()},
+        "data": {"movie": to_movie_detail_dto(movie, country).model_dump()},
         "meta": {"catalogueRevision": revision.id},
+    }
+
+
+@app.get(
+    "/api/movies/{movie_id}/similar",
+    response_model=MovieSimilarResponse,
+    status_code=200,
+)
+def get_similar_movies(
+    movie_id: str,
+    database_session: Session = Depends(get_db),  # noqa: B008
+):
+    _begin_read_snapshot(database_session)
+    if get_active_catalogue_revision(database_session) is None:
+        return _error(
+            "CATALOGUE_UNAVAILABLE", "Movie catalogue is unavailable", 503
+        )
+
+    source = get_active_movie_by_id(database_session, movie_id=movie_id)
+    if source is None:
+        return _error("MOVIE_NOT_FOUND", "Movie not found", 404)
+
+    try:
+        index = load_active_index(database_session)
+        candidates = list_genre_matched_movies(
+            database_session,
+            genre_ids=[genre.id for genre in source.genres],
+            limit=None,
+        )
+        movies = rank_similar_movies(index, source=source, candidates=candidates)
+    except IndexUnavailable:
+        return _error(
+            "INDEX_UNAVAILABLE", "Search index is temporarily unavailable", 503
+        )
+
+    return {
+        "data": {"movies": [to_movie_summary_dto(m).model_dump() for m in movies]}
     }
 
 
@@ -601,3 +971,26 @@ _DUMMY_PASSWORD_HASH = (
     "h6qrQH9mnU2BlE5+zY3mHA$"
     "OmtsPKfE9439waS1s/YJ6431AUHunXUiorIfT7qcbRA"
 )
+
+
+@app.api_route("/{path:path}", methods=["GET", "HEAD"], include_in_schema=False)
+def frontend(path: str):
+    # Keep the API/health namespaces separate from the SPA, including unknown paths.
+    if path.split("/", 1)[0] in {"api", "health"}:
+        return _error("NOT_FOUND", "Resource not found", 404)
+    root = FRONTEND_DIST.resolve()
+    asset = (root / path).resolve()
+    if asset.is_relative_to(root) and asset.is_file():
+        return FileResponse(asset)
+    spa_routes = {
+        "", "about-recommendations", "popular", "search", "login", "register",
+        "recommendations", "preferences", "profile", "watchlist",
+    }
+    segments = path.strip("/").split("/")
+    is_movie = len(segments) == 2 and segments[0] == "movies" and bool(segments[1])
+    if path.strip("/") in spa_routes or is_movie:
+        index = (root / "index.html").resolve()
+        if index.is_relative_to(root) and index.is_file():
+            return FileResponse(index, headers={"Cache-Control": "no-cache"})
+        return _error("SERVICE_UNAVAILABLE", "Application build is unavailable", 503)
+    return _error("NOT_FOUND", "Resource not found", 404)

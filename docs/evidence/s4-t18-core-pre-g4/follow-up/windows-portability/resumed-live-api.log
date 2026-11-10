@@ -1,0 +1,22 @@
+Started: 2026-10-30T15:19:05.711641+07:00
+Command: ['.venv/bin/python', 'docs/evidence/s4-t18-core-pre-g4/follow-up/windows-portability/verify_live_api.py', '--database', '/private/tmp/s4-t18-live-resume-20261030/catalogue.db', '--index', '/private/tmp/s4-t18-live-resume-20261030/overview-index.json', '--output', 'docs/evidence/s4-t18-core-pre-g4/follow-up/windows-portability']
+Cwd: /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE
+/Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+{
+  "status": "PASS",
+  "movies": 964,
+  "checks": 217,
+  "descriptionQuery": "the stakes in",
+  "index": {
+    "ready": true,
+    "catalogueRevision": "00a9831b-1c3a-489b-a8cf-51d36424e702",
+    "corpusDigest": "3ac90bf45649bba63965b0ff9b723d9588c00a64c58a7a204029aa80a19aca1e",
+    "configFingerprint": "41785781f34ba44091ac64f3b1c0503402ee760c518af1429d0acb94bbc31c99",
+    "movies": 964,
+    "usableDocuments": 962
+  }
+}
+
+Exit: 0
+Elapsed: 2.57s

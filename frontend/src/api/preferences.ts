@@ -96,5 +96,12 @@ export async function savePreferences(
   }
 
   const body = (await response.json()) as GenreListResponse;
-  return body.data.genres;
+  const saved = body?.data?.genres;
+  if (!Array.isArray(saved) || saved.some(genre => !genre ||
+      !Number.isInteger(genre.id) || typeof genre.name !== "string") ||
+      JSON.stringify(saved.map(genre => genre.id).sort((a, b) => a - b)) !==
+      JSON.stringify([...genreIds].sort((a, b) => a - b))) {
+    throw new PreferenceApiError("The saved preferences could not be confirmed. Please retry.", response.status);
+  }
+  return saved;
 }

@@ -1,0 +1,26 @@
+{
+  "metadata": {
+    "testedCommit": "2d030355ba13a2b089df50ec5767bc39964c090f",
+    "workingTree": "",
+    "node": "v24.19.0",
+    "python": "Python 3.12.6",
+    "t20SourceSha256": {
+      "playwright.t20.config.ts": "e18009677a4bdf549663f9d1c53c43db4870525f7cb25cb3d4a2d98fcf7796b7",
+      "e2e/s4-t20.trailer.ts": "88988d1cb5f908e1f0b22b51c4328b367981cd5ddda0f4fd41d0965409a8594a",
+      "e2e/fixtures/t20-backdrop.svg": "e4d096eb66e426e8c1897bdb2531a4c5cd08ded836719275a132bde2203e7f70",
+      "scripts/run-t20-e2e.mjs": "5868a497f8ad85e078e2b147ea574ea48cc040380e5c59bc33e55127d6e528eb"
+    },
+    "actualWorkers": 1
+  },
+  "reportedSourceFileCount": 178,
+  "sourceHashReference": "tested-source-sha256.json (normalized hashes; raw platform-specific hashes remain in the full ignored Playwright report)",
+  "stats": {
+    "startTime": "2026-10-31T10:31:00.296Z",
+    "duration": 9749.578,
+    "expected": 4,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "errors": []
+}

@@ -1,0 +1,1705 @@
+{
+  "browser": "156.0.4314.42",
+  "observations": [
+    {
+      "scenario": "similar-ranked",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": true,
+      "scores": {
+        "Moon Rescue": 0.8277369360823477,
+        "C": null,
+        "Orbit Medic": 0.23829541906570992,
+        "E": null,
+        "City Robot": 0.1078680014034405,
+        "G": null,
+        "Desert Heist": 0,
+        "I": null,
+        "Jazz Voyage": 0,
+        "K": null,
+        "Quiet Archive": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "width": 375,
+      "theme": "light",
+      "sourceGenres": [
+        {
+          "id": 8101,
+          "name": "Action"
+        },
+        {
+          "id": 8103,
+          "name": "Archive"
+        }
+      ],
+      "similarApi": [
+        {
+          "id": "20000000-0000-0000-0000-000000000002",
+          "title": "Moon Rescue",
+          "releaseYear": null,
+          "genres": [
+            {
+              "id": 8101,
+              "name": "Action"
+            },
+            {
+              "id": 8103,
+              "name": "Archive"
+            }
+          ],
+          "popularityScore": 5,
+          "posterUrl": null
+        },
+        {
+          "id": "20000000-0000-0000-0000-000000000004",
+          "title": "Orbit Medic",
+          "releaseYear": null,
+          "genres": [
+            {
+              "id": 8101,
+              "name": "Action"
+            }
+          ],
+          "popularityScore": 10,
+          "posterUrl": null
+        },
+        {
+          "id": "20000000-0000-0000-0000-000000000006",
+          "title": "City Robot",
+          "releaseYear": null,
+          "genres": [
+            {
+              "id": 8101,
+              "name": "Action"
+            }
+          ],
+          "popularityScore": 20,
+          "posterUrl": null
+        },
+        {
+          "id": "20000000-0000-0000-0000-000000000008",
+          "title": "Desert Heist",
+          "releaseYear": null,
+          "genres": [
+            {
+              "id": 8101,
+              "name": "Action"
+            }
+          ],
+          "popularityScore": 50,
+          "posterUrl": null
+        },
+        {
+          "id": "20000000-0000-0000-0000-000000000010",
+          "title": "Jazz Voyage",
+          "releaseYear": null,
+          "genres": [
+            {
+              "id": 8101,
+              "name": "Action"
+            }
+          ],
+          "popularityScore": 40,
+          "posterUrl": null
+        }
+      ]
+    },
+    {
+      "scenario": "similar-empty",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000013",
+      "sourceUsable": false,
+      "scores": {
+        "A": null,
+        "B": null,
+        "C": null,
+        "D": null,
+        "E": null,
+        "F": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null
+      }
+    },
+    {
+      "scenario": "similar-pair",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": true,
+      "scores": {
+        "Moon Rescue": 0.8060212567376087,
+        "C": null,
+        "Orbit Medic": 0.21474145467528344,
+        "E": null,
+        "F": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-missing-candidate",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": true,
+      "scores": {
+        "Moon Rescue": 0.8060212567376087,
+        "C": null,
+        "Orbit Medic": 0.21474145467528344,
+        "E": null,
+        "Quiet Archive": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-missing-source",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": false,
+      "scores": {
+        "Moon Rescue": null,
+        "C": null,
+        "Orbit Medic": null,
+        "E": null,
+        "Quiet Archive": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-blank-source",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": false,
+      "scores": {
+        "Moon Rescue": null,
+        "C": null,
+        "Orbit Medic": null,
+        "E": null,
+        "Quiet Archive": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-zero-source",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": false,
+      "scores": {
+        "Moon Rescue": null,
+        "C": null,
+        "Orbit Medic": null,
+        "E": null,
+        "Quiet Archive": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-index-failure",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": true,
+      "scores": {
+        "Moon Rescue": 0.8277369360823477,
+        "C": null,
+        "Orbit Medic": 0.23829541906570992,
+        "E": null,
+        "City Robot": 0.1078680014034405,
+        "G": null,
+        "Desert Heist": 0,
+        "I": null,
+        "Jazz Voyage": 0,
+        "K": null,
+        "Quiet Archive": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-ranked",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": true,
+      "scores": {
+        "Moon Rescue": 0.8277369360823477,
+        "C": null,
+        "Orbit Medic": 0.23829541906570992,
+        "E": null,
+        "City Robot": 0.1078680014034405,
+        "G": null,
+        "Desert Heist": 0,
+        "I": null,
+        "Jazz Voyage": 0,
+        "K": null,
+        "Quiet Archive": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-ranked",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": true,
+      "scores": {
+        "Moon Rescue": 0.8277369360823477,
+        "C": null,
+        "Orbit Medic": 0.23829541906570992,
+        "E": null,
+        "City Robot": 0.1078680014034405,
+        "G": null,
+        "Desert Heist": 0,
+        "I": null,
+        "Jazz Voyage": 0,
+        "K": null,
+        "Quiet Archive": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "width": 375,
+      "theme": "dark",
+      "sourceGenres": [
+        {
+          "id": 8101,
+          "name": "Action"
+        },
+        {
+          "id": 8103,
+          "name": "Archive"
+        }
+      ],
+      "similarApi": [
+        {
+          "id": "20000000-0000-0000-0000-000000000002",
+          "title": "Moon Rescue",
+          "releaseYear": null,
+          "genres": [
+            {
+              "id": 8101,
+              "name": "Action"
+            },
+            {
+              "id": 8103,
+              "name": "Archive"
+            }
+          ],
+          "popularityScore": 5,
+          "posterUrl": null
+        },
+        {
+          "id": "20000000-0000-0000-0000-000000000004",
+          "title": "Orbit Medic",
+          "releaseYear": null,
+          "genres": [
+            {
+              "id": 8101,
+              "name": "Action"
+            }
+          ],
+          "popularityScore": 10,
+          "posterUrl": null
+        },
+        {
+          "id": "20000000-0000-0000-0000-000000000006",
+          "title": "City Robot",
+          "releaseYear": null,
+          "genres": [
+            {
+              "id": 8101,
+              "name": "Action"
+            }
+          ],
+          "popularityScore": 20,
+          "posterUrl": null
+        },
+        {
+          "id": "20000000-0000-0000-0000-000000000008",
+          "title": "Desert Heist",
+          "releaseYear": null,
+          "genres": [
+            {
+              "id": 8101,
+              "name": "Action"
+            }
+          ],
+          "popularityScore": 50,
+          "posterUrl": null
+        },
+        {
+          "id": "20000000-0000-0000-0000-000000000010",
+          "title": "Jazz Voyage",
+          "releaseYear": null,
+          "genres": [
+            {
+              "id": 8101,
+              "name": "Action"
+            }
+          ],
+          "popularityScore": 40,
+          "posterUrl": null
+        }
+      ]
+    },
+    {
+      "scenario": "similar-empty",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000013",
+      "sourceUsable": false,
+      "scores": {
+        "A": null,
+        "B": null,
+        "C": null,
+        "D": null,
+        "E": null,
+        "F": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null
+      }
+    },
+    {
+      "scenario": "similar-pair",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": true,
+      "scores": {
+        "Moon Rescue": 0.8060212567376087,
+        "C": null,
+        "Orbit Medic": 0.21474145467528344,
+        "E": null,
+        "F": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-missing-candidate",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": true,
+      "scores": {
+        "Moon Rescue": 0.8060212567376087,
+        "C": null,
+        "Orbit Medic": 0.21474145467528344,
+        "E": null,
+        "Quiet Archive": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-missing-source",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": false,
+      "scores": {
+        "Moon Rescue": null,
+        "C": null,
+        "Orbit Medic": null,
+        "E": null,
+        "Quiet Archive": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-blank-source",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": false,
+      "scores": {
+        "Moon Rescue": null,
+        "C": null,
+        "Orbit Medic": null,
+        "E": null,
+        "Quiet Archive": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-zero-source",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": false,
+      "scores": {
+        "Moon Rescue": null,
+        "C": null,
+        "Orbit Medic": null,
+        "E": null,
+        "Quiet Archive": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-index-failure",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": true,
+      "scores": {
+        "Moon Rescue": 0.8277369360823477,
+        "C": null,
+        "Orbit Medic": 0.23829541906570992,
+        "E": null,
+        "City Robot": 0.1078680014034405,
+        "G": null,
+        "Desert Heist": 0,
+        "I": null,
+        "Jazz Voyage": 0,
+        "K": null,
+        "Quiet Archive": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-ranked",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": true,
+      "scores": {
+        "Moon Rescue": 0.8277369360823477,
+        "C": null,
+        "Orbit Medic": 0.23829541906570992,
+        "E": null,
+        "City Robot": 0.1078680014034405,
+        "G": null,
+        "Desert Heist": 0,
+        "I": null,
+        "Jazz Voyage": 0,
+        "K": null,
+        "Quiet Archive": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-ranked",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": true,
+      "scores": {
+        "Moon Rescue": 0.8277369360823477,
+        "C": null,
+        "Orbit Medic": 0.23829541906570992,
+        "E": null,
+        "City Robot": 0.1078680014034405,
+        "G": null,
+        "Desert Heist": 0,
+        "I": null,
+        "Jazz Voyage": 0,
+        "K": null,
+        "Quiet Archive": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "sourceGenres": [
+        {
+          "id": 8101,
+          "name": "Action"
+        },
+        {
+          "id": 8103,
+          "name": "Archive"
+        }
+      ],
+      "similarApi": [
+        {
+          "id": "20000000-0000-0000-0000-000000000002",
+          "title": "Moon Rescue",
+          "releaseYear": null,
+          "genres": [
+            {
+              "id": 8101,
+              "name": "Action"
+            },
+            {
+              "id": 8103,
+              "name": "Archive"
+            }
+          ],
+          "popularityScore": 5,
+          "posterUrl": null
+        },
+        {
+          "id": "20000000-0000-0000-0000-000000000004",
+          "title": "Orbit Medic",
+          "releaseYear": null,
+          "genres": [
+            {
+              "id": 8101,
+              "name": "Action"
+            }
+          ],
+          "popularityScore": 10,
+          "posterUrl": null
+        },
+        {
+          "id": "20000000-0000-0000-0000-000000000006",
+          "title": "City Robot",
+          "releaseYear": null,
+          "genres": [
+            {
+              "id": 8101,
+              "name": "Action"
+            }
+          ],
+          "popularityScore": 20,
+          "posterUrl": null
+        },
+        {
+          "id": "20000000-0000-0000-0000-000000000008",
+          "title": "Desert Heist",
+          "releaseYear": null,
+          "genres": [
+            {
+              "id": 8101,
+              "name": "Action"
+            }
+          ],
+          "popularityScore": 50,
+          "posterUrl": null
+        },
+        {
+          "id": "20000000-0000-0000-0000-000000000010",
+          "title": "Jazz Voyage",
+          "releaseYear": null,
+          "genres": [
+            {
+              "id": 8101,
+              "name": "Action"
+            }
+          ],
+          "popularityScore": 40,
+          "posterUrl": null
+        }
+      ]
+    },
+    {
+      "scenario": "similar-empty",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000013",
+      "sourceUsable": false,
+      "scores": {
+        "A": null,
+        "B": null,
+        "C": null,
+        "D": null,
+        "E": null,
+        "F": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null
+      }
+    },
+    {
+      "scenario": "similar-pair",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": true,
+      "scores": {
+        "Moon Rescue": 0.8060212567376087,
+        "C": null,
+        "Orbit Medic": 0.21474145467528344,
+        "E": null,
+        "F": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-missing-candidate",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": true,
+      "scores": {
+        "Moon Rescue": 0.8060212567376087,
+        "C": null,
+        "Orbit Medic": 0.21474145467528344,
+        "E": null,
+        "Quiet Archive": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-missing-source",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": false,
+      "scores": {
+        "Moon Rescue": null,
+        "C": null,
+        "Orbit Medic": null,
+        "E": null,
+        "Quiet Archive": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-blank-source",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": false,
+      "scores": {
+        "Moon Rescue": null,
+        "C": null,
+        "Orbit Medic": null,
+        "E": null,
+        "Quiet Archive": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-zero-source",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": false,
+      "scores": {
+        "Moon Rescue": null,
+        "C": null,
+        "Orbit Medic": null,
+        "E": null,
+        "Quiet Archive": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-index-failure",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": true,
+      "scores": {
+        "Moon Rescue": 0.8277369360823477,
+        "C": null,
+        "Orbit Medic": 0.23829541906570992,
+        "E": null,
+        "City Robot": 0.1078680014034405,
+        "G": null,
+        "Desert Heist": 0,
+        "I": null,
+        "Jazz Voyage": 0,
+        "K": null,
+        "Quiet Archive": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-ranked",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": true,
+      "scores": {
+        "Moon Rescue": 0.8277369360823477,
+        "C": null,
+        "Orbit Medic": 0.23829541906570992,
+        "E": null,
+        "City Robot": 0.1078680014034405,
+        "G": null,
+        "Desert Heist": 0,
+        "I": null,
+        "Jazz Voyage": 0,
+        "K": null,
+        "Quiet Archive": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-ranked",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": true,
+      "scores": {
+        "Moon Rescue": 0.8277369360823477,
+        "C": null,
+        "Orbit Medic": 0.23829541906570992,
+        "E": null,
+        "City Robot": 0.1078680014034405,
+        "G": null,
+        "Desert Heist": 0,
+        "I": null,
+        "Jazz Voyage": 0,
+        "K": null,
+        "Quiet Archive": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "sourceGenres": [
+        {
+          "id": 8101,
+          "name": "Action"
+        },
+        {
+          "id": 8103,
+          "name": "Archive"
+        }
+      ],
+      "similarApi": [
+        {
+          "id": "20000000-0000-0000-0000-000000000002",
+          "title": "Moon Rescue",
+          "releaseYear": null,
+          "genres": [
+            {
+              "id": 8101,
+              "name": "Action"
+            },
+            {
+              "id": 8103,
+              "name": "Archive"
+            }
+          ],
+          "popularityScore": 5,
+          "posterUrl": null
+        },
+        {
+          "id": "20000000-0000-0000-0000-000000000004",
+          "title": "Orbit Medic",
+          "releaseYear": null,
+          "genres": [
+            {
+              "id": 8101,
+              "name": "Action"
+            }
+          ],
+          "popularityScore": 10,
+          "posterUrl": null
+        },
+        {
+          "id": "20000000-0000-0000-0000-000000000006",
+          "title": "City Robot",
+          "releaseYear": null,
+          "genres": [
+            {
+              "id": 8101,
+              "name": "Action"
+            }
+          ],
+          "popularityScore": 20,
+          "posterUrl": null
+        },
+        {
+          "id": "20000000-0000-0000-0000-000000000008",
+          "title": "Desert Heist",
+          "releaseYear": null,
+          "genres": [
+            {
+              "id": 8101,
+              "name": "Action"
+            }
+          ],
+          "popularityScore": 50,
+          "posterUrl": null
+        },
+        {
+          "id": "20000000-0000-0000-0000-000000000010",
+          "title": "Jazz Voyage",
+          "releaseYear": null,
+          "genres": [
+            {
+              "id": 8101,
+              "name": "Action"
+            }
+          ],
+          "popularityScore": 40,
+          "posterUrl": null
+        }
+      ]
+    },
+    {
+      "scenario": "similar-empty",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000013",
+      "sourceUsable": false,
+      "scores": {
+        "A": null,
+        "B": null,
+        "C": null,
+        "D": null,
+        "E": null,
+        "F": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null
+      }
+    },
+    {
+      "scenario": "similar-pair",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": true,
+      "scores": {
+        "Moon Rescue": 0.8060212567376087,
+        "C": null,
+        "Orbit Medic": 0.21474145467528344,
+        "E": null,
+        "F": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-missing-candidate",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": true,
+      "scores": {
+        "Moon Rescue": 0.8060212567376087,
+        "C": null,
+        "Orbit Medic": 0.21474145467528344,
+        "E": null,
+        "Quiet Archive": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-missing-source",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": false,
+      "scores": {
+        "Moon Rescue": null,
+        "C": null,
+        "Orbit Medic": null,
+        "E": null,
+        "Quiet Archive": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-blank-source",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": false,
+      "scores": {
+        "Moon Rescue": null,
+        "C": null,
+        "Orbit Medic": null,
+        "E": null,
+        "Quiet Archive": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-zero-source",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": false,
+      "scores": {
+        "Moon Rescue": null,
+        "C": null,
+        "Orbit Medic": null,
+        "E": null,
+        "Quiet Archive": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-index-failure",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": true,
+      "scores": {
+        "Moon Rescue": 0.8277369360823477,
+        "C": null,
+        "Orbit Medic": 0.23829541906570992,
+        "E": null,
+        "City Robot": 0.1078680014034405,
+        "G": null,
+        "Desert Heist": 0,
+        "I": null,
+        "Jazz Voyage": 0,
+        "K": null,
+        "Quiet Archive": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-ranked",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": true,
+      "scores": {
+        "Moon Rescue": 0.8277369360823477,
+        "C": null,
+        "Orbit Medic": 0.23829541906570992,
+        "E": null,
+        "City Robot": 0.1078680014034405,
+        "G": null,
+        "Desert Heist": 0,
+        "I": null,
+        "Jazz Voyage": 0,
+        "K": null,
+        "Quiet Archive": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-ranked",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": true,
+      "scores": {
+        "Moon Rescue": 0.8277369360823477,
+        "C": null,
+        "Orbit Medic": 0.23829541906570992,
+        "E": null,
+        "City Robot": 0.1078680014034405,
+        "G": null,
+        "Desert Heist": 0,
+        "I": null,
+        "Jazz Voyage": 0,
+        "K": null,
+        "Quiet Archive": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "sourceGenres": [
+        {
+          "id": 8101,
+          "name": "Action"
+        },
+        {
+          "id": 8103,
+          "name": "Archive"
+        }
+      ],
+      "similarApi": [
+        {
+          "id": "20000000-0000-0000-0000-000000000002",
+          "title": "Moon Rescue",
+          "releaseYear": null,
+          "genres": [
+            {
+              "id": 8101,
+              "name": "Action"
+            },
+            {
+              "id": 8103,
+              "name": "Archive"
+            }
+          ],
+          "popularityScore": 5,
+          "posterUrl": null
+        },
+        {
+          "id": "20000000-0000-0000-0000-000000000004",
+          "title": "Orbit Medic",
+          "releaseYear": null,
+          "genres": [
+            {
+              "id": 8101,
+              "name": "Action"
+            }
+          ],
+          "popularityScore": 10,
+          "posterUrl": null
+        },
+        {
+          "id": "20000000-0000-0000-0000-000000000006",
+          "title": "City Robot",
+          "releaseYear": null,
+          "genres": [
+            {
+              "id": 8101,
+              "name": "Action"
+            }
+          ],
+          "popularityScore": 20,
+          "posterUrl": null
+        },
+        {
+          "id": "20000000-0000-0000-0000-000000000008",
+          "title": "Desert Heist",
+          "releaseYear": null,
+          "genres": [
+            {
+              "id": 8101,
+              "name": "Action"
+            }
+          ],
+          "popularityScore": 50,
+          "posterUrl": null
+        },
+        {
+          "id": "20000000-0000-0000-0000-000000000010",
+          "title": "Jazz Voyage",
+          "releaseYear": null,
+          "genres": [
+            {
+              "id": 8101,
+              "name": "Action"
+            }
+          ],
+          "popularityScore": 40,
+          "posterUrl": null
+        }
+      ]
+    },
+    {
+      "scenario": "similar-empty",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000013",
+      "sourceUsable": false,
+      "scores": {
+        "A": null,
+        "B": null,
+        "C": null,
+        "D": null,
+        "E": null,
+        "F": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null
+      }
+    },
+    {
+      "scenario": "similar-pair",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": true,
+      "scores": {
+        "Moon Rescue": 0.8060212567376087,
+        "C": null,
+        "Orbit Medic": 0.21474145467528344,
+        "E": null,
+        "F": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-missing-candidate",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": true,
+      "scores": {
+        "Moon Rescue": 0.8060212567376087,
+        "C": null,
+        "Orbit Medic": 0.21474145467528344,
+        "E": null,
+        "Quiet Archive": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-missing-source",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": false,
+      "scores": {
+        "Moon Rescue": null,
+        "C": null,
+        "Orbit Medic": null,
+        "E": null,
+        "Quiet Archive": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-blank-source",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": false,
+      "scores": {
+        "Moon Rescue": null,
+        "C": null,
+        "Orbit Medic": null,
+        "E": null,
+        "Quiet Archive": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-zero-source",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": false,
+      "scores": {
+        "Moon Rescue": null,
+        "C": null,
+        "Orbit Medic": null,
+        "E": null,
+        "Quiet Archive": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-index-failure",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": true,
+      "scores": {
+        "Moon Rescue": 0.8277369360823477,
+        "C": null,
+        "Orbit Medic": 0.23829541906570992,
+        "E": null,
+        "City Robot": 0.1078680014034405,
+        "G": null,
+        "Desert Heist": 0,
+        "I": null,
+        "Jazz Voyage": 0,
+        "K": null,
+        "Quiet Archive": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-ranked",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": true,
+      "scores": {
+        "Moon Rescue": 0.8277369360823477,
+        "C": null,
+        "Orbit Medic": 0.23829541906570992,
+        "E": null,
+        "City Robot": 0.1078680014034405,
+        "G": null,
+        "Desert Heist": 0,
+        "I": null,
+        "Jazz Voyage": 0,
+        "K": null,
+        "Quiet Archive": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-ranked",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": true,
+      "scores": {
+        "Moon Rescue": 0.8277369360823477,
+        "C": null,
+        "Orbit Medic": 0.23829541906570992,
+        "E": null,
+        "City Robot": 0.1078680014034405,
+        "G": null,
+        "Desert Heist": 0,
+        "I": null,
+        "Jazz Voyage": 0,
+        "K": null,
+        "Quiet Archive": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "sourceGenres": [
+        {
+          "id": 8101,
+          "name": "Action"
+        },
+        {
+          "id": 8103,
+          "name": "Archive"
+        }
+      ],
+      "similarApi": [
+        {
+          "id": "20000000-0000-0000-0000-000000000002",
+          "title": "Moon Rescue",
+          "releaseYear": null,
+          "genres": [
+            {
+              "id": 8101,
+              "name": "Action"
+            },
+            {
+              "id": 8103,
+              "name": "Archive"
+            }
+          ],
+          "popularityScore": 5,
+          "posterUrl": null
+        },
+        {
+          "id": "20000000-0000-0000-0000-000000000004",
+          "title": "Orbit Medic",
+          "releaseYear": null,
+          "genres": [
+            {
+              "id": 8101,
+              "name": "Action"
+            }
+          ],
+          "popularityScore": 10,
+          "posterUrl": null
+        },
+        {
+          "id": "20000000-0000-0000-0000-000000000006",
+          "title": "City Robot",
+          "releaseYear": null,
+          "genres": [
+            {
+              "id": 8101,
+              "name": "Action"
+            }
+          ],
+          "popularityScore": 20,
+          "posterUrl": null
+        },
+        {
+          "id": "20000000-0000-0000-0000-000000000008",
+          "title": "Desert Heist",
+          "releaseYear": null,
+          "genres": [
+            {
+              "id": 8101,
+              "name": "Action"
+            }
+          ],
+          "popularityScore": 50,
+          "posterUrl": null
+        },
+        {
+          "id": "20000000-0000-0000-0000-000000000010",
+          "title": "Jazz Voyage",
+          "releaseYear": null,
+          "genres": [
+            {
+              "id": 8101,
+              "name": "Action"
+            }
+          ],
+          "popularityScore": 40,
+          "posterUrl": null
+        }
+      ]
+    },
+    {
+      "scenario": "similar-empty",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000013",
+      "sourceUsable": false,
+      "scores": {
+        "A": null,
+        "B": null,
+        "C": null,
+        "D": null,
+        "E": null,
+        "F": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null
+      }
+    },
+    {
+      "scenario": "similar-pair",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": true,
+      "scores": {
+        "Moon Rescue": 0.8060212567376087,
+        "C": null,
+        "Orbit Medic": 0.21474145467528344,
+        "E": null,
+        "F": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-missing-candidate",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": true,
+      "scores": {
+        "Moon Rescue": 0.8060212567376087,
+        "C": null,
+        "Orbit Medic": 0.21474145467528344,
+        "E": null,
+        "Quiet Archive": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-missing-source",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": false,
+      "scores": {
+        "Moon Rescue": null,
+        "C": null,
+        "Orbit Medic": null,
+        "E": null,
+        "Quiet Archive": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-blank-source",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": false,
+      "scores": {
+        "Moon Rescue": null,
+        "C": null,
+        "Orbit Medic": null,
+        "E": null,
+        "Quiet Archive": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-zero-source",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": false,
+      "scores": {
+        "Moon Rescue": null,
+        "C": null,
+        "Orbit Medic": null,
+        "E": null,
+        "Quiet Archive": null,
+        "G": null,
+        "H": null,
+        "I": null,
+        "J": null,
+        "K": null,
+        "L": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-index-failure",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": true,
+      "scores": {
+        "Moon Rescue": 0.8277369360823477,
+        "C": null,
+        "Orbit Medic": 0.23829541906570992,
+        "E": null,
+        "City Robot": 0.1078680014034405,
+        "G": null,
+        "Desert Heist": 0,
+        "I": null,
+        "Jazz Voyage": 0,
+        "K": null,
+        "Quiet Archive": null,
+        "Archive candidate": null
+      }
+    },
+    {
+      "scenario": "similar-ranked",
+      "preferences": [],
+      "activeMovies": 13,
+      "finitePopularity": 12,
+      "sourceId": "20000000-0000-0000-0000-000000000001",
+      "sourceUsable": true,
+      "scores": {
+        "Moon Rescue": 0.8277369360823477,
+        "C": null,
+        "Orbit Medic": 0.23829541906570992,
+        "E": null,
+        "City Robot": 0.1078680014034405,
+        "G": null,
+        "Desert Heist": 0,
+        "I": null,
+        "Jazz Voyage": 0,
+        "K": null,
+        "Quiet Archive": null,
+        "Archive candidate": null
+      }
+    }
+  ],
+  "errors": [],
+  "external": []
+}

@@ -3,26 +3,46 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from datetime import datetime
+from datetime import UTC, datetime
 from math import isfinite
+from typing import Literal
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.catalogue.backdrops import backdrop_url
+from app.catalogue.posters import poster_url
+from app.catalogue.providers import (
+    DEFAULT_PROVIDER_COUNTRY,
+    PROVIDER_GROUPS,
+    ProviderCountry,
+    provider_logo_url,
+    watch_options_url,
+)
+from app.catalogue.trailers import youtube_url
 from app.db.models import (
     CatalogMovie,
     CatalogueRevision,
     CatalogueState,
     Genre,
     MovieGenre,
+    MovieProviderCheck,
     new_opaque_id,
     utc_now,
 )
-from app.recommendations.ranker import popularity_title_id_ordering
-from app.schemas.movies import GenreDto, MovieDetailDto, MovieSummaryDto
+from app.recommendations.overview_index import normalize_text
+from app.schemas.movies import (
+    GenreDto,
+    MovieDetailDto,
+    MovieProvidersDto,
+    MovieSummaryDto,
+    ProviderGroupsDto,
+    TrailerDto,
+    WatchProviderDto,
+)
 
 ACTIVE_CATALOGUE_STATE_ID = 1
+CatalogueSort = Literal["title_asc", "title_desc"]
 
 
 def create_catalogue_revision(
@@ -185,6 +205,20 @@ def set_movie_backdrop_path(
     return movie
 
 
+def set_movie_poster_path(
+    session: Session, *, movie_id: str, poster_path: str | None
+) -> CatalogMovie:
+    """Set media in the caller's transaction, without changing text/revision."""
+    if poster_path is not None and not isinstance(poster_path, str):
+        raise ValueError("poster_path must be a string or None")
+    movie = session.get(CatalogMovie, movie_id)
+    if movie is None:
+        raise ValueError("catalogue movie does not exist")
+    movie.poster_path = poster_path
+    session.flush()
+    return movie
+
+
 def upsert_genre(session: Session, *, genre_id: int, name: str) -> Genre:
     """Create or refresh a provider genre without duplicating its numeric ID."""
 
@@ -234,11 +268,32 @@ def replace_movie_genres(
     return [genres_by_id[genre_id] for genre_id in unique_genre_ids]
 
 
-def list_active_movies(session: Session, *, limit: int) -> list[CatalogMovie]:
-    """Return only movies in the active revision in deterministic popular order."""
+def count_active_movies(session: Session) -> int:
+    return session.scalar(
+        select(func.count(CatalogMovie.id)).join(
+            CatalogueState,
+            CatalogueState.active_revision_id == CatalogMovie.catalogue_revision_id,
+        ).where(CatalogueState.id == ACTIVE_CATALOGUE_STATE_ID)
+    ) or 0
+
+
+def list_active_movies(
+    session: Session, *, limit: int, page: int = 1, sort: CatalogueSort = "title_asc"
+) -> list[CatalogMovie]:
+    """Sort the entire active catalogue by title, then return a stable page."""
 
     if not 1 <= limit <= 10:
         raise ValueError("limit must be an integer from 1 to 10")
+    if page < 1:
+        raise ValueError("page must be positive")
+    if sort not in ("title_asc", "title_desc"):
+        raise ValueError("sort must be title_asc or title_desc")
+
+    title_order = (
+        (func.lower(CatalogMovie.title).desc(), CatalogMovie.title.desc())
+        if sort == "title_desc"
+        else (func.lower(CatalogMovie.title).asc(), CatalogMovie.title.asc())
+    )
 
     statement = (
         select(CatalogMovie)
@@ -248,8 +303,71 @@ def list_active_movies(session: Session, *, limit: int) -> list[CatalogMovie]:
         )
         .where(CatalogueState.id == ACTIVE_CATALOGUE_STATE_ID)
         .options(selectinload(CatalogMovie.genres))
-        .order_by(*popularity_title_id_ordering())
+        .order_by(*title_order, CatalogMovie.id)
         .limit(limit)
+        .offset((page - 1) * limit)
+    )
+    return list(session.scalars(statement).unique())
+
+
+def search_active_movie_titles(session: Session, *, query: str) -> list[CatalogMovie]:
+    """Return all ordered literal title hits from the active catalogue."""
+
+    connection = session.connection()
+    if connection.dialect.name == "postgresql":
+        # PostgreSQL lower()/collation differs from Python NFKC casefold.
+        query_key = normalize_text(query)
+        title_rows = session.execute(
+            select(CatalogMovie.id, CatalogMovie.title)
+            .join(CatalogueState, CatalogueState.active_revision_id == CatalogMovie.catalogue_revision_id)
+            .where(CatalogueState.id == ACTIVE_CATALOGUE_STATE_ID)
+        )
+        matched_ids = [movie_id for movie_id, title in title_rows
+                       if query_key in normalize_text(title)]
+        if not matched_ids:
+            return []
+        movies = session.scalars(
+            select(CatalogMovie).where(CatalogMovie.id.in_(matched_ids))
+            .options(selectinload(CatalogMovie.genres))
+        )
+        return sorted(movies.unique(),
+                      key=lambda movie: (normalize_text(movie.title), movie.id))
+    if connection.dialect.name == "sqlite":
+        connection.connection.driver_connection.create_function(
+            "movie_title_casefold", 1, normalize_text, deterministic=True
+        )
+        title_key = func.movie_title_casefold(CatalogMovie.title)
+        query_key = normalize_text(query)
+    escaped = (
+        query_key.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+    )
+    statement = (
+        select(CatalogMovie)
+        .join(
+            CatalogueState,
+            CatalogueState.active_revision_id == CatalogMovie.catalogue_revision_id,
+        )
+        .where(
+            CatalogueState.id == ACTIVE_CATALOGUE_STATE_ID,
+            title_key.like(f"%{escaped}%", escape="\\"),
+        )
+        .options(selectinload(CatalogMovie.genres))
+        .order_by(title_key, CatalogMovie.id)
+    )
+    return list(session.scalars(statement).unique())
+
+
+def list_active_movies_for_text_search(session: Session) -> list[CatalogMovie]:
+    """Load active summary rows once for full-corpus similarity ranking."""
+
+    statement = (
+        select(CatalogMovie)
+        .join(
+            CatalogueState,
+            CatalogueState.active_revision_id == CatalogMovie.catalogue_revision_id,
+        )
+        .where(CatalogueState.id == ACTIVE_CATALOGUE_STATE_ID)
+        .options(selectinload(CatalogMovie.genres))
     )
     return list(session.scalars(statement).unique())
 
@@ -267,7 +385,8 @@ def get_active_movie_by_id(session: Session, *, movie_id: str) -> CatalogMovie |
             CatalogueState.id == ACTIVE_CATALOGUE_STATE_ID,
             CatalogMovie.id == movie_id,
         )
-        .options(selectinload(CatalogMovie.genres))
+        .options(selectinload(CatalogMovie.genres),
+                 selectinload(CatalogMovie.provider_checks).selectinload(MovieProviderCheck.providers))
     )
     return session.scalar(statement)
 
@@ -281,12 +400,24 @@ def to_movie_summary_dto(movie: CatalogMovie) -> MovieSummaryDto:
         releaseYear=movie.release_year,
         genres=[GenreDto(id=genre.id, name=genre.name) for genre in movie.genres],
         popularityScore=movie.popularity_score,
+        posterUrl=poster_url(movie.poster_path),
+        backdropUrl=backdrop_url(movie.backdrop_path),
     )
 
 
-def to_movie_detail_dto(movie: CatalogMovie) -> MovieDetailDto:
+def to_movie_detail_dto(
+    movie: CatalogMovie, country: ProviderCountry = DEFAULT_PROVIDER_COUNTRY,
+) -> MovieDetailDto:
     """Project a catalogue movie to the safe public detail shape."""
 
+    check = next((check for check in movie.provider_checks if check.country == country), None)
+    groups = {group: [] for group in PROVIDER_GROUPS}
+    if check:
+        for provider in sorted(check.providers, key=lambda row: (row.availability_type, row.provider_id)):
+            if provider.country == country and provider.availability_type in groups:
+                groups[provider.availability_type].append(WatchProviderDto(
+                    id=provider.provider_id, name=provider.name, logoUrl=provider_logo_url(provider.logo_path),
+                ))
     return MovieDetailDto(
         id=movie.id,
         title=movie.title,
@@ -297,6 +428,42 @@ def to_movie_detail_dto(movie: CatalogMovie) -> MovieDetailDto:
         voteAverage=movie.vote_average,
         voteCount=movie.vote_count,
         backdropUrl=backdrop_url(movie.backdrop_path),
+        posterUrl=poster_url(movie.poster_path),
+        trailer=_trailer_dto(movie),
+        providers=MovieProvidersDto(
+            country=country,
+            status=check.status if check else "not_checked",
+            attemptedAt=_provider_timestamp(check.attempted_at) if check else None,
+            checkedAt=_provider_timestamp(check.checked_at) if check else None,
+            groups=ProviderGroupsDto(**groups),
+        ),
+        watchOptionsUrl=(watch_options_url(check.watch_options_url, int(movie.source_id), country)
+                         if check and movie.source == "tmdb" and movie.source_id.isascii()
+                         and movie.source_id.isdecimal() else None),
+    )
+
+
+def _provider_timestamp(value: datetime | None) -> str | None:
+    if value is None:
+        return None
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=UTC)
+    return value.astimezone(UTC).isoformat().replace("+00:00", "Z")
+
+
+def _trailer_dto(movie: CatalogMovie) -> TrailerDto | None:
+    url = youtube_url(movie.trailer_key)
+    if (url is None or movie.trailer_site != "YouTube"
+            or movie.trailer_type != "Trailer" or movie.trailer_official is not True):
+        return None
+    published = movie.trailer_published_at
+    return TrailerDto(
+        site="YouTube", key=movie.trailer_key, name=movie.trailer_name,
+        type="Trailer", official=True, language=movie.trailer_language,
+        publishedAt=(published.replace(tzinfo=UTC).isoformat().replace("+00:00", "Z")
+                     if published and published.tzinfo is None else
+                     published.astimezone(UTC).isoformat().replace("+00:00", "Z")
+                     if published else None), url=url,
     )
 
 

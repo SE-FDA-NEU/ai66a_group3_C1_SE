@@ -1,0 +1,217 @@
+{
+  "scope": "Author-local Chrome; isolated synthetic SQLite; final source identified by source-hashes.json",
+  "stats": {
+    "startTime": "2026-10-27T13:22:16.936Z",
+    "duration": 50618.775,
+    "expected": 16,
+    "skipped": 1,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "cases": [
+    {
+      "title": "S08 search uses real API/index across themes, sizes, states and safe return",
+      "file": "t01.visual.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 7983
+        }
+      ]
+    },
+    {
+      "title": "S08 delayed real search response cannot replace a newer query or return after unmount",
+      "file": "t01.visual.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1130
+        }
+      ]
+    },
+    {
+      "title": "S07 similar movies satisfy all five criteria with the real API, index and DB",
+      "file": "t01.visual.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 14265
+        }
+      ]
+    },
+    {
+      "title": "S07 similar results are public, identical across accounts, independent of ratings and keep the return context",
+      "file": "t01.visual.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1910
+        }
+      ]
+    },
+    {
+      "title": "S07 delayed real similar response for movie A cannot fill movie B",
+      "file": "t01.visual.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1022
+        }
+      ]
+    },
+    {
+      "title": "Home title sort precedes paging and button links preserve detail return in both themes",
+      "file": "t01.visual.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 3541
+        }
+      ]
+    },
+    {
+      "title": "personal navigation actions use shared buttons without changing saved genres",
+      "file": "t01.visual.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 2407
+        }
+      ]
+    },
+    {
+      "title": "existing public pages, both themes and 375/768/1440 layouts",
+      "file": "t01.visual.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 4126
+        }
+      ]
+    },
+    {
+      "title": "native star keyboard draft, save and theme preserve real state",
+      "file": "t01.visual.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1765
+        }
+      ]
+    },
+    {
+      "title": "Home hero and navbar leave personalisation entirely user initiated",
+      "file": "t01.visual.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1316
+        }
+      ]
+    },
+    {
+      "title": "guest Start survives the registration detour and opens real Preferences after sign-in",
+      "file": "t01.visual.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 980
+        }
+      ]
+    },
+    {
+      "title": "theme toggle preserves a real paginated URL and its ordered results",
+      "file": "t01.visual.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 709
+        }
+      ]
+    },
+    {
+      "title": "blocked browser storage still renders and switches theme",
+      "file": "t01.visual.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 792
+        }
+      ]
+    },
+    {
+      "title": "reference auth layouts stay concise, responsive and fully functional in both themes",
+      "file": "t01.visual.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1324
+        }
+      ]
+    },
+    {
+      "title": "centered action feedback reflects real login/save/logout acknowledgements without blocking the page",
+      "file": "t01.visual.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1810
+        }
+      ]
+    },
+    {
+      "title": "genre cards expose descriptions, native keyboard state and no implicit writes",
+      "file": "t01.visual.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 861
+        }
+      ]
+    },
+    {
+      "title": "read-only imported TMDb catalogue screenshots, real poster loading and themes",
+      "file": "t01.visual.ts",
+      "status": "skipped",
+      "expectedStatus": "skipped",
+      "runs": [
+        {
+          "status": "skipped",
+          "durationMs": 205
+        }
+      ]
+    }
+  ]
+}

@@ -130,7 +130,8 @@ def snapshot(path: Path, *, media: bool = False) -> dict:
             columns = [
                 r[1]
                 for r in db.execute(f'PRAGMA table_info("{table}")')
-                if media or r[1] != "backdrop_path"
+                if not r[1].startswith("trailer_")
+                and (media or r[1] not in {"backdrop_path", "poster_path"})
             ]
             quoted = ",".join(f'"{column}"' for column in columns)
             result[table] = db.execute(
@@ -149,7 +150,10 @@ def rankings(engine) -> dict:
     with Session(engine) as session:
         return {
             user: [
-                movie.model_dump()
+                # Backdrop presentation now appears in summary DTOs. Its URL
+                # may change during enrichment; every ranking/ownership field
+                # and the exact ordered movie IDs must still remain identical.
+                movie.model_dump(exclude={"backdropUrl"})
                 for movie in build_account_recommendations(
                     session, user_id=f"t28-user-{user}", limit=10
                 ).movies

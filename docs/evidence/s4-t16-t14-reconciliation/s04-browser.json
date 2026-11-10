@@ -1,0 +1,145 @@
+{
+  "scope": "Author-local Chrome; isolated synthetic migrated SQLite; source-hashes.json identifies the resolved working tree",
+  "stats": {
+    "startTime": "2026-10-28T00:28:33.893Z",
+    "duration": 19374.503,
+    "expected": 10,
+    "skipped": 1,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "cases": [
+    {
+      "title": "AC1/AC2/AC4: real sign-in, A90 B80 C80 top ten, Enter preferences and fresh matches",
+      "file": "s04.acceptance.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 2330
+        }
+      ]
+    },
+    {
+      "title": "AC4: saved genres with no match show true popular alternatives and edit/retry",
+      "file": "s04.acceptance.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1549
+        }
+      ]
+    },
+    {
+      "title": "AC3: successful empty shows guidance and zero cards",
+      "file": "s04.acceptance.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1011
+        }
+      ]
+    },
+    {
+      "title": "AC3: successful no-popularity shows guidance and zero cards",
+      "file": "s04.acceptance.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1048
+        }
+      ]
+    },
+    {
+      "title": "AC4: no-match without usable popular alternatives still has edit/retry and zero cards",
+      "file": "s04.acceptance.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1219
+        }
+      ]
+    },
+    {
+      "title": "real SQL failure is Error/Retry, preserves genres and recovers",
+      "file": "s04.acceptance.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1782
+        }
+      ]
+    },
+    {
+      "title": "delayed real cold-start response cannot replace results after a real genre save",
+      "file": "s04.acceptance.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1859
+        }
+      ]
+    },
+    {
+      "title": "S13 AC2: unknown email and incorrect password have the exact same visible message",
+      "file": "s13.acceptance.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1159
+        }
+      ]
+    },
+    {
+      "title": "S13 AC3: guest routes and rating CTA reach login without private requests or writes",
+      "file": "s13.acceptance.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1666
+        }
+      ]
+    },
+    {
+      "title": "S13 AC1/AC4/AC5: real login, save, logout/replay, switch, delayed A response and relogin",
+      "file": "s13.acceptance.ts",
+      "status": "expected",
+      "expectedStatus": "passed",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 4100
+        }
+      ]
+    },
+    {
+      "title": "S13 live TMDb environment smoke (separate from synthetic acceptance)",
+      "file": "s13.acceptance.ts",
+      "status": "skipped",
+      "expectedStatus": "skipped",
+      "runs": [
+        {
+          "status": "skipped",
+          "durationMs": 521
+        }
+      ]
+    }
+  ]
+}

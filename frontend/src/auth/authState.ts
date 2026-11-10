@@ -17,7 +17,13 @@ export type AuthContextValue = AuthState & {
   // Call when a protected API answers 401: drops the account so guards redirect.
   handleUnauthorized: () => void;
   recommendationVersion: number;
-  invalidateRecommendations: () => void;
+  // Opaque navigation scope; changes with account or recommendation data.
+  recommendationScope: string;
+  // Advances the request generation so older rankings are discarded. By default it
+  // also rotates the navigation scope, which drops saved page/filter/hash context
+  // (preferences, reset, account change). A rating save changes only the ranking
+  // of the same account, so it keeps that context.
+  invalidateRecommendations: (options?: { keepNavigationContext?: boolean }) => void;
 };
 
 export const AuthContext = createContext<AuthContextValue | null>(null);

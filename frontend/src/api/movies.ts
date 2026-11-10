@@ -9,6 +9,9 @@ export type MovieSummary = {
   releaseYear: number | null;
   genres: Genre[];
   popularityScore: number | null;
+  // Additive rollout: older backend responses may omit this image field.
+  posterUrl?: string | null;
+  backdropUrl?: string | null;
 };
 
 export type MovieDetail = MovieSummary & {
@@ -17,12 +20,35 @@ export type MovieDetail = MovieSummary & {
   voteCount: number | null;
   // Older detail deployments may omit this additive field during rollout.
   backdropUrl?: string | null;
+  trailer?: {
+    site: "YouTube";
+    key: string;
+    name: string | null;
+    type: "Trailer";
+    official: true;
+    language: string | null;
+    publishedAt: string | null;
+    url: string;
+  } | null;
+};
+
+export type CatalogueSort = "title_asc" | "title_desc";
+
+export type PageMeta = {
+  count: number;
+  limit: number;
+  page: number;
+  total: number;
+  totalPages: number;
+  unfilteredTotal: number;
+  catalogueRevision: string;
 };
 
 type MovieListResponse = {
   data: {
     movies: MovieSummary[];
   };
+  meta: PageMeta;
 };
 
 type MovieDetailResponse = {
@@ -76,6 +102,50 @@ export async function listMovies(limit = 10): Promise<MovieSummary[]> {
 
   const body = (await response.json()) as MovieListResponse;
   return body.data.movies;
+}
+
+export async function searchMoviePage(
+  query: string, page: number, revision?: string, signal?: AbortSignal,
+): Promise<MovieListResponse> {
+  const params = new URLSearchParams({ q: query.trim() });
+  if (page !== 1) params.set("page", String(page));
+  if (revision) params.set("catalogueRevision", revision);
+  const response = await fetch(`/api/movies/search?${params}`, { signal });
+  if (!response.ok) throw await readError(response);
+  const body = (await response.json()) as MovieListResponse;
+  if (!body.meta) throw new MovieApiError("Invalid search response", 0);
+  return body;
+}
+
+export async function getSimilarMovies(movieId: string, signal?: AbortSignal): Promise<MovieSummary[]> {
+  const response = await fetch(`/api/movies/${encodeURIComponent(movieId)}/similar`, { signal });
+  if (!response.ok) throw await readError(response);
+  const body = (await response.json()) as { data: { movies: MovieSummary[] } };
+  return body.data.movies;
+}
+
+export async function listMoviePage(
+  kind: "catalogue" | "popular",
+  page: number,
+  revision?: string,
+  signal?: AbortSignal,
+  sort: CatalogueSort = "title_asc",
+): Promise<MovieListResponse> {
+  const params = new URLSearchParams({ limit: "10" });
+  if (page !== 1) params.set("page", String(page));
+  if (revision) params.set("catalogueRevision", revision);
+  if (kind === "catalogue" && sort === "title_desc") params.set("sort", sort);
+  const path = kind === "popular" ? "/api/movies/popular" : "/api/movies";
+  const response = await fetch(`${path}?${params}`, { signal });
+  if (!response.ok) throw await readError(response);
+  const body = (await response.json()) as MovieListResponse;
+  if (!body.meta) throw new MovieApiError("Invalid movie response", 0);
+  const received = body.meta as Partial<PageMeta>;
+  return { ...body, meta: {
+    count: body.data.movies.length, limit: 10, page: 1,
+    total: body.data.movies.length, totalPages: body.data.movies.length ? 1 : 0,
+    unfilteredTotal: body.data.movies.length, catalogueRevision: "", ...received,
+  } };
 }
 
 export async function listPopularMovies(limit = 10): Promise<MovieSummary[]> {

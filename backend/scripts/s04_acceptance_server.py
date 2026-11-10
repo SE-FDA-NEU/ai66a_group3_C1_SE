@@ -10,6 +10,7 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import re
 import sqlite3
 import subprocess
 import sys
@@ -72,6 +73,59 @@ def seed_database(path: Path, fixture: dict) -> None:
         )
 
 
+ACTION, COMEDY, ARCHIVE = 8101, 8102, 8103
+SIMILAR_SOURCE_TEXT = "astronaut rescue mission on the moon base"
+# (fixture position, title, overview, popularity, genres or None to keep the seed genres)
+MOON_RESCUE = (2, "Moon Rescue", "An astronaut rescue mission on the moon", 5, None)
+ORBIT_MEDIC = (4, "Orbit Medic", "A medic joins an astronaut rescue crew", 10, None)
+QUIET_ARCHIVE = (6, "Quiet Archive", None, 100, None)
+# Candidates the Action source must not see: same table, a genre it does not share.
+AWAY = [(number, None, None, None, [COMEDY]) for number in (6, 8, 10, 12)]
+SIMILAR_SCENARIOS: dict[str, list[tuple]] = {
+    # Seven distinct candidates, one of them (Moon Rescue) matched through two shared
+    # genres. Popularity runs opposite to cosine so a popularity-only order is visible.
+    "similar-ranked": [
+        (1, "Moon Source", SIMILAR_SOURCE_TEXT, 90, [ACTION, ARCHIVE]),
+        (2, "Moon Rescue", MOON_RESCUE[2], 5, [ACTION, ARCHIVE]),
+        ORBIT_MEDIC,
+        (6, "City Robot", "A detective investigates a rescue in the city", 20, None),
+        (8, "Desert Heist", "A heist in the desert", 50, None),
+        (10, "Jazz Voyage", "A jazz band travels across the sea", 40, None),
+        (12, "Quiet Archive", None, 100, None),
+    ],
+    "similar-pair": [
+        (1, "Moon Source", SIMILAR_SOURCE_TEXT, 90, None), MOON_RESCUE, ORBIT_MEDIC,
+        *AWAY,
+    ],
+    "similar-missing-candidate": [
+        (1, "Moon Source", SIMILAR_SOURCE_TEXT, 90, None), MOON_RESCUE, ORBIT_MEDIC,
+        *[row for row in AWAY if row[0] != 6], QUIET_ARCHIVE,
+    ],
+    "similar-empty": [],
+}
+# Same candidates as "similar-missing-candidate"; only the source overview differs.
+for _name, _overview in {
+    "similar-missing-source": None,
+    "similar-blank-source": "   ",
+    "similar-zero-source": "the of and",
+}.items():
+    SIMILAR_SCENARIOS[_name] = [
+        (1, "Moon Source", _overview, 90, None),
+        *SIMILAR_SCENARIOS["similar-missing-candidate"][1:],
+    ]
+SIMILAR_SCENARIOS["similar-index-failure"] = SIMILAR_SCENARIOS["similar-ranked"]
+
+
+def supported_gate_path(path: str) -> bool:
+    """Only isolate the actual public/widget reads and membership writes under test."""
+    return path in {"/api/me/recommendations", "/api/movies/search"} or bool(
+        re.fullmatch(
+            r"/api/(?:movies/[A-Za-z0-9_-]+(?:/similar)?|me/(?:ratings|watchlist)/[A-Za-z0-9_-]+)",
+            path,
+        )
+    )
+
+
 def build_harness(path: Path, fixture: dict):
     from app.main import app as production_app
     from fastapi import FastAPI, HTTPException
@@ -82,7 +136,10 @@ def build_harness(path: Path, fixture: dict):
     broken = False
 
     def gate_state(gate: dict) -> dict:
-        return {key: value for key, value in gate.items() if key != "event"}
+        return {
+            key: value for key, value in gate.items()
+            if key not in {"event", "drained"}
+        }
 
     @controls.get("/__acceptance/ready")
     def ready():
@@ -112,7 +169,15 @@ def build_harness(path: Path, fixture: dict):
             "db-failure",
             "no-match",
             "no-match-no-popularity",
-        }:
+            "search-ranked",
+            "search-zero",
+            "search-empty",
+            "search-index-failure",
+            "detail-boundaries",
+            "detail-new-revision",
+            "popular-spotlight",
+            "trailer-media",
+        } | SIMILAR_SCENARIOS.keys():
             raise HTTPException(400, "Unknown fixture")
         with closing(sqlite3.connect(path)) as connection, connection:
             if broken:
@@ -120,18 +185,129 @@ def build_harness(path: Path, fixture: dict):
                     "ALTER TABLE catalog_movies_unavailable RENAME TO catalog_movies"
                 )
                 broken = False
+            # Similar scenarios change genres; every scenario starts from the seed.
+            connection.execute("DELETE FROM movie_genres")
+            connection.executemany(
+                "INSERT INTO movie_genres (movie_id, genre_id) VALUES (?, ?)",
+                [
+                    (row["id"], genre)
+                    for row in fixture["movies"]
+                    for genre in row["genreIds"]
+                ],
+            )
             connection.executemany(
                 "UPDATE catalog_movies SET popularity_score = ? WHERE id = ?",
                 [(row["popularity"], row["id"]) for row in fixture["movies"]],
             )
+            connection.executemany(
+                "UPDATE catalog_movies SET title = ?, overview = NULL, "
+                "poster_path = NULL, backdrop_path = NULL WHERE id = ?",
+                [(row["title"], row["id"]) for row in fixture["movies"]],
+            )
+            connection.execute(
+                "UPDATE catalog_movies SET trailer_site=NULL, trailer_key=NULL, "
+                "trailer_name=NULL, trailer_type=NULL, trailer_official=NULL, "
+                "trailer_language=NULL, trailer_published_at=NULL, "
+                "trailer_attempted_at=NULL, trailer_succeeded_at=NULL, trailer_status=NULL"
+            )
+            if name == "trailer-media":
+                for row, label in zip(
+                    fixture["movies"], ("both", "backdrop", "trailer", "neither", "broken", "next")
+                ):
+                    has_trailer = label in {"both", "trailer", "broken"}
+                    backdrop = (
+                        "/t20-broken.jpg" if label == "broken" else
+                        "/t20-backdrop.jpg" if label in {"both", "backdrop"} else None
+                    )
+                    connection.execute(
+                        "UPDATE catalog_movies SET title=?, release_year=2026, "
+                        "overview='An astronaut rescue mission on the moon', backdrop_path=?, "
+                        "trailer_site=?, trailer_key=?, trailer_name=?, trailer_type=?, "
+                        "trailer_official=?, trailer_language=?, trailer_status=?, "
+                        "trailer_attempted_at=?, trailer_succeeded_at=? WHERE id=?",
+                        (f"Fixture {label}", backdrop,
+                         "YouTube" if has_trailer else None,
+                         "AbCdEf123_-" if has_trailer else None,
+                         "Official fixture trailer" if has_trailer else None,
+                         "Trailer" if has_trailer else None,
+                         True if has_trailer else None, "en" if has_trailer else None,
+                         "success", utc_timestamp(), utc_timestamp(), row["id"]),
+                    )
+                    connection.execute("DELETE FROM movie_genres WHERE movie_id=?", (row["id"],))
+                    connection.execute("INSERT INTO movie_genres VALUES (?, ?)", (row["id"], ACTION))
+            if name == "popular-spotlight":
+                connection.executemany(
+                    "UPDATE catalog_movies SET title=?, overview=?, popularity_score=?, "
+                    "poster_path=?, backdrop_path=? WHERE id=?",
+                    [("The Last Observatory: A Journey Across the Midnight Sky" if number == 1 else
+                      f"Synthetic Film {number:02d}", "An astronaut rescue mission on the moon",
+                      100 - number, f"/spotlight{number}.jpg", f"/scene{number}.jpg", row["id"])
+                     for number, row in enumerate(fixture["movies"], 1)],
+                )
+            if name.startswith("search-"):
+                # Eleven title hits plus two independent overview documents.
+                search_rows = [
+                    ("Inception" if i == 0 else f"Inception {i:02d}", None, row["id"])
+                    for i, row in enumerate(fixture["movies"][:11])
+                ]
+                search_rows.extend([
+                    ("Moon Rescue", "An astronaut rescue mission on the moon",
+                     fixture["movies"][11]["id"]),
+                    ("City Robot", "A detective investigates a theft" if name == "search-zero"
+                     else "A detective investigates a rescue in the city",
+                     fixture["movies"][12]["id"]),
+                ])
+                connection.executemany(
+                    "UPDATE catalog_movies SET title = ?, overview = ? WHERE id = ?",
+                    search_rows,
+                )
+            for number, title, overview, popularity, genres in SIMILAR_SCENARIOS.get(name, []):
+                movie_id = fixture["movies"][number - 1]["id"]
+                if title is not None or overview is not None or popularity is not None:
+                    connection.execute(
+                        "UPDATE catalog_movies SET title = COALESCE(?, title), overview = ?,"
+                        " popularity_score = COALESCE(?, popularity_score) WHERE id = ?",
+                        (title, overview, popularity, movie_id),
+                    )
+                if genres is not None:
+                    connection.execute("DELETE FROM movie_genres WHERE movie_id = ?", (movie_id,))
+                    connection.executemany(
+                        "INSERT INTO movie_genres (movie_id, genre_id) VALUES (?, ?)",
+                        [(movie_id, genre) for genre in genres],
+                    )
             connection.execute(
                 "UPDATE catalog_movies SET catalogue_revision_id = ?",
                 (fixture["revision"],),
             )
             connection.execute(
                 "UPDATE catalogue_state SET active_revision_id = ? WHERE id = 1",
-                ("s04-empty" if name == "empty" else fixture["revision"],),
+                ("s04-empty" if name in {"empty", "search-empty"} else fixture["revision"],),
             )
+            if name.startswith("detail-"):
+                # More than ten matching rows exercise a real filtered page 2.
+                connection.execute("DELETE FROM movie_genres")
+                connection.executemany(
+                    "INSERT INTO movie_genres (movie_id, genre_id) VALUES (?, ?)",
+                    [(row["id"], genre) for row in fixture["movies"] for genre in (ACTION, COMEDY)],
+                )
+                connection.execute(
+                    "UPDATE catalog_movies SET release_year=2020, "
+                    "overview='An astronaut rescue mission on the moon'"
+                )
+                connection.execute(
+                    "UPDATE catalog_movies SET release_year=NULL, overview=NULL WHERE id=?",
+                    (fixture["movies"][-1]["id"],),
+                )
+                if name == "detail-new-revision":
+                    revision_id = "s04-detail-next"
+                    connection.execute(
+                        "INSERT OR IGNORE INTO catalogue_revisions "
+                        "(id, provider, created_at, inserted_movie_count, updated_movie_count, rejected_movie_count) "
+                        "VALUES (?, 's04-synthetic', ?, 0, 13, 0)",
+                        (revision_id, utc_timestamp()),
+                    )
+                    connection.execute("UPDATE catalog_movies SET catalogue_revision_id=?", (revision_id,))
+                    connection.execute("UPDATE catalogue_state SET active_revision_id=? WHERE id=1", (revision_id,))
             if name in {"no-match", "no-match-no-popularity"}:
                 # The genre was selectable when the editor opened. Retire its
                 # only movie before saving: a genuine canonical-but-no-match
@@ -165,20 +341,93 @@ def build_harness(path: Path, fixture: dict):
                     WHERE catalogue_revision_id =
                     (SELECT active_revision_id FROM catalogue_state WHERE id = 1)"""
             ).fetchone()
+        search_evidence = {}
+        if name.startswith("detail-") or name in {"popular-spotlight", "trailer-media"}:
+            from app.db.database import SessionLocal
+            from app.recommendations.overview_index import rebuild_active_index
+
+            with SessionLocal() as session:
+                rebuild_active_index(session)
+        if name.startswith("search-"):
+            from app.db.database import SessionLocal
+            from app.recommendations.overview_index import (
+                cosine_similarity,
+                rebuild_active_index,
+                resolve_index_path,
+            )
+
+            with SessionLocal() as session:
+                index = rebuild_active_index(session)
+            vector = index.transform_query("astronaut rescue moon")
+            search_evidence = {
+                "titleHits": 0 if name == "search-empty" else 11,
+                "scores": {
+                    title: cosine_similarity(vector, index.vector_for(row["id"]))
+                    for title, row in zip(["Moon Rescue", "City Robot"], fixture["movies"][11:])
+                } if name != "search-empty" else {},
+            }
+            if name == "search-index-failure":
+                resolve_index_path().unlink()
+        similar_evidence = {}
+        if name in SIMILAR_SCENARIOS:
+            from app.db.database import SessionLocal
+            from app.recommendations.overview_index import (
+                cosine_similarity,
+                rebuild_active_index,
+                resolve_index_path,
+            )
+
+            source = fixture["movies"][12 if name == "similar-empty" else 0]["id"]
+            with SessionLocal() as session:
+                index = rebuild_active_index(session)
+            with closing(sqlite3.connect(path)) as connection:
+                titles = dict(connection.execute("SELECT id, title FROM catalog_movies"))
+            source_vector = index.vector_for(source)
+            similar_evidence = {
+                "sourceId": source,
+                "sourceUsable": bool(source_vector),
+                # None marks a missing or zero vector; 0.0 is a valid usable score.
+                "scores": {
+                    titles[row["id"]]: (
+                        cosine_similarity(source_vector, index.vector_for(row["id"]))
+                        if source_vector and index.vector_for(row["id"])
+                        else None
+                    )
+                    for row in fixture["movies"]
+                    if row["id"] != source
+                },
+            }
+            if name == "similar-index-failure":
+                resolve_index_path().unlink()
         return {
             "scenario": name,
             "preferences": preferences,
             "activeMovies": count,
             "finitePopularity": finite or 0,
+            **search_evidence,
+            **similar_evidence,
         }
 
     @controls.post("/__acceptance/gates/{name}/{action}")
-    async def control_gate(name: str, action: str):
+    async def control_gate(name: str, action: str, match: dict[str, str] | None = None):
         nonlocal capturing
         if action == "arm":
             if capturing is not None or name in gates:
                 raise HTTPException(409, "Gate already exists or is capturing")
-            gates[name] = {"event": asyncio.Event(), "responses": [], "completed": 0}
+            match = match or {}
+            if any(key not in {"method", "path", "requestTag"} for key in match):
+                raise HTTPException(400, "Unknown gate matcher")
+            if match.get("method") and match["method"] not in {"GET", "PUT", "DELETE"}:
+                raise HTTPException(400, "Unsupported gate method")
+            if match.get("path") and not supported_gate_path(match["path"]):
+                raise HTTPException(400, "Unsupported gate path")
+            drained = asyncio.Event()
+            drained.set()
+            gates[name] = {
+                "event": asyncio.Event(), "drained": drained,
+                "responses": [], "completed": 0, "aborted": 0, "pending": 0,
+                "match": match,
+            }
             capturing = name
         elif name not in gates:
             raise HTTPException(404, "Unknown gate")
@@ -193,49 +442,80 @@ def build_harness(path: Path, fixture: dict):
 
     @controls.get("/__acceptance/gates/{name}")
     def inspect_gate(name: str):
+        if name not in gates:
+            raise HTTPException(404, "Unknown gate")
         return gate_state(gates[name])
 
     @controls.post("/__acceptance/release-gates")
     async def release_gates():
         nonlocal capturing
         capturing = None
-        for gate in gates.values():
+        active = list(gates.values())
+        for gate in active:
             gate["event"].set()
-        return {"released": len(gates)}
+        try:
+            await asyncio.wait_for(
+                asyncio.gather(*(gate["drained"].wait() for gate in active)),
+                timeout=10,
+            )
+        except TimeoutError:
+            pass
+        gates.clear()
+        return {"released": len(active), "pending": sum(gate["pending"] for gate in active)}
 
-    class DelayRealRecommendations:
+    class DelayRealResponses:
         async def __call__(self, scope, receive, send):
             name = capturing
+            gate = gates.get(name) if name is not None else None
+            if scope["type"] != "http" or gate is None:
+                return await production_app(scope, receive, send)
+            headers = dict(scope.get("headers", []))
+            request_tag = headers.get(b"x-s04-gate", b"").decode("ascii", errors="ignore")
+            selected = scope["path"] == gate["match"]["path"] if gate["match"].get("path") else (
+                scope["path"] in {"/api/me/recommendations", "/api/movies/search"}
+                or scope["path"].endswith("/similar")
+            )
             if (
-                scope["type"] != "http"
-                or scope["path"] != "/api/me/recommendations"
-                or name is None
+                not selected
+                or (gate["match"].get("method") and gate["match"]["method"] != scope["method"])
+                or (gate["match"].get("requestTag") and gate["match"]["requestTag"] != request_tag)
             ):
                 return await production_app(scope, receive, send)
-            messages = []
+            gate["pending"] += 1
+            gate["drained"].clear()
+            try:
+                messages = []
 
-            async def capture(message):
-                messages.append(message)
+                async def capture(message):
+                    messages.append(message)
 
-            await production_app(scope, receive, capture)
-            gate = gates[name]
-            gate["responses"].append(
-                {
-                    "status": next(
-                        m["status"]
-                        for m in messages
-                        if m["type"] == "http.response.start"
-                    ),
-                    "body": json.loads(b"".join(m.get("body", b"") for m in messages)),
-                }
-            )
-            # A deadline makes harness bugs fail instead of hanging the server.
-            await asyncio.wait_for(gate["event"].wait(), timeout=45)
-            for message in messages:
-                await send(message)
-            gate["completed"] += 1
+                await production_app(scope, receive, capture)
+                gate["responses"].append(
+                    {
+                        "method": scope["method"], "path": scope["path"],
+                        "requestTag": request_tag,
+                        "status": next(
+                            m["status"]
+                            for m in messages
+                            if m["type"] == "http.response.start"
+                        ),
+                        "body": json.loads(b"".join(m.get("body", b"") for m in messages)),
+                    }
+                )
+                # A deadline makes harness bugs fail instead of hanging the server.
+                await asyncio.wait_for(gate["event"].wait(), timeout=45)
+                for message in messages:
+                    await send(message)
+                gate["completed"] += 1
+            except asyncio.CancelledError:
+                gate["aborted"] += 1
+                raise
+            finally:
+                gate["pending"] -= 1
+                if gate["pending"] == 0:
+                    gate["drained"].set()
 
-    controls.mount("/", DelayRealRecommendations())
+    controls.mount("/", DelayRealResponses())
     return controls
 
 
@@ -248,6 +528,7 @@ def main() -> None:
         raise RuntimeError("Run via npm --prefix frontend run test:s04:e2e")
     path = Path(directory) / "acceptance.db"
     os.environ["DATABASE_URL"] = sqlite_url(path)
+    os.environ["NLP_INDEX_PATH"] = str(Path(directory) / "overview-index.json")
     live = os.environ.get("S13_TMDB_SMOKE") == "1"
     accepted = os.environ.get("S13_TMDB_DATABASE")
     if accepted and not live:
@@ -285,6 +566,14 @@ def main() -> None:
         seed_database(path, fixture)
     sys.path.insert(0, str(ROOT / "backend"))
     from app.db.database import engine
+
+    if os.environ.get("S04_SQL_DIAGNOSTICS") == "1":
+        from sqlalchemy import event
+
+        @event.listens_for(engine, "handle_error")
+        def report_test_database_error(context):
+            print("S04 DB diagnostic:", type(context.original_exception).__name__,
+                  str(context.original_exception), file=sys.stderr, flush=True)
 
     try:
         uvicorn.run(build_harness(path, fixture), host="127.0.0.1", port=8014)

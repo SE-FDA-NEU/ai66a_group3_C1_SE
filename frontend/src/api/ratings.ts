@@ -1,4 +1,4 @@
-export type RatingValue = 1 | 2 | 3 | 4 | 5;
+export type RatingValue = 0.5 | 1 | 1.5 | 2 | 2.5 | 3 | 3.5 | 4 | 4.5 | 5;
 
 export type RatingData = {
   movieId: string;
@@ -20,8 +20,8 @@ export class RatingApiError extends Error {
 export function isRatingValue(value: unknown): value is RatingValue {
   return (
     typeof value === "number" &&
-    Number.isInteger(value) &&
-    value >= 1 &&
+    Number.isInteger(value * 2) &&
+    value >= 0.5 &&
     value <= 5
   );
 }
@@ -86,7 +86,7 @@ export async function saveRating(
 ): Promise<RatingData> {
   if (!isRatingValue(rating)) {
     throw new RatingApiError(
-      "Choose a whole-number rating from 1 to 5",
+      "Choose a rating from 0.5 to 5 in half-star steps",
       400,
       "VALIDATION_ERROR",
     );

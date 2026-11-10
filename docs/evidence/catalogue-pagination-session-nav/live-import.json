@@ -1,0 +1,34 @@
+{
+  "checkedAtUtc": "2026-10-18T18:46:33.432453+00:00",
+  "importPages": 15,
+  "revision": {
+    "id": "25776801-1007-44c6-bee3-03e0d307d6e6",
+    "provider": "tmdb",
+    "created_at": "2026-10-18 18:45:56.990442",
+    "inserted_movie_count": 232,
+    "updated_movie_count": 20,
+    "rejected_movie_count": 48
+  },
+  "provenance": {
+    "movie_count": 252,
+    "distinct_source_ids": 252,
+    "non_tmdb_movies": 0,
+    "finite_popularity_movies": 252,
+    "movies_with_fetch_timestamp": 252,
+    "first_fetched_at": "2026-10-18 18:45:52.253192",
+    "last_fetched_at": "2026-10-18 18:45:52.253192"
+  },
+  "associatedGenreCount": 18,
+  "api": {
+    "homeTotal": 252,
+    "homePage1Count": 10,
+    "homePage2Count": 10,
+    "popularTotal": 252,
+    "reviewAccountLoginStatus": 200,
+    "recommendationTotal": 252,
+    "actionFilterTotal": 102,
+    "actionFilterPage2Count": 10
+  },
+  "metadataRequestsDuringPagination": 0,
+  "notes": "Application API TestClient reads the configured local database; no TMDb metadata calls are made by these page requests. This is API/provenance evidence, not browser screenshot evidence."
+}

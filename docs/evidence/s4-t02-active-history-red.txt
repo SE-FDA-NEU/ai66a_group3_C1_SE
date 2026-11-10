@@ -1,0 +1,17 @@
+S4-T02 active-catalogue regression RED — local PowerShell, 2026-10-24
+Committed production baseline: 8f313bc7e3d7c84671e26f13367cf07850d0f9f5
+Uncommitted test sha256-lf: 7d2a1f554b21af742662c92fd0991f1a77dc1ae83df5c125df28aa2ef3afa8d6
+Command: .\.venv\Scripts\python.exe backend/scripts/run_isolated_tests.py -q -k keeps_saved_rating_history
+Exit: 1
+
+_ test_s4_t02_keeps_saved_rating_history_when_source_leaves_active_catalogue _
+>       assert adjustment_for_candidate(
+            load_account_genre_signals(session, user_id=ACCOUNT_A), genre_ids=[1]
+        ) == 1
+E       AssertionError: assert 0 == 1
+E        +  where 0 = adjustment_for_candidate({}, genre_ids=[1])
+backend\tests\test_s4_t02_rating_signals.py:160: AssertionError
+1 failed, 535 deselected, 1 warning in 2.68s
+
+This RED is for removing the active-only rule. It is not the missing
+pre-implementation commit SHA for the original T02 signal feature.

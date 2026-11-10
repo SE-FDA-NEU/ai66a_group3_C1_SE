@@ -1,0 +1,3 @@
+# Captured terminal output keeps its original whitespace and pytest separators.
+**/*.log -whitespace conflict-marker-size=32
+checks/frontend-packages.txt -whitespace

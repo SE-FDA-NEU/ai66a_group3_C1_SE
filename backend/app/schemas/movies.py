@@ -1,6 +1,10 @@
 """Public movie catalogue data shapes."""
 
-from pydantic import BaseModel, ConfigDict
+from typing import Literal
+
+from pydantic import BaseModel, ConfigDict, Field
+
+from app.catalogue.providers import DEFAULT_PROVIDER_COUNTRY, ProviderCountry
 
 
 class GenreDto(BaseModel):
@@ -20,6 +24,8 @@ class MovieSummaryDto(BaseModel):
     releaseYear: int | None
     genres: list[GenreDto]
     popularityScore: float | None
+    posterUrl: str | None = None
+    backdropUrl: str | None = None
 
 
 class MovieDetailDto(BaseModel):
@@ -36,6 +42,51 @@ class MovieDetailDto(BaseModel):
     voteAverage: float | None
     voteCount: int | None
     backdropUrl: str | None
+    posterUrl: str | None = None
+    trailer: "TrailerDto | None" = None
+    providers: "MovieProvidersDto" = Field(default_factory=lambda: MovieProvidersDto())
+    watchOptionsUrl: str | None = None
+
+
+class WatchProviderDto(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    id: int
+    name: str
+    logoUrl: str | None
+
+
+class ProviderGroupsDto(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    flatrate: list[WatchProviderDto] = Field(default_factory=list)
+    rent: list[WatchProviderDto] = Field(default_factory=list)
+    buy: list[WatchProviderDto] = Field(default_factory=list)
+    free: list[WatchProviderDto] = Field(default_factory=list)
+    ads: list[WatchProviderDto] = Field(default_factory=list)
+
+
+class MovieProvidersDto(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    country: ProviderCountry = DEFAULT_PROVIDER_COUNTRY
+    status: Literal["not_checked", "success", "no_data", "error", "stale"] = "not_checked"
+    attemptedAt: str | None = None
+    checkedAt: str | None = None
+    groups: ProviderGroupsDto = Field(default_factory=ProviderGroupsDto)
+
+
+class TrailerDto(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    site: str
+    key: str
+    name: str | None
+    type: str
+    official: bool
+    language: str | None
+    publishedAt: str | None
+    url: str
 
 
 class MovieListMeta(BaseModel):
@@ -43,6 +94,10 @@ class MovieListMeta(BaseModel):
 
     count: int
     limit: int
+    page: int
+    total: int
+    totalPages: int
+    unfilteredTotal: int
     catalogueRevision: str
 
 
@@ -54,6 +109,15 @@ class MovieListData(BaseModel):
 
 class MovieListResponse(BaseModel):
     """The full response body for `GET /api/movies`."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    data: MovieListData
+    meta: MovieListMeta
+
+
+class MovieSearchResponse(BaseModel):
+    """One page from the complete ordered public Search result."""
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
@@ -80,3 +144,11 @@ class MovieDetailResponse(BaseModel):
 
     data: MovieDetailData
     meta: MovieDetailMeta
+
+
+class MovieSimilarResponse(BaseModel):
+    """Unpaged public Similar result, capped at five movies."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    data: MovieListData

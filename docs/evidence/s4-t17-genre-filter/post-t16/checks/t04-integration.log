@@ -1,0 +1,20 @@
+Captured: 2026-10-28T10:36:58.521185+07:00
+HEAD: af50498bd2c7326760497c864cd542e47f533de8
+Command: npm --prefix frontend run test:t04:integration
+Environment: TMDB_READ_ACCESS_TOKEN=empty TMDB_NETWORK_DISABLED=1
+
+
+> frontend@0.0.0 test:t04:integration
+> vitest run --config vitest.t04.config.ts
+
+
+ RUN  v5.0.2 /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/frontend
+
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  10:36:58
+   Duration  5.40s (tests 64%, environment 19%, transform 10%, import 7%)
+
+
+Exit code: 0

@@ -126,7 +126,8 @@ def _snapshot(engine: Engine, *, include_backdrop: bool = False) -> dict:
             columns = [
                 column
                 for column in table.columns
-                if include_backdrop or column.name != "backdrop_path"
+                if not column.name.startswith("trailer_")
+                and (include_backdrop or column.name not in {"backdrop_path", "poster_path"})
             ]
             snapshot[table.name] = [
                 tuple(row)
@@ -198,14 +199,22 @@ def test_upgrade_preserves_every_row_identity_and_constraint(tmp_path: Path) -> 
         assert len(before["users"]) == 2
         assert len(before["user_genre_preferences"]) == 3
         assert len(before["user_movie_ratings"]) == 2
-        _alembic(url, "upgrade", "head")
-        assert _snapshot(engine) == before
-        assert _constraints(engine) == constraints
+        # Attribute the additive-constraint assertion to the backdrop migration,
+        # rather than later migrations that intentionally change rating checks.
+        _alembic(url, "upgrade", BACKDROP_REVISION)
+        after = _snapshot(engine)
+        assert {table: after[table] for table in before} == before
+        after_constraints = _constraints(engine)
+        assert {table: after_constraints[table] for table in constraints} == constraints
         with engine.connect() as connection:
             assert connection.execute(text("PRAGMA foreign_key_check")).all() == []
             assert connection.execute(
                 text("SELECT backdrop_path FROM catalog_movies ORDER BY id")
             ).scalars().all() == [None, None, None]
+        _alembic(url, "upgrade", "head")
+        current = _snapshot(engine)
+        assert {table: current[table] for table in before} == before
+        assert current["user_movie_watchlist"] == []
     finally:
         engine.dispose()
 
@@ -317,7 +326,7 @@ def test_populated_upgrade_is_idempotent(database) -> None:
     assert _snapshot(engine, include_backdrop=True) == before
 
 
-def test_storage_exposes_only_valid_url_in_detail_dto(database) -> None:
+def test_storage_exposes_only_valid_url_in_detail_and_summary_dto(database) -> None:
     engine, _url = database
     with Session(engine) as session, session.begin():
         movies.set_movie_backdrop_path(
@@ -327,7 +336,7 @@ def test_storage_exposes_only_valid_url_in_detail_dto(database) -> None:
         summary = movies.to_movie_summary_dto(movie).model_dump()
         detail = movies.to_movie_detail_dto(movie).model_dump()
         assert "backdrop_path" not in summary | detail
-        assert "backdropUrl" not in summary
+        assert summary["backdropUrl"] == "https://image.tmdb.org/t/p/w780/storage-only.jpg"
         assert detail["backdropUrl"] == "https://image.tmdb.org/t/p/w780/storage-only.jpg"
 
 
@@ -362,7 +371,8 @@ def test_explicit_disposable_downgrade_preserves_non_backdrop_data(database) -> 
     assert "backdrop_path" not in {
         column["name"] for column in inspect(engine).get_columns("catalog_movies")
     }
-    assert _snapshot(engine) == before
+    after = _snapshot(engine)
+    assert {table: before[table] for table in after} == after
     assert _constraints(engine)["catalog_movies"]["unique"]
     _alembic(url, "upgrade", "head")
     assert _snapshot(engine) == before

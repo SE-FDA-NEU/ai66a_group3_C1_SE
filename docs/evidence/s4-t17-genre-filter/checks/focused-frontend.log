@@ -1,0 +1,16 @@
+
+> frontend@0.0.0 test
+> vitest run src/tests/recommendation-filter-acceptance.test.tsx src/tests/recommendation-filter.test.tsx src/tests/rating-recommendation-refresh.test.tsx src/tests/pagination-navigation.test.tsx src/tests/list-context-invalidation.test.tsx
+
+
+ RUN  v5.0.2 /Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/frontend
+
+
+ Test Files  5 passed (5)
+      Tests  29 passed (29)
+   Start at  22:10:06
+   Duration  3.02s (tests 42%, environment 37%, import 11%, transform 9%)
+
+    Isolate  5 workers spawned · ~458ms startup each (spawn + environment, per file)
+             at least ~686ms faster with isolate: false — reuses workers across files instead of one per file
+

@@ -1,0 +1,10 @@
+{
+  "database": "/private/tmp/s4-t18-live-20261030/catalogue.db",
+  "migrationHead": "f2c7e4a91b60",
+  "activeRevision": [],
+  "actualStoredMovies": 0,
+  "provider": null,
+  "sourceFetchedAt": null,
+  "importedAt": null,
+  "reason": "50-page import failed: HTTPS connection reset by peer; no accepted live catalogue"
+}

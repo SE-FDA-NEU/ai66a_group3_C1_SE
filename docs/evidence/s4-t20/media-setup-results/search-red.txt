@@ -1,0 +1,91 @@
+
+> frontend@0.0.0 test
+> vitest run src/tests/search-navigation-transition.test.tsx
+
+
+ RUN  v5.0.2 <repository>/frontend
+
+ ❯ src/tests/search-navigation-transition.test.tsx (4 tests | 4 failed) 172ms
+   × ignores an old search reply when browser navigation reaches / before React commits (conflict=false) 130ms
+   × ignores an old search reply when browser navigation reaches /search?q=new before React commits (conflict=false) 25ms
+   × ignores an old search reply when browser navigation reaches /search?q=moon&page=2 before React commits (conflict=false) 9ms
+   × ignores an old search reply when browser navigation reaches / before React commits (conflict=true) 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/tests/search-navigation-transition.test.tsx > ignores an old search reply when browser navigation reaches / before React commits (conflict=false)
+ FAIL  src/tests/search-navigation-transition.test.tsx > ignores an old search reply when browser navigation reaches /search?q=new before React commits (conflict=false)
+ FAIL  src/tests/search-navigation-transition.test.tsx > ignores an old search reply when browser navigation reaches /search?q=moon&page=2 before React commits (conflict=false)
+AssertionError: expected "vi.fn()" to not be called at all, but actually been called 1 times
+
+Received:
+
+  1st vi.fn() call:
+
+    Array [
+      Object {
+        "hash": "",
+        "pathname": "/search",
+        "search": "?q=moon",
+      },
+      Object {
+        "replace": true,
+        "state": Object {
+          "listViewContext": Object {
+            "catalogueRevision": "revision-a",
+            "route": "/search",
+          },
+        },
+      },
+    ]
+
+
+Number of calls: 1
+
+ ❯ src/tests/search-navigation-transition.test.tsx:35:26
+     33|         popularityScore: 1 }] }, meta: { page: 1, limit: 10, count: 1,…
+     34|         unfilteredTotal: 1, catalogueRevision: "revision-a" } }), { st…
+     35|     expect(navigate).not.toHaveBeenCalled();
+       |                          ^
+     36|     expect(screen.queryByText("Stale movie")).toBeNull();
+     37|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/tests/search-navigation-transition.test.tsx > ignores an old search reply when browser navigation reaches / before React commits (conflict=true)
+AssertionError: expected "vi.fn()" to not be called at all, but actually been called 1 times
+
+Received:
+
+  1st vi.fn() call:
+
+    Array [
+      Object {
+        "hash": "",
+        "pathname": "/search",
+        "search": "?q=moon&page=1",
+      },
+      Object {
+        "replace": true,
+      },
+    ]
+
+
+Number of calls: 1
+
+ ❯ src/tests/search-navigation-transition.test.tsx:35:26
+     33|         popularityScore: 1 }] }, meta: { page: 1, limit: 10, count: 1,…
+     34|         unfilteredTotal: 1, catalogueRevision: "revision-a" } }), { st…
+     35|     expect(navigate).not.toHaveBeenCalled();
+       |                          ^
+     36|     expect(screen.queryByText("Stale movie")).toBeNull();
+     37|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed (4)
+   Start at  19:34:33
+   Duration  1.83s (environment 65%, import 15%, tests 10%, transform 9%)
+

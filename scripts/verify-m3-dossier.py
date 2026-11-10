@@ -7,6 +7,8 @@ import struct
 from pathlib import Path
 from xml.etree import ElementTree
 
+from m3_dossier_cover import validate_cover
+
 ROOT = Path(__file__).resolve().parents[1]
 source = ROOT / "docs/ui.md"
 text = source.read_text(encoding="utf-8")
@@ -84,7 +86,7 @@ for asset in supplied:
 provenance = ROOT / manifest["suppliedAssetsProvenance"]
 assert provenance.exists()
 assert "not a browser network transcript" in provenance.read_text(encoding="utf-8")
-assert "| Submitter | Nguyen Xuan Kiet |" in text
+validate_cover(text)
 wireframes = ["home", "login", "register", "preferences", "movie-detail", "popular"] + [
     "recommendations-" + state for state in ["data", "empty", "loading", "error"]
 ]
@@ -122,9 +124,7 @@ assert "backdrop_path" in erd and "c6f8a2d4e901" in erd
 assert "The ERD in `docs/images/erd.png` is the M2 baseline" not in design
 assert "images/erd-m2.png" in design and "images/architecture-m2.png" in design
 assert "Preference persistence and recommendation generation" in design
-assert "| Assigned topic | AI Movie Recommendation System |" in text
-for student_id in ["11247306", "11247292", "11247264", "11247301", "11247260"]:
-    assert f"| {student_id} |" in text
+# Cover validation checks all five name/ID pairs, roles and submission links.
 assert "HUMAN REQUIRED: student ID" not in text
 assert "/issues/189" in text and "/pull/187" in text
 # This intentionally does not convert placeholders or a draft into acceptance.

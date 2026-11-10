@@ -1,0 +1,53 @@
+{
+  "selectedExecutableCommit": "132394c57a12b81bf889227f96370f39531bbb08",
+  "liveProvisioningExecutedAt": "21bd245069c25d52edcebb7367b66e9fddf28068",
+  "productionAndLockfilesEquivalent": true,
+  "environment": "fresh-clone local release; original user database untouched",
+  "migrationHead": "a3d1f8b72c44",
+  "catalogue": {
+    "movies": 951,
+    "posters": 951,
+    "backdrops": 947,
+    "trailers": 858,
+    "accounts": 2,
+    "watchlistRows": 2
+  },
+  "publicHTTP": "health/catalogue/detail/description-search/similar passed",
+  "descriptionSearchMatches": 5,
+  "similarMovies": 5,
+  "twoAccountsAfterRestart": "preferences, half-star ratings and watchlists retained separately",
+  "backupRestore": {
+    "allLogicalTableRowsEqual": true,
+    "logicalSnapshotSHA256": "1711b2c6a7e90012b3faf8c50c642c243aab3c540f4c0b34d83f340184094beb",
+    "backup": {
+      "action": "backup",
+      "activeRevision": "aa27fb2a-dea6-404a-afbc-8b655492f7aa",
+      "counts": {
+        "catalog_movies": 951,
+        "user_genre_preferences": 2,
+        "user_movie_ratings": 2,
+        "user_movie_watchlist": 2,
+        "users": 2
+      },
+      "migrationVersion": "a3d1f8b72c44",
+      "sha256": "f6b5278c6008d77ac069b5792147bc124c786cf4a06c3e1f8e7d83f1866aa6a1"
+    },
+    "restore": {
+      "action": "restore",
+      "activeRevision": "aa27fb2a-dea6-404a-afbc-8b655492f7aa",
+      "counts": {
+        "catalog_movies": 951,
+        "user_genre_preferences": 2,
+        "user_movie_ratings": 2,
+        "user_movie_watchlist": 2,
+        "users": 2
+      },
+      "migrationVersion": "a3d1f8b72c44",
+      "sha256": "f6b5278c6008d77ac069b5792147bc124c786cf4a06c3e1f8e7d83f1866aa6a1"
+    }
+  },
+  "resetOnRecoveredCopy": "A genres/ratings cleared; A/B watchlists and B profile unchanged; catalogue/index retained",
+  "servers": "three owned ephemeral-port backends stopped; user ports untouched",
+  "secrets": "runtime token blank/network disabled; private token used only by prior CLI import/enrichment",
+  "probeCorrection": "Initial harness attempted guest /api/genres; corrected to authenticated read. No product change was needed."
+}

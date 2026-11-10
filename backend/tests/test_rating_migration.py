@@ -7,6 +7,7 @@ import subprocess
 import sys
 from collections.abc import Iterator
 from pathlib import Path
+from urllib.parse import unquote
 
 import pytest
 from sqlalchemy import Engine, create_engine, event, inspect, text
@@ -166,6 +167,50 @@ def _rating_rows(
         ]
 
 
+def test_half_star_upgrade_preserves_identity_and_refuses_lossy_downgrade(engine: Engine) -> None:
+    database_url = unquote(str(engine.url))
+    assert _alembic(database_url, "downgrade", "e9b6f0a42c17").returncode == 0
+    with engine.begin() as connection:
+        connection.execute(text("""
+            INSERT INTO user_movie_ratings (id, user_id, movie_id, rating, created_at, updated_at)
+            VALUES ('preserved-rating', 'user-a', 'movie-a', 4,
+                    '2026-10-10 00:00:00', '2026-10-10 00:00:00')
+        """))
+        connection.execute(text("""
+            INSERT INTO user_movie_watchlist (id, user_id, movie_id, added_at)
+            VALUES ('preserved-save', 'user-b', 'movie-a', '2026-10-10 00:00:00')
+        """))
+        original = connection.execute(text("SELECT * FROM user_movie_ratings")).all()
+    upgraded = _alembic(database_url, "upgrade", "head")
+    assert upgraded.returncode == 0, upgraded.stderr
+    with engine.begin() as connection:
+        assert connection.execute(text("SELECT * FROM user_movie_ratings")).all() == original
+        assert connection.scalar(text("SELECT id FROM user_movie_watchlist")) == "preserved-save"
+        assert connection.exec_driver_sql("PRAGMA foreign_key_check").all() == []
+        connection.execute(text("UPDATE user_movie_ratings SET rating = 2.5"))
+    refused = _alembic(database_url, "downgrade", "e9b6f0a42c17")
+    assert refused.returncode != 0
+    assert "Cannot downgrade while half-star ratings exist" in refused.stderr
+    assert _rating_rows(engine) == [("user-a", "movie-a", 2.5)]
+    with engine.begin() as connection:
+        assert connection.scalar(text("SELECT version_num FROM alembic_version")) == "f2c7e4a91b60"
+        connection.execute(text("UPDATE user_movie_ratings SET rating = 4"))
+    assert _alembic(database_url, "downgrade", "e9b6f0a42c17").returncode == 0
+    assert _alembic(database_url, "upgrade", "head").returncode == 0
+    assert _rating_rows(engine) == [("user-a", "movie-a", 4)]
+
+
+@pytest.mark.parametrize("rating", [0.5, 1.5, 2.5, 3.5, 4.5])
+def test_migrated_database_accepts_half_stars(engine: Engine, rating: float) -> None:
+    with engine.begin() as connection:
+        connection.execute(text("""
+            INSERT INTO user_movie_ratings (id, user_id, movie_id, rating, created_at, updated_at)
+            VALUES ('half-rating', 'user-a', 'movie-a', :rating,
+                    '2026-10-10 00:00:00', '2026-10-10 00:00:00')
+        """), {"rating": rating})
+    assert _rating_rows(engine) == [("user-a", "movie-a", rating)]
+
+
 def test_migration_creates_account_owned_rating_table(
     engine: Engine,
 ) -> None:
@@ -276,7 +321,7 @@ def test_database_enforces_rating_range_and_foreign_keys(
             "id": "bad-fraction",
             "user_id": "user-a",
             "movie_id": "movie-a",
-            "rating": 3.5,
+            "rating": 3.25,
         },
     )
 

@@ -42,6 +42,15 @@ function listBody(movies: unknown[]) {
   };
 }
 
+function mockGuestList(movies: unknown[], path = "/api/movies/popular?limit=10") {
+  return vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+    const url = String(input);
+    if (url === "/api/auth/me") return json({ error: { code: "AUTHENTICATION_REQUIRED" } }, 401);
+    if (url === path) return json(listBody(movies));
+    return Promise.reject(new Error(`Unexpected request: ${url}`));
+  });
+}
+
 function detailBody(summary: ReturnType<typeof movie>) {
   return {
     data: {
@@ -62,7 +71,8 @@ function popularityOf(container: HTMLElement) {
 }
 
 function cardTitled(title: string) {
-  return screen.getByRole("heading", { name: title }).closest("article")!;
+  return screen.getAllByRole("article").find(card =>
+    within(card).queryByRole("heading", { name: title }))!;
 }
 
 afterEach(() => {
@@ -127,13 +137,11 @@ describe("S3-T36 popularity on shared movie cards", () => {
 
   it("keeps the backend order on /popular, 95 before 80, with no re-sorting", async () => {
     window.history.pushState({}, "", "/popular");
-    vi.spyOn(globalThis, "fetch").mockImplementationOnce(() =>
-      json(listBody([movie("high", "High", 95), movie("low", "Low", 80)])),
-    );
+    mockGuestList([movie("high", "High", 95), movie("low", "Low", 80)]);
 
     render(<App />);
 
-    await screen.findByText("High");
+    await within(await screen.findByRole("region", { name: "Popular movies" })).findByText("High");
     const cards = screen.getAllByRole("article");
     expect(
       cards.map((card) => within(card).getByRole("heading").textContent),
@@ -144,19 +152,15 @@ describe("S3-T36 popularity on shared movie cards", () => {
   it("preserves the backend tie-break order for equal scores", async () => {
     window.history.pushState({}, "", "/popular");
     // Deliberately not alphabetical and not by id: the server order is the truth.
-    vi.spyOn(globalThis, "fetch").mockImplementationOnce(() =>
-      json(
-        listBody([
+    mockGuestList([
           movie("m-2", "Zeta", 80),
           movie("m-3", "Alpha", 80),
           movie("m-1", "Beta", 80),
-        ]),
-      ),
-    );
+        ]);
 
     render(<App />);
 
-    await screen.findByText("Zeta");
+    await within(await screen.findByRole("region", { name: "Popular movies" })).findByText("Zeta");
     expect(
       screen
         .getAllByRole("article")
@@ -165,16 +169,12 @@ describe("S3-T36 popularity on shared movie cards", () => {
   });
 
   it("displays zero as a valid value and unavailable values without NaN", async () => {
-    window.history.pushState({}, "", "/popular");
-    vi.spyOn(globalThis, "fetch").mockImplementationOnce(() =>
-      json(
-        listBody([
+    window.history.pushState({}, "", "/");
+    mockGuestList([
           movie("zero", "Zero", 0),
           movie("none", "None", null),
           movie("round", "Round", 12.3456),
-        ]),
-      ),
-    );
+        ], "/api/movies?limit=10");
 
     render(<App />);
 
@@ -221,14 +221,13 @@ describe("S3-T36 popularity on the movie-details page", () => {
   it("shows the same label and value as the card for the same movie", async () => {
     window.history.pushState({}, "", "/popular");
     const selected = movie("a", "Movie A", 12.3456);
-    vi.spyOn(globalThis, "fetch")
-      .mockImplementationOnce(() => json(listBody([selected])))
-      .mockImplementationOnce(() => json(detailBody(selected)))
-      .mockImplementation((input) =>
-        String(input) === "/api/auth/me"
-          ? json({ error: { code: "AUTHENTICATION_REQUIRED" } }, 401)
-          : Promise.reject(new Error(`Unexpected request: ${String(input)}`)),
-      );
+    vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+      const url = String(input);
+      if (url === "/api/auth/me") return json({ error: { code: "AUTHENTICATION_REQUIRED" } }, 401);
+      if (url === "/api/movies/popular?limit=10") return json(listBody([selected]));
+      if (url === "/api/movies/a") return json(detailBody(selected));
+      return Promise.reject(new Error(`Unexpected request: ${url}`));
+    });
 
     render(<App />);
 

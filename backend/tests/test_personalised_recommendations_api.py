@@ -51,7 +51,11 @@ def database_session() -> Iterator[Session]:
     session = sessionmaker(bind=engine, autoflush=False, autocommit=False)()
 
     def override_get_db() -> Iterator[Session]:
-        yield session
+        try:
+            yield session
+        finally:
+            # Match production: read snapshots end with the request, not the test.
+            session.rollback()
 
     app.dependency_overrides[get_db] = override_get_db
     try:
@@ -170,11 +174,32 @@ def _expanded_expected_response(
                 "genres": [genres[genre_id] for genre_id in candidate["genreIds"]],
                 "popularityScore": candidate["popularityScore"],
                 "reason": expected["reason"],
+                "posterUrl": None,
+                "backdropUrl": None,
             }
         )
+        if case["expectedResponse"]["data"]["personalised"]:
+            movies[-1].update(
+                ratingAdjustment=0,
+                adjustedScore=candidate["popularityScore"],
+                basis="baseline",
+            )
+    saved_ids = set(case["savedGenreIds"])
+    base_count = sum(
+        bool(saved_ids.intersection(row["genreIds"]))
+        for row in candidates.values()
+    ) if saved_ids else 0
+    if not base_count:
+        base_count = sum(row["popularityScore"] is not None for row in candidates.values())
+    expected_meta = case["expectedResponse"]["meta"] | {
+        "page": 1,
+        "total": base_count,
+        "totalPages": (base_count + 9) // 10,
+        "unfilteredTotal": base_count,
+    }
     return {
         "data": case["expectedResponse"]["data"] | {"movies": movies},
-        "meta": case["expectedResponse"]["meta"],
+        "meta": expected_meta,
     }
 
 
@@ -267,6 +292,10 @@ def test_personalised_missing_popularity_is_preserved_and_not_invented(
     assert body["meta"] == {
         "count": 3,
         "limit": 10,
+        "page": 1,
+        "total": 3,
+        "totalPages": 1,
+        "unfilteredTotal": 3,
         "catalogueRevision": revision_id,
     }
     assert all(
@@ -382,6 +411,10 @@ def test_no_match_with_no_usable_popular_alternative_is_a_valid_empty_success(
         "meta": {
             "count": 0,
             "limit": 10,
+            "page": 1,
+            "total": 0,
+            "totalPages": 0,
+            "unfilteredTotal": 0,
             "catalogueRevision": revision.id,
         },
     }
@@ -681,13 +714,15 @@ def test_t09_active_empty_catalogue_is_cold_start_success_not_a_source_error(
             "personalised": False,
             "noMatch": False,
         },
-        "meta": {"count": 0, "limit": 2, "catalogueRevision": revision.id},
+        "meta": {"count": 0, "limit": 2, "page": 1, "total": 0,
+                 "totalPages": 0, "unfilteredTotal": 0,
+                 "catalogueRevision": revision.id},
     }
     assert _committed_preference_rows(database_session) == []
 
 
 @pytest.mark.parametrize("rating", [1, 5])
-def test_t09_saved_ratings_do_not_change_sprint3_ranking_or_preferences(
+def test_t09_saved_ratings_adjust_scores_without_changing_preferences(
     database_session: Session,
     rating: int,
 ) -> None:
@@ -711,6 +746,16 @@ def test_t09_saved_ratings_do_not_change_sprint3_ranking_or_preferences(
     after_a = account_a.get("/api/me/recommendations")
     after_b = account_b.get("/api/me/recommendations")
     assert after_a.status_code == after_b.status_code == 200
-    assert after_a.json() == baseline_a.json()
+    before_movies = baseline_a.json()["data"]["movies"]
+    after_movies = after_a.json()["data"]["movies"]
+    assert [movie["id"] for movie in after_movies] == [movie["id"] for movie in before_movies]
+    sign = 1 if rating == 5 else -1
+    for before, after in zip(before_movies, after_movies, strict=True):
+        assert after["popularityScore"] == before["popularityScore"]
+        assert after["ratingAdjustment"] == sign
+        expected = (before["popularityScore"] + sign
+                    if before["popularityScore"] is not None else None)
+        assert after["adjustedScore"] == expected
+        assert after["basis"] == "rating_signals"
     assert after_b.json() == baseline_b.json()
     assert _committed_preference_rows(database_session) == rows_before

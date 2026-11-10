@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/backend/scripts/verify_s02_recommendations_ui.py", line 61, in require_free_port
+    probe.bind(("127.0.0.1", port))
+PermissionError: [Errno 1] Operation not permitted
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/backend/scripts/verify_s4_t04_ranking_ui.py", line 646, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/backend/scripts/verify_s4_t04_ranking_ui.py", line 268, in main
+    require_free_port(8000)
+  File "/Users/trantuananh/ai66a_group3_C1_SE/ai66a_group3_C1_SE/backend/scripts/verify_s02_recommendations_ui.py", line 63, in require_free_port
+    raise RuntimeError(
+RuntimeError: Port 8000 is unavailable; stop that service before T12

@@ -1,0 +1,22 @@
+
+> frontend@0.0.0 test:t13:ui
+> node scripts/run-s04-e2e.mjs --config playwright.t13.config.ts
+
+[WebServer] INFO:     Started server process [8764]
+[WebServer] INFO:     Waiting for application startup.
+[WebServer] INFO:     Application startup complete.
+[WebServer] INFO:     Uvicorn running on http://127.0.0.1:8014 (Press CTRL+C to quit)
+[WebServer] (node:8834) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 4 tests using 1 worker
+
+(node:8835) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/t13.profile.ts:55:1 › real reset, cancel, persistence, A/B ownership and preserved watchlists (3.2s)
+  ✓  2 e2e/t13.profile.ts:137:1 › both themes, responsive keyboard controls and real page visuals (1.2s)
+  ✓  3 e2e/t13.profile.ts:188:1 › explicit rejection and ambiguous committed response require truthful recovery (1.1s)
+  ✓  4 e2e/t13.profile.ts:226:1 › signed-out access restores Profile intent and expired sessions use the existing guard (832ms)
+
+  4 passed (9.8s)
+s04_temporary_database_removed=true

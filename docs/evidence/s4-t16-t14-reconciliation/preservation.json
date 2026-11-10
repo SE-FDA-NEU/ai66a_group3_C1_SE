@@ -1,0 +1,13 @@
+{
+  "t16Parent": "3ef936eab893e105f61fb242c8b12969145340d2",
+  "mergedMain": "0936ee8f9d5d552b21634f282628d3ce1cbbd146",
+  "productionBackendAndMigrationsUnchangedFromT16": true,
+  "frontendChangesFromT16Parent": [
+    "frontend/src/auth/resetInvalidation.ts",
+    "frontend/src/pages/ProfilePage.tsx",
+    "frontend/src/tests/profile.test.tsx",
+    "frontend/src/tests/reset-invalidation.test.tsx"
+  ],
+  "resetProfileAndWindowsRunnerEqualMergedMain": true,
+  "scrumApprovalWorkflowUnchanged": true
+}

@@ -45,7 +45,7 @@ describe("S13 authentication UI", () => {
     expect(screen.getByLabelText("Password")).toBeInTheDocument();
   });
 
-  it("opens recommendations after a successful login", async () => {
+  it("opens Home after a successful login without an explicit protected destination", async () => {
     window.history.pushState({}, "", "/login");
 
     const fetchMock = vi
@@ -61,8 +61,8 @@ describe("S13 authentication UI", () => {
           });
         }
 
-        if (path === "/api/me/recommendations?limit=10") {
-          return emptyRecommendations();
+        if (path === "/api/movies?limit=10") {
+          return jsonResponse({ data: { movies: [] }, meta: { count: 0, limit: 10 } });
         }
 
         throw new Error(`Unexpected request: ${path}`);
@@ -79,9 +79,10 @@ describe("S13 authentication UI", () => {
     fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
 
     expect(
-      await screen.findByRole("heading", { name: "Recommendations" }),
+      await screen.findByRole("heading", { name: "Find your next movie" }),
     ).toBeInTheDocument();
-    expect(window.location.pathname).toBe("/recommendations");
+    expect(window.location.pathname).toBe("/");
+    expect(fetchMock.mock.calls.some(([input]) => String(input).startsWith("/api/me/"))).toBe(false);
 
     expect(fetchMock).toHaveBeenCalledWith(
       "/api/auth/login",
@@ -336,8 +337,8 @@ describe("T10 route guards and stale account state", () => {
     },
   );
 
-  it.each(["/", "/movies/1", "/login", "/register"])(
-    "does not check the session on public route %s",
+  it.each(["/", "/popular", "/movies/1", "/login", "/register"])(
+    "uses the appropriate session check on public route %s",
     async (path) => {
       window.history.pushState({}, "", path);
       const fetchSpy = vi
@@ -347,17 +348,23 @@ describe("T10 route guards and stale account state", () => {
       render(<App />);
 
       await waitFor(() => expect(window.location.pathname).toBe(path));
-      expect(fetchSpy).not.toHaveBeenCalledWith("/api/auth/me", expect.anything());
+      if (path === "/" || path === "/popular") {
+        await waitFor(() => expect(fetchSpy).toHaveBeenCalledWith("/api/auth/me", expect.anything()));
+      } else {
+        expect(fetchSpy).not.toHaveBeenCalledWith("/api/auth/me", expect.anything());
+      }
     },
   );
 
   it("renders a guarded route for a signed-in account", async () => {
     window.history.pushState({}, "", "/profile");
-    vi.spyOn(globalThis, "fetch").mockImplementation(() => jsonResponse(userA));
+    vi.spyOn(globalThis, "fetch").mockImplementation(input => String(input) === "/api/me/profile" ?
+      jsonResponse({ data: { genres: [], ratingCount: 0, watchlistCount: 0 } }) : jsonResponse(userA));
 
     render(<App />);
 
-    expect(await screen.findByRole("heading", { name: "Profile" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Your profile" })).toBeInTheDocument();
+    expect(await screen.findByText("No saved genres yet.")).toBeInTheDocument();
     expect(window.location.pathname).toBe("/profile");
   });
 

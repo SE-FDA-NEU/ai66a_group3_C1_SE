@@ -1,0 +1,1600 @@
+S4-T05 deliberate business-rule mutations (not feature TDD)
+Each RED is a production assertion, followed by byte-for-byte restoration and GREEN.
+
+## S01 minimum 1 -> 0
+node=tests/test_p0_acceptance.py::test_TC_P0_S01_002_zero_preserves_previous_rows
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______________ test_TC_P0_S01_002_zero_preserves_previous_rows _______________
+tests\test_p0_acceptance.py:97: in test_TC_P0_S01_002_zero_preserves_previous_rows
+    error(save(a, []), 400, "VALIDATION_ERROR")
+tests\test_p0_acceptance.py:73: in error
+    assert response.status_code == status, response.text
+E   AssertionError: {"data":{"genres":[]}}
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S01_002_zero_preserves_previous_rows
+1 failed, 1 warning in 1.51s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.42s
+
+## S01 maximum 5 -> 6
+node=tests/test_p0_acceptance.py::test_TC_P0_S01_007_invalid_sets_preserve_previous_selection
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________ test_TC_P0_S01_007_invalid_sets_preserve_previous_selection _________
+tests\test_p0_acceptance.py:136: in test_TC_P0_S01_007_invalid_sets_preserve_previous_selection
+    error(save(a, invalid), 400, "VALIDATION_ERROR")
+tests\test_p0_acceptance.py:73: in error
+    assert response.status_code == status, response.text
+E   AssertionError: {"data":{"genres":[{"id":28,"name":"Action"},{"id":35,"name":"Comedy"},{"id":10,"name":"Genre 10"},{"id":11,"name":"Genre 11"},{"id":12,"name":"Genre 12"},{"id":13,"name":"Genre 13"}]}}
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S01_007_invalid_sets_preserve_previous_selection
+1 failed, 1 warning in 1.54s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.42s
+
+## S02 truncate eligible set before paging
+node=tests/test_p0_acceptance.py::test_TC_P0_S02_001_full_set_paging_has_25_distinct_movies
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+__________ test_TC_P0_S02_001_full_set_paging_has_25_distinct_movies __________
+tests\test_p0_acceptance.py:173: in test_TC_P0_S02_001_full_set_paging_has_25_distinct_movies
+    assert [len(movies(response)) for response in pages] == [10, 10, 5]
+E   assert [10, 0, 0] == [10, 10, 5]
+E
+E     At index 1 diff: 0 != 10
+E     Use -v to get more diff
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S02_001_full_set_paging_has_25_distinct_movies
+1 failed, 1 warning in 1.54s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.51s
+
+## S04 popularity ascending
+node=tests/test_p0_acceptance.py::test_TC_P0_S04_002_cold_start_has_no_personal_score
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____________ test_TC_P0_S04_002_cold_start_has_no_personal_score _____________
+tests\test_p0_acceptance.py:308: in test_TC_P0_S04_002_cold_start_has_no_personal_score
+    assert [item["title"] for item in items] == ["A", "B", "C"]
+E   AssertionError: assert ['B', 'C', 'A'] == ['A', 'B', 'C']
+E
+E     At index 0 diff: 'B' != 'A'
+E     Use -v to get more diff
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S04_002_cold_start_has_no_personal_score
+1 failed, 1 warning in 1.48s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.39s
+
+## S04 ignore stale catalogue revision
+node=tests/test_p0_acceptance.py::test_TC_P0_S04_006_stale_catalogue_revision_is_409
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____________ test_TC_P0_S04_006_stale_catalogue_revision_is_409 ______________
+tests\test_p0_acceptance.py:366: in test_TC_P0_S04_006_stale_catalogue_revision_is_409
+    error(
+tests\test_p0_acceptance.py:73: in error
+    assert response.status_code == status, response.text
+E   AssertionError: {"data":{"movies":[]},"meta":{"count":0,"limit":10,"page":2,"total":0,"totalPages":0,"unfilteredTotal":0,"catalogueRevision":"959a1d3e-46c0-444b-a58f-121217842adb"}}
+E   assert 200 == 409
+E    +  where 200 = <Response [200 OK]>.status_code
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S04_006_stale_catalogue_revision_is_409
+1 failed, 1 warning in 1.45s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.31s
+
+## S12 allow seven-character password
+node=tests/test_p0_acceptance.py::test_TC_P0_S12_002_seven_char_password_has_no_row
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+______________ test_TC_P0_S12_002_seven_char_password_has_no_row ______________
+tests\test_p0_acceptance.py:395: in test_TC_P0_S12_002_seven_char_password_has_no_row
+    error(
+tests\test_p0_acceptance.py:73: in error
+    assert response.status_code == status, response.text
+E   AssertionError: {"data":{"user":{"id":"f1c5ccd9-bf37-4c11-8475-1fe6682bf7e1","email":"a@example.test"}}}
+E   assert 201 == 400
+E    +  where 201 = <Response [201 Created]>.status_code
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S12_002_seven_char_password_has_no_row
+1 failed, 1 warning in 1.42s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.30s
+
+## S13 accept wrong password for known account
+node=tests/test_p0_acceptance.py::test_TC_P0_S13_002_wrong_and_unknown_credentials_same_public_error
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____ test_TC_P0_S13_002_wrong_and_unknown_credentials_same_public_error ______
+tests\test_p0_acceptance.py:489: in test_TC_P0_S13_002_wrong_and_unknown_credentials_same_public_error
+    body = error(
+tests\test_p0_acceptance.py:73: in error
+    assert response.status_code == status, response.text
+E   AssertionError: {"data":{"user":{"id":"463e82ec-f5c7-41b8-9bc3-1235aa84e665","email":"a@example.test"}}}
+E   assert 200 == 401
+E    +  where 200 = <Response [200 OK]>.status_code
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S13_002_wrong_and_unknown_credentials_same_public_error
+1 failed, 1 warning in 1.61s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.49s
+
+## S05b ignore rating adjustment in displayed score
+node=tests/test_rating_ranking_acceptance.py::test_s05b_save_to_rerank_exact_scores_and_account_isolation
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________ test_s05b_save_to_rerank_exact_scores_and_account_isolation _________
+tests\test_rating_ranking_acceptance.py:126: in test_s05b_save_to_rerank_exact_scores_and_account_isolation
+    assert result["data"]["movies"][0]["id"] == expected_first
+E   AssertionError: assert '138a16cc-d37...-7b6750e3bbe2' == '71072f71-4be...-8fc0e2960fae'
+E
+E     - 71072f71-4be0-42c4-a923-8fc0e2960fae
+E     + 138a16cc-d376-42c7-9823-7b6750e3bbe2
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_rating_ranking_acceptance.py::test_s05b_save_to_rerank_exact_scores_and_account_isolation
+1 failed, 1 warning in 1.70s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.66s
+
+## S05a hide committed rating in save response
+node=tests/test_rating_ranking_acceptance.py::test_s05a_saved_value_replaces_one_row_and_invalid_write_preserves_it
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+____ test_s05a_saved_value_replaces_one_row_and_invalid_write_preserves_it ____
+tests\test_rating_ranking_acceptance.py:67: in test_s05a_saved_value_replaces_one_row_and_invalid_write_preserves_it
+    assert result.json()["data"]["rating"] == rating
+E   assert None == 5
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_rating_ranking_acceptance.py::test_s05a_saved_value_replaces_one_row_and_invalid_write_preserves_it
+1 failed, 1 warning in 1.69s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.71s
+
+## S01-001 hide available genres
+node=tests/test_p0_acceptance.py::test_TC_P0_S01_001_canonical_genres_and_empty_selection
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+___________ test_TC_P0_S01_001_canonical_genres_and_empty_selection ___________
+tests\test_p0_acceptance.py:87: in test_TC_P0_S01_001_canonical_genres_and_empty_selection
+    assert {item["id"] for item in a.get("/api/genres").json()["data"]["genres"]} == {
+E   assert set() == {28, 35}
+E
+E     Extra items in the right set:
+E     35
+E     28
+E     Use -v to get more diff
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S01_001_canonical_genres_and_empty_selection
+1 failed, 1 warning in 1.65s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.43s
+
+## S01-003 replace requested selection
+node=tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-003]
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+__ test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-003] ___
+tests\test_p0_acceptance.py:121: in test_TC_P0_S01_003_004_005_006_exact_selection_boundaries
+    assert selected(a) == requested
+E   assert [35] == [28]
+E
+E     At index 0 diff: 35 != 28
+E     Use -v to get more diff
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-003]
+1 failed, 1 warning in 1.75s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.55s
+
+## S01-004 replace requested selection
+node=tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-004]
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+__ test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-004] ___
+tests\test_p0_acceptance.py:121: in test_TC_P0_S01_003_004_005_006_exact_selection_boundaries
+    assert selected(a) == requested
+E   assert [35] == [28, 35]
+E
+E     At index 0 diff: 35 != 28
+E     Right contains one more item: 35
+E     Use -v to get more diff
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-004]
+1 failed, 1 warning in 1.77s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.58s
+
+## S01-005 replace requested selection
+node=tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-005]
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+__ test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-005] ___
+tests\test_p0_acceptance.py:121: in test_TC_P0_S01_003_004_005_006_exact_selection_boundaries
+    assert selected(a) == requested
+E   assert [35] == [28, 35, 10, 11]
+E
+E     At index 0 diff: 35 != 28
+E     Right contains 3 more items, first extra item: 35
+E     Use -v to get more diff
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-005]
+1 failed, 1 warning in 1.72s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.57s
+
+## S01-006 replace requested selection
+node=tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-006]
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+__ test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-006] ___
+tests\test_p0_acceptance.py:121: in test_TC_P0_S01_003_004_005_006_exact_selection_boundaries
+    assert selected(a) == requested
+E   assert [35] == [28, 35, 10, 11, 12]
+E
+E     At index 0 diff: 35 != 28
+E     Right contains 4 more items, first extra item: 35
+E     Use -v to get more diff
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S01_003_004_005_006_exact_selection_boundaries[TC-P0-S01-006]
+1 failed, 1 warning in 1.68s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.58s
+
+## S01-008 accept forged identity
+node=tests/test_p0_acceptance.py::test_TC_P0_S01_008_guest_forgery_and_origin_leave_accounts_intact
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+______ test_TC_P0_S01_008_guest_forgery_and_origin_leave_accounts_intact ______
+tests\test_p0_acceptance.py:149: in test_TC_P0_S01_008_guest_forgery_and_origin_leave_accounts_intact
+    error(
+tests\test_p0_acceptance.py:73: in error
+    assert response.status_code == status, response.text
+E   AssertionError: {"data":{"genres":[{"id":35,"name":"Comedy"}]}}
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S01_008_guest_forgery_and_origin_leave_accounts_intact
+1 failed, 1 warning in 1.69s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.59s
+
+## S02-002 reverse personal score order
+node=tests/test_p0_acceptance.py::test_TC_P0_S02_002_rating_free_order_and_reasons
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+______________ test_TC_P0_S02_002_rating_free_order_and_reasons _______________
+tests\test_p0_acceptance.py:183: in test_TC_P0_S02_002_rating_free_order_and_reasons
+    assert [item["popularityScore"] for item in result] == sorted(
+E   assert [89.0, 90.0, ....0, 94.0, ...] == [98.0, 97.0, ....0, 93.0, ...]
+E
+E     At index 0 diff: 89.0 != 98.0
+E     Use -v to get more diff
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S02_002_rating_free_order_and_reasons
+1 failed, 1 warning in 1.53s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.44s
+
+## S02-003 conceal no-match state
+node=tests/test_p0_acceptance.py::test_TC_P0_S02_003_no_match_uses_unboosted_popular
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____________ test_TC_P0_S02_003_no_match_uses_unboosted_popular ______________
+tests\test_p0_acceptance.py:204: in test_TC_P0_S02_003_no_match_uses_unboosted_popular
+    assert body["data"]["noMatch"] is True
+E   assert False is True
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S02_003_no_match_uses_unboosted_popular
+1 failed, 1 warning in 1.54s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.42s
+
+## S02-004 wrong auth refusal code
+node=tests/test_p0_acceptance.py::test_TC_P0_S02_004_guest_and_expired_cookie_are_private
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+___________ test_TC_P0_S02_004_guest_and_expired_cookie_are_private ___________
+tests\test_p0_acceptance.py:212: in test_TC_P0_S02_004_guest_and_expired_cookie_are_private
+    error(details.http.get(RECOMMENDATIONS), 401, "AUTHENTICATION_REQUIRED")
+tests\test_p0_acceptance.py:75: in error
+    assert body["error"]["code"] == code
+E   AssertionError: assert 'WRONG_AUTH_CODE' == 'AUTHENTICATION_REQUIRED'
+E
+E     - AUTHENTICATION_REQUIRED
+E     + WRONG_AUTH_CODE
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S02_004_guest_and_expired_cookie_are_private
+1 failed, 1 warning in 1.48s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.41s
+
+## S02-005 disguise core database failure
+node=tests/test_p0_acceptance.py::test_TC_P0_S02_005_core_failure_then_retry_preserves_preferences
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+______ test_TC_P0_S02_005_core_failure_then_retry_preserves_preferences _______
+tests\test_p0_acceptance.py:235: in test_TC_P0_S02_005_core_failure_then_retry_preserves_preferences
+    failed = error(a.get(RECOMMENDATIONS), 503, "SERVICE_UNAVAILABLE")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_p0_acceptance.py:75: in error
+    assert body["error"]["code"] == code
+E   AssertionError: assert 'WRONG_DB_CODE' == 'SERVICE_UNAVAILABLE'
+E
+E     - SERVICE_UNAVAILABLE
+E     + WRONG_DB_CODE
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S02_005_core_failure_then_retry_preserves_preferences
+1 failed, 1 warning in 1.59s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.45s
+
+## S02-006 skip genre view filter
+node=tests/test_p0_acceptance.py::test_TC_P0_S02_006_filter_after_whole_set_ranking
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+______________ test_TC_P0_S02_006_filter_after_whole_set_ranking ______________
+tests\test_p0_acceptance.py:248: in test_TC_P0_S02_006_filter_after_whole_set_ranking
+    assert [len(movies(first)), len(movies(second))] == [10, 2]
+E   assert [10, 10] == [10, 2]
+E
+E     At index 1 diff: 10 != 2
+E     Use -v to get more diff
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S02_006_filter_after_whole_set_ranking
+1 failed, 1 warning in 1.59s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.56s
+
+## S04-001 default to descending catalogue
+node=tests/test_p0_acceptance.py::test_TC_P0_S04_001_public_catalogue_pages_include_null_popularity
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+______ test_TC_P0_S04_001_public_catalogue_pages_include_null_popularity ______
+tests\test_p0_acceptance.py:275: in test_TC_P0_S04_001_public_catalogue_pages_include_null_popularity
+    assert [item["title"] for item in items] == sorted(item["title"] for item in items)
+E   AssertionError: assert ['Fixture mov...ovie 06', ...] == ['Extra 00', ...xtra 05', ...]
+E
+E     At index 0 diff: 'Fixture movie 11' != 'Extra 00'
+E     Use -v to get more diff
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S04_001_public_catalogue_pages_include_null_popularity
+1 failed, 1 warning in 1.49s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.41s
+
+## S04-003 report page size as total
+node=tests/test_p0_acceptance.py::test_TC_P0_S04_003_limit_9_and_10_keep_full_total
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+______________ test_TC_P0_S04_003_limit_9_and_10_keep_full_total ______________
+tests\test_p0_acceptance.py:318: in test_TC_P0_S04_003_limit_9_and_10_keep_full_total
+    assert response.json()["meta"]["total"] == 25
+E   assert 9 == 25
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S04_003_limit_9_and_10_keep_full_total
+1 failed, 1 warning in 1.48s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.32s
+
+## S04-004 wrong validation code
+node=tests/test_p0_acceptance.py::test_TC_P0_S04_004_limit_and_page_refusals
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________________ test_TC_P0_S04_004_limit_and_page_refusals __________________
+tests\test_p0_acceptance.py:329: in test_TC_P0_S04_004_limit_and_page_refusals
+    error(details.http.get("/api/movies", params=params), 400, "VALIDATION_ERROR")
+tests\test_p0_acceptance.py:75: in error
+    assert body["error"]["code"] == code
+E   AssertionError: assert 'WRONG_VALIDATION_CODE' == 'VALIDATION_ERROR'
+E
+E     - VALIDATION_ERROR
+E     + WRONG_VALIDATION_CODE
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S04_004_limit_and_page_refusals
+1 failed, 1 warning in 1.43s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.32s
+
+## S04-005 wrong missing-catalogue code
+node=tests/test_p0_acceptance.py::test_TC_P0_S04_005_empty_active_versus_missing_revision
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+___________ test_TC_P0_S04_005_empty_active_versus_missing_revision ___________
+tests\test_p0_acceptance.py:350: in test_TC_P0_S04_005_empty_active_versus_missing_revision
+    error(details.http.get("/api/movies"), 503, "CATALOGUE_UNAVAILABLE")
+tests\test_p0_acceptance.py:75: in error
+    assert body["error"]["code"] == code
+E   AssertionError: assert 'WRONG_CATALOGUE_CODE' == 'CATALOGUE_UNAVAILABLE'
+E
+E     - CATALOGUE_UNAVAILABLE
+E     + WRONG_CATALOGUE_CODE
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S04_005_empty_active_versus_missing_revision
+1 failed, 1 warning in 1.46s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.32s
+
+## S12-001 preserve mixed-case email
+node=tests/test_p0_acceptance.py::test_TC_P0_S12_001_eight_char_normalized_hashed_registration
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+________ test_TC_P0_S12_001_eight_char_normalized_hashed_registration _________
+tests\test_p0_acceptance.py:382: in test_TC_P0_S12_001_eight_char_normalized_hashed_registration
+    assert user["email"] == "mixed@example.test"
+E   AssertionError: assert 'MIXED@Example.Test' == 'mixed@example.test'
+E
+E     - mixed@example.test
+E     + MIXED@Example.Test
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S12_001_eight_char_normalized_hashed_registration
+1 failed, 1 warning in 1.55s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.35s
+
+## S12-003 require ten characters
+node=tests/test_p0_acceptance.py::test_TC_P0_S12_003_nine_char_password_has_safe_dto
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____________ test_TC_P0_S12_003_nine_char_password_has_safe_dto ______________
+tests\test_p0_acceptance.py:411: in test_TC_P0_S12_003_nine_char_password_has_safe_dto
+    assert response.status_code == 201
+E   assert 400 == 201
+E    +  where 400 = <Response [400 Bad Request]>.status_code
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S12_003_nine_char_password_has_safe_dto
+1 failed, 1 warning in 1.39s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.33s
+
+## S12-004 wrong duplicate-email message
+node=tests/test_p0_acceptance.py::test_TC_P0_S12_004_duplicate_normalized_email_is_conflict
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+__________ test_TC_P0_S12_004_duplicate_normalized_email_is_conflict __________
+tests\test_p0_acceptance.py:434: in test_TC_P0_S12_004_duplicate_normalized_email_is_conflict
+    assert response["error"]["message"] == "This email is already registered"
+E   AssertionError: assert 'Account already exists' == 'This email i...dy registered'
+E
+E     - This email is already registered
+E     + Account already exists
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S12_004_duplicate_normalized_email_is_conflict
+1 failed, 1 warning in 1.49s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.43s
+
+## S12-005 disguise account database failure
+node=tests/test_p0_acceptance.py::test_TC_P0_S12_005_invalid_email_and_storage_failure_create_no_account
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+___ test_TC_P0_S12_005_invalid_email_and_storage_failure_create_no_account ____
+tests\test_p0_acceptance.py:460: in test_TC_P0_S12_005_invalid_email_and_storage_failure_create_no_account
+    failed = error(
+tests\test_p0_acceptance.py:75: in error
+    assert body["error"]["code"] == code
+E   AssertionError: assert 'WRONG_DB_CODE' == 'SERVICE_UNAVAILABLE'
+E
+E     - SERVICE_UNAVAILABLE
+E     + WRONG_DB_CODE
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S12_005_invalid_email_and_storage_failure_create_no_account
+1 failed, 1 warning in 1.43s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.31s
+
+## S13-001 refuse valid me session
+node=tests/test_p0_acceptance.py::test_TC_P0_S13_001_login_me_cookie_and_safe_user
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+______________ test_TC_P0_S13_001_login_me_cookie_and_safe_user _______________
+tests\test_p0_acceptance.py:475: in test_TC_P0_S13_001_login_me_cookie_and_safe_user
+    assert response.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = <Response [401 Unauthorized]>.status_code
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S13_001_login_me_cookie_and_safe_user
+1 failed, 1 warning in 1.59s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.41s
+
+## S13-003 leave logout session active
+node=tests/test_p0_acceptance.py::test_TC_P0_S13_003_logout_replay_and_later_login_restore_data
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+________ test_TC_P0_S13_003_logout_replay_and_later_login_restore_data ________
+tests\test_p0_acceptance.py:510: in test_TC_P0_S13_003_logout_replay_and_later_login_restore_data
+    error(replay.get(PREFERENCES), 401, "AUTHENTICATION_REQUIRED")
+tests\test_p0_acceptance.py:73: in error
+    assert response.status_code == status, response.text
+E   AssertionError: {"data":{"genres":[{"id":28,"name":"Action"}]}}
+E   assert 200 == 401
+E    +  where 200 = <Response [200 OK]>.status_code
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S13_003_logout_replay_and_later_login_restore_data
+1 failed, 1 warning in 1.58s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.56s
+
+## S13-004 ignore expiry
+node=tests/test_p0_acceptance.py::test_TC_P0_S13_004_missing_expired_and_revoked_sessions_refused
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______ test_TC_P0_S13_004_missing_expired_and_revoked_sessions_refused _______
+tests\test_p0_acceptance.py:530: in test_TC_P0_S13_004_missing_expired_and_revoked_sessions_refused
+    error(a.get(PREFERENCES), 401, "AUTHENTICATION_REQUIRED")
+tests\test_p0_acceptance.py:73: in error
+    assert response.status_code == status, response.text
+E   AssertionError: {"data":{"genres":[]}}
+E   assert 200 == 401
+E    +  where 200 = <Response [200 OK]>.status_code
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S13_004_missing_expired_and_revoked_sessions_refused
+1 failed, 1 warning in 1.55s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.46s
+
+## S13-005 accept forged identity
+node=tests/test_p0_acceptance.py::test_TC_P0_S13_005_account_isolation_and_forged_identity
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+__________ test_TC_P0_S13_005_account_isolation_and_forged_identity ___________
+tests\test_p0_acceptance.py:547: in test_TC_P0_S13_005_account_isolation_and_forged_identity
+    error(
+tests\test_p0_acceptance.py:73: in error
+    assert response.status_code == status, response.text
+E   AssertionError: {"data":{"genres":[{"id":28,"name":"Action"}]}}
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S13_005_account_isolation_and_forged_identity
+1 failed, 1 warning in 1.65s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.57s
+
+## S13-006 allow foreign origin
+node=tests/test_p0_acceptance.py::test_TC_P0_S13_006_cross_origin_auth_and_write_refused
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+___________ test_TC_P0_S13_006_cross_origin_auth_and_write_refused ____________
+tests\test_p0_acceptance.py:561: in test_TC_P0_S13_006_cross_origin_auth_and_write_refused
+    error(
+tests\test_p0_acceptance.py:73: in error
+    assert response.status_code == status, response.text
+E   AssertionError: {"data":{"user":{"id":"ca2fc1bb-9490-4ee7-818c-0b0e86062985","email":"a@example.test"}}}
+E   assert 200 == 403
+E    +  where 200 = <Response [200 OK]>.status_code
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S13_006_cross_origin_auth_and_write_refused
+1 failed, 1 warning in 1.65s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.65s
+
+## S05a failure return code
+node=tests/test_rating_ranking_acceptance.py::test_s05a_failed_update_has_no_success_and_retry_commits
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+__________ test_s05a_failed_update_has_no_success_and_retry_commits ___________
+tests\test_rating_ranking_acceptance.py:94: in test_s05a_failed_update_has_no_success_and_retry_commits
+    failed = error(a.put(path, json={"rating": 5}), 503, "SERVICE_UNAVAILABLE")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_p0_acceptance.py:75: in error
+    assert body["error"]["code"] == code
+E   AssertionError: assert 'WRONG_SAVE_CODE' == 'SERVICE_UNAVAILABLE'
+E
+E     - SERVICE_UNAVAILABLE
+E     + WRONG_SAVE_CODE
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_rating_ranking_acceptance.py::test_s05a_failed_update_has_no_success_and_retry_commits
+1 failed, 1 warning in 1.58s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.54s
+
+## S05b conceal unavailable rating source
+node=tests/test_rating_ranking_acceptance.py::test_s05b_rating_query_failure_is_truthful_and_core_failure_is_error
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+____ test_s05b_rating_query_failure_is_truthful_and_core_failure_is_error _____
+tests\test_rating_ranking_acceptance.py:170: in test_s05b_rating_query_failure_is_truthful_and_core_failure_is_error
+    assert all(
+E   assert False
+E    +  where False = all(<generator object test_s05b_rating_query_failure_is_truthful_and_core_failure_is_error.<locals>.<genexpr> at 0x00000228360E7AC0>)
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_rating_ranking_acceptance.py::test_s05b_rating_query_failure_is_truthful_and_core_failure_is_error
+1 failed, 1 warning in 1.57s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.49s
+
+## S05b retain old rating signal after reset
+node=tests/test_rating_ranking_acceptance.py::test_s05b_reset_reselection_removes_old_signal_preserves_b
+red_exit=1
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________ test_s05b_reset_reselection_removes_old_signal_preserves_b __________
+tests\test_rating_ranking_acceptance.py:206: in test_s05b_reset_reselection_removes_old_signal_preserves_b
+    assert by_id(recommendation(a))[ids["action"]]["basis"] == "baseline"
+E   AssertionError: assert 'rating_signals' == 'baseline'
+E
+E     - baseline
+E     + rating_signals
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_rating_ranking_acceptance.py::test_s05b_reset_reselection_removes_old_signal_preserves_b
+1 failed, 1 warning in 1.80s
+green_exit=0
+.                                                                        [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Software engineering\ai66a_group3_C1_SE\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 1.64s

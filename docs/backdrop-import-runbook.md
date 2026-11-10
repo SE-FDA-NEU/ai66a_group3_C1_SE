@@ -31,27 +31,27 @@ accepted by the URL builder.
 
 ## Bounded enrichment for an existing active catalogue
 
-From the repository root, after applying migration `c6f8a2d4e901` and using
+From the repository root, after applying the current Alembic head and using
 the existing private server token and database:
 
 ```powershell
-.\.venv\Scripts\python.exe -m app.cli.import_tmdb_catalogue --enrich-backdrops --limit 300
+.\.venv\Scripts\python.exe -m app.cli.import_tmdb_catalogue --enrich-backdrops --all
 ```
 
-The command queries only active `source=tmdb` movies. The `--limit` range is
-1–300, default 300, with one movie-detail request per selected movie and no
-popular-page or genre request. An active catalogue of about 255 movies fits in
-one pass; that count is an input size, not a promise that every movie has a
-backdrop. A lower limit processes the first source IDs in deterministic order
-and reports `remaining`; rerunning that same lower limit does not page to later
-movies, so use 300 for the current full catalogue. Future catalogues over 300
-require an explicitly reviewed bounded batching change.
+`--all` snapshots all active `source=tmdb` movie IDs and visits every selected
+movie once, with at most 300 details requests per committed batch. It does not
+cap a 1,000-movie catalogue at 300. Optionally use `--all --limit 50` for smaller
+batches. There are no popular-page or genre requests. Without `--all`, the
+1–300 limit is deliberately one pass over the sorted prefix; repeating that
+bounded command does not move to another page. Image `--all` has no persistent
+attempt marker: another invocation refreshes the whole selected catalogue.
 
-The output reports `eligible`, `fetched`, `remaining`, `updated`, `cleared`,
+The all-mode output reports `active_revision`, `eligible`, `processed`, `remaining`, `updated`, `cleared`,
 `unchanged`, `missing` and `invalid`. `cleared` is included in `updated`.
 Missing and invalid provider media never erase a prior value. Any request or
-database failure aborts the transaction, prints a sanitized error and leaves
-earlier media values unchanged. Successful media-only updates do not create or
+database failure rolls back the current batch, prints a sanitized error and
+stops; earlier committed batches remain. The summary counts committed work
+only. An active-catalogue change also stops processing. Successful media-only updates do not create or
 activate a catalogue revision, touch the catalogue source-fetch timestamp, or
 invalidate a revision-keyed recommendation/TF-IDF corpus. A normal core
 reimport still creates a new catalogue revision and follows its existing
