@@ -3,7 +3,8 @@
 Issue #253. This runbook supersedes the SQLite file-copy section of
 [S4-C05](s4-c05-release-storage.md) for PostgreSQL. It applies to the T04
 regional head `d9a6f2c1e508` (after `b8e4d2c96f10`), with historical VN rows.
-The dated local rehearsal is in [the evidence](evidence/s5-t06-recovery/README.md).
+The real Neon and local rehearsal results are in
+[the evidence](evidence/s5-t06-recovery/README.md).
 T03's `/health` requires the **exact** Alembic head embedded in the running
 code. A database at a newer head cannot be served by older code.
 
@@ -28,10 +29,13 @@ restore date in private operations records; the public evidence may name the
 storage class and access owners without revealing credentials or account rows.
 Do not count Render's ephemeral filesystem or this repo as the durable copy.
 
-The local rehearsal used a temporary PostgreSQL 18 cluster and temporary custom
-archives. It does **not** establish the private durable production destination,
-replication, schedule or access. Those items require the named operators and
-their private Neon/backup credentials before #253 can be closed.
+On 10 November, the PO confirmed that shared durable backup storage and an
+independent teammate reproduction were still pending. Git holds this runbook,
+tests and redacted evidence. Custom-format archives contain password hashes,
+session digests and account data, so keep them in restricted private storage.
+The recorded real Neon rehearsal archive currently resides in an ignored local
+operator area. The named operators still need to establish the durable
+destination, replication, daily execution and access before #253 closes.
 
 ## Preflight and backup
 
@@ -97,14 +101,24 @@ archive is sensitive even though `pg_restore --list` shows no personal rows.
   --target-database '<confirmed-restore-db>'
 ```
 
-The comparator refuses identical targets, redirected URL targets, non-18
-servers, unvalidated constraints and unknown/multiple revisions. It checks
+The comparator registers all application models even in a fresh CLI process,
+refuses empty/incomplete metadata before connecting, and opens read-only
+database transactions. It refuses identical targets, redirected URL targets,
+non-18 servers, unvalidated constraints and unknown/multiple revisions. It checks
 every mapped application table, including all provider membership keys,
 country/status/timestamps/link URL and null states, active movie/media IDs,
 session ownership, genres, ratings and Watchlists. It prints only counts and
 equality flags, never rows, URLs, password hashes or tokens. If live writes
 continued after the dump, use a quiet window or compare against a contemporaneous
 private manifest; do not call an expected timing difference corruption.
+
+Exit 0 requires every application table and regional aggregate to match. Exit 1
+reports a data difference. Exit 2 reports a refused/failed comparison. Expect
+12 `table=...` lines at the current schema, including account tables and both
+provider tables. Investigate missing table output before accepting any result.
+The focused test changes a rating, supplied watch URL, check timestamp and
+provider name independently; each must produce exit 1, followed by exit 0 after
+the test change is undone.
 
 Rebuild/check the derived NLP artifact from the restored DB, using an **isolated
 index path**. This artifact is not a substitute for the database backup:
@@ -130,9 +144,11 @@ account checks. Preserve the original archive for investigation.
 
 Identify an approved **green main** commit from the CI and review records and
 capture its full SHA, its code Alembic head and deployment gate result. The
-isolated local rehearsal used T03 merge `f24ef54` at code head
-`a3d1f8b72c44`; confirm its actual green main CI status before selecting it for
-a public rollback. Keep branch protection, required approval and CI/deploy gate
+isolated local rehearsal used T03 merge
+`f24ef54699efb2fa26f363107bd31401f9b12e58` at code head
+`a3d1f8b72c44`. Its push-to-main CI passed and is linked in the dated evidence.
+Confirm the selected incident recovery point before a public rollback.
+Keep branch protection, required approval and CI/deploy gate
 active. A reviewed revert follows the same gate; do not use a manual deploy to
 bypass it.
 
@@ -179,12 +195,22 @@ TMDb/account rows. Run:
   backend/tests/test_s5_t06_postgres_recovery.py -q
 ```
 
-It covers native custom dump/restore, full-table exact comparison, legacy VN,
+Install the project with `python -m pip install -e "./backend[dev]" --no-deps`
+after the locked dependencies. This makes standalone `python -m app.cli...`
+commands available from the repository root. The focused recovery suite has
+five cases. Its database rehearsal is skipped when the two test URLs are absent.
+CI provisions two disposable databases, installs matching PostgreSQL 18 clients,
+runs this suite and rejects skipped cases. The default milestone command runs
+the 40 P0 tests. PostgreSQL client installation on Ubuntu follows the official
+package instructions. [PostgreSQL Ubuntu packages](https://www.postgresql.org/download/linux/ubuntu/)
+
+The suite covers native custom dump/restore, full-table exact comparison, legacy VN,
 independent US/GB/SG valid/null/stale/error states, provider groups, migration
 refusal, duplicate restore refusal, health head refusal/recovery, index startup,
 Search/Similar, country APIs, zero runtime TMDb calls, sessions, A/B reset and
-later login. T04's [full real catalogue result](evidence/s5-t04-providers/regional-2026-11-10.md)
-is reused at its recorded development source; the focused test is synthetic.
+later login. The T06 evidence records the full real Neon restore separately
+from synthetic supplementary states. The original source catalogue is documented
+in [T04's result](evidence/s5-t04-providers/regional-2026-11-10.md).
 T07 checks the country selector/button on its selected public candidate. T08
 receives this operational procedure; C02 receives the release compatibility
 and outstanding acceptance status. A non-contributing teammate must actually

@@ -1,0 +1,243 @@
+{
+  "verifiedAtLocal": "2026-11-10T20:15:55.992433+07:00",
+  "applicationSourceCommit": "37f065165caab6dee5e5ef178937d80f96dccf5c",
+  "execution": "Codex automation in the PO-authorized local environment; independent teammate reproduction pending",
+  "regression": {
+    "beforeFix": {
+      "failed": 3,
+      "cases": [
+        "standalone model registration",
+        "empty metadata refusal",
+        "missing users metadata refusal"
+      ]
+    },
+    "afterFix": {
+      "focusedRecoveryPassed": 5,
+      "skipped": 0,
+      "postgresqlIntegrationPassed": 12,
+      "p0Passed": 40,
+      "ruff": "passed",
+      "focusedElapsedSeconds": 13.36,
+      "focusedSourceDatabase": "s5_t06_final_source",
+      "focusedTargetDatabase": "s5_t06_final_target"
+    },
+    "mutationsDetected": [
+      "rating value",
+      "watch URL changed to another movie",
+      "last-success timestamp",
+      "provider name"
+    ],
+    "expectedMismatchExitCode": 1
+  },
+  "realNeonRestore": {
+    "startedAtUtc": "2026-11-10T13:08:49.992040+00:00",
+    "sourceDatabase": "cineai_development",
+    "targetDatabase": "s5_t06_neon_verified_20261110",
+    "operatorRole": "neondb_owner",
+    "tls": "verify-full",
+    "sourceSha": "37f065165caab6dee5e5ef178937d80f96dccf5c",
+    "applicationChangesUncommitted": false,
+    "serverVersion": "18.6 (ac70818)",
+    "catalogueRevision": "1ee08003-bc00-4888-b35c-8c6cbe599062",
+    "activeMovies": 989,
+    "providerChecks": [
+      {
+        "country": "GB",
+        "status": "no_data",
+        "count": 134
+      },
+      {
+        "country": "GB",
+        "status": "success",
+        "count": 855
+      },
+      {
+        "country": "SG",
+        "status": "no_data",
+        "count": 283
+      },
+      {
+        "country": "SG",
+        "status": "success",
+        "count": 706
+      },
+      {
+        "country": "US",
+        "status": "no_data",
+        "count": 89
+      },
+      {
+        "country": "US",
+        "status": "success",
+        "count": 900
+      },
+      {
+        "country": "VN",
+        "status": "no_data",
+        "count": 989
+      }
+    ],
+    "sourceTableCounts": {
+      "catalogue_revisions": 2,
+      "genres": 19,
+      "users": 2,
+      "auth_sessions": 6,
+      "catalog_movies": 989,
+      "catalogue_state": 1,
+      "user_genre_preferences": 2,
+      "movie_genres": 2756,
+      "movie_provider_checks": 3956,
+      "user_movie_ratings": 2,
+      "user_movie_watchlist": 2,
+      "movie_watch_providers": 21369
+    },
+    "pgDumpVersion": "pg_dump (PostgreSQL) 18.1",
+    "pgRestoreVersion": "pg_restore (PostgreSQL) 18.1",
+    "archive": {
+      "bytes": 582019,
+      "sha256": "6fd2e356115b7c1b83fee93bb4d7b90edf591629a7cb1226a53a2c0f7c50b082",
+      "storageClass": "Ignored private local rehearsal area; durable replicated backup pending"
+    },
+    "archiveListingVerified": true,
+    "schemaHead": "d9a6f2c1e508",
+    "allTwelveTablesExactlyEqual": true,
+    "providerWritePrivileges": [
+      false,
+      false
+    ],
+    "completedAtUtc": "2026-11-10T13:09:14.880344+00:00"
+  },
+  "restoredApi": {
+    "dateUtc": "2026-11-10T13:11:30.840758+00:00",
+    "target": "s5_t06_neon_verified_20261110",
+    "apiRole": "cineai_runtime",
+    "runtimeTmdbCalls": 0,
+    "sourceUntouched": true,
+    "details": [
+      {
+        "movieId": "2626f71e-8458-491c-a1f4-c2017d8f684b",
+        "country": "US",
+        "status": "success",
+        "validLinkPresent": true
+      },
+      {
+        "movieId": "2626f71e-8458-491c-a1f4-c2017d8f684b",
+        "country": "GB",
+        "status": "success",
+        "validLinkPresent": true
+      },
+      {
+        "movieId": "2626f71e-8458-491c-a1f4-c2017d8f684b",
+        "country": "SG",
+        "status": "success",
+        "validLinkPresent": true
+      },
+      {
+        "movieId": "2626f71e-8458-491c-a1f4-c2017d8f684b",
+        "country": "US",
+        "status": "success",
+        "validLinkPresent": true
+      },
+      {
+        "movieId": "311ba592-b894-4a79-be34-186d6cb03a0d",
+        "country": "US",
+        "status": "success",
+        "validLinkPresent": true
+      },
+      {
+        "movieId": "311ba592-b894-4a79-be34-186d6cb03a0d",
+        "country": "GB",
+        "status": "success",
+        "validLinkPresent": true
+      },
+      {
+        "movieId": "311ba592-b894-4a79-be34-186d6cb03a0d",
+        "country": "SG",
+        "status": "no_data",
+        "validLinkPresent": false
+      },
+      {
+        "movieId": "311ba592-b894-4a79-be34-186d6cb03a0d",
+        "country": "US",
+        "status": "success",
+        "validLinkPresent": true
+      }
+    ],
+    "accountChecks": {
+      "A": {
+        "genres": true,
+        "exactRating": true,
+        "watchlistIdentity": true,
+        "isolation": true
+      },
+      "B": {
+        "genres": true,
+        "exactRating": true,
+        "watchlistIdentity": true,
+        "isolation": true
+      }
+    },
+    "resetPreservesBothWatchlistsAndAllBData": true,
+    "restartSessionsLogoutAndLaterLogin": true,
+    "index": {
+      "movies": 989,
+      "usableDocuments": 988,
+      "corpusDigest": "714148f40f7c7788af159a2707804e23a5de47fc7b44e187a9aaa183a4ad2ec4",
+      "configFingerprint": "41785781f34ba44091ac64f3b1c0503402ee760c518af1429d0acb94bbc31c99"
+    },
+    "missingIndexRebuiltAfterRestart": true,
+    "restoredCatalogueMediaProvidersUnchanged": true
+  },
+  "realNeonRefusals": {
+    "target": "s5_t06_neon_verified_20261110",
+    "controlledExperiments": true,
+    "duplicateRestoreRefused": true,
+    "downgradeRefused": true,
+    "allTwelveTablesPreservedAfterEachRefusal": true,
+    "schemaHead": "d9a6f2c1e508"
+  },
+  "actualOldCodeRollback": {
+    "dateUtc": "2026-11-10T13:07:16.588985+00:00",
+    "reviewedCodeSha": "f24ef54699efb2fa26f363107bd31401f9b12e58",
+    "codeHead": "a3d1f8b72c44",
+    "source": "s5_t06_roll_source_20261110",
+    "restored": "s5_t06_roll_restored_20261110",
+    "synthetic": true,
+    "greenMainCi": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/42756095162",
+    "allTenPreProviderTablesEqual": true,
+    "compatibleProbe": {
+      "actualReviewedCodeImported": true,
+      "expectedHealth": 200,
+      "sourceCommit": "f24ef54699efb2fa26f363107bd31401f9b12e58",
+      "observedHealth": 200,
+      "catalogueMovies": 2,
+      "accountAB": true,
+      "genresRatingsWatchlists": true,
+      "descriptionSearch": true,
+      "similar": true
+    },
+    "incompatibleRegionalProbe": {
+      "actualReviewedCodeImported": true,
+      "expectedHealth": 503,
+      "sourceCommit": "f24ef54699efb2fa26f363107bd31401f9b12e58",
+      "observedHealth": 503
+    },
+    "archive": {
+      "bytes": 24194,
+      "sha256": "1a7b42a8335fdd96c8ad70a9699dfd4709f6c0baeaad6cac5cfa104dec086388"
+    },
+    "recoveryPointLimit": "Synthetic regional writes after the pre-provider backup are absent after rollback; no public switch or later-write preservation is claimed."
+  },
+  "remaining": {
+    "durablePrivateBackupStorage": "Pending; PO confirmed Git-only storage is currently available",
+    "primaryAndBackupArtifactAccess": "Pending",
+    "dailyExecutionAndSevenSuccessfulArchives": "Selected policy; operational setup pending",
+    "independentHumanReproduction": "Pending",
+    "substantiveFinalReviewAndMerge": "Pending"
+  },
+  "handoff": {
+    "T07": "Recovered target identity, country APIs, account/reset/media/NLP evidence; public selector/button acceptance belongs to T07",
+    "T08": "Recovery runbook and pending durable-storage/operator steps",
+    "C02": "Green rollback SHA, exact-head compatibility limit and pending review/merge status"
+  }
+}

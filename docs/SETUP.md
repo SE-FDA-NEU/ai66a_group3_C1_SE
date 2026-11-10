@@ -189,9 +189,11 @@ availability. Follow the migration/rollout and per-country evidence requirements
 
 For PostgreSQL 18 backup, isolated restore, regional/account comparison and
 code rollback, use the [S5-T06 recovery runbook](s5-t06-postgresql-recovery.md).
-Its [dated local rehearsal](evidence/s5-t06-recovery/README.md) is synthetic;
-the private Neon backup and independent operator reproduction require separate
-actual records before release acceptance.
+Its [dated verification](evidence/s5-t06-recovery/README.md) includes a real
+989-movie Neon restore and isolated synthetic refusal/rollback checks. Final
+acceptance still requires durable private backup storage with primary/backup
+operator access and a genuine independent reproduction. Git stores the runbook
+and redacted evidence. Keep sensitive database archives in private storage.
 
 After pulling changes, back up valuable SQLite data consistently and run
 `alembic upgrade head` before restarting the backend. Compare `alembic current`

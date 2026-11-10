@@ -59,7 +59,7 @@ def test_comparator_refuses_redirected_or_misidentified_database():
 def test_comparator_registers_every_model_in_a_fresh_process():
     script = ("from app.cli.compare_recovery import Base\n"
               f"assert set(Base.metadata.tables) == {APPLICATION_TABLES!r}\n")
-    result = _run([sys.executable, "-c", script])
+    result = _run([sys.executable, "-c", script], env={"PYTHONPATH": str(ROOT / "backend")})
     _assert_success(result, "standalone model registration")
 
 

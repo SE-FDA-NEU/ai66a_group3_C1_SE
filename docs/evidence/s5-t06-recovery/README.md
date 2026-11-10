@@ -1,103 +1,172 @@
-# S5-T06 recovery rehearsal evidence — 10 November 2026
+# S5-T06 recovery verification, 10 November 2026
 
-Issue #253. Current source checkout: `406530eabf4fba19eeaffdd703c515059c0558f5`
-(`feature/minhhoang`, containing T03/T04). An earlier local rehearsal used
-`7a198ff3ce8a07a08318bf837f162fa7b907b81d` (`origin/main`, T04 merge).
-The implementation and this record are uncommitted
-working-tree changes as requested; no PR, approval or merge is claimed.
+Issue #253, PR #262. Application source is
+`37f065165caab6dee5e5ef178937d80f96dccf5c`, extending the original PR
+`5ff39aa034722e6368265a33286475c52ab13308`. The run used Windows,
+Python 3.12.6, PostgreSQL clients 18.1, local PostgreSQL 18.1 and Neon
+PostgreSQL 18.6. Execution was Codex automation in the PO-authorized local
+environment. Independent teammate reproduction remains pending.
+[Structured verification](verification.json), [actual full-table comparison](comparison.txt)
 
-## Environment and actual commands
+## Comparator correction and regression
 
-Windows, Python 3.12.6, PostgreSQL **server 18.1**, `pg_dump` **18.1** and
-`pg_restore` **18.1**. A local cluster initialized for the earlier rehearsal in the user's temp
-directory listened only on `127.0.0.1:55432`, with local test trust
-authentication and `sslmode=disable`. It was not Neon or Render. The effective
-source target in the final focused run was `s5_t06_r3_source` / role `postgres`; the separate effective
-restore target was `s5_t06_r3_target` / role `postgres`. Both were empty before
-the test. The test archive was a custom `.dump` in pytest's temporary folder,
-never committed. The pre-provider rollback archive was also temporary. These
-are disposable test assets, **not** durable production backups.
+The original standalone CLI left ORM metadata empty and could return exit 0
+without comparing any application table. The review reproduced success with
+two source ratings versus one restored rating and with a wrong-movie watch URL.
 
-```text
-pg_ctl -D <previously-initialized-private-temp-cluster> -o "-p 55432 -h 127.0.0.1" -w start
-CREATE DATABASE s5_t06_r3_source ENCODING 'UTF8' TEMPLATE template0;
-CREATE DATABASE s5_t06_r3_target ENCODING 'UTF8' TEMPLATE template0;
-RECOVERY_TEST_SOURCE_URL=<local isolated PostgreSQL URL>
-RECOVERY_TEST_TARGET_URL=<different local isolated PostgreSQL URL>
-python -m pytest -c pytest.ini backend/tests/test_s5_t06_postgres_recovery.py -q
-python -m ruff check backend/app/cli/compare_recovery.py backend/tests/test_s5_t06_postgres_recovery.py
+Three regression cases failed before the correction, then passed afterward.
+The CLI now registers all models, rejects empty/incomplete metadata before
+connecting, opens read-only transactions and compares all 12 application tables.
+The focused native recovery test independently changes a rating, watch URL,
+check timestamp and provider name. Each change returns exit 1 and identifies the
+affected table. Undoing each test change restores exit 0.
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest -c pytest.ini backend/tests/test_s5_t06_postgres_recovery.py -v
+.\.venv\Scripts\python.exe -m pytest -c pytest.ini backend/tests/test_postgresql_t01.py -q
+.\.venv\Scripts\python.exe -m pytest -v
+.\.venv\Scripts\python.exe -m ruff check backend
 ```
 
-Actual final focused result: **2 passed in 16.30 seconds**, one inherited Starlette/httpx deprecation warning;
-Ruff passed. The test applied all Alembic migrations to source, seeded two
-synthetic movies, A/B accounts, sessions, preferences, exact 3.5/4.5 ratings,
-separate Watchlists, media and seven regional checks with five provider-group
-memberships. It ran `pg_dump -Fc`, `pg_restore --exit-on-error` into the empty
-target, and the new read-only comparator. Full row values in all mapped tables,
-including provider country/status/attempt/checked/link/null fields, matched
-exactly. Both targets reported `d9a6f2c1e508`, two movies, seven checks and
-five memberships. PostgreSQL reported zero unvalidated FK/check constraints.
-Read-only target identity queries returned
-`18.1|s5_t06_r3_source|postgres|d9a6f2c1e508|2|7|5` and
-`18.1|s5_t06_r3_target|postgres|d9a6f2c1e508|2|7|5`.
+With two newly created local databases named `s5_t06_final_source` and
+`s5_t06_final_target`, the focused suite passed **5 cases with zero skips**.
+PostgreSQL integration passed **12 cases with zero skips** in isolated schemas.
+The default milestone suite passed **40 P0 cases**. Ruff passed. The inherited
+Starlette/httpx TestClient deprecation warning remains. CI provisions matching
+PostgreSQL 18 clients and two empty databases, executes the focused recovery
+suite and rejects skipped cases.
 
-The comparator printed equality for all mapped tables and regional status/link
-aggregates without printing rows. A second restore into the populated target
-failed, and the full comparator still passed. Downgrade to VN-only
-`b8e4d2c96f10` refused populated US/GB/SG data; the full comparator still
-passed afterward.
-Temporarily setting the isolated target's Alembic version to the previous head
-made T03 health return 503; restoring the head returned 200. The recovered
-index built at startup. Catalogue, description Search, Similar, Details for
-US/GB/SG and default US, independent groups and valid/null/stale/error states
-on both movies, null SG link, unsupported VN/CA/lowercase rejection, preserved
-session cookies, A/B isolation, reset preserving both Watchlists, and a later
-login after a new application lifespan passed. Runtime TMDb access was patched
-to fail on any call; zero calls occurred.
+## Real Neon backup and restore
 
-## Code rollback rehearsal
+The source was `cineai_development`, containing the genuine imported T04
+catalogue and exactly two controlled synthetic development accounts. The
+operator role was `neondb_owner`, with `verify-full` TLS. An initial real restore
+used `s5_t06_neon_restore_20261110`. The final API verification used the newly
+created `s5_t06_neon_verified_20261110` target and the same consistent archive.
+Both restores used empty databases and matched all 12 source tables before
+application-flow probes.
 
-An archive of reviewed T03 main merge `f24ef54` was extracted to a separate
-temporary source directory during the earlier rehearsal and reused in this run.
-It embedded Alembic head `a3d1f8b72c44`. Against
-the recovered regional `d9a6f2c1e508` target, this **actual old code** returned
-health **503**, as required by the exact-head rule. This confirms direct code
-rollback alone is incompatible. Its green push-to-main CI status was not
-independently retrieved in this local rehearsal and must be confirmed by T03
-before using that commit for public rollback.
+The native operator commands used private `PG*` variables and an ignored private
+archive path. The public record exposes counts and archive checksum only.
 
-For the compatible path, the earlier rehearsal's isolated `s5_t06_rollsource` database was
-migrated to `a3d1f8b72c44` and seeded with one synthetic catalogue movie,
-poster/backdrop, two accounts, two preferences, 3.5/4.5 ratings and two
-Watchlists. `pg_dump -Fc` captured this **pre-provider** state. That source
-was then upgraded through `b8e4d2c96f10` to `d9a6f2c1e508`; the archive was
-restored with `pg_restore --exit-on-error` into the separate empty
-`s5_t06_rollback` database. The restore reported head `a3d1f8b72c44` and
-two users, ratings and Watchlists. The extracted T03 code, pointed only at
-this restored target again in the current run, returned health **200**, catalogue total **1**, login
-**200**, rating **3.5**, Watchlist total **1**, description Search **200** and
-Similar **200**. Its startup built an index from that target. This proves a
-compatible code-plus-data rollback on synthetic data. It does not prove a
-public rollback or preservation of writes after the older recovery point.
+```powershell
+pg_dump --format=custom --no-owner --no-privileges --file "$backupFile"
+pg_restore --list "$backupFile"
+# Set PG* to the independently confirmed new empty target.
+pg_restore --exit-on-error --no-owner --no-privileges --dbname "$targetDatabase" "$backupFile"
+# Load source/target application URLs privately.
+.\.venv\Scripts\python.exe -m app.cli.compare_recovery `
+  --source-database cineai_development `
+  --target-database s5_t06_neon_verified_20261110
+.\.venv\Scripts\python.exe -m alembic -c backend/alembic.ini check
+```
 
-## Real T04 evidence reused and remaining acceptance
+| Item | Actual restored result |
+| --- | --- |
+| Schema head | `d9a6f2c1e508` |
+| Active revision | `1ee08003-bc00-4888-b35c-8c6cbe599062` |
+| Active imported movies | 989 |
+| US / GB / SG checks | 989 each, 2,967 total |
+| Historical VN checks | 989 |
+| Provider group memberships | 21,369 |
+| Users / preferences / ratings / Watchlists | 2 / 2 / 2 / 2 |
+| Session rows at the recovery point | 6 |
+| Exact full-table comparison | All 12 equal, exit 0 |
+| Archive size / format | 582,019 bytes, native custom format |
 
-The [T04 real full-catalogue development result](../s5-t04-providers/regional-2026-11-10.md)
-is reused at its recorded source: Neon PostgreSQL 18.6, 989 active movies,
-2,967 US/GB/SG checks, preserved 989 legacy VN checks, real country links and
-independent regional API probes. It is **not** a T06 restore result. T04's
-record also says the public runtime was still at `a3d1f8b72c44` at its
-observation; no fresh public check was made here.
+The archive SHA-256 is
+`6fd2e356115b7c1b83fee93bb4d7b90edf591629a7cb1226a53a2c0f7c50b082`.
+The source was unchanged during comparison and subsequent restored API probes.
+The restricted `cineai_runtime` role received SELECT on catalogue/provider
+tables and the existing account-owned DML grants. It has no provider-table DML.
 
-The following cannot truthfully be marked done from this workspace: a durable
-private backup of the real Neon source with verified primary/backup operator
-access and seven-copy retention; a restore of that real 989-movie catalogue
-into an isolated PostgreSQL 18 target; its A/B and per-country comparison; a
-genuine reproduction by a named non-contributing teammate; formal review,
-green PR/merge and public T07 acceptance. @hoang3003 and the eligible backup
-reviewer must record those actual results, archive location/access, person,
-date, source SHA, commands and target identity before closing #253. Give T07
-the recovered regional/API evidence for public selector/button acceptance;
-give T08 the backup/restore/escalation procedure; give C02 the exact-head
-rollback limit and final review/merge status. No approval, submission receipt,
-production backup or release result is inferred from this local rehearsal.
+Source and restored regional outcome counts matched exactly.
+
+| Country | Success | No data | Error/stale |
+| --- | --- | --- | --- |
+| US | 900 | 89 | 0 |
+| GB | 855 | 134 | 0 |
+| SG | 706 | 283 | 0 |
+| VN history | 0 | 989 | 0 |
+
+Valid, missing, stale and error supplementary states are also covered by the
+separately labelled two-movie synthetic native dump/restore test. Genuine source
+provider data remains documented at its original T04 verification.
+[T04 regional source record](../s5-t04-providers/regional-2026-11-10.md)
+
+## Recovered application checks
+
+FastAPI TestClient probes used an HTTPS base URL and the restricted runtime
+role connected to the verified Neon restore. Runtime TMDb calls were blocked.
+
+- Health returned 200 with the exact schema head and catalogue total 989.
+- Details switched US/GB/SG/default US across two real imported movies. Groups,
+  selected-country links and genuine null states matched the stored source.
+- VN, CA, lowercase and empty country values returned safe 400 validation errors.
+- Description Search and Similar succeeded after explicit index rebuild/check.
+- A/B logins retained their separate genres, exact 3.5/4.5 ratings and movie IDs
+  in each Watchlist. Cross-account rating checks remained empty as expected.
+- Reset on the disposable A account cleared its genres/rating, retained both
+  Watchlists and preserved B genres/rating/Watchlist identity.
+- Authenticated cookies survived a new application lifespan. Logout invalidated
+  the session and later login restored B's values. Cookie transfer in the private
+  verifier was corrected to preserve domain/path and the final run passed.
+- Deleting only the derived restore index and starting another lifespan rebuilt
+  it from Neon. It remained ready for 989 movies and 988 usable documents.
+- All restored catalogue/media/provider tables remained unchanged during these
+  account-flow checks. The development source was untouched. Runtime TMDb calls
+  were zero. Account/session writes occurred only on the isolated restore.
+
+Corpus digest is
+`714148f40f7c7788af159a2707804e23a5de47fc7b44e187a9aaa183a4ad2ec4`.
+Config fingerprint is
+`41785781f34ba44091ac64f3b1c0503402ee760c518af1429d0acb94bbc31c99`.
+
+On that isolated target, a controlled duplicate native restore and downgrade to
+VN-only both failed. Full before/after inspection verified all 12 tables were
+unchanged after each refusal, retaining head `d9a6f2c1e508`.
+
+## Actual code rollback
+
+The reviewed T03 source
+`f24ef54699efb2fa26f363107bd31401f9b12e58` was extracted privately and imported
+in a separate Python process. Its push-to-main CI succeeded.
+[Verified green CI](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/42756095162)
+
+That actual old code returned health 503 against the real regional Neon restore,
+confirming the exact-head compatibility limit. A separate local synthetic source
+was migrated with the old code to `a3d1f8b72c44`, populated with two movies and
+A/B data, and backed up before provider migration. After upgrading the source
+and adding regional data, its pre-provider archive was restored into the separate
+empty `s5_t06_roll_restored_20261110` database.
+
+All ten pre-provider tables matched before old-code application probes. The
+actual T03 code returned health 200, catalogue total 2, successful A/B logins,
+the exact separate genres, 3.5/4.5 ratings and Watchlists, description Search
+and Similar. Writes after the older recovery point require an explicit incident
+decision. This rehearsal left public routing and deployment settings untouched.
+
+## Remaining closure work
+
+On 10 November the PO confirmed that shared durable backup storage and a genuine
+independent reproduction were not yet available. The current archive is a local
+private rehearsal asset in an ignored operator directory. The selected policy is
+daily backup plus pre-change backup, retaining seven successful copies. Operational
+execution, durable replication and independent backup-operator access remain pending.
+
+| Requirement | Status |
+| --- | --- |
+| Comparator, refusals and focused tests | Verified |
+| Genuine full-catalogue Neon restore and API/account/index checks | Verified |
+| Actual compatible/incompatible reviewed-code rollback | Verified |
+| Durable private destination, daily execution and seven-copy retention | Pending |
+| Primary/backup operators' actual artifact access | Pending |
+| Named non-contributing teammate reproduction | Pending |
+| Substantive formal review and protected merge | Pending |
+
+Git stores the runbook, code and redacted evidence. The sensitive archive needs
+private durable storage and tested access by both operators. T07 receives the
+recovered regional/API results for its public-product acceptance. T08 receives
+the runbook and remaining storage/operator actions. C02 receives the exact-head
+rollback limit, green source and final review/merge status. Keep `Refs #253`
+until the remaining issue conditions are fulfilled.
