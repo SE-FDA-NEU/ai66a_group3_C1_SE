@@ -150,7 +150,8 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     if args.enrich_providers:
-        _print_provider_all_result(result, "stopped" if result.authentication_stopped else "complete")
+        stopped = result.authentication_stopped or result.retry_after_seconds is not None
+        _print_provider_all_result(result, "stopped" if stopped else "complete")
         return 1 if result.authentication_stopped or result.failed_movie_count else 0
     if args.all and not args.enrich_trailers:
         _print_image_all_result(result, "complete")
@@ -203,6 +204,8 @@ def _print_provider_all_result(result: TmdbProviderAllResult, status: str) -> No
     for key in ("eligible", "already_checked", "processed", "with_vn_data", "no_vn_data", "failed",
                 "valid_link", "missing_link", "invalid_link", "remaining"):
         print(f"{key}={getattr(result, key + '_movie_count')}")
+    if result.retry_after_seconds is not None:
+        print(f"retry_after_seconds={result.retry_after_seconds}")
 
 
 def _print_image_all_result(result: TmdbImageAllResult, status: str) -> None:

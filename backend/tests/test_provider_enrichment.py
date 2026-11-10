@@ -34,6 +34,7 @@ from app.integrations.tmdb import (
     TmdbClient,
     TmdbImportError,
     TmdbPayloadError,
+    TmdbRetryDeferredError,
 )
 from app.main import app, get_db
 from app.recommendations.overview_index import (
@@ -181,7 +182,7 @@ def test_shared_adapter_uses_auth_and_bounded_retry(monkeypatch, statuses, expec
     assert all(request.headers["Authorization"] == "Bearer synthetic-token" for request in calls)
 
 
-def test_timeout_retry_is_bounded_and_retry_after_is_capped(monkeypatch):
+def test_timeout_retry_is_bounded_and_retry_after_is_preserved(monkeypatch):
     from app.integrations.tmdb import _retry_delay
 
     calls, waits = [], []
@@ -197,9 +198,69 @@ def test_timeout_retry_is_bounded_and_retry_after_is_capped(monkeypatch):
     ):
         TmdbClient("synthetic-token", http_client=http).fetch_movie_watch_providers(101)
     assert len(calls) == 3 and waits == [1, 2]
-    assert _retry_delay("99999", 0) == 30
+    assert _retry_delay("99999", 0) == 99999
     assert _retry_delay("nonsense", 1) == 2
+    assert _retry_delay("NaN", 1) == 2
+    assert _retry_delay("Infinity", 1) == 2
     assert _retry_delay("Wed, 01 Jan 2020 00:00:00 GMT", 0) == 0
+
+
+@pytest.mark.parametrize("retry_after", ["120", "date"])
+def test_long_retry_after_defers_without_an_early_request(monkeypatch, retry_after):
+    calls, waits = [], []
+    monkeypatch.setattr("app.integrations.tmdb.sleep", waits.append)
+    if retry_after == "date":
+        from email.utils import format_datetime
+        retry_after = format_datetime(datetime.now(UTC) + timedelta(seconds=120), usegmt=True)
+
+    def respond(request):
+        calls.append(request)
+        return httpx.Response(429, headers={"Retry-After": retry_after})
+
+    with (
+        httpx.Client(base_url="https://api.themoviedb.org/3", transport=httpx.MockTransport(respond)) as http,
+        pytest.raises(TmdbRetryDeferredError) as error,
+    ):
+        TmdbClient("synthetic-token", http_client=http).fetch_movie_watch_providers(101)
+    assert 118 <= error.value.retry_after_seconds <= 120
+    assert len(calls) == 1 and waits == []
+
+
+def test_exhausted_rate_limit_defers_instead_of_calling_next_movie(monkeypatch):
+    waits = []
+    monkeypatch.setattr("app.integrations.tmdb.sleep", waits.append)
+    with (
+        httpx.Client(base_url="https://api.themoviedb.org/3", transport=httpx.MockTransport(
+            lambda _request: httpx.Response(429, headers={"Retry-After": "2"}),
+        )) as http,
+        pytest.raises(TmdbRetryDeferredError) as error,
+    ):
+        TmdbClient("synthetic-token", http_client=http).fetch_movie_watch_providers(101)
+    assert error.value.retry_after_seconds == 2 and waits == [2, 2]
+
+
+def test_deferred_refresh_preserves_success_and_resumes(database):
+    gateway = ProviderGateway()
+    enrich_tmdb_providers_all(database, client=gateway)
+    first_id = rows(database)[0].id
+    with database() as session:
+        before = session.get(MovieProviderCheck, (first_id, "VN"))
+        previous = (before.checked_at, before.watch_options_url)
+    gateway.calls.clear()
+    gateway.fail_at, gateway.failure = 101, TmdbRetryDeferredError(120)
+    result = enrich_tmdb_providers_all(database, client=gateway, refresh=True)
+    assert gateway.calls == [101]
+    assert result.retry_after_seconds == 120 and not result.authentication_stopped
+    assert result.processed_movie_count == result.failed_movie_count == result.remaining_movie_count == 1
+    with database() as session:
+        after = session.get(MovieProviderCheck, (first_id, "VN"))
+        assert after.status == "stale"
+        assert (after.checked_at, after.watch_options_url) == previous
+        assert len(after.providers) == 1
+    gateway.fail_at = None
+    resumed = enrich_tmdb_providers_all(database, client=gateway)
+    assert resumed.processed_movie_count == 1 and resumed.already_checked_movie_count == 1
+    assert resumed.failed_movie_count == resumed.remaining_movie_count == 0
 
 
 def test_persistence_reruns_and_last_success_survives_failure(database):

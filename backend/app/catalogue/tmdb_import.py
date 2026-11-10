@@ -25,6 +25,7 @@ from app.integrations.tmdb import (
     TmdbAuthenticationError,
     TmdbImportError,
     TmdbPayloadError,
+    TmdbRetryDeferredError,
 )
 from app.repositories.movies import (
     activate_catalogue_revision,
@@ -165,6 +166,7 @@ class TmdbProviderAllResult:
     invalid_link_movie_count: int = 0
     remaining_movie_count: int = 0
     authentication_stopped: bool = False
+    retry_after_seconds: float | None = None
 
 
 class TmdbProviderAllError(RuntimeError):
@@ -601,12 +603,14 @@ def enrich_tmdb_providers_all(
         movie_ids = [movie_id for movie_id, status in rows if refresh or status not in {"success", "no_data"}]
     totals = Counter()
     stopped = False
+    retry_after_seconds = None
 
     def snapshot() -> TmdbProviderAllResult:
         return TmdbProviderAllResult(
             active_revision_id=revision_id, eligible_movie_count=len(rows),
             already_checked_movie_count=len(rows) - len(movie_ids),
             remaining_movie_count=len(movie_ids) - totals["processed"], authentication_stopped=stopped,
+            retry_after_seconds=retry_after_seconds,
             **{key + "_movie_count": totals[key] for key in (
                 "processed", "with_vn_data", "no_vn_data", "failed", "valid_link", "missing_link", "invalid_link",
             )},
@@ -641,8 +645,9 @@ def enrich_tmdb_providers_all(
                     except TmdbImportError as exc:
                         check.status = "stale" if check.checked_at else "error"
                         batch["failed"] += 1
-                        if isinstance(exc, TmdbAuthenticationError):
-                            stopped = True
+                        if isinstance(exc, (TmdbAuthenticationError, TmdbRetryDeferredError)):
+                            stopped = isinstance(exc, TmdbAuthenticationError)
+                            retry_after_seconds = getattr(exc, "retry_after_seconds", None)
                             break
                         continue
                     check.status = "success" if providers else "no_data"
@@ -661,7 +666,7 @@ def enrich_tmdb_providers_all(
         except (SQLAlchemyError, ValueError) as exc:
             raise TmdbProviderAllError(snapshot()) from exc
         totals.update(batch)
-        if stopped:
+        if stopped or retry_after_seconds is not None:
             break
     return snapshot()
 

@@ -11,6 +11,7 @@ import os
 from collections.abc import Mapping
 from datetime import UTC, datetime
 from email.utils import parsedate_to_datetime
+from math import isfinite
 from time import sleep
 from typing import Any, Self
 
@@ -21,6 +22,7 @@ TMDB_SOURCE = "tmdb"
 DEFAULT_TIMEOUT_SECONDS = 10.0
 DEFAULT_POPULAR_PAGES = 50
 MAX_POPULAR_PAGES = 50
+MAX_RETRY_WAIT_SECONDS = 30.0
 # Movie videos default to en-US. A live TMDb probe showed that a broad ISO
 # 639-1 list can return an empty videos array even when the default request
 # has videos. This bounded fallback set was checked against the live endpoint.
@@ -45,6 +47,14 @@ class TmdbAuthenticationError(TmdbImportError):
 
 class TmdbRateLimitError(TmdbImportError):
     """TMDb temporarily rejected the import because of rate limiting."""
+
+
+class TmdbRetryDeferredError(TmdbRateLimitError):
+    """Stop this invocation until the provider's retry window has elapsed."""
+
+    def __init__(self, retry_after_seconds: float) -> None:
+        self.retry_after_seconds = retry_after_seconds
+        super().__init__("TMDb requested a deferred retry; resume after the reported delay")
 
 
 class TmdbPayloadError(TmdbImportError):
@@ -169,14 +179,20 @@ class TmdbClient:
                     sleep(2 ** attempt)
                     continue
                 raise TmdbImportError("TMDb request failed") from exc
-            if response.status_code in {408, 429, 500, 502, 503, 504} and attempt < retries:
-                sleep(_retry_delay(response.headers.get("Retry-After"), attempt))
-                continue
+            if response.status_code in {408, 429, 500, 502, 503, 504}:
+                delay = _retry_delay(response.headers.get("Retry-After"), attempt)
+                if retries and delay > MAX_RETRY_WAIT_SECONDS:
+                    raise TmdbRetryDeferredError(delay)
+                if attempt < retries:
+                    sleep(delay)
+                    continue
             break
 
         if response.status_code == 401:
             raise TmdbAuthenticationError("TMDb authentication failed")
         if response.status_code == 429:
+            if retries:
+                raise TmdbRetryDeferredError(_retry_delay(response.headers.get("Retry-After"), attempt))
             raise TmdbRateLimitError("TMDb rate limit reached")
         if not response.is_success:
             raise TmdbImportError("TMDb request failed")
@@ -192,7 +208,7 @@ class TmdbClient:
 
 
 def _retry_delay(retry_after: str | None, attempt: int) -> float:
-    """Honor numeric/HTTP-date Retry-After within a bounded 30-second wait."""
+    """Keep the full valid server delay; the caller bounds waits by deferring."""
     delay = float(2 ** attempt)
     if retry_after:
         try:
@@ -202,7 +218,7 @@ def _retry_delay(retry_after: str | None, attempt: int) -> float:
                 delay = (parsedate_to_datetime(retry_after) - datetime.now(UTC)).total_seconds()
             except (ValueError, TypeError, OverflowError):
                 pass
-    return max(0.0, min(delay, 30.0))
+    return max(0.0, delay) if isfinite(delay) else float(2 ** attempt)
 
 
 def _required_object_list(

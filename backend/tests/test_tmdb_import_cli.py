@@ -265,6 +265,21 @@ def test_provider_cli_database_failure_reports_committed_counts_only(monkeypatch
     assert captured.err == "TMDb provider enrichment failed: current batch rolled back or catalogue changed\n"
 
 
+def test_provider_cli_deferred_retry_reports_delay_and_remaining(monkeypatch, capsys):
+    monkeypatch.setattr(command.TmdbClient, "from_environment", lambda: _FakeClient())
+    monkeypatch.setattr(command, "enrich_tmdb_providers_all", lambda *_args, **_kwargs: TmdbProviderAllResult(
+        active_revision_id="revision-id", eligible_movie_count=2, already_checked_movie_count=0,
+        processed_movie_count=1, failed_movie_count=1, remaining_movie_count=1,
+        retry_after_seconds=120,
+    ))
+    assert command.main(["--enrich-providers", "--all"]) == 1
+    captured = capsys.readouterr()
+    assert captured.out.startswith("TMDb VN provider enrichment all stopped\n")
+    assert "failed=1\n" in captured.out and "remaining=1\n" in captured.out
+    assert "retry_after_seconds=120\n" in captured.out
+    assert captured.err == ""
+
+
 class _FakeClient:
     def __enter__(self) -> Self:
         return self
