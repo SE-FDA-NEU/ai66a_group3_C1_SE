@@ -1,6 +1,10 @@
 """Public movie catalogue data shapes."""
 
-from pydantic import BaseModel, ConfigDict
+from typing import Literal
+
+from pydantic import BaseModel, ConfigDict, Field
+
+from app.catalogue.providers import DEFAULT_PROVIDER_COUNTRY, ProviderCountry
 
 
 class GenreDto(BaseModel):
@@ -40,6 +44,36 @@ class MovieDetailDto(BaseModel):
     backdropUrl: str | None
     posterUrl: str | None = None
     trailer: "TrailerDto | None" = None
+    providers: "MovieProvidersDto" = Field(default_factory=lambda: MovieProvidersDto())
+    watchOptionsUrl: str | None = None
+
+
+class WatchProviderDto(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    id: int
+    name: str
+    logoUrl: str | None
+
+
+class ProviderGroupsDto(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    flatrate: list[WatchProviderDto] = Field(default_factory=list)
+    rent: list[WatchProviderDto] = Field(default_factory=list)
+    buy: list[WatchProviderDto] = Field(default_factory=list)
+    free: list[WatchProviderDto] = Field(default_factory=list)
+    ads: list[WatchProviderDto] = Field(default_factory=list)
+
+
+class MovieProvidersDto(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    country: ProviderCountry = DEFAULT_PROVIDER_COUNTRY
+    status: Literal["not_checked", "success", "no_data", "error", "stale"] = "not_checked"
+    attemptedAt: str | None = None
+    checkedAt: str | None = None
+    groups: ProviderGroupsDto = Field(default_factory=ProviderGroupsDto)
 
 
 class TrailerDto(BaseModel):

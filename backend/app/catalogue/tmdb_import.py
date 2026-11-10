@@ -11,12 +11,17 @@ from typing import Any, Protocol
 
 from sqlalchemy import func, select
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from app.catalogue.backdrops import valid_backdrop_path
 from app.catalogue.posters import valid_poster_path
+from app.catalogue.providers import (
+    SUPPORTED_COUNTRIES,
+    ProviderCountry,
+    select_regional_providers,
+)
 from app.catalogue.trailers import Trailer, select_trailer
-from app.db.models import CatalogMovie, utc_now
+from app.db.models import CatalogMovie, MovieProviderCheck, MovieWatchProvider, utc_now
 from app.integrations.tmdb import (
     DEFAULT_POPULAR_PAGES,
     MAX_POPULAR_PAGES,
@@ -48,6 +53,8 @@ class TmdbCatalogueGateway(Protocol):
     def fetch_movie_details(self, movie_id: int) -> Mapping[str, Any]: ...
 
     def fetch_movie_videos(self, movie_id: int) -> Mapping[str, Any]: ...
+
+    def fetch_movie_watch_providers(self, movie_id: int) -> Mapping[str, Any]: ...
 
 
 @dataclass(frozen=True)
@@ -146,6 +153,49 @@ class TmdbTrailerAllDatabaseError(SQLAlchemyError):
     def __init__(self, partial_result: TmdbTrailerAllResult) -> None:
         self.partial_result = partial_result
         super().__init__("trailer enrichment batch failed")
+
+
+@dataclass(frozen=True)
+class TmdbProviderRegionResult:
+    country: ProviderCountry
+    eligible_movie_count: int
+    already_checked_movie_count: int
+    processed_movie_count: int = 0
+    with_data_movie_count: int = 0
+    no_data_movie_count: int = 0
+    failed_movie_count: int = 0
+    valid_link_movie_count: int = 0
+    missing_link_movie_count: int = 0
+    invalid_link_movie_count: int = 0
+    remaining_movie_count: int = 0
+
+
+@dataclass(frozen=True)
+class TmdbProviderAllResult:
+    active_revision_id: str
+    eligible_movie_count: int
+    already_checked_movie_count: int
+    processed_movie_count: int = 0
+    with_data_movie_count: int = 0
+    no_data_movie_count: int = 0
+    failed_movie_count: int = 0
+    valid_link_movie_count: int = 0
+    missing_link_movie_count: int = 0
+    invalid_link_movie_count: int = 0
+    remaining_movie_count: int = 0
+    movie_fetch_count: int = 0
+    http_request_count: int = 0
+    authentication_stopped: bool = False
+    retry_after_seconds: float | None = None
+    regions: tuple[TmdbProviderRegionResult, ...] = ()
+
+
+class TmdbProviderAllError(RuntimeError):
+    """Safe partial counts include only batches committed before the failure."""
+
+    def __init__(self, partial_result: TmdbProviderAllResult) -> None:
+        self.partial_result = partial_result
+        super().__init__("provider batch failed or active catalogue changed")
 
 
 @dataclass(frozen=True)
@@ -545,6 +595,149 @@ def enrich_tmdb_trailers_all(
         remaining = batch.remaining_movie_count
         authentication_stopped = batch.authentication_stopped
         if authentication_stopped:
+            break
+    return snapshot()
+
+
+def enrich_tmdb_providers_all(
+    session_factory: Callable[[], Session], *, client: TmdbCatalogueGateway,
+    batch_size: int = MAX_ENRICHMENT_MOVIES, refresh: bool = False,
+    countries: Sequence[ProviderCountry] = SUPPORTED_COUNTRIES,
+) -> TmdbProviderAllResult:
+    """Fetch each pending movie once and update its selected regional checks."""
+    if type(batch_size) is not int or not 1 <= batch_size <= MAX_ENRICHMENT_MOVIES:
+        raise ValueError(f"batch_size must be an integer from 1 to {MAX_ENRICHMENT_MOVIES}")
+    countries = tuple(countries)
+    if not countries or len(set(countries)) != len(countries) or any(
+        country not in SUPPORTED_COUNTRIES for country in countries
+    ):
+        raise ValueError("Choose unique provider countries from US, GB and SG")
+    with session_factory() as session:
+        revision = get_active_catalogue_revision(session)
+        if revision is None or revision.provider != TMDB_SOURCE:
+            raise ValueError("an active TMDb catalogue is required for provider enrichment")
+        revision_id = revision.id
+        active = (CatalogMovie.catalogue_revision_id == revision_id, CatalogMovie.source == TMDB_SOURCE)
+        all_ids = list(session.scalars(select(CatalogMovie.id).where(*active).order_by(
+            CatalogMovie.source_id, CatalogMovie.id,
+        )))
+        statuses = {(movie_id, country): status for movie_id, country, status in session.execute(
+            select(MovieProviderCheck.movie_id, MovieProviderCheck.country, MovieProviderCheck.status)
+            .join(CatalogMovie, CatalogMovie.id == MovieProviderCheck.movie_id)
+            .where(*active, MovieProviderCheck.country.in_(countries))
+        )}
+    pending = {movie_id: tuple(country for country in countries if refresh or
+               statuses.get((movie_id, country)) not in {"success", "no_data"}) for movie_id in all_ids}
+    movie_ids = [movie_id for movie_id in all_ids if pending[movie_id]]
+    eligible = {country: sum(country in pending[movie_id] for movie_id in all_ids) for country in countries}
+    totals = Counter()
+    region_totals = {country: Counter() for country in countries}
+    stopped = False
+    retry_after_seconds = None
+    fetches = 0
+    initial_requests = getattr(client, "request_count", 0)
+
+    def snapshot() -> TmdbProviderAllResult:
+        regions = tuple(TmdbProviderRegionResult(
+            country=country, eligible_movie_count=len(all_ids),
+            already_checked_movie_count=len(all_ids) - eligible[country],
+            remaining_movie_count=eligible[country] - region_totals[country]["processed"],
+            **{key + "_movie_count": region_totals[country][key] for key in (
+                "processed", "with_data", "no_data", "failed", "valid_link", "missing_link", "invalid_link",
+            )},
+        ) for country in countries)
+        return TmdbProviderAllResult(
+            active_revision_id=revision_id, eligible_movie_count=len(all_ids),
+            already_checked_movie_count=len(all_ids) - len(movie_ids),
+            remaining_movie_count=len(movie_ids) - totals["processed"],
+            authentication_stopped=stopped, retry_after_seconds=retry_after_seconds,
+            movie_fetch_count=fetches,
+            http_request_count=getattr(client, "request_count", initial_requests + fetches) - initial_requests,
+            regions=regions,
+            **{key + "_movie_count": totals[key] for key in (
+                "processed", "with_data", "no_data", "failed", "valid_link", "missing_link", "invalid_link",
+            )},
+        )
+
+    for offset in range(0, len(movie_ids), batch_size):
+        selected = movie_ids[offset:offset + batch_size]
+        batch = Counter()
+        regional_batch = {country: Counter() for country in countries}
+        try:
+            with session_factory() as session, session.begin():
+                current = get_active_catalogue_revision(session)
+                if current is None or current.id != revision_id:
+                    raise ValueError("active catalogue changed during provider enrichment")
+                movies = _select_image_movies(session, active, batch_size, selected)
+                checks = {(check.movie_id, check.country): check for check in session.scalars(
+                    select(MovieProviderCheck).where(MovieProviderCheck.movie_id.in_(selected),
+                        MovieProviderCheck.country.in_(countries)).options(selectinload(MovieProviderCheck.providers))
+                )}
+                for movie in movies:
+                    if not movie.source_id.isascii() or not movie.source_id.isdecimal() or int(movie.source_id) <= 0:
+                        raise ValueError("active TMDb catalogue contains an invalid source ID")
+                    attempted_at = utc_now()
+                    request_error = None
+                    fetches += 1
+                    try:
+                        payload = client.fetch_movie_watch_providers(int(movie.source_id))
+                    except TmdbImportError as exc:
+                        request_error = exc
+                        stopped = isinstance(exc, TmdbAuthenticationError)
+                        retry_after_seconds = getattr(exc, "retry_after_seconds", None)
+                    outcomes = Counter()
+                    for country in pending[movie.id]:
+                        check = checks.get((movie.id, country))
+                        if check is None:
+                            check = MovieProviderCheck(movie_id=movie.id, country=country,
+                                status="error", attempted_at=attempted_at, providers=[])
+                            session.add(check)
+                        check.attempted_at = attempted_at
+                        regional_batch[country]["processed"] += 1
+                        try:
+                            if request_error is not None:
+                                raise request_error
+                            providers, link, link_status = select_regional_providers(
+                                payload, int(movie.source_id), country,
+                            )
+                        except TmdbImportError:
+                            check.status = "stale" if check.checked_at else "error"
+                            regional_batch[country]["failed"] += 1
+                            outcomes["failed"] += 1
+                            continue
+                        check.status = "success" if providers else "no_data"
+                        check.checked_at = utc_now()
+                        check.watch_options_url, check.link_status = link, link_status
+                        if check.providers:
+                            check.providers.clear()
+                            session.flush()  # Delete old composite keys before inserting replacements.
+                        check.providers.extend(MovieWatchProvider(
+                            movie_id=movie.id, country=country, availability_type=provider.group,
+                            provider_id=provider.provider_id, name=provider.name, logo_path=provider.logo_path,
+                        ) for provider in providers)
+                        outcome = "with_data" if providers else "no_data"
+                        regional_batch[country][outcome] += 1
+                        regional_batch[country][link_status + "_link"] += 1
+                        outcomes[outcome] += 1
+                        outcomes[link_status + "_link"] += 1
+                    batch["processed"] += 1
+                    if outcomes["failed"]:
+                        batch["failed"] += 1
+                    else:
+                        batch["with_data" if outcomes["with_data"] else "no_data"] += 1
+                        link_outcome = "invalid_link" if outcomes["invalid_link"] else (
+                            "valid_link" if outcomes["valid_link"] else "missing_link"
+                        )
+                        batch[link_outcome] += 1
+                    if stopped or retry_after_seconds is not None:
+                        break
+                session.flush()
+        except (SQLAlchemyError, ValueError) as exc:
+            raise TmdbProviderAllError(snapshot()) from exc
+        totals.update(batch)
+        for country in countries:
+            region_totals[country].update(regional_batch[country])
+        if stopped or retry_after_seconds is not None:
             break
     return snapshot()
 

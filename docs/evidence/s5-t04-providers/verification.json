@@ -1,0 +1,176 @@
+{
+  "date": "2026-11-10",
+  "timezone": "Asia/Ho_Chi_Minh",
+  "testedSourceCommit": "42b14bdfffe31f91c9fec7ad5f767722421c855a",
+  "database": "cineai_development",
+  "publicRuntimeDatabase": "neondb",
+  "environment": "local operator/ASGI TestClient with real Neon development; public runtime rollout pending",
+  "serverVersion": "18.6 (ac70818)",
+  "schemaHead": "b8e4d2c96f10",
+  "catalogueMatchesRuntimeBeforeMigration": true,
+  "existingRowsPreservedByMigration": true,
+  "activeRevision": "1ee08003-bc00-4888-b35c-8c6cbe599062",
+  "fullRefresh": {
+    "active_revision": "1ee08003-bc00-4888-b35c-8c6cbe599062",
+    "eligible": 989,
+    "already_checked": 0,
+    "processed": 989,
+    "with_vn_data": 0,
+    "no_vn_data": 989,
+    "failed": 0,
+    "valid_link": 0,
+    "missing_link": 989,
+    "invalid_link": 0,
+    "remaining": 0
+  },
+  "fullRefreshElapsedSeconds": 423.07,
+  "noopResume": {
+    "active_revision": "1ee08003-bc00-4888-b35c-8c6cbe599062",
+    "eligible": 989,
+    "already_checked": 989,
+    "processed": 0,
+    "with_vn_data": 0,
+    "no_vn_data": 0,
+    "failed": 0,
+    "valid_link": 0,
+    "missing_link": 0,
+    "invalid_link": 0,
+    "remaining": 0
+  },
+  "resumeAfterControlledFailure": {
+    "active_revision": "1ee08003-bc00-4888-b35c-8c6cbe599062",
+    "eligible": 989,
+    "already_checked": 988,
+    "processed": 1,
+    "with_vn_data": 0,
+    "no_vn_data": 1,
+    "failed": 0,
+    "valid_link": 0,
+    "missing_link": 1,
+    "invalid_link": 0,
+    "remaining": 0
+  },
+  "TMDbRegionProbe": {
+    "endpoint": "/watch/providers/regions",
+    "returnedRegions": 139,
+    "VNListed": false
+  },
+  "finalStatusCounts": {
+    "no_data": 989
+  },
+  "finalLinkCounts": {
+    "missing": 989
+  },
+  "providerMemberships": 0,
+  "coreFingerprintsPreserved": true,
+  "index": {
+    "movies": 989,
+    "usableDocuments": 988,
+    "corpusDigest": "714148f40f7c7788af159a2707804e23a5de47fc7b44e187a9aaa183a4ad2ec4",
+    "configFingerprint": "41785781f34ba44091ac64f3b1c0503402ee760c518af1429d0acb94bbc31c99"
+  },
+  "accountChecks": {
+    "A": {
+      "genresPreserved": true,
+      "ratingPreserved": true,
+      "watchlistPreserved": true,
+      "isolationPassed": true
+    },
+    "B": {
+      "genresPreserved": true,
+      "ratingPreserved": true,
+      "watchlistPreserved": true,
+      "isolationPassed": true
+    }
+  },
+  "detailsSamples": [
+    {
+      "movieId": "2626f71e-8458-491c-a1f4-c2017d8f684b",
+      "status": "no_data",
+      "watchOptionsUrl": null,
+      "country": "VN",
+      "groupCounts": {
+        "flatrate": 0,
+        "rent": 0,
+        "buy": 0,
+        "free": 0,
+        "ads": 0
+      }
+    },
+    {
+      "movieId": "311ba592-b894-4a79-be34-186d6cb03a0d",
+      "status": "no_data",
+      "watchOptionsUrl": null,
+      "country": "VN",
+      "groupCounts": {
+        "flatrate": 0,
+        "rent": 0,
+        "buy": 0,
+        "free": 0,
+        "ads": 0
+      }
+    }
+  ],
+  "runtimeDetailsTmdbCalls": 0,
+  "runtimeRolePermissions": {
+    "movie_provider_checks": {
+      "select": true,
+      "write": false
+    },
+    "movie_watch_providers": {
+      "select": true,
+      "write": false
+    }
+  },
+  "TLS": {
+    "clientActive": true,
+    "mode": "verify-full",
+    "channelBinding": "require",
+    "CA": "certifi"
+  },
+  "controlledStaleCheck": {
+    "simulatedFailure": true,
+    "priorSuccessfulCheckAndDataPreserved": true,
+    "detailsVerified": true,
+    "processed": 1,
+    "failed": 1,
+    "remaining": 988
+  },
+  "privateBackups": {
+    "before": {
+      "privateFile": "development-before-t04.dump",
+      "bytes": 324644,
+      "sha256": "2dd2b868976d1de615719c00f896dfe15af1911cfee8d61b3e184d2097b08b6e",
+      "archiveListVerified": true
+    },
+    "after": {
+      "database": "cineai_development",
+      "privateFile": "development-after-t04.dump",
+      "bytes": 367461,
+      "sha256": "7d7aa7f271ed06f405ef91aa7c34096c98b0567de2a9d66a1c1d4267f478d759",
+      "bothProviderTablesInArchive": true,
+      "restoreExecuted": false
+    }
+  },
+  "automatedChecks": {
+    "affectedBackendPassed": 247,
+    "postgresql18Passed": 12,
+    "P0Passed": 40,
+    "productionAndBootstrapPassed": 50,
+    "startupRetryAssertionsRedBeforeFix": 5,
+    "ruff": "passed",
+    "diffCheck": "passed"
+  },
+  "pending": [
+    "independent substantive review of final candidate",
+    "reviewed merge",
+    "coordinated public runtime backup/migration/grants/enrichment/deployment and verification"
+  ],
+  "publicRuntimeFinalReadOnlyCheck": {
+    "database": "neondb",
+    "head": "a3d1f8b72c44",
+    "unchangedTables": 10,
+    "changedTables": [],
+    "T04MigrationApplied": false
+  }
+}

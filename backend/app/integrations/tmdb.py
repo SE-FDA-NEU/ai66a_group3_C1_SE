@@ -9,6 +9,10 @@ from __future__ import annotations
 
 import os
 from collections.abc import Mapping
+from datetime import UTC, datetime
+from email.utils import parsedate_to_datetime
+from math import isfinite
+from time import sleep
 from typing import Any, Self
 
 import httpx
@@ -18,6 +22,7 @@ TMDB_SOURCE = "tmdb"
 DEFAULT_TIMEOUT_SECONDS = 10.0
 DEFAULT_POPULAR_PAGES = 50
 MAX_POPULAR_PAGES = 50
+MAX_RETRY_WAIT_SECONDS = 30.0
 # Movie videos default to en-US. A live TMDb probe showed that a broad ISO
 # 639-1 list can return an empty videos array even when the default request
 # has videos. This bounded fallback set was checked against the live endpoint.
@@ -42,6 +47,14 @@ class TmdbAuthenticationError(TmdbImportError):
 
 class TmdbRateLimitError(TmdbImportError):
     """TMDb temporarily rejected the import because of rate limiting."""
+
+
+class TmdbRetryDeferredError(TmdbRateLimitError):
+    """Stop this invocation until the provider's retry window has elapsed."""
+
+    def __init__(self, retry_after_seconds: float) -> None:
+        self.retry_after_seconds = retry_after_seconds
+        super().__init__("TMDb requested a deferred retry; resume after the reported delay")
 
 
 class TmdbPayloadError(TmdbImportError):
@@ -73,6 +86,7 @@ class TmdbClient:
             "Accept": "application/json",
         }
         self._owns_http_client = http_client is None
+        self.request_count = 0
         self._http_client = http_client or httpx.Client(
             base_url=TMDB_BASE_URL,
             timeout=DEFAULT_TIMEOUT_SECONDS,
@@ -137,28 +151,50 @@ class TmdbClient:
             params={"language": "en-US", "include_video_language": VIDEO_LANGUAGES},
         )
 
+    def fetch_movie_watch_providers(self, movie_id: int) -> Mapping[str, Any]:
+        """At most three timed requests per movie, including transient retries."""
+        if type(movie_id) is not int or movie_id <= 0:
+            raise ValueError("movie_id must be positive")
+        return self._get_json(f"/movie/{movie_id}/watch/providers", params={}, retries=2)
+
     def _get_json(
-        self, path: str, *, params: Mapping[str, str | int]
+        self, path: str, *, params: Mapping[str, str | int], retries: int = 0
     ) -> Mapping[str, Any]:
-        try:
-            response = self._http_client.get(
-                path,
-                params=params,
-                headers=self._headers,
-            )
-        except httpx.TimeoutException as exc:
-            raise TmdbImportError("TMDb request timed out") from exc
-        except httpx.ConnectError as exc:
-            raise TmdbImportError(
-                "TMDb request failed; check network/DNS access to "
-                "api.themoviedb.org"
-            ) from exc
-        except httpx.HTTPError as exc:
-            raise TmdbImportError("TMDb request failed") from exc
+        for attempt in range(retries + 1):
+            try:
+                self.request_count += 1
+                response = self._http_client.get(path, params=params, headers=self._headers)
+            except httpx.TimeoutException as exc:
+                if attempt < retries:
+                    sleep(2 ** attempt)
+                    continue
+                raise TmdbImportError("TMDb request timed out") from exc
+            except httpx.ConnectError as exc:
+                if attempt < retries:
+                    sleep(2 ** attempt)
+                    continue
+                raise TmdbImportError(
+                    "TMDb request failed; check network/DNS access to api.themoviedb.org"
+                ) from exc
+            except httpx.HTTPError as exc:
+                if attempt < retries:
+                    sleep(2 ** attempt)
+                    continue
+                raise TmdbImportError("TMDb request failed") from exc
+            if response.status_code in {408, 429, 500, 502, 503, 504}:
+                delay = _retry_delay(response.headers.get("Retry-After"), attempt)
+                if retries and delay > MAX_RETRY_WAIT_SECONDS:
+                    raise TmdbRetryDeferredError(delay)
+                if attempt < retries:
+                    sleep(delay)
+                    continue
+            break
 
         if response.status_code == 401:
             raise TmdbAuthenticationError("TMDb authentication failed")
         if response.status_code == 429:
+            if retries:
+                raise TmdbRetryDeferredError(_retry_delay(response.headers.get("Retry-After"), attempt))
             raise TmdbRateLimitError("TMDb rate limit reached")
         if not response.is_success:
             raise TmdbImportError("TMDb request failed")
@@ -171,6 +207,20 @@ class TmdbClient:
         if not isinstance(payload, Mapping):
             raise TmdbPayloadError("TMDb returned an invalid response")
         return payload
+
+
+def _retry_delay(retry_after: str | None, attempt: int) -> float:
+    """Keep the full valid server delay; the caller bounds waits by deferring."""
+    delay = float(2 ** attempt)
+    if retry_after:
+        try:
+            delay = float(retry_after)
+        except ValueError:
+            try:
+                delay = (parsedate_to_datetime(retry_after) - datetime.now(UTC)).total_seconds()
+            except (ValueError, TypeError, OverflowError):
+                pass
+    return max(0.0, delay) if isfinite(delay) else float(2 ** attempt)
 
 
 def _required_object_list(

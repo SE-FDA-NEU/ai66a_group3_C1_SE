@@ -12,6 +12,13 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.catalogue.backdrops import backdrop_url
 from app.catalogue.posters import poster_url
+from app.catalogue.providers import (
+    DEFAULT_PROVIDER_COUNTRY,
+    PROVIDER_GROUPS,
+    ProviderCountry,
+    provider_logo_url,
+    watch_options_url,
+)
 from app.catalogue.trailers import youtube_url
 from app.db.models import (
     CatalogMovie,
@@ -19,11 +26,20 @@ from app.db.models import (
     CatalogueState,
     Genre,
     MovieGenre,
+    MovieProviderCheck,
     new_opaque_id,
     utc_now,
 )
 from app.recommendations.overview_index import normalize_text
-from app.schemas.movies import GenreDto, MovieDetailDto, MovieSummaryDto, TrailerDto
+from app.schemas.movies import (
+    GenreDto,
+    MovieDetailDto,
+    MovieProvidersDto,
+    MovieSummaryDto,
+    ProviderGroupsDto,
+    TrailerDto,
+    WatchProviderDto,
+)
 
 ACTIVE_CATALOGUE_STATE_ID = 1
 CatalogueSort = Literal["title_asc", "title_desc"]
@@ -369,7 +385,8 @@ def get_active_movie_by_id(session: Session, *, movie_id: str) -> CatalogMovie |
             CatalogueState.id == ACTIVE_CATALOGUE_STATE_ID,
             CatalogMovie.id == movie_id,
         )
-        .options(selectinload(CatalogMovie.genres))
+        .options(selectinload(CatalogMovie.genres),
+                 selectinload(CatalogMovie.provider_checks).selectinload(MovieProviderCheck.providers))
     )
     return session.scalar(statement)
 
@@ -388,9 +405,19 @@ def to_movie_summary_dto(movie: CatalogMovie) -> MovieSummaryDto:
     )
 
 
-def to_movie_detail_dto(movie: CatalogMovie) -> MovieDetailDto:
+def to_movie_detail_dto(
+    movie: CatalogMovie, country: ProviderCountry = DEFAULT_PROVIDER_COUNTRY,
+) -> MovieDetailDto:
     """Project a catalogue movie to the safe public detail shape."""
 
+    check = next((check for check in movie.provider_checks if check.country == country), None)
+    groups = {group: [] for group in PROVIDER_GROUPS}
+    if check:
+        for provider in sorted(check.providers, key=lambda row: (row.availability_type, row.provider_id)):
+            if provider.country == country and provider.availability_type in groups:
+                groups[provider.availability_type].append(WatchProviderDto(
+                    id=provider.provider_id, name=provider.name, logoUrl=provider_logo_url(provider.logo_path),
+                ))
     return MovieDetailDto(
         id=movie.id,
         title=movie.title,
@@ -403,7 +430,25 @@ def to_movie_detail_dto(movie: CatalogMovie) -> MovieDetailDto:
         backdropUrl=backdrop_url(movie.backdrop_path),
         posterUrl=poster_url(movie.poster_path),
         trailer=_trailer_dto(movie),
+        providers=MovieProvidersDto(
+            country=country,
+            status=check.status if check else "not_checked",
+            attemptedAt=_provider_timestamp(check.attempted_at) if check else None,
+            checkedAt=_provider_timestamp(check.checked_at) if check else None,
+            groups=ProviderGroupsDto(**groups),
+        ),
+        watchOptionsUrl=(watch_options_url(check.watch_options_url, int(movie.source_id), country)
+                         if check and movie.source == "tmdb" and movie.source_id.isascii()
+                         and movie.source_id.isdecimal() else None),
     )
+
+
+def _provider_timestamp(value: datetime | None) -> str | None:
+    if value is None:
+        return None
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=UTC)
+    return value.astimezone(UTC).isoformat().replace("+00:00", "Z")
 
 
 def _trailer_dto(movie: CatalogMovie) -> TrailerDto | None:

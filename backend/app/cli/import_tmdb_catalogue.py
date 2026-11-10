@@ -8,15 +8,19 @@ from datetime import UTC, datetime
 
 from sqlalchemy.exc import SQLAlchemyError
 
+from app.catalogue.providers import SUPPORTED_COUNTRIES
 from app.catalogue.tmdb_import import (
     MAX_ENRICHMENT_MOVIES,
     TmdbImageAllError,
     TmdbImageAllResult,
+    TmdbProviderAllError,
+    TmdbProviderAllResult,
     TmdbTrailerAllDatabaseError,
     TmdbTrailerAllResult,
     enrich_tmdb_backdrops,
     enrich_tmdb_images_all,
     enrich_tmdb_posters,
+    enrich_tmdb_providers_all,
     enrich_tmdb_trailers,
     enrich_tmdb_trailers_all,
     import_tmdb_catalogue,
@@ -55,6 +59,16 @@ def main(argv: list[str] | None = None) -> int:
         "--enrich-trailers", action="store_true",
         help="Update optional trailer metadata/status on existing active TMDb movies.",
     )
+    enrichment.add_argument(
+        "--enrich-providers", action="store_true",
+        help="Check regional providers and supplied TMDb watch links across the active catalogue.",
+    )
+    parser.add_argument("--countries", nargs="+", choices=SUPPORTED_COUNTRIES,
+                        help="Provider countries (default: US GB SG). Requires --enrich-providers --all.")
+    parser.add_argument(
+        "--refresh", action="store_true",
+        help="Recheck successful/no-data movies too (requires --enrich-providers --all).",
+    )
     parser.add_argument(
         "--limit",
         type=int,
@@ -64,16 +78,24 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument(
         "--all", action="store_true",
-        help="Enrich all active images, or all pending trailers, in committed batches.",
+        help="Enrich the whole active catalogue in committed batches; trailers/providers resume pending work.",
     )
     args = parser.parse_args(argv)
-    media_only = args.enrich_backdrops or args.enrich_posters or args.enrich_trailers
+    media_only = args.enrich_backdrops or args.enrich_posters or args.enrich_trailers or args.enrich_providers
     if media_only and args.pages is not None:
         parser.error("--pages cannot be combined with media-only enrichment")
     if not media_only and args.limit is not None:
         parser.error("--limit requires an enrichment mode")
     if args.all and not media_only:
         parser.error("--all requires an enrichment mode")
+    if args.enrich_providers and not args.all:
+        parser.error("--enrich-providers requires --all; --limit controls committed batch size")
+    if args.refresh and not args.enrich_providers:
+        parser.error("--refresh requires --enrich-providers --all")
+    if args.countries and not args.enrich_providers:
+        parser.error("--countries requires --enrich-providers --all")
+    if args.countries and len(set(args.countries)) != len(args.countries):
+        parser.error("--countries must contain unique country codes")
 
     try:
         client = TmdbClient.from_environment()
@@ -83,7 +105,13 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         with client:
-            if args.all and args.enrich_trailers:
+            if args.enrich_providers:
+                result = enrich_tmdb_providers_all(
+                    SessionLocal, client=client, batch_size=args.limit or MAX_ENRICHMENT_MOVIES,
+                    refresh=args.refresh,
+                    countries=tuple(args.countries or SUPPORTED_COUNTRIES),
+                )
+            elif args.all and args.enrich_trailers:
                 result = enrich_tmdb_trailers_all(
                     SessionLocal, client=client,
                     batch_size=args.limit or MAX_ENRICHMENT_MOVIES,
@@ -107,6 +135,10 @@ def main(argv: list[str] | None = None) -> int:
                         result = import_tmdb_catalogue(
                             session, client=client, pages=args.pages or DEFAULT_POPULAR_PAGES
                         )
+    except TmdbProviderAllError as exc:
+        _print_provider_all_result(exc.partial_result, "failed")
+        sys.stderr.write("TMDb provider enrichment failed: current batch rolled back or catalogue changed\n")
+        return 1
     except TmdbImageAllError as exc:
         _print_image_all_result(exc.partial_result, "failed")
         sys.stderr.write(f"TMDb image enrichment failed: {exc.reason}; current batch rolled back\n")
@@ -125,6 +157,10 @@ def main(argv: list[str] | None = None) -> int:
         sys.stderr.write("TMDb catalogue import failed: catalogue validation failed\n")
         return 1
 
+    if args.enrich_providers:
+        stopped = result.authentication_stopped or result.retry_after_seconds is not None
+        _print_provider_all_result(result, "stopped" if stopped else "complete")
+        return 1 if result.authentication_stopped or result.failed_movie_count else 0
     if args.all and not args.enrich_trailers:
         _print_image_all_result(result, "complete")
         return 0
@@ -168,6 +204,23 @@ def main(argv: list[str] | None = None) -> int:
     print(f"imported_at={_utc_timestamp(result.imported_at)}")
     print(f"sample_source_ids={','.join(result.sample_source_ids)}")
     return 0
+
+
+def _print_provider_all_result(result: TmdbProviderAllResult, status: str) -> None:
+    print(f"TMDb regional provider enrichment all {status}")
+    print(f"active_revision={result.active_revision_id}")
+    fields = ("eligible", "already_checked", "processed", "with_data", "no_data", "failed",
+              "valid_link", "missing_link", "invalid_link", "remaining")
+    for key in fields:
+        print(f"{key}={getattr(result, key + '_movie_count')}")
+    print(f"movie_fetches={result.movie_fetch_count}")
+    print(f"http_requests={result.http_request_count}")
+    print(f"http_retries={max(0, result.http_request_count - result.movie_fetch_count)}")
+    for region in result.regions:
+        for key in fields:
+            print(f"{region.country}.{key}={getattr(region, key + '_movie_count')}")
+    if result.retry_after_seconds is not None:
+        print(f"retry_after_seconds={result.retry_after_seconds}")
 
 
 def _print_image_all_result(result: TmdbImageAllResult, status: str) -> None:

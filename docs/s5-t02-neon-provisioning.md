@@ -96,7 +96,7 @@ T02 runs the backend locally or on staging against the **real Neon target** and 
 
 Verify a valid index on one startup; delete **only** the derived index file on the test instance and restart to prove rebuilding from Neon; also verify a stale index is rebuilt, using the focused fixture plus an appropriate live check. After each restart, run `check`, description Search and Similar, and verify the exact A/B preferences, sessions, half-star ratings and Watchlists again. An artifact deletion affects only derived data; PostgreSQL account rows remain. The documented Uvicorn command emits the `NLP index ready` record through its INFO logger; confirm that record appears before relying on it. Record its revision, digest, config, movie/usable-document counts and `elapsed_seconds`, plus observed CPU/memory from a named tool on the actual machine/environment. Local/staging numbers are labelled local/staging; they are never reported as Render numbers.
 
-T02 can complete after these Neon-backed checks and an eligible review; it does not wait for T03's Render deployment or T04's provider/link enrichment. T03 independently verifies startup/readiness on Render after handoff. Give T03 the environment variable names, startup command, index path and Neon-backed readiness/restart results; give T04 the active revision, real TMDb IDs and PostgreSQL 18 connection interface for VN providers and `watchOptionsUrl`; give T08 the actual setup/results and approved test-account handoff. T04 owns provider schema, enrichment and DTO; T05 owns the TMDb button.
+T02 can complete after these Neon-backed checks and an eligible review; it does not wait for T03's Render deployment or T04's provider/link enrichment. T03 independently verifies startup/readiness on Render after handoff. Give T03 the environment variable names, startup command, index path and Neon-backed readiness/restart results; give T04 the active revision, real TMDb IDs and PostgreSQL 18 connection interface for regional providers and `watchOptionsUrl`; give T08 the actual setup/results and approved test-account handoff. T04 owns provider schema, enrichment and DTO; T05 owns the TMDb button.
 
 ## Evidence record
 
@@ -118,3 +118,33 @@ Actual results and the final-review status for this delivery are recorded in the
 | T03 Render recheck | Separate downstream T03 evidence |
 
 Attach the actual commands and redacted output to the evidence record. Local synthetic tests and a local PostgreSQL 18 fixture establish code behaviour only; they do not fill the Neon-backed results above. T02 hands the results to T03/T04/T08, then checks CI and obtains substantive approval from an eligible non-contributing reviewer before closure.
+
+## Downstream T04 provider schema and operator handoff
+
+T02's results above retain their tested `a3d1f8b72c44` schema head. T04 adds
+`b8e4d2c96f10` for provider tables and `d9a6f2c1e508` for US/GB/SG checks while preserving historical VN rows; it does not re-import the core
+catalogue or change the NLP corpus. Before using the revised Details API,
+apply the current migrations to the independently confirmed target with the
+migration role. Confirm `heads`, `current` and `check` agree, then ensure the
+restricted runtime role can read the new tables:
+
+```sql
+GRANT SELECT ON TABLE movie_provider_checks, movie_watch_providers TO cineai_runtime;
+```
+
+Runtime requests do not need write access to these tables or a TMDb token.
+The explicit importer uses the approved operator role, serial authenticated
+TMDb requests and bounded retries. The [T04 API/operator contract](api.md#14-s5-t04-regional-providers-and-tmdb-watch-options-251)
+defines exact commands, full-catalogue versus resume semantics, count
+reconciliation, selected-country URL validation, T05/T06/T08 DTO/attribution handoff and
+PostgreSQL recovery requirements. The [T04 verification record](evidence/s5-t04-providers/README.md)
+contains real whole-catalogue results on `cineai_development`. Public runtime
+migration/enrichment remains coordinated with the reviewed T04 deployment
+because T03 health requires the running code and database heads to agree.
+
+The current T04 country-aware contract defaults Details to US and supports GB/SG.
+For explicit operator enrichment, use
+`python -m app.cli.import_tmdb_catalogue --enrich-providers --all --countries US GB SG --limit 300`.
+Its limit is a committed movie-batch size. Each movie payload is shared across
+pending regions. Preserve both the earlier VN record and the dated regional run.
+[Regional T04 verification](evidence/s5-t04-providers/regional-2026-11-10.md)

@@ -59,6 +59,12 @@ def _seed(db: sqlite3.Connection) -> None:
                  ('rb','b','movie-b',3,'2026-10-24','2026-10-24');
         INSERT INTO user_movie_watchlist(id,user_id,movie_id,added_at)
           VALUES ('wa','a','movie-a','2026-10-24'),('wb','b','movie-b','2026-10-24');
+        INSERT INTO movie_provider_checks(movie_id,country,status,attempted_at,checked_at,
+          watch_options_url,link_status) VALUES
+          ('movie-a','US','success','2026-11-09','2026-11-09',
+           'https://www.themoviedb.org/movie/101/watch?locale=US','valid');
+        INSERT INTO movie_watch_providers(movie_id,country,availability_type,provider_id,name,logo_path)
+          VALUES ('movie-a','US','flatrate',8,'Synthetic Stream','/provider.jpg');
     """)
     db.commit()
 
@@ -68,7 +74,8 @@ def test_online_wal_backup_restore_and_account_index_recovery(tmp_path: Path):
     backup = tmp_path / "backup.db"
     recovered = tmp_path / "recovered.db"
     tables = ("users", "catalogue_state", "catalog_movies", "movie_genres",
-              "user_genre_preferences", "user_movie_ratings", "user_movie_watchlist")
+              "user_genre_preferences", "user_movie_ratings", "user_movie_watchlist",
+              "movie_provider_checks", "movie_watch_providers")
     with closing(sqlite3.connect(live)) as writer:
         _seed(writer)
         expected = {table: _rows(writer, table) for table in tables}
@@ -109,6 +116,10 @@ def test_online_wal_backup_restore_and_account_index_recovery(tmp_path: Path):
             assert db.execute(text("SELECT count(*) FROM user_genre_preferences WHERE user_id='b'")).scalar_one() == 1
             assert db.execute(text("SELECT count(*) FROM user_movie_ratings WHERE user_id='b'")).scalar_one() == 1
             assert db.execute(text("SELECT poster_path,backdrop_path,trailer_key FROM catalog_movies WHERE id='movie-a'")).one() == ("/a.jpg", "/a-back.jpg", "AbCdEf123_-")
+            assert db.execute(text("SELECT country,status,watch_options_url FROM movie_provider_checks WHERE movie_id='movie-a'")).one() == (
+                "US", "success", "https://www.themoviedb.org/movie/101/watch?locale=US",
+            )
+            assert db.execute(text("SELECT availability_type,provider_id FROM movie_watch_providers WHERE movie_id='movie-a'")).all() == [("flatrate", 8)]
         with Session(engine) as session:
             assert load_active_index(session, index_path).movie_ids == rebuilt.movie_ids
         assert inspect_database(recovered)["counts"]["user_movie_watchlist"] == 2
@@ -120,6 +131,10 @@ c = TestClient(app)
 assert c.get('/health').json()['migrationVersion']
 assert c.get('/api/movies').json()['meta']['total'] == 2
 assert c.get('/api/movies/search?q=moon&mode=description').status_code == 200
+movie = c.get('/api/movies/movie-a').json()['data']['movie']
+assert movie['providers']['status'] == 'success'
+assert movie['providers']['groups']['flatrate'][0]['id'] == 8
+assert movie['watchOptionsUrl'] == 'https://www.themoviedb.org/movie/101/watch?locale=US'
 """
     probe = subprocess.run(
         [sys.executable, "-c", probe_code],

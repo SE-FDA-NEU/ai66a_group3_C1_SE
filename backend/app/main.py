@@ -16,6 +16,7 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 from starlette.exceptions import HTTPException
 
+from app.catalogue.providers import DEFAULT_PROVIDER_COUNTRY, ProviderCountry
 from app.db.account_writes import begin_account_write, resolve_account_write_user
 from app.db.database import PROJECT_ROOT, Base, SessionLocal, engine
 from app.db.models import Genre, User, UserMovieRating
@@ -906,8 +907,10 @@ def search_movies(
 @app.get("/api/movies/{movie_id}", response_model=MovieDetailResponse, status_code=200)
 def get_movie(
     movie_id: str,
+    country: ProviderCountry = DEFAULT_PROVIDER_COUNTRY,
     database_session: Session = Depends(get_db),  # noqa: B008
 ):
+    _begin_read_snapshot(database_session)
     revision = get_active_catalogue_revision(database_session)
     if revision is None:
         return _error(
@@ -919,7 +922,7 @@ def get_movie(
         return _error("MOVIE_NOT_FOUND", "Movie not found", 404)
 
     return {
-        "data": {"movie": to_movie_detail_dto(movie).model_dump()},
+        "data": {"movie": to_movie_detail_dto(movie, country).model_dump()},
         "meta": {"catalogueRevision": revision.id},
     }
 

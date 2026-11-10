@@ -1232,3 +1232,183 @@ an unavailable index/catalogue. Search/Next never call TMDb metadata APIs.
 
 The submitted URL query and page survive details/Similar return, reload and
 Back. New query submission resets page 1; typing alone sends nothing.
+
+## 14. S5-T04 regional providers and TMDb watch options (#251)
+
+### Country selection and Details DTO
+
+`GET /api/movies/{movieId}?country=US` reads provider metadata from the local
+application database. Supported countries are **US, GB, SG**, with **US** as the
+omitted-parameter default. Unsupported, lowercase or empty country values return
+HTTP **400** with the existing safe `VALIDATION_ERROR` envelope. Movie identity,
+groups, status, timestamps and the nullable link all refer to the selected country.
+
+The following synthetic response illustrates the additional fields under
+`data.movie`.
+
+```json
+{
+  "providers": {
+    "country": "US",
+    "status": "success",
+    "attemptedAt": "2026-11-10T10:00:00Z",
+    "checkedAt": "2026-11-10T10:00:01Z",
+    "groups": {
+      "flatrate": [{"id": 8, "name": "Example provider", "logoUrl": null}],
+      "rent": [], "buy": [], "free": [], "ads": []
+    }
+  },
+  "watchOptionsUrl": null
+}
+```
+
+All five arrays are present. `id` is the positive TMDb provider ID, `name` is the
+supplied provider name and `logoUrl` is a validated nullable HTTPS image URL under
+`https://image.tmdb.org/t/p/w92/`. Membership is unique per movie, country, group
+and provider. A provider offering both rent and buy appears in both groups.
+`flatrate` maps to Stream, `rent` to Rent, `buy` to Buy, `free` to free access
+and `ads` to access with advertisements.
+
+| Status | Meaning for the selected country |
+| --- | --- |
+| `not_checked` | No check exists. Groups are empty and timestamps/link are null. |
+| `success` | The last valid response supplied supported memberships. |
+| `no_data` | The last valid response supplied no supported memberships or omitted the country. Availability is unknown. |
+| `error` | The latest check failed before any successful check. Groups/link remain empty. |
+| `stale` | Refresh failed after a successful check. Previous groups/link and `checkedAt` remain available with a freshness warning. |
+
+`attemptedAt` records the latest attempt, including failures. `checkedAt` records
+the last successful response, including valid no-data responses. Both use UTC
+ISO-8601 with `Z`. A later valid no-data response clears old memberships and link
+as supplied. Failed/malformed responses retain the last successful values.
+Details uses one database read snapshot for the check and memberships.
+
+`watchOptionsUrl` comes from `results[requestedCountry].link` of this exact TMDb
+movie. Validation requires HTTPS, host `themoviedb.org` or `www.themoviedb.org`,
+port omitted/443, the matching `/movie/<tmdbId>/watch` path with an optional title
+slug, and exactly one `locale=<requestedCountry>` parameter. User information,
+fragments, redirect parameters and mismatched movie/country values fail validation.
+The validated supplied URL is stored verbatim and checked again when exposed.
+Link validity is independent of membership availability.
+
+T05 owns the compact country selector, browser preference, freshness/unknown
+wording and single **View watch options on TMDb ↗** button for a non-null link.
+On country/movie changes, clear the previous region's displayed state and accept
+only the latest matching request. Provider badges stay informational. T06 consumes
+the same country-aware metadata for its approved filtering scope.
+
+### Migration and recovery
+
+The single Alembic head is `d9a6f2c1e508`, following the already-applied
+`b8e4d2c96f10`, which introduced the provider tables after `a3d1f8b72c44`.
+The follow-on migration permits stored countries VN, US, GB and SG. Existing VN
+checks/memberships remain historical data. Public country selection is US/GB/SG.
+
+`movie_provider_checks` stores status, attempt/success times, nullable watch URL
+and last successful link classification (`valid`, `missing`, `invalid`).
+`movie_watch_providers` stores normalized memberships, names and validated logo
+paths. Composite keys and cascading foreign keys enforce ownership. SQLite table
+rebuilding preserves child memberships. PostgreSQL alters the check constraint
+in place. Downgrading to the VN-only revision is refused while other-country
+rows exist. Back up and resolve regional data explicitly before such a downgrade.
+
+Include both provider tables, constraints and runtime SELECT grants in recovery.
+Verify the schema head and selected-country Details after restore. The restricted
+runtime role needs SELECT on these tables. Enrichment uses the operator role.
+Provider-only writes preserve catalogue identity, media, account rows, source-fetch
+time, overview corpus digest and NLP configuration.
+
+### Operator import and rollout
+
+Use the approved T02 migration/import role and independently confirmed target.
+Keep `DATABASE_URL`, `TMDB_READ_ACCESS_TOKEN` and TLS configuration private.
+Enable TMDb networking only for the explicit operator process. The ordinary web
+process reads stored metadata and can retain `TMDB_NETWORK_DISABLED=1`.
+
+Rehearse against Neon development. Coordinate public migration with reviewed
+code deployment because T03 health requires database revision and running code
+head to match. Verify `/health`, Details and restricted-role SELECT access before
+recording public rollout completion. Follow the T02 target/credential handoff.
+[S5-T02 runbook](s5-t02-neon-provisioning.md)
+
+```powershell
+.\.venv\Scripts\python.exe -m alembic -c backend/alembic.ini upgrade head
+.\.venv\Scripts\python.exe -m alembic -c backend/alembic.ini current
+.\.venv\Scripts\python.exe -m alembic -c backend/alembic.ini check
+.\.venv\Scripts\python.exe -m app.cli.import_tmdb_catalogue --enrich-providers --all --countries US GB SG --limit 300
+```
+
+Omitting `--countries` selects all three. An explicit subset, such as
+`--countries SG GB`, checks only those countries. Codes must be unique and
+supported. `--all` is required and `--pages` is incompatible with provider mode.
+`--limit` is the committed movie-batch size, 1–300. Each pending movie is fetched
+once before retries, and the shared payload updates its pending countries.
+For 989 movies and three countries this means 989 movie fetches and 2,967 regional
+checks before accounting for HTTP retries.
+
+Successful/no-data pairs are skipped on resume. Pending/error/stale pairs are
+retried independently, retaining the timestamps of successful countries skipped
+for that movie. To refresh successful pairs too, add `--refresh`.
+
+```powershell
+.\.venv\Scripts\python.exe -m app.cli.import_tmdb_catalogue --enrich-providers --all --countries US GB SG --refresh --limit 300
+```
+
+Requests run serially with a 10-second HTTP timeout and at most two retries for
+network/transient errors and 408/429/500/502/503/504. Retry-After supports numeric
+seconds and HTTP dates. Delays up to 30 seconds are waited in-process. A longer
+delay or exhausted 429 commits current progress, stops further requests and
+reports `retry_after_seconds`. Wait at least that delay after stopping, then resume
+without `--refresh`. Backoff without a valid Retry-After is 1 then 2 seconds.
+Authentication failure stops after recording that attempt.
+
+A malformed country result fails only that region. Request-wide failures apply
+to all pending countries for that movie. Last successful values remain available.
+Completed batches survive interruption. Database errors roll back the whole
+current batch and report committed progress. A changed active revision stops
+later batches. Serialize core catalogue imports and provider enrichment through
+the operator workflow, then confirm the active revision before resuming.
+
+### Counts and evidence
+
+CLI output separates unique movies, HTTP attempts and regional checks.
+
+| Fields | Meaning |
+| --- | --- |
+| `active_revision`, `eligible` | Frozen active revision and movie population. |
+| `already_checked`, `processed`, `remaining` | Movies skipped, committed or still pending in this invocation. |
+| `with_data`, `no_data`, `failed` | Disjoint outcomes for committed movies. Any selected region failure classifies that movie as failed. Otherwise any membership classifies it as with-data. |
+| `valid_link`, `missing_link`, `invalid_link` | Outcomes for movies with all selected checks successful. Invalid takes precedence, then any valid link, otherwise missing. |
+| `movie_fetches` | Calls to fetch a movie payload, including calls in a rolled-back batch. |
+| `http_requests`, `http_retries` | Actual HTTP attempts and additional retry attempts. |
+| `US.*`, `GB.*`, `SG.*` | The same eligible/skipped/processed/outcome/link/remaining counts for each selected country. |
+| `retry_after_seconds` | Required pause before resuming a deferred invocation. |
+
+For both global and each regional record, reconcile
+`eligible = already_checked + processed + remaining`,
+`processed = with_data + no_data + failed`, and
+`valid_link + missing_link + invalid_link = processed - failed`.
+Global processed counts unique movies. Summing regional processed counts counts
+movie-country checks. Partial resumes can process one movie for just one country.
+Keep each invocation separately to avoid double-counting repeated attempts.
+
+Record source SHA, UTC/local date, target and role names, PostgreSQL version,
+schema/revision, actual population, per-country counts and safe stdout. Verify
+real Details for multiple movies/countries, missing data, unchanged successful
+regions during partial resume, retained stale data after a controlled failure,
+zero runtime metadata calls, A/B ownership and the ready NLP index. Keep private
+backup files and credentials outside Git. Independent teammate review and public
+rollout are recorded separately from development checks.
+[Regional acceptance](evidence/s5-t04-providers/regional-2026-11-10.md),
+[historical VN acceptance](evidence/s5-t04-providers/README.md)
+
+CI runs focused offline regional/provider/CLI checks and a PostgreSQL 18
+integration suite. The optional recovery regression verifies both provider tables.
+The default milestone P0 command remains `python -m pytest -v`.
+
+### Attribution
+
+T05/T08 must credit JustWatch wherever watch availability is presented. Use an
+approved TMDb logo and include the required product notice in About/Credits.
+[TMDb watch-provider reference](https://developer.themoviedb.org/reference/movie-watch-providers),
+[TMDb attribution requirements](https://developer.themoviedb.org/docs/faq)
