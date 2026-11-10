@@ -170,15 +170,22 @@ Its build command produces `frontend/dist` and its start command uses the instal
 `certifi` CA bundle with verified Neon TLS. Deploy the reviewed frontend-serving
 change from green `main` before expecting the public root URL to render React.
 
-For Sprint 5 VN watch-provider metadata, use the confirmed migration/import
-target and the [T04 operator and rollout contract](api.md#14-s5-t04-vn-providers-and-tmdb-watch-options-251).
-After coordinating migration with deployment, the explicit command is
-`python -m app.cli.import_tmdb_catalogue --enrich-providers --all --refresh --limit 300`.
-Here `300` is a committed batch size, so the command still visits every active
-movie. Resume pending/stale checks by omitting `--refresh`. Wait for any
-reported `retry_after_seconds` before resuming. The web process reads this
-metadata from the database. Coverage depends on the selected country's data
-from TMDb, and absent VN results remain unknown availability.
+For Sprint 5 regional watch-provider metadata, use the confirmed operator target
+and coordinate migration with the reviewed deployment. The public Details default
+is US, with GB and SG also supported. Run from the repository root after loading
+private database/token/TLS settings and enabling TMDb networking for this process.
+
+```powershell
+.\.venv\Scripts\python.exe -m alembic -c backend/alembic.ini upgrade head
+.\.venv\Scripts\python.exe -m app.cli.import_tmdb_catalogue --enrich-providers --all --countries US GB SG --limit 300
+```
+
+`300` is the committed movie-batch size. The command visits every pending movie
+and shares each payload across its selected countries. Resume by repeating the
+command. Add `--refresh` to recheck successful/no-data pairs. Wait for any reported
+`retry_after_seconds` before resuming. Missing selected-country data is unknown
+availability. Follow the migration/rollout and per-country evidence requirements.
+[T04 operator contract](api.md#14-s5-t04-regional-providers-and-tmdb-watch-options-251)
 
 After pulling changes, back up valuable SQLite data consistently and run
 `alembic upgrade head` before restarting the backend. Compare `alembic current`

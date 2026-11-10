@@ -1,5 +1,9 @@
 # S5-T04 provider verification
 
+This record preserves the VN-only run against its original source and schema.
+The later US/GB/SG implementation and real enrichment have a separate dated
+record. [Regional acceptance, 10 November 2026](regional-2026-11-10.md)
+
 Issue [#251](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/251),
 PR [#261](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/261).
 Verified on 10 November 2026, Asia/Ho_Chi_Minh, with Python 3.12.6 and
