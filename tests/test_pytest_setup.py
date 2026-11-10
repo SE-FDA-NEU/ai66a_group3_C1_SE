@@ -41,6 +41,8 @@ assert database.is_file()
 assert engine.url == make_url(os.environ["DATABASE_URL"])
 assert os.environ["TMDB_READ_ACCESS_TOKEN"] == ""
 assert os.environ["TMDB_NETWORK_DISABLED"] == "1"
+assert os.environ["APP_ENV"] == "test"
+assert os.environ["SESSION_COOKIE_SECURE"] == "false"
 assert Path(os.environ["NLP_INDEX_PATH"]).parent == database.parent
 assert TestClient(app).get("/health").status_code == 200
 if os.environ["BOOTSTRAP_FAIL"] == "1":
@@ -65,6 +67,8 @@ def test_default_engine():
         NLP_INDEX_PATH=str(external_index),
         TMDB_READ_ACCESS_TOKEN="synthetic-inherited-token",
         TMDB_NETWORK_DISABLED="0",
+        APP_ENV="production",
+        SESSION_COOKIE_SECURE="true",
         BOOTSTRAP_MARKER=str(marker),
         BOOTSTRAP_FAIL="1" if invocation == "collection-failure" else "0",
     )
