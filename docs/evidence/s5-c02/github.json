@@ -1,0 +1,493 @@
+{
+  "checkedAt": "2026-11-11T14:03:06.681067+00:00",
+  "main": "acc49243e4db404438b00521c2f7a6234377fb18",
+  "mainCI": {
+    "id": 43025094939,
+    "head_sha": "acc49243e4db404438b00521c2f7a6234377fb18",
+    "conclusion": "success",
+    "html_url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/43025094939",
+    "created_at": "2026-11-11T12:59:31Z",
+    "updated_at": "2026-11-11T13:00:52Z"
+  },
+  "issues": [
+    {
+      "number": 247,
+      "title": "[Chore] S5-C01 \u2014 Confirm full feature scope, ownership and M5 release plan",
+      "state": "closed",
+      "closed_at": "2026-11-06T08:55:03Z",
+      "assignees": [
+        "kietxuan"
+      ]
+    },
+    {
+      "number": 248,
+      "title": "[Task] S5-T01 \u2014 Preserve application behaviour on PostgreSQL 18",
+      "state": "closed",
+      "closed_at": "2026-11-07T19:00:25Z",
+      "assignees": [
+        "hoang3003"
+      ]
+    },
+    {
+      "number": 249,
+      "title": "[Task] S5-T02 \u2014 Provision Neon PostgreSQL 18, TMDb data and NLP startup",
+      "state": "closed",
+      "closed_at": "2026-11-09T14:04:42Z",
+      "assignees": [
+        "NguyenTuanAnh0608"
+      ]
+    },
+    {
+      "number": 250,
+      "title": "[Task] S5-T03 \u2014 Gate PostgreSQL 18 CI and deploy a healthy public application",
+      "state": "closed",
+      "closed_at": "2026-11-10T04:28:30Z",
+      "assignees": [
+        "anotify-vie"
+      ]
+    },
+    {
+      "number": 251,
+      "title": "[Task] S5-T04 \u2014 Import regional providers and validated TMDb watch-options links",
+      "state": "closed",
+      "closed_at": "2026-11-10T06:07:29Z",
+      "assignees": [
+        "anotify-vie"
+      ]
+    },
+    {
+      "number": 252,
+      "title": "[Task] S5-T05 \u2014 Display regional providers with a country selector and TMDb button",
+      "state": "closed",
+      "closed_at": "2026-11-11T08:28:35Z",
+      "assignees": [
+        "vu-huzy"
+      ]
+    },
+    {
+      "number": 253,
+      "title": "[Task] S5-T06 \u2014 Rehearse PostgreSQL recovery and rollback including provider data",
+      "state": "closed",
+      "closed_at": "2026-11-11T08:29:11Z",
+      "assignees": [
+        "hoang3003"
+      ]
+    },
+    {
+      "number": 254,
+      "title": "[Task] S5-T07 \u2014 Deliver acceptance tooling, technical evidence and final execution checklist",
+      "state": "closed",
+      "closed_at": "2026-11-11T11:55:37Z",
+      "assignees": [
+        "NguyenTuanAnh0608"
+      ]
+    },
+    {
+      "number": 255,
+      "title": "[Task] S5-T08 \u2014 Deliver monitoring baseline, operations docs and final release handoff",
+      "state": "closed",
+      "closed_at": "2026-11-11T12:59:30Z",
+      "assignees": [
+        "vu-huzy"
+      ]
+    },
+    {
+      "number": 256,
+      "title": "[Chore] S5-C02 \u2014 Sprint 5 wrap-up, complete-feature v1.0 release and submission",
+      "state": "open",
+      "closed_at": null,
+      "assignees": [
+        "kietxuan"
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "type": "deletion",
+      "ruleset_source_type": "Organization",
+      "ruleset_source": "SE-FDA-NEU",
+      "ruleset_id": 21296815
+    },
+    {
+      "type": "non_fast_forward",
+      "ruleset_source_type": "Organization",
+      "ruleset_source": "SE-FDA-NEU",
+      "ruleset_id": 21296815
+    },
+    {
+      "type": "pull_request",
+      "parameters": {
+        "required_approving_review_count": 1,
+        "dismiss_stale_reviews_on_push": false,
+        "required_reviewers": [],
+        "require_code_owner_review": false,
+        "require_last_push_approval": false,
+        "required_review_thread_resolution": false,
+        "require_extra_approval_for_unattributed_changes": true,
+        "allowed_merge_methods": [
+          "merge",
+          "squash",
+          "rebase"
+        ]
+      },
+      "ruleset_source_type": "Organization",
+      "ruleset_source": "SE-FDA-NEU",
+      "ruleset_id": 21296815
+    }
+  ],
+  "releaseV1": false,
+  "pullRequests": [
+    {
+      "number": 257,
+      "owner": "kietxuan",
+      "merged": true,
+      "mergedAt": "2026-11-06T08:55:01Z",
+      "head": "131f44d64571cb5a0271e078fca702608b57cfd3",
+      "contributors": [
+        "kietxuan"
+      ],
+      "greenHeadCI": true,
+      "reviews": [
+        {
+          "reviewer": "hoang3003",
+          "state": "APPROVED",
+          "commit": "131f44d64571cb5a0271e078fca702608b57cfd3",
+          "submittedAt": "2026-11-06T08:51:39Z",
+          "beforeMerge": true,
+          "body": "okay sis"
+        },
+        {
+          "reviewer": "vu-huzy",
+          "state": "APPROVED",
+          "commit": "131f44d64571cb5a0271e078fca702608b57cfd3",
+          "submittedAt": "2026-11-11T02:27:32Z",
+          "beforeMerge": false,
+          "body": "ok"
+        }
+      ]
+    },
+    {
+      "number": 258,
+      "owner": "hoang3003",
+      "merged": true,
+      "mergedAt": "2026-11-07T19:00:24Z",
+      "head": "a94b47ac5048bec52d4a370fa020a151d8040c2c",
+      "contributors": [
+        "hoang3003"
+      ],
+      "greenHeadCI": true,
+      "reviews": [
+        {
+          "reviewer": "kietxuan",
+          "state": "APPROVED",
+          "commit": "a94b47ac5048bec52d4a370fa020a151d8040c2c",
+          "submittedAt": "2026-11-07T18:10:22Z",
+          "beforeMerge": true,
+          "body": "ok sis"
+        },
+        {
+          "reviewer": "vu-huzy",
+          "state": "APPROVED",
+          "commit": "a94b47ac5048bec52d4a370fa020a151d8040c2c",
+          "submittedAt": "2026-11-11T02:27:18Z",
+          "beforeMerge": false,
+          "body": "ok"
+        },
+        {
+          "reviewer": "anotify-vie",
+          "state": "APPROVED",
+          "commit": "a94b47ac5048bec52d4a370fa020a151d8040c2c",
+          "submittedAt": "2026-11-11T11:37:46Z",
+          "beforeMerge": false,
+          "body": "nice"
+        }
+      ]
+    },
+    {
+      "number": 259,
+      "owner": "NguyenTuanAnh0608",
+      "merged": true,
+      "mergedAt": "2026-11-09T13:42:36Z",
+      "head": "755ed486acd905d3abf441fe19b17bc5bdf2069a",
+      "contributors": [
+        "NguyenTuanAnh0608",
+        "kietxuan"
+      ],
+      "greenHeadCI": true,
+      "reviews": [
+        {
+          "reviewer": "hoang3003",
+          "state": "APPROVED",
+          "commit": "96d4f3b9c799838f8b657d424ca17ded830222b2",
+          "submittedAt": "2026-11-09T07:09:21Z",
+          "beforeMerge": true,
+          "body": "okay"
+        },
+        {
+          "reviewer": "kietxuan",
+          "state": "APPROVED",
+          "commit": "755ed486acd905d3abf441fe19b17bc5bdf2069a",
+          "submittedAt": "2026-11-09T14:04:13Z",
+          "beforeMerge": false,
+          "body": "oki"
+        },
+        {
+          "reviewer": "vu-huzy",
+          "state": "APPROVED",
+          "commit": "755ed486acd905d3abf441fe19b17bc5bdf2069a",
+          "submittedAt": "2026-11-11T02:27:06Z",
+          "beforeMerge": false,
+          "body": "ok"
+        },
+        {
+          "reviewer": "anotify-vie",
+          "state": "APPROVED",
+          "commit": "755ed486acd905d3abf441fe19b17bc5bdf2069a",
+          "submittedAt": "2026-11-11T11:38:45Z",
+          "beforeMerge": false,
+          "body": "ok"
+        }
+      ]
+    },
+    {
+      "number": 260,
+      "owner": "anotify-vie",
+      "merged": true,
+      "mergedAt": "2026-11-10T04:28:29Z",
+      "head": "6d4f60a357533cc63f6d71ac53f133ef53fc5c5e",
+      "contributors": [
+        "kietxuan"
+      ],
+      "greenHeadCI": true,
+      "reviews": [
+        {
+          "reviewer": "kietxuan",
+          "state": "APPROVED",
+          "commit": "6d4f60a357533cc63f6d71ac53f133ef53fc5c5e",
+          "submittedAt": "2026-11-10T04:24:47Z",
+          "beforeMerge": true,
+          "body": "oke\n"
+        },
+        {
+          "reviewer": "vu-huzy",
+          "state": "APPROVED",
+          "commit": "6d4f60a357533cc63f6d71ac53f133ef53fc5c5e",
+          "submittedAt": "2026-11-10T04:26:30Z",
+          "beforeMerge": true,
+          "body": "ok"
+        },
+        {
+          "reviewer": "NguyenTuanAnh0608",
+          "state": "APPROVED",
+          "commit": "6d4f60a357533cc63f6d71ac53f133ef53fc5c5e",
+          "submittedAt": "2026-11-10T08:33:07Z",
+          "beforeMerge": false,
+          "body": "oke"
+        },
+        {
+          "reviewer": "hoang3003",
+          "state": "APPROVED",
+          "commit": "6d4f60a357533cc63f6d71ac53f133ef53fc5c5e",
+          "submittedAt": "2026-11-11T11:37:58Z",
+          "beforeMerge": false,
+          "body": "ok"
+        }
+      ]
+    },
+    {
+      "number": 261,
+      "owner": "anotify-vie",
+      "merged": true,
+      "mergedAt": "2026-11-10T06:07:27Z",
+      "head": "da1f8b08b8ae6c70cfa989e708d5f6a88a53fff8",
+      "contributors": [
+        "kietxuan"
+      ],
+      "greenHeadCI": true,
+      "reviews": [
+        {
+          "reviewer": "vu-huzy",
+          "state": "APPROVED",
+          "commit": "f5e3eec8da1727da99d0645f68d1f96fa180089b",
+          "submittedAt": "2026-11-10T04:26:10Z",
+          "beforeMerge": true,
+          "body": "ok"
+        },
+        {
+          "reviewer": "kietxuan",
+          "state": "APPROVED",
+          "commit": "4ef13fe68edef37adfeb63d01581769cfbdb1228",
+          "submittedAt": "2026-11-10T05:08:42Z",
+          "beforeMerge": true,
+          "body": "oke"
+        },
+        {
+          "reviewer": "hoang3003",
+          "state": "APPROVED",
+          "commit": "da1f8b08b8ae6c70cfa989e708d5f6a88a53fff8",
+          "submittedAt": "2026-11-11T11:37:18Z",
+          "beforeMerge": false,
+          "body": "ok"
+        }
+      ]
+    },
+    {
+      "number": 262,
+      "owner": "hoang3003",
+      "merged": true,
+      "mergedAt": "2026-11-11T07:43:56Z",
+      "head": "a91f9304ac45fa10ad648e449fe98eb897d219cf",
+      "contributors": [
+        "hoang3003",
+        "kietxuan"
+      ],
+      "greenHeadCI": true,
+      "reviews": [
+        {
+          "reviewer": "kietxuan",
+          "state": "APPROVED",
+          "commit": "a91f9304ac45fa10ad648e449fe98eb897d219cf",
+          "submittedAt": "2026-11-10T13:26:39Z",
+          "beforeMerge": true,
+          "body": "oke"
+        },
+        {
+          "reviewer": "vu-huzy",
+          "state": "APPROVED",
+          "commit": "a91f9304ac45fa10ad648e449fe98eb897d219cf",
+          "submittedAt": "2026-11-11T02:24:50Z",
+          "beforeMerge": true,
+          "body": "ok"
+        },
+        {
+          "reviewer": "anotify-vie",
+          "state": "APPROVED",
+          "commit": "a91f9304ac45fa10ad648e449fe98eb897d219cf",
+          "submittedAt": "2026-11-11T11:36:53Z",
+          "beforeMerge": false,
+          "body": "ok"
+        }
+      ]
+    },
+    {
+      "number": 263,
+      "owner": "vu-huzy",
+      "merged": true,
+      "mergedAt": "2026-11-11T08:28:34Z",
+      "head": "429ced45417809f1adddad3301f9828505c200b2",
+      "contributors": [
+        "kietxuan",
+        "vu-huzy"
+      ],
+      "greenHeadCI": true,
+      "reviews": [
+        {
+          "reviewer": "kietxuan",
+          "state": "APPROVED",
+          "commit": "429ced45417809f1adddad3301f9828505c200b2",
+          "submittedAt": "2026-11-11T05:27:30Z",
+          "beforeMerge": true,
+          "body": "ok"
+        },
+        {
+          "reviewer": "anotify-vie",
+          "state": "APPROVED",
+          "commit": "429ced45417809f1adddad3301f9828505c200b2",
+          "submittedAt": "2026-11-11T11:36:10Z",
+          "beforeMerge": false,
+          "body": "ok"
+        },
+        {
+          "reviewer": "hoang3003",
+          "state": "APPROVED",
+          "commit": "429ced45417809f1adddad3301f9828505c200b2",
+          "submittedAt": "2026-11-11T11:36:32Z",
+          "beforeMerge": false,
+          "body": "ok"
+        }
+      ]
+    },
+    {
+      "number": 264,
+      "owner": "vu-huzy",
+      "merged": true,
+      "mergedAt": "2026-11-11T12:59:28Z",
+      "head": "415bd5884b792bc7576368bf83cdd62d6001b636",
+      "contributors": [
+        "kietxuan",
+        "vu-huzy"
+      ],
+      "greenHeadCI": true,
+      "reviews": [
+        {
+          "reviewer": "kietxuan",
+          "state": "APPROVED",
+          "commit": "da8c6a4960d0c665aeabb9bd8ecc8ca7eab07539",
+          "submittedAt": "2026-11-11T11:21:52Z",
+          "beforeMerge": true,
+          "body": "oke"
+        },
+        {
+          "reviewer": "hoang3003",
+          "state": "APPROVED",
+          "commit": "da8c6a4960d0c665aeabb9bd8ecc8ca7eab07539",
+          "submittedAt": "2026-11-11T11:35:52Z",
+          "beforeMerge": true,
+          "body": "ok"
+        },
+        {
+          "reviewer": "NguyenTuanAnh0608",
+          "state": "APPROVED",
+          "commit": "da8c6a4960d0c665aeabb9bd8ecc8ca7eab07539",
+          "submittedAt": "2026-11-11T11:42:56Z",
+          "beforeMerge": true,
+          "body": "oke"
+        }
+      ]
+    },
+    {
+      "number": 265,
+      "owner": "NguyenTuanAnh0608",
+      "merged": true,
+      "mergedAt": "2026-11-11T11:55:35Z",
+      "head": "c6a0e6020eb4f2dae98fc5304ae3b1e3c6b753f1",
+      "contributors": [
+        "NguyenTuanAnh0608",
+        "kietxuan"
+      ],
+      "greenHeadCI": true,
+      "reviews": [
+        {
+          "reviewer": "kietxuan",
+          "state": "APPROVED",
+          "commit": "055de665ebec9e546e6eed705c841e2c2b9eb603",
+          "submittedAt": "2026-11-11T09:45:26Z",
+          "beforeMerge": true,
+          "body": "oke "
+        },
+        {
+          "reviewer": "hoang3003",
+          "state": "APPROVED",
+          "commit": "00ee61b605fa76efc2890cf1c0ddd5fe2c3f94f6",
+          "submittedAt": "2026-11-11T11:35:10Z",
+          "beforeMerge": true,
+          "body": "ok"
+        }
+      ]
+    }
+  ],
+  "storySources": [
+    {
+      "number": 32,
+      "closed_at": "2026-10-04T14:02:22Z",
+      "estimate": 3,
+      "criteriaChecked": true
+    },
+    {
+      "number": 44,
+      "closed_at": "2026-10-04T14:02:26Z",
+      "estimate": 3,
+      "criteriaChecked": true
+    }
+  ]
+}

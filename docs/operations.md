@@ -1,11 +1,11 @@
 # CineAI operations
 
 Owner: @vu-huzy, [T08 #255](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/255).
-Baseline: **11 November 2026, 17:51 UTC+7**, before the PO-deferred regional rollout.
-[Recorded observations](evidence/s5-t08-operations/README.md) distinguish the live
-version, reviewed main and outstanding release acceptance. The M5 brief says
-seven sections but enumerates six; these six follow its table, with the wording
-clarification tracked in [Planning](sprint5-backlog-refinement.md).
+Current read-only observation: **11 November 2026**, after the regional rollout.
+[C02 evidence](evidence/s5-c02/README.md) identifies the running source and the
+remaining release/device/PO/administrative gates. The earlier
+[T08 observations](evidence/s5-t08-operations/README.md) remain historical.
+The M5 brief says seven sections but lists six; these follow the six-row table.
 
 ## 1. Deployment and release
 
@@ -13,13 +13,13 @@ clarification tracked in [Planning](sprint5-backlog-refinement.md).
 | --- | --- |
 | URL/platform | <https://cineai-o9tf.onrender.com/>; Render **Free**, native Python, Singapore, one worker; Neon PostgreSQL **18.6**, Singapore. [SETUP](SETUP.md#postgresql-18-neon-and-render-public-runtime) |
 | Render identity | `cineai`, `srv-dbp96kp42hec73bv94j0`, **My Workspace**. Connected account now sees the correct service. Branch `main`, repository `SE-FDA-NEU/ai66a_group3_C1_SE`, `/health`, Free and `autoDeployTrigger=checksPass` were read from Render; no settings changed |
-| Actual live release | Deploy `dep-dbpaf38n74is73dcl8k0`, **live**, SHA `f24ef54699efb2fa26f363107bd31401f9b12e58`; health 200/head `a3d1f8b72c44`. Regional DTO/selector is not deployed |
-| Reviewed main baseline | `50aa9ad4fccc63f5d7ef8186bb296ed12f0d18ee`, [green CI 42987332068](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/42987332068), code head `d9a6f2c1e508`. Recheck the actual final SHA after the remaining PR merges |
+| Actual live release | Deploy `dep-dbq71cvf3r2c73e7g890`, **live**, SHA `acc49243e4db404438b00521c2f7a6234377fb18`; 13:43:59 UTC, 11 November. Public health 200/head `d9a6f2c1e508`; 989 movies and all 2,967 US/GB/SG checks populated. [Read-only evidence](evidence/s5-c02/runtime.json) |
+| Reviewed main baseline | Same `acc4924` source; [green CI 43025094939](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/43025094939). This C02 documentation PR is a later source, not automatically the running app or a completed release |
 | Merge → CI → deploy | Reviewed PRs, required checks/approval, green main CI, configured **After CI Checks Pass**. The setting is verified; a complete failed-CI/no-deploy experiment is not claimed |
-| One-batch release hold | PO wants preparation before one Manual Deploy. Reviewed T07/T08 delivery PRs close their amended technical/documentation scopes; C02 stays open with `Refs #256` for all final public/human/operational gates. Use the [C02 handoff](s5-t08-c02-handoff.md#one-batch-release-plan) to prevent unintended auto-deploys; this PR does not toggle Render or deploy |
-| Safe rollout | Fresh verified private backup; freeze green main SHA; coordinate the matching deployment, exact-head migration and grants in an agreed window. A temporary 503 while code/schema differ is possible. Wait for **live + health 200 at the expected head**, then enrich US/GB/SG. Do not migrate during preparation or reimport the existing movie catalogue just for providers |
+| One-batch release hold | **Superseded by PO:** deploy first, document observed results, permit further reviewed deploys. For docs-only merges that should retain the app, use `[skip render]` in the actual merge commit and verify the skip; keep CI enabled. [Current release rule](s5-c02-wrap-up.md#deploy-first-document-afterward--po-amendment) |
+| Safe rollout | New backup was restored and matched 11 pre-change tables before the requested two migrations/grants; current schema/read permissions pass. For each future incompatible change, coordinate backup/migration/grants with matching deployment; temporary 503 is possible. Do not reimport the catalogue solely for providers |
 | Rollback/recovery | [T06](s5-t06-postgresql-recovery.md) rehearsed old T03 code: 503 on regional schema, 200 on an isolated pre-provider restore. A fresh runtime backup was also restored/compared across 11 snapshot tables on 11 November. Neither is a Render rollback. Restore into an isolated target and verify compatibility before switching; never overwrite later writes or silently discard regional data |
-| Final identity | **Pending C02**: verified running SHA = selected green-main SHA = `v1.0` target. No tag/deploy/rehearsal/PO acceptance is claimed by this baseline |
+| Final identity | **Pending C02:** v1.0 must equal the verified running main commit. Track latest documentation-main SHA and its CI separately after a docs-only skip. Final PO/device/demo/release/submission are not claimed |
 
 ## 2. Continuous integration and protected main
 
@@ -30,14 +30,14 @@ clarification tracked in [Planning](sprint5-backlog-refinement.md).
 | Detect stack | Select storage/bootstrap scope from the diff |
 | Python tests | Locked install, Ruff, **40 P0** cases, traceability, focused provider/CLI and affected storage/bootstrap checks, health/serving/session boundaries |
 | PostgreSQL 18 integration | `postgres:18`, authenticated integration and native dump/restore with major-18 clients, zero DB skips |
-| Node build and tests | `npm ci`, ESLint, 42 regional-provider UI cases, TypeScript/production build. T07 PR #265 adds 18 focused acceptance-verifier cases; not yet in this main baseline |
+| Node build and tests | `npm ci`, ESLint, 42 regional-provider UI cases, TypeScript/production build and T07's 18 focused acceptance-verifier cases, now merged via #265 |
 | No secrets committed | Credential patterns and forbidden artifacts |
 
 | Evidence | Actual result |
 | --- | --- |
-| Main CI | Run [42987332068](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/42987332068), five jobs green, 1m18s (08:28:36–08:29:54Z). Recheck after final merges |
-| Effective rules API | [Snapshot](evidence/s5-t08-operations/github-protection.json): deletion/non-fast-forward protection and one PR approval; no `required_status_checks` entry returned. Contributor has `push=true`, `admin=false`. Complete protection is **not certified** |
-| Admin action/screenshot | **Pending under C02 #256:** admin configures the five required contexts, confirms PR + approval, and captures the real branch/rules settings screen. C02's reviewed documentation update incorporates that screenshot before selecting the release SHA. Stale-review dismissal is recommended team hygiene, not an extra M5 minimum. API JSON is not the required settings screenshot |
+| Main CI | Run [43025094939](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/43025094939), `acc4924`, success, 81 seconds (12:59:31–13:00:52 UTC). Recheck latest main after this PR merges |
+| Effective rules API | [C02 GitHub snapshot](evidence/s5-c02/github.json): PR with one approval, deletion/non-fast-forward protection; no required-status-check entry returned. Admin must confirm/configure enforcement; complete protection is not certified |
+| Admin action/screenshot | **Pending C02:** admin confirms/enforces the five contexts plus PR/approval and captures the authentic settings screen for this document. Under the deploy-first amendment it can be supplied after this baseline; it remains mandatory before C02 closes. API JSON is not the screenshot |
 | Review | Scrum hygiene checks issue/approval metadata; substantive non-contributor review must still precede merge |
 
 ## 3. Monitoring, logs and incident response
@@ -69,6 +69,12 @@ and safe Logs (`error_type`, `sqlstate`, `errno`), and open an issue with the
 redacted timeline. Do not log passwords, cookies, tokens, account data or literal
 user query strings. Deploy: @anotify-vie → @kietxuan; DB: @NguyenTuanAnh0608 →
 @hoang3003; recovery: @hoang3003 → @NguyenTuanAnh0608. Never bypass stale-head health.
+
+Post-deploy observations: 13:45–13:50 UTC had 101 completions (71 health),
+0 five-hundreds, p95 408.67 ms; 13:50–13:55 had 70/70 health, 0 five-hundreds,
+p95 99.85 ms. [All-page, deduplicated samples](evidence/s5-c02/monitoring.json)
+measure app processing, not user-load performance or uptime. Repeat after a new
+candidate; preserve the old f24 series as history.
 
 ## 4. Risks and technical debt
 

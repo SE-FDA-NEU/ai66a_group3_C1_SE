@@ -1,0 +1,33 @@
+{
+  "service": {
+    "id": "srv-dbp96kp42hec73bv94j0",
+    "workspace": "tea-d7kdoovaqgkc73brc7ag",
+    "name": "cineai",
+    "url": "https://cineai-o9tf.onrender.com",
+    "branch": "main",
+    "plan": "free",
+    "region": "singapore",
+    "healthCheckPath": "/health",
+    "autoDeploy": "yes",
+    "autoDeployTrigger": "checksPass"
+  },
+  "deploy": {
+    "commit": {
+      "createdAt": "2026-11-11T12:59:28Z",
+      "id": "acc49243e4db404438b00521c2f7a6234377fb18",
+      "message": "Merge pull request #264 from SE-FDA-NEU/s5-t08-operations-docs\n\n[#255] Deliver operations baseline and hand final release to C02 [skip render]"
+    },
+    "createdAt": "2026-11-11T13:42:11.487237Z",
+    "finishedAt": "2026-11-11T13:43:59.201512Z",
+    "id": "dep-dbq71cvf3r2c73e7g890",
+    "startedAt": "2026-11-11T13:42:11.443483Z",
+    "status": "live",
+    "trigger": "manual",
+    "updatedAt": "2026-11-11T13:44:28.659701Z"
+  },
+  "previousDeploy": {
+    "id": "dep-dbq6p2mk1f9s73a66nog",
+    "status": "canceled",
+    "commit": "acc49243e4db404438b00521c2f7a6234377fb18"
+  }
+}

@@ -2,8 +2,10 @@
 
 From [T08 #255](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/255),
 @vu-huzy, to SM5 @kietxuan, [C02 #256](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/256).
-Baseline **11 November 2026**: main `50aa9ad4fccc63f5d7ef8186bb296ed12f0d18ee`;
-public Render runs `f24ef54699efb2fa26f363107bd31401f9b12e58`.
+Historical T08 baseline **11 November 2026**: main `50aa9ad4fccc63f5d7ef8186bb296ed12f0d18ee`;
+public then ran `f24ef54699efb2fa26f363107bd31401f9b12e58`.
+**Current C02:** T07/T08 are merged/Closed; acc4924 is Live, migrated and regional
+data is populated. See [current wrap-up/evidence](s5-c02-wrap-up.md).
 No final acceptance, release, rehearsal, PDF or LMS receipt is invented. PDF/LMS
 work is manual; no export tooling or submission PDF is added to Git.
 
@@ -41,7 +43,7 @@ C02; SM5 is accountable for the final evidence and closure.
 | Regional public rollout and final acceptance | C02/SM5 coordinates Render @anotify-vie + Neon @NguyenTuanAnh0608: frozen green-main release, actual deployed SHA/head/PostgreSQL 18, per-country US/GB/SG data, all six P0s and affected regional/media/account journeys, real phone/private-laptop checks, five-person rehearsal and PO decision. Execute the checklist supplied by T07; T07 closure is not a pass for these items |
 | Effective branch protection and authentic screenshot | Repository admin adds the five required CI contexts plus PR/approval, verifies enforcement and captures the actual settings screen. [Current API snapshot](evidence/s5-t08-operations/github-protection.json) is evidence of the gap, not a substitute screenshot |
 | Durable recovery handoff | @hoang3003 / @NguyenTuanAnh0608: private durable destination, actual shared access, daily execution/retention and independent reproduction. A locally restored backup is not those items |
-| Final-candidate monitoring | @vu-huzy / @kietxuan repeat windows/correlation after rollout; current baseline is from f24, not the future regional candidate |
+| Final-candidate monitoring | @vu-huzy / @kietxuan post-deploy windows are recorded in C02; repeat/correlate after any subsequent candidate and retain f24 as history |
 | C02 final facts | SM5 records Review/Retro, accepted outcomes/contributions, ≥4 reviewed green merged S5 PRs, each member's merged PR/review/closed issue, committed/completed/velocity and the five-Sprint table |
 | Release/submission | SM5 binds exact live SHA/green CI/v1.0, exports/submits manually and records a real receipt in #256 |
 
@@ -49,64 +51,41 @@ The six enumerated sections are implemented; the brief's seven-versus-six typo
 remains tracked, without inventing a seventh section. Extend retention when the
 grade-publication date becomes known; that future date is not fabricated.
 The authentic protection screenshot must be incorporated into operations.md by
-the reviewed C02 documentation update before selecting the final release SHA.
+a reviewed C02 documentation update before C02 closure; it is still missing.
 Final post-deploy observations may be recorded in C02's dated completion comment,
 with a direct link from the baseline operations record. Any required source/doc
 fix still receives review and green CI; it is not hidden in an issue comment.
 
 ## One-batch release plan
 
-The PO deferred all production deploy/migration/enrichment on 11 November and
-wants preparation complete before one **Manual Deploy → Deploy latest commit**.
-This is an intended rollout, not an assertion that final release acceptance can
-finish before a new public version exists. Nothing in this T08 PR changes
-Render settings, migrations or the public catalogue.
+**Historical heading retained for existing links; the PO has superseded the
+one-deploy restriction.** The selected workflow is now deploy first, collect
+actual evidence, then finish reviewed C02 documentation. Further reviewed fixes
+and deployments are allowed. The earlier plan is preserved in the T08 source
+at acc4924, not treated as current instructions.
 
-1. Finish and independently review the T07/T08 technical/documentation
-   deliverables. PR #265 uses **Closes #254** and PR #264 uses **Closes #255**
-   under the amended scopes; C02's documentation PR keeps **Refs #256**.
-   Retain every final public/external gate as Pending under C02. Do not turn
-   pending results into "done" to prepare a merge.
-2. Render is still **After CI Checks Pass**, so ordinary main merges may auto
-   deploy. For the agreed batching hold, put the documented **`[skip render]`**
-   phrase in each actual main merge/squash commit message (not merely a PR body),
-   then verify the skipped event. GitHub CI must still run. This is documented
-   [Render behaviour](https://render.com/docs/deploys#skipping-an-auto-deploy);
-   no auto-deploy toggle is performed by this PR. Do not replace the gate with
-   On Commit or claim an unverified bypass is safe.
-3. Before selecting the release SHA, merge the reviewed wrap-up documents as C02
-   requires. Freeze that main commit, verify its **latest ci.yml is green** and
-   confirm the actual Render source/settings. The final SHA may differ from this
-   baseline; do not hard-code `50aa9ad4` as the future release.
-4. In the agreed window, take a **new** consistent backup and verify the target,
-   role, PostgreSQL 18 and restore path. Coordinate the matching deploy,
-   migrations/grants and exact-head health; a temporary 503 is possible while
-   versions differ. The button does not run migrations or TMDb enrichment.
-   After **live + healthy**, enrich the existing active catalogue for US/GB/SG;
-   do not run a new 50-page import solely to add provider data.
-5. Under C02, run the T07-supplied public journeys/phone/rehearsal/PO checklist
-   and repeat T08's monitoring checks on the final candidate. Record actual
-   results and handoffs before closing C02. Its
-   explicit post-merge completion comment records the deployment/tag/submission
-   facts; code/repo documents remain a dated pre-release baseline until a
-   verified update is made.
-6. Verify **running SHA = selected green-main SHA = v1.0 target**. Create the tag
-   on that verified deployed commit, export the manual PDF with actual links,
-   submit and record the receipt. Close #256 manually only when all its gates
-   are fulfilled. No tag or date is supplied in advance.
-7. If acceptance exposes a code/document defect, fix/review it and obtain fresh
-   CI and whatever subsequent deployment is required. One click is a preference,
-   not a reason to accept a failing release or tag a different, unserved commit.
-   C02 forbids silently moving the demonstrated version; do not assume a later
-   main documentation commit is the SHA currently running.
+1. T07 #265 and T08 #264 are merged; their delivery issues are Closed. C02's PR
+   keeps **Refs #256** while actual final gates remain outstanding.
+2. Running acc4924, current health/schema and full-catalogue regional data are
+   verified in [C02](s5-c02-wrap-up.md). The source is not yet tagged v1.0.
+3. Complete actual public P0/accepted-feature/device/demo/PO checks, protection
+   screenshot and durable recovery handoff. Review/merge C02's evidence/docs;
+   retain Pending for anything not performed. No invented receipt or meeting.
+4. Render remains After CI Checks Pass. A docs-only merge may use `[skip render]`
+   in its actual merge/squash message to retain the running app; verify the skip.
+   Keep CI enabled. If allowing another deploy, verify that new Live SHA and
+   affected health/acceptance instead. No platform setting is changed here.
+5. Track running app SHA and green CI separately from latest documentation-main
+   SHA/CI. Tag v1.0 on the accepted running main commit, not blindly on a newer
+   docs-only commit. Never silently move an already-published tag.
+6. Export/submit the PDF manually with actual release/CI links. Link final
+   acceptance, Review/Retro, metrics/member/protection/recovery/maintenance and
+   LMS receipt in #256's completion comment. Close C02 manually only when done.
 
-T07's technical delivery does not depend on T08's final dossier. Both delivery
-issues may close at their reviewed merges while C02 remains open for final
-acceptance, avoiding a circular "close all → deploy → prove closure" dependency.
-If a reviewer requires final observations in repository
-files rather than the allowed completion record, make that update truthfully
-and recheck the exact-SHA release rule; do not promise a single deploy regardless
-of what final acceptance finds.
+Full [release policy](s5-c02-wrap-up.md#deploy-first-document-afterward--po-amendment)
+and [remaining R01–R09](s5-c02-wrap-up.md#remaining-c02-gates-and-named-next-actions)
+replace the old merge-wrap-up-before-deploy constraint. No PDF/export tool is
+added and this documentation PR performs no production changes.
 
 ## Manual submission block
 
@@ -121,7 +100,7 @@ following team/role values are already confirmed; submission itself is not.
 | Product Owner / SM5 | @kietxuan / @kietxuan |
 | Repository | [SE-FDA-NEU/ai66a_group3_C1_SE](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE) |
 | Setup | [docs/SETUP.md on main](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/docs/SETUP.md) |
-| Final deployed SHA / matching green CI | Pending final release; do not substitute the old f24 deployment or a PR-only CI run |
+| Final deployed SHA / matching green CI | Current acc4924/deploy dep-dbq71cvf3r2c73e7g890 and CI 43025094939 are verified; final PO/release selection remains Pending. Record later docs-main SHA separately |
 | Release v1.0 | [Intended release URL](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/releases/tag/v1.0), **not created/verified yet** |
 | Test accounts | See the first screen of README; shared app-only demo login was verified |
 | Submitted by | Nguyen Xuan Kiet, planned SM5 submitter; record actual submission |

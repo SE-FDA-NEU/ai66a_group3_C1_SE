@@ -1,0 +1,331 @@
+{
+  "checkedAt": "2026-11-11T14:03:51.290363+00:00",
+  "kind": "read-only operator observation; no production writes",
+  "postgresql": "18.6 (ac70818)",
+  "migration": "d9a6f2c1e508",
+  "activeMovies": 989,
+  "providerChecks": [
+    {
+      "country": "GB",
+      "status": "no_data",
+      "count": 130
+    },
+    {
+      "country": "GB",
+      "status": "success",
+      "count": 859
+    },
+    {
+      "country": "SG",
+      "status": "no_data",
+      "count": 283
+    },
+    {
+      "country": "SG",
+      "status": "success",
+      "count": 706
+    },
+    {
+      "country": "US",
+      "status": "no_data",
+      "count": 85
+    },
+    {
+      "country": "US",
+      "status": "success",
+      "count": 904
+    }
+  ],
+  "memberships": [
+    {
+      "country": "GB",
+      "count": 8728
+    },
+    {
+      "country": "SG",
+      "count": 1459
+    },
+    {
+      "country": "US",
+      "count": 11278
+    }
+  ],
+  "validWatchLinks": [
+    {
+      "country": "GB",
+      "count": 859
+    },
+    {
+      "country": "SG",
+      "count": 706
+    },
+    {
+      "country": "US",
+      "count": 904
+    }
+  ],
+  "runtimeSelect": [
+    {
+      "table": "alembic_version",
+      "allowed": true
+    },
+    {
+      "table": "auth_sessions",
+      "allowed": true
+    },
+    {
+      "table": "catalog_movies",
+      "allowed": true
+    },
+    {
+      "table": "catalogue_revisions",
+      "allowed": true
+    },
+    {
+      "table": "catalogue_state",
+      "allowed": true
+    },
+    {
+      "table": "genres",
+      "allowed": true
+    },
+    {
+      "table": "movie_genres",
+      "allowed": true
+    },
+    {
+      "table": "movie_provider_checks",
+      "allowed": true
+    },
+    {
+      "table": "movie_watch_providers",
+      "allowed": true
+    },
+    {
+      "table": "user_genre_preferences",
+      "allowed": true
+    },
+    {
+      "table": "user_movie_ratings",
+      "allowed": true
+    },
+    {
+      "table": "user_movie_watchlist",
+      "allowed": true
+    },
+    {
+      "table": "users",
+      "allowed": true
+    }
+  ],
+  "public": {
+    "health": {
+      "status": 200,
+      "body": {
+        "status": "ok",
+        "database": "connected",
+        "migrationVersion": "d9a6f2c1e508"
+      }
+    },
+    "GB": {
+      "status": 200,
+      "body": {
+        "id": "0009d2cc-da61-4859-a687-8788830b7594",
+        "providers": {
+          "country": "GB",
+          "status": "success",
+          "attemptedAt": "2026-11-11T13:56:22.977970Z",
+          "checkedAt": "2026-11-11T13:56:23.263541Z",
+          "groups": {
+            "flatrate": [
+              {
+                "id": 29,
+                "name": "Sky Go",
+                "logoUrl": "https://image.tmdb.org/t/p/w92/1Yvl9eP3pmktqChitnFhHJHcBtX.png"
+              },
+              {
+                "id": 591,
+                "name": "Now TV Cinema",
+                "logoUrl": "https://image.tmdb.org/t/p/w92/hlfGtOZsbFw8jwVwDaFPUbaKgrq.png"
+              }
+            ],
+            "rent": [
+              {
+                "id": 2,
+                "name": "Apple TV Store",
+                "logoUrl": "https://image.tmdb.org/t/p/w92/qdEGArH3lKfFnAtYXMkSYk5wxuG.png"
+              },
+              {
+                "id": 10,
+                "name": "Amazon Video",
+                "logoUrl": "https://image.tmdb.org/t/p/w92/jn6TLbtaTZntTRX9UYucHJvpQx1.png"
+              },
+              {
+                "id": 130,
+                "name": "Sky Store",
+                "logoUrl": "https://image.tmdb.org/t/p/w92/nNkZ1JKe6vNhzti14KiKEUWHE6H.png"
+              }
+            ],
+            "buy": [
+              {
+                "id": 2,
+                "name": "Apple TV Store",
+                "logoUrl": "https://image.tmdb.org/t/p/w92/qdEGArH3lKfFnAtYXMkSYk5wxuG.png"
+              },
+              {
+                "id": 10,
+                "name": "Amazon Video",
+                "logoUrl": "https://image.tmdb.org/t/p/w92/jn6TLbtaTZntTRX9UYucHJvpQx1.png"
+              },
+              {
+                "id": 35,
+                "name": "Rakuten TV",
+                "logoUrl": "https://image.tmdb.org/t/p/w92/872dfVu1biZISJ8rO143CZZutPR.png"
+              },
+              {
+                "id": 130,
+                "name": "Sky Store",
+                "logoUrl": "https://image.tmdb.org/t/p/w92/nNkZ1JKe6vNhzti14KiKEUWHE6H.png"
+              },
+              {
+                "id": 192,
+                "name": "YouTube",
+                "logoUrl": "https://image.tmdb.org/t/p/w92/5Maob4o5w8oZnNeYpCDyVFD3M7X.png"
+              }
+            ],
+            "free": [],
+            "ads": []
+          }
+        },
+        "watchOptionsUrl": "https://www.themoviedb.org/movie/953-madagascar/watch?locale=GB"
+      }
+    },
+    "SG": {
+      "status": 200,
+      "body": {
+        "id": "0009d2cc-da61-4859-a687-8788830b7594",
+        "providers": {
+          "country": "SG",
+          "status": "success",
+          "attemptedAt": "2026-11-11T13:56:22.977970Z",
+          "checkedAt": "2026-11-11T13:56:23.264541Z",
+          "groups": {
+            "flatrate": [
+              {
+                "id": 119,
+                "name": "Amazon Prime Video",
+                "logoUrl": "https://image.tmdb.org/t/p/w92/gMZdpavHmxFNnLpMHwVxfqeux2g.png"
+              }
+            ],
+            "rent": [
+              {
+                "id": 2,
+                "name": "Apple TV Store",
+                "logoUrl": "https://image.tmdb.org/t/p/w92/qdEGArH3lKfFnAtYXMkSYk5wxuG.png"
+              }
+            ],
+            "buy": [
+              {
+                "id": 2,
+                "name": "Apple TV Store",
+                "logoUrl": "https://image.tmdb.org/t/p/w92/qdEGArH3lKfFnAtYXMkSYk5wxuG.png"
+              }
+            ],
+            "free": [],
+            "ads": []
+          }
+        },
+        "watchOptionsUrl": "https://www.themoviedb.org/movie/953-madagascar/watch?locale=SG"
+      }
+    },
+    "US": {
+      "status": 200,
+      "body": {
+        "id": "0009d2cc-da61-4859-a687-8788830b7594",
+        "providers": {
+          "country": "US",
+          "status": "success",
+          "attemptedAt": "2026-11-11T13:56:22.977970Z",
+          "checkedAt": "2026-11-11T13:56:23.263541Z",
+          "groups": {
+            "flatrate": [
+              {
+                "id": 386,
+                "name": "Peacock Premium",
+                "logoUrl": "https://image.tmdb.org/t/p/w92/a1UIdq5BrkcAxnxcUhFsNbXnxeu.png"
+              },
+              {
+                "id": 387,
+                "name": "Peacock Premium Plus",
+                "logoUrl": "https://image.tmdb.org/t/p/w92/yrEwyMzEKdqAoGhaWUARtIxByol.png"
+              }
+            ],
+            "rent": [
+              {
+                "id": 2,
+                "name": "Apple TV Store",
+                "logoUrl": "https://image.tmdb.org/t/p/w92/qdEGArH3lKfFnAtYXMkSYk5wxuG.png"
+              },
+              {
+                "id": 3,
+                "name": "Google Play Movies",
+                "logoUrl": "https://image.tmdb.org/t/p/w92/aZRENwYILujqs0RVOZutTh0BVGV.png"
+              },
+              {
+                "id": 7,
+                "name": "Fandango At Home",
+                "logoUrl": "https://image.tmdb.org/t/p/w92/wpOt6x0dRxTrIzuBosto4LGd7E9.png"
+              },
+              {
+                "id": 10,
+                "name": "Amazon Video",
+                "logoUrl": "https://image.tmdb.org/t/p/w92/jn6TLbtaTZntTRX9UYucHJvpQx1.png"
+              },
+              {
+                "id": 192,
+                "name": "YouTube",
+                "logoUrl": "https://image.tmdb.org/t/p/w92/5Maob4o5w8oZnNeYpCDyVFD3M7X.png"
+              }
+            ],
+            "buy": [
+              {
+                "id": 2,
+                "name": "Apple TV Store",
+                "logoUrl": "https://image.tmdb.org/t/p/w92/qdEGArH3lKfFnAtYXMkSYk5wxuG.png"
+              },
+              {
+                "id": 3,
+                "name": "Google Play Movies",
+                "logoUrl": "https://image.tmdb.org/t/p/w92/aZRENwYILujqs0RVOZutTh0BVGV.png"
+              },
+              {
+                "id": 7,
+                "name": "Fandango At Home",
+                "logoUrl": "https://image.tmdb.org/t/p/w92/wpOt6x0dRxTrIzuBosto4LGd7E9.png"
+              },
+              {
+                "id": 10,
+                "name": "Amazon Video",
+                "logoUrl": "https://image.tmdb.org/t/p/w92/jn6TLbtaTZntTRX9UYucHJvpQx1.png"
+              },
+              {
+                "id": 192,
+                "name": "YouTube",
+                "logoUrl": "https://image.tmdb.org/t/p/w92/5Maob4o5w8oZnNeYpCDyVFD3M7X.png"
+              }
+            ],
+            "free": [],
+            "ads": [
+              {
+                "id": 207,
+                "name": "The Roku Channel",
+                "logoUrl": "https://image.tmdb.org/t/p/w92/b7uhrYJtAe7b1ieJGg705vTbwrX.png"
+              }
+            ]
+          }
+        },
+        "watchOptionsUrl": "https://www.themoviedb.org/movie/953-madagascar/watch?locale=US"
+      }
+    }
+  }
+}

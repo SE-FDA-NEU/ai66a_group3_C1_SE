@@ -27,34 +27,27 @@ The sprint still has exactly the same ten work issues, owners and review coordin
 | [T04 #251](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/251) | Import regional providers and validated TMDb watch-options links | @anotify-vie | @hoang3003 | #248, #249 | Closed |
 | [T05 #252](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/252) | Display regional providers with a country selector and TMDb button | @vu-huzy | @NguyenTuanAnh0608 | #251 | Closed |
 | [T06 #253](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/253) | Rehearse PostgreSQL recovery and rollback including provider data | @hoang3003 | @NguyenTuanAnh0608 | #250, #251 | Closed |
-| [T07 #254](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/254) | Deliver acceptance tooling, actual technical evidence and final execution checklist to C02 | @NguyenTuanAnh0608 | @vu-huzy | #250, #252, #253 technical handoffs | Open; closes at reviewed #265 merge |
-| [T08 #255](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/255) | Deliver monitoring baseline, operations/portable docs and release handoff to C02 | @vu-huzy | @hoang3003 | #250, #253, #254 technical handoffs | Open; closes at reviewed #264 merge |
+| [T07 #254](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/254) | Deliver acceptance tooling, actual technical evidence and final execution checklist to C02 | @NguyenTuanAnh0608 | @vu-huzy | #250, #252, #253 technical handoffs | Closed via merged #265 |
+| [T08 #255](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/255) | Deliver monitoring baseline, operations/portable docs and release handoff to C02 | @vu-huzy | @hoang3003 | #250, #253, #254 technical handoffs | Closed via merged #264 |
 | [C02 #256](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/256) | Sprint 5 wrap-up, complete-feature v1.0 release and submission | @kietxuan | @anotify-vie | #247 to #255 | Open |
 
 The live graph has 23 blocked-by edges and no cycle. The "Closed" states record
 GitHub issue state only; several closed issues still list pending operator steps
 in their own evidence (for example durable backup storage and an independent
-recovery reproduction in [T06](s5-t06-postgresql-recovery.md), and the public
-runtime rollout of the regional migration). The operator roster below,
+recovery reproduction in [T06](s5-t06-postgresql-recovery.md), while the regional runtime rollout is now verified by C02). The operator roster below,
 retention date and monitoring owners are unchanged. The current public runtime
 status and risks are in [operations](operations.md).
 
-**11 November readiness amendment:** the PO deferred production deploy,
-migration and enrichment until the remaining readiness PRs are prepared, aiming
-for one Manual Deploy of a frozen green-main candidate. Under the PO's closure
-amendment, the T07/T08 PRs use Closes #254 / Closes #255 after technical delivery,
-green checks and independent formal review. C02's PR uses Refs #256; all remaining
-public/human/operational release acceptance stays Pending under C02 until
-evidenced. Technical issue closure does not certify release acceptance.
-Correct Render access is now verified;
-actual live SHA is `f24ef54699efb2fa26f363107bd31401f9b12e58`, not the newer
-regional main candidate. Auto-deploy remains After CI Checks Pass; the
-[release handoff](s5-t08-c02-handoff.md#one-batch-release-plan) explains the
-explicit merge-commit skip phrase and exact-SHA/CI checks. No service settings,
-original Planning screenshots were changed. The dependency topology is retained;
-T07/T08 require technical handoffs, while C02 owns final operational completion.
-This is a
-batching preference, not permission to invent final results or ignore a defect.
+**11 November deployment/closure amendment:** T07/T08 are merged and Closed;
+C02 remains Open. The PO removed the one-deploy restriction and chose deploy
+first, collect real evidence, then review/merge C02 docs. Render confirms
+acc4924 Live; Neon head d9a6f2c1e508 and all 989 x 3 regional checks are populated.
+The [C02 record](s5-c02-wrap-up.md) supersedes earlier f24/undeployed statements.
+No original Planning screenshot is changed. Under the revised policy, record
+running SHA/CI separately from later docs-main SHA/CI; v1.0 targets the accepted
+running main commit. Further reviewed deploys are allowed. All remaining M5
+public/device/demo/PO, protection, recovery, wrap-up and submission gates remain
+C02 responsibilities; no final result is inferred from closed task states.
 
 > **Historical record.** Everything from here to "Author verification" is the
 > 6 November Planning snapshot. Its issue titles, the T04 CI / T05 monitoring
@@ -258,11 +251,11 @@ The supplied M5 brief says seven operations sections but enumerates six. T08
 prepares all six enumerated sections in order, observes the 800-word prose
 limit outside tables and records any instructor clarification.
 
-The final ordering is T08 documentation merge, C02 wrap-up merge, green main
-CI, deployment of that SHA, final public checks, v1.0 tag/release, manual PDF
-submission and C02 completion comment. The wrap-up PR uses Refs #256 while
-those external release steps are outstanding. This places the final recorded
-wrap-up in the demonstrated release commit.
+The current ordering permits green-main deployment, actual public observations,
+reviewed C02 documentation and further verified deploys if needed. Track running
+and documentation SHAs separately, tag v1.0 on the accepted running main commit,
+then complete manual submission and C02's real completion comment. The wrap-up
+PR uses Refs #256; see the superseding C02 release policy above.
 
 C01 closes after its planning PR has green checks, a substantive independent
 approval and a merge. Implementation, cloud access and public acceptance have

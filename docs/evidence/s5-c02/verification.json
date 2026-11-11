@@ -1,0 +1,35 @@
+{
+  "checkedAt": "2026-11-11T14:12:31.482075+00:00",
+  "author": "Codex automated checks; not independent teammate acceptance",
+  "checks": {
+    "markdownFilesAndAnchors": "PASS",
+    "operationsSections": 6,
+    "operationsProseWords": 314,
+    "regionalAggregateAndApi": "PASS",
+    "monitoringRecalculation": "PASS",
+    "publicReadOnlyBrowser": "14/14 pass; physical phone/PO/demo pending",
+    "compactP0": "40 passed, 1 inherited deprecation warning",
+    "verifierContract": "18 passed",
+    "c01DocumentationCheck": "PASS",
+    "credentialPatternScanChangedText": "PASS",
+    "noProductionWritesDuringDocumentation": true
+  },
+  "sourceHashes": {
+    "README.md": "78979e86b3bc4593a2a188b8f4d2237f15555900896898e4b5d75e0bc234b4af",
+    "docs/evidence/s5-c02/README.md": "7857831384f54ecd1f1af823426fddc1217ff829842d997f82fc76bdf83bd476",
+    "docs/evidence/s5-c02/c02-public-detail-desktop.png": "2bf5c9125c7ec7d30772f523f671800f242ef85536d7c902b8d4671d38050b6c",
+    "docs/evidence/s5-c02/c02-public-detail-mobile-emulated.png": "368dc107d52d46423a18720fe02f6e6ecbda47080f9bfcb336d889a439e3240a",
+    "docs/evidence/s5-c02/c02-public-probe.json": "4eb18f2991d681f1ba59bba805c38489049ffbfc39b80acd480a79d24b50af45",
+    "docs/evidence/s5-c02/github.json": "036fbc4727338d228c22557adb1ce4732c918263bfa00e4c30098b37f0e0980a",
+    "docs/evidence/s5-c02/monitoring.json": "5ef7d9a65e2b3836aaf45b96a63b83ceffed33924d46f39c61af5c0e3a990b42",
+    "docs/evidence/s5-c02/render.json": "a5446b84ec6fd0885536b253cb78ac559b0276dec9184f5bf6c506dc53b833cd",
+    "docs/evidence/s5-c02/runtime.json": "2ae4a8da3336f887b3a5efb2b84344c8f16f3c42e4a7764b09e0f10c56211861",
+    "docs/operations.md": "9d686f18060a5d76fd4b264f75c67883669b9ac7aaa0225b4dc5338561bf0f5c",
+    "docs/s5-c02-wrap-up.md": "71a1e714551723a2d26fff4d705c737a40f66f6c9d0d54a452cc18a7ec0c0b04",
+    "docs/s5-t06-postgresql-recovery.md": "fc24f15e137a99a58951a8101d4cf01c96a267a5d896de542ad468f9d392200e",
+    "docs/s5-t08-c02-handoff.md": "d8009373cdade624d6b943c25b2f6fe266ca8d54f02ed583643d55abd7b47712",
+    "docs/sprint-log.md": "852b0ad1e12a84e02ca860b27b345a5f5420d39ef7b0b0510ad1a3bc997f3d0d",
+    "docs/sprint5-backlog-refinement.md": "97288dafd849b3e261ff17fabb2ad8b59dc6a6ed75b89a2c1dea1d7cd022a131"
+  },
+  "hashFormat": "SHA-256; Markdown/JSON CRLF normalized to LF; binary files unchanged"
+}

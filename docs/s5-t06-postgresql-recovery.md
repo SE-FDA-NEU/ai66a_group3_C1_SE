@@ -35,7 +35,10 @@ tests and redacted evidence. Custom-format archives contain password hashes,
 session digests and account data, so keep them in restricted private storage.
 The recorded real Neon rehearsal archive currently resides in an ignored local
 operator area. The named operators still need to establish the durable
-destination, replication, daily execution and access before #253 closes.
+destination, replication, daily execution and access. #253 is now Closed as a
+technical delivery; these unfinished operational obligations are explicitly
+owned by [C02 R06](s5-c02-wrap-up.md#remaining-c02-gates-and-named-next-actions),
+not deemed complete by that issue state.
 
 ## Preflight and backup
 

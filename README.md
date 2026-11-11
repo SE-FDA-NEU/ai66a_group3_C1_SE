@@ -7,10 +7,11 @@
 **Release 5 first screen** — Sprint 5, 5–12 November 2026. PO and Scrum Master
 (SM5): **@kietxuan**. The free Render service sleeps when idle, so the first
 request can take about a minute; this is not a guaranteed-uptime service.
-The public runtime is verified at T03 commit `f24ef546` (11 November 2026);
-the regional watch-provider selector is in `main` but is **not yet rolled out publicly**.
-The PO is preparing a single coordinated release window. Exact status is in
-the [operations record](docs/operations.md#1-deployment-and-release).
+Public deployment `acc4924` is verified Live on **11 November 2026**, with
+989 TMDb movies, PostgreSQL 18 and US/GB/SG availability checks populated.
+Final full-device/PO/demo acceptance, v1.0 and submission remain Pending under
+[C02](docs/s5-c02-wrap-up.md). Current evidence and operating procedures are in
+[operations](docs/operations.md#1-deployment-and-release).
 
 **Public test account — application user (the only app role):**
 
