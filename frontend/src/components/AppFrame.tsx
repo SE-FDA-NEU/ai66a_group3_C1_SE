@@ -1,17 +1,43 @@
-import type { ReactNode } from "react";
+import { useEffect, useSyncExternalStore, type ReactNode } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { ThemeToggle } from "../theme.tsx";
 import SessionNavigation from "./SessionNavigation.tsx";
 import { useAuth } from "../auth/authState.ts";
+import MobileNavigation from "./MobileNavigation.tsx";
+
+const compactQuery = "(max-width: 1100px)";
+function subscribeCompact(onChange: () => void) {
+  const media = window.matchMedia?.(compactQuery);
+  media?.addEventListener("change", onChange);
+  return () => media?.removeEventListener("change", onChange);
+}
+const isCompact = () => window.matchMedia?.(compactQuery).matches ?? false;
 
 export default function AppFrame({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
   const auth = useAuth();
+  const compact = useSyncExternalStore(subscribeCompact, isCompact, () => false);
   const authPage = pathname === "/login" || pathname === "/register";
   // Public lists restore sessions as before. Other routes keep their existing
   // guard/rating ownership; the static explanation must not start an API call.
   const publicList = pathname === "/" || pathname === "/popular" || pathname === "/search";
   const showSession = !authPage && (publicList || auth.status === "authenticated" || auth.status === "unauthenticated");
+  const { status, refresh } = auth;
+  useEffect(() => {
+    // A closed mobile drawer must not prevent public pages restoring a session.
+    if (publicList && status === "unknown") void refresh();
+  }, [publicList, status, refresh]);
+  const navigation = <nav className="primary-nav" aria-label="Main navigation">
+    <NavLink to="/" end>Home</NavLink>
+    <NavLink to="/popular">Popular movies</NavLink>
+    <NavLink to="/search">Search</NavLink>
+    <NavLink to="/recommendations">My recommendations</NavLink>
+    <NavLink to="/preferences">Preferences</NavLink>
+    <NavLink to="/watchlist">My watchlist</NavLink>
+    {auth.status === "authenticated" ? <NavLink to="/profile">Profile</NavLink> : null}
+    <NavLink to="/about-recommendations">How recommendations work</NavLink>
+  </nav>;
+  const session = showSession ? <SessionNavigation showRecommendationsLink={false} /> : null;
   return <>
     <a className="skip-link" href="#main-content">Skip to content</a>
     <header className="app-header">
@@ -19,19 +45,10 @@ export default function AppFrame({ children }: { children: ReactNode }) {
         <Link className="brand" to="/" aria-label="CineAI movie catalogue">
           <span className="brand__mark" aria-hidden="true">✦</span><span>Cine<span className="brand__accent">AI</span></span>
         </Link>
-        <nav className="primary-nav" aria-label="Main navigation">
-          <NavLink to="/" end>Home</NavLink>
-          <NavLink to="/popular">Popular movies</NavLink>
-          <NavLink to="/search">Search</NavLink>
-          <NavLink to="/recommendations">My recommendations</NavLink>
-          <NavLink to="/preferences">Preferences</NavLink>
-          <NavLink to="/watchlist">My watchlist</NavLink>
-          {auth.status === "authenticated" ? <NavLink to="/profile">Profile</NavLink> : null}
-          <NavLink to="/about-recommendations">How recommendations work</NavLink>
-        </nav>
+        {!compact ? navigation : null}
         <div className="app-header__account">
           <ThemeToggle />
-          {showSession ? <SessionNavigation showRecommendationsLink={false} /> : null}
+          {compact ? <MobileNavigation>{navigation}{session}</MobileNavigation> : session}
         </div>
       </div>
     </header>

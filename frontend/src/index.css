@@ -486,3 +486,39 @@ p { line-height: 1.65; }
   .movie-providers__selector, .movie-providers__selector select { width: 100%; }
   .provider-action .button-link { width: 100%; text-align: center; }
 }
+
+/* Compact navigation uses one modal drawer, not wrapped rows of header links. */
+.navigation-toggle, .navigation-close { width: 44px; height: 44px; min-height: 44px; padding: 0; flex: 0 0 44px; }
+.navigation-backdrop { position: fixed; inset: 0; z-index: 60; background: rgb(0 0 0 / 60%); }
+.navigation-drawer { display: flex; flex-direction: column; width: min(360px, calc(100% - 24px)); height: 100dvh; background: var(--surface); color: var(--text); border-right: 1px solid var(--border); box-shadow: var(--shadow); }
+.navigation-drawer__heading { display: flex; flex: 0 0 auto; align-items: center; justify-content: space-between; gap: 1rem; padding: max(1.25rem, env(safe-area-inset-top)) 1.25rem 1.25rem; border-bottom: 1px solid var(--border); }
+.navigation-drawer__heading h2 { margin: .25rem 0 0; font-size: 1.25rem; }
+.navigation-close { font-size: 1.75rem; }
+.navigation-drawer__body { min-height: 0; padding: 1rem 1.25rem max(1.25rem, env(safe-area-inset-bottom)); overflow-y: auto; overscroll-behavior: contain; }
+.navigation-drawer .primary-nav { display: grid; gap: .4rem; }
+.navigation-drawer .primary-nav a { display: flex; align-items: center; min-height: 48px; padding: .8rem 1rem; font-size: .9rem; overflow-wrap: anywhere; }
+.navigation-drawer .primary-nav a.active { color: var(--accent); box-shadow: inset 3px 0 var(--accent); }
+.navigation-drawer .session-actions { display: flex; flex-direction: column; align-items: stretch; gap: .75rem; margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid var(--border); }
+.navigation-drawer .session-actions > .muted { max-width: 100%; flex-basis: auto; text-align: left; font-size: .8rem; }
+.navigation-drawer .session-actions button, .navigation-drawer .session-actions .button-link { min-height: 44px; font-size: .85rem; }
+@media (max-width: 1100px) {
+  .app-header__inner { flex-wrap: nowrap; padding: .75rem 1rem; gap: .75rem; }
+  .app-header__account { flex-basis: auto; margin-left: auto; align-items: center; gap: .5rem; }
+  .app-header .brand { font-size: 1.45rem; }
+  .app-header .theme-toggle { width: 44px; height: 44px; min-height: 44px; padding: 0; }
+  .app-header .theme-toggle > span:last-child { display: none; }
+}
+@media (max-width: 600px) {
+  /* Avoid the iOS focus zoom and keep narrow forms usable. */
+  input, select, textarea, .catalogue-sort select, .movie-providers__selector select { font-size: 1rem; }
+  .search-controls { grid-template-columns: minmax(0, 1fr); }
+  .search-controls > button { width: 100%; }
+  .catalogue-hero__visual { display: none; }
+  .preferences-page .genre-option { min-height: 150px; padding: .75rem; }
+  .preference-toolbar { position: static; }
+  .movie-detail__facts { grid-template-columns: 1fr; }
+  .recommendations-card { padding: 1rem; }
+  .page-controls button { padding-inline: .5rem; }
+  .spotlight-dots button { width: 44px; height: 44px; min-height: 44px; }
+  .spotlight-pagination__label { display: none; }
+}

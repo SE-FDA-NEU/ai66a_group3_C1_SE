@@ -214,7 +214,9 @@ function PreferencesPage() {
             <span className="preference-toolbar__symbol" aria-hidden="true">✦</span>
             <div><p id="genre-selection-count" className="selection-count" aria-live="polite">
               {selectedIds.size} of {MAX_GENRES} selected
-            </p><p className="field-hint">Clear one selection to make room for another.</p></div>
+            </p><p className="field-hint">{selectedIds.size >= MAX_GENRES
+              ? "Clear one selection to make room for another."
+              : "Choose up to 5 genres, then save your preferences."}</p></div>
           </div>
           <div className="preference-actions"><button type="button" onClick={() => void handleSave()} disabled={isSaving}>
             {isSaving ? "Saving..." : "Save preferences"}<span aria-hidden="true"> →</span>
