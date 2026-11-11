@@ -187,6 +187,14 @@ command. Add `--refresh` to recheck successful/no-data pairs. Wait for any repor
 availability. Follow the migration/rollout and per-country evidence requirements.
 [T04 operator contract](api.md#14-s5-t04-regional-providers-and-tmdb-watch-options-251)
 
+For PostgreSQL 18 backup, isolated restore, regional/account comparison and
+code rollback, use the [S5-T06 recovery runbook](s5-t06-postgresql-recovery.md).
+Its [dated verification](evidence/s5-t06-recovery/README.md) includes a real
+989-movie Neon restore and isolated synthetic refusal/rollback checks. Final
+acceptance still requires durable private backup storage with primary/backup
+operator access and a genuine independent reproduction. Git stores the runbook
+and redacted evidence. Keep sensitive database archives in private storage.
+
 After pulling changes, back up valuable SQLite data consistently and run
 `alembic upgrade head` before restarting the backend. Compare `alembic current`
 with `alembic heads`; use the actual repository head, not an old task's revision.

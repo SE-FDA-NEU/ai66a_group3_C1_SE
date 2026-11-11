@@ -1,0 +1,15 @@
+source_database=cineai_development target_database=s5_t06_neon_verified_20261110
+source_head=d9a6f2c1e508 target_head=d9a6f2c1e508
+table=catalogue_revisions rows=2 equal=true
+table=genres rows=19 equal=true
+table=users rows=2 equal=true
+table=auth_sessions rows=6 equal=true
+table=catalog_movies rows=989 equal=true
+table=catalogue_state rows=1 equal=true
+table=user_genre_preferences rows=2 equal=true
+table=movie_genres rows=2756 equal=true
+table=movie_provider_checks rows=3956 equal=true
+table=user_movie_ratings rows=2 equal=true
+table=user_movie_watchlist rows=2 equal=true
+table=movie_watch_providers rows=21369 equal=true
+region_status_and_link_states_equal=true
