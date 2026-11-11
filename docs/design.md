@@ -735,7 +735,7 @@ backdrop remains a separate detail hero with text overlay/fallback.
 | `MovieRating` with `StarRating` (T01) | account/movie key; `StarRating(value,onChange,disabled)` | Radio stars change draft; `MovieRating` owns existing GET/PUT, committed value and explicit Save. |
 | Watchlist feature control (planned T12) | account/movie key, `inWatchlist`, pending/error | Integrate with T01 shell without inventing a second shared component until T12 exports one. |
 | `PageControls` | API `meta`, current URL state | Ten per page by default, only API totals, revision-aware navigation. |
-| Provider slot (planned style only) | static label and deferred state | No `ProviderSlot` export exists in T01. If shown, use muted non-clickable text `Availability information is not yet available`; no live VN offer claim before S5. |
+| Provider slot (planned style only; **superseded in Sprint 5**, see section 13) | static label and deferred state | Historical S4 contract: no `ProviderSlot` export in T01 and muted non-clickable `Availability information is not yet available`. The shipped Details section is the regional Where to watch UI described in section 13. |
 
 Feature owners own the actual API/state integration for their pages. Shared
 shell/CSS/router/schema changes use T01/route/migration ownership; the
@@ -851,11 +851,11 @@ working behaviour; this design section is no implementation evidence.
 
 The ZIP's fixed titles/posters, 15,000+ movies, real-time TMDb syncing,
 match percentages, neural/vector claims, IMDb/director/runtime facts, 4K or
-full-film playback, clickable VN provider badges, fake account avatar and
+full-film playback, clickable provider badges, fake account avatar and
 production company claims are sample content. Only imported local catalogue
 data and approved application API fields may appear as factual product data.
-VN provider slots may be styled as non-clickable placeholders for S5, with
-no live availability claim. Trailer support is only admitted through
+*Historical S4 wording, superseded in Sprint 5 (section 13):* VN provider slots
+were to be non-clickable placeholders with no live availability claim. Trailer support is only admitted through
 T19/T20 if those tasks are accepted; no full film, autoplay or invented
 provider link enters this C03 contract.
 
@@ -917,3 +917,34 @@ the current table/constraint contract above supersedes its rating column.
 Downgrade refuses fractional rows instead of silently rounding. Setup now
 imports 50 popular pages (about 1,000 raw rows), then rebuilds/checks the
 shared overview index for the active revision.
+
+## 13. Sprint 5 amendment: PostgreSQL 18, regional providers and the TMDb action
+
+This section supersedes earlier VN-only and non-clickable provider wording; the
+earlier text stays as dated history. Evidence:
+[T04](evidence/s5-t04-providers/regional-2026-11-10.md),
+[T05](evidence/s5-t05-regional-ui.md), contract in
+[API section 14](api.md#14-s5-t04-regional-providers-and-tmdb-watch-options-251).
+
+- **Data store.** PostgreSQL **18** (Neon, Singapore) is the public database;
+  SQLite remains the local default and the default test database. The current
+  Alembic head is `d9a6f2c1e508`, following `b8e4d2c96f10` (provider tables).
+- **Provider tables.** `movie_provider_checks` (status, attempt/success times,
+  nullable `watch_options_url` and `link_status`) and `movie_watch_providers` (group
+  memberships) are keyed per `(movie_id, country)`. Stored countries are VN
+  (legacy history), US, GB and SG.
+- **Policy.** Public choices are **US (default), GB and SG**. The selection controls
+  viewing availability only. Unsupported values return a safe HTTP 400.
+- **Details DTO.** `GET /api/movies/{movieId}?country=<code>` adds `providers`
+  (country, status, `attemptedAt`, `checkedAt`, five groups) and nullable
+  `watchOptionsUrl`, all for the selected country. Missing data is unknown
+  availability and not a failure.
+- **UI.** A compact accessible selector in Where to watch persists a valid choice
+  in `cineai-watch-country`. Badges are informational and not links. One
+  button-styled link, **View watch options on TMDb ↗**, opens the movie- and
+  country-specific TMDb page in a new tab (`rel="noopener noreferrer"`). It is not a
+  CineAI player or a provider deep link. States: badges only, empty groups with a
+  valid link, no data (neutral wording), stale (warning with the last successful
+  date), error and not-checked.
+- **Attribution.** "Watch provider data comes from TMDb, powered by JustWatch."
+  stays visible, with the TMDB non-endorsement notice.

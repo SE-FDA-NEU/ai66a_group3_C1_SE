@@ -4,6 +4,64 @@ C01 [#247](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/247).
 PO and SM5 are **@kietxuan**. The planned independent reviewer is
 **@hoang3003**, with another non-contributing member taking over if needed.
 
+## Current scope and delivery map (amended 7, 8 and 10 November 2026)
+
+Reconciled by S5-T08 [#255](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/255)
+against the live issues on 11 November 2026 and the amendments recorded in
+[C01 #247](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/247).
+The sprint still has exactly the same ten work issues, owners and review coordinators.
+
+| Amendment | Current decision |
+|---|---|
+| 7 November | Regional watch providers are committed Sprint 5 scope (replacing the original deferral). T03 absorbed CI/protection and basic health/logging, T04 became the providers backend, T05 the providers UI and T08 absorbed monitoring plus final documentation |
+| 8 November | Standardise on **PostgreSQL 18.x** (replacing PostgreSQL 17) and add exactly one validated **View watch options on TMDb ↗** action below the provider groups. Badges remain informational |
+| 10 November | Supported markets are **US (default), GB and SG** with one compact browser-persisted selector, replacing the VN-only policy. The actual VN run (989 movies, no data) is historical evidence |
+| 11 November, closure ownership | PO requests T07/T08 closure on their reviewed technical/documentation deliveries. C02 explicitly owns all remaining deployment, final public/device/PO/demo acceptance, required-check settings/screenshot, durable recovery handoff and final monitoring, in addition to wrap-up/v1.0/submission. No M5 requirement or issue is removed |
+
+| Issue | Current delivery | Owner | Review coordinator | Blocked by (live 11 Nov) | State 11 Nov |
+|---|---|---|---|---|---|
+| [C01 #247](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/247) | Confirm full feature scope, ownership and M5 release plan | @kietxuan | @hoang3003 | none | Closed |
+| [T01 #248](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/248) | Preserve application behaviour on PostgreSQL 18 | @hoang3003 | @kietxuan | #247 | Closed |
+| [T02 #249](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/249) | Provision Neon PostgreSQL 18, TMDb data and NLP startup | @NguyenTuanAnh0608 | @hoang3003 | #248 | Closed |
+| [T03 #250](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/250) | Gate PostgreSQL 18 CI and deploy a healthy public application | @anotify-vie | @NguyenTuanAnh0608 | #249 | Closed |
+| [T04 #251](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/251) | Import regional providers and validated TMDb watch-options links | @anotify-vie | @hoang3003 | #248, #249 | Closed |
+| [T05 #252](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/252) | Display regional providers with a country selector and TMDb button | @vu-huzy | @NguyenTuanAnh0608 | #251 | Closed |
+| [T06 #253](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/253) | Rehearse PostgreSQL recovery and rollback including provider data | @hoang3003 | @NguyenTuanAnh0608 | #250, #251 | Closed |
+| [T07 #254](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/254) | Deliver acceptance tooling, actual technical evidence and final execution checklist to C02 | @NguyenTuanAnh0608 | @vu-huzy | #250, #252, #253 technical handoffs | Open; closes at reviewed #265 merge |
+| [T08 #255](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/255) | Deliver monitoring baseline, operations/portable docs and release handoff to C02 | @vu-huzy | @hoang3003 | #250, #253, #254 technical handoffs | Open; closes at reviewed #264 merge |
+| [C02 #256](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/256) | Sprint 5 wrap-up, complete-feature v1.0 release and submission | @kietxuan | @anotify-vie | #247 to #255 | Open |
+
+The live graph has 23 blocked-by edges and no cycle. The "Closed" states record
+GitHub issue state only; several closed issues still list pending operator steps
+in their own evidence (for example durable backup storage and an independent
+recovery reproduction in [T06](s5-t06-postgresql-recovery.md), and the public
+runtime rollout of the regional migration). The operator roster below,
+retention date and monitoring owners are unchanged. The current public runtime
+status and risks are in [operations](operations.md).
+
+**11 November readiness amendment:** the PO deferred production deploy,
+migration and enrichment until the remaining readiness PRs are prepared, aiming
+for one Manual Deploy of a frozen green-main candidate. Under the PO's closure
+amendment, the T07/T08 PRs use Closes #254 / Closes #255 after technical delivery,
+green checks and independent formal review. C02's PR uses Refs #256; all remaining
+public/human/operational release acceptance stays Pending under C02 until
+evidenced. Technical issue closure does not certify release acceptance.
+Correct Render access is now verified;
+actual live SHA is `f24ef54699efb2fa26f363107bd31401f9b12e58`, not the newer
+regional main candidate. Auto-deploy remains After CI Checks Pass; the
+[release handoff](s5-t08-c02-handoff.md#one-batch-release-plan) explains the
+explicit merge-commit skip phrase and exact-SHA/CI checks. No service settings,
+original Planning screenshots were changed. The dependency topology is retained;
+T07/T08 require technical handoffs, while C02 owns final operational completion.
+This is a
+batching preference, not permission to invent final results or ignore a defect.
+
+> **Historical record.** Everything from here to "Author verification" is the
+> 6 November Planning snapshot. Its issue titles, the T04 CI / T05 monitoring
+> assignment, the PostgreSQL 17 reference in older logs and the VN deferral are
+> superseded by the table above. The three Planning screenshots show that
+> original inventory (all ten items Open) and were deliberately not altered.
+
 ## Planning facts and evidence
 
 | Fact | Recorded value and source |

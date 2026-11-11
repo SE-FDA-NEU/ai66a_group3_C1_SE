@@ -8,6 +8,12 @@ environment and Python installs are needed; see [Verify](#verify). The decision
 is in [design.md](design.md); manual
 smoke/provenance and verification ownership are in the [runbook](tmdb-sprint3-runbook.md).
 
+**Public release path (PostgreSQL 18, Neon, Render):** see
+[PostgreSQL 18, Neon and Render](#postgresql-18-neon-and-render-public-runtime).
+Day-to-day monitoring, rollback and ownership are in [operations](operations.md).
+The sections between this note and that one describe the local SQLite path and
+their dated test records are historical.
+
 Earlier clean-clone baseline tested by: Codex, Sprint 3, 2026-10-18, Windows PowerShell,
 Python 3.12.6 / Node.js 24.19.0 / Microsoft Edge 155.0.4283.62, committed
 application and verification-code SHA
@@ -271,6 +277,176 @@ Do not switch to a separate demo database, reseed, or rerun an import merely
 to create the account. A fresh clone creates its own database by migrations
 and a real TMDb import; it does not copy the team's local database.
 
+## PostgreSQL 18, Neon and Render (public runtime)
+
+This is the operator path for the public service
+(<https://cineai-o9tf.onrender.com/>). The commands above use local SQLite; the
+public runtime uses **PostgreSQL 18** on Neon (Singapore) and Render Free.
+Run everything from the repository root after the locked installs. On POSIX replace
+`.\.venv\Scripts\python.exe` with `python`. Keep every connection URL, password and
+TMDb token in a private secret manager or ignored `.env`; never paste them into
+Git, issues, screenshots or chat. Public status of each step is in the
+[operations record](operations.md#1-deployment-and-release).
+
+| Value (name only) | Used by | Notes |
+| --- | --- | --- |
+| `DATABASE_URL` | all commands and the server | `postgresql+psycopg://` URL with `sslmode=verify-full`; operator role for migrate/import/enrich, restricted runtime role for the web service |
+| `PGSSLROOTCERT` | server and CLIs | `python -m certifi` bundle; see [S5-T03](s5-t03-deployment.md) |
+| `TMDB_READ_ACCESS_TOKEN` | import/enrichment only | never set on the web service; keep `TMDB_NETWORK_DISABLED=1` there |
+| `NLP_INDEX_PATH` | server, index CLI | derived and disposable, for example under `/tmp` on Render |
+
+### 1. Confirm the target, then migrate
+
+Follow [S5-T02](s5-t02-neon-provisioning.md) to confirm host, database, role,
+PostgreSQL major 18 and TLS before any write. Take a private backup of a populated
+target first ([recovery runbook](s5-t06-postgresql-recovery.md)). Then:
+
+```powershell
+.\.venv\Scripts\python.exe -m alembic -c backend/alembic.ini heads
+.\.venv\Scripts\python.exe -m alembic -c backend/alembic.ini upgrade head
+.\.venv\Scripts\python.exe -m alembic -c backend/alembic.ini current
+.\.venv\Scripts\python.exe -m alembic -c backend/alembic.ini check
+```
+
+`current` must equal the single `heads` result (currently `d9a6f2c1e508`). Grant
+the restricted runtime role `SELECT` on `movie_provider_checks` and
+`movie_watch_providers` (T02 and T04 runbooks). Because `/health` needs the exact
+head in the running code, migrate the **public** database only together with the
+reviewed matching deployment.
+
+The PO has deferred the public rollout until the remaining PRs are ready.
+These are operator instructions, not a request to migrate now. Freeze and
+recheck the final green-main SHA, back up the actual runtime, then coordinate
+migration/grants with deployment in one agreed window. A temporary health 503
+while versions differ is possible. Wait for the matching release to be live
+and healthy before enrichment; follow the [release handoff](s5-t08-c02-handoff.md#one-batch-release-plan).
+
+### 2. Explicit catalogue import and whole-catalogue enrichment
+
+Import is an explicit operator action; the web service never imports. Use the
+explicit 50-page budget, then enrich **every** active movie. With `--all`,
+`--limit` is only a batch size (at most 300), not a catalogue cap.
+
+```powershell
+.\.venv\Scripts\python.exe -m app.cli.import_tmdb_catalogue --pages 50
+.\.venv\Scripts\python.exe -m app.cli.import_tmdb_catalogue --enrich-posters --all
+.\.venv\Scripts\python.exe -m app.cli.import_tmdb_catalogue --enrich-backdrops --all
+.\.venv\Scripts\python.exe -m app.cli.import_tmdb_catalogue --enrich-trailers --all
+.\.venv\Scripts\python.exe -m app.cli.import_tmdb_catalogue --enrich-providers --all --countries US GB SG --limit 300
+```
+
+The provider command also stores each movie's selected-country TMDb
+watch-options link from the same payload, so there is no separate link command.
+The actual 9 November Neon import accepted 989 movies and rejected 11 duplicate
+TMDb IDs ([record](evidence/s5-t02-neon/README.md)); expect an actual count near
+1,000, not an exact one. On an existing accepted catalogue, do not repeat the
+50-page import just to add providers: an import can replace its active snapshot.
+Run only the required enrichment against that active catalogue.
+
+Resume semantics differ by mode:
+
+- Poster/backdrop `--all` deliberately revisits the entire active-ID snapshot,
+  including previous valid/null results; another invocation is a full refresh.
+- Trailer `--all` resumes pending/unattempted work.
+- Provider `--all --countries US GB SG` resumes eligible movie-country pairs;
+  `--limit 300` is a committed batch size, never the total catalogue cap.
+  Wait for any reported `retry_after_seconds`. Only provider mode supports
+  `--refresh` to recheck already successful/no-data pairs.
+
+### 3. Regional checks: what the counts mean
+
+Keep three units apart. **Movies** are unique active movies (989 in the
+development catalogue). **Requests** are HTTP attempts: one shared TMDb payload is
+fetched per attempted movie, so 989 fetches and zero retries served all three
+countries. **Regional checks** are movie-country pairs (989 × 3 = 2,967). Reconcile
+each invocation separately using
+[API section 14](api.md#14-s5-t04-regional-providers-and-tmdb-watch-options-251).
+
+Actual development coverage of 10 November (Neon `cineai_development`, not the
+public runtime) is recorded in the [dated acceptance](evidence/s5-t04-providers/regional-2026-11-10.md):
+
+| Country | With data | No data | Failed | Valid links | Missing links |
+| --- | --- | --- | --- | --- | --- |
+| US (default) | 900 | 89 | 0 | 900 | 89 |
+| GB | 855 | 134 | 0 | 855 | 134 |
+| SG | 706 | 283 | 0 | 706 | 283 |
+
+Missing data is unknown availability and is shown neutrally. The earlier VN-only
+run (989 movies, no VN data; TMDb's region list omitted VN) is
+[historical](evidence/s5-t04-providers/README.md) and its rows stay in the
+database as history. Public-runtime enrichment has **not** been run: as of
+11 November the public service still reports schema `a3d1f8b72c44`.
+
+### 4. Public review users
+
+The local review command (`create_review_account --confirm-local-demo`) is for a
+SQLite demo database and refuses `APP_ENV=production`. For PostgreSQL create each
+approved application-only account with the guarded operator command; the password
+comes from a separate secret environment variable and an existing account is never
+overwritten:
+
+```powershell
+.\.venv\Scripts\python.exe -m app.cli.provision_account `
+  --database-url-env DATABASE_URL `
+  --expected-host <confirmed-host> --expected-database <confirmed-database> `
+  --operator <operator> --email <approved-review-email> `
+  --password-env REVIEW_ACCOUNT_PASSWORD
+```
+
+The PO-approved public demo values are in the [README first screen](../README.md).
+Public login/session/logout was verified on 11 November 2026; no account was
+created or password changed for that check. Provisioning does not reset an
+existing account, so verify an actual login before claiming credentials work.
+
+### 5. Index, startup, cold start and recovery
+
+```powershell
+.\.venv\Scripts\python.exe -m app.cli.rebuild_overview_index rebuild
+.\.venv\Scripts\python.exe -m app.cli.rebuild_overview_index check
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
+```
+
+The index is derived from PostgreSQL. At startup the app reuses a matching file and
+rebuilds a missing or stale one before serving (local Neon-backed measurements of
+3.2 to 3.8 s are labelled local, not Render). On Render use the build and start
+commands in the [deployment runbook](s5-t03-deployment.md). The Free service
+sleeps when idle, so the first public request may take about a minute (53.7 s was
+observed on 11 November); wait and retry, and do not expect uptime guarantees.
+Check `GET /health`: HTTP 200 and a `migrationVersion` equal to the code head. A 503
+means a stale or unreachable database, not a reason to bypass the check.
+
+For backup, isolated restore, comparison and code rollback use the
+[recovery runbook](s5-t06-postgresql-recovery.md); an index file is never a backup.
+Use the full guarded backup/restore commands in that runbook. Comparison needs
+**separate** private `RECOVERY_SOURCE_URL` and `RECOVERY_TARGET_URL` values and
+independently confirmed database names:
+
+```powershell
+.\.venv\Scripts\python.exe -m app.cli.compare_recovery `
+  --source-database '<confirmed-source-db>' `
+  --target-database '<confirmed-isolated-restore-db>'
+```
+
+The `RECOVERY_TEST_SOURCE_URL` / `RECOVERY_TEST_TARGET_URL` names below are for
+the isolated test suite, not the comparator CLI. Rebuild/check the index on the
+restore. Do not replace the live database from an old archive that predates new writes.
+
+### 6. PostgreSQL 18 tests
+
+Use a disposable, password-authenticated PostgreSQL 18 database (never the public
+one). Skips are not acceptance, so require execution:
+
+```powershell
+$env:TEST_POSTGRES_URL = '<disposable password-authenticated PostgreSQL 18 URL>'
+$env:TEST_POSTGRES_MAJOR = '18'
+$env:REQUIRE_POSTGRES_TESTS = '1'
+.\.venv\Scripts\python.exe -m pytest -c pytest.ini backend/tests/test_postgresql_t01.py -v
+```
+
+The focused recovery suite additionally needs two empty `s5_t06_*` databases and
+PostgreSQL 18 clients (`RECOVERY_TEST_SOURCE_URL`, `RECOVERY_TEST_TARGET_URL`; see
+the recovery runbook). Main CI runs both suites with a `postgres:18` service.
+
 ## Required import result and smoke
 
 A successful import prints this shape, with actual counts depending on the
@@ -353,10 +529,12 @@ npm --prefix frontend run dev
 
 ## Expected result
 
-Open `http://127.0.0.1:8000/health`. The response is:
+Open `http://127.0.0.1:8000/health`. The response has this shape, with
+`migrationVersion` equal to the single `alembic heads` result (`d9a6f2c1e508` at
+the current source; older values in historical records are not current):
 
 ```json
-{"status":"ok","database":"connected","migrationVersion":"e9b6f0a42c17"}
+{"status":"ok","database":"connected","migrationVersion":"d9a6f2c1e508"}
 ```
 
 Open `http://localhost:5173/`. The existing home page reads its cards from the
@@ -370,15 +548,16 @@ the current routes on the imported catalogue.
 
 ### Public application-only review account
 
-The PO confirmed that the following credentials are **only for this project's
-local demonstration**, are not a Gmail/service password, and may be published.
+The PO confirmed that these are **project-demo-only** credentials, are not a
+Gmail/service password, and may be published. Public login/session/logout also
+passed on 11 November 2026 ([evidence](evidence/s5-t08-operations/demo-account-check.json)).
 
 | Field | Review value |
 |---|---|
 | Email | `kietxuan@gmail.com` |
 | Password | `123456789` |
-| Purpose | Local M3 application review only; no administrator role |
-| Database | The same configured SQLite database with its accepted TMDb catalogue |
+| Purpose | Shared application-user demonstration; no administrator role |
+| Database | Public: the existing Neon runtime. Local: the configured SQLite TMDb catalogue |
 
 After the successful import, the account command shown above creates the user
 in that database with an Argon2id password hash. `--confirm-local-demo` opts
@@ -393,8 +572,10 @@ preferences, ratings, sessions and catalogue. If the email already exists
 with a different password, it exits nonzero without resetting that password
 or deleting data. Contact the account owner instead of overwriting the database.
 The command requires explicit opt-in, refuses `APP_ENV=production`/`prod`,
-does not run at application startup and must never be used on a public or
-production deployment. Rotate/remove the demo account before such deployment.
+does not run at application startup and must never be used to provision a public
+PostgreSQL deployment. For that target use the guarded `provision_account` flow
+above; keep service/operator credentials private. The approved shared app-demo
+account is intentional and already works publicly. Never use it for personal data.
 
 The instructor can start at `/`, choose **Sign in**, and use this account.
 After sign-in, Home stays open. Choose **My recommendations** to view results.

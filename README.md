@@ -1,8 +1,52 @@
-# AI Movie Recommendation System
+**CineAI public HTTPS app: [https://cineai-o9tf.onrender.com/](https://cineai-o9tf.onrender.com/)**
 
-[CineAI public baseline](https://cineai-o9tf.onrender.com/) — the backend is reachable.
-The frontend deployment is pending the reviewed S5-T03 merge and green-main deploy.
-See the [deployment and acceptance record](docs/s5-t03-deployment.md).
+[![CI](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/workflows/ci.yml)
+
+# AI Movie Recommendation System (CineAI)
+
+**Release 5 first screen** — Sprint 5, 5–12 November 2026. PO and Scrum Master
+(SM5): **@kietxuan**. The free Render service sleeps when idle, so the first
+request can take about a minute; this is not a guaranteed-uptime service.
+The public runtime is verified at T03 commit `f24ef546` (11 November 2026);
+the regional watch-provider selector is in `main` but is **not yet rolled out publicly**.
+The PO is preparing a single coordinated release window. Exact status is in
+the [operations record](docs/operations.md#1-deployment-and-release).
+
+**Public test account — application user (the only app role):**
+
+| Email | Password | Verified |
+| --- | --- | --- |
+| `kietxuan@gmail.com` | `123456789` | Public login/session/logout passed on 11 November 2026 |
+
+The PO approved publishing these **project-demo-only** values; they are not a
+Gmail, Render, Neon or GitHub password. This shared account's demo state may
+change. Use **Create account** with separate synthetic users for registration,
+cold-start and account-isolation checks. [Account evidence](docs/evidence/s5-t08-operations/demo-account-check.json)
+and [local/public provisioning](docs/SETUP.md#disposable-test-account-and-p0-journey).
+
+**Six P0 journeys — start from Home and click:**
+[S01 select genres #17](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/17) ·
+[S02 recommendations #18](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/18) ·
+[S03 movie details #19](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/19) ·
+[S04 explore without preferences #20](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/20) ·
+[S12 register #44](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/44) ·
+[S13 sign in and out #45](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/45).
+Start at Home: **Start/Preferences** (S01), **My recommendations** (S02),
+**View details** on a card (S03), **Popular movies** without login (S04),
+**Create account** (S12), and **Sign in / Sign out** (S13).
+The detailed paths are in the [P0 table below](#sprint-3-review--start-here).
+
+| Member | GitHub | Sprint 5 issues |
+| --- | --- | --- |
+| Nguyen Xuan Kiet | [`@kietxuan`](https://github.com/kietxuan) | PO, SM5; planning #247, wrap-up #256 |
+| Tran Minh Hoang | [`@hoang3003`](https://github.com/hoang3003) | PostgreSQL #248, recovery #253 |
+| Tran Tuan Anh | [`@anotify-vie`](https://github.com/anotify-vie) | CI/deploy #250, regional providers #251 |
+| Vu Quoc Huy | [`@vu-huzy`](https://github.com/vu-huzy) | Regional UI #252, operations/README/SETUP #255 |
+| Nguyen Tuan Anh | [`@NguyenTuanAnh0608`](https://github.com/NguyenTuanAnh0608) | Neon/data #249, public acceptance #254 |
+
+Operate and recover the service with the [operations guide](docs/operations.md),
+the [deployment runbook](docs/s5-t03-deployment.md) and the
+[PostgreSQL recovery runbook](docs/s5-t06-postgresql-recovery.md).
 
 For university students facing choice overload, this system turns a small set of
 genre preferences and optional ratings into transparent movie recommendations,
@@ -92,6 +136,11 @@ and account-isolation checks are also created in that same database.
 - [Definition of Done](docs/definition-of-done.md)
 - [Sprint log](docs/sprint-log.md)
 - [Sprint 4 Planning, commitment and current scope](docs/sprint4-backlog-refinement.md)
+- [Sprint 5 Planning, amendments and current delivery map](docs/sprint5-backlog-refinement.md)
+- [Operations: deployment, CI, monitoring, risks, maintenance and lessons](docs/operations.md)
+- [PostgreSQL 18 connection and provisioning (S5-T01)](docs/s5-t01-postgresql.md),
+  [Neon and catalogue provisioning (S5-T02)](docs/s5-t02-neon-provisioning.md)
+- [Regional providers API and operator contract (S5-T04)](docs/api.md#14-s5-t04-regional-providers-and-tmdb-watch-options-251)
 
 ## Definition of Done
 
@@ -110,6 +159,10 @@ and token-free. See the [runbook](docs/tmdb-sprint3-runbook.md).
 ## Setup
 
 For platform-specific setup, expected output, troubleshooting, and clean-clone verification, see [docs/SETUP.md](docs/SETUP.md).
+The sections below describe the local SQLite path. For the public PostgreSQL 18 / Neon / Render path
+(explicit `--pages 50` import, whole-catalogue enrichment, regional providers, review users,
+index rebuild, startup and recovery) follow
+[SETUP: PostgreSQL 18, Neon and Render](docs/SETUP.md#postgresql-18-neon-and-render-public-runtime).
 
 ```bash
 git clone https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE.git
@@ -132,7 +185,8 @@ The selected stack is:
 - Uvicorn
 - SQLAlchemy
 - Alembic
-- SQLite
+- SQLite for local development and the default tests
+- PostgreSQL 18 (`psycopg`) for the public Neon database and the CI integration job
 
 ### Frontend
 
@@ -317,11 +371,14 @@ Confirm that Alembic has exactly one migration head:
 ..\.venv\Scripts\python.exe -m alembic -c alembic.ini heads
 ```
 
-Expected head:
+Expected head at the current source (`main` after PR #263):
 
 ```text
-c6f8a2d4e901 (head)
+d9a6f2c1e508 (head)
 ```
+
+Use the actual `alembic heads` result if a later migration is added; older
+documentation heads (for example `c6f8a2d4e901`) are historical.
 
 
 ## Historical M2 Catalogue Bootstrap / Offline Test Support
@@ -484,8 +541,11 @@ Example response:
 
 `migrationVersion` must match the single revision reported by `alembic heads`.
 After pulling schema changes, back up the database and apply `alembic upgrade head`
-before restarting the backend. Health checks connectivity; HTTP 200 with an older
-revision can still leave movie routes failing because model columns are missing.
+before restarting the backend. On the PostgreSQL/Render runtime `/health` requires
+the database revision to equal the **exact** head embedded in the running code and
+probes every mapped table, returning a safe JSON 503 otherwise, so migrate and
+deploy matching code together (see [operations](docs/operations.md#1-deployment-and-release)).
+Every response carries an `X-Request-ID` used in logs and JSON errors.
 
 
 ## Run the Frontend
@@ -774,32 +834,35 @@ npm --prefix frontend run dev
 
 ## CI
 
-GitHub Actions runs automatically on pushed branches and pull requests.
+GitHub Actions runs automatically on pushed branches and pull requests. The
+`CI` workflow ([ci.yml](.github/workflows/ci.yml)) has five jobs; a green
+push-to-main run takes about 1 to 1.5 minutes
+([details and protection status](docs/operations.md#2-continuous-integration-and-protected-main)).
 
-The CI workflow verifies the following.
+### Detect stack
 
-### Stack Detection
+- decides whether the focused storage and early-bootstrap checks apply
 
-- `backend/pyproject.toml`
-- `frontend/package.json`
+### Python tests
 
-### Backend
-
-- Python 3.12 setup
-- locked dependency installation
-- database migration
+- Python 3.12 setup and locked dependency installation
 - Ruff lint
-- pytest
+- the 40 mandatory P0 tests with automatic temporary-database setup
+- P0 traceability, regional provider/CLI tests, health/serving/session tests
 
-### Frontend
+### PostgreSQL 18 integration
 
-- Node.js 24 setup
-- `npm ci`
-- frontend lint
-- Vitest tests
-- frontend production build
+- `postgres:18` service container with a disposable CI-only database
+- PostgreSQL integration suite and isolated native recovery rehearsal, with
+  skipped cases rejected
 
-### Repository Safety
+### Node build and tests
+
+- Node.js 24 setup and `npm ci`
+- frontend lint, the focused regional watch-provider UI suite and the
+  production build (the full Vitest suite is an optional extended run)
+
+### No secrets committed
 
 CI also checks that obvious credentials and forbidden local files are not committed.
 
@@ -850,6 +913,34 @@ It is valid for the environment-variable name to appear in:
 
 A real TMDb token must never appear in the repository.
 
+
+## Regional "Where to watch" (US, GB, SG)
+
+Movie Details shows viewing availability for one market at a time. The
+supported choices are **United States (US, the default), United Kingdom (GB) and
+Singapore (SG)**. A compact selector in the Where to watch section stores a valid
+choice in the browser (`cineai-watch-country`, falling back to US when the value
+is missing or invalid) and requests `GET /api/movies/{movieId}?country=<code>`.
+The selection affects viewing availability only. Other country codes (including
+the earlier VN pilot and lowercase values) are rejected with a safe HTTP 400.
+
+- Provider badges (Stream, Rent, Buy, Free, With ads) are informational and not
+  links. Missing data is shown neutrally as
+  `Viewing availability is not available for <country>`; it is unknown
+  availability, not an unhealthy movie or database.
+- Exactly one action, **View watch options on TMDb ↗**, opens that movie's
+  TMDb viewing-options page for the selected country in a new tab. It is not a
+  CineAI player and not a guaranteed provider deep link. Badges without a link,
+  a valid link with empty groups, and a null link each render accordingly; a stale
+  result keeps its last successful data with a warning.
+- Attribution stays visible: "Watch provider data comes from TMDb, powered by
+  JustWatch", and the site states that it uses the TMDB API but is not endorsed
+  or certified by TMDB.
+- Contract, import counts and per-country coverage:
+  [API section 14](docs/api.md#14-s5-t04-regional-providers-and-tmdb-watch-options-251),
+  [dated regional acceptance](docs/evidence/s5-t04-providers/regional-2026-11-10.md)
+  (the earlier VN-only run is [historical](docs/evidence/s5-t04-providers/README.md)),
+  [UI verification](docs/evidence/s5-t05-regional-ui.md).
 
 ## Project Structure
 

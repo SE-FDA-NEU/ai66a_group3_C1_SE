@@ -1,0 +1,44 @@
+{
+  "permissions": {
+    "admin": false,
+    "maintain": false,
+    "push": true,
+    "triage": true,
+    "pull": true
+  },
+  "rules": [
+    {
+      "type": "deletion",
+      "ruleset_source_type": "Organization",
+      "ruleset_source": "SE-FDA-NEU",
+      "ruleset_id": 21296815
+    },
+    {
+      "type": "non_fast_forward",
+      "ruleset_source_type": "Organization",
+      "ruleset_source": "SE-FDA-NEU",
+      "ruleset_id": 21296815
+    },
+    {
+      "type": "pull_request",
+      "parameters": {
+        "required_approving_review_count": 1,
+        "dismiss_stale_reviews_on_push": false,
+        "required_reviewers": [],
+        "require_code_owner_review": false,
+        "require_last_push_approval": false,
+        "required_review_thread_resolution": false,
+        "require_extra_approval_for_unattributed_changes": true,
+        "allowed_merge_methods": [
+          "merge",
+          "squash",
+          "rebase"
+        ]
+      },
+      "ruleset_source_type": "Organization",
+      "ruleset_source": "SE-FDA-NEU",
+      "ruleset_id": 21296815
+    }
+  ],
+  "observedAt": "2026-11-11T10:50:14.5833557Z"
+}

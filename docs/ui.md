@@ -487,6 +487,22 @@ trace, token, password or session cookie is reproduced in this dossier.
 
 ## 4. What changed since M2
 
+**Sprint 5 regional UI amendment (11 November 2026; source contract, not public
+acceptance):** the M3 screens and decisions below remain historical. Reviewed
+main adds a compact US/GB/SG selector (US default, valid browser-persisted choice)
+inside Details. Selected-country groups are informational badges; one nullable
+**View watch options on TMDb ↗** action opens the correct movie/market in a new
+tab. Badges-only/missing-link, empty-groups/valid-link, no-data/error/not-checked
+and stale-warning states remain distinct; stale data keeps its last successful
+date. Attribution stays visible, and the selector/action work with both themes,
+keyboard and mobile layout. Movie/country-keyed requests prevent stale results
+from replacing the final selection. The
+[API section 14](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/docs/api.md#14-s5-t04-regional-providers-and-tmdb-watch-options-251)
+defines the DTO, safety and market context; the
+[operations record](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/docs/operations.md)
+distinguishes the old live f24 baseline from the deferred regional release.
+The original four M3 sections and first three submission-page groups are preserved.
+
 ### Saved preferences required persistent state and a fresh result generation
 
 M2's recommendation landing used only the popular cold-start response. The

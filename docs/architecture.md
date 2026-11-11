@@ -73,8 +73,8 @@ The Sprint 3 backdrop chain is also complete: T26 stores nullable
 `backdrop_path`; T27 imports/maps it and returns nullable `backdropUrl`; T37
 renders the responsive detail hero with safe fallback; and T28/#131 verifies
 storage, importer, API, UI, rollback, account preservation, and live public-CDN
-delivery. Trailer work remains Sprint 4 and provider availability remains an
-optional Sprint 5 concern.
+delivery. Trailer work remains Sprint 4. *(Historical: provider availability was
+later delivered in Sprint 5; see section 10.)*
 
 ## 2. Selected stack
 
@@ -444,3 +444,20 @@ the current table/constraint contract above supersedes its rating column.
 Downgrade refuses fractional rows instead of silently rounding. Setup now
 imports 50 popular pages (about 1,000 raw rows), then rebuilds/checks the
 shared overview index for the active revision.
+
+## 10. Sprint 5 amendment: public runtime and regional providers
+
+Earlier SQLite-only statements in this document describe the local default and
+the Sprint 3 and Sprint 4 history. The public release adds:
+
+| Concern | Current design |
+| --- | --- |
+| Runtime | One Render Free web service (Singapore) serves the React build, `/api` and `/health` over one HTTPS origin. Free instances sleep when idle and have no persistent disk |
+| Database | Neon PostgreSQL 18 (Singapore). The restricted runtime role has account-table DML and `SELECT` elsewhere; migrations, imports and enrichment use the operator role |
+| Health gate | `/health` requires the database revision to equal the exact Alembic head in the running code, then probes every mapped table. Migration and deployment must therefore be coordinated |
+| Derived index | The NLP index is rebuilt from the database at startup when missing or stale and lives in disposable storage |
+| Providers | `movie_provider_checks` and `movie_watch_providers` hold US, GB and SG data (and historical VN rows). They are written only by the operator importer and read by Details, which makes no runtime TMDb call |
+| Deploy path | PR, required checks and teammate review, merge, green main CI, Render deploy; see [operations](operations.md) |
+
+The current head is `d9a6f2c1e508` (after `b8e4d2c96f10` and `a3d1f8b72c44`).
+Recovery and rollback rules are in [the recovery runbook](s5-t06-postgresql-recovery.md).
