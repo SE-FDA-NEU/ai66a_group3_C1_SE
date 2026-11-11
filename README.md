@@ -41,25 +41,34 @@ when you want them. Protected destinations may return you to the requested page.
 
 ## Current public release and M5 status
 
-Verified on **11 November 2026**: Render Free/Singapore, live application commit
-`acc49243e4db404438b00521c2f7a6234377fb18`, Neon PostgreSQL 18.6,
-989 active TMDb movies and 2,967 US/GB/SG availability checks.
-[Source CI](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/43025094939)
-and [deployment/data evidence](docs/evidence/s5-c02/README.md) identify that
-observation; later documentation commits do not automatically identify the app.
+Use the live references below to check the current version. This section does
+not freeze a commit that would become outdated at the next deployment.
 
-Kiet reports phone/private-laptop checks OK and explicitly accepts acc4924;
-[release v1.0](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/releases/tag/v1.0)
-targets that running commit. Branch-protection evidence, durable recovery
-handoff, final documentation review and manual submission remain tracked in
-[C02 #256](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/256) and the
-[C02 wrap-up](docs/s5-c02-wrap-up.md). This README does not claim M5 is finished.
-The free service may take about a minute to wake after inactivity.
+| Item | Current source of truth |
+| --- | --- |
+| Running application | [Open CineAI](https://cineai-o9tf.onrender.com/) |
+| Deployed commit | [Render service / Deploys](https://dashboard.render.com/web/srv-dbp96kp42hec73bv94j0): inspect the deployment marked **Live** and its full commit SHA; workspace access is required |
+| M5 release | [Release v1.0](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/releases/tag/v1.0): inspect the tag's target commit and compare it with Render Live |
+| Latest main CI | [ci.yml runs on main](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/workflows/ci.yml?query=branch%3Amain): select the latest main run and confirm success; a green PR run alone is not the final main check |
+| Runtime and operational guidance | Render Free/Singapore with Neon PostgreSQL 18; [setup](docs/SETUP.md) and [operations](docs/operations.md) |
+
+The required M5 release identity is **running app commit = v1.0 target**.
+Merging a PR does not prove deployment or update an existing release tag.
+After deploying a new reviewed green-main candidate, verify the Live SHA,
+repeat affected acceptance checks, and reconcile the release before submission.
+Record the actual Live SHA, matching CI run and acceptance date in the release
+notes and submission. Keep documentation-main identity separate when it differs.
+
+[C02 evidence](docs/evidence/s5-c02/README.md) and the
+[C02 wrap-up](docs/s5-c02-wrap-up.md) retain dated deployment, data-count and
+acceptance observations; these historical records do not certify a later
+deployment. C02 is closed; remaining administrative/operational/submission
+evidence is still disclosed there. The free service may take about a minute
+to wake after inactivity.
 
 [Health endpoint](https://cineai-o9tf.onrender.com/health) returns HTTP 200 when
-the database/schema/required-table checks pass, otherwise 503. The required
-release identity is **running app commit = v1.0 target**. After a docs-only merge,
-record the latest documentation-main SHA/CI separately; see
+the database/schema/required-table checks pass, otherwise 503. It does not
+report the application commit. See the
 [release policy](docs/s5-c02-wrap-up.md#deploy-first-document-afterward--po-amendment).
 Keep the site available until grades are published and the group's longer
 retention commitment is fulfilled; [owners and schedule](docs/operations.md#5-maintenance-plan).
