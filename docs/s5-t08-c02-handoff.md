@@ -19,34 +19,54 @@ work is manual; no export tooling or submission PDF is added to Git.
 | Scope/contracts | [Planning](sprint5-backlog-refinement.md#current-scope-and-delivery-map-amended-7-8-and-10-november-2026), [log](sprint-log.md), [design section 13](design.md#13-sprint-5-amendment-postgresql-18-regional-providers-and-the-tmdb-action), [architecture section 10](architecture.md#10-sprint-5-amendment-public-runtime-and-regional-providers) |
 | T07 technical handoff | [PR #265](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/265): 989-real-movie local run, actual public account journeys, mutation red/restored-green, screenshots and human-acceptance checklist. The PR is not final public acceptance |
 
-## Still required before closure/submission
+## Closure boundary approved by the PO — 11 November 2026
+
+T07 #254 closes through reviewed PR #265 when its acceptance tooling, technical
+evidence and execution checklist are merged. T08 #255 closes through reviewed
+PR #264 when its monitoring baseline, reconciled documents and release handoff
+are merged. Both PRs still require green checks and a substantive formal
+pre-merge approval from another eligible member. Neither closure certifies the
+future public candidate or completion of Milestone 5.
+
+C02 #256 explicitly accepts ownership of every unexecuted release/operational
+and human-acceptance item below. The original T07/T08 final-public requirements
+are retained as C02 acceptance criteria, not dropped or marked as passed. No new
+issue is created. T07/T08 owners continue assisting their assigned checks under
+C02; SM5 is accountable for the final evidence and closure.
+
+## Still required before C02 closure/submission
 
 | Pending item | Owner and next action |
 | --- | --- |
-| Regional public rollout and T07 final acceptance | Render @anotify-vie + Neon @NguyenTuanAnh0608 coordinate the frozen green-main release; T07 records actual deployed SHA, US/GB/SG data, all affected public journeys, real phone/private-laptop checks, rehearsal and PO decision |
+| Regional public rollout and final acceptance | C02/SM5 coordinates Render @anotify-vie + Neon @NguyenTuanAnh0608: frozen green-main release, actual deployed SHA/head/PostgreSQL 18, per-country US/GB/SG data, all six P0s and affected regional/media/account journeys, real phone/private-laptop checks, five-person rehearsal and PO decision. Execute the checklist supplied by T07; T07 closure is not a pass for these items |
 | Effective branch protection and authentic screenshot | Repository admin adds the five required CI contexts plus PR/approval, verifies enforcement and captures the actual settings screen. [Current API snapshot](evidence/s5-t08-operations/github-protection.json) is evidence of the gap, not a substitute screenshot |
 | Durable recovery handoff | @hoang3003 / @NguyenTuanAnh0608: private durable destination, actual shared access, daily execution/retention and independent reproduction. A locally restored backup is not those items |
 | Final-candidate monitoring | @vu-huzy / @kietxuan repeat windows/correlation after rollout; current baseline is from f24, not the future regional candidate |
-| Eligible formal T08 review | @hoang3003 coordinates a substantive Review changes + approval from a non-contributor. Do not count short approval text or an author/contributor's own verification |
 | C02 final facts | SM5 records Review/Retro, accepted outcomes/contributions, ≥4 reviewed green merged S5 PRs, each member's merged PR/review/closed issue, committed/completed/velocity and the five-Sprint table |
 | Release/submission | SM5 binds exact live SHA/green CI/v1.0, exports/submits manually and records a real receipt in #256 |
 
 The six enumerated sections are implemented; the brief's seven-versus-six typo
 remains tracked, without inventing a seventh section. Extend retention when the
 grade-publication date becomes known; that future date is not fabricated.
+The authentic protection screenshot must be incorporated into operations.md by
+the reviewed C02 documentation update before selecting the final release SHA.
+Final post-deploy observations may be recorded in C02's dated completion comment,
+with a direct link from the baseline operations record. Any required source/doc
+fix still receives review and green CI; it is not hidden in an issue comment.
 
 ## One-batch release plan
 
 The PO deferred all production deploy/migration/enrichment on 11 November and
 wants preparation complete before one **Manual Deploy → Deploy latest commit**.
-This is an intended rollout, not an assertion that the issue acceptance can be
-finished before a new public version exists. Nothing in this T08 PR changes
+This is an intended rollout, not an assertion that final release acceptance can
+finish before a new public version exists. Nothing in this T08 PR changes
 Render settings, migrations or the public catalogue.
 
-1. Finish and independently review implementation/readiness PRs. Merge partial
-   T07/T08/C02 documentation using **Refs**, retaining truthful pending items.
-   Their final public/external gates stay open. Do not turn pending results into
-   "done" to prepare a merge.
+1. Finish and independently review the T07/T08 technical/documentation
+   deliverables. PR #265 uses **Closes #254** and PR #264 uses **Closes #255**
+   under the amended scopes; C02's documentation PR keeps **Refs #256**.
+   Retain every final public/external gate as Pending under C02. Do not turn
+   pending results into "done" to prepare a merge.
 2. Render is still **After CI Checks Pass**, so ordinary main merges may auto
    deploy. For the agreed batching hold, put the documented **`[skip render]`**
    phrase in each actual main merge/squash commit message (not merely a PR body),
@@ -64,8 +84,9 @@ Render settings, migrations or the public catalogue.
    versions differ. The button does not run migrations or TMDb enrichment.
    After **live + healthy**, enrich the existing active catalogue for US/GB/SG;
    do not run a new 50-page import solely to add provider data.
-5. Run the final public T07 journeys/phone/rehearsal/PO and T08 monitoring checks.
-   Record actual results and handoffs before closing their issues. C02's
+5. Under C02, run the T07-supplied public journeys/phone/rehearsal/PO checklist
+   and repeat T08's monitoring checks on the final candidate. Record actual
+   results and handoffs before closing C02. Its
    explicit post-merge completion comment records the deployment/tag/submission
    facts; code/repo documents remain a dated pre-release baseline until a
    verified update is made.
@@ -79,9 +100,10 @@ Render settings, migrations or the public catalogue.
    C02 forbids silently moving the demonstrated version; do not assume a later
    main documentation commit is the SHA currently running.
 
-T07 does not depend on T08's final dossier. Preparation can merge without
-closing either issue, so the plan avoids a circular "close all → deploy → prove
-closure" dependency. If a reviewer requires final observations in repository
+T07's technical delivery does not depend on T08's final dossier. Both delivery
+issues may close at their reviewed merges while C02 remains open for final
+acceptance, avoiding a circular "close all → deploy → prove closure" dependency.
+If a reviewer requires final observations in repository
 files rather than the allowed completion record, make that update truthfully
 and recheck the exact-SHA release rule; do not promise a single deploy regardless
 of what final acceptance finds.

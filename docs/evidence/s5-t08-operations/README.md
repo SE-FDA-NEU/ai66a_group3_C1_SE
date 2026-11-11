@@ -105,6 +105,10 @@ reproduction still require T06's actual handoff.
 
 T07's [PR #265](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/265) supplies
 technical checks, real-TMDb scenes and the human acceptance checklist; it has
-not established physical-phone/team-rehearsal/PO acceptance. T08 is not closed
-by this baseline. The [C02 release plan](../../s5-t08-c02-handoff.md#one-batch-release-plan)
-keeps preparation, one intended rollout and final external records separate.
+not established physical-phone/team-rehearsal/PO acceptance. On 11 November the
+PO reassigned final public/device/demo/PO checks, protection screenshot, durable
+backup handoff and final-candidate monitoring to C02 #256. T08 closes only when
+this amended documentation/baseline delivery receives green checks, substantive
+independent formal approval and merge; that closure does not certify M5 or the
+future runtime. The [C02 release plan](../../s5-t08-c02-handoff.md#one-batch-release-plan)
+names the owners and preserves every pending requirement through final release.

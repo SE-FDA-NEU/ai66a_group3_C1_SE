@@ -831,8 +831,11 @@ observations of f24, not acceptance of the future regional candidate. See
 
 [T07 PR #265](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/265) contains
 fixed verifiers and real-TMDb technical evidence; physical phone, timed rehearsal
-and PO acceptance remain open. Preparation may merge with Refs while those gates
-remain open. [The C02 handoff](s5-t08-c02-handoff.md#one-batch-release-plan)
+and PO acceptance remain Pending under C02. On 11 November the PO amended
+T07/T08 to close at reviewed technical/documentation merges (Closes #254 / #255).
+C02 #256 explicitly accepts all remaining public, operational and human checks;
+no test result, PO decision or M5 requirement is waived. C02's PR retains Refs
+#256 until actual release/submission completion. [The C02 handoff](s5-t08-c02-handoff.md#one-batch-release-plan)
 records the intended single manual-release window and the need to control
 auto-deploy on actual main commit messages. It does not promise one rollout if
 final acceptance finds defects. Final velocity, acceptance, selected release SHA,

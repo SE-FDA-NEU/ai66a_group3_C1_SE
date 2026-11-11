@@ -16,6 +16,7 @@ The sprint still has exactly the same ten work issues, owners and review coordin
 | 7 November | Regional watch providers are committed Sprint 5 scope (replacing the original deferral). T03 absorbed CI/protection and basic health/logging, T04 became the providers backend, T05 the providers UI and T08 absorbed monitoring plus final documentation |
 | 8 November | Standardise on **PostgreSQL 18.x** (replacing PostgreSQL 17) and add exactly one validated **View watch options on TMDb ↗** action below the provider groups. Badges remain informational |
 | 10 November | Supported markets are **US (default), GB and SG** with one compact browser-persisted selector, replacing the VN-only policy. The actual VN run (989 movies, no data) is historical evidence |
+| 11 November, closure ownership | PO requests T07/T08 closure on their reviewed technical/documentation deliveries. C02 explicitly owns all remaining deployment, final public/device/PO/demo acceptance, required-check settings/screenshot, durable recovery handoff and final monitoring, in addition to wrap-up/v1.0/submission. No M5 requirement or issue is removed |
 
 | Issue | Current delivery | Owner | Review coordinator | Blocked by (live 11 Nov) | State 11 Nov |
 |---|---|---|---|---|---|
@@ -26,8 +27,8 @@ The sprint still has exactly the same ten work issues, owners and review coordin
 | [T04 #251](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/251) | Import regional providers and validated TMDb watch-options links | @anotify-vie | @hoang3003 | #248, #249 | Closed |
 | [T05 #252](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/252) | Display regional providers with a country selector and TMDb button | @vu-huzy | @NguyenTuanAnh0608 | #251 | Closed |
 | [T06 #253](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/253) | Rehearse PostgreSQL recovery and rollback including provider data | @hoang3003 | @NguyenTuanAnh0608 | #250, #251 | Closed |
-| [T07 #254](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/254) | Accept all public features, regional providers and the M5 demo | @NguyenTuanAnh0608 | @vu-huzy | #250, #252, #253 | Open |
-| [T08 #255](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/255) | Complete monitoring, operations and portable setup documentation | @vu-huzy | @hoang3003 | #250, #253, #254 | Open |
+| [T07 #254](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/254) | Deliver acceptance tooling, actual technical evidence and final execution checklist to C02 | @NguyenTuanAnh0608 | @vu-huzy | #250, #252, #253 technical handoffs | Open; closes at reviewed #265 merge |
+| [T08 #255](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/255) | Deliver monitoring baseline, operations/portable docs and release handoff to C02 | @vu-huzy | @hoang3003 | #250, #253, #254 technical handoffs | Open; closes at reviewed #264 merge |
 | [C02 #256](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/256) | Sprint 5 wrap-up, complete-feature v1.0 release and submission | @kietxuan | @anotify-vie | #247 to #255 | Open |
 
 The live graph has 23 blocked-by edges and no cycle. The "Closed" states record
@@ -40,14 +41,19 @@ status and risks are in [operations](operations.md).
 
 **11 November readiness amendment:** the PO deferred production deploy,
 migration and enrichment until the remaining readiness PRs are prepared, aiming
-for one Manual Deploy of a frozen green-main candidate. T07/T08/C02 may merge
-partial documentation with Refs, but their public/human/external acceptance
-must remain open until evidenced. Correct Render access is now verified;
+for one Manual Deploy of a frozen green-main candidate. Under the PO's closure
+amendment, the T07/T08 PRs use Closes #254 / Closes #255 after technical delivery,
+green checks and independent formal review. C02's PR uses Refs #256; all remaining
+public/human/operational release acceptance stays Pending under C02 until
+evidenced. Technical issue closure does not certify release acceptance.
+Correct Render access is now verified;
 actual live SHA is `f24ef54699efb2fa26f363107bd31401f9b12e58`, not the newer
 regional main candidate. Auto-deploy remains After CI Checks Pass; the
 [release handoff](s5-t08-c02-handoff.md#one-batch-release-plan) explains the
 explicit merge-commit skip phrase and exact-SHA/CI checks. No service settings,
-issue dependencies or original Planning screenshots were changed. This is a
+original Planning screenshots were changed. The dependency topology is retained;
+T07/T08 require technical handoffs, while C02 owns final operational completion.
+This is a
 batching preference, not permission to invent final results or ignore a defect.
 
 > **Historical record.** Everything from here to "Author verification" is the
