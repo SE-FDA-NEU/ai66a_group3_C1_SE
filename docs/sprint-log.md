@@ -773,11 +773,12 @@ identifiable v1.0 release.
 | Completed Story Points at the captured baseline | **0** |
 | Final velocity and throughput | C02 records final Story Point velocity for the selected scope and actual Closed technical items |
 
-The selected implementation is Render Free and Neon Free PostgreSQL 17 in
+The selected implementation is Render Free and Neon Free PostgreSQL in
 Singapore, using one HTTPS origin. T02 provisions a fresh TMDb catalogue with
 `--pages 50`, dedicated public review accounts and recoverable index startup.
-The ten-item M5 release commitment moves VN watch providers to a future
-enhancement decision.
+*Historical (6 November plan, superseded):* the original text named PostgreSQL 17
+and moved VN watch providers to a future enhancement decision. See the
+amendments below for the current PostgreSQL 18 and regional-provider scope.
 
 Project 9 was aligned to **Sprint 5, Nov 05–Nov 12** on 6 November. C01 is
 In Progress, the other nine work items are Todo and formal planning PR review
@@ -793,3 +794,28 @@ T02/T03/T04 verify actual cloud/repository access for their named operators.
 C02 owns the final Review/Retro, PO acceptance, member contribution audit,
 committed/completed/velocity reconciliation, five-Sprint table, exact deployed
 v1.0 SHA, manual submission receipt and maintenance handoff.
+
+### Scope amendments and current status (S5-T08 reconciliation, 11 November 2026)
+
+The PO amended the existing ten issues in place, creating no new work issue
+(recorded in [C01 #247](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/247)):
+
+| Date | Amendment |
+|---|---|
+| 7 November | Regional watch providers are committed Sprint 5 scope; T03 absorbs CI/protection and basic health/logging, T04 is the providers backend, T05 the providers UI, T08 monitoring and final documentation |
+| 8 November | PostgreSQL **18.x** replaces PostgreSQL 17 for integration, CI, Neon and recovery; one validated "View watch options on TMDb ↗" action is added below the provider badges |
+| 10 November | Supported markets are US (default), GB and SG with a compact browser-persisted selector, replacing the VN-only policy. The 989-movie VN run with no data stays as historical evidence |
+
+The [Planning record](sprint5-backlog-refinement.md#current-scope-and-delivery-map-amended-7-8-and-10-november-2026)
+holds the reconciled owner, dependency and state table, with the 6 November
+tables and screenshots kept as labelled history. As of 11 November T01 to T06 are
+Closed and T07, T08 and C02 are Open; T04 (#251), T05 (#252) and T06 (#253)
+merged as PRs #261, #263 and #262. Evidence for each:
+[T04](evidence/s5-t04-providers/regional-2026-11-10.md),
+[T05](evidence/s5-t05-regional-ui.md),
+[T06](evidence/s5-t06-recovery/README.md).
+
+The public runtime had **not** received the regional migration: `/health` reported
+`a3d1f8b72c44` while main's code head is `d9a6f2c1e508`. Final velocity, public
+acceptance, the exact deployed SHA and the v1.0 tag remain with T07 and C02. Live
+monitoring, risks and maintenance are in [operations](operations.md).
