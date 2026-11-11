@@ -3,7 +3,7 @@
 Owner/PO/SM5: **@kietxuan**, [C02 #256](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/256).
 Sprint: **5–12 November 2026**; Planning **6 November**, all five members,
 two accepted issues each (PO-confirmed C01). This is a **partial completion
-record**, not PO acceptance, a finished retrospective, a release or an LMS receipt.
+record**: PO acceptance and v1.0 are now recorded; remaining admin/private-storage/submission gates are not fabricated.
 The PR uses **Refs #256**, never automatic closure.
 
 ## Verified delivery and source identity
@@ -19,14 +19,17 @@ The PR uses **Refs #256**, never automatic closure.
 | Migration/recovery preparation | Codex ran the requested two migrations after a fresh consistent backup was restored and matched all 11 pre-change tables. Direct `cineai_runtime` queries read all 12 required application tables; Alembic check found no additional operations. This is not an independent teammate rehearsal or a durable shared backup |
 | Delivery throughput | C01 and T01–T08: 9/10 work issues Closed, 9 merged PRs #257–#265; C02 remains Open |
 | Product points | Committed 0 / completed 0 / velocity 0 new Story Points; release Tasks/Chores have no points. Do not recount already-delivered product Stories |
-| Release/submission | v1.0 not present at the GitHub observation; manual PDF and LMS receipt Pending |
+| Release/submission | Existing annotated v1.0 tag resolves to the Live acc4924 source; matching Release is published at [v1.0](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/releases/tag/v1.0). Manual PDF and LMS receipt remain Pending. [Current release check](evidence/s5-c02/release-status.json) |
 
 Sources: [Render](evidence/s5-c02/render.json), [runtime](evidence/s5-c02/runtime.json),
 [GitHub](evidence/s5-c02/github.json), [operations](operations.md).
 The user's report that deployment/availability now works is corroborated by
 these independent read-only API/database observations, but not a full UI/device test.
-No production write, import, migration or deploy was performed while preparing
-this documentation PR. Earlier migration/import actions remain dated separately.
+The initial preparation was read-only. The final follow-up exercised only
+synthetic app accounts (two reusable existing and two newly created for actual
+HTTP 201 registration); it did not alter real users, import, migrate or deploy.
+A fresh regional snapshot was backed up and restored into an isolated local
+PostgreSQL database without changing the source. Details are dated below.
 
 ## Regional data actually present
 
@@ -103,24 +106,59 @@ traffic, not user-load performance. Quantiles use nearest rank ceil(n*p)-1;
 uptime nor an SLO. [Samples and pagination](evidence/s5-c02/monitoring.json)
 reproduce the measurements. Earlier T08/f24 windows remain historical.
 
+## Final technical acceptance and user-reported device check
+
+A repeat public read-only probe passed **14/14**. Authenticated browser journeys
+passed **8/8** with reusable synthetic users, then **8/8** with exactly two fresh
+synthetic users: both registrations returned HTTP **201**, the duplicate was a
+real **409** with actionable UI, save-rating **200**, reload/later-login retained
+state, A/B ownership was isolated, and confirmed reset kept Watchlist/B. Search,
+Similar, media, regions/link/popup and list context passed the read-only probe.
+No real account was used. [New-registration evidence](evidence/s5-c02/final-public-new-registration.json),
+[reused accounts](evidence/s5-c02/final-public-reused-accounts.json),
+[read-only probe](evidence/s5-c02/final-public-probe.json).
+These are technical scenario results, not a fabricated per-AC human decision.
+The JSON sourceCommit identifies the test checkout ece8882 (docs/verifier changes),
+while authenticated Render identifies the running application as acc4924.
+
+**User report:** Nguyen Xuan Kiet confirmed checking a physical phone and a
+private/incognito laptop browser on **11 November 2026**, result **OK**.
+Phone model/OS/browser and per-device candidate SHA were not supplied and are
+not invented. [Recorded report](evidence/s5-c02/human-device-report.json) is a
+human report, separate from headless mobile emulation. PO explicitly confirmed acceptance of Live **acc4924** in the project
+conversation on 11 November 2026, authorizing official release. This does not
+add unreported device/browser details.
+
+Health response request ID `req_3d31a42c73a54d65b6eafc44ec9d44cf` matched the
+actual Render GET /health completion at 15:06:51 UTC, HTTP 200, **25.89 ms** app
+time. [Correlation](evidence/s5-c02/health-correlation.json) complements the complete
+monitoring windows; client/host wake-up time is not equated with app processing.
+
+The fresh regional archive was restored and all **13 public tables** matched
+the consistent source snapshot (including regional memberships/links and account
+data); 989 movies/head d9a6f2c1e508. The archive remains private and is not in Git.
+This automated local run does not certify shared durable storage or another
+member's restore. [Verification](evidence/s5-c02/regional-backup-verification.json),
+[private storage and independent-restore guide](s5-c02-private-backup-handoff.md).
+
 ## Remaining C02 gates and named next actions
 
 | Gate | Current evidence / remaining work | Owner/helper | State |
 | --- | --- | --- | --- |
-| R01 rollout/data | Live source, health, schema and all three-country coverage verified; retain fresh backups and final-source identity | SM5; Tran Tuan Anh / Nguyen Tuan Anh | Technical evidence supplied |
-| R02 full public acceptance | Re-run all six P0 and accepted Search/Similar/rating/Watchlist/reset/filter/page/return/media/region journeys on the selected final candidate; record real refusal/persistence/isolation and defects | Nguyen Tuan Anh, PO | Pending |
-| R03 devices/PO | Real phone + private laptop, named device/browser/tester/date/SHA; actual PO decision. Emulation and user report are not this evidence | PO + testers | Pending |
-| R04 demo | Actual five-person 12-minute rehearsal, timing/problems/fixes; normal/refusal/boundaries + local mutation/restore; before/after UI, pipeline/design/lesson/risk | All members | Pending |
-| R05 protection/review | Effective rules currently show PR+1 approval but no required-status-check entry; admin confirms/enforces five CI contexts and supplies authentic settings screenshot for operations.md. C02 needs substantive independent pre-merge approval | Repository admin; eligible reviewer | Pending |
-| R06 durable recovery | Private shared durable destination, primary/backup access, daily backup/seven successful copies and independent restore reproduction. Local verified archive is only partial evidence | Hoang / Nguyen Tuan Anh | Pending |
-| R07 monitoring | Two complete post-deploy windows supplied; continue detection/response and retain incident/request correlation. Re-observe if the deployed candidate changes | Huy / Kiet | Baseline supplied; ongoing |
-| R08 wrap-up | Nine delivery issues/PRs and each member's formal activity audited; real Review/Retro date/attendance/feedback, agreed improvement/owner and maintenance acknowledgement still missing | SM5 + all members | Partial |
-| R09 release/submission | Verify final live SHA/green CI; create v1.0 with three content lines; manual Team03_M5.pdf and genuine LMS receipt; retention through grades and agreed minimum | SM5 | Pending |
+| R01 rollout/data | Live source, health, schema and three-country coverage verified | SM5; Tran Tuan Anh / Nguyen Tuan Anh | Technical pass |
+| R02 public technical journeys | 14/14 read-only plus 8/8 fresh-registration and 8/8 reused-account browser scenarios; real server refusal/persistence/isolation. Retain the exact source and resolve any reported defect before final release | Nguyen Tuan Anh, PO | Technical pass; PO accepted acc4924 |
+| R03 devices/PO | Kiet reports physical phone/private laptop on 11 November, result OK; exact device/browser/SHA unreported. PO explicitly accepts acc4924 for release; preserve unreported device details | PO | Device report and PO acceptance received |
+| R05 protection/review | No admin permission through current connector; effective API rules still lack a required-status-check entry. Admin must confirm/enforce checks and provide real settings screenshot. Huy approved ece8882 with only “ok”; substantive final review/comment remains required | Repository admin; eligible reviewer | Pending |
+| R06 durable recovery | Regional backup/restore matches 13 tables. User confirms no durable shared destination yet; follow the guide, verify operators' access/download/checksum and independent restore/schedule | Hoang / Nguyen Tuan Anh | Technical restore pass; handoff Pending |
+| R07 monitoring | Complete post-deploy windows plus exact health request/log correlation supplied; repeat if candidate changes and continue response duties | Huy / Kiet | Technical evidence supplied; ongoing |
+| R08 metrics/contribution | Current 9/10 issue throughput, zero new Story Points and five-Sprint table supplied; formal contribution facts audited. Final review and maintenance acknowledgement still needed | SM5 | Documentation supplied; acknowledgements Pending |
+| R09 release/submission | Published v1.0 matches Live acc4924 after PO acceptance; finalize reviewed docs/main CI identity, manual Team03_M5.pdf and actual LMS receipt | SM5 | Pending |
 
-Execution: [T07 C02 checklist](evidence/s5-t07/completion-checklist.md),
-[T08 handoff](s5-t08-c02-handoff.md), [manual submission block](s5-t08-c02-handoff.md#manual-submission-block).
-No future physical-device test, meeting, independent restore, screenshot or
-submission is invented. No generated PDF or export tool is in this PR.
+On 11 November the PO explicitly removed rehearsal and Review/Retro reporting
+from C02; the team will prepare these separately. They are not C02 closure
+conditions and are not recorded as completed. The M5 live presentation remains
+the team's separate responsibility; its execution is not proved by this PR.
+No extra issue or invented event is introduced.
 
 ## Deploy first, document afterward — PO amendment
 
@@ -150,22 +188,35 @@ Do not retag an already-published release to conceal an unverified deployment.
 If a source/doc change is needed after selection, use review/green CI and explicit
 release verification. The source running at the URL must equal the v1.0 target.
 
-## Review/Retro and maintenance receipt to complete
+## Release and maintenance receipt to complete
 
 | Record | Required actual value |
 | --- | --- |
-| Sprint Review | Pending date/time, participants, actual PO AC/DoD decision and feedback |
-| Retrospective | Pending date/time, what happened, agreed improvement, named owner/due date |
 | Maintenance handoff | Pending primary/backup acknowledgement of access, monitoring/backup schedule and incident/retention duties |
 | Retention | Kiet primary, Tran Tuan Anh backup; keep online through the latest of grade publication, 12 December 2026 and one calendar month after actual v1.0. Grade date not announced |
-| Final release | Pending actual deploy/SHA/health/CI/tag link; retain current dated baseline above |
+| Final release | PO accepts acc4924; published v1.0 tag/Live/green source CI match. Later docs-main SHA/CI recorded separately |
 | Submission | Pending manual Team03_M5.pdf export/submission date and real receipt; no PDF/tool in Git |
 
 ## Completion comment template (manual, after the work)
 
 Fill actual values only: running SHA/deploy and health; documentation-main SHA
-and latest green CI; v1.0 target/release link; final P0/devices/PO/demo results;
-Review/Retro/action/maintenance acknowledgements; protection screenshot/reviewer;
+and latest green CI; v1.0 target/release link; final P0/devices/PO results;
+maintenance acknowledgements; protection screenshot/reviewer;
 durable recovery receipt; manual PDF/LMS submission receipt. Link resolved
 R01–R09 and note any genuine accepted risk. Then close #256 manually. A merged
 preparation PR alone does not close Sprint 5.
+
+## Published release and manual submission
+
+The PO explicitly accepted acc4924 on 11 November 2026; the existing matching
+Draft was published as [CineAI v1.0](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/releases/tag/v1.0).
+[Release proof](evidence/s5-c02/release-status.json) identifies the actual
+publication time, immutable source identity and operator action. No tag was
+moved and no Render deployment was triggered. Later docs changes are separate.
+
+The remaining closure items are substantive independent review/merge and green
+latest-main CI; required-check enforcement/authentic settings screenshot;
+private durable backup/access/independent reproduction and maintenance
+acknowledgement; manual PDF/LMS receipt. User phone/private-laptop report and
+explicit PO acceptance are now received. The separate team presentation is not
+claimed performed. C02 stays Open until its retained closure items are proven.

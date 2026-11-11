@@ -18,8 +18,8 @@ The M5 brief says seven sections but lists six; these follow the six-row table.
 | Merge → CI → deploy | Reviewed PRs, required checks/approval, green main CI, configured **After CI Checks Pass**. The setting is verified; a complete failed-CI/no-deploy experiment is not claimed |
 | One-batch release hold | **Superseded by PO:** deploy first, document observed results, permit further reviewed deploys. For docs-only merges that should retain the app, use `[skip render]` in the actual merge commit and verify the skip; keep CI enabled. [Current release rule](s5-c02-wrap-up.md#deploy-first-document-afterward--po-amendment) |
 | Safe rollout | New backup was restored and matched 11 pre-change tables before the requested two migrations/grants; current schema/read permissions pass. For each future incompatible change, coordinate backup/migration/grants with matching deployment; temporary 503 is possible. Do not reimport the catalogue solely for providers |
-| Rollback/recovery | [T06](s5-t06-postgresql-recovery.md) rehearsed old T03 code: 503 on regional schema, 200 on an isolated pre-provider restore. A fresh runtime backup was also restored/compared across 11 snapshot tables on 11 November. Neither is a Render rollback. Restore into an isolated target and verify compatibility before switching; never overwrite later writes or silently discard regional data |
-| Final identity | **Pending C02:** v1.0 must equal the verified running main commit. Track latest documentation-main SHA and its CI separately after a docs-only skip. Final PO/device/demo/release/submission are not claimed |
+| Rollback/recovery | [T06](s5-t06-postgresql-recovery.md) rehearsed old T03 code: 503 on regional schema, 200 on an isolated pre-provider restore. A fresh runtime backup was also restored/compared across 11 snapshot tables on 11 November. Neither is a Render rollback. A later regional backup restored/compared all 13 public tables; durable shared storage and teammate reproduction remain Pending under C02 R06. Restore into an isolated target and verify compatibility before switching; never overwrite later writes or silently discard regional data |
+| Final identity | **Verified:** PO accepts acc4924; published [v1.0](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/releases/tag/v1.0) targets that exact running green-main source. Latest docs-main SHA/CI may differ. C02 admin/private-storage/review/submission remain Pending |
 
 ## 2. Continuous integration and protected main
 
@@ -75,6 +75,11 @@ Post-deploy observations: 13:45–13:50 UTC had 101 completions (71 health),
 p95 99.85 ms. [All-page, deduplicated samples](evidence/s5-c02/monitoring.json)
 measure app processing, not user-load performance or uptime. Repeat after a new
 candidate; preserve the old f24 series as history.
+
+A fresh health response request ID matched Render's GET /health HTTP 200 at
+25.89 ms app time; [correlation](evidence/s5-c02/health-correlation.json). Current
+public probes pass 14/14 read-only and 8/8 fresh-account scenarios; Kiet separately
+reports phone/private-laptop OK. [Final evidence](s5-c02-wrap-up.md#final-technical-acceptance-and-user-reported-device-check).
 
 ## 4. Risks and technical debt
 

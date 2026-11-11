@@ -1,0 +1,18 @@
+{
+  "checkedAt": "2026-11-11T15:06:51.357082+00:00",
+  "target": "https://cineai-o9tf.onrender.com/health",
+  "requestId": "req_3d31a42c73a54d65b6eafc44ec9d44cf",
+  "response": {
+    "status": 200,
+    "migrationVersion": "d9a6f2c1e508"
+  },
+  "renderLog": {
+    "timestamp": "2026-11-11T15:06:51.124036409Z",
+    "status": 200,
+    "route": "/health",
+    "latencyMs": 25.89
+  },
+  "exactRequestIdMatch": true,
+  "source": "Authenticated Render CineAI application log; complete 1-row result; no account/body/cookie/secret fields",
+  "runningCommit": "acc49243e4db404438b00521c2f7a6234377fb18"
+}

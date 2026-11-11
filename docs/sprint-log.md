@@ -855,7 +855,7 @@ and [actual public/Neon evidence](evidence/s5-c02/runtime.json).
 | Merged PRs | **9**, #257–#265, each with green head CI and another member's pre-merge approval at a recorded revision; substantive/final-head caveats remain in the review audit |
 | Per-member formal activity | All five have owned merged PR(s), formal review(s) and Closed assigned issues; this is not blanket certification of review substance |
 | Runtime | Render acc4924 Live, Neon PostgreSQL 18.6/head d9a6f2c1e508, public health 200, 989 movies and 2,967 US/GB/SG checks |
-| Final PO/Review/Retro/demo/submission | **Pending**, no meeting/date/approval/receipt invented |
+| Final PO/release/submission | **Pending**, no approval/receipt invented; rehearsal and Review/Retro documentation removed from C02 by the PO, prepared separately by the team |
 
 | Sprint | Committed Story Points | Completed Story Points | Velocity | Source / interpretation |
 | --- | ---: | ---: | ---: | --- |
@@ -878,8 +878,44 @@ Current running acc4924 and its green CI are distinct from this later C02
 source. v1.0 must target the verified accepted running main commit; a docs-only
 skip does not silently move the deployed app. This PR uses **Refs #256**.
 
-Real final Review/Retro attendance/date/feedback, an agreed improvement/owner,
-PO/device/demo acceptance, required-check settings screenshot, durable recovery
+Explicit final PO decision, required-check settings screenshot, durable recovery
 handoff, maintenance acknowledgement and manual v1.0/PDF/LMS receipt remain
 Pending in [the R01–R09 checklist](s5-c02-wrap-up.md#remaining-c02-gates-and-named-next-actions).
 Only close C02 after actual evidence; no new issue or fabricated event is added.
+
+### C02 final technical follow-up and user report — 11 November 2026
+
+Fresh public probes passed 14/14 read-only plus 8/8 reused-account scenarios and
+8/8 new-account scenarios (two real HTTP 201 registrations, duplicate HTTP 409,
+rating HTTP 200, reload/later-login persistence, A/B isolation, reset preserving
+Watchlist and original-list context). Only dedicated synthetic accounts were
+written; no real user was used. Health response/log IDs match, HTTP 200/25.89 ms.
+The regional backup was restored and all 13 snapshot tables matched; durable
+upload/access and independent teammate restore are not yet completed.
+
+PO/tester Nguyen Xuan Kiet reports physical phone and private laptop checks on
+11 November, result OK; device/browser/per-device SHA not supplied. Explicit PO
+candidate acceptance remains requested. Tag v1.0 exists at Live acc4924; Release
+is Draft. [Evidence and current closure gates](s5-c02-wrap-up.md).
+
+Per explicit PO instruction, rehearsal and Review/Retro reporting are removed
+from C02. The team prepares these separately; this entry does not fabricate
+attendance, feedback or performance. Story Point metrics and 9/10 current work
+throughput are unchanged. C02 stays Open for actual protection/review, private
+backup handoff, PO/release/maintenance and manual submission evidence.
+
+### PO candidate acceptance and v1.0 publication — 11 November 2026
+
+PO Nguyen Xuan Kiet explicitly confirms candidate **acc4924** accepted. The
+existing annotated v1.0 tag resolves to that running green-main source; its
+matching Draft Release was published after that decision. No retag or Render
+deploy was performed. [Published v1.0](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/releases/tag/v1.0),
+[release proof](evidence/s5-c02/release-status.json), [device/PO report](evidence/s5-c02/human-device-report.json).
+This supersedes the preceding Pending PO/Draft snapshot without changing its
+historical observations. Latest documentation-main SHA/CI can differ from the
+running application; v1.0 still identifies the actual served source.
+
+C02 remains Open for genuine required-check/settings screenshot, substantive
+review/merge and fresh main CI, durable shared backup/access/independent restore,
+maintenance acknowledgement and manual PDF/LMS receipt. Presentation preparation
+is outside C02 by PO instruction; no event/attendance/result is invented.

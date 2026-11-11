@@ -1,0 +1,24 @@
+{
+  "source": "Previously verified private regional backup, restored to isolated local PostgreSQL 18",
+  "all13SnapshotTablesEqual": true,
+  "head": "d9a6f2c1e508",
+  "restoredHealth": 200,
+  "indexRebuild": "PASS",
+  "indexCheck": "PASS",
+  "countries": {
+    "US": {
+      "status": 200,
+      "providerStatus": "success"
+    },
+    "GB": {
+      "status": 200,
+      "providerStatus": "success"
+    },
+    "SG": {
+      "status": 200,
+      "providerStatus": "success"
+    }
+  },
+  "tmdbNetwork": "disabled",
+  "operator": "Codex automated check, not independent teammate reproduction"
+}

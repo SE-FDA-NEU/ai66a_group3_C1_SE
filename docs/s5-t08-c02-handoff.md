@@ -6,7 +6,7 @@ Historical T08 baseline **11 November 2026**: main `50aa9ad4fccc63f5d7ef8186bb29
 public then ran `f24ef54699efb2fa26f363107bd31401f9b12e58`.
 **Current C02:** T07/T08 are merged/Closed; acc4924 is Live, migrated and regional
 data is populated. See [current wrap-up/evidence](s5-c02-wrap-up.md).
-No final acceptance, release, rehearsal, PDF or LMS receipt is invented. PDF/LMS
+No final PO acceptance, published release, PDF or LMS receipt is invented. PDF/LMS
 work is manual; no export tooling or submission PDF is added to Git.
 
 ## Supplied and verified
@@ -40,11 +40,11 @@ C02; SM5 is accountable for the final evidence and closure.
 
 | Pending item | Owner and next action |
 | --- | --- |
-| Regional public rollout and final acceptance | C02/SM5 coordinates Render @anotify-vie + Neon @NguyenTuanAnh0608: frozen green-main release, actual deployed SHA/head/PostgreSQL 18, per-country US/GB/SG data, all six P0s and affected regional/media/account journeys, real phone/private-laptop checks, five-person rehearsal and PO decision. Execute the checklist supplied by T07; T07 closure is not a pass for these items |
+| Regional public rollout and final acceptance | C02/SM5 coordinates Render @anotify-vie + Neon @NguyenTuanAnh0608: frozen green-main release, actual deployed SHA/head/PostgreSQL 18, per-country US/GB/SG data, all six P0s and affected regional/media/account journeys, real phone/private-laptop checks, PO decision. Execute the checklist supplied by T07; T07 closure is not a pass for these items |
 | Effective branch protection and authentic screenshot | Repository admin adds the five required CI contexts plus PR/approval, verifies enforcement and captures the actual settings screen. [Current API snapshot](evidence/s5-t08-operations/github-protection.json) is evidence of the gap, not a substitute screenshot |
 | Durable recovery handoff | @hoang3003 / @NguyenTuanAnh0608: private durable destination, actual shared access, daily execution/retention and independent reproduction. A locally restored backup is not those items |
 | Final-candidate monitoring | @vu-huzy / @kietxuan post-deploy windows are recorded in C02; repeat/correlate after any subsequent candidate and retain f24 as history |
-| C02 final facts | SM5 records Review/Retro, accepted outcomes/contributions, ≥4 reviewed green merged S5 PRs, each member's merged PR/review/closed issue, committed/completed/velocity and the five-Sprint table |
+| C02 final facts | SM5 records accepted outcomes/contributions, ≥4 reviewed green merged S5 PRs, each member's merged PR/review/closed issue, committed/completed/velocity and the five-Sprint table |
 | Release/submission | SM5 binds exact live SHA/green CI/v1.0, exports/submits manually and records a real receipt in #256 |
 
 The six enumerated sections are implemented; the brief's seven-versus-six typo
@@ -68,7 +68,7 @@ at acc4924, not treated as current instructions.
    keeps **Refs #256** while actual final gates remain outstanding.
 2. Running acc4924, current health/schema and full-catalogue regional data are
    verified in [C02](s5-c02-wrap-up.md). The source is not yet tagged v1.0.
-3. Complete actual public P0/accepted-feature/device/demo/PO checks, protection
+3. Complete actual public P0/accepted-feature/device/PO checks, protection
    screenshot and durable recovery handoff. Review/merge C02's evidence/docs;
    retain Pending for anything not performed. No invented receipt or meeting.
 4. Render remains After CI Checks Pass. A docs-only merge may use `[skip render]`
@@ -79,7 +79,7 @@ at acc4924, not treated as current instructions.
    SHA/CI. Tag v1.0 on the accepted running main commit, not blindly on a newer
    docs-only commit. Never silently move an already-published tag.
 6. Export/submit the PDF manually with actual release/CI links. Link final
-   acceptance, Review/Retro, metrics/member/protection/recovery/maintenance and
+   acceptance, metrics/member/protection/recovery/maintenance and
    LMS receipt in #256's completion comment. Close C02 manually only when done.
 
 Full [release policy](s5-c02-wrap-up.md#deploy-first-document-afterward--po-amendment)
@@ -100,8 +100,8 @@ following team/role values are already confirmed; submission itself is not.
 | Product Owner / SM5 | @kietxuan / @kietxuan |
 | Repository | [SE-FDA-NEU/ai66a_group3_C1_SE](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE) |
 | Setup | [docs/SETUP.md on main](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/blob/main/docs/SETUP.md) |
-| Final deployed SHA / matching green CI | Current acc4924/deploy dep-dbq71cvf3r2c73e7g890 and CI 43025094939 are verified; final PO/release selection remains Pending. Record later docs-main SHA separately |
-| Release v1.0 | [Intended release URL](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/releases/tag/v1.0), **not created/verified yet** |
+| Final deployed SHA / matching green CI | Current acc4924/deploy dep-dbq71cvf3r2c73e7g890 and CI 43025094939 are verified; PO accepts acc4924 and v1.0 is published; manual submission remains Pending. Record later docs-main SHA separately |
+| Release v1.0 | [Intended release URL](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/releases/tag/v1.0), **published and verified at acc4924 after PO acceptance** |
 | Test accounts | See the first screen of README; shared app-only demo login was verified |
 | Submitted by | Nguyen Xuan Kiet, planned SM5 submitter; record actual submission |
 | PDF / date / receipt | `Team03_M5.pdf`; actual export date and LMS receipt pending; no PDF/tools committed |
@@ -109,3 +109,24 @@ following team/role values are already confirmed; submission itself is not.
 Keep the service until at least **12 December 2026**, one calendar month after
 actual v1.0, and grade publication, whichever is latest. @kietxuan owns retention,
 @anotify-vie is backup. This is the maintenance commitment, not an execution log.
+
+## Final follow-up — user scope and received evidence
+
+Kiet reports physical-phone/private-laptop checks OK on 11 November 2026;
+models/browsers/per-device SHA were not supplied. Fresh public read-only 14/14
+and account 8/8 scenarios pass, including two genuine HTTP 201 registrations,
+409 duplicate refusal and persistence/isolation. Regional backup restore matches
+13 tables; private durable upload/access/independent handoff still Pending.
+The existing v1.0 tag points to Live acc4924; Release has now been published after explicit
+PO acceptance of acc4924. See current C02 evidence rather than the earlier baseline.
+
+The PO removed rehearsal/Review/Retro reporting from C02; the team prepares
+these separately, without a claim they occurred. Private backup setup and
+independent restore are explained in [the handoff guide](s5-c02-private-backup-handoff.md).
+Protection screenshot/required checks, substantive review, maintenance and
+manual PDF/LMS receipt remain real pending items. No archive/PDF/secret enters Git.
+
+PO acceptance and v1.0 publication are now verified; raw device details are still
+unreported. Retain required-check screenshot, substantive final review/merge,
+durable backup handoff/maintenance and manual PDF/LMS receipt as Pending. Use
+[the private backup guide](s5-c02-private-backup-handoff.md); no archive is public.

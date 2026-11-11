@@ -1,0 +1,63 @@
+{
+  "checkedAt": "2026-11-11T15:02:15.708Z",
+  "target": "https://cineai-o9tf.onrender.com",
+  "sourceCommit": "ece88824f4e0e7cf3f237daed0c157ffadbae1c4",
+  "device": "fresh headless Edge desktop contexts; no physical phone",
+  "credentials": "reused from private git-ignored file; no credential values recorded",
+  "checks": [
+    {
+      "name": "A registration/reusable account and Home login",
+      "status": "pass"
+    },
+    {
+      "name": "duplicate registration is a real HTTP 409 and actionable UI refusal",
+      "status": "pass"
+    },
+    {
+      "name": "A genres, half-star rating, Watchlist and reload persistence",
+      "status": "pass"
+    },
+    {
+      "name": "A sign out/later login preserves server state and session navigation",
+      "status": "pass"
+    },
+    {
+      "name": "personalised score metadata, full-set filtering/paging and Details return preserve preferences",
+      "status": "pass"
+    },
+    {
+      "name": "B is isolated from A",
+      "status": "pass"
+    },
+    {
+      "name": "reset cancellation preserves data; confirmation clears genres/ratings but keeps Watchlist and B",
+      "status": "pass"
+    },
+    {
+      "name": "Watchlist route/Details return and removal are server-confirmed",
+      "status": "pass"
+    }
+  ],
+  "browser": "157.0.4341.46",
+  "health": {
+    "status": 200,
+    "body": {
+      "status": "ok",
+      "database": "connected",
+      "migrationVersion": "d9a6f2c1e508"
+    }
+  },
+  "aRegistrationStatus": 409,
+  "duplicateStatus": 409,
+  "ratingWrite": "HTTP 200",
+  "movieId": "2626f71e-8458-491c-a1f4-c2017d8f684b",
+  "recommendations": {
+    "unfilteredTotal": 353,
+    "comedyTotal": 47,
+    "pages": 5,
+    "preferencesUnchanged": true
+  },
+  "bRegistrationStatus": 409,
+  "technicalPass": true,
+  "fullIssueAcceptance": false
+}

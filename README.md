@@ -48,8 +48,10 @@ Verified on **11 November 2026**: Render Free/Singapore, live application commit
 and [deployment/data evidence](docs/evidence/s5-c02/README.md) identify that
 observation; later documentation commits do not automatically identify the app.
 
-Final full-device/PO/demo acceptance, branch-protection evidence, durable
-recovery handoff, `v1.0` and manual submission are still tracked in
+Kiet reports phone/private-laptop checks OK and explicitly accepts acc4924;
+[release v1.0](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/releases/tag/v1.0)
+targets that running commit. Branch-protection evidence, durable recovery
+handoff, final documentation review and manual submission remain tracked in
 [C02 #256](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/256) and the
 [C02 wrap-up](docs/s5-c02-wrap-up.md). This README does not claim M5 is finished.
 The free service may take about a minute to wake after inactivity.
@@ -107,7 +109,8 @@ recorded acceptance boundaries rather than treating this summary as new evidence
 Moved public persistence to PostgreSQL 18/Neon, deployed to Render, added
 US/GB/SG availability and validated TMDb watch-options links, and prepared
 monitoring/recovery/operations and the M5 handoff. C01/T01–T08 are Closed;
-C02 and final release/submission gates remain Open at the recorded audit.
+C02 remains Open for the remaining administrative/operational/submission
+gates; PO acceptance and v1.0 publication are now recorded.
 [Planning](docs/sprint5-backlog-refinement.md) · [Operations](docs/operations.md) ·
 [C02](docs/s5-c02-wrap-up.md) ·
 [Five-Sprint metrics](docs/sprint-log.md#c02-current-delivery-and-five-sprint-reconciliation--11-november-2026).

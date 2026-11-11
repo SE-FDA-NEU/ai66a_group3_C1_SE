@@ -45,5 +45,42 @@
       "README.md": "d2c24121e593e5230f6421e92c09800988bf21e1a5392f9b0c80c4416c62ecfe",
       "scripts/verify-s3-c01-docs.mjs": "1bea8026a28e56a5fa5fc4e755a37272ddce1b5812638dff04fda243e3598955"
     }
+  },
+  "finalFollowup": {
+    "checkedAt": "2026-11-11T15:15:31.145780+00:00",
+    "checks": {
+      "relativeFilesAndAnchors": "PASS",
+      "operationsSections": 6,
+      "operationsProseWords": 349,
+      "publicReadOnly": "14/14 pass",
+      "publicReusedAccounts": "8/8 pass",
+      "publicFreshRegistration": "8/8 pass; two 201s, duplicate 409",
+      "regionalBackup13Tables": "PASS",
+      "restoredIndexHealthCountries": "PASS",
+      "healthRequestCorrelation": "PASS",
+      "poAcceptance": "explicit user confirmation for acc4924",
+      "releaseV1": "Published, target matches Live",
+      "privateCloudAndIndependentHumanRestore": "Pending user action",
+      "protectionScreenshotAndSubstantiveReview": "Pending admin/teammate",
+      "manualPdfLmsReceipt": "Pending user action",
+      "rehearsalReviewRetro": "Removed from C02 by explicit PO instruction; team prepares separately"
+    },
+    "sourceHashes": {
+      "README.md": "b79d98c4a03524316fcadb1fdbb79df53043a24b42afa2f8d775eca98dc214c6",
+      "docs/evidence/s5-c02/README.md": "abeae5b42f58ac5f6d9343e3e3caccec8f80fae37226d1c8de24f3997aa4049c",
+      "docs/evidence/s5-c02/final-public-new-registration.json": "2f39be8a46bf526f365abf568d8d3d9c47e3e8717d4f393440acadb4403462c6",
+      "docs/evidence/s5-c02/final-public-probe.json": "b78c5a8f00f2a74c1dd2232bf02ad1db15dd2c2967f48e59277b4c8757320ebb",
+      "docs/evidence/s5-c02/final-public-reused-accounts.json": "7f3e48c0b2957c654c59f35d31648f3c0df386c7080868f2d8d1800f03357887",
+      "docs/evidence/s5-c02/health-correlation.json": "fb54de23a18eb8e3b366300ac9c3f66820e75356800f0f31a01be3409b4ca7c0",
+      "docs/evidence/s5-c02/human-device-report.json": "5fb2a992fbeddc829af5cbbad5dc8faf5d0ec44568bb5b0ddbd511c6ce400b7b",
+      "docs/evidence/s5-c02/regional-backup-verification.json": "09c37c6b8203c40b7b2f7a905bac3ab02fc9f9506b6bd126fef052b017660404",
+      "docs/evidence/s5-c02/release-status.json": "2f3cdfb918e367715b40d243a2e0f2ec1745ee25b24d88e77661fe1e6077a94b",
+      "docs/evidence/s5-c02/restored-runtime-check.json": "d07cdcb5c52776f2703c039a1c9076ce9e4ce954635215f0ea114ba8af577c0a",
+      "docs/operations.md": "d6cb88772b20261478616056bc651fddbf8779291fca2cd7f52e07d0708fb17e",
+      "docs/s5-c02-private-backup-handoff.md": "408bd49fab862da8e51351e23401f72fce678f430747df4d586e1347fe56c5ca",
+      "docs/s5-c02-wrap-up.md": "1c9d2ae2a2cdb1ae5f169c094a8f4f69802d55de4a9ab816477d892d80dbda35",
+      "docs/s5-t08-c02-handoff.md": "74eb052c9c021a2bdcc847f93e15cc84c55228c3382e9542b66872de35076343",
+      "docs/sprint-log.md": "d096c961249eb896dafb31722fae2a4b3d8d57a09a181105e0316c4f9ec35843"
+    }
   }
 }
