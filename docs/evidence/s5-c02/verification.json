@@ -31,5 +31,19 @@
     "docs/sprint-log.md": "852b0ad1e12a84e02ca860b27b345a5f5420d39ef7b0b0510ad1a3bc997f3d0d",
     "docs/sprint5-backlog-refinement.md": "97288dafd849b3e261ff17fabb2ad8b59dc6a6ed75b89a2c1dea1d7cd022a131"
   },
-  "hashFormat": "SHA-256; Markdown/JSON CRLF normalized to LF; binary files unchanged"
+  "hashFormat": "SHA-256; Markdown/JSON CRLF normalized to LF; binary files unchanged",
+  "readmeFollowup": {
+    "checkedAt": "2026-11-11T14:36:21.553464+00:00",
+    "purpose": "M5 first screen and chronological Sprint 1-5 README; old verification/sourceHashes describe the original C02 snapshot",
+    "readmeLines": 238,
+    "relativeFilesAndAnchors": "PASS",
+    "setupMediaCases": "5 passed",
+    "documentationVerifier": "PASS",
+    "negativeControl": "Swapped Sprint 1/2 headings: verifier failed on chronology; restored exact original bytes and verifier passed",
+    "productionChanges": false,
+    "sourceHashes": {
+      "README.md": "d2c24121e593e5230f6421e92c09800988bf21e1a5392f9b0c80c4416c62ecfe",
+      "scripts/verify-s3-c01-docs.mjs": "1bea8026a28e56a5fa5fc4e755a37272ddce1b5812638dff04fda243e3598955"
+    }
+  }
 }

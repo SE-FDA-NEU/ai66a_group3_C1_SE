@@ -19,13 +19,29 @@ const check = name => checks.push(name);
 assert.equal(snapshot.sprintDates.start, "2026-10-05");
 assert.equal(snapshot.sprintDates.end, "2026-10-18");
 assert(readme.includes("05–18 October 2026"));
-const start = readme.indexOf("## Sprint 3 review — start here");
-const team = readme.indexOf("## Team and Sprint 1 roles");
-assert(start > 0 && team > start, "P0 review block must precede historical roles");
-const entryBlock = readme.slice(start, team);
+const start = readme.indexOf("## P0 stories — start from Home");
+const release = readme.indexOf("## Current public release and M5 status");
+const history = readme.indexOf("## Sprint history");
+assert(start > 0 && release > start && history > release,
+  "Current M5/P0 entry information must precede chronological Sprint history");
+const entryBlock = readme.slice(0, release);
+assert(readme.split(/\r?\n/, 1)[0].includes("https://cineai-o9tf.onrender.com/"),
+  "The running public URL must be on the first line");
+for (const value of ["badge.svg?branch=main", "kietxuan@gmail.com", "123456789", "Team 03", "Sprint 5 Scrum Master"])
+  assert(entryBlock.includes(value), `Missing M5 first-screen field: ${value}`);
 for (const n of [17, 18, 19, 20, 44, 45]) assert(entryBlock.includes(`/issues/${n}`));
-for (const item of ["@kietxuan", "@vu-huzy", "@hoang3003", "@NguyenTuanAnh0608", "Select at least one genre (up to 5), then choose Save preferences."]) assert(entryBlock.includes(item));
-check("README lists all six P0 entry points, current dates, roles and BR1 rejection before historical roles");
+for (const item of ["@kietxuan", "@vu-huzy", "@hoang3003", "@anotify-vie", "@NguyenTuanAnh0608"])
+  assert(entryBlock.includes(item));
+assert(readme.includes("Select at least one genre (up to 5), then choose Save preferences."));
+assert(readme.includes('id="sprint-3-review--start-here"'), "Keep historical P0 links valid");
+const sprintSections = [...readme.matchAll(/^### Sprint ([1-5]) — /gm)];
+assert.deepEqual(sprintSections.map(match => Number(match[1])), [1, 2, 3, 4, 5],
+  "Sprint summaries must appear once each, in chronological order");
+const sprint3Block = readme.slice(sprintSections[2].index, sprintSections[3].index);
+for (const value of ["05–18 October 2026", "@kietxuan", "@vu-huzy"])
+  assert(sprint3Block.includes(value), "Retain the confirmed Sprint 3 dates and roles");
+assert.equal([...readme.matchAll(/^# /gm)].length, 1, "README must have one project title");
+check("README M5 first-screen fields, six P0 starts, ordered Sprint 1-5 history, dates/roles and BR1 example are preserved");
 
 const ids = snapshot.inventory.map(w => w.issue);
 assert.equal(ids.length, 43);
