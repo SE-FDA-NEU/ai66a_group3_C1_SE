@@ -66,10 +66,23 @@ retention commitment is fulfilled; [owners and schedule](docs/operations.md#5-ma
 
 ## Sprint history
 
+Each table records the member's role and general work in that Sprint. PO and SM
+also contributed to delivery; implementation, fixes and reviews were shared.
+The linked Sprint records and pull requests retain the detailed evidence.
+
 ### Sprint 1 — Requirements and product backlog
 
 Defined the student problem/personas, scope, business rules, Stories, priorities,
 traceability and Definition of Done. PO: @kietxuan; SM1: @hoang3003.
+
+| Member | Role | Main responsibilities |
+| --- | --- | --- |
+| Nguyen Xuan Kiet | Product Owner | Define product scope and priorities; refine the backlog and agree the Sprint commitment. |
+| Tran Minh Hoang | Scrum Master | Coordinate the team's process, track progress and consolidate Sprint outcomes and wrap-up. |
+| Tran Tuan Anh | Developer | Research student needs; develop personas and usage scenarios to inform the requirements. |
+| Vu Quoc Huy | Developer | Prepare the requirements dossier and connect requirements, Stories and acceptance criteria through traceability. |
+| Nguyen Tuan Anh | Developer | Establish repository readiness, business-rule and route conventions, and the Definition of Done. |
+
 [Scope](docs/product-scope.md) · [Business rules](docs/business-rules.md) ·
 [Traceability](docs/traceability.md) · [Sprint 1 record](docs/sprint-log.md#sprint-1---repository-activity-recorded-2026-09-08-to-2026-09-20).
 
@@ -78,6 +91,15 @@ traceability and Definition of Done. PO: @kietxuan; SM1: @hoang3003.
 Established architecture/module/API contracts, catalogue/account persistence,
 server-side TMDb import and the initial frontend/backend/CI walking skeleton.
 PO: @kietxuan; SM2: @NguyenTuanAnh0608.
+
+| Member | Role | Main responsibilities |
+| --- | --- | --- |
+| Nguyen Xuan Kiet | Product Owner | Refine scope; implement catalogue storage, server-only TMDb import and reproducible seed/bootstrap support; define explanation and attribution content. |
+| Tran Minh Hoang | Developer | Define architecture/data/API contracts; implement session endpoints, the recommendations landing and explanation page; verify the detail walking skeleton. |
+| Tran Tuan Anh | Developer | Implement sign-in/navigation, catalogue cards and details, and the popular/cold-start API; prepare database setup and runtime CI. |
+| Vu Quoc Huy | Developer | Implement registration and public catalogue/detail endpoints; verify account boundaries and integrated journeys; assemble the design dossier. |
+| Nguyen Tuan Anh | Scrum Master | Coordinate Sprint delivery and wrap-up; implement account/password storage, registration form and server sessions; verify explanation navigation. |
+
 [Design](docs/design.md) · [Architecture](docs/architecture.md) ·
 [API](docs/api.md) · [Sprint 2 record](docs/sprint-log.md#sprint-2---repository-activity-recorded-2026-09-24-to-2026-10-02).
 These living design documents also contain explicitly dated later amendments.
@@ -92,6 +114,14 @@ Sprint dates. [UI dossier](docs/ui.md) ·
 [Planning/reconciliation](docs/sprint3-backlog-refinement.md) ·
 [Sprint 3 record](docs/sprint-log.md#sprint-3---2026-10-05-to-2026-10-18).
 
+| Member | Role | Main responsibilities |
+| --- | --- | --- |
+| Nguyen Xuan Kiet | Product Owner | Refine and accept scope; implement preference validation, recommendation empty/error states and genre filtering; deliver real TMDb import, backdrop storage/compatibility checks and the rating widget. |
+| Tran Minh Hoang | Developer | Implement personalised recommendation endpoints, Popular UI and verification, reset backend and backdrop details UI; reconcile API/schema contracts and rating account-switch checks. |
+| Tran Tuan Anh | Developer | Implement preference save/restore UI, cold-start transitions and popular catalogue endpoints; deliver rating storage/API verification, integrated P0 acceptance and the UI/accessibility dossier. |
+| Vu Quoc Huy | Scrum Master | Coordinate Sprint delivery and wrap-up; implement preference storage, genre ranking, recommendation cards and rating API; verify details/mobile controls and show TMDb popularity. |
+| Nguyen Tuan Anh | Developer | Prepare deterministic fixtures and preference isolation tests; implement Home genre controls, retry/race handling, detail-return context and backdrop enrichment; verify clean-clone setup and isolated CI. |
+
 ### Sprint 4 — Discovery, interface and tested business rules
 
 Planning: 20 October; reported Review/Retro: 1 November 2026.
@@ -103,20 +133,41 @@ recorded acceptance boundaries rather than treating this summary as new evidence
 [Planning](docs/sprint4-backlog-refinement.md) · [Testing dossier](docs/testing.md) ·
 [Sprint 4 record](docs/sprint-log.md#sprint-4--wrap-up-cutoff-1-november-2026).
 
+| Member | Role | Main responsibilities |
+| --- | --- | --- |
+| Nguyen Xuan Kiet | Product Owner | Refine and accept scope; redesign shared UI, onboarding, themes, posters and rating controls; implement reset concurrency, Profile UI and detail-return verification; improve search pagination and discovery presentation. |
+| Tran Minh Hoang | Developer | Implement account-owned rating signals and deterministic ranking oracles, Profile API and persistent Watchlist, reset invalidation and official trailer import; reconcile contracts. |
+| Tran Tuan Anh | Scrum Master | Coordinate Sprint delivery and wrap-up; implement personalised ranking/fallback and Search UI; verify filtering/pagination, cold-start/account isolation and core readiness. |
+| Vu Quoc Huy | Developer | Implement rating-save ranking refresh/explanations and Similar API/UI; verify full reset, later-login persistence and accessible recovery; compile the testing dossier. |
+| Nguyen Tuan Anh | Developer | Implement the shared versioned TF-IDF index and title/overview Search API; verify rating/ranking privacy and TDD evidence; integrate trailer UI and prepare build/index/persistence recovery. |
+
 ### Sprint 5 — Public deployment, regional availability and release
 
 **5–12 November 2026**, Planning 6 November; PO/SM5: @kietxuan.
 Moved public persistence to PostgreSQL 18/Neon, deployed to Render, added
 US/GB/SG availability and validated TMDb watch-options links, and prepared
-monitoring/recovery/operations and the M5 handoff. C01/T01–T08 are Closed;
-C02 remains Open for the remaining administrative/operational/submission
-gates; PO acceptance and v1.0 publication are now recorded.
+monitoring/recovery/operations and the M5 handoff. C01/T01–T08 and C02 are now
+Closed, following the C02 documentation merge. Issue closure does not replace
+the remaining administrative/operational/submission evidence disclosed in the
+wrap-up; PO acceptance and v1.0 publication are recorded separately.
+
+| Member | Role | Main responsibilities |
+| --- | --- | --- |
+| Nguyen Xuan Kiet | Product Owner / Scrum Master | Lead Planning, scope and team commitment; accept the public candidate; reconcile final audit, Sprint metrics, README, release and submission handoff. |
+| Tran Minh Hoang | Developer | Verify PostgreSQL 18 compatibility and migrations; prepare and test backup, restore and rollback procedures. |
+| Tran Tuan Anh | Developer | Prepare CI/protected-main requirements and Render deployment; implement regional provider enrichment and validated movie/market watch-options links. |
+| Vu Quoc Huy | Developer | Implement the regional Where to watch interface; prepare monitoring, portable setup, README and operations documentation. |
+| Nguyen Tuan Anh | Developer | Provision and verify Neon, imported TMDb data and NLP startup; prepare public acceptance checks and the final verification handoff. |
+
 [Planning](docs/sprint5-backlog-refinement.md) · [Operations](docs/operations.md) ·
 [C02](docs/s5-c02-wrap-up.md) ·
 [Five-Sprint metrics](docs/sprint-log.md#c02-current-delivery-and-five-sprint-reconciliation--11-november-2026).
 
 ## Application behaviour
 
+- On phones/tablets, open the three-line navigation button beside the theme
+  toggle to find the pages and account actions. Close with the × button, the
+  backdrop or Escape. Wider screens retain the expanded navigation.
 - Home browses the imported catalogue by title A–Z or Z–A; Popular orders by
   TMDb popularity. Recommendations rank eligible account results before genre
   filtering and pagination. Details returns to the retained list context.
@@ -207,6 +258,8 @@ It uses isolated fixtures and does not need a real TMDb token or production DB.
 [P0 case map, normal/refusal/boundaries and mutation evidence](docs/testing.md).
 Optional feature/browser suites are documented with their individual features;
 they are not prerequisites for taking a screenshot of the compact M4 test run.
+For the compact menu and mobile layout check, see the
+[focused verification and screenshots](docs/evidence/mobile-navigation/README.md).
 
 [ci.yml](.github/workflows/ci.yml) checks stack selection, Python lint/P0/affected
 backend paths, authenticated PostgreSQL 18/native recovery, frontend lint/focused
@@ -231,8 +284,9 @@ Product Owner: @kietxuan. Scrum Master rotation: **Sprint 1 @hoang3003 →
 Sprint 2 @NguyenTuanAnh0608 → Sprint 3 @vu-huzy → Sprint 4 @anotify-vie →
 Sprint 5 @kietxuan**. C01 is PO-owned; C02 is SM-owned. GitHub's
 [Project 9](https://github.com/orgs/SE-FDA-NEU/projects/9) tracks the work.
-Historical role/output records live in the Sprint log instead of competing
-with the current team/release information at the top of this README.
+The Sprint tables above summarise every member's work; the Sprint log contains
+the detailed role/output records and metrics. The current team/release entry
+remains at the top for reviewers opening the repository.
 
 The backend lives in `backend/app`, migrations in `backend/alembic`, the React
 frontend in `frontend/src`, and verification in `tests`, `backend/tests` and

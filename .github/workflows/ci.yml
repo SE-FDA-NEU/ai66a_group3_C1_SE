@@ -261,8 +261,8 @@ jobs:
       - name: Lint frontend
         run: npm --prefix frontend run lint
 
-      - name: Verify regional watch-provider UI
-        run: npm --prefix frontend test -- src/tests/movie-watch-providers.test.tsx
+      - name: Verify providers, session navigation and onboarding
+        run: npm --prefix frontend test -- src/tests/movie-watch-providers.test.tsx src/tests/mobile-navigation.test.tsx src/tests/home-onboarding.test.tsx --maxWorkers=1
 
       - name: Verify T07 acceptance rejects incorrect results
         run: node --test frontend/scripts/s5-t07-contract.node-test.mjs
@@ -274,7 +274,7 @@ jobs:
         if: always()
         run: |
           echo "### Frontend validation scope" >> "$GITHUB_STEP_SUMMARY"
-          echo "Lint, focused regional-provider UI tests and build are automatic; see their step results above." >> "$GITHUB_STEP_SUMMARY"
+          echo "Lint, focused provider/session-navigation/onboarding UI tests and build are automatic; see their step results above." >> "$GITHUB_STEP_SUMMARY"
           echo "Optional full Vitest and browser regressions: not run. Dispatch Optional extended regression or the individual feature workflows to run them." >> "$GITHUB_STEP_SUMMARY"
 
 
