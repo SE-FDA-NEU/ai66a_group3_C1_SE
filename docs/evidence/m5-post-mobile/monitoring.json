@@ -1,0 +1,610 @@
+{
+  "windowStart": "2026-11-11T16:53:04Z",
+  "windowEnd": "2026-11-11T16:58:04Z",
+  "timezone": "UTC",
+  "pages": 2,
+  "complete": true,
+  "counts": {
+    "completed": 118,
+    "health": 71,
+    "fourHundreds": 7,
+    "fiveHundreds": 0
+  },
+  "errorRatePercent": 0,
+  "p50": 30.52,
+  "p95": 698.3,
+  "max": 1855.45,
+  "samples": [
+    {
+      "status": 200,
+      "appMs": 35.51,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 46.31,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 79.56,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 35.37,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 29,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 33.97,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 31.03,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 30.28,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 30.12,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 32.24,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 34.92,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 33.37,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 30.15,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 246.42,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 30.73,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 31.89,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 29.29,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 112.37,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 29.71,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 29.82,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 32.31,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 34.43,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 30.12,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 28.67,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 32.92,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 29.49,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 31.94,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 30.31,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 87.45,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 42.26,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 67.96,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 31.8,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 30.12,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 32.49,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 30.44,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 32.06,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 30.52,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 54.98,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 31.65,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 31.15,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 29.77,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 31.68,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 38.7,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 30.27,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 29.81,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 32.67,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 30.15,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 32.52,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 33.36,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 1.26,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 1.21,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 1.18,
+      "isHealth": false
+    },
+    {
+      "status": 401,
+      "appMs": 6.02,
+      "isHealth": false
+    },
+    {
+      "status": 404,
+      "appMs": 7.46,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 63.94,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 19.85,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 53.06,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 158.05,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 18.55,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 28.35,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 846.08,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 505.68,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 687.53,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 709.69,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 330.61,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 65.25,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 23.15,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 291.17,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 759.97,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 502.81,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 24.07,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 18.18,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 1855.45,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 1693.55,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 18.67,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 18.34,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 17.31,
+      "isHealth": false
+    },
+    {
+      "status": 400,
+      "appMs": 1.14,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 31.75,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 17.64,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 17.2,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 1.78,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 19.55,
+      "isHealth": false
+    },
+    {
+      "status": 401,
+      "appMs": 0.84,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 585.62,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 1.45,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 1.21,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 1.09,
+      "isHealth": false
+    },
+    {
+      "status": 401,
+      "appMs": 1.59,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 17.87,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 17.7,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 698.3,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 30.86,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 28.08,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 34.95,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 31.61,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 30.24,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 30.18,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 31.26,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 34.88,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 61.19,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 29.41,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 33.22,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 30.74,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 31.62,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 29.87,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 29.54,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 28.98,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 31.82,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 31.43,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 4.6,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 3.98,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 4.83,
+      "isHealth": false
+    },
+    {
+      "status": 401,
+      "appMs": 1.03,
+      "isHealth": false
+    },
+    {
+      "status": 404,
+      "appMs": 2.33,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 24.47,
+      "isHealth": false
+    },
+    {
+      "status": 200,
+      "appMs": 29.8,
+      "isHealth": true
+    },
+    {
+      "status": 200,
+      "appMs": 30.26,
+      "isHealth": true
+    }
+  ],
+  "scope": "Post-deployment app processing times, includes health and read-only verifier traffic; not a load benchmark or uptime guarantee"
+}

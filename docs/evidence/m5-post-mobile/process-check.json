@@ -1,0 +1,44 @@
+{
+  "ruleTypes": [
+    "deletion",
+    "non_fast_forward",
+    "pull_request"
+  ],
+  "requiredStatusChecks": [],
+  "pr267": {
+    "mergedAt": "2026-11-11T16:48:50Z",
+    "head": "d0eb718ebb5689c180bf19234ca85511553b33e6",
+    "reviewSummary": [
+      {
+        "reviewer": "hoang3003",
+        "state": "APPROVED",
+        "commit": "d0eb718ebb5689c180bf19234ca85511553b33e6",
+        "submittedAt": "2026-11-11T16:47:22Z"
+      }
+    ]
+  },
+  "ciDurationSeconds": 87,
+  "jobs": [
+    {
+      "name": "Detect stack",
+      "conclusion": "success"
+    },
+    {
+      "name": "PostgreSQL 18 integration",
+      "conclusion": "success"
+    },
+    {
+      "name": "No secrets committed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Node build and tests",
+      "conclusion": "success"
+    },
+    {
+      "name": "Python tests",
+      "conclusion": "success"
+    }
+  ],
+  "c02State": "closed"
+}

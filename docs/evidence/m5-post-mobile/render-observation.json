@@ -1,0 +1,27 @@
+{
+  "observedAt": "2026-11-11T16:55:54Z",
+  "workspace": {
+    "id": "tea-d7kdoovaqgkc73brc7ag",
+    "name": "My Workspace"
+  },
+  "service": {
+    "id": "srv-dbp96kp42hec73bv94j0",
+    "name": "cineai",
+    "repo": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE",
+    "branch": "main",
+    "autoDeployTrigger": "checksPass",
+    "plan": "free",
+    "region": "singapore",
+    "healthCheckPath": "/health",
+    "url": "https://cineai-o9tf.onrender.com"
+  },
+  "deployment": {
+    "id": "dep-dbq9pjoqidvc73etjt4g",
+    "status": "live",
+    "commit": "80b15f705ca64752a346a636490b80be347487bd",
+    "trigger": "new_commit",
+    "createdAt": "2026-11-11T16:50:24.402853Z",
+    "finishedAt": "2026-11-11T16:53:03.60014Z"
+  },
+  "limitation": "Read-only authenticated Render observation, not a deployment action."
+}

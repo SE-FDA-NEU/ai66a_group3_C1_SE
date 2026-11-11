@@ -1,0 +1,24 @@
+{
+  "checkedAt": "2026-11-11T16:57:51.937Z",
+  "target": "https://cineai-o9tf.onrender.com",
+  "device": "Edge headless; emulated 375x812; fresh guest context",
+  "checks": [
+    "Compact header and real catalogue are visible without overflow",
+    "Guest menu exposes all seven navigation destinations and real account actions",
+    "Escape releases modal and restores focus",
+    "Light theme and drawer work on the deployed site",
+    "Guest Preferences selection reaches Sign in through visible navigation",
+    "No browser script errors"
+  ],
+  "headerHeight": 69,
+  "navigationLinks": [
+    "Home",
+    "Popular movies",
+    "Search",
+    "My recommendations",
+    "Preferences",
+    "My watchlist",
+    "How recommendations work"
+  ],
+  "pass": true
+}
