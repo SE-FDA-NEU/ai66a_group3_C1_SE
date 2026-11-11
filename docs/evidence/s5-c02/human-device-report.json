@@ -1,0 +1,13 @@
+{
+  "reportedDate": "2026-11-11",
+  "reporterAndTester": "Nguyen Xuan Kiet",
+  "phone": "physical phone, model/OS/browser not supplied",
+  "laptop": "private/incognito browser, OS/browser not supplied",
+  "reportedResult": "OK",
+  "evidenceKind": "Explicit PO/user report in project conversation, not an agent-performed physical-device run",
+  "reportedCandidateSha": null,
+  "candidateCorrelation": "Render independently reports acc4924 Live; user did not supply a per-device SHA",
+  "poFinalCandidateDecision": "PO explicitly accepts acc49243e4db404438b00521c2f7a6234377fb18 for official release, confirmed in project conversation on 11 November 2026",
+  "demoAndReviewRetro": "PO instructed to omit these from C02; team prepares them separately, no completion claimed",
+  "acceptedCandidateSha": "acc49243e4db404438b00521c2f7a6234377fb18"
+}

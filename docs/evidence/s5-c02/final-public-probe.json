@@ -1,0 +1,495 @@
+{
+  "checkedAt": "2026-11-11T15:02:20.805Z",
+  "target": "https://cineai-o9tf.onrender.com",
+  "sourceCommit": "ece88824f4e0e7cf3f237daed0c157ffadbae1c4",
+  "expectedHead": "d9a6f2c1e508",
+  "deployedSha": null,
+  "device": "fresh headless Edge contexts; desktop and emulated 390x844; no physical phone",
+  "checks": [
+    {
+      "name": "health matches source migration",
+      "status": "pass"
+    },
+    {
+      "name": "Home is reachable and contains imported data",
+      "status": "pass"
+    },
+    {
+      "name": "light and dark themes",
+      "status": "pass"
+    },
+    {
+      "name": "Popular navigation",
+      "status": "pass"
+    },
+    {
+      "name": "Home Z-A, page two and exact Details return context",
+      "status": "pass"
+    },
+    {
+      "name": "Search is submit-only and paginates all matches; return context survives Details",
+      "status": "pass"
+    },
+    {
+      "name": "Details reached through visible Home navigation",
+      "status": "pass"
+    },
+    {
+      "name": "real media and NLP Similar render on Details",
+      "status": "pass"
+    },
+    {
+      "name": "API movie/country/link US",
+      "status": "pass"
+    },
+    {
+      "name": "API movie/country/link GB",
+      "status": "pass"
+    },
+    {
+      "name": "API movie/country/link SG",
+      "status": "pass"
+    },
+    {
+      "name": "unsupported region is a safe refusal",
+      "status": "pass"
+    },
+    {
+      "name": "US default and country UI/API consistency",
+      "status": "pass"
+    },
+    {
+      "name": "invalid stored market falls back to US; mobile layout",
+      "status": "pass"
+    }
+  ],
+  "physicalPhone": "pending",
+  "poAcceptance": "pending",
+  "teamRehearsal": "pending",
+  "browser": "Microsoft Edge 157.0.4341.46",
+  "health": {
+    "status": 200,
+    "body": {
+      "status": "ok",
+      "database": "connected",
+      "migrationVersion": "d9a6f2c1e508"
+    }
+  },
+  "home": {
+    "status": 200,
+    "movieLinks": 10
+  },
+  "search": {
+    "query": "the",
+    "total": 329,
+    "firstPage": 10,
+    "secondPage": 10,
+    "noDuplicateIds": true
+  },
+  "detail": {
+    "clickedHref": "/movies/2626f71e-8458-491c-a1f4-c2017d8f684b",
+    "movieId": "2626f71e-8458-491c-a1f4-c2017d8f684b",
+    "sourceId": "19913",
+    "heading": "(500) Days of Summer",
+    "regions": {
+      "US": {
+        "countrySelector": 1,
+        "selectedCountry": "US",
+        "heading": "Where to watch in United States",
+        "actionCount": 1,
+        "actionHref": "https://www.themoviedb.org/movie/19913-500-days-of-summer/watch?locale=US",
+        "actionTarget": "_blank",
+        "actionRel": "noopener noreferrer",
+        "groups": {
+          "flatrate": [],
+          "rent": [
+            "Apple TV Store",
+            "Google Play Movies",
+            "Fandango At Home",
+            "Amazon Video",
+            "YouTube"
+          ],
+          "buy": [
+            "Apple TV Store",
+            "Google Play Movies",
+            "Fandango At Home",
+            "Amazon Video",
+            "YouTube"
+          ],
+          "free": [
+            "Hoopla"
+          ],
+          "ads": []
+        },
+        "attribution": true,
+        "staleWarning": false
+      },
+      "GB": {
+        "countrySelector": 1,
+        "selectedCountry": "GB",
+        "heading": "Where to watch in United Kingdom",
+        "actionCount": 1,
+        "actionHref": "https://www.themoviedb.org/movie/19913-500-days-of-summer/watch?locale=GB",
+        "actionTarget": "_blank",
+        "actionRel": "noopener noreferrer",
+        "groups": {
+          "flatrate": [
+            "Disney Plus"
+          ],
+          "rent": [
+            "Apple TV Store",
+            "Amazon Video",
+            "Rakuten TV",
+            "Sky Store",
+            "YouTube"
+          ],
+          "buy": [
+            "Apple TV Store",
+            "Amazon Video",
+            "Rakuten TV",
+            "Sky Store",
+            "YouTube"
+          ],
+          "free": [],
+          "ads": []
+        },
+        "attribution": true,
+        "staleWarning": false
+      },
+      "SG": {
+        "countrySelector": 1,
+        "selectedCountry": "SG",
+        "heading": "Where to watch in Singapore",
+        "actionCount": 1,
+        "actionHref": "https://www.themoviedb.org/movie/19913-500-days-of-summer/watch?locale=SG",
+        "actionTarget": "_blank",
+        "actionRel": "noopener noreferrer",
+        "groups": {
+          "flatrate": [
+            "Disney Plus"
+          ],
+          "rent": [],
+          "buy": [],
+          "free": [],
+          "ads": []
+        },
+        "attribution": true,
+        "staleWarning": false
+      }
+    }
+  },
+  "media": {
+    "realPoster": true,
+    "backdropPresent": true,
+    "trailerEmbedOpens": true,
+    "similarCount": 5,
+    "playbackConfirmation": "not asserted; external YouTube availability depends on the network/video"
+  },
+  "regionalApi": {
+    "US": {
+      "status": 200,
+      "body": {
+        "data": {
+          "movie": {
+            "id": "2626f71e-8458-491c-a1f4-c2017d8f684b",
+            "title": "(500) Days of Summer",
+            "releaseYear": 2009,
+            "genres": [
+              {
+                "id": 35,
+                "name": "Comedy"
+              },
+              {
+                "id": 18,
+                "name": "Drama"
+              },
+              {
+                "id": 10749,
+                "name": "Romance"
+              }
+            ],
+            "overview": "Tom, greeting-card writer and hopeless romantic, is caught completely off-guard when his girlfriend, Summer, suddenly dumps him. He reflects on their 500 days together to try to figure out where their love affair went sour, and in doing so, Tom rediscovers his true passions in life.",
+            "popularityScore": 11.3378,
+            "voteAverage": 7.3,
+            "voteCount": 11433,
+            "backdropUrl": "https://image.tmdb.org/t/p/w780/1M2i4Mxd03elGOTmEkIvqrHfmyS.jpg",
+            "posterUrl": "https://image.tmdb.org/t/p/w500/qXAuQ9hF30sQRsXf40OfRVl0MJZ.jpg",
+            "trailer": {
+              "site": "YouTube",
+              "key": "oBxR8cEt2xM",
+              "name": "(Not) A Love Story",
+              "type": "Trailer",
+              "official": true,
+              "language": "en",
+              "publishedAt": "2019-07-09T22:01:14Z",
+              "url": "https://www.youtube.com/watch?v=oBxR8cEt2xM"
+            },
+            "providers": {
+              "country": "US",
+              "status": "success",
+              "attemptedAt": "2026-11-11T13:53:56.162062Z",
+              "checkedAt": "2026-11-11T13:53:56.442751Z",
+              "groups": {
+                "flatrate": [],
+                "rent": [
+                  {
+                    "id": 2,
+                    "name": "Apple TV Store",
+                    "logoUrl": "https://image.tmdb.org/t/p/w92/qdEGArH3lKfFnAtYXMkSYk5wxuG.png"
+                  },
+                  {
+                    "id": 3,
+                    "name": "Google Play Movies",
+                    "logoUrl": "https://image.tmdb.org/t/p/w92/aZRENwYILujqs0RVOZutTh0BVGV.png"
+                  },
+                  {
+                    "id": 7,
+                    "name": "Fandango At Home",
+                    "logoUrl": "https://image.tmdb.org/t/p/w92/wpOt6x0dRxTrIzuBosto4LGd7E9.png"
+                  },
+                  {
+                    "id": 10,
+                    "name": "Amazon Video",
+                    "logoUrl": "https://image.tmdb.org/t/p/w92/jn6TLbtaTZntTRX9UYucHJvpQx1.png"
+                  },
+                  {
+                    "id": 192,
+                    "name": "YouTube",
+                    "logoUrl": "https://image.tmdb.org/t/p/w92/5Maob4o5w8oZnNeYpCDyVFD3M7X.png"
+                  }
+                ],
+                "buy": [
+                  {
+                    "id": 2,
+                    "name": "Apple TV Store",
+                    "logoUrl": "https://image.tmdb.org/t/p/w92/qdEGArH3lKfFnAtYXMkSYk5wxuG.png"
+                  },
+                  {
+                    "id": 3,
+                    "name": "Google Play Movies",
+                    "logoUrl": "https://image.tmdb.org/t/p/w92/aZRENwYILujqs0RVOZutTh0BVGV.png"
+                  },
+                  {
+                    "id": 7,
+                    "name": "Fandango At Home",
+                    "logoUrl": "https://image.tmdb.org/t/p/w92/wpOt6x0dRxTrIzuBosto4LGd7E9.png"
+                  },
+                  {
+                    "id": 10,
+                    "name": "Amazon Video",
+                    "logoUrl": "https://image.tmdb.org/t/p/w92/jn6TLbtaTZntTRX9UYucHJvpQx1.png"
+                  },
+                  {
+                    "id": 192,
+                    "name": "YouTube",
+                    "logoUrl": "https://image.tmdb.org/t/p/w92/5Maob4o5w8oZnNeYpCDyVFD3M7X.png"
+                  }
+                ],
+                "free": [
+                  {
+                    "id": 212,
+                    "name": "Hoopla",
+                    "logoUrl": "https://image.tmdb.org/t/p/w92/gtjNBzAoGgUtYzt0UKXmwG34WWL.png"
+                  }
+                ],
+                "ads": []
+              }
+            },
+            "watchOptionsUrl": "https://www.themoviedb.org/movie/19913-500-days-of-summer/watch?locale=US"
+          }
+        },
+        "meta": {
+          "catalogueRevision": "1ee08003-bc00-4888-b35c-8c6cbe599062"
+        }
+      }
+    },
+    "GB": {
+      "status": 200,
+      "body": {
+        "data": {
+          "movie": {
+            "id": "2626f71e-8458-491c-a1f4-c2017d8f684b",
+            "title": "(500) Days of Summer",
+            "releaseYear": 2009,
+            "genres": [
+              {
+                "id": 35,
+                "name": "Comedy"
+              },
+              {
+                "id": 18,
+                "name": "Drama"
+              },
+              {
+                "id": 10749,
+                "name": "Romance"
+              }
+            ],
+            "overview": "Tom, greeting-card writer and hopeless romantic, is caught completely off-guard when his girlfriend, Summer, suddenly dumps him. He reflects on their 500 days together to try to figure out where their love affair went sour, and in doing so, Tom rediscovers his true passions in life.",
+            "popularityScore": 11.3378,
+            "voteAverage": 7.3,
+            "voteCount": 11433,
+            "backdropUrl": "https://image.tmdb.org/t/p/w780/1M2i4Mxd03elGOTmEkIvqrHfmyS.jpg",
+            "posterUrl": "https://image.tmdb.org/t/p/w500/qXAuQ9hF30sQRsXf40OfRVl0MJZ.jpg",
+            "trailer": {
+              "site": "YouTube",
+              "key": "oBxR8cEt2xM",
+              "name": "(Not) A Love Story",
+              "type": "Trailer",
+              "official": true,
+              "language": "en",
+              "publishedAt": "2019-07-09T22:01:14Z",
+              "url": "https://www.youtube.com/watch?v=oBxR8cEt2xM"
+            },
+            "providers": {
+              "country": "GB",
+              "status": "success",
+              "attemptedAt": "2026-11-11T13:53:56.162062Z",
+              "checkedAt": "2026-11-11T13:53:56.443747Z",
+              "groups": {
+                "flatrate": [
+                  {
+                    "id": 337,
+                    "name": "Disney Plus",
+                    "logoUrl": "https://image.tmdb.org/t/p/w92/5eZ872CghnHFLB1j8grszbrx0dx.png"
+                  }
+                ],
+                "rent": [
+                  {
+                    "id": 2,
+                    "name": "Apple TV Store",
+                    "logoUrl": "https://image.tmdb.org/t/p/w92/qdEGArH3lKfFnAtYXMkSYk5wxuG.png"
+                  },
+                  {
+                    "id": 10,
+                    "name": "Amazon Video",
+                    "logoUrl": "https://image.tmdb.org/t/p/w92/jn6TLbtaTZntTRX9UYucHJvpQx1.png"
+                  },
+                  {
+                    "id": 35,
+                    "name": "Rakuten TV",
+                    "logoUrl": "https://image.tmdb.org/t/p/w92/872dfVu1biZISJ8rO143CZZutPR.png"
+                  },
+                  {
+                    "id": 130,
+                    "name": "Sky Store",
+                    "logoUrl": "https://image.tmdb.org/t/p/w92/nNkZ1JKe6vNhzti14KiKEUWHE6H.png"
+                  },
+                  {
+                    "id": 192,
+                    "name": "YouTube",
+                    "logoUrl": "https://image.tmdb.org/t/p/w92/5Maob4o5w8oZnNeYpCDyVFD3M7X.png"
+                  }
+                ],
+                "buy": [
+                  {
+                    "id": 2,
+                    "name": "Apple TV Store",
+                    "logoUrl": "https://image.tmdb.org/t/p/w92/qdEGArH3lKfFnAtYXMkSYk5wxuG.png"
+                  },
+                  {
+                    "id": 10,
+                    "name": "Amazon Video",
+                    "logoUrl": "https://image.tmdb.org/t/p/w92/jn6TLbtaTZntTRX9UYucHJvpQx1.png"
+                  },
+                  {
+                    "id": 35,
+                    "name": "Rakuten TV",
+                    "logoUrl": "https://image.tmdb.org/t/p/w92/872dfVu1biZISJ8rO143CZZutPR.png"
+                  },
+                  {
+                    "id": 130,
+                    "name": "Sky Store",
+                    "logoUrl": "https://image.tmdb.org/t/p/w92/nNkZ1JKe6vNhzti14KiKEUWHE6H.png"
+                  },
+                  {
+                    "id": 192,
+                    "name": "YouTube",
+                    "logoUrl": "https://image.tmdb.org/t/p/w92/5Maob4o5w8oZnNeYpCDyVFD3M7X.png"
+                  }
+                ],
+                "free": [],
+                "ads": []
+              }
+            },
+            "watchOptionsUrl": "https://www.themoviedb.org/movie/19913-500-days-of-summer/watch?locale=GB"
+          }
+        },
+        "meta": {
+          "catalogueRevision": "1ee08003-bc00-4888-b35c-8c6cbe599062"
+        }
+      }
+    },
+    "SG": {
+      "status": 200,
+      "body": {
+        "data": {
+          "movie": {
+            "id": "2626f71e-8458-491c-a1f4-c2017d8f684b",
+            "title": "(500) Days of Summer",
+            "releaseYear": 2009,
+            "genres": [
+              {
+                "id": 35,
+                "name": "Comedy"
+              },
+              {
+                "id": 18,
+                "name": "Drama"
+              },
+              {
+                "id": 10749,
+                "name": "Romance"
+              }
+            ],
+            "overview": "Tom, greeting-card writer and hopeless romantic, is caught completely off-guard when his girlfriend, Summer, suddenly dumps him. He reflects on their 500 days together to try to figure out where their love affair went sour, and in doing so, Tom rediscovers his true passions in life.",
+            "popularityScore": 11.3378,
+            "voteAverage": 7.3,
+            "voteCount": 11433,
+            "backdropUrl": "https://image.tmdb.org/t/p/w780/1M2i4Mxd03elGOTmEkIvqrHfmyS.jpg",
+            "posterUrl": "https://image.tmdb.org/t/p/w500/qXAuQ9hF30sQRsXf40OfRVl0MJZ.jpg",
+            "trailer": {
+              "site": "YouTube",
+              "key": "oBxR8cEt2xM",
+              "name": "(Not) A Love Story",
+              "type": "Trailer",
+              "official": true,
+              "language": "en",
+              "publishedAt": "2019-07-09T22:01:14Z",
+              "url": "https://www.youtube.com/watch?v=oBxR8cEt2xM"
+            },
+            "providers": {
+              "country": "SG",
+              "status": "success",
+              "attemptedAt": "2026-11-11T13:53:56.162062Z",
+              "checkedAt": "2026-11-11T13:53:56.443747Z",
+              "groups": {
+                "flatrate": [
+                  {
+                    "id": 337,
+                    "name": "Disney Plus",
+                    "logoUrl": "https://image.tmdb.org/t/p/w92/5eZ872CghnHFLB1j8grszbrx0dx.png"
+                  }
+                ],
+                "rent": [],
+                "buy": [],
+                "free": [],
+                "ads": []
+              }
+            },
+            "watchOptionsUrl": "https://www.themoviedb.org/movie/19913-500-days-of-summer/watch?locale=SG"
+          }
+        },
+        "meta": {
+          "catalogueRevision": "1ee08003-bc00-4888-b35c-8c6cbe599062"
+        }
+      }
+    }
+  },
+  "externalTab": {
+    "destination": "https://www.themoviedb.org/movie/19913-500-days-of-summer/watch?locale=US",
+    "originalRouteRetained": true
+  },
+  "technicalPass": true,
+  "fullIssueAcceptance": false
+}

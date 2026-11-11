@@ -1,0 +1,101 @@
+{
+  "checkedAt": "2026-11-11T14:12:31.482075+00:00",
+  "author": "Codex automated checks; not independent teammate acceptance",
+  "checks": {
+    "markdownFilesAndAnchors": "PASS",
+    "operationsSections": 6,
+    "operationsProseWords": 314,
+    "regionalAggregateAndApi": "PASS",
+    "monitoringRecalculation": "PASS",
+    "publicReadOnlyBrowser": "14/14 pass; physical phone/PO/demo pending",
+    "compactP0": "40 passed, 1 inherited deprecation warning",
+    "verifierContract": "18 passed",
+    "c01DocumentationCheck": "PASS",
+    "credentialPatternScanChangedText": "PASS",
+    "noProductionWritesDuringDocumentation": true
+  },
+  "sourceHashes": {
+    "README.md": "78979e86b3bc4593a2a188b8f4d2237f15555900896898e4b5d75e0bc234b4af",
+    "docs/evidence/s5-c02/README.md": "7857831384f54ecd1f1af823426fddc1217ff829842d997f82fc76bdf83bd476",
+    "docs/evidence/s5-c02/c02-public-detail-desktop.png": "2bf5c9125c7ec7d30772f523f671800f242ef85536d7c902b8d4671d38050b6c",
+    "docs/evidence/s5-c02/c02-public-detail-mobile-emulated.png": "368dc107d52d46423a18720fe02f6e6ecbda47080f9bfcb336d889a439e3240a",
+    "docs/evidence/s5-c02/c02-public-probe.json": "4eb18f2991d681f1ba59bba805c38489049ffbfc39b80acd480a79d24b50af45",
+    "docs/evidence/s5-c02/github.json": "036fbc4727338d228c22557adb1ce4732c918263bfa00e4c30098b37f0e0980a",
+    "docs/evidence/s5-c02/monitoring.json": "5ef7d9a65e2b3836aaf45b96a63b83ceffed33924d46f39c61af5c0e3a990b42",
+    "docs/evidence/s5-c02/render.json": "a5446b84ec6fd0885536b253cb78ac559b0276dec9184f5bf6c506dc53b833cd",
+    "docs/evidence/s5-c02/runtime.json": "2ae4a8da3336f887b3a5efb2b84344c8f16f3c42e4a7764b09e0f10c56211861",
+    "docs/operations.md": "9d686f18060a5d76fd4b264f75c67883669b9ac7aaa0225b4dc5338561bf0f5c",
+    "docs/s5-c02-wrap-up.md": "71a1e714551723a2d26fff4d705c737a40f66f6c9d0d54a452cc18a7ec0c0b04",
+    "docs/s5-t06-postgresql-recovery.md": "fc24f15e137a99a58951a8101d4cf01c96a267a5d896de542ad468f9d392200e",
+    "docs/s5-t08-c02-handoff.md": "d8009373cdade624d6b943c25b2f6fe266ca8d54f02ed583643d55abd7b47712",
+    "docs/sprint-log.md": "852b0ad1e12a84e02ca860b27b345a5f5420d39ef7b0b0510ad1a3bc997f3d0d",
+    "docs/sprint5-backlog-refinement.md": "97288dafd849b3e261ff17fabb2ad8b59dc6a6ed75b89a2c1dea1d7cd022a131"
+  },
+  "hashFormat": "SHA-256; Markdown/JSON CRLF normalized to LF; binary files unchanged",
+  "readmeFollowup": {
+    "checkedAt": "2026-11-11T14:36:21.553464+00:00",
+    "purpose": "M5 first screen and chronological Sprint 1-5 README; old verification/sourceHashes describe the original C02 snapshot",
+    "readmeLines": 238,
+    "relativeFilesAndAnchors": "PASS",
+    "setupMediaCases": "5 passed",
+    "documentationVerifier": "PASS",
+    "negativeControl": "Swapped Sprint 1/2 headings: verifier failed on chronology; restored exact original bytes and verifier passed",
+    "productionChanges": false,
+    "sourceHashes": {
+      "README.md": "d2c24121e593e5230f6421e92c09800988bf21e1a5392f9b0c80c4416c62ecfe",
+      "scripts/verify-s3-c01-docs.mjs": "1bea8026a28e56a5fa5fc4e755a37272ddce1b5812638dff04fda243e3598955"
+    }
+  },
+  "finalFollowup": {
+    "checkedAt": "2026-11-11T15:15:31.145780+00:00",
+    "checks": {
+      "relativeFilesAndAnchors": "PASS",
+      "operationsSections": 6,
+      "operationsProseWords": 349,
+      "publicReadOnly": "14/14 pass",
+      "publicReusedAccounts": "8/8 pass",
+      "publicFreshRegistration": "8/8 pass; two 201s, duplicate 409",
+      "regionalBackup13Tables": "PASS",
+      "restoredIndexHealthCountries": "PASS",
+      "healthRequestCorrelation": "PASS",
+      "poAcceptance": "explicit user confirmation for acc4924",
+      "releaseV1": "Published, target matches Live",
+      "privateCloudAndIndependentHumanRestore": "Pending user action",
+      "protectionScreenshotAndSubstantiveReview": "Pending admin/teammate",
+      "manualPdfLmsReceipt": "Pending user action",
+      "rehearsalReviewRetro": "Removed from C02 by explicit PO instruction; team prepares separately"
+    },
+    "sourceHashes": {
+      "README.md": "b79d98c4a03524316fcadb1fdbb79df53043a24b42afa2f8d775eca98dc214c6",
+      "docs/evidence/s5-c02/README.md": "abeae5b42f58ac5f6d9343e3e3caccec8f80fae37226d1c8de24f3997aa4049c",
+      "docs/evidence/s5-c02/final-public-new-registration.json": "2f39be8a46bf526f365abf568d8d3d9c47e3e8717d4f393440acadb4403462c6",
+      "docs/evidence/s5-c02/final-public-probe.json": "b78c5a8f00f2a74c1dd2232bf02ad1db15dd2c2967f48e59277b4c8757320ebb",
+      "docs/evidence/s5-c02/final-public-reused-accounts.json": "7f3e48c0b2957c654c59f35d31648f3c0df386c7080868f2d8d1800f03357887",
+      "docs/evidence/s5-c02/health-correlation.json": "fb54de23a18eb8e3b366300ac9c3f66820e75356800f0f31a01be3409b4ca7c0",
+      "docs/evidence/s5-c02/human-device-report.json": "5fb2a992fbeddc829af5cbbad5dc8faf5d0ec44568bb5b0ddbd511c6ce400b7b",
+      "docs/evidence/s5-c02/regional-backup-verification.json": "09c37c6b8203c40b7b2f7a905bac3ab02fc9f9506b6bd126fef052b017660404",
+      "docs/evidence/s5-c02/release-status.json": "2f3cdfb918e367715b40d243a2e0f2ec1745ee25b24d88e77661fe1e6077a94b",
+      "docs/evidence/s5-c02/restored-runtime-check.json": "d07cdcb5c52776f2703c039a1c9076ce9e4ce954635215f0ea114ba8af577c0a",
+      "docs/operations.md": "d6cb88772b20261478616056bc651fddbf8779291fca2cd7f52e07d0708fb17e",
+      "docs/s5-c02-private-backup-handoff.md": "408bd49fab862da8e51351e23401f72fce678f430747df4d586e1347fe56c5ca",
+      "docs/s5-c02-wrap-up.md": "1c9d2ae2a2cdb1ae5f169c094a8f4f69802d55de4a9ab816477d892d80dbda35",
+      "docs/s5-t08-c02-handoff.md": "74eb052c9c021a2bdcc847f93e15cc84c55228c3382e9542b66872de35076343",
+      "docs/sprint-log.md": "d096c961249eb896dafb31722fae2a4b3d8d57a09a181105e0316c4f9ec35843"
+    }
+  },
+  "nonAdminFollowup": {
+    "checkedAt": "2026-11-11T16:00:33.756034+00:00",
+    "operationsSections": 6,
+    "operationsProseWords": 444,
+    "filesAndWhitespace": "PASS",
+    "documentationVerifier": "PASS",
+    "adminRuleChangePerformed": false,
+    "screenshotOrExceptionFabricated": false,
+    "scope": "Clarify rollback, current risk owners and real external dependency; not M5 waiver",
+    "sourceHashes": {
+      "docs/operations.md": "4925486415e473fb87a0877fb78734708dfaec4cd9f77e6f4bf84b0db132b25d",
+      "docs/s5-c02-wrap-up.md": "dcea21a8cc79d9d2cbd1dce4769c77a50c7763507c0f9e81cccacd373f0e245a",
+      "docs/evidence/s5-c02/nonadmin-protection-check.json": "3dc94cd06e2f96027a67d666d9c538796b2204cb01d3f47582bb84f62c22428c"
+    }
+  }
+}

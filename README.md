@@ -1,981 +1,241 @@
-**CineAI public HTTPS app: [https://cineai-o9tf.onrender.com/](https://cineai-o9tf.onrender.com/)**
+**Running app: [https://cineai-o9tf.onrender.com/](https://cineai-o9tf.onrender.com/)**
 
 [![CI](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/workflows/ci.yml)
 
-# AI Movie Recommendation System (CineAI)
+# CineAI — AI Movie Recommendation System
 
-**Release 5 first screen** — Sprint 5, 5–12 November 2026. PO and Scrum Master
-(SM5): **@kietxuan**. The free Render service sleeps when idle, so the first
-request can take about a minute; this is not a guaranteed-uptime service.
-The public runtime is verified at T03 commit `f24ef546` (11 November 2026);
-the regional watch-provider selector is in `main` but is **not yet rolled out publicly**.
-The PO is preparing a single coordinated release window. Exact status is in
-the [operations record](docs/operations.md#1-deployment-and-release).
+Movie discovery for university students: browse real TMDb movies, choose genres
+and use optional ratings to receive explainable recommendations.
 
-**Public test account — application user (the only app role):**
+**Public test account:** `kietxuan@gmail.com` / `123456789` — application user,
+the only app role. These PO-approved credentials are for this project's demo
+only. For registration/cold-start checks, choose **Create account** instead.
 
-| Email | Password | Verified |
-| --- | --- | --- |
-| `kietxuan@gmail.com` | `123456789` | Public login/session/logout passed on 11 November 2026 |
+**Team 03:** Nguyen Xuan Kiet (11247306, [@kietxuan](https://github.com/kietxuan));
+Tran Minh Hoang (11247292, [@hoang3003](https://github.com/hoang3003));
+Tran Tuan Anh (11247264, [@anotify-vie](https://github.com/anotify-vie));
+Vu Quoc Huy (11247301, [@vu-huzy](https://github.com/vu-huzy));
+Nguyen Tuan Anh (11247260, [@NguyenTuanAnh0608](https://github.com/NguyenTuanAnh0608)).
+**Product Owner and Sprint 5 Scrum Master: @kietxuan.**
 
-The PO approved publishing these **project-demo-only** values; they are not a
-Gmail, Render, Neon or GitHub password. This shared account's demo state may
-change. Use **Create account** with separate synthetic users for registration,
-cold-start and account-isolation checks. [Account evidence](docs/evidence/s5-t08-operations/demo-account-check.json)
-and [local/public provisioning](docs/SETUP.md#disposable-test-account-and-p0-journey).
+<a id="sprint-3-review--start-here"></a>
 
-**Six P0 journeys — start from Home and click:**
-[S01 select genres #17](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/17) ·
-[S02 recommendations #18](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/18) ·
-[S03 movie details #19](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/19) ·
-[S04 explore without preferences #20](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/20) ·
-[S12 register #44](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/44) ·
-[S13 sign in and out #45](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/45).
-Start at Home: **Start/Preferences** (S01), **My recommendations** (S02),
-**View details** on a card (S03), **Popular movies** without login (S04),
-**Create account** (S12), and **Sign in / Sign out** (S13).
-The detailed paths are in the [P0 table below](#sprint-3-review--start-here).
+## P0 stories — start from Home
 
-| Member | GitHub | Sprint 5 issues |
-| --- | --- | --- |
-| Nguyen Xuan Kiet | [`@kietxuan`](https://github.com/kietxuan) | PO, SM5; planning #247, wrap-up #256 |
-| Tran Minh Hoang | [`@hoang3003`](https://github.com/hoang3003) | PostgreSQL #248, recovery #253 |
-| Tran Tuan Anh | [`@anotify-vie`](https://github.com/anotify-vie) | CI/deploy #250, regional providers #251 |
-| Vu Quoc Huy | [`@vu-huzy`](https://github.com/vu-huzy) | Regional UI #252, operations/README/SETUP #255 |
-| Nguyen Tuan Anh | [`@NguyenTuanAnh0608`](https://github.com/NguyenTuanAnh0608) | Neon/data #249, public acceptance #254 |
+Use the public URL above and visible buttons; no feature URL needs to be typed.
+Signing in normally returns to Home; choose Preferences or My recommendations
+when you want them. Protected destinations may return you to the requested page.
 
-Operate and recover the service with the [operations guide](docs/operations.md),
-the [deployment runbook](docs/s5-t03-deployment.md) and the
-[PostgreSQL recovery runbook](docs/s5-t06-postgresql-recovery.md).
+| P0 Story | Start from Home and click |
+| --- | --- |
+| [S01 — Select favourite genres #17](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/17) | Sign in → Start or Preferences → select 1–5 genres → Save preferences |
+| [S02 — Get personalised recommendations #18](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/18) | Save preferences → My recommendations; inspect reasons, filters and pages |
+| [S03 — View movie details #19](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/19) | View details on a visible movie card → return to the originating list |
+| [S04 — Explore without preferences #20](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/20) | Popular movies without login; for the account cold-start path, create/sign in to an account without saved genres → My recommendations → Popular / Not personalised |
+| [S12 — Register an account #44](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/44) | Create account → enter valid email/password → submit |
+| [S13 — Sign in and sign out #45](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/45) | Sign in → use the signed-in navigation → Sign out |
 
-For university students facing choice overload, this system turns a small set of
-genre preferences and optional ratings into transparent movie recommendations,
-rather than giving every viewer the same generic popularity list.
+[Setup guide](docs/SETUP.md) · [Operations](docs/operations.md) ·
+[P0 test cases](docs/testing.md#2-test-cases-for-every-p0-story) ·
+[Project board](https://github.com/orgs/SE-FDA-NEU/projects/9)
 
-## Sprint 3 review — start here
+## Current public release and M5 status
 
-**Sprint 3: 05–18 October 2026. Product Owner: @kietxuan.
-Scrum Master: @vu-huzy.** The PO confirmed these dates; the board's older
-iteration-date labels have not been updated. SM3 differs from SM1 (@hoang3003)
-and SM2 (@NguyenTuanAnh0608).
+Verified on **11 November 2026**: Render Free/Singapore, live application commit
+`acc49243e4db404438b00521c2f7a6234377fb18`, Neon PostgreSQL 18.6,
+989 active TMDb movies and 2,967 US/GB/SG availability checks.
+[Source CI](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/43025094939)
+and [deployment/data evidence](docs/evidence/s5-c02/README.md) identify that
+observation; later documentation commits do not automatically identify the app.
 
-**Sprint 4 Scrum Master (SM4): @anotify-vie**, distinct from SM3 (@vu-huzy).
+Kiet reports phone/private-laptop checks OK and explicitly accepts acc4924;
+[release v1.0](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/releases/tag/v1.0)
+targets that running commit. Branch-protection evidence, durable recovery
+handoff, final documentation review and manual submission remain tracked in
+[C02 #256](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/256) and the
+[C02 wrap-up](docs/s5-c02-wrap-up.md). This README does not claim M5 is finished.
+The free service may take about a minute to wake after inactivity.
 
-Begin at the home page (`/`) and use visible controls; feature URLs do not need
-to be entered by hand. Follow [SETUP](docs/SETUP.md) first, including its
-explicit account-provisioning step on the same TMDb-imported database. The
-public app-only review login is documented there; no real service password
-or TMDb token is published. Confirm the review machine's private TMDb
-token/network arrangement before the session.
+[Health endpoint](https://cineai-o9tf.onrender.com/health) returns HTTP 200 when
+the database/schema/required-table checks pass, otherwise 503. The required
+release identity is **running app commit = v1.0 target**. After a docs-only merge,
+record the latest documentation-main SHA/CI separately; see
+[release policy](docs/s5-c02-wrap-up.md#deploy-first-document-afterward--po-amendment).
+Keep the site available until grades are published and the group's longer
+retention commitment is fulfilled; [owners and schedule](docs/operations.md#5-maintenance-plan).
 
-| P0 Story | Start from the home page and use | Screen / route | Issue |
-|---|---|---|---|
-| S01 — Select favourite genres | Sign in → Enter preferences; authenticated home → Start also opens the picker | `/preferences` | [#17](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/17) |
-| S02 — Get personalised recommendations | Sign in → Enter preferences → choose 1–5 genres → Save preferences | `/preferences` → `/recommendations` | [#18](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/18) |
-| S03 — View movie details | View details on a visible movie card | `/movies/:movieId` | [#19](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/19) |
-| S04 — Explore without preferences | Register/sign in with a new account; see Popular / Not personalised | `/recommendations` | [#20](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/20) |
-| S12 — Register an account | Sign in → Create an account | `/register` | [#44](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/44) |
-| S13 — Sign in and sign out | Sign in; then use Sign out on recommendations | `/login` → `/recommendations` → `/` | [#45](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/45) |
+## Sprint history
 
-**Deliberate business-rule rejection (BR1):** open the picker with zero genres
-selected and choose **Save preferences**. Expect
+### Sprint 1 — Requirements and product backlog
+
+Defined the student problem/personas, scope, business rules, Stories, priorities,
+traceability and Definition of Done. PO: @kietxuan; SM1: @hoang3003.
+[Scope](docs/product-scope.md) · [Business rules](docs/business-rules.md) ·
+[Traceability](docs/traceability.md) · [Sprint 1 record](docs/sprint-log.md#sprint-1---repository-activity-recorded-2026-09-08-to-2026-09-20).
+
+### Sprint 2 — Design and walking skeleton
+
+Established architecture/module/API contracts, catalogue/account persistence,
+server-side TMDb import and the initial frontend/backend/CI walking skeleton.
+PO: @kietxuan; SM2: @NguyenTuanAnh0608.
+[Design](docs/design.md) · [Architecture](docs/architecture.md) ·
+[API](docs/api.md) · [Sprint 2 record](docs/sprint-log.md#sprint-2---repository-activity-recorded-2026-09-24-to-2026-10-02).
+These living design documents also contain explicitly dated later amendments.
+
+### Sprint 3 — Usable P0 journeys and real movie data
+
+**05–18 October 2026**, PO-confirmed; PO: @kietxuan; SM3: @vu-huzy.
+Delivered integrated preferences/recommendations, authenticated persistence,
+filtering/pagination/return context, ratings storage/UI, real TMDb catalogue
+and movie-detail backdrops. Historical board date labels are not the confirmed
+Sprint dates. [UI dossier](docs/ui.md) ·
+[Planning/reconciliation](docs/sprint3-backlog-refinement.md) ·
+[Sprint 3 record](docs/sprint-log.md#sprint-3---2026-10-05-to-2026-10-18).
+
+### Sprint 4 — Discovery, interface and tested business rules
+
+Planning: 20 October; reported Review/Retro: 1 November 2026.
+PO: @kietxuan; SM4: @anotify-vie.
+Added rating-aware ranking, shared TF-IDF Search/Similar, persistent Watchlist,
+Profile/reset preserving Watchlist, light/dark redesign, posters, half-star
+explicit-save ratings and embedded official trailers. Preserve each feature's
+recorded acceptance boundaries rather than treating this summary as new evidence.
+[Planning](docs/sprint4-backlog-refinement.md) · [Testing dossier](docs/testing.md) ·
+[Sprint 4 record](docs/sprint-log.md#sprint-4--wrap-up-cutoff-1-november-2026).
+
+### Sprint 5 — Public deployment, regional availability and release
+
+**5–12 November 2026**, Planning 6 November; PO/SM5: @kietxuan.
+Moved public persistence to PostgreSQL 18/Neon, deployed to Render, added
+US/GB/SG availability and validated TMDb watch-options links, and prepared
+monitoring/recovery/operations and the M5 handoff. C01/T01–T08 are Closed;
+C02 remains Open for the remaining administrative/operational/submission
+gates; PO acceptance and v1.0 publication are now recorded.
+[Planning](docs/sprint5-backlog-refinement.md) · [Operations](docs/operations.md) ·
+[C02](docs/s5-c02-wrap-up.md) ·
+[Five-Sprint metrics](docs/sprint-log.md#c02-current-delivery-and-five-sprint-reconciliation--11-november-2026).
+
+## Application behaviour
+
+- Home browses the imported catalogue by title A–Z or Z–A; Popular orders by
+  TMDb popularity. Recommendations rank eligible account results before genre
+  filtering and pagination. Details returns to the retained list context.
+- Ratings use 0.5–5 stars and an explicit Save rating action. Watchlist is
+  account-owned and persistent; adding a movie does not alter ranking. Reset
+  clears the account's genres/ratings and keeps its Watchlist.
+- Search runs on submit, with pagination over all eligible title/overview
+  matches. Similar uses the shared versioned overview TF-IDF index.
+- Details uses actual TMDb posters/backdrops with honest image fallbacks,
+  plus an optional official YouTube trailer below the poster, played in-page.
+  Missing trailers are described rather than replaced with unrelated videos.
+- Where to watch supports **US (default), GB and SG**, with a browser-persisted
+  country selector. Provider badges are informational. One validated movie/market
+  action opens **View watch options on TMDb** in a new tab. Missing availability
+  means unknown data, not "nowhere to watch". TMDb/JustWatch attribution stays visible.
+- Metadata comes from the imported database at runtime. Private TMDb credentials
+  are used by operator CLIs, never frontend variables or per-page metadata fetches.
+
+To demonstrate validation, use the genre picker with no genres selected and
+choose Save preferences. Expected message:
 `Select at least one genre (up to 5), then choose Save preferences.`
-The picker remains open and no invalid selection is saved.
-
-These are review entry points, not an assertion that all Story DoD gates are
-complete. See the [Sprint 3 backlog reconciliation](docs/sprint3-backlog-refinement.md)
-for actual issue/acceptance states, planning images and outstanding handoffs.
-
-- [Local setup and clean-clone guide](docs/SETUP.md)
-- [Required TMDb catalogue setup from Sprint 3](docs/tmdb-sprint3-runbook.md)
-
-The [setup guide](docs/SETUP.md#disposable-test-account-and-p0-journey)
-contains the PO-authorized application-only review account, the opt-in creation
-command, and the full P0/restart procedure. Provisioning uses the configured
-TMDb database, not a separate demo database. Fresh test users for registration
-and account-isolation checks are also created in that same database.
-
-## Team and Sprint 1 roles
-
-| Member           | GitHub                                                       | Sprint 1 responsibility                                   |
-| ---------------- | ------------------------------------------------------------ | --------------------------------------------------------- |
-| Nguyen Xuan Kiet | [`@kietxuan`](https://github.com/kietxuan)                   | Product Owner; C01 backlog refinement                     |
-| Tran Minh Hoang  | [`@hoang3003`](https://github.com/hoang3003)                 | Scrum Master; C02 Sprint 1 wrap-up                        |
-| Tran Tuan Anh    | [`@anotify-vie`](https://github.com/anotify-vie)             | C03 user research, personas, and scenarios                |
-| Vu Quoc Huy      | [`@vu-huzy`](https://github.com/vu-huzy)                     | C04 M1 requirements-document integration                  |
-| Nguyen Tuan Anh  | [`@NguyenTuanAnh0608`](https://github.com/NguyenTuanAnh0608) | C05 repository readiness, rules, routes, and traceability |
-
-## Sprint 2 roles
-
-| Member           | GitHub                                                       | Sprint 2 responsibility                                       |
-| ---------------- | ------------------------------------------------------------ | ------------------------------------------------------------- |
-| Nguyen Xuan Kiet | [`@kietxuan`](https://github.com/kietxuan)                   | Product Owner; C01 backlog refinement (#67)                   |
-| Tran Minh Hoang  | [`@hoang3003`](https://github.com/hoang3003)                 | C03 architecture, data, and API contracts (#69)               |
-| Tran Tuan Anh    | [`@anotify-vie`](https://github.com/anotify-vie)             | C04 runtime, CI, and database setup (#70)                     |
-| Vu Quoc Huy      | [`@vu-huzy`](https://github.com/vu-huzy)                     | C05 Milestone 2 design dossier (#71)                          |
-| Nguyen Tuan Anh  | [`@NguyenTuanAnh0608`](https://github.com/NguyenTuanAnh0608) | Scrum Master; C02 Sprint 2 wrap-up (#68)                      |
-
-## Project management
-
-- Scrum Master rotation: **SM3 = @vu-huzy; SM4 = @anotify-vie;
-  SM5 = @kietxuan**. C01 Planning remains PO-owned; C02 wrap-up remains
-  SM-owned. See the [Sprint 4 wrap-up and Sprint 5 handoff](docs/sprint-log.md#sprint-4--wrap-up-cutoff-1-november-2026).
-- Repository: [SE-FDA-NEU/ai66a_group3_C1_SE](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE)
-- Project board: [@group3_c1_se — Project 9](https://github.com/orgs/SE-FDA-NEU/projects/9)
-- Product backlog: 14 Story Issues, #17–#24, #30–#33, #44 and #45 (54 points).
-  The six P0 Stories are S01–S04, S12 and S13; S06 is P1.
-
-## Requirements references
-
-- [Product scope](docs/product-scope.md)
-- [Business rules with worked examples](docs/business-rules.md)
-- [Route and Story traceability](docs/traceability.md)
-- [M2 design document](docs/design.md)
-- [M2 architecture and ownership contract](docs/architecture.md)
-- [M2 auth, catalogue, and recommendation API contract](docs/api.md)
-- [Definition of Done](docs/definition-of-done.md)
-- [Sprint log](docs/sprint-log.md)
-- [Sprint 4 Planning, commitment and current scope](docs/sprint4-backlog-refinement.md)
-- [Sprint 5 Planning, amendments and current delivery map](docs/sprint5-backlog-refinement.md)
-- [Operations: deployment, CI, monitoring, risks, maintenance and lessons](docs/operations.md)
-- [PostgreSQL 18 connection and provisioning (S5-T01)](docs/s5-t01-postgresql.md),
-  [Neon and catalogue provisioning (S5-T02)](docs/s5-t02-neon-provisioning.md)
-- [Regional providers API and operator contract (S5-T04)](docs/api.md#14-s5-t04-regional-providers-and-tmdb-watch-options-251)
-
-## Definition of Done
-
-A Story is Done only when every acceptance criterion passes, the feature runs from
-a clean clone using this README, an automated test covers the changed behaviour, CI
-is green, a teammate who did not author the change approves the PR, the PR is merged
-to `main`, no secret or database dump is committed, and traceability is updated when
-a route or screen changes. The full checklist is in
-[docs/definition-of-done.md](docs/definition-of-done.md).
-
-From Sprint 3, catalogue-dependent Story acceptance also requires a successful
-TMDb import into SQLite and verified manual provenance smoke for the demo/staging
-environment. M2 seed-only data is not accepted; automated tests remain synthetic
-and token-free. See the [runbook](docs/tmdb-sprint3-runbook.md).
+For a server-side refusal, register a duplicate synthetic email and inspect its
+actionable response. Use the full [P0 normal/error/boundary map](docs/testing.md).
 
 ## Setup
 
-For platform-specific setup, expected output, troubleshooting, and clean-clone verification, see [docs/SETUP.md](docs/SETUP.md).
-The sections below describe the local SQLite path. For the public PostgreSQL 18 / Neon / Render path
-(explicit `--pages 50` import, whole-catalogue enrichment, regional providers, review users,
-index rebuild, startup and recovery) follow
-[SETUP: PostgreSQL 18, Neon and Render](docs/SETUP.md#postgresql-18-neon-and-render-public-runtime).
+Use [docs/SETUP.md](docs/SETUP.md) for the maintained, platform-specific steps,
+expected output and troubleshooting. It distinguishes **SQLite local development**
+from the **PostgreSQL 18 / Neon / Render public runtime**. Local databases and
+accounts are separate from the hosted demo; the public test login is not
+implicitly provisioned into every fresh local database.
 
 ```bash
 git clone https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE.git
 cd ai66a_group3_C1_SE
 ```
 
-# AI Movie Recommendation System (Sprint 2)
-
-## Overview
-
-Sprint 2 C04 bootstraps the shared runtime and development environment for the project.
-
-The selected stack is:
-
-### Backend
-
-- Python 3.12
-- FastAPI
-- Pydantic
-- Uvicorn
-- SQLAlchemy
-- Alembic
-- SQLite for local development and the default tests
-- PostgreSQL 18 (`psycopg`) for the public Neon database and the CI integration job
-
-### Frontend
-
-- Node.js 24
-- React
-- TypeScript
-- Vite
-- React Router
-
-### Testing
-
-- pytest
-- Vitest
-- React Testing Library
-
-During local development, Vite proxies `/api` requests to the FastAPI server.
-
-
-## Requirements
-
-Install the following before running the project:
-
-- Python 3.12
-- Node.js 24
-- npm
-
-Check the installed versions.
-
-### macOS/Linux
+Use Python **3.12** and Node.js **24**. Create/activate `.venv` and prepare the
+private root `.env` as described in SETUP. Then, from the repository root:
 
 ```bash
-python3.12 --version
-node --version
-npm --version
-```
-
-### Windows PowerShell
-
-```powershell
-py -3.12 --version
-node --version
-npm --version
-```
-
-
-## Environment Setup
-
-The project uses a local `.env` file for runtime configuration.
-
-### macOS/Linux
-
-From the repository root:
-
-```bash
-cp .env.example .env
-mkdir -p data
-```
-
-### Windows PowerShell
-
-From the repository root:
-
-```powershell
-Copy-Item .env.example .env
-New-Item -ItemType Directory -Force data
-```
-
-The default local configuration is:
-
-```env
-DATABASE_URL=sqlite:///./data/app.db
-TMDB_READ_ACCESS_TOKEN=
-```
-
-From Sprint 3, a valid `TMDB_READ_ACCESS_TOKEN` is required by anyone running
-the server-side import to prepare a development, staging or demo catalogue.
-Configure it privately in the root `.env` or server environment. Teammates
-using an already-imported backend and automated tests do not need a real token.
-The token must never enter a frontend/Vite variable. See the
-[required TMDb Sprint 3 runbook](docs/tmdb-sprint3-runbook.md).
-
-Do not commit:
-
-- `.env`
-- TMDb access tokens
-- API keys
-- SQLite database files
-- database dumps
-
-
-## Backend Setup
-
-### 1. Create a virtual environment
-
-#### macOS/Linux
-
-```bash
-python3.12 -m venv .venv
-source .venv/bin/activate
-```
-
-#### Windows PowerShell
-
-```powershell
-py -3.12 -m venv .venv
-.\.venv\Scripts\Activate.ps1
-```
-
-### 2. Install locked backend dependencies
-
-After activating the virtual environment:
-
-```bash
-python -m pip install --upgrade pip
 python -m pip install -r backend/requirements.lock.txt
 python -m pip install -e "./backend[dev]" --no-deps
-```
-
-`backend/requirements.lock.txt` contains pinned third-party Python dependencies used for reproducible installation.
-
-The lockfile must not contain an editable Git reference to the project itself. The final command installs the local backend package in editable mode without resolving dependencies again.
-
-
-## Frontend Setup
-
-Install frontend dependencies from the lockfile:
-
-```bash
 npm --prefix frontend ci
-```
-
-The frontend uses `frontend/package-lock.json` to keep dependency versions reproducible.
-
-
-## Database Setup
-
-The local SQLite database is stored at:
-
-```text
-data/app.db
-```
-
-If the `data` directory was not created during environment setup, create it first.
-
-### macOS/Linux
-
-```bash
-mkdir -p data
-```
-
-### Windows PowerShell
-
-```powershell
-New-Item -ItemType Directory -Force data
-```
-
-Apply all database migrations:
-
-```bash
-python -m alembic -c backend/alembic.ini upgrade head
-```
-
-C04 only bootstraps the shared migration system. Feature-specific schemas, such as account and catalogue tables, are owned by their corresponding Sprint tasks.
-
-### Verify the account storage boundary
-
-From the repository root, run the focused account checks:
-
-```powershell
-Set-Location backend
-..\.venv\Scripts\python.exe -m pytest tests/test_account_migration.py tests/test_user_repository.py tests/test_passwords.py -q
-```
-
-These checks verify that the migration follows the catalogue revision, email
-case variants hit the same database uniqueness constraint, plaintext passwords
-are replaced by Argon2id hashes, and the public account DTO contains only `id`
-and `email`.
-
-Confirm that Alembic has exactly one migration head:
-
-```powershell
-..\.venv\Scripts\python.exe -m alembic -c alembic.ini heads
-```
-
-Expected head at the current source (`main` after PR #263):
-
-```text
-d9a6f2c1e508 (head)
-```
-
-Use the actual `alembic heads` result if a later migration is added; older
-documentation heads (for example `c6f8a2d4e901`) are historical.
-
-
-## Historical M2 Catalogue Bootstrap / Offline Test Support
-
-For historical M2 reproduction or explicitly labelled offline work in a
-separate database, run this command from the repository root:
-
-```bash
-python -m app.cli.bootstrap_m2_catalogue
-```
-
-The command creates the parent directory for the configured SQLite database,
-applies every Alembic migration, and activates the fixed local M2 catalogue. It
-does not read `TMDB_READ_ACCESS_TOKEN` or make a network request. The command
-is therefore safe to run with an empty TMDb token and without internet access.
-
-Successful output has this shape:
-
-```text
-M2 catalogue bootstrap complete
-active_revision=<opaque UUID>
-movies=12
-genres=8
-movie_genres=22
-```
-
-Run the command a second time to verify idempotence: it reports the same active
-revision and row counts, without duplicate movies or movie/genre relations.
-This seed is not accepted as the Sprint 3 development/staging/demo catalogue.
-The command activates the seed revision; do not run it on the accepted Sprint 3
-database after a TMDb import. It remains useful for controlled tests/offline work.
-
-## Required server-side TMDb catalogue import — Sprint 3 onward
-
-TMDb is the required movie-catalogue source for development, staging and
-milestone demos from Sprint 3. After dependency/environment setup, create the
-configured SQLite parent directory and apply migrations, then import directly.
-Running the M2 bootstrap is not a prerequisite:
-
-```bash
 python -m alembic -c backend/alembic.ini upgrade head
 python -m app.cli.import_tmdb_catalogue --pages 50
+python -m app.cli.import_tmdb_catalogue --enrich-posters --all
+python -m app.cli.import_tmdb_catalogue --enrich-backdrops --all
 python -m app.cli.import_tmdb_catalogue --enrich-trailers --all
+python -m app.cli.import_tmdb_catalogue --enrich-providers --all --countries US GB SG --limit 300
 python -m app.cli.rebuild_overview_index rebuild
 python -m app.cli.rebuild_overview_index check
 ```
 
-Set `TMDB_READ_ACCESS_TOKEN` only in the server environment or in the local,
-gitignored `.env` file. The CLI default reads 50 pages of TMDb popular movies and
-the official movie genre list; it requests a movie-detail record only when a
-popular result omits `genre_ids`. It never runs as part of browser requests,
-automated tests, or the M2 bootstrap command.
+Before migration/import, verify that `DATABASE_URL` targets the intended **local**
+database, not production. Operator commands need a private `TMDB_READ_ACCESS_TOKEN`
+and network access. Fifty pages target roughly 1,000 raw results; the actual
+valid/deduplicated total varies. With `--all`, `--limit 300` is a batch size, not
+a total cap. Do not reimport the accepted catalogue just to enrich providers.
+The M2 seed command is historical/offline test support, not M3–M5 demo data.
 
-The standard review setup imports 50 pages, targeting about 1,000 distinct
-active TMDb movies in the configured database. The CLI default is also 50
-pages; explicit smaller budgets are intended for targeted smoke tests. The review command is:
-
-```bash
-python -m app.cli.import_tmdb_catalogue --pages 50
-python -m app.cli.rebuild_overview_index rebuild
-python -m app.cli.rebuild_overview_index check
-```
-
-The allowed budget is 1–50 pages (roughly 20–1,000 results before validation and
-deduplication). Live counts can vary. Each import activates a new snapshot; it
-does not append blindly. Retained TMDb movies keep their internal IDs, and
-accounts, preferences and ratings are not deleted. A later import without
-`--pages` uses the same 50-page default. Back up an existing database before
-refreshing it. Public and recommendation pages contain at most ten cards;
-pagination makes the complete eligible catalogue reachable.
-
-The setup also enriches trailers for all pending active movies. Existing
-catalogues can use `--enrich-posters --all` or `--enrich-backdrops --all` without
-re-importing or shrinking their snapshot. With `--all`, `--limit` is a per-batch
-budget (maximum 300), not a cap on the whole catalogue. See
-[the full setup and migration steps](docs/SETUP.md#existing-catalogues-migrate-and-enrich-every-movie).
-
-On success, the command prints a safe provenance summary: provider, opaque
-active revision ID, inserted/updated/rejected counts, movie/associated-genre/
-finite-popularity counts, source fetch timestamp and up to three provider
-source IDs, plus the active revision import timestamp. A missing/invalid
-credential, rate limit, timeout, invalid snapshot, or database failure leaves
-the prior active catalogue unchanged. Never commit, print, screenshot, or paste
-the actual access token.
-
-The required Sprint 3 contract is tracked under [#128](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/128):
-missing-token errors must give safe setup guidance, and the setup must never
-silently substitute the M2 seed. A fresh environment is not ready for catalogue
-acceptance until import and provenance smoke succeed. Existing valid TMDb data
-remains usable if a later import fails; record the failed attempt honestly.
-
-Run the separate mandatory manual smoke in the
-[runbook](docs/tmdb-sprint3-runbook.md): record active revision/provider `tmdb`,
-movie source/source IDs, fetch/import timestamps, counts, candidate SHA and
-actual API results. The demo catalogue must support the committed flows,
-including at least ten distinct finite-popularity movies for the public popular
-list. This live smoke is outside CI; it is not evidence that planned Sprint 3
-routes or media features are already implemented.
-
-The browser reads movie data through the local backend/SQLite API. Optional
-trailer enrichment is a separate Sprint 4 step documented in the
-[trailer runbook](docs/trailer-import-runbook.md); requiring TMDb catalogue
-import did not make that enhancement a Sprint 3 commitment.
-
-Verify the automated boundary with synthetic provider responses, isolated test
-databases and no real credential or provider network request:
-
-```bash
-python -m pytest backend/tests/test_tmdb_import.py backend/tests/test_m2_catalogue_bootstrap.py backend/tests/test_movies_api.py -v
-python -m ruff check backend
-```
-
-
-## Run the Backend
-
-For one-origin React/FastAPI production serving, Render settings, required CI checks and operator acceptance steps, see the [S5-T03 deployment runbook](docs/s5-t03-deployment.md).
-
-From the repository root with the Python virtual environment activated:
+Run the backend and frontend in separate activated terminals:
 
 ```bash
 python -m uvicorn app.main:app --app-dir backend --reload
 ```
 
-The backend runs at:
-
-```text
-http://127.0.0.1:8000
-```
-
-FastAPI documentation is available at:
-
-```text
-http://127.0.0.1:8000/docs
-```
-
-Keep this terminal running while developing or testing the frontend against the backend.
-
-
-## Health Check
-
-Apply the database migrations before starting the backend.
-
-After the backend is running, open:
-
-```text
-http://127.0.0.1:8000/health
-```
-
-The health endpoint verifies database connectivity by reading the Alembic migration state from the database.
-
-Example response:
-
-```json
-{
-  "status": "ok",
-  "database": "connected",
-  "migrationVersion": "<current-migration-revision>"
-}
-```
-
-`migrationVersion` must match the single revision reported by `alembic heads`.
-After pulling schema changes, back up the database and apply `alembic upgrade head`
-before restarting the backend. On the PostgreSQL/Render runtime `/health` requires
-the database revision to equal the **exact** head embedded in the running code and
-probes every mapped table, returning a safe JSON 503 otherwise, so migrate and
-deploy matching code together (see [operations](docs/operations.md#1-deployment-and-release)).
-Every response carries an `X-Request-ID` used in logs and JSON errors.
-
-
-## Run the Frontend
-
-Open a second terminal from the repository root while keeping the backend running.
-
-Start the Vite development server:
-
 ```bash
 npm --prefix frontend run dev
 ```
 
-The frontend runs at:
+Open **http://localhost:5173** and use Create account to create a local user,
+or follow [review-user provisioning](docs/SETUP.md#disposable-test-account-and-p0-journey).
+Vite proxies relative `/api` calls to **http://127.0.0.1:8000**.
+For production migration/grants, TLS, startup and index recovery, follow the
+[Neon/Render runbook](docs/SETUP.md#postgresql-18-neon-and-render-public-runtime)
+rather than copying local SQLite commands into a production terminal.
 
-```text
-http://localhost:5173
-```
+## Tests, CI and review
 
-During local development, requests beginning with:
-
-```text
-/api
-```
-
-are proxied by Vite to:
-
-```text
-http://127.0.0.1:8000
-```
-
-Frontend code should therefore use relative API paths such as:
-
-```ts
-fetch("/api/auth/me")
-```
-
-instead of hardcoding the backend host.
-
-
-## Run Backend Tests
-
-Make sure the virtual environment is activated and database migrations have been applied.
+The default milestone suite is the compact **40-case P0 suite**:
 
 ```bash
-python -m pytest backend/tests -v
+python -m pytest -v
 ```
 
-The backend test suite includes runtime and database-backed health verification.
-
-To rerun only the S2-T08 login/logout/current-account contract tests:
-
-```bash
-python -m pytest backend/tests/test_auth_sessions.py -v
-```
-
-
-## Run Frontend Tests
-
-```bash
-npm --prefix frontend test
-```
-
-The S04 cold-start browser acceptance suite uses Chromium, real sign-in/API
-requests, and a migrated temporary SQLite database on dedicated ports 8014 and
-5174. Install the browser once with `cd frontend` then
-`npx playwright install chromium`, return to the repository root, and run:
-
-```bash
-npm --prefix frontend run test:s04:e2e
-python backend/scripts/collect_s04_evidence.py
-```
-
-The runner selects the repository `.venv` Python when present; otherwise it
-uses `python` on PATH. Override it with `S04_PYTHON` if needed. No TMDb token
-is required. The parent runner owns one temporary database directory per run
-and removes it in `finally` after Playwright and its servers stop, including
-forced backend shutdown on Windows. Run `npm --prefix frontend run test:s04:runner`
-to check cleanup and isolation from other runs.
-
-[PR #176](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/176) has
-[successful S04 CI](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/38864844350/job/116855188548)
-and [Hoàng's approval](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/176#pullrequestreview-5544269476)
-on `fbc1897`. See the [S04 AC matrix, refreshed evidence, and reviewer steps](docs/evidence/s3-t14-cold-start-acceptance/README.md)
-for the local runner fix and its source manifest.
-
-
-## Lint Backend
-
-```bash
-python -m ruff check backend
-```
-
-Expected result:
-
-```text
-All checks passed!
-```
-
-
-## Lint Frontend
-
-```bash
-npm --prefix frontend run lint
-```
-
-
-## Build Frontend
-
-```bash
-npm --prefix frontend run build
-```
-
-The production frontend output is generated under:
-
-```text
-frontend/dist/
-```
-
-The generated `frontend/dist/` directory should not be committed.
-
-
-## Full Local Verification
-
-The following sequence reproduces the dependencies and offline checks from a
-clean clone. CI/unit/integration tests use synthetic fixtures and mock TMDb;
-do not configure a real token for those checks. Keep test databases separate
-from the accepted application database.
-
-For a Sprint 3 development/staging/demo environment, additionally configure
-your private token, run the required import after migrations and record the
-manual live smoke in the [runbook](docs/tmdb-sprint3-runbook.md). Passing the
-offline checks alone does not establish TMDb catalogue readiness.
-
-### macOS/Linux
-
-#### 1. Create the environment configuration and local data directory
-
-```bash
-cp .env.example .env
-mkdir -p data
-```
-
-#### 2. Create and activate the Python virtual environment
-
-```bash
-python3.12 -m venv .venv
-source .venv/bin/activate
-```
-
-#### 3. Install locked backend dependencies
-
-```bash
-python -m pip install --upgrade pip
-python -m pip install -r backend/requirements.lock.txt
-python -m pip install -e "./backend[dev]" --no-deps
-```
-
-#### 4. Install frontend dependencies
-
-```bash
-npm --prefix frontend ci
-```
-
-#### 5. Apply database migrations
-
-```bash
-python -m alembic -c backend/alembic.ini upgrade head
-```
-
-#### 6. Run backend lint
-
-```bash
-python -m ruff check backend
-```
-
-#### 7. Run backend tests
-
-```bash
-python -m pytest backend/tests -v
-```
-
-#### 8. Run frontend lint
-
-```bash
-npm --prefix frontend run lint
-```
-
-#### 9. Run frontend tests
-
-```bash
-npm --prefix frontend test
-```
-
-#### 10. Build the frontend
-
-```bash
-npm --prefix frontend run build
-```
-
-### Windows PowerShell
-
-#### 1. Create the environment configuration and local data directory
-
-```powershell
-Copy-Item .env.example .env
-New-Item -ItemType Directory -Force data
-```
-
-#### 2. Create and activate the Python virtual environment
-
-```powershell
-py -3.12 -m venv .venv
-.\.venv\Scripts\Activate.ps1
-```
-
-#### 3. Install locked backend dependencies
-
-```powershell
-python -m pip install --upgrade pip
-python -m pip install -r backend/requirements.lock.txt
-python -m pip install -e "./backend[dev]" --no-deps
-```
-
-#### 4. Install frontend dependencies
-
-```powershell
-npm --prefix frontend ci
-```
-
-#### 5. Apply database migrations
-
-```powershell
-python -m alembic -c backend/alembic.ini upgrade head
-```
-
-#### 6. Run backend lint
-
-```powershell
-python -m ruff check backend
-```
-
-#### 7. Run backend tests
-
-```powershell
-python -m pytest backend/tests -v
-```
-
-#### 8. Run frontend lint
-
-```powershell
-npm --prefix frontend run lint
-```
-
-#### 9. Run frontend tests
-
-```powershell
-npm --prefix frontend test
-```
-
-#### 10. Build the frontend
-
-```powershell
-npm --prefix frontend run build
-```
-
-If all commands pass, the local runtime matches the checks used by CI.
-
-To run the application after verification, use two terminals:
-
-From Sprint 3, first complete the required TMDb import and provenance smoke
-above. M2 seed-only operation is explicitly offline support and cannot be used
-as M3 acceptance evidence.
-
-**Terminal 1 — Backend**
-
-```bash
-python -m uvicorn app.main:app --app-dir backend --reload
-```
-
-**Terminal 2 — Frontend**
-
-```bash
-npm --prefix frontend run dev
-```
-
-
-## CI
-
-GitHub Actions runs automatically on pushed branches and pull requests. The
-`CI` workflow ([ci.yml](.github/workflows/ci.yml)) has five jobs; a green
-push-to-main run takes about 1 to 1.5 minutes
-([details and protection status](docs/operations.md#2-continuous-integration-and-protected-main)).
-
-### Detect stack
-
-- decides whether the focused storage and early-bootstrap checks apply
-
-### Python tests
-
-- Python 3.12 setup and locked dependency installation
-- Ruff lint
-- the 40 mandatory P0 tests with automatic temporary-database setup
-- P0 traceability, regional provider/CLI tests, health/serving/session tests
-
-### PostgreSQL 18 integration
-
-- `postgres:18` service container with a disposable CI-only database
-- PostgreSQL integration suite and isolated native recovery rehearsal, with
-  skipped cases rejected
-
-### Node build and tests
-
-- Node.js 24 setup and `npm ci`
-- frontend lint, the focused regional watch-provider UI suite and the
-  production build (the full Vitest suite is an optional extended run)
-
-### No secrets committed
-
-CI also checks that obvious credentials and forbidden local files are not committed.
-
-The repository must not contain tracked:
-
-```text
-.env
-*.db
-*.sqlite
-*.sqlite3
-*.dump
-```
-
-
-## Verify No Local Database or Environment Files Are Tracked
-
-### macOS/Linux
-
-```bash
-git ls-files | grep -E '(^|/)\.env$|\.db$|\.sqlite$|\.sqlite3$|\.sql$|\.dump$'
-```
-
-Expected result: no output.
-
-### Windows PowerShell
-
-```powershell
-git ls-files | Select-String -Pattern '(^|/)\.env$|\.db$|\.sqlite$|\.sqlite3$|\.sql$|\.dump$'
-```
-
-Expected result: no output.
-
-
-## Verify TMDb Credentials Are Not Committed
-
-Run:
-
-```bash
-git grep "TMDB_READ_ACCESS_TOKEN"
-```
-
-It is valid for the environment-variable name to appear in:
-
-- `.env.example`
-- runtime configuration
-- CI configuration
-- project documentation
-
-A real TMDb token must never appear in the repository.
-
-
-## Regional "Where to watch" (US, GB, SG)
-
-Movie Details shows viewing availability for one market at a time. The
-supported choices are **United States (US, the default), United Kingdom (GB) and
-Singapore (SG)**. A compact selector in the Where to watch section stores a valid
-choice in the browser (`cineai-watch-country`, falling back to US when the value
-is missing or invalid) and requests `GET /api/movies/{movieId}?country=<code>`.
-The selection affects viewing availability only. Other country codes (including
-the earlier VN pilot and lowercase values) are rejected with a safe HTTP 400.
-
-- Provider badges (Stream, Rent, Buy, Free, With ads) are informational and not
-  links. Missing data is shown neutrally as
-  `Viewing availability is not available for <country>`; it is unknown
-  availability, not an unhealthy movie or database.
-- Exactly one action, **View watch options on TMDb ↗**, opens that movie's
-  TMDb viewing-options page for the selected country in a new tab. It is not a
-  CineAI player and not a guaranteed provider deep link. Badges without a link,
-  a valid link with empty groups, and a null link each render accordingly; a stale
-  result keeps its last successful data with a warning.
-- Attribution stays visible: "Watch provider data comes from TMDb, powered by
-  JustWatch", and the site states that it uses the TMDB API but is not endorsed
-  or certified by TMDB.
-- Contract, import counts and per-country coverage:
-  [API section 14](docs/api.md#14-s5-t04-regional-providers-and-tmdb-watch-options-251),
-  [dated regional acceptance](docs/evidence/s5-t04-providers/regional-2026-11-10.md)
-  (the earlier VN-only run is [historical](docs/evidence/s5-t04-providers/README.md)),
-  [UI verification](docs/evidence/s5-t05-regional-ui.md).
-
-## Project Structure
-
-The C04 runtime bootstrap provides the following shared structure:
-
-```text
-.
-├── backend/
-│   ├── alembic/
-│   │   ├── versions/
-│   │   ├── env.py
-│   │   └── script.py.mako
-│   ├── app/
-│   │   ├── db/
-│   │   │   ├── __init__.py
-│   │   │   └── database.py
-│   │   ├── __init__.py
-│   │   └── main.py
-│   ├── tests/
-│   ├── alembic.ini
-│   ├── pyproject.toml
-│   └── requirements.lock.txt
-│
-├── frontend/
-│   ├── src/
-│   ├── package.json
-│   ├── package-lock.json
-│   └── vite.config.ts
-│
-├── data/
-│   └── .gitkeep
-│
-├── .env.example
-├── .gitignore
-└── README.md
-```
-
-Feature-specific backend modules and user-facing UI are implemented by their corresponding Sprint tasks and should not be added to C04 simply to extend the bootstrap scope.
+It uses isolated fixtures and does not need a real TMDb token or production DB.
+[P0 case map, normal/refusal/boundaries and mutation evidence](docs/testing.md).
+Optional feature/browser suites are documented with their individual features;
+they are not prerequisites for taking a screenshot of the compact M4 test run.
+
+[ci.yml](.github/workflows/ci.yml) checks stack selection, Python lint/P0/affected
+backend paths, authenticated PostgreSQL 18/native recovery, frontend lint/focused
+tests/build and forbidden credentials/files. See
+[CI jobs and protected-main evidence](docs/operations.md#2-continuous-integration-and-protected-main)
+for required contexts, latest recorded green-main run and remaining admin work.
+Another member must review changes with a substantive comment and approval
+before merge. CI metadata alone does not prove an independent review.
+
+## Documentation and ownership
+
+| Need | Source |
+| --- | --- |
+| Scope, rules, traceability, DoD | [Scope](docs/product-scope.md), [rules](docs/business-rules.md), [traceability](docs/traceability.md), [DoD](docs/definition-of-done.md) |
+| Setup and public deployment | [SETUP](docs/SETUP.md), [T03](docs/s5-t03-deployment.md) |
+| Architecture, modules and contracts | [Architecture](docs/architecture.md), [design](docs/design.md), [API](docs/api.md) |
+| M3 UI / M4 tests | [UI](docs/ui.md), [testing](docs/testing.md) |
+| Release, monitoring, risks and maintenance | [Operations](docs/operations.md), [PostgreSQL recovery](docs/s5-t06-postgresql-recovery.md) |
+| Sprint history, metrics and final submission | [Sprint log](docs/sprint-log.md), [C02](docs/s5-c02-wrap-up.md), [manual M5 block](docs/s5-t08-c02-handoff.md#manual-submission-block) |
+
+Product Owner: @kietxuan. Scrum Master rotation: **Sprint 1 @hoang3003 →
+Sprint 2 @NguyenTuanAnh0608 → Sprint 3 @vu-huzy → Sprint 4 @anotify-vie →
+Sprint 5 @kietxuan**. C01 is PO-owned; C02 is SM-owned. GitHub's
+[Project 9](https://github.com/orgs/SE-FDA-NEU/projects/9) tracks the work.
+Historical role/output records live in the Sprint log instead of competing
+with the current team/release information at the top of this README.
+
+The backend lives in `backend/app`, migrations in `backend/alembic`, the React
+frontend in `frontend/src`, and verification in `tests`, `backend/tests` and
+feature-specific frontend scripts. Keep `.env`, service credentials, database
+files/dumps and generated submission PDFs out of Git. The published application
+review login is intentionally approved demo data, not a real-service secret.

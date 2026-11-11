@@ -795,7 +795,7 @@ C02 owns the final Review/Retro, PO acceptance, member contribution audit,
 committed/completed/velocity reconciliation, five-Sprint table, exact deployed
 v1.0 SHA, manual submission receipt and maintenance handoff.
 
-### Scope amendments and current status (S5-T08 reconciliation, 11 November 2026)
+### Historical T08 observation (superseded by C02 below)
 
 The PO amended the existing ten issues in place, creating no new work issue
 (recorded in [C01 #247](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/247)):
@@ -840,3 +840,82 @@ records the intended single manual-release window and the need to control
 auto-deploy on actual main commit messages. It does not promise one rollout if
 final acceptance finds defects. Final velocity, acceptance, selected release SHA,
 v1.0 and the real submission receipt remain C02 facts, not invented task/commit points.
+
+### C02 current delivery and five-Sprint reconciliation — 11 November 2026
+
+This updates the earlier capture without rewriting its observations. Source:
+[C02 wrap-up](s5-c02-wrap-up.md), [GitHub audit](evidence/s5-c02/github.json)
+and [actual public/Neon evidence](evidence/s5-c02/runtime.json).
+
+| Sprint 5 measure | Current observed value |
+| --- | --- |
+| Committed | 10 engineering work items; **0 new Story Points** |
+| Completed work items | **9/10 Closed**, C01/T01–T08; C02 remains Open |
+| Completed Story Points / velocity | **0 / 0**; release Tasks/Chores earn no points |
+| Merged PRs | **9**, #257–#265, each with green head CI and another member's pre-merge approval at a recorded revision; substantive/final-head caveats remain in the review audit |
+| Per-member formal activity | All five have owned merged PR(s), formal review(s) and Closed assigned issues; this is not blanket certification of review substance |
+| Runtime | Render acc4924 Live, Neon PostgreSQL 18.6/head d9a6f2c1e508, public health 200, 989 movies and 2,967 US/GB/SG checks |
+| Final PO/release/submission | **Pending**, no approval/receipt invented; rehearsal and Review/Retro documentation removed from C02 by the PO, prepared separately by the team |
+
+| Sprint | Committed Story Points | Completed Story Points | Velocity | Source / interpretation |
+| --- | ---: | ---: | ---: | --- |
+| 1 | 0 | 0 | 0 | [Sprint 1](#sprint-1---repository-activity-recorded-2026-09-08-to-2026-09-20): five Chores, no product Story delivery |
+| 2 | 6 | 6 | 6 | [S10 #32](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/32) and [S12 #44](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/44), 3 each; PO reported both Done. The saved GitHub read confirms final checked AC and closure on 4 October; supersedes the earlier pre-closure 0-completed snapshot, not a new Sprint 5 award |
+| 3 | 24 | 30 | 30 | [PO ledger](evidence/s3-c02-reconciliation.md): 21 new P0 + 9 P1 delivered; 24-point review commitment contains already-delivered S12, never count its 3 points again |
+| 4 | 18 | 18 | 18 | [Sprint 4 PO record](#planning-commitment-and-accepted-points): four accepted Stories 5+5+5+3 on 1 November |
+| 5 | 0 | 0 | 0 | Ten release Tasks/Chores, no newly estimated product Story; 9/10 current work-item throughput is separate |
+
+Sprint 2 reconciliation uses the PO's previously reported S10/S12 completion,
+current checked AC and recorded closure dates; it does not equate every closed
+Task to a finished Story. [Saved estimates/criteria](evidence/s5-c02/github.json)
+support 3+3. The old Sprint 2 section's 0 describes its earlier cutoff; the
+five-Sprint table is the later reconciliation. No historical meeting, capacity
+or original commitment is reconstructed from commits.
+
+The PO now permits deploy-first/document-afterward and multiple reviewed
+releases if needed. The former one-window/merge-docs-first plan is superseded.
+Current running acc4924 and its green CI are distinct from this later C02
+source. v1.0 must target the verified accepted running main commit; a docs-only
+skip does not silently move the deployed app. This PR uses **Refs #256**.
+
+Explicit final PO decision, required-check settings screenshot, durable recovery
+handoff, maintenance acknowledgement and manual v1.0/PDF/LMS receipt remain
+Pending in [the R01–R09 checklist](s5-c02-wrap-up.md#remaining-c02-gates-and-named-next-actions).
+Only close C02 after actual evidence; no new issue or fabricated event is added.
+
+### C02 final technical follow-up and user report — 11 November 2026
+
+Fresh public probes passed 14/14 read-only plus 8/8 reused-account scenarios and
+8/8 new-account scenarios (two real HTTP 201 registrations, duplicate HTTP 409,
+rating HTTP 200, reload/later-login persistence, A/B isolation, reset preserving
+Watchlist and original-list context). Only dedicated synthetic accounts were
+written; no real user was used. Health response/log IDs match, HTTP 200/25.89 ms.
+The regional backup was restored and all 13 snapshot tables matched; durable
+upload/access and independent teammate restore are not yet completed.
+
+PO/tester Nguyen Xuan Kiet reports physical phone and private laptop checks on
+11 November, result OK; device/browser/per-device SHA not supplied. Explicit PO
+candidate acceptance remains requested. Tag v1.0 exists at Live acc4924; Release
+is Draft. [Evidence and current closure gates](s5-c02-wrap-up.md).
+
+Per explicit PO instruction, rehearsal and Review/Retro reporting are removed
+from C02. The team prepares these separately; this entry does not fabricate
+attendance, feedback or performance. Story Point metrics and 9/10 current work
+throughput are unchanged. C02 stays Open for actual protection/review, private
+backup handoff, PO/release/maintenance and manual submission evidence.
+
+### PO candidate acceptance and v1.0 publication — 11 November 2026
+
+PO Nguyen Xuan Kiet explicitly confirms candidate **acc4924** accepted. The
+existing annotated v1.0 tag resolves to that running green-main source; its
+matching Draft Release was published after that decision. No retag or Render
+deploy was performed. [Published v1.0](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/releases/tag/v1.0),
+[release proof](evidence/s5-c02/release-status.json), [device/PO report](evidence/s5-c02/human-device-report.json).
+This supersedes the preceding Pending PO/Draft snapshot without changing its
+historical observations. Latest documentation-main SHA/CI can differ from the
+running application; v1.0 still identifies the actual served source.
+
+C02 remains Open for genuine required-check/settings screenshot, substantive
+review/merge and fresh main CI, durable shared backup/access/independent restore,
+maintenance acknowledgement and manual PDF/LMS receipt. Presentation preparation
+is outside C02 by PO instruction; no event/attendance/result is invented.

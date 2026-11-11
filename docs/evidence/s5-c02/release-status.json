@@ -1,0 +1,12 @@
+{
+  "checkedAt": "2026-11-11T15:12:34.282045+00:00",
+  "tag": "v1.0",
+  "tagTarget": "acc49243e4db404438b00521c2f7a6234377fb18",
+  "matchesObservedLiveCommit": true,
+  "releaseId": 441837810,
+  "draft": false,
+  "publishedAt": "2026-11-11T15:12:33Z",
+  "publicReleaseUrl": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/releases/tag/v1.0",
+  "publication": "Published after explicit PO acceptance of acc4924 in project conversation on 11 November 2026; no retag or deployment",
+  "po": "Nguyen Xuan Kiet (@kietxuan)"
+}
