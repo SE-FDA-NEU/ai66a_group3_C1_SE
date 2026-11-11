@@ -1,0 +1,61 @@
+{
+  "pr": {
+    "state": "open",
+    "merged": false,
+    "head": "856b98239ab34fa8c98c67e2f51c6835bdb497ef",
+    "mergeable": true
+  },
+  "issueState": "open",
+  "main": "acc49243e4db404438b00521c2f7a6234377fb18",
+  "permissions": {
+    "admin": false,
+    "maintain": false,
+    "push": true,
+    "triage": true,
+    "pull": true
+  },
+  "visibility": "public",
+  "rules": [
+    {
+      "type": "deletion",
+      "ruleset_source_type": "Organization",
+      "ruleset_source": "SE-FDA-NEU",
+      "ruleset_id": 21296815
+    },
+    {
+      "type": "non_fast_forward",
+      "ruleset_source_type": "Organization",
+      "ruleset_source": "SE-FDA-NEU",
+      "ruleset_id": 21296815
+    },
+    {
+      "type": "pull_request",
+      "parameters": {
+        "required_approving_review_count": 1,
+        "dismiss_stale_reviews_on_push": false,
+        "required_reviewers": [],
+        "require_code_owner_review": false,
+        "require_last_push_approval": false,
+        "required_review_thread_resolution": false,
+        "require_extra_approval_for_unattributed_changes": true,
+        "allowed_merge_methods": [
+          "merge",
+          "squash",
+          "rebase"
+        ]
+      },
+      "ruleset_source_type": "Organization",
+      "ruleset_source": "SE-FDA-NEU",
+      "ruleset_id": 21296815
+    }
+  ],
+  "classicProtectionReadStatus": 404,
+  "release": {
+    "url": "https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/releases/tag/v1.0",
+    "draft": false
+  },
+  "checkedAt": "2026-11-11T15:59:41.827181+00:00",
+  "interpretation": "PR + one approval are evidenced by effective organization rules. Required-status-check enforcement and the requested settings screenshot are not evidenced. Classic protection 404 can reflect lack of permission; it is not proof no classic rule exists.",
+  "userReport": "PO confirms no admin permission to capture/edit branch protection.",
+  "instructorException": "Not supplied; no exemption is claimed."
+}

@@ -18,8 +18,18 @@ The M5 brief says seven sections but lists six; these follow the six-row table.
 | Merge → CI → deploy | Reviewed PRs, required checks/approval, green main CI, configured **After CI Checks Pass**. The setting is verified; a complete failed-CI/no-deploy experiment is not claimed |
 | One-batch release hold | **Superseded by PO:** deploy first, document observed results, permit further reviewed deploys. For docs-only merges that should retain the app, use `[skip render]` in the actual merge commit and verify the skip; keep CI enabled. [Current release rule](s5-c02-wrap-up.md#deploy-first-document-afterward--po-amendment) |
 | Safe rollout | New backup was restored and matched 11 pre-change tables before the requested two migrations/grants; current schema/read permissions pass. For each future incompatible change, coordinate backup/migration/grants with matching deployment; temporary 503 is possible. Do not reimport the catalogue solely for providers |
-| Rollback/recovery | [T06](s5-t06-postgresql-recovery.md) rehearsed old T03 code: 503 on regional schema, 200 on an isolated pre-provider restore. A fresh runtime backup was also restored/compared across 11 snapshot tables on 11 November. Neither is a Render rollback. A later regional backup restored/compared all 13 public tables; durable shared storage and teammate reproduction remain Pending under C02 R06. Restore into an isolated target and verify compatibility before switching; never overwrite later writes or silently discard regional data |
+| Rollback/recovery | Use the compatible-code or isolated-restore procedure below. Automated regional restore verified all 13 public tables, restored NLP and health; this is not a Render rollback or independent teammate handoff. Durable storage remains C02 R06 |
 | Final identity | **Verified:** PO accepts acc4924; published [v1.0](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/releases/tag/v1.0) targets that exact running green-main source. Latest docs-main SHA/CI may differ. C02 admin/private-storage/review/submission remain Pending |
+
+Rollback procedure: identify the last known-good code SHA and its required
+schema. If compatible with the current DB, revert the faulty app change through
+a reviewed PR, wait for green main CI, deploy and verify Live SHA, health and
+affected P0s. If schema differs, first restore a known-good backup to a **new
+isolated PostgreSQL target**, verify data/index/health with compatible code, then
+coordinate the operator-approved DB configuration/code switch. Preserve the
+current DB and later writes until reconciliation; do not downgrade a populated
+regional DB blindly. Record the actual action and recheck auto-deploy settings.
+[T06 restore steps](s5-t06-postgresql-recovery.md#restore-to-a-separate-postgresql-target).
 
 ## 2. Continuous integration and protected main
 
@@ -37,7 +47,7 @@ The M5 brief says seven sections but lists six; these follow the six-row table.
 | --- | --- |
 | Main CI | Run [43025094939](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/43025094939), `acc4924`, success, 81 seconds (12:59:31–13:00:52 UTC). Recheck latest main after this PR merges |
 | Effective rules API | [C02 GitHub snapshot](evidence/s5-c02/github.json): PR with one approval, deletion/non-fast-forward protection; no required-status-check entry returned. Admin must confirm/configure enforcement; complete protection is not certified |
-| Admin action/screenshot | **Pending C02:** admin confirms/enforces the five contexts plus PR/approval and captures the authentic settings screen for this document. Under the deploy-first amendment it can be supplied after this baseline; it remains mandatory before C02 closes. API JSON is not the screenshot |
+| Admin action/screenshot | **Pending C02:** admin confirms/enforces the five contexts plus PR/approval and captures the authentic settings screen for this document. The PO confirms no admin access; this is an external admin dependency, not an exemption. [Read-only permission/rule evidence](evidence/s5-c02/nonadmin-protection-check.json). Under the deploy-first amendment it can be supplied after this baseline; it remains mandatory before C02 closes. API JSON is not the screenshot |
 | Review | Scrum hygiene checks issue/approval metadata; substantive non-contributor review must still precede merge |
 
 ## 3. Monitoring, logs and incident response
@@ -85,14 +95,14 @@ reports phone/private-laptop OK. [Final evidence](s5-c02-wrap-up.md#final-techni
 
 | Item | Layer | What could happen | Plan |
 | --- | --- | --- | --- |
-| Public behind main | infrastructure | Missing regional UI; an uncoordinated migration breaks exact-head health | Coordinated backed-up rollout and public acceptance: [#254](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/254), [#256](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/256) |
+| Future code/schema skew | infrastructure | An incompatible deploy or rollback breaks exact-head health | Coordinated backup/migration/deploy and verified identity: [C02 #256](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/256); current acc4924 regional rollout is verified |
 | Required checks not evidenced | infrastructure | A red candidate could merge | Admin configuration and authentic screenshot: [#250](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/250), C02 audit |
-| Local-only backups | data | Disk loss leaves no durable recovery copy | Durable destination, operator access, daily execution and independent reproduction remain [#253](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/253) follow-up |
+| Local-only backups | data | Disk loss leaves no durable recovery copy | [C02 #256/R06](s5-c02-wrap-up.md#remaining-c02-gates-and-named-next-actions) owns durable destination/access/daily retention and independent reproduction; T06 is Closed as technical delivery |
 | Free sleep/ephemeral index | infrastructure | Slow first request; index rebuilt after replacement | Accepted: free hosting is the agreed scope; disclose, check before demos and rebuild derived state |
 | Shared Neon quota | infrastructure | Heavy jobs affect runtime capacity | Accepted: separate databases, quota checks and quiet import/test windows |
 | TMDb regional gaps | data | A selected market has no provider/link information | Accepted: neutral unknown wording, exact-market nullable link and attribution; development coverage is not public acceptance |
 | Manual monitoring | infrastructure | Incidents between daily checks may be missed | Accepted for this free-plan scope: named owner/backup and incident escalation |
-| Test automation is not a phone/PO decision | tests | Emulation or green CI is mistaken for full acceptance | Physical device, real rehearsal and PO decision: [#254](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/254) |
+| Test automation is not a phone/PO decision | tests | Emulation or green CI is mistaken for full acceptance | Accepted: Kiet reports phone/private-laptop OK and accepts acc4924; retain [the real report](evidence/s5-c02/human-device-report.json), repeat affected checks after changes. Team presentation is separate from C02 |
 
 ## 5. Maintenance plan
 

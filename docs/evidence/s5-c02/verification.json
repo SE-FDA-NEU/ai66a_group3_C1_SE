@@ -82,5 +82,20 @@
       "docs/s5-t08-c02-handoff.md": "74eb052c9c021a2bdcc847f93e15cc84c55228c3382e9542b66872de35076343",
       "docs/sprint-log.md": "d096c961249eb896dafb31722fae2a4b3d8d57a09a181105e0316c4f9ec35843"
     }
+  },
+  "nonAdminFollowup": {
+    "checkedAt": "2026-11-11T16:00:33.756034+00:00",
+    "operationsSections": 6,
+    "operationsProseWords": 444,
+    "filesAndWhitespace": "PASS",
+    "documentationVerifier": "PASS",
+    "adminRuleChangePerformed": false,
+    "screenshotOrExceptionFabricated": false,
+    "scope": "Clarify rollback, current risk owners and real external dependency; not M5 waiver",
+    "sourceHashes": {
+      "docs/operations.md": "4925486415e473fb87a0877fb78734708dfaec4cd9f77e6f4bf84b0db132b25d",
+      "docs/s5-c02-wrap-up.md": "dcea21a8cc79d9d2cbd1dce4769c77a50c7763507c0f9e81cccacd373f0e245a",
+      "docs/evidence/s5-c02/nonadmin-protection-check.json": "3dc94cd06e2f96027a67d666d9c538796b2204cb01d3f47582bb84f62c22428c"
+    }
   }
 }

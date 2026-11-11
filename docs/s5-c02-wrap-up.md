@@ -220,3 +220,26 @@ private durable backup/access/independent reproduction and maintenance
 acknowledgement; manual PDF/LMS receipt. User phone/private-laptop report and
 explicit PO acceptance are now received. The separate team presentation is not
 claimed performed. C02 stays Open until its retained closure items are proven.
+
+## Non-admin limitation confirmed by the PO — 11 November 2026
+
+The PO confirms that the team cannot access admin branch-protection settings.
+[Authenticated read-only evidence](evidence/s5-c02/nonadmin-protection-check.json)
+shows push access, no admin/maintain permission, organization PR/one-approval
+rules and no required-status-check entry. Classic settings read returns 404,
+which may be a permission response; it does not prove absence of every rule.
+No settings screenshot, enforcement change or instructor exception is invented.
+
+Only the repository/organization admin can supply/confirm the missing effective
+settings or grant appropriate access. If the instructor allows substitute
+read-only evidence because access is centrally controlled, record that actual
+exception and its scope before marking this gate satisfied. Until then R05 is
+an external dependency, not Done. Existing green CI and Render after-checks
+protect deployment but do not prove GitHub blocks merging red CI.
+
+The operations rollback now states compatible-code and isolated-restore paths;
+risk owners point to C02 instead of closed delivery issues. Private shared backup,
+independent download/restore, maintenance acknowledgement, substantive final
+review/merge and manual LMS receipt remain outstanding unless actual receipts
+are supplied. Technical preparation can merge with Refs #256; closing C02 does
+not by itself prove these M5 conditions.
