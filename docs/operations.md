@@ -1,25 +1,34 @@
 # CineAI operations
 
 Owner: @vu-huzy, [T08 #255](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/255).
-Current read-only observation: **11 November 2026**, after the regional rollout.
-[C02 evidence](evidence/s5-c02/README.md) identifies the running source and the
-remaining release/device/PO/administrative gates. The earlier
-[T08 observations](evidence/s5-t08-operations/README.md) remain historical.
-The M5 brief says seven sections but lists six; these follow the six-row table.
+Current read-only observation: **11 November 2026**, after the mobile navigation
+deployment from merged PR #267. [Post-deploy evidence](evidence/m5-post-mobile/README.md)
+identifies the Live source, matching green-main CI, public checks and the
+remaining release mismatch. Earlier [C02](evidence/s5-c02/README.md) and
+[T08 observations](evidence/s5-t08-operations/README.md) remain dated history.
+The six sections below follow the M5 operations requirements. C02 is Closed;
+that administrative state does not replace missing operational/admin evidence.
 
 ## 1. Deployment and release
 
 | Item | Verified state / operating procedure |
 | --- | --- |
-| URL/platform | <https://cineai-o9tf.onrender.com/>; Render **Free**, native Python, Singapore, one worker; Neon PostgreSQL **18.6**, Singapore. [SETUP](SETUP.md#postgresql-18-neon-and-render-public-runtime) |
+| URL/platform | <https://cineai-o9tf.onrender.com/>; Render **Free**, native Python, Singapore, one worker; Neon PostgreSQL **18** (last DB version audit: 18.6), Singapore. [SETUP](SETUP.md#postgresql-18-neon-and-render-public-runtime) |
 | Render identity | `cineai`, `srv-dbp96kp42hec73bv94j0`, **My Workspace**. Connected account now sees the correct service. Branch `main`, repository `SE-FDA-NEU/ai66a_group3_C1_SE`, `/health`, Free and `autoDeployTrigger=checksPass` were read from Render; no settings changed |
-| Actual live release | Deploy `dep-dbq71cvf3r2c73e7g890`, **live**, SHA `acc49243e4db404438b00521c2f7a6234377fb18`; 13:43:59 UTC, 11 November. Public health 200/head `d9a6f2c1e508`; 989 movies and all 2,967 US/GB/SG checks populated. [Read-only evidence](evidence/s5-c02/runtime.json) |
-| Reviewed main baseline | Same `acc4924` source; [green CI 43025094939](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/43025094939). This C02 documentation PR is a later source, not automatically the running app or a completed release |
+| Actual live deployment | Deploy `dep-dbq9pjoqidvc73etjt4g`, **live**, SHA `80b15f705ca64752a346a636490b80be347487bd`; completed 16:53:03 UTC / 23:53:03 UTC+7 on 11 November. Public health 200/head `d9a6f2c1e508`. The previous manual deploy of this same SHA is deactivated after the successful automatic deploy. [Current evidence](evidence/m5-post-mobile/release-observation.json) |
+| Reviewed application source | Merged [PR #267](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/267); @hoang3003 approved its final head before merge. Matching [green main CI 43062004407](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/43062004407). A later docs-only main SHA may differ from the running application |
 | Merge → CI → deploy | Reviewed PRs, required checks/approval, green main CI, configured **After CI Checks Pass**. The setting is verified; a complete failed-CI/no-deploy experiment is not claimed |
 | One-batch release hold | **Superseded by PO:** deploy first, document observed results, permit further reviewed deploys. For docs-only merges that should retain the app, use `[skip render]` in the actual merge commit and verify the skip; keep CI enabled. [Current release rule](s5-c02-wrap-up.md#deploy-first-document-afterward--po-amendment) |
-| Safe rollout | New backup was restored and matched 11 pre-change tables before the requested two migrations/grants; current schema/read permissions pass. For each future incompatible change, coordinate backup/migration/grants with matching deployment; temporary 503 is possible. Do not reimport the catalogue solely for providers |
+| Safe rollout | PR #267 changes frontend/docs/CI and requires no new migration or catalogue import. The current public head and regional APIs pass. Earlier C02 backup/restore and migration evidence remains historical; for each future incompatible change, coordinate backup/migration/grants with matching deployment. Do not reimport the catalogue solely for providers |
 | Rollback/recovery | Use the compatible-code or isolated-restore procedure below. Automated regional restore verified all 13 public tables, restored NLP and health; this is not a Render rollback or independent teammate handoff. Durable storage remains C02 R06 |
-| Final identity | **Verified:** PO accepts acc4924; published [v1.0](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/releases/tag/v1.0) targets that exact running green-main source. Latest docs-main SHA/CI may differ. C02 admin/private-storage/review/submission remain Pending |
+| Release identity and dated check | M5 requires **Render Live SHA = v1.0 target**. At the 16:55:54 UTC observation, [v1.0](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/releases/tag/v1.0) targeted `acc49243e4db404438b00521c2f7a6234377fb18` while Live was `80b15f7`. The old PO/device acceptance belongs to acc4924. Accept/reconcile the new candidate and record the verified target/date in release notes before submission; recheck the [current sources](../README.md#current-public-release-and-m5-status) rather than treating this snapshot as the later tag state. This documentation update did not change a tag |
+
+For this documentation-only follow-up, preserve the verified application by
+retaining **`[skip render]` in the actual merge/squash commit**, leaving CI
+enabled, and checking that Render stayed on the intended Live SHA. Record the
+new documentation-main CI separately. The latest submission CI link should
+identify the latest successful main run when exporting the PDF; it can be newer
+than the application-source CI recorded above.
 
 Rollback procedure: identify the last known-good code SHA and its required
 schema. If compatible with the current DB, revert the faulty app change through
@@ -40,14 +49,14 @@ regional DB blindly. Record the actual action and recheck auto-deploy settings.
 | Detect stack | Select storage/bootstrap scope from the diff |
 | Python tests | Locked install, Ruff, **40 P0** cases, traceability, focused provider/CLI and affected storage/bootstrap checks, health/serving/session boundaries |
 | PostgreSQL 18 integration | `postgres:18`, authenticated integration and native dump/restore with major-18 clients, zero DB skips |
-| Node build and tests | `npm ci`, ESLint, 42 regional-provider UI cases, TypeScript/production build and T07's 18 focused acceptance-verifier cases, now merged via #265 |
+| Node build and tests | `npm ci`, ESLint, **54 focused provider/navigation/onboarding UI cases**, TypeScript/production build and T07's **18** acceptance-verifier cases. Full optional suites are not required by this pipeline |
 | No secrets committed | Credential patterns and forbidden artifacts |
 
 | Evidence | Actual result |
 | --- | --- |
-| Main CI | Run [43025094939](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/43025094939), `acc4924`, success, 81 seconds (12:59:31–13:00:52 UTC). Recheck latest main after this PR merges |
-| Effective rules API | [C02 GitHub snapshot](evidence/s5-c02/github.json): PR with one approval, deletion/non-fast-forward protection; no required-status-check entry returned. Admin must confirm/configure enforcement; complete protection is not certified |
-| Admin action/screenshot | **Pending C02:** admin confirms/enforces the five contexts plus PR/approval and captures the authentic settings screen for this document. The PO confirms no admin access; this is an external admin dependency, not an exemption. [Read-only permission/rule evidence](evidence/s5-c02/nonadmin-protection-check.json). Under the deploy-first amendment it can be supplied after this baseline; it remains mandatory before C02 closes. API JSON is not the screenshot |
+| Main CI at verification | Run [43062004407](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/43062004407), `80b15f7`, success, **87 seconds** (16:48:53–16:50:20 UTC). All five jobs passed. [Latest main runs](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/workflows/ci.yml?query=branch%3Amain) must be checked again after a subsequent merge |
+| Effective rules API | [Fresh read-only check](evidence/m5-post-mobile/process-check.json): PR, deletion and non-fast-forward rules are returned; no required-status-check entry is returned. The earlier snapshot records one required approval. Admin must confirm/configure CI enforcement; complete protection is not certified |
+| Admin action/screenshot | **Still required for M5:** admin confirms/enforces the five contexts plus PR/approval and supplies an authentic settings screenshot. The PO has no admin access; this is an external admin dependency, not an exemption. [Permission evidence](evidence/s5-c02/nonadmin-protection-check.json). C02 closure does not certify this requirement; API JSON is not the screenshot |
 | Review | Scrum hygiene checks issue/approval metadata; substantive non-contributor review must still precede merge |
 
 ## 3. Monitoring, logs and incident response
@@ -80,29 +89,45 @@ redacted timeline. Do not log passwords, cookies, tokens, account data or litera
 user query strings. Deploy: @anotify-vie → @kietxuan; DB: @NguyenTuanAnh0608 →
 @hoang3003; recovery: @hoang3003 → @NguyenTuanAnh0608. Never bypass stale-head health.
 
-Post-deploy observations: 13:45–13:50 UTC had 101 completions (71 health),
+Historical acc4924 post-deploy observations: 13:45–13:50 UTC had 101 completions (71 health),
 0 five-hundreds, p95 408.67 ms; 13:50–13:55 had 70/70 health, 0 five-hundreds,
 p95 99.85 ms. [All-page, deduplicated samples](evidence/s5-c02/monitoring.json)
 measure app processing, not user-load performance or uptime. Repeat after a new
 candidate; preserve the old f24 series as history.
 
-A fresh health response request ID matched Render's GET /health HTTP 200 at
-25.89 ms app time; [correlation](evidence/s5-c02/health-correlation.json). Current
-public probes pass 14/14 read-only and 8/8 fresh-account scenarios; Kiet separately
-reports phone/private-laptop OK. [Final evidence](s5-c02-wrap-up.md#final-technical-acceptance-and-user-reported-device-check).
+For the historical acc4924 candidate, a health response request ID matched Render's GET /health HTTP 200 at
+25.89 ms app time; [correlation](evidence/s5-c02/health-correlation.json). That candidate's
+public probes passed 14/14 read-only and 8/8 fresh-account scenarios; Kiet separately
+reported phone/private-laptop OK. [Historical acceptance](s5-c02-wrap-up.md#final-technical-acceptance-and-user-reported-device-check).
+
+Current **80b15f7** post-deploy window, **16:53:04–16:58:04 UTC**:
+118 completed requests, 71 health, 7 four-hundreds and 0 five-hundreds;
+server error rate **0%**, app p50 **30.52 ms**, p95 **698.30 ms**, max **1855.45 ms**.
+Both pages were fetched and request IDs deduplicated. This includes health and
+read-only verifier traffic; it is not a load benchmark or uptime guarantee.
+[Redacted samples and calculation](evidence/m5-post-mobile/monitoring.json).
+
+Fresh public checks on the current deployment: **14/14 read-only checks pass**,
+plus **6/6 deployed mobile-navigation checks** (375px emulation, header 69px,
+guest destinations, light theme, focus/Escape and protected-route handoff).
+Health confirms DB connected/head `d9a6f2c1e508`; public regional checks cover
+US/GB/SG. These checks do not claim fresh authenticated write journeys, physical
+phone acceptance, PO acceptance or YouTube playback availability.
+[Reports and screenshots](evidence/m5-post-mobile/README.md).
 
 ## 4. Risks and technical debt
 
 | Item | Layer | What could happen | Plan |
 | --- | --- | --- | --- |
-| Future code/schema skew | infrastructure | An incompatible deploy or rollback breaks exact-head health | Coordinated backup/migration/deploy and verified identity: [C02 #256](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/256); current acc4924 regional rollout is verified |
+| Future code/schema skew | infrastructure | An incompatible deploy or rollback breaks exact-head health | Accepted with coordinated backup/migration/deploy and identity checks; 80b15f7 public health/head and regional APIs are verified |
+| Release tag drift | docs | The version opened by the instructor differs from v1.0 | [C02 #256](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/256) release follow-up: reconcile Live 80b15f7 and v1.0, record the prior target, and verify both before submission |
 | Required checks not evidenced | infrastructure | A red candidate could merge | Admin configuration and authentic screenshot: [#250](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/250), C02 audit |
 | Local-only backups | data | Disk loss leaves no durable recovery copy | [C02 #256/R06](s5-c02-wrap-up.md#remaining-c02-gates-and-named-next-actions) owns durable destination/access/daily retention and independent reproduction; T06 is Closed as technical delivery |
 | Free sleep/ephemeral index | infrastructure | Slow first request; index rebuilt after replacement | Accepted: free hosting is the agreed scope; disclose, check before demos and rebuild derived state |
 | Shared Neon quota | infrastructure | Heavy jobs affect runtime capacity | Accepted: separate databases, quota checks and quiet import/test windows |
 | TMDb regional gaps | data | A selected market has no provider/link information | Accepted: neutral unknown wording, exact-market nullable link and attribution; development coverage is not public acceptance |
 | Manual monitoring | infrastructure | Incidents between daily checks may be missed | Accepted for this free-plan scope: named owner/backup and incident escalation |
-| Test automation is not a phone/PO decision | tests | Emulation or green CI is mistaken for full acceptance | Accepted: Kiet reports phone/private-laptop OK and accepts acc4924; retain [the real report](evidence/s5-c02/human-device-report.json), repeat affected checks after changes. Team presentation is separate from C02 |
+| Test automation is not a phone/PO decision | tests | Emulation or green CI is mistaken for full acceptance | Accepted: retain the [acc4924 human report](evidence/s5-c02/human-device-report.json); repeat affected human checks and PO acceptance for 80b15f7. Team presentation is separate from C02 |
 
 ## 5. Maintenance plan
 
