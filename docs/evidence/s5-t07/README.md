@@ -28,7 +28,20 @@ The executed local commands were `python -m pytest -q`, `python scripts/verify_s
 
 The required local business-rule mutation was real and temporary: change `PreferenceRequest.genreIds` maximum from 5 to 6, run `TC-P0-S01-007`, then restore the exact original bytes. The [red run](mutation-red.txt) failed because six genres returned HTTP 200 instead of the required 400; the [restored green run](mutation-restored-green.txt) passed. Exit codes were 1 then 0, and the source SHA-256 before/after matched `C3A5597679E891D620C4DE8B9C8327797A04C2BBBBB229BCB9300338B4E35F0F`.
 
-The public account probe is **inconclusive**. Three separate attempts each created one unique synthetic account (HTTP 201), but the subsequent duplicate-email UI attempt displayed `Email is required` and sent no second registration request in the final diagnostic. The script's temporary credentials were not written to the repository or retained after each run, so later-login/A–B checks were not established on public. [Last diagnostic](public-accounts.json). This is not yet evidence of a server duplicate-email defect; rerun with a stable, approved review account after the deployment is corrected. No further public accounts should be created just to debug the probe.
+The public account probe is **inconclusive**. Three separate attempts each navigated to Login after submitting a unique synthetic account; the final diagnostic captured HTTP 201 for the initial registration. Its subsequent duplicate-email UI attempt displayed `Email is required` and sent no second registration request. The script's temporary credentials were not written to the repository or retained after each run, so later-login/A–B checks were not established on public. [Last diagnostic](public-accounts.json). This is not yet evidence of a server duplicate-email defect; rerun with a stable, approved review account after the deployment is corrected. No further public accounts should be created just to debug the probe.
+
+## Acceptance coverage against #254
+
+| Requirement | Status on the current public candidate |
+| --- | --- |
+| Six P0 journeys from Home on a private laptop and physical phone | **Incomplete.** Home, Popular and Details were observed in headless Edge; 40 isolated P0 tests pass. No physical-phone run or complete public six-story journey was recorded. |
+| Account save, later login, A/B isolation and actionable server refusal | **Local only.** The disposable PostgreSQL UI journey passes; the public account probe stopped before persistence/isolation and did not establish a duplicate-email server refusal through the UI. |
+| Search, Similar, ratings/reranking, explanation, Watchlist/reset, sorting/filtering/pagination, return context, themes and responsive navigation | **Partial.** Focused automated tests and prior source evidence exist, but the complete public browser matrix and real phone checks were not run on one identified deployed SHA. |
+| Real media and US/GB/SG providers, safe movie-specific TMDb link, nullable/stale/fallback states, selector storage/races and attribution | **Blocked.** The public DTO/UI lacks regional-provider fields and controls. Local current-source fixtures and focused frontend tests pass but cannot accept the public candidate. |
+| PostgreSQL 18 migration/API/concurrency/target-override and T06 recovery | **Local checks pass** with zero DB skips and prior real Neon recovery evidence; the public target's migration is old and its deployed SHA is unknown. |
+| Local business-rule mutation and restored green | **Done.** The 5→6 genre limit mutation produced the expected failure; exact-byte restore passed. |
+| Two M3/current comparisons and five-person 12-minute demo | **Prepared, not rehearsed.** The second current image is a labelled local synthetic source render; speaker ownership and timed team rehearsal remain open. |
+| PO acceptance and eligible independent review | **Not recorded.** Issue #254 remains open; there is no T07 PR or review yet. |
 
 ## Two authentic M3/current UI comparisons
 
