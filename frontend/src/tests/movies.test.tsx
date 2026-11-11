@@ -261,7 +261,7 @@ describe("S08 public search UI", () => {
       const url = String(input);
       if (url === "/api/auth/me") return jsonResponse({}, 401);
       if (url.startsWith("/api/movies/search?")) return jsonResponse({ data: { movies: [movies[2]] } });
-      if (url === "/api/movies/movie-3") return jsonResponse({ data: { movie: { ...movies[2], overview: "Synthetic detail", voteCount: 0, voteAverage: null } } });
+      if (url === "/api/movies/movie-3?country=US") return jsonResponse({ data: { movie: { ...movies[2], overview: "Synthetic detail", voteCount: 0, voteAverage: null } } });
       throw new Error(`Unexpected request ${url}`);
     });
     render(<App />);
@@ -306,7 +306,7 @@ describe("T15 public catalogue UI", () => {
           data: { movies },
           meta: { count: 10, limit: 10, catalogueRevision: "revision-test" },
         });
-      if (url === "/api/movies/movie-3") return jsonResponse({
+      if (url === "/api/movies/movie-3?country=US") return jsonResponse({
           data: {
             movie: {
               ...movies[2],
@@ -330,7 +330,7 @@ describe("T15 public catalogue UI", () => {
     expect(
       await screen.findByRole("heading", { name: "Movie 3" }),
     ).toBeInTheDocument();
-    expect(fetchMock).toHaveBeenCalledWith("/api/movies/movie-3");
+    expect(fetchMock).toHaveBeenCalledWith("/api/movies/movie-3?country=US");
   });
 
   it("shows unavailable text for missing detail year and overview", async () => {
@@ -463,7 +463,7 @@ describe("T15 public catalogue UI", () => {
       await screen.findByRole("link", { name: "Sign in to rate this movie" }),
     ).toHaveAttribute("href", "/login");
     expect(fetchMock).toHaveBeenCalledTimes(3);
-    expect(fetchMock).toHaveBeenCalledWith("/api/movies/public-movie");
+    expect(fetchMock).toHaveBeenCalledWith("/api/movies/public-movie?country=US");
     expect(fetchMock).toHaveBeenCalledWith("/api/movies/public-movie/similar", expect.anything());
   });
 });

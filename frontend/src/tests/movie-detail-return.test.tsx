@@ -76,7 +76,7 @@ describe("S3-T17 movie-detail return context", () => {
       if (request.method === "GET" && request.url === "/api/genres") {
         return jsonResponse({ data: { genres: [action, drama] } });
       }
-      if (request.method === "GET" && request.url === "/api/movies/movie-a") {
+      if (request.method === "GET" && request.url === "/api/movies/movie-a?country=US") {
         return jsonResponse({ data: { movie: detail } });
       }
       if (request.url === "/api/me/ratings/movie-a")
@@ -164,7 +164,7 @@ describe("S3-T17 movie-detail return context", () => {
       if (method === "GET" && url === "/api/genres") {
         return jsonResponse({ data: { genres: [action, drama] } });
       }
-      if (method === "GET" && url === "/api/movies/movie-a") {
+      if (method === "GET" && url === "/api/movies/movie-a?country=US") {
         return jsonResponse({ data: { movie: detail } });
       }
       if (url === "/api/me/ratings/movie-a")
@@ -222,7 +222,7 @@ describe("S3-T17 movie-detail return context", () => {
     expect(
       await screen.findByRole("heading", { name: "Find your next movie" }),
     ).toBeInTheDocument();
-    expect(fetchMock).toHaveBeenNthCalledWith(1, "/api/movies/movie-a");
+    expect(fetchMock).toHaveBeenNthCalledWith(1, "/api/movies/movie-a?country=US");
     expect(fetchMock).toHaveBeenCalledWith("/api/movies?limit=10", expect.anything());
   });
 

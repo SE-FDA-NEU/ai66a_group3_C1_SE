@@ -46,7 +46,7 @@ it("restores a saved rating on a direct detail load without changing preferences
   vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
     const path = String(input);
     calls.push(path);
-    if (path === "/api/movies/movie-a")
+    if (path === "/api/movies/movie-a?country=US")
       return json({ data: { movie: movie() } });
     if (path === "/api/auth/me") return json({ data: { user } });
     if (path === "/api/me/ratings/movie-a")
@@ -60,7 +60,7 @@ it("restores a saved rating on a direct detail load without changing preferences
   await screen.findByText("Your saved rating: 5/5");
   expect(screen.getByText("Public overview")).toBeInTheDocument();
   expect(calls).toEqual([
-    "/api/movies/movie-a",
+    "/api/movies/movie-a?country=US",
     "/api/auth/me",
     "/api/movies/movie-a/similar",
     "/api/me/ratings/movie-a",
@@ -111,14 +111,14 @@ it("unmounts the previous private widget while a new movie is loading", async ()
   const oldSave = deferred();
   vi.spyOn(globalThis, "fetch").mockImplementation(async (input, options) => {
     const path = String(input);
-    if (path === "/api/movies/movie-a")
+    if (path === "/api/movies/movie-a?country=US")
       return json({ data: { movie: movie() } });
     if (path === "/api/auth/me") return json({ data: { user } });
     if (path === "/api/me/ratings/movie-a")
       return options?.method === "PUT"
         ? oldSave.promise
         : json({ data: { movieId: "movie-a", rating: 3 } });
-    if (path === "/api/movies/movie-b") return nextMovie.promise;
+    if (path === "/api/movies/movie-b?country=US") return nextMovie.promise;
     if (path === "/api/me/ratings/movie-b")
       return json({ data: { movieId: "movie-b", rating: null } });
     throw new Error(`Unexpected request: ${path}`);
@@ -150,9 +150,9 @@ it("a retry for an old movie cannot replace the new route or its widget", async 
   let attempts = 0;
   vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
     const path = String(input);
-    if (path === "/api/movies/movie-a")
+    if (path === "/api/movies/movie-a?country=US")
       return ++attempts === 1 ? json({}, 503) : oldRetry.promise;
-    if (path === "/api/movies/movie-b")
+    if (path === "/api/movies/movie-b?country=US")
       return json({ data: { movie: movie("movie-b") } });
     if (path === "/api/auth/me") return json({}, 401);
     throw new Error(`Unexpected request: ${path}`);

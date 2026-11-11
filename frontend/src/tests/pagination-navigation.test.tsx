@@ -28,7 +28,7 @@ it("restores Home page 2 after details and keeps public access during session ve
       return json({ data: { movies }, meta: { count: movies.length, limit: 10, page,
         total: 25, totalPages: 3, unfilteredTotal: 25, catalogueRevision: "rev-a" } });
     }
-    if (url === "/api/movies/movie-11") return json({ data: { movie: {
+    if (url === "/api/movies/movie-11?country=US") return json({ data: { movie: {
       ...catalogue[10], overview: "Page two detail", voteAverage: null,
       voteCount: null, backdropUrl: null } } });
     throw new Error(`Unexpected request ${url}`);
@@ -75,7 +75,7 @@ it("filters complete recommendations into two pages and preserves the view URL",
         total: candidates.length, totalPages: Math.ceil(candidates.length / 10),
         unfilteredTotal: 35, catalogueRevision: "rev-a" } });
     }
-    if (url === "/api/movies/rec-33") return json({ data: { movie: {
+    if (url === "/api/movies/rec-33?country=US") return json({ data: { movie: {
       ...base[33], overview: "Filtered page two detail", voteAverage: null,
       voteCount: null, backdropUrl: null } } });
     if (url === "/api/me/ratings/rec-33") {

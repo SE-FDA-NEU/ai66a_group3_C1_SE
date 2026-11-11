@@ -131,9 +131,9 @@ describe("movie detail backdrop transitions", () => {
   it("places the official trailer button below the poster", async () => {
     vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
       const url = String(input);
-      if (url === "/api/movies/movie-a")
+      if (url === "/api/movies/movie-a?country=US")
         return response({ data: { movie: { ...detail("movie-a"), trailer: TRAILER } } });
-      if (url === "/api/movies/movie-b")
+      if (url === "/api/movies/movie-b?country=US")
         return response({ data: { movie: { ...detail("movie-b"), trailer: null } } });
       if (url === "/api/auth/me") return response({}, 401);
       if (url.endsWith("/similar")) return response({ data: { movies: [] } });
@@ -165,7 +165,7 @@ describe("movie detail backdrop transitions", () => {
   ])("renders safe media for %s", async (_case, trailer, backdropUrl) => {
     vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
       const url = String(input);
-      if (url === "/api/movies/movie-a") return response({ data: {
+      if (url === "/api/movies/movie-a?country=US") return response({ data: {
         movie: { ...detail("movie-a", backdropUrl), ...(trailer === undefined ? {} : { trailer }) },
       } });
       if (url === "/api/auth/me") return response({}, 401);
@@ -186,9 +186,9 @@ describe("movie detail backdrop transitions", () => {
     vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
       const url = String(input);
       calls.push(url);
-      if (url === "/api/movies/movie-a")
+      if (url === "/api/movies/movie-a?country=US")
         return response({ data: { movie: detail("movie-a", IMAGE_A) } });
-      if (url === "/api/movies/movie-b") return nextMovie.promise;
+      if (url === "/api/movies/movie-b?country=US") return nextMovie.promise;
       if (url === "/api/auth/me") return response({}, 401);
       if (url.endsWith("/similar")) return response({ data: { movies: [] } });
       throw new Error(`Unexpected request: ${url}`);
@@ -219,10 +219,10 @@ describe("movie detail backdrop transitions", () => {
     fireEvent.load(nextImage);
     expect(nextImage).toHaveClass("movie-detail__hero-image--loaded");
     expect(calls).toEqual([
-      "/api/movies/movie-a",
+      "/api/movies/movie-a?country=US",
       "/api/auth/me",
       "/api/movies/movie-a/similar",
-      "/api/movies/movie-b",
+      "/api/movies/movie-b?country=US",
       "/api/movies/movie-b/similar",
     ]);
   });
@@ -231,9 +231,9 @@ describe("movie detail backdrop transitions", () => {
     const nextMovie = deferredResponse();
     vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
       const url = String(input);
-      if (url === "/api/movies/movie-a")
+      if (url === "/api/movies/movie-a?country=US")
         return response({ data: { movie: { ...detail("movie-a"), trailer: TRAILER } } });
-      if (url === "/api/movies/movie-b") return nextMovie.promise;
+      if (url === "/api/movies/movie-b?country=US") return nextMovie.promise;
       if (url === "/api/auth/me") return response({}, 401);
       if (url.endsWith("/similar")) return response({ data: { movies: [] } });
       throw new Error(`Unexpected request: ${url}`);
@@ -256,8 +256,8 @@ describe("movie detail backdrop transitions", () => {
     const oldMovie = deferredResponse();
     vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
       const url = String(input);
-      if (url === "/api/movies/movie-a") return oldMovie.promise;
-      if (url === "/api/movies/movie-b")
+      if (url === "/api/movies/movie-a?country=US") return oldMovie.promise;
+      if (url === "/api/movies/movie-b?country=US")
         return response({ data: { movie: { ...detail("movie-b", null), trailer: null } } });
       if (url === "/api/auth/me") return response({}, 401);
       throw new Error(`Unexpected request: ${url}`);

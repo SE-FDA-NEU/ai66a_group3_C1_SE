@@ -210,7 +210,7 @@ it("discards A's detail return page, genre and revision after signing in as B", 
         ? json(recommendations([movie("A private movie", "a1")], 2, 12))
         : json(recommendations([movie("B private movie", "b1")], 1, 1, "rev-b"));
     }
-    if (url === "/api/movies/a1") return json({ data: { movie: {
+    if (url === "/api/movies/a1?country=US") return json({ data: { movie: {
       ...movie("A private movie", "a1"), overview: "Public detail", voteAverage: null, voteCount: null,
     } } });
     if (url === "/api/me/ratings/a1") return json({ data: { movieId: "a1", rating: null } });
@@ -281,7 +281,7 @@ it("keeps a detail navigation when only the recommendation source and hash chang
       requests.push(url);
       return json(recommendations([movie("Source Movie", "source-1")], 1, 1));
     }
-    if (url === "/api/movies/source-1") return json({ data: { movie: {
+    if (url === "/api/movies/source-1?country=US") return json({ data: { movie: {
       ...movie("Source Movie", "source-1"), overview: "Source detail",
       voteAverage: null, voteCount: null, backdropUrl: null } } });
     if (url === "/api/me/ratings/source-1")
@@ -387,7 +387,7 @@ it("returns from details with the old revision and resets a changed catalogue", 
         limit: 10, page, total: source.length, totalPages: Math.ceil(source.length / 10),
         unfilteredTotal: source.length, catalogueRevision: activeRevision } });
     }
-    if (url === "/api/movies/movie-11") return json({ data: { movie: {
+    if (url === "/api/movies/movie-11?country=US") return json({ data: { movie: {
       ...movies[10], overview: "Detail", voteAverage: null,
       voteCount: null, backdropUrl: null } } });
     throw new Error(`Unexpected request ${url}`);
@@ -421,7 +421,7 @@ it("TC-S4-T16-RET-002 clears a stale genre after the detail return detects a new
       return json(recommendations([sample], Number(params.get("page") ?? 1),
         activeRevision === "rev-a" ? 12 : 1, activeRevision));
     }
-    if (url === "/api/movies/filtered-11") return json({ data: { movie: {
+    if (url === "/api/movies/filtered-11?country=US") return json({ data: { movie: {
       ...sample, overview: "Filtered detail", voteAverage: null,
       voteCount: null, backdropUrl: null } } });
     throw new Error(`Unexpected request ${url}`);

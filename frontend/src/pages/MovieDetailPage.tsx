@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 
-import { getMovie, MovieApiError, type MovieDetail } from "../api/movies.ts";
+import { getMovie, MovieApiError, type MovieDetail, type WatchCountry } from "../api/movies.ts";
 import { formatPopularityScore, POPULARITY_LABEL } from "../formatPopularity.ts";
 import { resolveMovieDetailReturn } from "../navigation/movieDetailReturn.ts";
 import MovieBackdropHero from "../components/MovieBackdropHero.tsx";
@@ -9,12 +9,14 @@ import MovieRating from "../components/MovieRating.tsx";
 import MoviePoster from "../components/MoviePoster.tsx";
 import { MovieTrailer } from "../components/MovieTrailer.tsx";
 import MovieWatchlist from "../components/MovieWatchlist.tsx";
+import MovieWatchProviders from "../components/MovieWatchProviders.tsx";
 import SimilarMovies from "../components/SimilarMovies.tsx";
+import { readWatchCountry } from "../watchCountry.ts";
 
 const INFORMATION_UNAVAILABLE = "Information unavailable";
 
 type DetailLoad = { movieId: string } & (
-  | { status: "ready"; movie: MovieDetail }
+  | { status: "ready"; movie: MovieDetail; country: WatchCountry }
   | { status: "notFound" }
   | { status: "error"; message: string }
 );
@@ -28,14 +30,16 @@ function MovieDetailPage() {
   // A route change must not leave the previous movie's private widget mounted.
   const currentLoad = load?.movieId === movieId ? load : null;
   const movie = currentLoad?.status === "ready" ? currentLoad.movie : null;
+  const watchCountry = currentLoad?.status === "ready" ? currentLoad.country : null;
 
   useEffect(() => {
     let cancelled = false;
 
-    getMovie(movieId)
+    const country = readWatchCountry();
+    getMovie(movieId, country)
       .then((result) => {
         if (!cancelled) {
-          setLoad({ movieId, status: "ready", movie: result });
+          setLoad({ movieId, status: "ready", movie: result, country });
         }
       })
       .catch((error) => {
@@ -120,7 +124,7 @@ function MovieDetailPage() {
     );
   }
 
-  if (!movie) {
+  if (!movie || !watchCountry) {
     return null;
   }
 
@@ -167,6 +171,8 @@ function MovieDetailPage() {
             <h2>Overview</h2>
             <p>{movie.overview ?? INFORMATION_UNAVAILABLE}</p>
           </section>
+          <MovieWatchProviders key={movie.id} movieId={movie.id}
+            initialCountry={watchCountry} initialMovie={movie} />
           <MovieRating movieId={movie.id} />
           <MovieWatchlist movieId={movie.id} />
           </div>

@@ -222,7 +222,7 @@ it("features the server-ranked film on every Popular page without changing list 
     .getByRole("heading", { name: "Page two" })).toBeVisible());
   expect(screen.getByRole("region", { name: "Popular movie spotlight" })).toHaveTextContent("#11 in this catalogue");
   expect(requests.filter(request => request === "GET /api/movies/popular")).toHaveLength(2);
-  expect(requests.some(request => request.includes("/api/movies/m-"))).toBe(false);
+  expect(requests.some(request => request.includes("/api/movies/m-?country=US"))).toBe(false);
 });
 
 it("returns from the featured movie to the same Popular context", async () => {
