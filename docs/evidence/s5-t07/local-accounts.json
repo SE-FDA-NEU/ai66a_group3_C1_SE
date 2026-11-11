@@ -1,0 +1,30 @@
+{
+  "checkedAt": "2026-11-11T09:25:53.595Z",
+  "target": "http://127.0.0.1:8507",
+  "accounts": "two unique synthetic accounts; credentials kept only in process memory",
+  "device": "Microsoft Edge headless on this machine, desktop viewport; no physical phone",
+  "registrationStatuses": [
+    201,
+    409
+  ],
+  "aRegistered": true,
+  "duplicatePage": "http://127.0.0.1:8507/register",
+  "duplicateVisibleErrors": [
+    "This email is already registered"
+  ],
+  "duplicateEmailValid": true,
+  "duplicateRegistration": "UI displayed duplicate-email refusal",
+  "aGenreSaved": "Action",
+  "movieHref": "/movies/movie-a",
+  "aSaved": {
+    "watchlist": true,
+    "rating": 4.5
+  },
+  "aReloadPersisted": true,
+  "aLaterLoginPersisted": true,
+  "bIsolated": {
+    "genre": "Drama",
+    "watchlist": false,
+    "rating": null
+  }
+}

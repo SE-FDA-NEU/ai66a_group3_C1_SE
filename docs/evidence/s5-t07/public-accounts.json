@@ -1,0 +1,17 @@
+{
+  "checkedAt": "2026-11-11T09:26:20.101Z",
+  "target": "https://cineai-o9tf.onrender.com",
+  "accounts": "two unique synthetic accounts; credentials kept only in process memory",
+  "device": "Microsoft Edge headless on this machine, desktop viewport; no physical phone",
+  "registrationStatuses": [
+    201
+  ],
+  "aRegistered": true,
+  "duplicatePage": "https://cineai-o9tf.onrender.com/register",
+  "duplicateVisibleErrors": [
+    "Email is required"
+  ],
+  "duplicateEmailValid": true,
+  "duplicateRegistration": "UI did not display the expected message",
+  "failure": "Duplicate registration responses 201; expected UI message absent"
+}

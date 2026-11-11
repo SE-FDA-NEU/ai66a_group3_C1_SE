@@ -1,0 +1,63 @@
+{
+  "checkedAt": "2026-11-11T09:29:51.524Z",
+  "target": "https://cineai-o9tf.onrender.com",
+  "requestedMovieId": "2626f71e-8458-491c-a1f4-c2017d8f684b",
+  "browser": "Microsoft Edge 157.0.4341.42 (headless)",
+  "device": "desktop browser and emulated 390x844 mobile viewport; no physical phone",
+  "home": {
+    "status": 200,
+    "heading": "Find your\nnext movie",
+    "movieLinks": 10,
+    "lightTheme": "light"
+  },
+  "popular": {
+    "url": "https://cineai-o9tf.onrender.com/popular",
+    "heading": "Popular movies"
+  },
+  "detail": {
+    "clickedHref": "/movies/2626f71e-8458-491c-a1f4-c2017d8f684b",
+    "url": "https://cineai-o9tf.onrender.com/movies/2626f71e-8458-491c-a1f4-c2017d8f684b",
+    "heading": "(500) Days of Summer",
+    "countrySelector": 0,
+    "watchOptionsActions": 0
+  },
+  "health": {
+    "status": 200,
+    "body": {
+      "status": "ok",
+      "database": "connected",
+      "migrationVersion": "a3d1f8b72c44"
+    }
+  },
+  "regionalApi": {
+    "US": {
+      "status": 200,
+      "movieId": "2626f71e-8458-491c-a1f4-c2017d8f684b",
+      "country": null,
+      "providerStatus": null,
+      "watchOptionsUrl": null,
+      "fieldsPresent": false
+    },
+    "GB": {
+      "status": 200,
+      "movieId": "2626f71e-8458-491c-a1f4-c2017d8f684b",
+      "country": null,
+      "providerStatus": null,
+      "watchOptionsUrl": null,
+      "fieldsPresent": false
+    },
+    "SG": {
+      "status": 200,
+      "movieId": "2626f71e-8458-491c-a1f4-c2017d8f684b",
+      "country": null,
+      "providerStatus": null,
+      "watchOptionsUrl": null,
+      "fieldsPresent": false
+    }
+  },
+  "mobileEmulation": {
+    "status": 200,
+    "heading": "(500) Days of Summer",
+    "countrySelector": 0
+  }
+}
