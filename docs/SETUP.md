@@ -195,6 +195,12 @@ acceptance still requires durable private backup storage with primary/backup
 operator access and a genuine independent reproduction. Git stores the runbook
 and redacted evidence. Keep sensitive database archives in private storage.
 
+For an isolated local restore on Windows, create the target with UTF8 encoding
+(for example, `createdb --template=template0 --encoding=UTF8 --lc-collate=C --lc-ctype=C <new-target>`).
+Verify `SHOW server_encoding` returns `UTF8`: the Windows default WIN1252 cannot
+restore all multilingual TMDb titles. Neon already uses UTF8; do not recreate
+the public database to apply this local-test instruction.
+
 After pulling changes, back up valuable SQLite data consistently and run
 `alembic upgrade head` before restarting the backend. Compare `alembic current`
 with `alembic heads`; use the actual repository head, not an old task's revision.

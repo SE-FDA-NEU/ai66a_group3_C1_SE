@@ -1,0 +1,83 @@
+{
+  "checkedAt": "2026-11-11T09:29:33.413Z",
+  "target": "http://127.0.0.1:8507",
+  "requestedMovieId": "movie-a",
+  "browser": "Microsoft Edge 157.0.4341.42 (headless)",
+  "device": "desktop browser and emulated 390x844 mobile viewport; no physical phone",
+  "home": {
+    "status": 200,
+    "heading": "Find your\nnext movie",
+    "movieLinks": 2,
+    "lightTheme": "light"
+  },
+  "popular": {
+    "url": "http://127.0.0.1:8507/popular",
+    "heading": "Popular movies"
+  },
+  "detail": {
+    "clickedHref": "/movies/movie-a",
+    "url": "http://127.0.0.1:8507/movies/movie-a",
+    "heading": "Moon journey",
+    "countrySelector": 1,
+    "watchOptionsActions": 1,
+    "regions": {
+      "US": {
+        "heading": "Where to watch in United States",
+        "actionHref": "https://www.themoviedb.org/movie/101/watch?locale=US",
+        "actionTarget": "_blank",
+        "actionRel": "noopener noreferrer"
+      },
+      "GB": {
+        "heading": "Where to watch in United Kingdom",
+        "actionHref": "https://www.themoviedb.org/movie/101/watch?locale=GB",
+        "actionTarget": "_blank",
+        "actionRel": "noopener noreferrer"
+      },
+      "SG": {
+        "heading": "Where to watch in Singapore",
+        "actionHref": null,
+        "actionTarget": null,
+        "actionRel": null
+      }
+    }
+  },
+  "health": {
+    "status": 200,
+    "body": {
+      "status": "ok",
+      "database": "connected",
+      "migrationVersion": "d9a6f2c1e508"
+    }
+  },
+  "regionalApi": {
+    "US": {
+      "status": 200,
+      "movieId": "movie-a",
+      "country": "US",
+      "providerStatus": "success",
+      "watchOptionsUrl": "https://www.themoviedb.org/movie/101/watch?locale=US",
+      "fieldsPresent": true
+    },
+    "GB": {
+      "status": 200,
+      "movieId": "movie-a",
+      "country": "GB",
+      "providerStatus": "success",
+      "watchOptionsUrl": "https://www.themoviedb.org/movie/101/watch?locale=GB",
+      "fieldsPresent": true
+    },
+    "SG": {
+      "status": 200,
+      "movieId": "movie-a",
+      "country": "SG",
+      "providerStatus": "no_data",
+      "watchOptionsUrl": null,
+      "fieldsPresent": true
+    }
+  },
+  "mobileEmulation": {
+    "status": 200,
+    "heading": "Moon journey",
+    "countrySelector": 1
+  }
+}

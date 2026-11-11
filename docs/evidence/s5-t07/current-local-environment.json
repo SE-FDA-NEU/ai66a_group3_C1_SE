@@ -1,0 +1,40 @@
+{
+  "postgresVersion": "18.1",
+  "migrationVersion": "d9a6f2c1e508",
+  "activeImportedMovies": 989,
+  "archiveSha256": "6fd2e356115b7c1b83fee93bb4d7b90edf591629a7cb1226a53a2c0f7c50b082",
+  "source": "private T06 Neon development archive, 10 November 2026",
+  "target": "isolated loopback PostgreSQL; public/Neon unchanged",
+  "movieSources": [
+    {
+      "id": "2626f71e-8458-491c-a1f4-c2017d8f684b",
+      "sourceId": "19913",
+      "title": "(500) Days of Summer"
+    },
+    {
+      "id": "311ba592-b894-4a79-be34-186d6cb03a0d",
+      "sourceId": "584586",
+      "title": "0.0MHz"
+    },
+    {
+      "id": "ce59a368-2e6a-499f-baee-703649c399b1",
+      "sourceId": "4951",
+      "title": "10 Things I Hate About You"
+    }
+  ],
+  "postgresqlTests": {
+    "cases": 17,
+    "failures": 0,
+    "skips": 0
+  },
+  "p0Tests": 40,
+  "frontendCases": 128,
+  "verifierCases": 18,
+  "scriptHashes": {
+    "frontend/scripts/s5-t07-public-probe.mjs": "cb9d4754f2b5d4ab451d38b4524f9cb58ca3c022cf75f7ac88540c14dacf0f05",
+    "frontend/scripts/s5-t07-public-accounts.mjs": "e8113b026b2c3b2c66811fbab7a2e9af5caf4ada76eb76390f47a5b3ad0cd04f",
+    "frontend/scripts/s5-t07-contract.mjs": "e7f9f93f2846e0a9f1f3b0a6ef4bd7da634348684c45b4be2900bbb2c1f1c9b8",
+    "scripts/verify_s5_t07_mutation.py": "1cc8b9b997f2a26a1b77c1ee3839a669c03849fbccd634a6a261e92f9b7908f2"
+  },
+  "scriptHashFormat": "SHA-256 of UTF-8 files with CRLF normalized to LF"
+}

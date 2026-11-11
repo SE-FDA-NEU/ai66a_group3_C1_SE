@@ -1,0 +1,50 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________ test_TC_P0_S01_007_invalid_sets_preserve_previous_selection _________
+
+details = namespace(http=<starlette.testclient.TestClient object at 0x000002EDE523E060>, engine=Engine(sqlite:///C%3A/Users/Admi...b1'], revision='f0ad3592-6834-4f76-b3ac-f756f7d897d1', app=<fastapi.applications.FastAPI object at 0x000002EDE52E2810>)
+
+    def test_TC_P0_S01_007_invalid_sets_preserve_previous_selection(details):
+        add_genres(details, [10, 11, 12, 13])
+        a = account(details)
+        assert save(a, [28, 35]).status_code == 200
+        for invalid in ([28, 35, 10, 11, 12, 13], [28, 28], [True], ["28"]):
+>           error(save(a, invalid), 400, "VALIDATION_ERROR")
+
+tests\test_p0_acceptance.py:136:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+response = <Response [200 OK]>, status = 400, code = 'VALIDATION_ERROR'
+
+    def error(response, status, code):
+>       assert response.status_code == status, response.text
+E       AssertionError: {"data":{"genres":[{"id":28,"name":"Action"},{"id":35,"name":"Comedy"},{"id":10,"name":"Genre 10"},{"id":11,"name":"Genre 11"},{"id":12,"name":"Genre 12"},{"id":13,"name":"Genre 13"}]}}
+E       assert 200 == 400
+E        +  where 200 = <Response [200 OK]>.status_code
+
+tests\test_p0_acceptance.py:73: AssertionError
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 2d8a3f83d517, bootstrap database
+INFO  [alembic.runtime.migration] Running upgrade 2d8a3f83d517 -> 4bde7d96c1c2, create catalogue storage
+INFO  [alembic.runtime.migration] Running upgrade 4bde7d96c1c2 -> 7f5b1d2a6e90, create users
+INFO  [alembic.runtime.migration] Running upgrade 7f5b1d2a6e90 -> 8c1e2f4a7b90, create server-managed auth sessions
+INFO  [alembic.runtime.migration] Running upgrade 8c1e2f4a7b90 -> 9d2f5a1c3b84, create account-owned genre preferences
+INFO  [alembic.runtime.migration] Running upgrade 9d2f5a1c3b84 -> b7e4c2d91f30, create account-owned movie ratings
+INFO  [alembic.runtime.migration] Running upgrade b7e4c2d91f30 -> c6f8a2d4e901, Add nullable catalogue backdrop storage without rebuilding existing tables.
+INFO  [alembic.runtime.migration] Running upgrade c6f8a2d4e901 -> d8a4e6f20195, Add nullable poster metadata, preserving existing identity and account rows.
+INFO  [alembic.runtime.migration] Running upgrade d8a4e6f20195 -> e9b6f0a42c17, Create persistent account-owned watchlist.
+INFO  [alembic.runtime.migration] Running upgrade e9b6f0a42c17 -> f2c7e4a91b60, Allow 0.5 through 5 stars in 0.5 steps without changing rating identity.
+INFO  [alembic.runtime.migration] Running upgrade f2c7e4a91b60 -> a3d1f8b72c44, Add optional trailer and enrichment status to existing catalogue movies.
+INFO  [alembic.runtime.migration] Running upgrade a3d1f8b72c44 -> b8e4d2c96f10, Store VN provider memberships and independent check/link provenance.
+INFO  [alembic.runtime.migration] Running upgrade b8e4d2c96f10 -> d9a6f2c1e508, Support US/GB/SG while preserving historical VN provider rows.
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  <workspace>\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_p0_acceptance.py::test_TC_P0_S01_007_invalid_sets_preserve_previous_selection
+1 failed, 1 warning in 1.55s

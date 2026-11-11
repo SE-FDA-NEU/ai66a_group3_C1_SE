@@ -264,6 +264,9 @@ jobs:
       - name: Verify regional watch-provider UI
         run: npm --prefix frontend test -- src/tests/movie-watch-providers.test.tsx
 
+      - name: Verify T07 acceptance rejects incorrect results
+        run: node --test frontend/scripts/s5-t07-contract.node-test.mjs
+
       - name: Build frontend
         run: npm --prefix frontend run build
 

@@ -1,0 +1,9 @@
+{
+  "case": "tests/test_p0_acceptance.py::test_TC_P0_S01_007_invalid_sets_preserve_previous_selection",
+  "mutation": "maximum genres 5 to 6, local source only",
+  "redExit": 1,
+  "restoredGreenExit": 0,
+  "sourceSha256": "c3a5597679e891d620c4de8b9c8327797a04c2bbbbb229bcb9300338b4e35f0f",
+  "exactBytesRestored": true,
+  "database": "temporary isolated SQLite from pytest bootstrap; no public/Neon writes"
+}

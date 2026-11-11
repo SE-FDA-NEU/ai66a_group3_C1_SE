@@ -1,0 +1,20 @@
+{
+  "provenance": "Read from isolated restore of T06 Neon TMDb archive, 10 November 2026; IDs are catalogue-specific, refresh this map for another database.",
+  "movies": [
+    {
+      "id": "2626f71e-8458-491c-a1f4-c2017d8f684b",
+      "sourceId": "19913",
+      "title": "(500) Days of Summer"
+    },
+    {
+      "id": "311ba592-b894-4a79-be34-186d6cb03a0d",
+      "sourceId": "584586",
+      "title": "0.0MHz"
+    },
+    {
+      "id": "ce59a368-2e6a-499f-baee-703649c399b1",
+      "sourceId": "4951",
+      "title": "10 Things I Hate About You"
+    }
+  ]
+}
