@@ -1,0 +1,248 @@
+{
+  "checkedAt": "2026-11-11T10:16:34.783Z",
+  "target": "https://cineai-o9tf.onrender.com",
+  "sourceCommit": "055de665ebec9e546e6eed705c841e2c2b9eb603",
+  "expectedHead": "d9a6f2c1e508",
+  "deployedSha": null,
+  "device": "fresh headless Edge contexts; desktop and emulated 390x844; no physical phone",
+  "checks": [
+    {
+      "name": "health matches source migration",
+      "status": "fail",
+      "message": "Public schema differs from this source candidate"
+    },
+    {
+      "name": "Home is reachable and contains imported data",
+      "status": "pass"
+    },
+    {
+      "name": "light and dark themes",
+      "status": "pass"
+    },
+    {
+      "name": "Popular navigation",
+      "status": "pass"
+    },
+    {
+      "name": "Home Z-A, page two and exact Details return context",
+      "status": "pass"
+    },
+    {
+      "name": "Search is submit-only and paginates all matches; return context survives Details",
+      "status": "pass"
+    },
+    {
+      "name": "Details reached through visible Home navigation",
+      "status": "pass"
+    },
+    {
+      "name": "real media and NLP Similar render on Details",
+      "status": "pass"
+    },
+    {
+      "name": "API movie/country/link US",
+      "status": "fail",
+      "message": "Details returned another country"
+    },
+    {
+      "name": "API movie/country/link GB",
+      "status": "fail",
+      "message": "Details returned another country"
+    },
+    {
+      "name": "API movie/country/link SG",
+      "status": "fail",
+      "message": "Details returned another country"
+    },
+    {
+      "name": "unsupported region is a safe refusal",
+      "status": "fail",
+      "message": "expect(received).toBe(expected) // Object.is equality"
+    },
+    {
+      "name": "US default and country UI/API consistency",
+      "status": "fail",
+      "message": "expect(locator).toHaveCount(expected) failed"
+    },
+    {
+      "name": "invalid stored market falls back to US; mobile layout",
+      "status": "fail",
+      "message": "expect(locator).toHaveValue(expected) failed"
+    }
+  ],
+  "physicalPhone": "pending",
+  "poAcceptance": "pending",
+  "teamRehearsal": "pending",
+  "browser": "Microsoft Edge 157.0.4341.46",
+  "health": {
+    "status": 200,
+    "body": {
+      "status": "ok",
+      "database": "connected",
+      "migrationVersion": "a3d1f8b72c44"
+    }
+  },
+  "home": {
+    "status": 200,
+    "movieLinks": 10
+  },
+  "search": {
+    "query": "the",
+    "total": 329,
+    "firstPage": 10,
+    "secondPage": 10,
+    "noDuplicateIds": true
+  },
+  "detail": {
+    "clickedHref": "/movies/2626f71e-8458-491c-a1f4-c2017d8f684b",
+    "movieId": "2626f71e-8458-491c-a1f4-c2017d8f684b",
+    "sourceId": "19913",
+    "heading": "(500) Days of Summer"
+  },
+  "media": {
+    "realPoster": true,
+    "backdropPresent": true,
+    "trailerEmbedOpens": true,
+    "similarCount": 5,
+    "playbackConfirmation": "not asserted; external YouTube availability depends on the network/video"
+  },
+  "regionalApi": {
+    "US": {
+      "status": 200,
+      "body": {
+        "data": {
+          "movie": {
+            "id": "2626f71e-8458-491c-a1f4-c2017d8f684b",
+            "title": "(500) Days of Summer",
+            "releaseYear": 2009,
+            "genres": [
+              {
+                "id": 35,
+                "name": "Comedy"
+              },
+              {
+                "id": 18,
+                "name": "Drama"
+              },
+              {
+                "id": 10749,
+                "name": "Romance"
+              }
+            ],
+            "overview": "Tom, greeting-card writer and hopeless romantic, is caught completely off-guard when his girlfriend, Summer, suddenly dumps him. He reflects on their 500 days together to try to figure out where their love affair went sour, and in doing so, Tom rediscovers his true passions in life.",
+            "popularityScore": 11.3378,
+            "voteAverage": 7.3,
+            "voteCount": 11433,
+            "backdropUrl": "https://image.tmdb.org/t/p/w780/1M2i4Mxd03elGOTmEkIvqrHfmyS.jpg",
+            "posterUrl": "https://image.tmdb.org/t/p/w500/qXAuQ9hF30sQRsXf40OfRVl0MJZ.jpg",
+            "trailer": {
+              "site": "YouTube",
+              "key": "oBxR8cEt2xM",
+              "name": "(Not) A Love Story",
+              "type": "Trailer",
+              "official": true,
+              "language": "en",
+              "publishedAt": "2019-07-09T22:01:14Z",
+              "url": "https://www.youtube.com/watch?v=oBxR8cEt2xM"
+            }
+          }
+        },
+        "meta": {
+          "catalogueRevision": "1ee08003-bc00-4888-b35c-8c6cbe599062"
+        }
+      }
+    },
+    "GB": {
+      "status": 200,
+      "body": {
+        "data": {
+          "movie": {
+            "id": "2626f71e-8458-491c-a1f4-c2017d8f684b",
+            "title": "(500) Days of Summer",
+            "releaseYear": 2009,
+            "genres": [
+              {
+                "id": 35,
+                "name": "Comedy"
+              },
+              {
+                "id": 18,
+                "name": "Drama"
+              },
+              {
+                "id": 10749,
+                "name": "Romance"
+              }
+            ],
+            "overview": "Tom, greeting-card writer and hopeless romantic, is caught completely off-guard when his girlfriend, Summer, suddenly dumps him. He reflects on their 500 days together to try to figure out where their love affair went sour, and in doing so, Tom rediscovers his true passions in life.",
+            "popularityScore": 11.3378,
+            "voteAverage": 7.3,
+            "voteCount": 11433,
+            "backdropUrl": "https://image.tmdb.org/t/p/w780/1M2i4Mxd03elGOTmEkIvqrHfmyS.jpg",
+            "posterUrl": "https://image.tmdb.org/t/p/w500/qXAuQ9hF30sQRsXf40OfRVl0MJZ.jpg",
+            "trailer": {
+              "site": "YouTube",
+              "key": "oBxR8cEt2xM",
+              "name": "(Not) A Love Story",
+              "type": "Trailer",
+              "official": true,
+              "language": "en",
+              "publishedAt": "2019-07-09T22:01:14Z",
+              "url": "https://www.youtube.com/watch?v=oBxR8cEt2xM"
+            }
+          }
+        },
+        "meta": {
+          "catalogueRevision": "1ee08003-bc00-4888-b35c-8c6cbe599062"
+        }
+      }
+    },
+    "SG": {
+      "status": 200,
+      "body": {
+        "data": {
+          "movie": {
+            "id": "2626f71e-8458-491c-a1f4-c2017d8f684b",
+            "title": "(500) Days of Summer",
+            "releaseYear": 2009,
+            "genres": [
+              {
+                "id": 35,
+                "name": "Comedy"
+              },
+              {
+                "id": 18,
+                "name": "Drama"
+              },
+              {
+                "id": 10749,
+                "name": "Romance"
+              }
+            ],
+            "overview": "Tom, greeting-card writer and hopeless romantic, is caught completely off-guard when his girlfriend, Summer, suddenly dumps him. He reflects on their 500 days together to try to figure out where their love affair went sour, and in doing so, Tom rediscovers his true passions in life.",
+            "popularityScore": 11.3378,
+            "voteAverage": 7.3,
+            "voteCount": 11433,
+            "backdropUrl": "https://image.tmdb.org/t/p/w780/1M2i4Mxd03elGOTmEkIvqrHfmyS.jpg",
+            "posterUrl": "https://image.tmdb.org/t/p/w500/qXAuQ9hF30sQRsXf40OfRVl0MJZ.jpg",
+            "trailer": {
+              "site": "YouTube",
+              "key": "oBxR8cEt2xM",
+              "name": "(Not) A Love Story",
+              "type": "Trailer",
+              "official": true,
+              "language": "en",
+              "publishedAt": "2019-07-09T22:01:14Z",
+              "url": "https://www.youtube.com/watch?v=oBxR8cEt2xM"
+            }
+          }
+        },
+        "meta": {
+          "catalogueRevision": "1ee08003-bc00-4888-b35c-8c6cbe599062"
+        }
+      }
+    }
+  },
+  "technicalPass": false,
+  "fullIssueAcceptance": false
+}

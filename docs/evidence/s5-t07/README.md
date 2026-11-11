@@ -1,69 +1,89 @@
-# S5-T07 public acceptance and M5 demo preparation
+# S5-T07 public acceptance and M5 demo
 
-Issue [#254](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/254). Checked on **11 November 2026** (Asia/Saigon) from the application source at `50aa9ad4fccc63f5d7ef8186bb296ed12f0d18ee`. This is an **incomplete acceptance record**: the current public deployment lacks the regional-provider release. No PO decision or independent review is claimed.
+Refs [#254](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/254), PR [#265](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/265). Updated **11 November 2026**, Asia/Saigon. **T07 is not accepted/closed.** The application source remains main `50aa9ad4fccc63f5d7ef8186bb296ed12f0d18ee`; this PR changes acceptance tooling/evidence, not application behaviour. The JSON source-commit field identifies the checkout used for a run; [script hashes](current-local-environment.json) identify the tested verifier bytes before their commit.
 
-## Candidate identity and public blocker
+## Current result and release blocker
 
-The source commit is the merge of [T05 PR #263](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/263). Its [main CI run](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/42987332068) completed successfully. T03 [#260](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/260), T05 #263 and T06 [#262](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/262) are merged; their prior evidence is recorded at [T03](../../s5-t03-deployment.md), [T05](../s5-t05-regional-ui.md) and [T06](../s5-t06-recovery/README.md).
+| Target/check | Actual result | Evidence |
+| --- | --- | --- |
+| Isolated local PostgreSQL 18.1, production frontend bundle | Restored **989 actual TMDb movies** from the private T06 Neon archive, not a two-movie demo. Head `d9a6f2c1e508`; original Neon/public data not used for local writes | [Environment/archive digest](current-local-environment.json), [local probe](local-current-probe.json) |
+| Read-only local browser/API checks | **14/14 pass**: Home, two themes, Z–A/page/return, submit-only Search/all-result pagination, real poster, trailer dialog, Similar, US/GB/SG DTO/UI/link/groups, default/storage/reload and mobile emulation | [Desktop](local-current-detail-desktop.png), [390px emulation](local-current-detail-mobile-emulated.png) |
+| Public read-only probe | **7 pass / 7 fail**. `/health` is 200 for the old runtime, with head `a3d1f8b72c44`. The required current schema/API/selector are absent; unsupported `VN` is still ignored instead of refused | [Public JSON](public-current-probe.json), [public Details](public-current-detail-desktop.png) |
+| Existing public features | Home sort/page/return, Search, Similar and trailer embed opening pass. Search `the`: **329 matches**, 10 on pages 1/2, no duplicate IDs; no total-results cap of 10 | Same public JSON. Video playback itself was not asserted; YouTube/video/network restrictions are external |
+| Account UI journeys, local **and public** | **8/8 pass** using two reusable synthetic accounts per target: create/login, real duplicate HTTP **409** + actionable UI, preferences, 4.5 rating, reload/later login, ranking metadata, filtering/paging/return, A/B isolation, cancel/reset-keeps-Watchlist and removal | [Local](current-local-accounts.json), [public](current-public-accounts.json) |
+| Recommendation filtering on both targets | 353 eligible results; Comedy filter 47 results/5 pages, correct genre membership, preferences unchanged; Details returns to retained page/filter | Account JSON above |
+| Render identity/access | Connector exposes workspace `abc` with a group-04 service, not CineAI. Browser-control initialization also failed (`kernel assets`, OS error 3). No Render settings, deploy, restart or public migration was performed; deployed SHA is **unverified** | Confirm actual CineAI Deploy Details before acceptance |
+| Physical phone, team rehearsal, PO acceptance | **Pending.** User confirmed no rehearsal or PO acceptance yet; no physical phone is connected to the agent | [Completion checklist](completion-checklist.md) |
 
-The only supplied public target is `https://cineai-o9tf.onrender.com/`. A real headless Microsoft Edge 157 desktop session and an **emulated** 390×844 mobile viewport visited it. The [read-only probe](public-probe.json) recorded Home 200 with 10 movie links, Popular and Details navigation, a working light-theme switch, and `/health` 200. The catalogue API reported 989 movies. This does not substitute for a physical phone or a private laptop browser.
+A 200 health response validates the old running code/database pair; it does not prove that the new regional release is deployed. Do not downgrade or change the expected head just to make this gate green.
 
-**Release blocker:** public `/health` reports migration `a3d1f8b72c44`, while the current source's local PostgreSQL target is at `d9a6f2c1e508`. The public Details DTO for an imported movie has neither `providers` nor `watchOptionsUrl` for US, GB or SG. The public Details UI has no Country selector and no TMDb watch-options action. The [public desktop Details image](public-detail-desktop.png) and [mobile emulation](public-detail-mobile-emulated.png) show this. The actual Render deployed source SHA is **unverified**; the schema/API observations prove the required candidate is not fully deployed, without identifying its exact old SHA. Do not mark the regional-provider or final public gate accepted on this deployment.
+The public account probe now uses a **fresh browser context** for duplicate registration, waits for the actual POST response, checks 409/error code/UI and retains reusable credentials only in a git-ignored file. This resolves the previous probe's inconclusive `Email is required` result; no server duplicate-email defect was established. The successful repeat reused the same accounts (409 registration), saved rating via HTTP 200, then removed its own Watchlist item after verifying reset preservation. Other users' accounts/data were untouched.
 
-## Reproducible local checks
+## Focused test evidence
 
-Windows, Python 3.12.10, Node 24.15.0 and a temporary isolated PostgreSQL **18.1** server on loopback were used. The native `psql` query returned `server_version = 18.1`. Runtime examples used two labelled synthetic movies from the disposable T06 recovery fixture; no public or Neon database was mutated by the local suites. Local Edge used the production frontend bundle and a loopback FastAPI process. [Local browser/API observations](local-probe.json) show schema `d9a6f2c1e508`, the Country selector and API responses for US/GB/SG. Movie `movie-a` has an exact US TMDb URL ending `movie/101/watch?locale=US`, the analogous GB URL and SG no-data/null-link fallback. The visible US and GB actions use `_blank` and `noopener noreferrer`. [Local desktop](local-detail-desktop.png) and [mobile emulation](local-detail-mobile-emulated.png) images show the current component. These synthetic results are **not** claims about public regional data.
-
-| Check | Actual result |
+| Check | Result |
 | --- | --- |
-| `python -m pytest -q` | 40 P0 tests passed, zero skipped. The [existing case map](../../testing.md#2-test-cases-for-every-p0-story) covers normal, refusal and boundary cases for S01/S02/S03/S04/S12/S13; the trace script mapped 37 logical IDs to 40 collected cases. |
-| Nine affected frontend suites, including regional providers, Details, account/navigation/media and Watchlist | 128 passed. |
-| PostgreSQL T01 integration, with `TEST_POSTGRES_MAJOR=18` and a disposable database | 12 passed, zero skipped. Includes migration, target-override refusal, API isolation and concurrency. |
-| PostgreSQL T06 dump/restore comparator, two disposable databases | 5 passed, zero skipped. See the prior [real Neon recovery handoff](../s5-t06-recovery/README.md) for source/restore counts and provider-link persistence. |
-| Focused provider/CLI/health/production-serving backend selection | 154 passed; two symlink tests failed at setup on Windows `WinError 1314` because this account cannot create symlinks. A rerun in the alternate execution context hit temp-directory ACL errors. No application assertion failed in those two tests. |
-| Python Ruff, frontend ESLint and production build | Passed. |
-| Local account UI journey | [Two synthetic accounts](local-accounts.json): duplicate registration returned HTTP 409 with the UI refusal, A saved Action/4.5 stars/Watchlist and retained both after reload and later login, B saved Drama and saw neither A's rating nor Watchlist membership. |
+| `python -m pytest -q` | **40 passed**, compact P0 suite; one dependency deprecation warning |
+| T01 PostgreSQL 18 + T06 native recovery | **17 passed, zero skipped**, authenticated isolated loopback databases; server 18.1 |
+| Nine affected frontend suites listed below | **128 passed** |
+| T07 verifier contract | **18 passed**; rejects old/failed health, wrong movie/country/link/groups, missing selector, unsafe new-tab action and missing stale warning; accepts legitimate no-data/null link and numeric-ID-plus-slug URLs |
+| ESLint, TypeScript and production build | Pass |
+| Local S01 rule mutation | **Red exit 1 → restored-green exit 0**, exact bytes restored; [red](mutation-red.txt), [green](mutation-restored-green.txt), [digest/result](mutation.json) |
+| Earlier two Windows symlink setup failures | Not relabelled as local passes. Linux CI [42997436169](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/42997436169), step `Verify production serving, health and sessions offline`, passed its production-serving selection containing both cases. This PR's CI reruns that selection |
 
-The executed local commands were `python -m pytest -q`, `python scripts/verify_s4_t05_trace.py`, `python -m ruff check backend`, `npm.cmd --prefix frontend run lint`, `npm.cmd --prefix frontend run build`, and the nine-file Vitest selection listed in [T05's affected-suite command](../s5-t05-regional-ui.md#automated-verification). The PostgreSQL runs were `python -m pytest -q -c pytest.ini backend/tests/test_postgresql_t01.py` and `python -m pytest -q -c pytest.ini backend/tests/test_s5_t06_postgres_recovery.py`, with the disposable PostgreSQL URL variables set as those test files require. The browser scripts were `node scripts/s5-t07-public-probe.mjs` and, with explicit write opt-in, `node scripts/s5-t07-public-accounts.mjs` from `frontend/`. Their JSON artifacts identify the observed target and device class.
+The P0 [case map](../../testing.md#2-test-cases-for-every-p0-story) is reused; `testing.md` is not expanded with unrelated suites. The mutation is `PreferenceRequest` maximum 5 → 6 and `TC-P0-S01-007`: six genres incorrectly return 200, the test fails expecting 400, and the restored source passes. The runner always restores in `finally`. Never run a mutation on a deployed service.
 
-The required local business-rule mutation was real and temporary: change `PreferenceRequest.genreIds` maximum from 5 to 6, run `TC-P0-S01-007`, then restore the exact original bytes. The [red run](mutation-red.txt) failed because six genres returned HTTP 200 instead of the required 400; the [restored green run](mutation-restored-green.txt) passed. Exit codes were 1 then 0, and the source SHA-256 before/after matched `C3A5597679E891D620C4DE8B9C8327797A04C2BBBBB229BCB9300338B4E35F0F`.
+The read-only probe collects named pass/fail checks and exits nonzero on **any** failed check. API/UI observations must agree on the same movie and country; a nullable link is allowed, but a displayed link requires a trusted numeric TMDb source ID, correct locale, safe origin/path and new-tab rel. An observed popup preserves the original route. Source-map samples come from the isolated archive's `catalog_movies.source_id`, not from the URL being tested. Refresh [movie-sources.json](movie-sources.json) for another catalogue rather than trusting these database-specific opaque IDs.
 
-The public account probe is **inconclusive**. Three separate attempts each navigated to Login after submitting a unique synthetic account; the final diagnostic captured HTTP 201 for the initial registration. Its subsequent duplicate-email UI attempt displayed `Email is required` and sent no second registration request. The script's temporary credentials were not written to the repository or retained after each run, so later-login/A–B checks were not established on public. [Last diagnostic](public-accounts.json). This is not yet evidence of a server duplicate-email defect; rerun with a stable, approved review account after the deployment is corrected. No further public accounts should be created just to debug the probe.
+## Run from repository root
 
-## Acceptance coverage against #254
+Install dependencies using [SETUP](../../SETUP.md). The browser probes use installed Microsoft Edge and `frontend/node_modules/@playwright/test`. PostgreSQL tests follow the authenticated disposable-target instructions in SETUP/T06; local restore databases on Windows must be **UTF8** (e.g. template0, encoding UTF8, C collation/ctype), not default WIN1252. The initial local restore failed on a multilingual TMDb title under WIN1252; the UTF8 restore succeeded. No dump, password or database URL is committed.
 
-| Requirement | Status on the current public candidate |
-| --- | --- |
-| Six P0 journeys from Home on a private laptop and physical phone | **Incomplete.** Home, Popular and Details were observed in headless Edge; 40 isolated P0 tests pass. No physical-phone run or complete public six-story journey was recorded. |
-| Account save, later login, A/B isolation and actionable server refusal | **Local only.** The disposable PostgreSQL UI journey passes; the public account probe stopped before persistence/isolation and did not establish a duplicate-email server refusal through the UI. |
-| Search, Similar, ratings/reranking, explanation, Watchlist/reset, sorting/filtering/pagination, return context, themes and responsive navigation | **Partial.** Focused automated tests and prior source evidence exist, but the complete public browser matrix and real phone checks were not run on one identified deployed SHA. |
-| Real media and US/GB/SG providers, safe movie-specific TMDb link, nullable/stale/fallback states, selector storage/races and attribution | **Blocked.** The public DTO/UI lacks regional-provider fields and controls. Local current-source fixtures and focused frontend tests pass but cannot accept the public candidate. |
-| PostgreSQL 18 migration/API/concurrency/target-override and T06 recovery | **Local checks pass** with zero DB skips and prior real Neon recovery evidence; the public target's migration is old and its deployed SHA is unknown. |
-| Local business-rule mutation and restored green | **Done.** The 5→6 genre limit mutation produced the expected failure; exact-byte restore passed. |
-| Two M3/current comparisons and five-person 12-minute demo | **Prepared, not rehearsed.** The second current image is a labelled local synthetic source render; speaker ownership and timed team rehearsal remain open. |
-| PO acceptance and eligible independent review | **Not recorded.** Issue #254 remains open; there is no T07 PR or review yet. |
+```powershell
+.\.venv\Scripts\python.exe -m pytest -q
+node --test frontend/scripts/s5-t07-contract.node-test.mjs
+.\.venv\Scripts\python.exe scripts/verify_s5_t07_mutation.py
+npm.cmd --prefix frontend test -- src/tests/movie-watch-providers.test.tsx src/tests/movie-detail-acceptance.test.tsx src/tests/movie-detail-rating.test.tsx src/tests/movie-detail-return.test.tsx src/tests/movie-backdrop.test.tsx src/tests/auth-catalogue-handoff.test.tsx src/tests/movie-trailer.test.tsx src/tests/watchlist.test.tsx src/tests/list-context-invalidation.test.tsx
+npm.cmd --prefix frontend run lint
+npm.cmd --prefix frontend run build
+```
 
-## Two authentic M3/current UI comparisons
+Read-only public probe (currently expected to exit **1** because the candidate is not deployed):
 
-1. [M3 Home](../s3-m3-p0-handoff/latest/live/live-first-screen.png) → [current public Home](public-home-desktop.png). The old first screen placed navigation as a set of buttons beside a plain catalogue. The current screen has an explicit Home header, separate Start/Explore actions, catalogue sort and poster cards. The current public Home is real deployed UI, but it is still missing the T05 release on Details.
-2. [M3 Details](../s3-t28-backdrop-acceptance/live/live-1280.png) → [current local Details](local-detail-desktop.png). The old view foregrounded the backdrop and basic metadata. The current source adds the regional availability section beside existing trailer/rating/Watchlist areas. This is a **layout comparison**: the M3 image uses a real imported movie, whereas the local current image uses a synthetic movie with no poster/backdrop.
+```powershell
+$env:S5_T07_PUBLIC_URL = 'https://cineai-o9tf.onrender.com'
+$env:S5_T07_PROBE_LABEL = 'public-current'
+node frontend/scripts/s5-t07-public-probe.mjs
+```
 
-The defended design choice is a Country selector inside each movie's availability block: country is visible next to the groups and URL, and the frontend keys results by movie and country so rapid switches cannot display a previous movie's link under the new label. The focused frontend suite exercises storage fallback, request races, invalid/missing/stale URLs, logo fallback, keyboard and theme behavior. The lesson from this run is that green source CI cannot establish a public release: checking the deployed DTO and migration exposed a version gap immediately. The plan is to deploy the reviewed source, verify its exact Render SHA/schema, then repeat the public UI/data checks.
+Output defaults to ignored `.venv/t07ops/results`, so a repeat does not overwrite committed historical evidence. `S5_T07_OUTPUT_DIR` overrides it. The expected head is derived from the source Alembic chain; an intentional override uses `S5_T07_EXPECTED_HEAD` and must match the reviewed candidate. `S5_T07_MOVIES_FILE` can supply another trusted `{ "movies": [{ "id": "opaque DB id", "sourceId": "numeric TMDb id" }] }` map. If selecting `S5_T07_MOVIE_ID`, select a movie reachable on Home's first page; otherwise discovery uses its first visible movie.
 
-## Twelve-minute rehearsal card (not yet rehearsed)
+Opt-in account probe **writes only its two synthetic app accounts**, including reset/removal. Use an ignored private file; never use a member's or instructor's account. On first use, enable account creation once; later runs reuse the same file and do not create more users:
 
-| Time | Speaker slot and action |
-| --- | --- |
-| 0:00–1:00 | Member 1: candidate SHA, two M3/current comparisons, owned PR/test/rule. |
-| 1:00–6:00 | Member 2: Home → six P0 journeys, actionable refusal, account A/B persistence; explain owned PR/test/rule. |
-| 6:00–8:00 | Member 3: US/GB/SG selector, exact TMDb movie/country link, missing/stale fallback and original-tab context; owned PR/test/rule. |
-| 8:00–10:00 | Member 4: PostgreSQL 18, health/source identity, T06 restart/recovery and focused red/green; owned PR/test/rule. |
-| 10:00–12:00 | Member 5: design choice, lesson, remaining risk/plan and PO decision; owned PR/test/rule. |
+```powershell
+$env:S5_T07_ALLOW_PUBLIC_WRITES = '1'
+$env:S5_T07_ACCOUNTS_FILE = '.venv/t07ops/public-accounts.private.json'
+$env:S5_T07_CREATE_ACCOUNTS = '1' # first use only
+node frontend/scripts/s5-t07-public-accounts.mjs
+Remove-Item Env:S5_T07_CREATE_ACCOUNTS
+```
 
-Assign the five real members and their actual merged PRs before rehearsal. The speaking plan has **not** been timed with the team.
+For an already running isolated local app, set `S5_T07_PUBLIC_URL=http://127.0.0.1:8507`, `S5_T07_PROBE_LABEL=local-current` and a **different** ignored accounts file. Local server preparation/private archives are not deliverables in Git. These probes are diagnostics, not a substitute for the entire issue: `fullIssueAcceptance` stays false: these probes do not grant issue acceptance; the separate checklist records deployed identity and human decisions.
 
-## Required before acceptance/PR closure
+## Remaining acceptance and handoff
 
-- Deploy the reviewed candidate to the supplied public origin and obtain the actual Render deployed SHA. Confirm it matches a green reviewed source, `/health` migration is at the current head, and imported regional records are present. Recheck all US/GB/SG Details DTOs, exact movie/country URLs, groups, nullable/no-data/stale/invalid cases and new-tab/original-tab behavior against genuine data plus labelled deterministic fixtures.
-- Run all six P0 journeys from Home in a private laptop browser **and physical phone**, including real account persistence, an actionable server refusal, Search/Similar, ratings, Watchlist/reset, media, themes, pagination and responsive navigation. Reproduce affected T03/T06 recovery checks on the deployed candidate. Record devices, browsers, timestamps and source identity.
-- Rehearse the five speaking sections with all members, collect actual PO acceptance and an eligible independent substantive review. Record the instructor-selected P0 mapping and actual results. No approval, deployment identity or rehearsal is inferred from this preparation.
+- Deploy the reviewed **green main** candidate with the regional migration/import through the actual CineAI operators. Record Render deployed SHA and matching CI/head; do not infer SHA from schema alone. Back up first and coordinate migration/deployment because old code requires its own exact head. Re-run the public probe and affected journeys against the new candidate.
+- Reuse [T03](../../s5-t03-deployment.md), [T05](../s5-t05-regional-ui.md) and [T06](../s5-t06-recovery/README.md). The isolated 17-case recovery/integration pass does not replace T06's pending durable backup/operator access/independent reproduction. Confirm the operational handoff, then reproduce affected checks without destructive production rehearsal.
+- [Physical-phone, candidate acceptance and timed-demo checklist](completion-checklist.md): record real devices/browsers/dates, all six public P0 journeys, regional/media/context checks and remaining human decisions. Emulation is clearly labelled.
+- Link null, invalid, stale, missing-provider, invalid storage/logo and race cases reuse [T05's 42-case suite](../s5-t05-regional-ui.md#automated-verification) and labelled fixtures. Current real US/GB/SG API/UI/popup checks pass locally; they remain blocked on public. Do not require all real movies to have providers or trailers.
+- PO has **not** accepted this candidate. PR #265 exists; an earlier `oke` approval is not substantive acceptance. Kiệt is contributing this completion, so a fresh substantive pre-merge review must come from a non-contributor (coordinator Huy or another eligible member).
+- Keep `Refs #254` while any acceptance item is incomplete. T07 does **not** wait for T08; send this factual handoff to T08/C02. Final `v1.0` promotion/submission remains C02, without PDF/export tooling in Git.
+
+## Two authentic M3/current comparisons and demo material
+
+1. [M3 Home](../s3-m3-p0-handoff/latest/live/live-first-screen.png) → [current public Home](public-current-home-desktop.png): button-heavy plain catalogue versus shared navbar, Start/Explore, poster cards and catalogue sorting.
+2. [M3 Details](../s3-t28-backdrop-acceptance/live/live-1280.png) → [current local Details with an actual imported TMDb movie](local-current-detail-desktop.png): basic metadata/backdrop versus embedded-trailer control, rating/Watchlist and regional availability. The current screenshot is local, not a claim that regional providers are publicly deployed.
+
+Design choice: the market selector sits next to the groups/action; movie+country identify requests so another region's late response cannot appear under the final label. Lesson: source CI was green while the public DTO/schema was old, so always check both. Risk: a migration ahead of compatible running code makes exact-head health fail; plan a coordinated backed-up rollout and rehearse compatibility. The five-person 1/5/2/2/2-minute allocation is in the checklist and is **not yet rehearsed**.
+
+Historical initial records (`public-probe.json`, `local-probe.json`, `public-accounts.json`, `local-accounts.json` and unprefixed screenshots) remain unchanged. Their local `movie-a`/`movie-b` scenes were explicitly synthetic; current prefixed evidence supersedes those observations using the real restored catalogue.
