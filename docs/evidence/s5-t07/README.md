@@ -1,6 +1,6 @@
 # S5-T07 public acceptance and M5 demo
 
-Refs [#254](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/254), PR [#265](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/265). Updated **11 November 2026**, Asia/Saigon. **T07 is not accepted/closed.** The application source remains main `50aa9ad4fccc63f5d7ef8186bb296ed12f0d18ee`; this PR changes acceptance tooling/evidence, not application behaviour. The JSON source-commit field identifies the checkout used for a run; [script hashes](current-local-environment.json) identify the tested verifier bytes before their commit.
+[T07 #254](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/254), PR [#265](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/265). Updated **11 November 2026**, Asia/Saigon. The PO amended T07 to deliver acceptance tooling, actual technical evidence and the final execution checklist; **C02 #256 now owns all unexecuted public/device/demo/PO acceptance**. PR #265 may close #254 only after green checks, substantive independent formal approval and merge. Neither that closure nor the checks below certify final M5 acceptance. The application source remains main `50aa9ad4fccc63f5d7ef8186bb296ed12f0d18ee`; this PR changes acceptance tooling/evidence, not application behaviour. The JSON source-commit field identifies the checkout used for a run; [script hashes](current-local-environment.json) identify the tested verifier bytes before their commit.
 
 ## Current result and release blocker
 
@@ -12,7 +12,7 @@ Refs [#254](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/254), PR [#2
 | Existing public features | Home sort/page/return, Search, Similar and trailer embed opening pass. Search `the`: **329 matches**, 10 on pages 1/2, no duplicate IDs; no total-results cap of 10 | Same public JSON. Video playback itself was not asserted; YouTube/video/network restrictions are external |
 | Account UI journeys, local **and public** | **8/8 pass** using two reusable synthetic accounts per target: create/login, real duplicate HTTP **409** + actionable UI, preferences, 4.5 rating, reload/later login, ranking metadata, filtering/paging/return, A/B isolation, cancel/reset-keeps-Watchlist and removal | [Local](current-local-accounts.json), [public](current-public-accounts.json) |
 | Recommendation filtering on both targets | 353 eligible results; Comedy filter 47 results/5 pages, correct genre membership, preferences unchanged; Details returns to retained page/filter | Account JSON above |
-| Render identity/access | Connector exposes workspace `abc` with a group-04 service, not CineAI. Browser-control initialization also failed (`kernel assets`, OS error 3). No Render settings, deploy, restart or public migration was performed; deployed SHA is **unverified** | Confirm actual CineAI Deploy Details before acceptance |
+| Render identity/access at the original probe | Connector originally exposed workspace `abc` with a group-04 service; browser-control initialization failed (`kernel assets`, OS error 3). After reconnection, T08 verified correct **My Workspace**, CineAI service `srv-dbp96kp42hec73bv94j0`, live SHA `f24ef54699efb2fa26f363107bd31401f9b12e58`. The regional candidate is still not deployed | [Authenticated T08 follow-up, PR #264](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/264). No deploy, migration or service configuration change is claimed |
 | Physical phone, team rehearsal, PO acceptance | **Pending.** User confirmed no rehearsal or PO acceptance yet; no physical phone is connected to the agent | [Completion checklist](completion-checklist.md) |
 
 A 200 health response validates the old running code/database pair; it does not prove that the new regional release is deployed. Do not downgrade or change the expected head just to make this gate green.
@@ -68,16 +68,21 @@ node frontend/scripts/s5-t07-public-accounts.mjs
 Remove-Item Env:S5_T07_CREATE_ACCOUNTS
 ```
 
-For an already running isolated local app, set `S5_T07_PUBLIC_URL=http://127.0.0.1:8507`, `S5_T07_PROBE_LABEL=local-current` and a **different** ignored accounts file. Local server preparation/private archives are not deliverables in Git. These probes are diagnostics, not a substitute for the entire issue: `fullIssueAcceptance` stays false: these probes do not grant issue acceptance; the separate checklist records deployed identity and human decisions.
+For an already running isolated local app, set `S5_T07_PUBLIC_URL=http://127.0.0.1:8507`, `S5_T07_PROBE_LABEL=local-current` and a **different** ignored accounts file. Local server preparation/private archives are not deliverables in Git. These probes are diagnostics, not final public/M5 acceptance. The historical output field `fullIssueAcceptance` stays false; the scope amendment does not rewrite any recorded result. C02 executes the separate checklist and records deployed identity and human decisions.
 
-## Remaining acceptance and handoff
+## Final acceptance handed to C02 #256
+
+On 11 November the PO requested closure of T07/T08 at their reviewed delivery
+merges and completion of the Sprint under C02. The following requirements are
+preserved, assigned to C02 and remain **Pending**, rather than being waived or
+reported as passed. T07 owner Nguyễn Tuấn Anh assists SM5 with execution.
 
 - Deploy the reviewed **green main** candidate with the regional migration/import through the actual CineAI operators. Record Render deployed SHA and matching CI/head; do not infer SHA from schema alone. Back up first and coordinate migration/deployment because old code requires its own exact head. Re-run the public probe and affected journeys against the new candidate.
 - Reuse [T03](../../s5-t03-deployment.md), [T05](../s5-t05-regional-ui.md) and [T06](../s5-t06-recovery/README.md). The isolated 17-case recovery/integration pass does not replace T06's pending durable backup/operator access/independent reproduction. Confirm the operational handoff, then reproduce affected checks without destructive production rehearsal.
 - [Physical-phone, candidate acceptance and timed-demo checklist](completion-checklist.md): record real devices/browsers/dates, all six public P0 journeys, regional/media/context checks and remaining human decisions. Emulation is clearly labelled.
 - Link null, invalid, stale, missing-provider, invalid storage/logo and race cases reuse [T05's 42-case suite](../s5-t05-regional-ui.md#automated-verification) and labelled fixtures. Current real US/GB/SG API/UI/popup checks pass locally; they remain blocked on public. Do not require all real movies to have providers or trailers.
 - PO has **not** accepted this candidate. PR #265 exists; an earlier `oke` approval is not substantive acceptance. Kiệt is contributing this completion, so a fresh substantive pre-merge review must come from a non-contributor (coordinator Huy or another eligible member).
-- Keep `Refs #254` while any acceptance item is incomplete. T07 does **not** wait for T08; send this factual handoff to T08/C02. Final `v1.0` promotion/submission remains C02, without PDF/export tooling in Git.
+- PR #265 uses `Closes #254` for the amended technical/readiness scope. Green checks and a substantive independent pre-merge approval remain mandatory. C02 keeps `Refs #256` until its final public/device/demo/PO, operations, release and submission criteria are fulfilled; no PDF/export tooling enters Git.
 
 ## Two authentic M3/current comparisons and demo material
 

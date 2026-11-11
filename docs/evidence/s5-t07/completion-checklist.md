@@ -1,8 +1,15 @@
-# T07 final candidate, phone and demo checklist
+# C02 final candidate, phone and demo checklist supplied by T07
 
 All items below are **Pending** until the named person records the actual result.
 On 11 November the PO confirmed that rehearsal and public acceptance have not
 happened. Headless mobile emulation has run; no physical phone was connected.
+
+**Ownership amendment, 11 November:** the PO assigns execution and final sign-off
+to [C02 #256](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/256), SM5
+@kietxuan, assisted by the named operators/T07 owner. T07 closes at its reviewed
+technical-delivery merge; it supplies this checklist without claiming these
+future results. C02 cannot close until the requirements and actual evidence
+below are fulfilled. No milestone criterion is removed.
 
 ## 1. Operator handoff
 
@@ -45,11 +52,11 @@ confirm the specific test/rule they can explain.
 
 | Time | Member and owned PR | Demonstration |
 | --- | --- | --- |
-| 0:00–1:00 | Kiệt — [Planning #257](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/257) | URL/SHA, two M3/current comparisons, P0 entry map |
-| 1:00–6:00 | Nguyễn Tuấn Anh — [Neon #259](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/259), T07 #265 | Live P0 journeys, server refusal and account persistence/isolation; owned test/rule |
-| 6:00–8:00 | Huy — [regional UI #263](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/263) | Selector, safe TMDb action, fallback and retained original tab |
-| 8:00–10:00 | Hoàng — [recovery #262](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/262) | PostgreSQL 18/recovery, source identity, local red/green |
-| 10:00–12:00 | Trần Tuấn Anh — [deploy #260](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/260), [providers #261](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/261) | Pipeline/health, design choice, real lesson and risk/plan |
+| 0:00–1:00 | Kiệt — [Planning #257](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/257) | Problem/persona, time saved and all P0 stories |
+| 1:00–6:00 | Nguyễn Tuấn Anh — [Neon #259](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/259), T07 #265 | Private-window public P0 journeys, server refusal, create/reload persistence and two authentic M3/current UI comparisons |
+| 6:00–8:00 | Huy — [regional UI #263](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/263) | Green tests; testing.md normal/refusal/both boundaries; local mutation red and restored-green. Explain the actual test/rule; do not claim authorship of T07 tooling |
+| 8:00–10:00 | Hoàng — [recovery #262](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/262) | Latest green-main Actions, protected branch, merge/deploy/rollback, health and one defended design decision |
+| 10:00–12:00 | Trần Tuấn Anh — [deploy #260](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/260), [providers #261](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/261) | One actual lesson (happened/changed/next time), one known risk/plan; prepare owned code for individual questions |
 
 - [ ] Record rehearsal date, participants, actual durations, problems and fixes.
 - [ ] Map the instructor-selected P0 to normal/refusal/boundary cases in [testing.md](../../testing.md#2-test-cases-for-every-p0-story). S01 is prepared: 1/5 accepted, 0/6 refused; the local 5→6 mutation turns the six-genre test red, then restores green. Do not claim the instructor chose S01 until that happens.
@@ -63,10 +70,11 @@ confirm the specific test/rule they can explain.
 | PO/date, accepted AC and unresolved defects | Pending |
 | Physical-phone/private-laptop evidence | Pending |
 | Five-person timed rehearsal | Pending |
-| Non-contributing reviewer's substantive Review changes and approval | Pending |
+| C02 non-contributing reviewer's substantive Review changes and approval | Pending |
 
-Kiệt contributes the completion commit; his previous short approval cannot be
-the independent final review. Huy coordinates an eligible reviewer. Keep
-`Refs #254` until the results are recorded, then close through the reviewed
-merge. T07 hands results to T08/C02 and does not wait for the final dossier,
-`v1.0` promotion or manual PDF/LMS submission.
+Kiệt contributes T07's completion commit; his previous short approval cannot be
+its independent final review. Huy coordinates an eligible reviewer before PR
+#265 merges with `Closes #254`. That technical-delivery review is separate from
+C02's eventual PO decision and final wrap-up review. C02 uses `Refs #256` while
+the actual checklist, monitoring/protection/recovery handoff, exact-SHA `v1.0`
+promotion and manual PDF/LMS submission remain outstanding.
