@@ -225,6 +225,9 @@ jobs:
       - name: Lint frontend
         run: npm --prefix frontend run lint
 
+      - name: Verify regional watch-provider UI
+        run: npm --prefix frontend test -- src/tests/movie-watch-providers.test.tsx
+
       - name: Build frontend
         run: npm --prefix frontend run build
 
@@ -232,7 +235,7 @@ jobs:
         if: always()
         run: |
           echo "### Frontend validation scope" >> "$GITHUB_STEP_SUMMARY"
-          echo "Lint and build are automatic; see their step results above." >> "$GITHUB_STEP_SUMMARY"
+          echo "Lint, focused regional-provider UI tests and build are automatic; see their step results above." >> "$GITHUB_STEP_SUMMARY"
           echo "Optional full Vitest and browser regressions: not run. Dispatch Optional extended regression or the individual feature workflows to run them." >> "$GITHUB_STEP_SUMMARY"
 
 

@@ -80,7 +80,7 @@ function Results({ availability, country }: { availability: Availability; countr
         : `Viewing availability is not available for ${name}.`;
   }
   return <>
-    {status === "stale" && groups.length > 0 ? <p className="provider-warning" role="note">
+    {status === "stale" ? <p className="provider-warning" role="note">
       Showing the last successful check{checked ? ` on ${checked}` : ""}. The latest refresh failed,
       so this may be out of date.</p> : null}
     {message ? <p className="provider-message muted">{message}</p> : null}

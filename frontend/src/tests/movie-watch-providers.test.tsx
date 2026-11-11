@@ -312,6 +312,27 @@ describe("S5-T05 regional watch providers", () => {
     expect(screen.getByRole("link", { name: /View watch options/ })).toBeVisible();
   });
 
+  it.each([null, link("movie-a", "US")])(
+    "warns about an empty stale snapshot with watch URL %s",
+    async (watchUrl) => {
+      installApi((id, country) => json(movieBody(id, {
+        ...success(country, []), status: "stale",
+      }, watchUrl)));
+      renderDetail();
+
+      const warning = await screen.findByRole("note");
+      expect(warning).toHaveTextContent("Showing the last successful check on 10 Nov 2026.");
+      expect(warning).toHaveTextContent("The latest refresh failed");
+      expect(screen.getByText("Viewing availability is not available for United States.")).toBeVisible();
+      expect(within(section()).queryAllByRole("listitem")).toHaveLength(0);
+      if (watchUrl) {
+        expect(screen.getByRole("link", { name: /View watch options/ })).toHaveAttribute("href", watchUrl);
+      } else {
+        expect(screen.queryByRole("link", { name: /View watch options/ })).not.toBeInTheDocument();
+      }
+    },
+  );
+
   it("renders every group in order with validated logos and keeps names when a logo breaks", async () => {
     installApi((id, country) => json(movieBody(id, {
       country, status: "success", attemptedAt: null, checkedAt: "2026-11-10T10:00:01Z",
