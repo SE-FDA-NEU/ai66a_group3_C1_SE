@@ -1,0 +1,189 @@
+{
+  "source": "3ee9d76335689ad5247f0d644722dc5be96b4a96",
+  "verifiedAtUtc": "2026-11-11T05:15:15.645Z",
+  "timeZone": "Asia/Saigon",
+  "database": "cineai_development",
+  "data": "real imported Neon catalogue",
+  "browser": "157.0.8103.39",
+  "checks": [
+    {
+      "movie": "2626f71e-8458-491c-a1f4-c2017d8f684b",
+      "country": "US",
+      "status": "success",
+      "membershipCount": 11,
+      "linkPresent": true
+    },
+    {
+      "movie": "2626f71e-8458-491c-a1f4-c2017d8f684b",
+      "country": "GB",
+      "status": "success",
+      "membershipCount": 11,
+      "linkPresent": true
+    },
+    {
+      "movie": "2626f71e-8458-491c-a1f4-c2017d8f684b",
+      "country": "SG",
+      "status": "success",
+      "membershipCount": 1,
+      "linkPresent": true
+    },
+    {
+      "movie": "2626f71e-8458-491c-a1f4-c2017d8f684b",
+      "country": "SG",
+      "status": "success",
+      "membershipCount": 1,
+      "linkPresent": true
+    },
+    {
+      "movie": "311ba592-b894-4a79-be34-186d6cb03a0d",
+      "country": "SG",
+      "status": "no_data",
+      "membershipCount": 0,
+      "linkPresent": false
+    },
+    {
+      "movie": "311ba592-b894-4a79-be34-186d6cb03a0d",
+      "country": "US",
+      "status": "success",
+      "membershipCount": 7,
+      "linkPresent": true
+    },
+    {
+      "movie": "311ba592-b894-4a79-be34-186d6cb03a0d",
+      "country": "GB",
+      "status": "success",
+      "membershipCount": 7,
+      "linkPresent": true
+    },
+    {
+      "width": 375,
+      "theme": "dark",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 375,
+      "theme": "light",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 1280,
+      "theme": "dark",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 1280,
+      "theme": "light",
+      "horizontalOverflow": false
+    },
+    {
+      "movie": "311ba592-b894-4a79-be34-186d6cb03a0d",
+      "country": "US",
+      "status": "success",
+      "membershipCount": 7,
+      "linkPresent": true
+    }
+  ],
+  "screenshots": [
+    {
+      "file": "providers-375-dark.png",
+      "sha256": "e6890a0cf934354551715a18a7ef85dbb33d29cdfd4b743c1fe9fee605f35c08",
+      "dataKind": "real stored Neon provider data"
+    },
+    {
+      "file": "providers-375-light.png",
+      "sha256": "6443415410bbdbef23581694158c9f7043d76ae882374444b084a30738505d9f",
+      "dataKind": "real stored Neon provider data"
+    },
+    {
+      "file": "providers-768-dark.png",
+      "sha256": "40aba432482be07919b2ead46dc6c14a952fba1c3d304f86db877ebbfe64e048",
+      "dataKind": "real stored Neon provider data"
+    },
+    {
+      "file": "providers-768-light.png",
+      "sha256": "7259b9c909e1172a29a5d0796c291c7e093d8235f5d7b1e7c99baddac5b1a74f",
+      "dataKind": "real stored Neon provider data"
+    },
+    {
+      "file": "providers-1280-dark.png",
+      "sha256": "2912e44f1254ae274033e02abf6debb270b2b454b2f92176964ce3c37c061b44",
+      "dataKind": "real stored Neon provider data"
+    },
+    {
+      "file": "providers-1280-light.png",
+      "sha256": "8af63f0b45a92e41c6b664221c101751f1b789f123fd7732b5b078d161b7d1c3",
+      "dataKind": "real stored Neon provider data"
+    },
+    {
+      "file": "stale-empty-with-link.png",
+      "sha256": "024b27cd1e8a06cddaade0725410c14905ecfcb2901109e925deb8ad71a9bdac",
+      "dataKind": "synthetic stale response"
+    },
+    {
+      "file": "stale-empty-no-link.png",
+      "sha256": "435130c0eba92387149e62e72f092309db962edb5fbff217d0bfbebbacb22008",
+      "dataKind": "synthetic stale response"
+    }
+  ],
+  "syntheticChecks": [
+    {
+      "fixture": "stale provider response overlay; database unchanged",
+      "country": "GB",
+      "groups": 0,
+      "withLink": true,
+      "warningVisible": true
+    },
+    {
+      "fixture": "stale provider response overlay; database unchanged",
+      "country": "GB",
+      "groups": 0,
+      "withLink": false,
+      "warningVisible": true
+    }
+  ],
+  "health": {
+    "status": "ok",
+    "database": "connected",
+    "migrationVersion": "d9a6f2c1e508"
+  },
+  "catalogue": {
+    "count": 10,
+    "limit": 10,
+    "page": 1,
+    "total": 989,
+    "totalPages": 99,
+    "unfilteredTotal": 989,
+    "catalogueRevision": "1ee08003-bc00-4888-b35c-8c6cbe599062"
+  },
+  "keyboardSelection": true,
+  "newTabPreservesOriginalRoute": true,
+  "corruptCountryFallsBackToUS": true,
+  "allPassed": true,
+  "environment": "Local production build served by FastAPI against real Neon PostgreSQL",
+  "apiRole": "cineai_runtime",
+  "tmdbMetadataNetworkingDisabled": true,
+  "externalPage": "TMDb target URL/new-tab behavior verified with controlled external HTML",
+  "automated": {
+    "providerCases": 42,
+    "affectedCases": 128,
+    "testFiles": 9,
+    "redBeforeFix": 2,
+    "lint": "passed",
+    "productionBuild": "passed"
+  },
+  "remainingAcceptance": [
+    "Independent substantive formal review and approval on the final candidate",
+    "Protected-main merge"
+  ],
+  "serverBinding": "loopback-only review process"
+}

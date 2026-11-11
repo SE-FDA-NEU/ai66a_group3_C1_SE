@@ -150,7 +150,7 @@ function installFakeServer() {
       );
     }
     if (method === "GET" && url.startsWith("/api/movies/")) {
-      const movie = movies.find((m) => `/api/movies/${m.id}` === url);
+      const movie = movies.find((m) => `/api/movies/${m.id}?country=US` === url);
       return Promise.resolve(
         movie
           ? json({

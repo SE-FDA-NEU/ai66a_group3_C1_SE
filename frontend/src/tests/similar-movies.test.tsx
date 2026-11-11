@@ -54,7 +54,7 @@ function installApi(handlers: Record<string, Handler>) {
 
 function movieRoutes(id: string) {
   return {
-    [`/api/movies/${id}`]: () => json({ data: { movie: detail(id) } }),
+    [`/api/movies/${id}?country=US`]: () => json({ data: { movie: detail(id) } }),
   };
 }
 

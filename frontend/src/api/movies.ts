@@ -14,7 +14,22 @@ export type MovieSummary = {
   backdropUrl?: string | null;
 };
 
+export type WatchCountry = "US" | "GB" | "SG";
+export type ProviderGroupKey = "flatrate" | "rent" | "buy" | "free" | "ads";
+export type WatchProvider = { id: number; name: string; logoUrl: string | null };
+export type ProviderStatus = "not_checked" | "success" | "no_data" | "error" | "stale";
+export type MovieProviders = {
+  country: string;
+  status: ProviderStatus;
+  attemptedAt: string | null;
+  checkedAt: string | null;
+  groups: Partial<Record<ProviderGroupKey, WatchProvider[]>>;
+};
+
 export type MovieDetail = MovieSummary & {
+  // Regional availability for the requested country. Older deployments omit it.
+  providers?: MovieProviders | null;
+  watchOptionsUrl?: string | null;
   overview: string | null;
   voteAverage: number | null;
   voteCount: number | null;
@@ -159,8 +174,11 @@ export async function listPopularMovies(limit = 10): Promise<MovieSummary[]> {
   return body.data.movies;
 }
 
-export async function getMovie(movieId: string): Promise<MovieDetail> {
-  const response = await fetch(`/api/movies/${encodeURIComponent(movieId)}`);
+export async function getMovie(
+  movieId: string, country: WatchCountry = "US", signal?: AbortSignal,
+): Promise<MovieDetail> {
+  const path = `/api/movies/${encodeURIComponent(movieId)}?country=${country}`;
+  const response = await (signal ? fetch(path, { signal }) : fetch(path));
 
   if (!response.ok) {
     throw await readError(response);

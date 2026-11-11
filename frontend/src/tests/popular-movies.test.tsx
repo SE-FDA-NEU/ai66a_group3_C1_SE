@@ -152,7 +152,7 @@ describe("S3-T20 public popular-movie page", () => {
       const url = String(input);
       if (url === "/api/auth/me") return jsonResponse({ error: { code: "AUTHENTICATION_REQUIRED" } }, 401);
       if (url.startsWith("/api/movies/popular?")) return jsonResponse(movieListResponse([selectedMovie]));
-      if (url === `/api/movies/${selectedMovie.id}`) return jsonResponse({
+      if (url === `/api/movies/${selectedMovie.id}?country=US`) return jsonResponse({
           data: {
             movie: {
               ...selectedMovie,
@@ -176,7 +176,7 @@ describe("S3-T20 public popular-movie page", () => {
 
     expect(window.location.pathname).toBe(`/movies/${selectedMovie.id}`);
     expect(await screen.findByText("Popular movie detail.")).toBeInTheDocument();
-    expect(fetchMock).toHaveBeenCalledWith(`/api/movies/${selectedMovie.id}`);
+    expect(fetchMock).toHaveBeenCalledWith(`/api/movies/${selectedMovie.id}?country=US`);
   });
 
   it("does not overwrite preferences when a signed-in viewer opens the page", async () => {

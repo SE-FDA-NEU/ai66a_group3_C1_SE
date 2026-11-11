@@ -225,7 +225,7 @@ describe("S3-T36 popularity on the movie-details page", () => {
       const url = String(input);
       if (url === "/api/auth/me") return json({ error: { code: "AUTHENTICATION_REQUIRED" } }, 401);
       if (url === "/api/movies/popular?limit=10") return json(listBody([selected]));
-      if (url === "/api/movies/a") return json(detailBody(selected));
+      if (url === "/api/movies/a?country=US") return json(detailBody(selected));
       return Promise.reject(new Error(`Unexpected request: ${url}`));
     });
 
@@ -266,7 +266,7 @@ describe("S3-T36 popularity on the movie-details page", () => {
     vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
       const url = String(input);
       requests.push(url);
-      if (url === "/api/movies/a") return json(detailBody(movie("a", "Movie A", 80)));
+      if (url === "/api/movies/a?country=US") return json(detailBody(movie("a", "Movie A", 80)));
       if (url === "/api/auth/me") {
         return json({ data: { user: { id: "user-1", email: "v@example.com" } } });
       }
@@ -292,7 +292,7 @@ describe("S3-T36 popularity on the movie-details page", () => {
     vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
       const url = String(input);
       requests.push(url);
-      if (url === "/api/movies/a") return json(detailBody(movie("a", "Movie A", 95)));
+      if (url === "/api/movies/a?country=US") return json(detailBody(movie("a", "Movie A", 95)));
       return json({ error: { code: "AUTHENTICATION_REQUIRED" } }, 401);
     });
 

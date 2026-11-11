@@ -218,7 +218,7 @@ describe("S4-T04 save-to-rerank journey", () => {
         return json({ data: { user: { id: "account-a", email: "a@example.com" } } });
       if (requested === "/api/genres") return json({ data: { genres: [action, comedy] } });
       if (requested.startsWith("/api/me/recommendations")) return json(recommendations(requested));
-      if (requested === "/api/movies/movie-a") return json({ data: { movie: detail } });
+      if (requested === "/api/movies/movie-a?country=US") return json({ data: { movie: detail } });
       if (requested === "/api/me/watchlist/movie-a")
         return json({ data: { movieId: "movie-a", inWatchlist: false } });
       if (requested === "/api/me/ratings/movie-a") {

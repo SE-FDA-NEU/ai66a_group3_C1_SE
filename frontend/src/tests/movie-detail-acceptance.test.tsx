@@ -114,7 +114,7 @@ function installServer(options?: {
       });
     }
     if (method === "GET" && url.startsWith("/api/movies/")) {
-      const movieId = decodeURIComponent(url.slice("/api/movies/".length));
+      const movieId = decodeURIComponent(url.slice("/api/movies/".length).split("?")[0]);
       const movie = movies.find((candidate) => candidate.id === movieId);
 
       if (!movie || state.unavailableMovieIds.has(movieId)) {
