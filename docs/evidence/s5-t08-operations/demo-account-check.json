@@ -1,0 +1,48 @@
+{
+  "checkedAt": "2026-11-11T10:50:10.694158+00:00",
+  "target": "https://cineai-o9tf.onrender.com",
+  "account": "PO-approved application-only demo account; values intentionally published in README",
+  "requests": [
+    {
+      "label": "health",
+      "status": 200,
+      "elapsedMs": 49724.59,
+      "requestId": "req_61966bba966d4324b68440628c4b7de2"
+    },
+    {
+      "label": "demo-login",
+      "status": 200,
+      "elapsedMs": 1447.33,
+      "requestId": "req_83c02eca19744d91923968e1f3518cff"
+    },
+    {
+      "label": "demo-session",
+      "status": 200,
+      "elapsedMs": 100.4,
+      "requestId": "req_1cd09a006cfa4a7484e2c65666bba4b0"
+    },
+    {
+      "label": "demo-logout",
+      "status": 204,
+      "elapsedMs": 104.52,
+      "requestId": "req_49da2334331841cca405b4d94613c30c"
+    },
+    {
+      "label": "logout-refusal",
+      "status": 401,
+      "elapsedMs": 91.58,
+      "requestId": "req_b84c0eb371004435b90df5a6dfb4e191"
+    }
+  ],
+  "health": {
+    "status": "ok",
+    "database": "connected",
+    "migrationVersion": "a3d1f8b72c44"
+  },
+  "loginPass": true,
+  "sessionPass": true,
+  "logoutPass": true,
+  "logoutRefused": true,
+  "allPass": true,
+  "finishedAt": "2026-11-11T10:51:02.524977+00:00"
+}

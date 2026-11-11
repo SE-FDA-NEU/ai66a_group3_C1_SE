@@ -1,0 +1,40 @@
+{
+  "verifiedAt": "2026-11-11T11:15:24.958504+00:00",
+  "verifiedBy": "Codex automated documentation/command/data checks, not independent teammate approval",
+  "prBaseCommit": "7d7df28be784c6e861ea4e5bb022606e54313248",
+  "mainBaseline": "50aa9ad4fccc63f5d7ef8186bb296ed12f0d18ee",
+  "checks": {
+    "setupMediaCliCases": 5,
+    "c01DocumentationCheck": "PASS",
+    "provisionAndComparatorHelp": "PASS",
+    "operationsSections": 6,
+    "operationsProseWordsOutsideTablesAndCode": 271,
+    "riskRows": 8,
+    "riskLayersMatchM5": true,
+    "maintenanceAreas": 6,
+    "lessons": 5,
+    "relativeFilesAndAnchors": "PASS",
+    "monitoringWindowRecalculation": "220 and 106 requests; all count/quantile values match",
+    "uiFourSectionsAndFrontMatterPreserved": true,
+    "noProductionDeploymentMigrationEnrichmentOrConfigurationChange": true
+  },
+  "hashFormat": "SHA-256, CRLF normalized to LF",
+  "sourceHashes": {
+    "README.md": "d7b5e53e044369b3a492520e5a68965c878a9ebe49d76382d937438b0d1cd55f",
+    "docs/SETUP.md": "99274cb23b021284e2e8c66cce9c00aaaf4a24806fa6a2b502860aba0c13bed1",
+    "docs/api.md": "fe45b4f94d5a6211f0cb7874b38087ec5a4c32bf637d7e9150a864114a6c1bf9",
+    "docs/architecture.md": "bd2bdc3c06f7a8b9cef88f510b94de491a61c5bfb2e73193f0280b57c4de3ae8",
+    "docs/design.md": "5010d7f2efbcea73ee8e771a69515dcc476e5ce5d23b536073e45f43fcc9aaf3",
+    "docs/evidence/s5-t08-operations/README.md": "6bad25a813ecd175a8e8d3dea9f738deae41b2b53f7c1a2e67f94f8840d8d78c",
+    "docs/evidence/s5-t08-operations/demo-account-check.json": "3f91c65ee2b2154b1d251260aa2d649def0d0771988e8efec024b1a6f1387ef2",
+    "docs/evidence/s5-t08-operations/github-protection.json": "34d6b904eb25a04ca283f9ab249d408c8e51b2b132bec911285fa3d2deda41ea",
+    "docs/evidence/s5-t08-operations/observations.json": "c4609cd8594412d81e1cbc2b9d44d0ece3b53c281cadd10773586e9340d571c9",
+    "docs/evidence/s5-t08-operations/request-samples.json": "f2d6af0e3008134d1a0afda652c1dc986df1232b8ac08ee1b566453ad37f2870",
+    "docs/operations.md": "26e647df76eae87ea1382b27ce88744f5685a4680fc57de041a71ff7cd4fb6ab",
+    "docs/s5-t03-deployment.md": "dc011d9bafae9ac43acfcf6bdcfff9fa47f60d201cba46ea6ff57169da4dbac5",
+    "docs/s5-t08-c02-handoff.md": "a9b6fe9729a07d047e6f046370aa2e32b11283d031c9c42577fc1773edb93bbb",
+    "docs/sprint-log.md": "3b7665908db5f89cc6c38f1611c5ee9e7b721e8f04b9c162448e28298ab27962",
+    "docs/sprint5-backlog-refinement.md": "8c38f8d69cc816871b91ba64806628f0354ef7066d1cf6c75c993b8d95322830",
+    "docs/ui.md": "42be32bcc14544a42346d4713aba3d648fc52ef2d81702941ad3d13e45de0fa8"
+  }
+}

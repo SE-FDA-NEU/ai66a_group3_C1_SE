@@ -7,17 +7,22 @@
 **Release 5 first screen** — Sprint 5, 5–12 November 2026. PO and Scrum Master
 (SM5): **@kietxuan**. The free Render service sleeps when idle, so the first
 request can take about a minute; this is not a guaranteed-uptime service.
-The public runtime currently serves the T03 build; the regional watch-provider
-selector is in `main` but is **not yet rolled out publicly**. Exact status is in
+The public runtime is verified at T03 commit `f24ef546` (11 November 2026);
+the regional watch-provider selector is in `main` but is **not yet rolled out publicly**.
+The PO is preparing a single coordinated release window. Exact status is in
 the [operations record](docs/operations.md#1-deployment-and-release).
 
-**Test accounts.** Anyone can use **Sign in → Create an account** on the public
-site (a disposable email and a password of at least eight characters). Shared
-application-only review accounts for the instructor are **not yet published**:
-the PO-approved login values must be added here, and only these app-only values,
-never a service password or token. The local-only review account in
-[SETUP](docs/SETUP.md#disposable-test-account-and-p0-journey) must not be used
-on the public deployment.
+**Public test account — application user (the only app role):**
+
+| Email | Password | Verified |
+| --- | --- | --- |
+| `kietxuan@gmail.com` | `123456789` | Public login/session/logout passed on 11 November 2026 |
+
+The PO approved publishing these **project-demo-only** values; they are not a
+Gmail, Render, Neon or GitHub password. This shared account's demo state may
+change. Use **Create account** with separate synthetic users for registration,
+cold-start and account-isolation checks. [Account evidence](docs/evidence/s5-t08-operations/demo-account-check.json)
+and [local/public provisioning](docs/SETUP.md#disposable-test-account-and-p0-journey).
 
 **Six P0 journeys — start from Home and click:**
 [S01 select genres #17](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/17) ·
@@ -26,7 +31,10 @@ on the public deployment.
 [S04 explore without preferences #20](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/20) ·
 [S12 register #44](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/44) ·
 [S13 sign in and out #45](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/45).
-The click path for each is in the [P0 table below](#sprint-3-review--start-here).
+Start at Home: **Start/Preferences** (S01), **My recommendations** (S02),
+**View details** on a card (S03), **Popular movies** without login (S04),
+**Create account** (S12), and **Sign in / Sign out** (S13).
+The detailed paths are in the [P0 table below](#sprint-3-review--start-here).
 
 | Member | GitHub | Sprint 5 issues |
 | --- | --- | --- |

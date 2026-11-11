@@ -1,0 +1,82 @@
+{
+  "verifiedAt": "2026-11-11T10:51:02.525Z",
+  "service": {
+    "id": "srv-dbp96kp42hec73bv94j0",
+    "workspace": "My Workspace",
+    "url": "https://cineai-o9tf.onrender.com/",
+    "repository": "SE-FDA-NEU/ai66a_group3_C1_SE",
+    "branch": "main",
+    "plan": "free",
+    "region": "singapore",
+    "healthCheckPath": "/health",
+    "autoDeploy": "yes",
+    "autoDeployTrigger": "checksPass",
+    "runtime": "python",
+    "singleWorker": true
+  },
+  "liveDeploy": {
+    "id": "dep-dbpaf38n74is73dcl8k0",
+    "status": "live",
+    "commit": "f24ef54699efb2fa26f363107bd31401f9b12e58",
+    "finishedAt": "2026-11-10T05:13:31.192702Z",
+    "observedMigration": "a3d1f8b72c44"
+  },
+  "reviewedMain": {
+    "commit": "50aa9ad4fccc63f5d7ef8186bb296ed12f0d18ee",
+    "ciRun": 42987332068,
+    "conclusion": "success",
+    "migration": "d9a6f2c1e508",
+    "regionalRollout": "deferred by PO; no deploy/migration/enrichment performed"
+  },
+  "logWindows": [
+    {
+      "start": "2026-11-11T10:05:00Z",
+      "end": "2026-11-11T10:10:00Z",
+      "complete": true,
+      "pages": 3,
+      "requestCount": 220,
+      "healthRequests": 72,
+      "clientErrors": 10,
+      "serverErrors": 0,
+      "errorRatePercent": 0,
+      "latencyMs": {
+        "p50": 26.81,
+        "p95": 825.67,
+        "max": 1619.05
+      },
+      "scope": "deduplicated request-completion application logs, all routes including health; 4xx are not server errors; excludes platform/cold-start transit time"
+    },
+    {
+      "start": "2026-11-11T10:15:00Z",
+      "end": "2026-11-11T10:20:00Z",
+      "complete": true,
+      "pages": 2,
+      "requestCount": 106,
+      "healthRequests": 71,
+      "clientErrors": 3,
+      "serverErrors": 0,
+      "errorRatePercent": 0,
+      "latencyMs": {
+        "p50": 26.72,
+        "p95": 693,
+        "max": 1263.14
+      },
+      "scope": "deduplicated request-completion application logs, all routes including health; 4xx are not server errors; excludes platform/cold-start transit time"
+    }
+  ],
+  "requestCorrelation": {
+    "requestId": "req_61966bba966d4324b68440628c4b7de2",
+    "method": "GET",
+    "route": "/health",
+    "status": 200,
+    "serverLatencyMs": 22.36,
+    "logTimestamp": "2026-11-11T10:50:59.771559501Z",
+    "clientElapsedMs": 49724.59,
+    "interpretation": "server time excludes platform wake-up/network time; cold-start-like client observation is not an uptime guarantee"
+  },
+  "limits": [
+    "Baseline measurements are from the old live f24 release, not final regional acceptance.",
+    "Samples include health probes and deliberate 4xx; no bodies, cookies, tokens, IPs, account identifiers or literal user URLs exported.",
+    "No production deploy, migration, import, configuration or branch protection change."
+  ]
+}

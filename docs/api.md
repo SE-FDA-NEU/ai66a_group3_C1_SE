@@ -1,5 +1,11 @@
 # HTTP API contract: Sprint 3 baseline and Sprint 4 extensions
 
+**Sprint 5 current contract:** section 14 specifies the implemented US/GB/SG
+Details query and nullable movie-specific TMDb action on reviewed main. This is
+not proof of public rollout. The [operations baseline](operations.md#1-deployment-and-release)
+records the live SHA/head and deferred coordinated release; earlier sections
+retain their historical revision labels.
+
 Contract revision: `S3-FINAL`, reconciled on 2026-10-18 against Sprint 3
 `main` SHA `f9774cbe7248c29915086d29bf2b9f99c2aa528a`.
 

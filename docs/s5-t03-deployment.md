@@ -1,7 +1,12 @@
 # S5-T03 deployment and acceptance
 
 Issue [#250](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/250).
-Repository preparation is available. The public backend baseline is reachable at [CineAI](https://cineai-o9tf.onrender.com/), with the current observations recorded below. Full UI deployment and admin acceptance remain **Manual/operator verification required**.
+Historical T03 preparation/acceptance is retained below. The 11 November
+[operations baseline](operations.md#1-deployment-and-release) now verifies the
+public React app at [CineAI](https://cineai-o9tf.onrender.com/), live T03 commit
+`f24ef54699efb2fa26f363107bd31401f9b12e58` and the correctly connected Render
+service. Regional rollout is deferred by the PO; effective branch protection,
+final public acceptance and exact-SHA release remain operator/admin work.
 
 ## T02 dependency
 
@@ -143,7 +148,12 @@ Direct HTTPS requests to `https://cineai-o9tf.onrender.com` returned `/health` 2
 
 The operator's Environment screenshot shows Python 3.12.6, Node 24, production mode, Secure cookies, `/tmp/ai66a-overview-tfidf-v1.json` and the runtime database role. The complete database URL, Render source/auto-deploy settings, ingress trust guarantees and service access require separate private/operator confirmation. The screenshot alone does not establish those settings.
 
-The connected Render account can access a different team's workspace and returns 404 for the CineAI service ID `srv-dbp96kp42hec73bv94j0`. GitHub reports `admin=false` for the current contributor. Changes to the correct Render service and effective repository protection therefore require the service owner and repository administrator.
+**Historical T03 access limitation:** the then-connected Render account saw a
+different team's workspace and returned 404 for CineAI
+`srv-dbp96kp42hec73bv94j0`. On 11 November the PO reconnected the correct account;
+authenticated read-only access now verifies CineAI in My Workspace. GitHub still
+reports `admin=false`, so required-check configuration and its authentic settings
+screenshot require a repository administrator. See [T08 evidence](evidence/s5-t08-operations/README.md).
 
 The effective main rules queried through GitHub currently include deletion protection, non-fast-forward protection and one required approving PR review from organization ruleset `21296815`. Required status checks are absent from the effective branch rules. Stale-review dismissal, last-push approval and review-thread resolution are false. Classic branch protection returns 404. An admin must apply and re-query the missing settings before protection acceptance.
 
@@ -163,7 +173,11 @@ Verified on 10 November 2026, Windows, Python 3.12.6 and Node 24.19.0, using the
 | Actual bundle + Neon runtime | A separate local production-mode Uvicorn process used the restricted Neon runtime role, explicit certifi bundle and 989-movie catalogue. Health, ten SPA route refreshes, both generated JS/CSS assets and correlated JSON 404s passed. This verifies the PR bundle locally; public UI acceptance awaits deployment. |
 | Public HTTPS backend | Actual demo login passed with Secure/HttpOnly/SameSite=Lax cookie, subsequent `/api/auth/me` requests passed, cross-origin logout was rejected with 403 while the session remained valid, legitimate logout returned 204, then `/api/auth/me` returned 401. These were API-level checks from the operator machine. Phone/laptop browser UI journeys remain pending. |
 
-The current public backend still serves the pre-T03 root 404. Merge the reviewed PR, wait for green main and deploy that commit before recording public UI/asset acceptance.
+**Historical pre-T03-deploy result:** the public backend then returned root 404.
+The reviewed T03 commit was subsequently deployed; 11 November verification
+shows the React app at the public URL. Keep the earlier result as history, not
+the current status. The newer regional code/head still requires a coordinated
+rollout and its own acceptance evidence.
 
 | Remaining gate | Required result / responsible handoff |
 | --- | --- |

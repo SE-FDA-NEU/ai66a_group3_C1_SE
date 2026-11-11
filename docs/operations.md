@@ -1,109 +1,109 @@
 # CineAI operations
 
-Issue [#255](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/255), owner @vu-huzy.
-Facts are as of **11 November 2026, 15:40 (UTC+7)** on main
-`50aa9ad4fccc63f5d7ef8186bb296ed12f0d18ee`. Every unproven item is marked **Not done**.
-Public URL: <https://cineai-o9tf.onrender.com/>. Setup commands are in [SETUP](SETUP.md).
-The supplied M5 brief says seven sections but enumerates six; the six below follow
-that enumerated order, and the instructor's clarification is still awaited
-([planning record](sprint5-backlog-refinement.md)).
+Owner: @vu-huzy, [T08 #255](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/255).
+Baseline: **11 November 2026, 17:51 UTC+7**, before the PO-deferred regional rollout.
+[Recorded observations](evidence/s5-t08-operations/README.md) distinguish the live
+version, reviewed main and outstanding release acceptance. The M5 brief says
+seven sections but enumerates six; these six follow its table, with the wording
+clarification tracked in [Planning](sprint5-backlog-refinement.md).
 
 ## 1. Deployment and release
 
-| Item | Current state and source |
+| Item | Verified state / operating procedure |
 | --- | --- |
-| Platform | Render Free web service (native Python, Singapore) serving the React build, `/api` and `/health` from one HTTPS origin; Neon Free PostgreSQL 18, AWS `ap-southeast-1`. Settings: [deployment runbook](s5-t03-deployment.md), [Neon record](evidence/s5-t02-neon/README.md). |
-| Merge to green to deploy | PR, required checks and teammate review, merge to `main`, green main CI, then Render **After CI Checks Pass**. The Render dashboard values were not visible to this author; confirmation by the service owner is **Not done**. |
-| Latest green main | `50aa9ad4fccc63f5d7ef8186bb296ed12f0d18ee` (merge of PR #263), [CI run 42987332068](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/42987332068), success. Its code Alembic head is `d9a6f2c1e508`. |
-| Running public release | `/health` returned 200 with `migrationVersion` `a3d1f8b72c44` and `/` returned the React HTML. The Render deployed commit SHA is **Not recorded** (Deploy Details needed). The public runtime is therefore older than main: Details has no `providers`/`watchOptionsUrl` and ignores `country`. |
-| Release identity | No `v1.0` tag exists. Exact-SHA identity, tag and final deployment belong to [#256](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/256): **Not done**. |
-| Exercised rollback | Rehearsed on isolated PostgreSQL targets only ([recovery evidence](evidence/s5-t06-recovery/README.md)): reviewed T03 source `f24ef54699efb2fa26f363107bd31401f9b12e58` returned health 503 against the regional schema and 200 against a restored pre-provider archive. A Render dashboard redeploy of an earlier SHA was **Not done**. |
-| Safe forward order | Fresh private backup, migrate with the operator role, deploy the matching green commit, check `/health` and Details, then enrich. `/health` requires the exact code head, so never migrate ahead of the code. See [recovery runbook](s5-t06-postgresql-recovery.md). |
+| URL/platform | <https://cineai-o9tf.onrender.com/>; Render **Free**, native Python, Singapore, one worker; Neon PostgreSQL **18.6**, Singapore. [SETUP](SETUP.md#postgresql-18-neon-and-render-public-runtime) |
+| Render identity | `cineai`, `srv-dbp96kp42hec73bv94j0`, **My Workspace**. Connected account now sees the correct service. Branch `main`, repository `SE-FDA-NEU/ai66a_group3_C1_SE`, `/health`, Free and `autoDeployTrigger=checksPass` were read from Render; no settings changed |
+| Actual live release | Deploy `dep-dbpaf38n74is73dcl8k0`, **live**, SHA `f24ef54699efb2fa26f363107bd31401f9b12e58`; health 200/head `a3d1f8b72c44`. Regional DTO/selector is not deployed |
+| Reviewed main baseline | `50aa9ad4fccc63f5d7ef8186bb296ed12f0d18ee`, [green CI 42987332068](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/42987332068), code head `d9a6f2c1e508`. Recheck the actual final SHA after the remaining PR merges |
+| Merge → CI → deploy | Reviewed PRs, required checks/approval, green main CI, configured **After CI Checks Pass**. The setting is verified; a complete failed-CI/no-deploy experiment is not claimed |
+| One-batch release hold | PO wants preparation before one Manual Deploy. Approve/prepare partial T07/T08/C02 deliveries with `Refs`; do not close them. Use the [C02 handoff](s5-t08-c02-handoff.md#one-batch-release-plan) to prevent unintended auto-deploys; this PR does not toggle Render or deploy |
+| Safe rollout | Fresh verified private backup; freeze green main SHA; coordinate the matching deployment, exact-head migration and grants in an agreed window. A temporary 503 while code/schema differ is possible. Wait for **live + health 200 at the expected head**, then enrich US/GB/SG. Do not migrate during preparation or reimport the existing movie catalogue just for providers |
+| Rollback/recovery | [T06](s5-t06-postgresql-recovery.md) rehearsed old T03 code: 503 on regional schema, 200 on an isolated pre-provider restore. A fresh runtime backup was also restored/compared across 11 snapshot tables on 11 November. Neither is a Render rollback. Restore into an isolated target and verify compatibility before switching; never overwrite later writes or silently discard regional data |
+| Final identity | **Pending C02**: verified running SHA = selected green-main SHA = `v1.0` target. No tag/deploy/rehearsal/PO acceptance is claimed by this baseline |
 
 ## 2. Continuous integration and protected main
 
-The `CI` workflow ([ci.yml](../.github/workflows/ci.yml)) runs on every push, on pull requests to main/develop and manually.
+`CI` ([ci.yml](../.github/workflows/ci.yml)) runs on pushes, main/develop PRs and manual dispatch.
 
-| Required context | Steps |
+| Job / context to require | Checks |
 | --- | --- |
-| Detect stack | Decide whether storage and test-bootstrap checks apply to the diff. |
-| Python tests | Locked install, Ruff, 40 P0 tests, P0 traceability, regional provider/CLI tests, optional storage/bootstrap checks, health/serving/session tests. |
-| PostgreSQL 18 integration | `postgres:18` service, PostgreSQL integration suite with no skips, PostgreSQL 18 clients, isolated native recovery rehearsal. |
-| Node build and tests | `npm ci`, lint, the 42-case regional provider UI suite, production build. |
-| No secrets committed | Credential-pattern scan and forbidden-file check. |
+| Detect stack | Select storage/bootstrap scope from the diff |
+| Python tests | Locked install, Ruff, **40 P0** cases, traceability, focused provider/CLI and affected storage/bootstrap checks, health/serving/session boundaries |
+| PostgreSQL 18 integration | `postgres:18`, authenticated integration and native dump/restore with major-18 clients, zero DB skips |
+| Node build and tests | `npm ci`, ESLint, 42 regional-provider UI cases, TypeScript/production build. T07 PR #265 adds 18 focused acceptance-verifier cases; not yet in this main baseline |
+| No secrets committed | Credential patterns and forbidden artifacts |
 
-| Evidence | Result |
+| Evidence | Actual result |
 | --- | --- |
-| Actual duration | The last six push-to-main runs (#258 to #263) took 1m06s to 1m26s. Run 42987332068: created 08:28:36Z, finished 08:29:54Z, 1m18s. |
-| Green main run | [42987332068](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/42987332068), all five jobs succeeded. |
-| Effective protection (GitHub API, 11 November) | Ruleset 21296815 supplies deletion block, non-fast-forward block and a pull-request rule with one approving review. Stale-review dismissal, last-push approval and thread resolution are off. **No required status checks** are present. |
-| Authentic protection screenshot | **Not done.** A repository administrator must apply the settings in the [runbook](s5-t03-deployment.md#main-protection-and-deploy-gate) and capture the real screen. No image is fabricated. |
-| Review hygiene | The `Scrum hygiene` workflow requires an issue link and a reviewer other than the author. |
+| Main CI | Run [42987332068](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/actions/runs/42987332068), five jobs green, 1m18s (08:28:36–08:29:54Z). Recheck after final merges |
+| Effective rules API | [Snapshot](evidence/s5-t08-operations/github-protection.json): deletion/non-fast-forward protection and one PR approval; no `required_status_checks` entry returned. Contributor has `push=true`, `admin=false`. Complete protection is **not certified** |
+| Admin action/screenshot | **Pending:** admin configures the five required contexts, confirms PR + approval, and captures the real branch/rules settings screen. Stale-review dismissal is recommended team hygiene, not an extra M5 minimum. API JSON is not the required settings screenshot |
+| Review | Scrum hygiene checks issue/approval metadata; substantive non-contributor review must still precede merge |
 
 ## 3. Monitoring, logs and incident response
 
-Source of record: the Render service **Logs** and **Events** pages plus `GET /health`. Logging, request IDs and
-redaction are defined in the [deployment runbook](s5-t03-deployment.md#serving-security-health-and-logs).
-Check from a terminal:
+Read **CineAI → Logs/Events** and `/health`; filter application request-completion
+lines, deduplicate `request_id`, and use `status`/`latency_ms`. Error rate is
+`5xx / completed requests × 100`; expected 4xx, startup lines and tracebacks are
+not server errors. Samples include health probes. App time excludes wake-up/network time.
 
-```bash
-curl -s -o /dev/null -w "%{http_code} %{time_total}s\n" https://cineai-o9tf.onrender.com/health
-```
-
-The Free service sleeps when idle, so the first request can take about a minute. These checks neither
-prevent sleep nor imply guaranteed uptime, and no keep-alive pinger is used.
-
-| Signal | Source and interval | Threshold (proposed, awaiting PO/owner confirmation) | Owner |
-| --- | --- | --- | --- |
-| Availability | `/health` once daily and before each demonstration | Not 200, or a warm answer slower than 5 s; repeat after 5 minutes, a second failure is an incident | @vu-huzy, backup @kietxuan |
-| Error rate | Render Logs over one observation window: server-error lines divided by all request lines | Above 2% in a window, or the same route failing repeatedly | @vu-huzy |
-| Response time | Log `latency` field and the curl timing | Warm `/health` above 1 s repeatedly; a cold first request is expected to be slow | @vu-huzy |
-| Quotas | Render and Neon consoles, daily | Any warning or exhausted allowance | Render @anotify-vie, Neon @NguyenTuanAnh0608 |
-
-| Observation | Source | Result |
+| Signal | Initial response threshold and frequency | Owner / backup |
 | --- | --- | --- |
-| 11 Nov 2026, 15:37 to 15:40 | `curl` from the author's machine, not Render logs | First `/health` 53.7 s (consistent with wake-up; idle state not independently confirmed), then 0.42 s and 0.27 s, all 200. `/api/movies?limit=1` 0.30 s with 989 movies. Unknown `/api` and missing asset return JSON 404 with a `requestId`; `/health` returns an `X-Request-ID` header. |
-| Error-rate series over explicit intervals | Render Logs | **Not done.** Log access was unavailable to this author. The service owner must record windows, request counts and 5xx counts. |
-| Log-side request correlation | Render Logs | **Not done.** The response side is confirmed above; matching an ID in Render Logs is pending. |
+| Health | Daily/before demos; non-200 or repeated warm health >1,000 ms: repeat after 5 minutes, then investigate. Allow up to 90 s for a first Free-instance wake-up; no sleep-prevention pinger | @vu-huzy / @kietxuan |
+| Error rate | 5-minute windows when checking logs or investigating; >2% or repeated same-route 5xx triggers investigation; record numerator/denominator | @vu-huzy / @kietxuan |
+| Response time | Watch `latency_ms` p50/p95/max by route; repeated warm-health threshold above triggers investigation. Baseline route mix is not a promised SLO | @vu-huzy / @kietxuan |
+| Quotas | Daily Render/Neon console warnings and before heavy operator jobs | Render @anotify-vie; Neon @NguyenTuanAnh0608 |
 
-| Incident step | Action |
-| --- | --- |
-| Confirm and record | Repeat the check, note time, status and `requestId`. Never paste cookies, URLs with identifiers or connection strings. |
-| Diagnose | Check Render Events for a running deploy, then Logs for startup `error_type`, `sqlstate` or `errno`. A 503 can mean a head mismatch, so hold deployment and never bypass health. |
-| Escalate | Runtime and deploys: @anotify-vie then @kietxuan. Database access: @NguyenTuanAnh0608 then @hoang3003. Backup and restore: @hoang3003 then @NguyenTuanAnh0608. Decisions: @kietxuan. |
-| Record | Open a GitHub issue with timeline, SHA, head and outcome. |
+| 11 November baseline interval, UTC+7 | Completed / health / 4xx / 5xx | Error rate | App p50 / p95 / max, ms |
+| --- | --- | --- | --- |
+| 17:05–17:10 | 220 / 72 / 10 / 0 | 0% | 26.81 / 825.67 / 1619.05 |
+| 17:15–17:20 | 106 / 71 / 3 / 0 | 0% | 26.72 / 693 / 1263.14 |
+
+Both paginated log windows were fully fetched. [Redacted samples and calculation](evidence/s5-t08-operations/README.md)
+are reproducible. A 17:50 client health took 49,724.59 ms, with the same response
+request ID logged by Render at 22.36 ms: consistent with platform/wake-up overhead,
+not evidence of steady-state app latency. No zero-error/uptime guarantee follows.
+
+For an incident: record time/SHA/status/request ID, repeat health, inspect Events
+and safe Logs (`error_type`, `sqlstate`, `errno`), and open an issue with the
+redacted timeline. Do not log passwords, cookies, tokens, account data or literal
+user query strings. Deploy: @anotify-vie → @kietxuan; DB: @NguyenTuanAnh0608 →
+@hoang3003; recovery: @hoang3003 → @NguyenTuanAnh0608. Never bypass stale-head health.
 
 ## 4. Risks and technical debt
 
 | Item | Layer | What could happen | Plan |
 | --- | --- | --- | --- |
-| Public runtime behind main | Deployment and database | Regional Details and selector are absent publicly; migrating the database before the code makes `/health` fail | Backup, migrate, deploy and enrich as one rehearsed change, tracked by [#254](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/254) and [#256](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/256) |
-| Backup storage is a local operator folder | Data | Disk loss leaves no restorable copy; daily execution and independent reproduction are not done | Pending items listed in [#253](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/253) and its [evidence](evidence/s5-t06-recovery/README.md#remaining-closure-work) |
-| Main lacks required checks and stale-review dismissal | Process | A red or outdated candidate could merge | Repository administrator applies the runbook settings; C02 audits at [#256](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/256) |
-| Free-plan sleep, one worker, ephemeral disk | Runtime | A cold request takes about a minute (53.7 s seen); the NLP index rebuilds in `/tmp` | Accepted: no paid plan in scope. Disclosed, checked before demos, no uptime claim |
-| Neon Free shared compute and quota | Database | Development or test jobs slow or exhaust the runtime database | Accepted: separate databases, no heavy jobs near demos, daily quota check ([Neon record](evidence/s5-t02-neon/README.md)) |
-| TMDb regional coverage and terms | External data | Many movies lack a market (development run: no data for US 89, GB 134, SG 283 of 989) | Accepted: neutral unknown wording, TMDb/JustWatch attribution, operator-only token, refresh with `--refresh` |
-| No automated alerting | Monitoring | An outage goes unnoticed between daily checks | Accepted for this scope: manual daily check by the monitoring owner |
+| Public behind main | infrastructure | Missing regional UI; an uncoordinated migration breaks exact-head health | Coordinated backed-up rollout and public acceptance: [#254](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/254), [#256](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/256) |
+| Required checks not evidenced | infrastructure | A red candidate could merge | Admin configuration and authentic screenshot: [#250](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/250), C02 audit |
+| Local-only backups | data | Disk loss leaves no durable recovery copy | Durable destination, operator access, daily execution and independent reproduction remain [#253](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/253) follow-up |
+| Free sleep/ephemeral index | infrastructure | Slow first request; index rebuilt after replacement | Accepted: free hosting is the agreed scope; disclose, check before demos and rebuild derived state |
+| Shared Neon quota | infrastructure | Heavy jobs affect runtime capacity | Accepted: separate databases, quota checks and quiet import/test windows |
+| TMDb regional gaps | data | A selected market has no provider/link information | Accepted: neutral unknown wording, exact-market nullable link and attribution; development coverage is not public acceptance |
+| Manual monitoring | infrastructure | Incidents between daily checks may be missed | Accepted for this free-plan scope: named owner/backup and incident escalation |
+| Test automation is not a phone/PO decision | tests | Emulation or green CI is mistaken for full acceptance | Physical device, real rehearsal and PO decision: [#254](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/issues/254) |
 
 ## 5. Maintenance plan
 
-| Area | What to do | Owner | How often |
+| Area | What to do | Owner / backup | How often |
 | --- | --- | --- | --- |
-| Bugs | Triage new GitHub issues, reproduce locally, fix by reviewed PR | Owner of the affected area; @kietxuan prioritises | On report; reviewed at each daily check |
-| Dependencies | Keep lockfiles, rerun the CI jobs, audit production packages with `npm --prefix frontend audit --omit=dev` | @anotify-vie (proposed) | Before any release or demo |
-| Backups | Logical backup after public writes and before schema or provider changes; keep the latest seven successes | @hoang3003, backup @NguyenTuanAnh0608 | Daily after writes and before changes |
-| Monitoring | Health, error-rate, latency and quota checks from section 3 | @vu-huzy, backup @kietxuan | Daily and before demos |
-| Documentation | Update this file, README and SETUP when URL, head, commands, accounts or owners change, then recheck links | @vu-huzy | Each release or change |
-| Service retention | Keep the URL available and extend the date when the instructor announces grading | @kietxuan, backup @anotify-vie | Reconfirm at each month end |
+| Bugs | Reproduce, prioritise and fix by reviewed PR | Area owner; @kietxuan prioritises | On report; daily triage |
+| Dependencies | Review locks/advisories, `npm --prefix frontend audit --omit=dev`, affected CI before adoption | @vu-huzy / @anotify-vie | Before releases/demos |
+| Backups | Private logical backup, verify restoration and retain seven successful copies | @hoang3003 / @NguyenTuanAnh0608 | Daily after writes and before changes; durable automation/access pending |
+| Monitoring | Health/log error rate/latency/quota checks and response above | @vu-huzy / @kietxuan | Daily, before demos, on failure |
+| Documentation | Keep URL/SHA/commands/accounts/owners true; recheck links | @vu-huzy / @kietxuan | Every release/change |
+| Retention | Keep service and extend the deadline when grading is announced | @kietxuan / @anotify-vie | Confirm at each month end |
 
-Latest required maintenance date: **12 December 2026**. It extends to one calendar month after the actual v1.0
-release and to the grade-publication date (still unannounced), whichever is latest.
+Retain at least through **12 December 2026**, extending to one calendar month
+after actual `v1.0` and grade publication, whichever is latest. Daily execution,
+shared-backup access and final maintenance handoff are not claimed by this plan.
 
 ## 6. Lessons learned
 
 | What happened | What changed | What to do differently |
 | --- | --- | --- |
-| The VN-only provider run found no data for all 989 movies and TMDb's region list omitted VN ([T04 history](evidence/s5-t04-providers/README.md)) | The PO approved US/GB/SG on 10 November; the VN run stays as dated history | Probe real provider coverage before committing a UI scope |
-| The first recovery comparator exited 0 without comparing any table ([T06](evidence/s5-t06-recovery/README.md)) | It now registers all models, refuses empty metadata and compares 12 tables | Give every verifier a deliberate-mutation test that must fail |
-| `/health` requires the exact code head, so the regional migration could not reach the runtime before its code | Runbooks state the rollout order and the rollback limit | Schedule migration and deploy as one change and rehearse old code on the new schema early |
-| Two stale-empty UI cases showed no warning ([T05](evidence/s5-t05-regional-ui.md)) | A warning now appears for every stale result, with regression tests | List every status and link combination as test cases before building |
+| VN had no data for 989 movies | PO approved US/GB/SG; the actual VN run stays dated history | Probe market coverage before promising availability |
+| Comparator once returned 0 without comparing tables | T06 registers all 12 models and rejects empty metadata | Deliberately break every important verifier |
+| Source CI was green while public code/head stayed old | T07 records live SHA/API and named failed public checks | Verify deployment identity as well as source CI |
+| Two stale-empty provider cases omitted their warning | T05 shows the warning for every stale combination | Enumerate status/link combinations before UI work |
+| Windows WIN1252 restore rejected multilingual TMDb titles | T07 restored the real catalogue successfully with UTF8 | Check server/target encoding before restore |

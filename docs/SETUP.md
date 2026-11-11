@@ -201,6 +201,12 @@ acceptance still requires durable private backup storage with primary/backup
 operator access and a genuine independent reproduction. Git stores the runbook
 and redacted evidence. Keep sensitive database archives in private storage.
 
+For an isolated local restore on Windows, create the target with UTF8 encoding
+(for example, `createdb --template=template0 --encoding=UTF8 --lc-collate=C --lc-ctype=C <new-target>`).
+Verify `SHOW server_encoding` returns `UTF8`: the Windows default WIN1252 cannot
+restore all multilingual TMDb titles. Neon already uses UTF8; do not recreate
+the public database to apply this local-test instruction.
+
 After pulling changes, back up valuable SQLite data consistently and run
 `alembic upgrade head` before restarting the backend. Compare `alembic current`
 with `alembic heads`; use the actual repository head, not an old task's revision.
@@ -308,6 +314,13 @@ the restricted runtime role `SELECT` on `movie_provider_checks` and
 head in the running code, migrate the **public** database only together with the
 reviewed matching deployment.
 
+The PO has deferred the public rollout until the remaining PRs are ready.
+These are operator instructions, not a request to migrate now. Freeze and
+recheck the final green-main SHA, back up the actual runtime, then coordinate
+migration/grants with deployment in one agreed window. A temporary health 503
+while versions differ is possible. Wait for the matching release to be live
+and healthy before enrichment; follow the [release handoff](s5-t08-c02-handoff.md#one-batch-release-plan).
+
 ### 2. Explicit catalogue import and whole-catalogue enrichment
 
 Import is an explicit operator action; the web service never imports. Use the
@@ -326,8 +339,19 @@ The provider command also stores each movie's selected-country TMDb
 watch-options link from the same payload, so there is no separate link command.
 The actual 9 November Neon import accepted 989 movies and rejected 11 duplicate
 TMDb IDs ([record](evidence/s5-t02-neon/README.md)); expect an actual count near
-1,000, not an exact one. Repeat a command to resume; wait for any reported
-`retry_after_seconds` first. Add `--refresh` only to recheck completed pairs.
+1,000, not an exact one. On an existing accepted catalogue, do not repeat the
+50-page import just to add providers: an import can replace its active snapshot.
+Run only the required enrichment against that active catalogue.
+
+Resume semantics differ by mode:
+
+- Poster/backdrop `--all` deliberately revisits the entire active-ID snapshot,
+  including previous valid/null results; another invocation is a full refresh.
+- Trailer `--all` resumes pending/unattempted work.
+- Provider `--all --countries US GB SG` resumes eligible movie-country pairs;
+  `--limit 300` is a committed batch size, never the total catalogue cap.
+  Wait for any reported `retry_after_seconds`. Only provider mode supports
+  `--refresh` to recheck already successful/no-data pairs.
 
 ### 3. Regional checks: what the counts mean
 
@@ -369,8 +393,10 @@ overwritten:
   --password-env REVIEW_ACCOUNT_PASSWORD
 ```
 
-The PO-approved public login values are published in the README only when
-supplied; none is recorded in this file.
+The PO-approved public demo values are in the [README first screen](../README.md).
+Public login/session/logout was verified on 11 November 2026; no account was
+created or password changed for that check. Provisioning does not reset an
+existing account, so verify an actual login before claiming credentials work.
 
 ### 5. Index, startup, cold start and recovery
 
@@ -391,9 +417,19 @@ means a stale or unreachable database, not a reason to bypass the check.
 
 For backup, isolated restore, comparison and code rollback use the
 [recovery runbook](s5-t06-postgresql-recovery.md); an index file is never a backup.
-Short form: `pg_dump --format=custom`, `pg_restore --exit-on-error` into a new empty
-database, `python -m app.cli.compare_recovery --source-database <db> --target-database <db>`
-with private `PG*`/URL settings, then rebuild and check the index on the restore.
+Use the full guarded backup/restore commands in that runbook. Comparison needs
+**separate** private `RECOVERY_SOURCE_URL` and `RECOVERY_TARGET_URL` values and
+independently confirmed database names:
+
+```powershell
+.\.venv\Scripts\python.exe -m app.cli.compare_recovery `
+  --source-database '<confirmed-source-db>' `
+  --target-database '<confirmed-isolated-restore-db>'
+```
+
+The `RECOVERY_TEST_SOURCE_URL` / `RECOVERY_TEST_TARGET_URL` names below are for
+the isolated test suite, not the comparator CLI. Rebuild/check the index on the
+restore. Do not replace the live database from an old archive that predates new writes.
 
 ### 6. PostgreSQL 18 tests
 
@@ -512,15 +548,16 @@ the current routes on the imported catalogue.
 
 ### Public application-only review account
 
-The PO confirmed that the following credentials are **only for this project's
-local demonstration**, are not a Gmail/service password, and may be published.
+The PO confirmed that these are **project-demo-only** credentials, are not a
+Gmail/service password, and may be published. Public login/session/logout also
+passed on 11 November 2026 ([evidence](evidence/s5-t08-operations/demo-account-check.json)).
 
 | Field | Review value |
 |---|---|
 | Email | `kietxuan@gmail.com` |
 | Password | `123456789` |
-| Purpose | Local M3 application review only; no administrator role |
-| Database | The same configured SQLite database with its accepted TMDb catalogue |
+| Purpose | Shared application-user demonstration; no administrator role |
+| Database | Public: the existing Neon runtime. Local: the configured SQLite TMDb catalogue |
 
 After the successful import, the account command shown above creates the user
 in that database with an Argon2id password hash. `--confirm-local-demo` opts
@@ -535,8 +572,10 @@ preferences, ratings, sessions and catalogue. If the email already exists
 with a different password, it exits nonzero without resetting that password
 or deleting data. Contact the account owner instead of overwriting the database.
 The command requires explicit opt-in, refuses `APP_ENV=production`/`prod`,
-does not run at application startup and must never be used on a public or
-production deployment. Rotate/remove the demo account before such deployment.
+does not run at application startup and must never be used to provision a public
+PostgreSQL deployment. For that target use the guarded `provision_account` flow
+above; keep service/operator credentials private. The approved shared app-demo
+account is intentional and already works publicly. Never use it for personal data.
 
 The instructor can start at `/`, choose **Sign in**, and use this account.
 After sign-in, Home stays open. Choose **My recommendations** to view results.

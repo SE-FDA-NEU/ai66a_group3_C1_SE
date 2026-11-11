@@ -815,7 +815,25 @@ merged as PRs #261, #263 and #262. Evidence for each:
 [T05](evidence/s5-t05-regional-ui.md),
 [T06](evidence/s5-t06-recovery/README.md).
 
-The public runtime had **not** received the regional migration: `/health` reported
-`a3d1f8b72c44` while main's code head is `d9a6f2c1e508`. Final velocity, public
-acceptance, the exact deployed SHA and the v1.0 tag remain with T07 and C02. Live
-monitoring, risks and maintenance are in [operations](operations.md).
+The public runtime has **not** received the regional migration: `/health` reports
+`a3d1f8b72c44` while main's code head is `d9a6f2c1e508`. After reconnecting the
+correct Render workspace on 11 November, authenticated Deploy Details confirmed
+the live SHA **`f24ef54699efb2fa26f363107bd31401f9b12e58`**, Free/Singapore/main,
+`/health` and After CI Checks Pass. No deploy, migration, enrichment or service
+configuration change was performed; the PO deferred production rollout until
+the readiness PRs are prepared.
+
+T08 recorded two complete Render-log windows (220 and 106 request completions,
+zero 5xx; p95 app processing 825.67 and 693 ms), a real response/log request-ID
+correlation, and successful public demo login/session/logout. These are baseline
+observations of f24, not acceptance of the future regional candidate. See
+[operations evidence](evidence/s5-t08-operations/README.md).
+
+[T07 PR #265](https://github.com/SE-FDA-NEU/ai66a_group3_C1_SE/pull/265) contains
+fixed verifiers and real-TMDb technical evidence; physical phone, timed rehearsal
+and PO acceptance remain open. Preparation may merge with Refs while those gates
+remain open. [The C02 handoff](s5-t08-c02-handoff.md#one-batch-release-plan)
+records the intended single manual-release window and the need to control
+auto-deploy on actual main commit messages. It does not promise one rollout if
+final acceptance finds defects. Final velocity, acceptance, selected release SHA,
+v1.0 and the real submission receipt remain C02 facts, not invented task/commit points.

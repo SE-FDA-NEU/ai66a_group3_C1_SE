@@ -38,6 +38,18 @@ runtime rollout of the regional migration). The operator roster below,
 retention date and monitoring owners are unchanged. The current public runtime
 status and risks are in [operations](operations.md).
 
+**11 November readiness amendment:** the PO deferred production deploy,
+migration and enrichment until the remaining readiness PRs are prepared, aiming
+for one Manual Deploy of a frozen green-main candidate. T07/T08/C02 may merge
+partial documentation with Refs, but their public/human/external acceptance
+must remain open until evidenced. Correct Render access is now verified;
+actual live SHA is `f24ef54699efb2fa26f363107bd31401f9b12e58`, not the newer
+regional main candidate. Auto-deploy remains After CI Checks Pass; the
+[release handoff](s5-t08-c02-handoff.md#one-batch-release-plan) explains the
+explicit merge-commit skip phrase and exact-SHA/CI checks. No service settings,
+issue dependencies or original Planning screenshots were changed. This is a
+batching preference, not permission to invent final results or ignore a defect.
+
 > **Historical record.** Everything from here to "Author verification" is the
 > 6 November Planning snapshot. Its issue titles, the T04 CI / T05 monitoring
 > assignment, the PostgreSQL 17 reference in older logs and the VN deferral are
